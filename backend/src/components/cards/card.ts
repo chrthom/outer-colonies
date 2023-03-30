@@ -46,8 +46,8 @@ export class HullMultipart {
 
 export abstract class EquipmentCard extends Card {
     readonly profile!: EquipmentProfile;
-    readonly attackProfile!: AttackProfile;
-    constructor(id: number, name: string, profile: EquipmentProfile, attackProfile: AttackProfile) {
+    readonly attackProfile?: AttackProfile;
+    constructor(id: number, name: string, profile: EquipmentProfile, attackProfile?: AttackProfile) {
         super(id, name, CardType.Equipment);
         this.profile = profile;
         this.attackProfile = attackProfile;
@@ -55,11 +55,26 @@ export abstract class EquipmentCard extends Card {
 }
 
 export class EquipmentProfile {
-    
+    readonly energy: number;
+    readonly hp: number;
+    readonly speed: number;
+    readonly pointDefense: number;
+    readonly shield: number;
+    readonly armour: number;
+    readonly theta: number;
+    readonly xi: number;
+    readonly phi: number;
+    readonly omega: number;
+    readonly delta: number;
+    readonly psi: number;
 }
 
 export class AttackProfile {
-    
+    readonly range: number;
+    readonly damage: number;
+    readonly pointDefense: number;
+    readonly shield: number;
+    readonly armour: number;
 }
 
 module.exports = {

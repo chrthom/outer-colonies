@@ -1,13 +1,11 @@
 {
   "name": "outercolonies-server",
   "version": "1.0.0",
-  "description": "",
   "main": "dist/app.js",
   "scripts": {
     "start": "npx nodemon src/app.ts"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Christopher Thomsen",
   "dependencies": {
     "express": "^4.17.1",
     "nodemon": "^2.0.22",
