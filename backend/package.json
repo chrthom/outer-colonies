@@ -2,9 +2,9 @@
   "name": "outercolonies-server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "npx nodemon src/app.ts"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,9 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.1",
+    "@types/node": "^18.15.11",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.5.0",
     "typescript": "^5.0.2"
   }
 }

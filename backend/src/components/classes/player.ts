@@ -1,6 +1,9 @@
-const cards = require('./cards');
+import Cards from './cards';
 
-class Player {
+export default class Player {
+    name!: string;
+    activeDeck = [];
+    game = {};
     constructor(name) {
         this.name = name;
         this.activeDeck = [];
@@ -9,5 +12,3 @@ class Player {
         };
     }
 }
-
-module.exports = Player;

@@ -1,5 +1,5 @@
-const Player = require('./classes/player');
-const { v4: uuidv4 } = require('uuid');
+import Player from './classes/player';
+import { v4 as uuidv4 } from 'uuid';
 
 const mm = 'matchmaking';
 const gameRoomPrefix = 'game-';
@@ -13,17 +13,18 @@ function numberOfPlayersInMatchMaking(io) {
     return clients ? clients.size : 0;
 }
 
-function initGame(socket1, socket2) {
+function initGame(io, socket1, socket2) {
     let gameRoom = gameRoomPrefix + uuidv4();
     socket1.leave(mm);
     socket1.join(gameRoom);
     socket1.player.game.deck = socket1.player.activeDeck;
     socket2.leave(mm);
     socket2.join(gameRoom);
-    io.sockets.in(gameRoom).emit(mm, 'start', clientSocket.player.name + ' vs. ' + partnerSocket.player.name);
+    socket2.player.game.deck = socket2.player.activeDeck;
+    io.sockets.in(gameRoom).emit(mm, 'start', socket1.player.name + ' vs. ' + socket2.player.name);
 }
 
-const matchMakingSocketListeners = (io, socket) => {
+export const matchMakingSocketListeners = (io, socket) => {
     socket.on('login', (name) => {
         if (name) {
             console.log('Player logged in: ' + name);
@@ -34,7 +35,7 @@ const matchMakingSocketListeners = (io, socket) => {
     });
 }
 
-const matchMakingCron = (io) => {
+export const matchMakingCron = (io) => {
     const clients = clientsInMatchMaking(io);
     const numClients = numberOfPlayersInMatchMaking(io);
     if (numClients > 1) {
@@ -43,13 +44,8 @@ const matchMakingCron = (io) => {
         for (const clientId of clients) {
             const clientSocket = io.sockets.sockets.get(clientId);
             clientSocket.emit(mm, 'search', numClients - 1);
-            if (partnerSocket) initGame(clientSocket, partnerSocket)
+            if (partnerSocket) initGame(io, clientSocket, partnerSocket)
             else partnerSocket = clientSocket;
         }
     }
 }
-
-module.exports = {
-    matchMakingSocketListeners,
-    matchMakingCron
-};

@@ -1,19 +1,18 @@
-const express = require('express');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
+import { gameSocketListeners } from './components/game';
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: '*',
         methods: ['PUT', 'GET', 'POST', 'DELETE', 'OPTIONS'],
-        headers: '*',
         credentials: false
     }
 });
-
-const { matchMakingSocketListeners, matchMakingCron } = require('./components/matchmaking');
-const { gameSocketListeners } = require('./components/game');
 
 io.on('connection', (socket) => {
     console.log('Player connected: ' + socket.id);
