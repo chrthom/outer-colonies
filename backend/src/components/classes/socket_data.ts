@@ -1,4 +1,6 @@
 import Cards from './cards';
+import { Card } from '../cards/card'
+import Match from './match'
 
 const defaultDeck = [
     Cards.card160,
@@ -29,14 +31,11 @@ const defaultDeck = [
 
 export default class SocketData {
     name!: string;
-    activeDeck = [];
-    game = {};
-    constructor(name) {
+    activeDeck!: Array<Card>;
+    playerNo: number;
+    match: Match;
+    constructor(name: string) {
         this.name = name;
         this.activeDeck = defaultDeck;
-        this.game = {
-            room: null,
-            deck: null
-        };
     }
 }

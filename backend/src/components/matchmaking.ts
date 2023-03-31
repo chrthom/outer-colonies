@@ -1,8 +1,10 @@
 import SocketData from './classes/socket_data';
 import { v4 as uuidv4 } from 'uuid';
+import Match from './classes/match';
+import Player from './classes/player';
 
 const mm = 'matchmaking';
-const gameRoomPrefix = 'game-';
+const gameRoomPrefix = 'match-';
 
 function clientsInMatchMaking(io) {
     return io.sockets.adapter.rooms.get(mm);
@@ -13,22 +15,19 @@ function numberOfPlayersInMatchMaking(io): number {
     return clients ? clients.size : 0;
 }
 
-function shuffle<T>(array: Array<T>): Array<T> {
-    return array.sort(() => Math.random() -0.5)
-}
-
-function joinGame(socket, gameRoom): void {
+function joinGame(socket, match: Match, playerNo: number): void {
     socket.leave(mm);
-    socket.join(gameRoom);
-    socket.data.game.room = gameRoom;
-    socket.data.game.deck = shuffle(socket.data.activeDeck);
+    socket.join(match.room);
+    socket.data.match = match;
+    socket.data.playerNo = playerNo;
+    match.players[playerNo] = new Player(socket.data.name, socket.data.activeDeck);
 }
 
 function initGame(io, socket1, socket2): void {
-    let gameRoom = gameRoomPrefix + uuidv4();
-    joinGame(socket1, gameRoom);
-    joinGame(socket2, gameRoom);
-    io.sockets.to(gameRoom).emit(mm, 'start', socket1.data.name + ' vs. ' + socket2.data.name);
+    const match = new Match(gameRoomPrefix + uuidv4());
+    joinGame(socket1, match, 0);
+    joinGame(socket2, match, 1);
+    io.sockets.to(match.room).emit(mm, 'start', match.matchName());
 }
 
 export function matchMakingSocketListeners(io, socket): void {

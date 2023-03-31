@@ -1,4 +1,4 @@
-abstract class Card {
+export abstract class Card {
     readonly id!: number;
     readonly name!: string;
     readonly type!: CardType;
