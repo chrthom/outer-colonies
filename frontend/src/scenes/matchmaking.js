@@ -30,6 +30,13 @@ export default class Matchmaking extends Phaser.Scene {
                     break;
                 case 'start':
                     self.statusText.setText('Trete Spiel bei: ' + params);
+                    this.socket.off('connect');
+                    this.socket.off('matchmaking');
+                    setTimeout(function() {
+                        self.scene.start('Game', {
+                            socket: self.socket
+                        })
+                    }, 3000);
                     break;
             }
         });

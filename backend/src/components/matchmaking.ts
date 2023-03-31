@@ -1,4 +1,4 @@
-import Player from './classes/player';
+import SocketData from './classes/socket_data';
 import { v4 as uuidv4 } from 'uuid';
 
 const mm = 'matchmaking';
@@ -8,34 +8,41 @@ function clientsInMatchMaking(io) {
     return io.sockets.adapter.rooms.get(mm);
 }
 
-function numberOfPlayersInMatchMaking(io) {
+function numberOfPlayersInMatchMaking(io): number {
     const clients = clientsInMatchMaking(io);
     return clients ? clients.size : 0;
 }
 
-function initGame(io, socket1, socket2) {
-    let gameRoom = gameRoomPrefix + uuidv4();
-    socket1.leave(mm);
-    socket1.join(gameRoom);
-    socket1.player.game.deck = socket1.player.activeDeck;
-    socket2.leave(mm);
-    socket2.join(gameRoom);
-    socket2.player.game.deck = socket2.player.activeDeck;
-    io.sockets.in(gameRoom).emit(mm, 'start', socket1.player.name + ' vs. ' + socket2.player.name);
+function shuffle<T>(array: Array<T>): Array<T> {
+    return array.sort(() => Math.random() -0.5)
 }
 
-export const matchMakingSocketListeners = (io, socket) => {
+function joinGame(socket, gameRoom): void {
+    socket.leave(mm);
+    socket.join(gameRoom);
+    socket.data.game.room = gameRoom;
+    socket.data.game.deck = shuffle(socket.data.activeDeck);
+}
+
+function initGame(io, socket1, socket2): void {
+    let gameRoom = gameRoomPrefix + uuidv4();
+    joinGame(socket1, gameRoom);
+    joinGame(socket2, gameRoom);
+    io.sockets.to(gameRoom).emit(mm, 'start', socket1.data.name + ' vs. ' + socket2.data.name);
+}
+
+export function matchMakingSocketListeners(io, socket): void {
     socket.on('login', (name) => {
         if (name) {
             console.log('Player logged in: ' + name);
-            socket.player = new Player(name);
+            socket.data = new SocketData(name);
             socket.join(mm);
             socket.emit(mm, 'search', numberOfPlayersInMatchMaking(io) - 1);
         }
     });
 }
 
-export const matchMakingCron = (io) => {
+export function matchMakingCron(io): void {
     const clients = clientsInMatchMaking(io);
     const numClients = numberOfPlayersInMatchMaking(io);
     if (numClients > 1) {

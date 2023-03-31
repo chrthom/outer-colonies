@@ -8,12 +8,20 @@ export default class Game extends Phaser.Scene {
         });
     }
 
+    init(data) {
+        this.socket = data.socket;
+    }
+
     preload () {
         this.load.image('card_back', 'src/assets/cards/back_side.png');
     }
     
     create () {
         let self = this;
+
+        this.socket.emit('ready');
+
+        // Sample objects for testing
 
         this.playerDeck = this.add.image(1050, 600, 'card_back').setScale(0.1, 0.1);
         this.opponentDeck = this.add.image(1050, 100, 'card_back').setScale(0.1, 0.1);

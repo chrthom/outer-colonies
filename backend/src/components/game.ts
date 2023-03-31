@@ -1,5 +1,7 @@
-import Player from './classes/player';
+import SocketData from './classes/socket_data';
 
-export const gameSocketListeners = (io, socket) => {
-
+export function gameSocketListeners(io, socket): void {
+    socket.on('ready', () => {
+        console.log('Player ' + socket.data.name + ' is ready');
+    });
 };

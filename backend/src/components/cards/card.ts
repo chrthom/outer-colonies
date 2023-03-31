@@ -76,12 +76,3 @@ export class AttackProfile {
     readonly shield: number;
     readonly armour: number;
 }
-
-module.exports = {
-    HullCard,
-    HullProfile,
-    HullMultipart,
-    EquipmentCard,
-    EquipmentProfile,
-    AttackProfile
-};
