@@ -38,4 +38,7 @@ export default class SocketData {
         this.name = name;
         this.activeDeck = defaultDeck;
     }
+    opponentPlayerNo(): number {
+        return this.playerNo == 0 ? 1 : 0;
+    }
 }
