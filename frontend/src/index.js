@@ -5,8 +5,8 @@ import GameScene from './scenes/game'
 const config = {
     type: Phaser.AUTO,
     parent: 'game',
-    width: 1200,
-    height: 700,
+    width: 1320,
+    height: 720,
     scene: [ MatchmakingScene, GameScene ]
 };
 

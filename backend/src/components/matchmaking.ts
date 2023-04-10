@@ -33,7 +33,7 @@ function initGame(io, socket1, socket2): void {
 export function matchMakingSocketListeners(io, socket): void {
     socket.on('login', (name: string) => {
         if (name) {
-            console.log('Player logged in: ' + name);
+            console.log(`Player logged in: ${name}`);
             socket.data = new SocketData(name);
             socket.join(mm);
             socket.emit(mm, 'search', numberOfPlayersInMatchMaking(io) - 1);
@@ -45,7 +45,7 @@ export function matchMakingCron(io): void {
     const clients = clientsInMatchMaking(io);
     const numClients = numberOfPlayersInMatchMaking(io);
     if (numClients > 1) {
-        console.log('Performing matchmaking for ' + numClients + ' clients...');
+        console.log(`Performing matchmaking for ${numClients}} clients...`);
         let partnerSocket = null;
         for (const clientId of clients) {
             const clientSocket = io.sockets.sockets.get(clientId);

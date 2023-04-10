@@ -45,7 +45,7 @@ export function gameSocketListeners(io, socket): void {
     socket.on('ready', () => {
         socket.data.match.players[socket.data.playerNo].ready = true;
         if (socket.data.match.players[socket.data.opponentPlayerNo()].ready) {
-            console.log('Game match ' + socket.data.match.matchName() + ' is ready to start');
+            console.log(`Game match ${socket.data.match.matchName()} is ready to start`);
             initMatch(io, socket);
         }
     });
