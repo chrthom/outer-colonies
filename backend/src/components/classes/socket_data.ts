@@ -1,5 +1,5 @@
 import Cards from './cards';
-import { Card } from '../cards/card'
+import { Card } from './cards/card'
 import Match from './match'
 
 const defaultDeck = [
@@ -36,9 +36,9 @@ export default class SocketData {
     match: Match;
     constructor(name: string) {
         this.name = name;
-        this.activeDeck = defaultDeck;
+        this.activeDeck = defaultDeck.slice();
     }
     opponentPlayerNo(): number {
-        return this.playerNo == 0 ? 1 : 0;
+        return this.match.opponentPlayerNo(this.playerNo);
     }
 }

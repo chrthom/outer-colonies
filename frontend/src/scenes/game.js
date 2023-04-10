@@ -2,6 +2,11 @@ import Card from '../components/card';
 import io from 'socket.io-client';
 
 export default class Game extends Phaser.Scene {
+    state = {};
+    obj = {
+        hand: []
+    };
+
     constructor () {
         super({
             key: 'Game'
@@ -14,10 +19,19 @@ export default class Game extends Phaser.Scene {
 
     preload () {
         this.load.image('card_back', 'src/assets/cards/back_side.png');
+        this.load.image('card_130', 'src/assets/cards/130.png');
+        this.load.image('card_160', 'src/assets/cards/160.png');
+        this.load.image('card_163', 'src/assets/cards/163.png');
+        this.load.image('card_166', 'src/assets/cards/166.png');
+        this.load.image('card_348', 'src/assets/cards/348.png');
     }
     
     create () {
         let self = this;
+
+        this.socket.on('state', (state) => {
+            this.updateState(state);
+        });
 
         this.socket.emit('ready');
 
@@ -50,4 +64,14 @@ export default class Game extends Phaser.Scene {
     }
 
     update() {}
+
+    updateState(state) {
+        this.state = state;
+        //console.log('Received new state: ' + JSON.stringify(state)); //
+        this.obj.hand.forEach(image => image.destroy());
+        this.obj.hand = state.hand.map((card, index) => {
+            console.log('Hand card ' + index + ': ' + card.id);
+            return this.add.image(100 + index * 100, 600, 'card_' + card.id).setScale(0.12, 0.12);
+        });
+    }
 }

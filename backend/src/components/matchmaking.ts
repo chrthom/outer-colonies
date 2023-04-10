@@ -20,7 +20,7 @@ function joinGame(socket, match: Match, playerNo: number): void {
     socket.join(match.room);
     socket.data.match = match;
     socket.data.playerNo = playerNo;
-    match.players[playerNo] = new Player(socket.data.id, socket.data.name, socket.data.activeDeck);
+    match.players[playerNo] = new Player(socket.id, socket.data.name, socket.data.activeDeck.slice());
 }
 
 function initGame(io, socket1, socket2): void {
@@ -31,7 +31,7 @@ function initGame(io, socket1, socket2): void {
 }
 
 export function matchMakingSocketListeners(io, socket): void {
-    socket.on('login', (name) => {
+    socket.on('login', (name: string) => {
         if (name) {
             console.log('Player logged in: ' + name);
             socket.data = new SocketData(name);

@@ -36,7 +36,7 @@ export default class Matchmaking extends Phaser.Scene {
                         self.scene.start('Game', {
                             socket: self.socket
                         })
-                    }, 3000);
+                    }, 1000);
                     break;
             }
         });
