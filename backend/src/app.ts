@@ -1,10 +1,13 @@
 import express from 'express';
+import fetch from 'node-fetch';
+import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
 import { gameSocketListeners } from './components/game';
 
 const app = express();
+app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
@@ -24,6 +27,11 @@ io.on('connection', (socket) => {
 });
 
 setInterval(matchMakingCron, 3000, io);
+
+app.get('/cardimages/*', (req, res) => {
+    const file = req.path.replace('/cardimages/', '');
+    fetch(`https://thomsen.in/outercolonies/${file}`).then(actual => actual.body.pipe(res));
+});
 
 httpServer.listen(3000, () => {
     console.log('Server started!');

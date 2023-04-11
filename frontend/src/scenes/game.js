@@ -18,7 +18,8 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
-        [ 'back', 130, 160, 163, 166, 348].forEach(id => this.load.image(`card_${id}`, `src/assets/cards/${id}.png`));
+        [ 'back', 130, 160, 163, 166, 348].forEach(id => 
+            this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
     }
     
     create () {
