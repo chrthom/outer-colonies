@@ -1,4 +1,4 @@
-import Card from '../components/card';
+import { CardImage, HandCard } from '../components/card';
 
 export default class Game extends Phaser.Scene {
     state = {};
@@ -33,7 +33,7 @@ export default class Game extends Phaser.Scene {
 
         // Sample objects for testing
 
-        this.obj.deck = new Card(this, 1150, 620, 'back');
+        this.obj.deck = new CardImage(this, 1150, 620, 'back');
 
         this.dealText = this.add.text(50, 600, ['Start']).setFontSize(18).setFontFamily('Trebuchet MS').setColor('#00ffff').setInteractive();
         this.dealText.on('pointerdown', function () {
@@ -62,10 +62,9 @@ export default class Game extends Phaser.Scene {
     updateState(state) {
         this.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
-        this.hand.forEach(card => card.sprite.destroy());
-        this.hand = state.hand.map((card, index) => {
-            const x = 70 + (state.hand.length <= 8 ? index * 125 : index * 1000 / state.hand.length);
-            return new Card(this, x, 620, card.id);
+        this.hand.forEach(card => card.destroy());
+        this.hand = state.hand.map((cardData) => {
+            return new HandCard(this, state.hand.length, cardData);
         });
     }
 }

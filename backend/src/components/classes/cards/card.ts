@@ -9,8 +9,12 @@ export abstract class Card {
     }
 }
 
-enum CardType {
-    Hull, Equipment, Colony, Tactic, Orb
+export enum CardType {
+    Hull = 'hull',
+    Equipment = 'equipment',
+    Colony = 'colony',
+    Tactic = 'tactic',
+    Orb = 'orb'
 }
 
 export abstract class HullCard extends Card {

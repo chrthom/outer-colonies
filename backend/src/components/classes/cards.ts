@@ -1,4 +1,4 @@
-import { Card160, Card348 } from './cards/hullCards';
+import { Card160, Card348 } from './cards/hull_cards';
 import { Card163 } from './cards/equipment_defense_cards';
 import { Card130, Card166 } from './cards/equipment_weapon_cards';
 
