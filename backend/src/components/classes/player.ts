@@ -18,9 +18,11 @@ export default class Player {
         return rules.freeActions; // TODO: Dummy until logic is implemented
     }
     resetRemainingActions(): void {
-        for (const ct in Object.keys(CardType)) {
-            this.remainingActions[CardType[ct]] = this.totalActions(CardType[ct]);
-        }
+        this.remainingActions[CardType.Colony] = this.totalActions(CardType.Colony);
+        this.remainingActions[CardType.Hull] = this.totalActions(CardType.Hull);
+        this.remainingActions[CardType.Equipment] = this.totalActions(CardType.Equipment);
+        this.remainingActions[CardType.Tactic] = this.totalActions(CardType.Tactic);
+        this.remainingActions[CardType.Orb] = this.totalActions(CardType.Orb);
     }
     shuffleDeck(): void {
         this.deck = this.shuffle(this.deck);

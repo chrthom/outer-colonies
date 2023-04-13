@@ -27,12 +27,19 @@ function initMatch(io, match: Match): void {
         player.shuffleDeck();
         player.drawCards(rules.initialCardsToDraw);
     });
-    // Emit draw cards event
+    // TODO: Emit draw cards event
     emitState(io, match);
-    match.nextTurn();
-    // Emit start phase event
+    // TODO: Wait for respone for redrawing cards
+    nextTurn(io, match);
+}
+
+function nextTurn(io, match: Match): void {
+    match.execStartPhase();
+    // TODO: Emit start phase event
     emitState(io, match);
+    // TODO: Wait for response to continue
     match.execBuildPhase();
+    emitState(io, match);
 }
 
 export function gameSocketListeners(io, socket): void {

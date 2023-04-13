@@ -58,20 +58,18 @@ export default class Match {
         else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
         else this.activePlayerNo = Math.round(Math.random());
     }
-    nextTurn(): void {
+    execStartPhase(): void { // TODO: Return Event to send to player
         this.activePlayerNo = this.activePlayerNo == 0 ? 1 : 0;
         this.turnPhase = TurnPhase.Start;
         this.getActivePlayer().resetRemainingActions();
-        this.execStartPhase();
-    }
-    execStartPhase(): void { // TODO: Return Event to send to player
-        // TODO: Move hips from neutral zone to orbital zone
+        // TODO: Move ships from neutral zone to orbital zone
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
         // TODO: Check if no cards are left in deck
         // TODO: Check for effects on drawing a cards (like drawing an extra card)
         // TODO: Execute start of turn effects of cards
     }
     execBuildPhase(): void {
+        this.turnPhase = TurnPhase.Build;
         // TODO
     }
     getFrontendState(playerNo: number): FrontendState {
@@ -103,20 +101,22 @@ export default class Match {
     private checkCardIsPlayable(card: Card, player: Player, isActive: boolean): boolean {
         if (isActive) {
             if (player.remainingActions[card.type] == 0) return false;
-            switch (card.type) {
-                case CardType.Colony: 
-                    return false;
-                case CardType.Equipment:
-                    return false;
-                case CardType.Hull:
-                    return true;
-                case CardType.Orb:
-                    return false;
-                case CardType.Tactic:
-                    return false;
-            }
+            if (this.turnPhase == TurnPhase.Build) 
+                switch (card.type) {
+                    case CardType.Colony: 
+                        return false;
+                    case CardType.Equipment:
+                        return false;
+                    case CardType.Hull:
+                        return true;
+                    case CardType.Orb:
+                        return false;
+                    case CardType.Tactic:
+                        return false;
+                }
+            return false; // TODO: Change for tactic cardsthat are always playable
         } else {
-            return false; // Change for tactic card that are always playable
+            return false; // TODO: Change for tactic cards that are always playable
         }
     }
 }
