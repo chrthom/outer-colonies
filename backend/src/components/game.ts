@@ -51,4 +51,8 @@ export function gameSocketListeners(io, socket): void {
             initMatch(io, match);
         }
     });
+    socket.on('handcard', (index) => {
+        const player = socket.data.match.players[socket.data.playerNo];
+        console.log(`Player ${player.name} clicked card number ${index}`); //
+    });
 };

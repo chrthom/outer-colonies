@@ -42,12 +42,16 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
+    handCardClicked = (index) => {
+        this.socket.emit('handcard', index);
+    }
+
     updateState(state) {
         this.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
         this.hand.forEach(card => card.destroy());
         this.hand = state.hand.map((cardData) => {
-            return new HandCard(this, state.hand.length, cardData);
+            return new HandCard(this, state.hand.length, cardData, this.handCardClicked);
         });
         if (state.playerIsActive) {
             switch (state.turnPhase) {

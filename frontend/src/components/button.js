@@ -12,13 +12,13 @@ export class Button {
             .setColor('#eeeeaa')
             .setOrigin(1, 0)
             .setInteractive();
-        this.sprite.on('pointerdown', function () {
+        this.sprite.on('pointerdown', () => {
             self.action.onClickAction();
         });
-        this.sprite.on('pointerover', function () {
+        this.sprite.on('pointerover', () => {
             self.sprite.setColor('#ff69b4');
         });
-        this.sprite.on('pointerout', function () {
+        this.sprite.on('pointerout', () => {
             self.sprite.setColor('#eeeeaa');
         });
         this.hide();

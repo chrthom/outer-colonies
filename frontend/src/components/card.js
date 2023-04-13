@@ -13,11 +13,14 @@ export class CardImage {
 export class HandCard extends CardImage {
     index;
     playable;
-    constructor(scene, handCardsTotal, hardCardData) {
+    constructor(scene, handCardsTotal, hardCardData, onClickAction) {
         const x = 70 + (handCardsTotal <= 8 ? hardCardData.index * 125 : hardCardData.index * 1000 / handCardsTotal);
         super(scene, x, 620, hardCardData.cardId);
-        if (hardCardData.playable) this.sprite.setInteractive();
-        else this.sprite.alpha = 0.5;
-        //scene.input.setDraggable(card);
+        if (hardCardData.playable) {
+            this.sprite.setInteractive();
+            this.sprite.on('pointerdown', () => {
+                onClickAction(hardCardData.index);
+            });
+        } else this.sprite.alpha = 0.5;
     }
 }
