@@ -1,3 +1,5 @@
+import { CardStack } from "../card_stack";
+
 export abstract class Card {
     readonly id!: number;
     readonly name!: string;
@@ -7,6 +9,9 @@ export abstract class Card {
         this.name = name;
         this.type = type;
     }
+    abstract canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack>
+    abstract canBeAttachedToColony(cardStacks: Array<CardStack>): boolean
+    abstract profile(): CardProfile
 }
 
 export enum CardType {
@@ -19,58 +24,85 @@ export enum CardType {
 
 export abstract class HullCard extends Card {
     readonly multipart!: HullMultipart;
-    readonly profile!: HullProfile;
+    readonly hullProfile!: HullProfile;
     constructor(id: number, name: string, multipart: HullMultipart, profile: HullProfile) {
         super(id, name, CardType.Hull);
         this.multipart = multipart;
-        this.profile = profile;
+        this.hullProfile = profile;
+    }
+    canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
+        return cardStacks.filter((cs: CardStack) =>
+            cs.card.type == CardType.Hull 
+                && (<HullCard> cs.card).multipart.neededParts.indexOf(this.id)
+                && cs.attachedCards.filter((c: CardStack) => c.card.name == this.name)); // TODO: Rethink if matching by name is a good idea
+    }
+    canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
+        return this.hullProfile.energy >= 0 ? true : false;
+    }
+    profile(): CardProfile {
+        return <CardProfile> this.hullProfile;
+        /*
+        return {
+            hp: this.hullProfile.hp,
+            speed: this.hullProfile.speed,
+            energy: this.hullProfile.energy,
+            theta: this.hullProfile.theta,
+            xi: this.hullProfile.xi,
+            phi: this.hullProfile.phi,
+            omega: this.hullProfile.omega,
+            delta: this.hullProfile.delta,
+            psi: this.hullProfile.psi,
+        }
+        */
     }
 }
 
 export class HullProfile {
-    readonly hp: number;
-    readonly speed: number;
-    readonly energy: number;
-    readonly theta: number;
-    readonly xi: number;
-    readonly phi: number;
-    readonly omega: number;
-    readonly delta: number;
-    readonly psi: number;
+    readonly hp: number = 0;
+    readonly speed: number = 0;
+    readonly energy: number = 0;
+    readonly theta: number = 0;
+    readonly xi: number = 0;
+    readonly phi: number = 0;
+    readonly omega: number = 0;
+    readonly delta: number = 0;
+    readonly psi: number = 0;
 }
 
 export class HullMultipart {
     partNo!: number;
-    neededParts!: number;
+    neededParts!: Array<number>;
     static noMultipart: HullMultipart = {
         partNo: 1,
-        neededParts: 1
+        neededParts: []
     };
 }
 
 export abstract class EquipmentCard extends Card {
-    readonly profile!: EquipmentProfile;
+    readonly equipmentProfile!: EquipmentProfile;
     readonly attackProfile?: AttackProfile;
     constructor(id: number, name: string, profile: EquipmentProfile, attackProfile?: AttackProfile) {
         super(id, name, CardType.Equipment);
-        this.profile = profile;
+        this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
+    }
+    canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
+        return cardStacks.filter((cs: CardStack) => 
+            cs.card.type == CardType.Hull 
+            && cs.profileMatches(this.profile()));
+    }
+    canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
+        return false;
+    }
+    profile(): CardProfile {
+        return <CardProfile> this.equipmentProfile;
     }
 }
 
-export class EquipmentProfile {
-    readonly energy: number;
-    readonly hp: number;
-    readonly speed: number;
-    readonly pointDefense: number;
-    readonly shield: number;
-    readonly armour: number;
-    readonly theta: number;
-    readonly xi: number;
-    readonly phi: number;
-    readonly omega: number;
-    readonly delta: number;
-    readonly psi: number;
+export class EquipmentProfile extends HullProfile {
+    readonly pointDefense: number = 0;
+    readonly shield: number = 0;
+    readonly armour: number = 0;
 }
 
 export class AttackProfile {
@@ -80,3 +112,5 @@ export class AttackProfile {
     readonly shield: number;
     readonly armour: number;
 }
+
+export class CardProfile extends EquipmentProfile {}

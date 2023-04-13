@@ -13,7 +13,7 @@ export class Button {
             .setOrigin(1, 0)
             .setInteractive();
         this.sprite.on('pointerdown', () => {
-            self.action.onClickAction();
+            self.action.onClick();
         });
         this.sprite.on('pointerover', () => {
             self.sprite.setColor('#ff69b4');

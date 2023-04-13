@@ -10,6 +10,10 @@ function getSocket(io, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
 }
 
+function getPlayer(socket) {
+    return socket.data.match.players[socket.data.playerNo];
+}
+
 function forAllPlayers(f: (playerNo: number) => void): void {
     f(0);
     f(1);
@@ -52,7 +56,7 @@ export function gameSocketListeners(io, socket): void {
         }
     });
     socket.on('handcard', (index) => {
-        const player = socket.data.match.players[socket.data.playerNo];
-        console.log(`Player ${player.name} clicked card number ${index}`); //
+        console.log(`Player ${getPlayer(socket).name} clicked card number ${index} => ${getPlayer(socket).hand[index].name}`); //
+        // CONTINUE HERE: Check cards to attach this to + attach to colony - see card.js canBeAttachedTo() and canBeAttachedToColony()
     });
 };
