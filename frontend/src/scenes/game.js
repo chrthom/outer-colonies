@@ -1,3 +1,4 @@
+import { Button } from '../components/button';
 import { CardImage, HandCard } from '../components/card';
 import { Prompt } from '../components/prompt';
 
@@ -6,7 +7,8 @@ export default class Game extends Phaser.Scene {
     hand = [];
     obj = {
         deck: null,
-        prompt: null
+        prompt: null,
+        button: null
     };
 
     constructor () {
@@ -33,31 +35,16 @@ export default class Game extends Phaser.Scene {
 
         this.obj.deck = new CardImage(this, 1150, 620, 'back');
         this.obj.prompt = new Prompt(this);
+        this.obj.button = new Button(this);
 
         this.socket.emit('ready');
-
-        /*
-        this.dealText.on('pointerdown', function () {
-            self.dealCards();
-        })
-        this.dealText.on('pointerover', function () {
-            self.dealText.setColor('#ff69b4');
-        })
-        this.dealText.on('pointerout', function () {
-            self.dealText.setColor('#00ffff');
-        })
-        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-        })
-        */
     }
 
     update() {}
 
     updateState(state) {
         this.state = state;
-        console.log('Received new state: ' + JSON.stringify(state)); //
+        //console.log('Received new state: ' + JSON.stringify(state)); //
         this.hand.forEach(card => card.destroy());
         this.hand = state.hand.map((cardData) => {
             return new HandCard(this, state.hand.length, cardData);
@@ -71,6 +58,9 @@ export default class Game extends Phaser.Scene {
                         + `${state.remainingActions.colony}x Kolonie, `
                         + `${state.remainingActions.tactic}x Taktik`
                     this.obj.prompt.showText(promptText)
+                    this.obj.button.show('Aufbauphase beenden', () => {
+                        console.log('Weiter'); //
+                    });
                     break;
             }
         }
