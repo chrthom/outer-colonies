@@ -1,4 +1,5 @@
 import { Card, CardType } from './cards/card';
+import { CardStack } from './card_stack';
 import { rules } from '../rules';
 
 export default class Player {
@@ -7,6 +8,7 @@ export default class Player {
     ready: boolean = false;
     deck!: Array<Card>;
     hand: Array<Card> = [];
+    cardStacks: Array<CardStack> = [];
     remainingActions = {};
     constructor(id: string, name: string, deck: Array<Card>) {
         this.id = id;
