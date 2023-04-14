@@ -42,7 +42,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             return {
                 index: index,
                 cardId: c.id,
-                playable: match.checkCardIsPlayable(c, player, match.activePlayerNo == playerNo)
+                playable: match.checkCardIsPlayable(c, playerNo)
             };
         }),
         remainingActions: {

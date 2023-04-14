@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/scenes/matchmaking';
 import { gameSocketListeners } from './components/scenes/game';
+import { MsgTypeInbound } from './components/config/oc_enums';
 
 const app = express();
 app.use(cors());
@@ -17,9 +18,9 @@ const io = new Server(httpServer, {
     }
 });
 
-io.on('connection', (socket) => {
+io.on(MsgTypeInbound.Connection, (socket) => {
     console.log(`Player connected: ${socket.id}`);
-    socket.on('disconnect', () => {
+    socket.on(MsgTypeInbound.Disconnect, () => {
         console.log(`Player disconnected: ${socket.id}`);
     });
     matchMakingSocketListeners(io, socket);

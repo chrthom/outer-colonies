@@ -18,7 +18,7 @@ export default class CardStack {
     profileMatches(c: CardProfile): boolean {
         return Object.values(this.combineCardProfiles(this.profile(), c)).filter((v: number) => v < 0).length == 0;
     }
-    private getCards(): Array<Card> {
+    getCards(): Array<Card> {
         return this.attachedCards.flatMap((cs: CardStack) => cs.getCards()).concat(this.card);
     }
     private combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {

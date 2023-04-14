@@ -39,7 +39,9 @@ export default class Match {
         this.turnPhase = TurnPhase.Build;
         // TODO
     }
-    checkCardIsPlayable(card: Card, player: Player, isActive: boolean): boolean {
+    checkCardIsPlayable(card: Card, playerNo: number): boolean {
+        const player = this.players[playerNo];
+        const isActive = this.getActivePlayer().id == player.id;
         if (isActive) {
             if (player.remainingActions[card.type] == 0) return false;
             if (this.turnPhase == TurnPhase.Build) 
@@ -55,9 +57,9 @@ export default class Match {
                     case CardType.Tactic:
                         return false;
                 }
-            return false; // TODO: Change for tactic cardsthat are always playable
+            return false; // TODO: Change for tactic cards, that are always playable
         } else {
-            return false; // TODO: Change for tactic cards that are always playable
+            return false; // TODO: Change for tactic cards, that are always playable
         }
     }
 }

@@ -32,6 +32,9 @@ export default class Game extends Phaser.Scene {
         this.socket.on('state', (state) => {
             this.updateState(state);
         });
+        this.socket.on('card_request', (cardRequest) => {
+            console.log(JSON.stringify(cardRequest)); // TODO: Implement this
+        });
 
         this.obj.deck = new CardImage(this, 1150, 620, 'back');
         this.obj.prompt = new Prompt(this);
@@ -48,7 +51,7 @@ export default class Game extends Phaser.Scene {
 
     updateState(state) {
         this.state = state;
-        //console.log('Received new state: ' + JSON.stringify(state)); //
+        console.log('Received new state: ' + JSON.stringify(state)); //
         this.hand.forEach(card => card.destroy());
         this.hand = state.hand.map((cardData) => {
             return new HandCard(this, state.hand.length, cardData, this.handCardClicked);

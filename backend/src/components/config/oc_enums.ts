@@ -6,8 +6,18 @@ export enum CardType {
     Orb = 'orb'
 }
 
-export enum MesgType {
-    state = 'state'
+export enum MsgTypeInbound {
+    Connection = 'connection',
+    Disconnect = 'disconnect',
+    Handcard = 'handcard',
+    Login = 'login',
+    Ready = 'ready'
+}
+
+export enum MsgTypeOutbound {
+    Matchmaking = 'matchmaking',
+    State = 'state',
+    CardRequest = 'card_request'
 }
 
 export enum TurnPhase {

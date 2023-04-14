@@ -1,8 +1,9 @@
 import Player from '../game_state/player';
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
+import toFrontendCardRequest from '../frontend_converters/frontend_card_request';
 import { rules } from '../config/rules';
-import { MesgType } from '../config/oc_enums'
+import { MsgTypeInbound, MsgTypeOutbound } from '../config/oc_enums'
 
 function getSocket(io, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
@@ -19,7 +20,7 @@ function forAllPlayers(f: (playerNo: number) => void): void {
 
 function emitState(io, match: Match): void {
     forAllPlayers((playerNo: number) => {
-        getSocket(io, match, playerNo).emit(MesgType.state, toFrontendState(match, playerNo));
+        getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
     });
 }
 
@@ -45,7 +46,7 @@ function nextTurn(io, match: Match): void {
 }
 
 export function gameSocketListeners(io, socket): void {
-    socket.on('ready', () => {
+    socket.on(MsgTypeInbound.Ready, () => {
         const match = socket.data.match;
         match.players[socket.data.playerNo].ready = true;
         if (match.players[socket.data.opponentPlayerNo()].ready) {
@@ -53,17 +54,16 @@ export function gameSocketListeners(io, socket): void {
             initMatch(io, match);
         }
     });
-    socket.on('handcard', (index) => {
+    socket.on(MsgTypeInbound.Handcard, (index: number) => {
         const match = socket.data.match;
         const player = getPlayer(socket);
+        const playerNo = socket.data.playerNo;
+        const cardStacks = player.cardStacks;
         const handCard = player.hand[index];
         console.log(`Player ${getPlayer(socket).name} clicked card number ${index} => ${getPlayer(socket).hand[index].name}`); //
-
-        // CONTINUE HERE: Check cards to attach this to + attach to colony - see card.js canBeAttachedTo() and canBeAttachedToColony()
-        if (match.checkCardIsPlayable(handCard, player, match.getActivePlayer.id == player.id)) {
-            const cardStacks =  player.cardStacks;
-            const canBeAttachedToColony = handCard.canBeAttachedToColony(cardStacks);
-            const canBeAttachedTo = handCard.canBeAttachedTo(cardStacks);
+        if (match.checkCardIsPlayable(handCard, playerNo)) {
+            const payload = toFrontendCardRequest(handCard.canBeAttachedTo(cardStacks), handCard.canBeAttachedToColony(cardStacks), index);
+            socket.emit(MsgTypeOutbound.CardRequest, payload);
         } else this.emitState(io, match);
     });
 };
