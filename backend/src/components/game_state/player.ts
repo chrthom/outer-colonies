@@ -1,6 +1,7 @@
-import { Card, CardType } from './cards/card';
-import { CardStack } from './card_stack';
-import { rules } from '../rules';
+import Card from '../cards/card';
+import CardStack from '../cards/card_stack';
+import { rules } from '../config/rules';
+import { CardType } from '../config/oc_enums'
 
 export default class Player {
     id!: string;

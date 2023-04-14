@@ -1,6 +1,6 @@
-import Cards from './cards';
-import { Card } from './cards/card'
-import Match from './match'
+import Cards from '../cards/collection/card_collection';
+import Card from '../cards/card'
+import Match from '../game_state/match'
 
 const defaultDeck = [
     Cards.card160,

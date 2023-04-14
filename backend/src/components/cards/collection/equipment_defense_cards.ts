@@ -1,4 +1,4 @@
-import { EquipmentCard } from './card';
+import EquipmentCard from '../types/equipmentCard';
 
 export class Card163 extends EquipmentCard {
     constructor() {

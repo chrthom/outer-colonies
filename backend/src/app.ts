@@ -3,8 +3,8 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
-import { gameSocketListeners } from './components/game';
+import { matchMakingSocketListeners, matchMakingCron } from './components/scenes/matchmaking';
+import { gameSocketListeners } from './components/scenes/game';
 
 const app = express();
 app.use(cors());

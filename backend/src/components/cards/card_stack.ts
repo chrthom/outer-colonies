@@ -1,12 +1,8 @@
-import { Card, CardType, CardProfile } from './cards/card';
+import Card from './card';
+import CardProfile from './card_profile';
+import { Zone } from '../config/oc_enums';
 
-export enum Zone {
-    Colony = 'colony',
-    Oribital = 'orbital',
-    Neutral = 'neutral'
-}
-
-export class CardStack {
+export default class CardStack {
     card!: Card;
     attachedCards: Array<CardStack> = [];
     damage: number = 0;

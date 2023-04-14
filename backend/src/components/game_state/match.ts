@@ -1,40 +1,7 @@
 import Player from './player';
-import { rules } from '../rules';
-import { Card, CardType } from './cards/card';
-
-class FrontendOpponent {
-    name!: string;
-    handCardNo!: number;
-}
-class FrontendActions {
-    hull!: number;
-    equipment!: number;
-    colony!: number;
-    tactic!: number;
-    orb!: number;
-}
-
-class FrontendHandCard {
-    index!: number;
-    cardId!: number;
-    playable!: boolean;
-}
-
-class FrontendState {
-    playerIsActive: boolean;
-    turnPhase: TurnPhase;
-    opponent!: FrontendOpponent;
-    hand!: Array<FrontendHandCard>;
-    remainingActions: FrontendActions;
-}
-
-export enum TurnPhase {
-    Start = 'start',
-    Build = 'build',
-    Plan = 'plan',
-    Fight = 'fight',
-    End = 'end'
-}
+import Card from '../cards/card';
+import { rules } from '../config/rules';
+import { CardType, TurnPhase } from '../config/oc_enums'
 
 export default class Match {
     readonly room!: string;
@@ -72,33 +39,7 @@ export default class Match {
         this.turnPhase = TurnPhase.Build;
         // TODO
     }
-    getFrontendState(playerNo: number): FrontendState {
-        const player = this.players[playerNo];
-        const opponent = this.players[this.opponentPlayerNo(playerNo)];
-        return {
-            playerIsActive: this.activePlayerNo == playerNo,
-            turnPhase: this.turnPhase,
-            opponent: {
-                name: opponent.name,
-                handCardNo: opponent.hand.length
-            },
-            hand: player.hand.map((c: Card, index: number) => {
-                return {
-                    index: index,
-                    cardId: c.id,
-                    playable: this.checkCardIsPlayable(c, player, this.activePlayerNo == playerNo)
-                };
-            }),
-            remainingActions: {
-                hull: player.remainingActions[CardType.Hull],
-                equipment: player.remainingActions[CardType.Equipment],
-                colony: player.remainingActions[CardType.Colony],
-                tactic: player.remainingActions[CardType.Tactic],
-                orb: player.remainingActions[CardType.Orb]
-            }
-        };
-    }
-    private checkCardIsPlayable(card: Card, player: Player, isActive: boolean): boolean {
+    checkCardIsPlayable(card: Card, player: Player, isActive: boolean): boolean {
         if (isActive) {
             if (player.remainingActions[card.type] == 0) return false;
             if (this.turnPhase == TurnPhase.Build) 

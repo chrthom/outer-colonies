@@ -1,7 +1,7 @@
-import SocketData from './classes/socket_data';
+import SocketData from '../game_state/socket_data';
+import Match from '../game_state/match';
+import Player from '../game_state/player';
 import { v4 as uuidv4 } from 'uuid';
-import Match from './classes/match';
-import Player from './classes/player';
 
 const mm = 'matchmaking';
 const gameRoomPrefix = 'match-';
