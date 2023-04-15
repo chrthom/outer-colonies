@@ -39,27 +39,4 @@ export default class Match {
         this.turnPhase = TurnPhase.Build;
         // TODO
     }
-    checkCardIsPlayable(card: Card, playerNo: number): boolean {
-        const player = this.players[playerNo];
-        const isActive = this.getActivePlayer().id == player.id;
-        if (isActive) {
-            if (player.remainingActions[card.type] == 0) return false;
-            if (this.turnPhase == TurnPhase.Build) 
-                switch (card.type) {
-                    case CardType.Colony: 
-                        return false;
-                    case CardType.Equipment:
-                        return false;
-                    case CardType.Hull:
-                        return true;
-                    case CardType.Orb:
-                        return false;
-                    case CardType.Tactic:
-                        return false;
-                }
-            return false; // TODO: Change for tactic cards, that are always playable
-        } else {
-            return false; // TODO: Change for tactic cards, that are always playable
-        }
-    }
 }

@@ -1,6 +1,7 @@
 import Card from '../card';
 import CardProfile from '../card_profile';
 import CardStack from '../card_stack';
+import Match from '../../game_state/match'
 import { CardType } from '../../config/oc_enums';
 
 export default abstract class HullCard extends Card {
@@ -19,6 +20,9 @@ export default abstract class HullCard extends Card {
     }
     canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
         return this.hullProfile.energy >= 0 ? true : false;
+    }
+    isPlayableDecorator(match: Match, playerNo: number): boolean {
+        return true;
     }
     profile(): CardProfile {
         return <CardProfile> this.hullProfile;
