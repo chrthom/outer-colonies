@@ -2,7 +2,8 @@ import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 
 class FrontendCardRequest {
-    src: number;
+    message!: string;
+    srcIndex: number;
     options!: Array<FrontendCardRequestOption>;
 }
 
@@ -21,7 +22,8 @@ export default function toFrontendCardRequest(cardStacks: Array<CardStack>, colo
     });
     const colonyOption: Array<FrontendCardRequestOption> = colony ? [ { index: cardStackOptions.length, cardIds: [ 'colony' ] } ] : [];
     return {
-        src: srcIndex,
+        message: 'TBD', // TODO: Add message here
+        srcIndex: srcIndex,
         options: cardStackOptions.concat(colonyOption)
     };
 }

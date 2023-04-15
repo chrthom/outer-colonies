@@ -54,16 +54,26 @@ export function gameSocketListeners(io, socket): void {
             initMatch(io, match);
         }
     });
-    socket.on(MsgTypeInbound.Handcard, (index: number) => {
+    socket.on(MsgTypeInbound.Handcard, (srcIndex: number, target?: string) => {
         const match = socket.data.match;
         const player = getPlayer(socket);
         const playerNo = socket.data.playerNo;
         const cardStacks = player.cardStacks;
-        const handCard = player.hand[index];
-        console.log(`Player ${getPlayer(socket).name} clicked card number ${index} => ${getPlayer(socket).hand[index].name}`); //
+        const handCard = player.hand[srcIndex];
         if (handCard.isPlayable(match, playerNo)) {
-            const payload = toFrontendCardRequest(handCard.canBeAttachedTo(cardStacks), handCard.canBeAttachedToColony(cardStacks), index);
-            socket.emit(MsgTypeOutbound.CardRequest, payload);
-        } else this.emitState(io, match);
+            if (target) {
+                if (target == 'colony' && handCard.canBeAttachedToColony()) {
+                    // TODO: Implement logic to attach / play card
+                } else if (parseInt(target) >= 0 && player.card_stack[+target] && handCard.canBeAttachedTo(player.card_stack[+target])) {
+                    // TODO: Implement logic to attach / play card
+                } else {
+                    this.emitState(io, match);
+                }
+            } else { // Provide data to choose target to play
+                const payload = toFrontendCardRequest(handCard.canBeAttachedTo(cardStacks), handCard.canBeAttachedToColony(cardStacks), srcIndex);
+                socket.emit(MsgTypeOutbound.CardRequest, payload);
+                // TODO: Skip this step, if there is only 1 valid target
+            }
+        }
     });
 };
