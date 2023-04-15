@@ -61,7 +61,7 @@ export function gameSocketListeners(io, socket): void {
         const cardStacks = player.cardStacks;
         const handCard = player.hand[index];
         console.log(`Player ${getPlayer(socket).name} clicked card number ${index} => ${getPlayer(socket).hand[index].name}`); //
-        if (match.checkCardIsPlayable(handCard, playerNo)) {
+        if (handCard.isPlayable(match, playerNo)) {
             const payload = toFrontendCardRequest(handCard.canBeAttachedTo(cardStacks), handCard.canBeAttachedToColony(cardStacks), index);
             socket.emit(MsgTypeOutbound.CardRequest, payload);
         } else this.emitState(io, match);
