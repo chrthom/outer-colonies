@@ -1,7 +1,7 @@
 import SocketData from '../game_state/socket_data';
 import Match from '../game_state/match';
 import Player from '../game_state/player';
-import { MsgTypeInbound, MsgTypeOutbound } from '../config/oc_enums';
+import { MsgTypeInbound, MsgTypeOutbound } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 
 const matchmakingRoom = 'matchmaking';

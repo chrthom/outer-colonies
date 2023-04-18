@@ -1,7 +1,7 @@
 import Player from './player';
 import Card from '../cards/card';
 import { rules } from '../config/rules';
-import { CardType, TurnPhase } from '../config/oc_enums'
+import { CardType, TurnPhase } from '../config/enums'
 
 export default class Match {
     readonly room!: string;

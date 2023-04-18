@@ -28,7 +28,7 @@ export class CardImage {
         this.highlightReset();
         this.sprite.alpha = 0.5;
     }
-    highlightedTarget() {
+    highlightTarget() {
         this.highlightReset();
         this.sprite.setTint(0xff6666, 0xff6666, 0xffffff, 0xffffff);
     }
@@ -36,41 +36,64 @@ export class CardImage {
         this.sprite.alpha = 1;
         this.sprite.setTint(0xffffff);
     }
+    setClickable(onClickAction, parameter) {
+        this.sprite.setInteractive();
+        this.sprite.on('pointerdown', () => {
+            onClickAction(parameter);
+        });
+    }
 }
 
 export class HandCard extends CardImage {
-    index;
-    playable;
-    constructor(scene, handCards, hardCardData, onClickAction) {
+    uuid;
+    constructor(scene, handCardsNum, handCardData, onClickAction) {
         const x = layout.xPadding + (
-            handCards <= layout.hand.defaultThreshold ? 
-            hardCardData.index * layout.defaultDistance : 
-            hardCardData.index * layout.hand.maxWidth / handCards
+            handCardsNum <= layout.hand.defaultThreshold ? 
+            handCardData.index * layout.defaultDistance : 
+            handCardData.index * layout.hand.maxWidth / handCardsNum
         );
-        super(scene, x, layout.hand.y, hardCardData.cardId);
-        if (hardCardData.playable) {
-            this.sprite.setInteractive();
-            this.sprite.on('pointerdown', () => {
-                onClickAction(hardCardData);
-            });
-        } else this.highlightDisabled();
+        super(scene, x, layout.hand.y, handCardData.cardId);
+        this.uuid = handCardData.uuid;
+        if (handCardData.playable) this.setClickable(onClickAction, handCardData);
+        else this.highlightDisabled();
     }
 }
 
 export class CardStack {
-    sprites;
+    cards;
+    uuid;
     zone;
     ownPlayer;
     damage;
-    constructor(scene, cardIds, zone, index, zoneCards, ownPlayer, damage) {
+    constructor(scene, uuid, cardIds, zone, onClickAction, index, zoneCardsNum, ownPlayer, damage) {
+        const self = this;
         const x = layout.xPadding + (
-            zoneCards <= layout.zones.defaultThreshold ? 
+            zoneCardsNum <= layout.zones.defaultThreshold ? 
             index * layout.defaultDistance : 
-            index * layout.zones.maxWidth / zoneCards
+            index * layout.zones.maxWidth / zoneCardsNum
         );
-        this.sprites = cardIds.map((id, index) => new CardImage(scene, x, layout.ownColonyZoneY, id)); // TODO: Adjust y for multiple cards
+        this.cards = cardIds.map((id, index) => new CardImage(scene, x, layout.ownColonyZoneY, id)); // TODO: Adjust y for multiple cards
+        this.cards.forEach((c) => {
+            c.sprite.setInteractive();
+            c.sprite.on('pointerdown', () => {
+                onClickAction(self);
+            });
+        });
+        this.uuid = uuid;
         this.zone = zone;
         this.ownPlayer = ownPlayer;
         this.damage = damage;
+    }
+    destroy() {
+        this.cards.forEach((c) => c.destroy());
+    }
+    highlightDisabled() {
+        this.cards.forEach((c) => c.highlightDisabled());
+    }
+    highlightTarget() {
+        this.cards.forEach((c) => c.highlightTarget());
+    }
+    highlightReset() {
+        this.cards.forEach((c) => c.highlightReset());
     }
 }

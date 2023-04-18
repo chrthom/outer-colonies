@@ -4,7 +4,7 @@ import { Prompt } from '../components/prompt';
 
 export default class Game extends Phaser.Scene {
     state = {};
-    mode = 'default';
+    activeCard = null;
     hand = [];
     cardStacks = [];
     obj = {
@@ -35,7 +35,7 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
 
-        this.cardStacks.push(new CardStack(this, [ 'colony' ], 'colony', 0, 1, true, 0));
+        this.cardStacks.push(new CardStack(this, 'colony', [ 'colony' ], 'colony', this.cardStackClicked, 0, 1, true, 0));
         this.obj.deck = new CardImage(this, 1150, 620, 'back');
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
@@ -45,21 +45,31 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
-    handCardClicked = (hardCardData) => {
-        if (this.mode == 'default') {
-            this.mode = 'target';
-            const targetUUIDs = hardCardData.validTargets.cardUUIDs;
-            console.log('Can be attached to cards: ' + JSON.stringify(targetUUIDs));
-            console.log('Can be attached to colony: ' + hardCardData.validTargets.ownColony);
-        } else if (this.mode == 'target') {
-            this.mode = 'default';
+    handCardClicked = (handCardData) => {
+        if (this.activeCard) {
+            this.activeCard = null;
+            this.cardStacks.forEach((cs) => cs.highlightReset());
+        } else {
+            this.activeCard = handCardData.uuid;
+            let attachableCardStacks = [];
+            console.log('Can be attached to cards: ' + JSON.stringify(handCardData.validTargets.cardUUIDs));
+            // TODO: Implement attaching to cards
+            console.log('Can be attached to colony: ' + handCardData.validTargets.ownColony);
+            if (handCardData.validTargets.ownColony) {
+                attachableCardStacks.push(this.cardStacks.find((cs) => cs.uuid == 'colony'));
+            }
+            attachableCardStacks.forEach((cs) => cs.highlightTarget());
         }
-        //this.socket.emit('handcard', index);
+    }
+
+    cardStackClicked = (cardStack) => {
+        this.socket.emit('handcard', this.activeCard, cardStack.uuid);
     }
 
     updateState(state) {
         this.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
+        this.activeCard = null;
         this.hand.forEach(card => card.destroy());
         this.hand = state.hand.map((cardData) => {
             return new HandCard(this, state.hand.length, cardData, this.handCardClicked);
@@ -79,5 +89,9 @@ export default class Game extends Phaser.Scene {
                     break;
             }
         }
+    }
+
+    getCardStackByUUID(uuid) {
+        return this.cardStacks.find((cs) => cs.uuid == uuid);
     }
 }

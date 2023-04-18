@@ -1,7 +1,7 @@
 import CardStack from './card_stack';
 import CardProfile from './card_profile';
 import Match from '../game_state/match';
-import { CardType, TurnPhase } from '../config/oc_enums';
+import { CardType, TurnPhase } from '../config/enums';
 
 export default abstract class Card {
     readonly id!: number;

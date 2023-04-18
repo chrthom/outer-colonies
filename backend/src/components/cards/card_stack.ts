@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { Zone } from '../config/oc_enums';
+import { Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class CardStack {

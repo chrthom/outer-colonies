@@ -5,7 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/scenes/matchmaking';
 import { gameSocketListeners } from './components/scenes/game';
-import { MsgTypeInbound } from './components/config/oc_enums';
+import { MsgTypeInbound } from './components/config/enums';
 
 const app = express();
 app.use(cors());

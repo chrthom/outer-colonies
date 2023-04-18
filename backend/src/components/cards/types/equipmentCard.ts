@@ -4,7 +4,7 @@ import CardStack from '../card_stack';
 import Match from '../../game_state/match'
 import { AttackProfile } from '../card_profile';
 import { HullProfile } from './hullCard';
-import { CardType } from '../../config/oc_enums';
+import { CardType } from '../../config/enums';
 
 export default abstract class EquipmentCard extends Card {
     readonly equipmentProfile!: EquipmentProfile;

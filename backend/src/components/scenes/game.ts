@@ -3,8 +3,8 @@ import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
 import toFrontendCardRequest from '../frontend_converters/frontend_card_request';
 import { rules } from '../config/rules';
-import { MsgTypeInbound, MsgTypeOutbound } from '../config/oc_enums'
-import { getCardStackByUUID } from '../utils/oc_utils';
+import { MsgTypeInbound, MsgTypeOutbound } from '../config/enums'
+import { getCardStackByUUID } from '../utils/utils';
 
 function getSocket(io, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);

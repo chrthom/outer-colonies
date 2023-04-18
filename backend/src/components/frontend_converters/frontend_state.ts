@@ -1,6 +1,6 @@
 import Match from '../game_state/match'
 import CardStack from '../cards/card_stack';
-import { CardType, TurnPhase } from '../config/oc_enums'
+import { CardType, TurnPhase } from '../config/enums'
 
 class FrontendOpponent {
     name!: string;

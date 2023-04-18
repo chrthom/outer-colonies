@@ -2,7 +2,7 @@ import Card from '../card';
 import CardProfile from '../card_profile';
 import CardStack from '../card_stack';
 import Match from '../../game_state/match'
-import { CardType } from '../../config/oc_enums';
+import { CardType } from '../../config/enums';
 
 export default abstract class HullCard extends Card {
     readonly multipart!: HullMultipart;

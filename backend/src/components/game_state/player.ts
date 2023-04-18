@@ -1,7 +1,7 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { rules } from '../config/rules';
-import { CardType, Zone } from '../config/oc_enums'
+import { CardType, Zone } from '../config/enums'
 
 export default class Player {
     id!: string;
