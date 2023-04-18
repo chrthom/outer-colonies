@@ -1,14 +1,18 @@
 import Card from './card';
 import CardProfile from './card_profile';
 import { Zone } from '../config/oc_enums';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class CardStack {
     card!: Card;
+    zone!: Zone;
+    uuid!: string;
     attachedCards: Array<CardStack> = [];
     damage: number = 0;
-    zone: Zone = Zone.Colony;
-    constructor(card: Card) {
+    constructor(card: Card, zone: Zone) {
         this.card = card;
+        this.zone = zone;
+        this.uuid = uuidv4();
     }
     profile(): CardProfile {
         return this.getCards()

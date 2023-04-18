@@ -1,14 +1,14 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { rules } from '../config/rules';
-import { CardType } from '../config/oc_enums'
+import { CardType, Zone } from '../config/oc_enums'
 
 export default class Player {
     id!: string;
     name!: string;
     ready: boolean = false;
     deck!: Array<Card>;
-    hand: Array<Card> = [];
+    hand: Array<CardStack> = [];
     cardStacks: Array<CardStack> = [];
     remainingActions = {};
     constructor(id: string, name: string, deck: Array<Card>) {
@@ -30,8 +30,8 @@ export default class Player {
     shuffleDeck(): void {
         this.deck = this.shuffle(this.deck);
     }
-    drawCards(num: number): Array<Card> {
-        const newCards = this.deck.splice(0, num);
+    drawCards(num: number): Array<CardStack> {
+        const newCards = this.deck.splice(0, num).map((c: Card) => new CardStack(c, Zone.Hand));
         this.hand = this.hand.concat(newCards);
         return newCards;
     }

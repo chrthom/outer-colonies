@@ -1,10 +1,12 @@
 import { Button } from '../components/button';
-import { CardImage, HandCard } from '../components/card';
+import { CardImage, CardStack, HandCard } from '../components/card';
 import { Prompt } from '../components/prompt';
 
 export default class Game extends Phaser.Scene {
     state = {};
+    mode = 'default';
     hand = [];
+    cardStacks = [];
     obj = {
         deck: null,
         prompt: null,
@@ -22,7 +24,7 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
-        [ 'back', 130, 160, 163, 166, 348].forEach(id => 
+        [ 'back', 'colony', 130, 160, 163, 166, 348].forEach(id => 
             this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
     }
     
@@ -32,10 +34,8 @@ export default class Game extends Phaser.Scene {
         this.socket.on('state', (state) => {
             this.updateState(state);
         });
-        this.socket.on('card_request', (cardRequest) => {
-            console.log(JSON.stringify(cardRequest)); // TODO: Implement this
-        });
 
+        this.cardStacks.push(new CardStack(this, [ 'colony' ], 'colony', 0, 1, true, 0));
         this.obj.deck = new CardImage(this, 1150, 620, 'back');
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
@@ -45,13 +45,21 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
-    handCardClicked = (index) => {
-        this.socket.emit('handcard', index);
+    handCardClicked = (hardCardData) => {
+        if (this.mode == 'default') {
+            this.mode = 'target';
+            const targetUUIDs = hardCardData.validTargets.cardUUIDs;
+            console.log('Can be attached to cards: ' + JSON.stringify(targetUUIDs));
+            console.log('Can be attached to colony: ' + hardCardData.validTargets.ownColony);
+        } else if (this.mode == 'target') {
+            this.mode = 'default';
+        }
+        //this.socket.emit('handcard', index);
     }
 
     updateState(state) {
         this.state = state;
-        console.log('Received new state: ' + JSON.stringify(state)); //
+        //console.log('Received new state: ' + JSON.stringify(state)); //
         this.hand.forEach(card => card.destroy());
         this.hand = state.hand.map((cardData) => {
             return new HandCard(this, state.hand.length, cardData, this.handCardClicked);
@@ -66,7 +74,7 @@ export default class Game extends Phaser.Scene {
                         + `${state.remainingActions.tactic}x Taktik`
                     this.obj.prompt.showText(promptText)
                     this.obj.button.show('Aufbauphase beenden', () => {
-                        console.log('Weiter'); //
+                        console.log('Aufbauphase beenden'); //
                     });
                     break;
             }

@@ -1,3 +1,19 @@
+const layout = {
+    xPadding: 70,
+    defaultDistance: 125,
+    stackDistance: 30,
+    hand: {
+        y: 620,
+        defaultThreshold: 8,
+        maxWidth: 1000
+    },
+    zones: {
+        defaultThreshold: 10,
+        maxWidth: 1250
+    },
+    ownColonyZoneY: 450
+}
+
 export class CardImage {
     sprite;
     constructor(scene, x, y, cardId) {
@@ -8,19 +24,53 @@ export class CardImage {
     destroy() {
         this.sprite.destroy();
     }
+    highlightDisabled() {
+        this.highlightReset();
+        this.sprite.alpha = 0.5;
+    }
+    highlightedTarget() {
+        this.highlightReset();
+        this.sprite.setTint(0xff6666, 0xff6666, 0xffffff, 0xffffff);
+    }
+    highlightReset() {
+        this.sprite.alpha = 1;
+        this.sprite.setTint(0xffffff);
+    }
 }
 
 export class HandCard extends CardImage {
     index;
     playable;
-    constructor(scene, handCardsTotal, hardCardData, onClickAction) {
-        const x = 70 + (handCardsTotal <= 8 ? hardCardData.index * 125 : hardCardData.index * 1000 / handCardsTotal);
-        super(scene, x, 620, hardCardData.cardId);
+    constructor(scene, handCards, hardCardData, onClickAction) {
+        const x = layout.xPadding + (
+            handCards <= layout.hand.defaultThreshold ? 
+            hardCardData.index * layout.defaultDistance : 
+            hardCardData.index * layout.hand.maxWidth / handCards
+        );
+        super(scene, x, layout.hand.y, hardCardData.cardId);
         if (hardCardData.playable) {
             this.sprite.setInteractive();
             this.sprite.on('pointerdown', () => {
-                onClickAction(hardCardData.index);
+                onClickAction(hardCardData);
             });
-        } else this.sprite.alpha = 0.5;
+        } else this.highlightDisabled();
+    }
+}
+
+export class CardStack {
+    sprites;
+    zone;
+    ownPlayer;
+    damage;
+    constructor(scene, cardIds, zone, index, zoneCards, ownPlayer, damage) {
+        const x = layout.xPadding + (
+            zoneCards <= layout.zones.defaultThreshold ? 
+            index * layout.defaultDistance : 
+            index * layout.zones.maxWidth / zoneCards
+        );
+        this.sprites = cardIds.map((id, index) => new CardImage(scene, x, layout.ownColonyZoneY, id)); // TODO: Adjust y for multiple cards
+        this.zone = zone;
+        this.ownPlayer = ownPlayer;
+        this.damage = damage;
     }
 }

@@ -29,6 +29,7 @@ export enum TurnPhase {
 }
 
 export enum Zone {
+    Hand = 'hand',
     Colony = 'colony',
     Oribital = 'orbital',
     Neutral = 'neutral'
