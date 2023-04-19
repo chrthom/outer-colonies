@@ -19,7 +19,8 @@ export class CardImage {
     constructor(scene, x, y, cardId) {
         this.sprite = scene.add.image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
-            .setScale(0.15, 0.15);
+            .setScale(0.15, 0.15)
+            .setInteractive();
     }
     destroy() {
         this.sprite.destroy();
@@ -28,7 +29,7 @@ export class CardImage {
         this.highlightReset();
         this.sprite.alpha = 0.5;
     }
-    highlightTarget() {
+    highlightSelected() {
         this.highlightReset();
         this.sprite.setTint(0xff6666, 0xff6666, 0xffffff, 0xffffff);
     }
@@ -37,7 +38,6 @@ export class CardImage {
         this.sprite.setTint(0xffffff);
     }
     setClickable(onClickAction, parameter) {
-        this.sprite.setInteractive();
         this.sprite.on('pointerdown', () => {
             onClickAction(parameter);
         });
@@ -46,6 +46,7 @@ export class CardImage {
 
 export class HandCard extends CardImage {
     uuid;
+    data;
     constructor(scene, handCardsNum, handCardData, onClickAction) {
         const x = layout.xPadding + (
             handCardsNum <= layout.hand.defaultThreshold ? 
@@ -53,8 +54,12 @@ export class HandCard extends CardImage {
             handCardData.index * layout.hand.maxWidth / handCardsNum
         );
         super(scene, x, layout.hand.y, handCardData.cardId);
+        this.data = handCardData;
         this.uuid = handCardData.uuid;
-        if (handCardData.playable) this.setClickable(onClickAction, handCardData);
+        if (handCardData.playable) this.setClickable(onClickAction, this);
+    }
+    highlightPlayability() {
+        if (this.data.playable) this.highlightReset();
         else this.highlightDisabled();
     }
 }
@@ -88,12 +93,18 @@ export class CardStack {
         this.cards.forEach((c) => c.destroy());
     }
     highlightDisabled() {
-        this.cards.forEach((c) => c.highlightDisabled());
+        this.cards.forEach((c) => {
+            c.highlightDisabled();
+            c.sprite.setInteractive(false);
+        });
     }
-    highlightTarget() {
-        this.cards.forEach((c) => c.highlightTarget());
+    highlightSelected() {
+        this.cards.forEach((c) => c.highlightSelected());
     }
     highlightReset() {
-        this.cards.forEach((c) => c.highlightReset());
+        this.cards.forEach((c) => {
+            c.highlightReset();
+            c.sprite.setInteractive();
+        });
     }
 }

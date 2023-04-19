@@ -82,6 +82,6 @@ export function gameSocketListeners(io, socket): void {
         } else {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
         }
-        this.emitState(io, match);
+        emitState(io, match);
     });
 };

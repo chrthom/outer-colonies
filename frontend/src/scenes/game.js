@@ -35,7 +35,6 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
 
-        this.cardStacks.push(new CardStack(this, 'colony', [ 'colony' ], 'colony', this.cardStackClicked, 0, 1, true, 0));
         this.obj.deck = new CardImage(this, 1150, 620, 'back');
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
@@ -45,38 +44,44 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
-    handCardClicked = (handCardData) => {
-        if (this.activeCard) {
-            this.activeCard = null;
-            this.cardStacks.forEach((cs) => cs.highlightReset());
-        } else {
-            this.activeCard = handCardData.uuid;
-            let attachableCardStacks = [];
-            console.log('Can be attached to cards: ' + JSON.stringify(handCardData.validTargets.cardUUIDs));
+    handCardClicked = (handCard) => {
+        const reset = this.activeCard == handCard.uuid;
+        this.activeCard = null;
+        this.hand.forEach(c => c.highlightPlayability());
+        this.cardStacks.forEach((cs) => cs.highlightReset());
+        if (!reset) {
+            this.activeCard = handCard.data.uuid;
+            handCard.highlightSelected();
+            let nonAttachableCardStacks = [];
+            console.log('Can be attached to cards: ' + JSON.stringify(handCard.data.validTargets.cardUUIDs));
             // TODO: Implement attaching to cards
-            console.log('Can be attached to colony: ' + handCardData.validTargets.ownColony);
-            if (handCardData.validTargets.ownColony) {
-                attachableCardStacks.push(this.cardStacks.find((cs) => cs.uuid == 'colony'));
+            console.log('Can be attached to colony: ' + handCard.data.validTargets.ownColony);
+            if (!handCard.data.validTargets.ownColony) {
+                nonAttachableCardStacks.push(this.cardStacks.find((cs) => cs.uuid == 'colony'));
             }
-            attachableCardStacks.forEach((cs) => cs.highlightTarget());
+            nonAttachableCardStacks.forEach((cs) => cs.highlightDisabled());
         }
     }
 
     cardStackClicked = (cardStack) => {
-        this.socket.emit('handcard', this.activeCard, cardStack.uuid);
+        if (this.activeCard) this.socket.emit('handcard', this.activeCard, cardStack.uuid);
     }
 
     updateState(state) {
         this.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
         this.activeCard = null;
-        this.hand.forEach(card => card.destroy());
+        this.hand.forEach(c => c.destroy());
         this.hand = state.hand.map((cardData) => {
             return new HandCard(this, state.hand.length, cardData, this.handCardClicked);
         });
+        this.cardStacks.forEach(c => c.destroy());
+        this.cardStacks = [ new CardStack(this, 'colony', [ 'colony' ], 'colony', this.cardStackClicked, 0, 1, true, 0) ];
+        //this.state
         if (state.playerIsActive) {
             switch (state.turnPhase) {
                 case 'build':
+                    this.hand.forEach((c) => c.highlightPlayability());
                     const promptText = 'Aufbauphase: Spiele Karten\n'
                         + `${state.remainingActions.hull}x Hülle, `
                         + `${state.remainingActions.equipment}x Ausrüstung, `
@@ -84,7 +89,7 @@ export default class Game extends Phaser.Scene {
                         + `${state.remainingActions.tactic}x Taktik`
                     this.obj.prompt.showText(promptText)
                     this.obj.button.show('Aufbauphase beenden', () => {
-                        console.log('Aufbauphase beenden'); //
+                        console.log('Aufbauphase beendet'); // TODO: Implement
                     });
                     break;
             }

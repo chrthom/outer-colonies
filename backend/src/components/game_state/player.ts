@@ -37,6 +37,7 @@ export default class Player {
         return newCards;
     }
     playCardToColonyZone(handCard: CardStack): void {
+        this.remainingActions[handCard.card.type]--;
         handCard.zone = Zone.Colony;
         this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
