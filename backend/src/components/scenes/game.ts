@@ -1,9 +1,8 @@
 import Player from '../game_state/player';
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
-import toFrontendCardRequest from '../frontend_converters/frontend_card_request';
 import { rules } from '../config/rules';
-import { MsgTypeInbound, MsgTypeOutbound } from '../config/enums'
+import { MsgTypeInbound, MsgTypeOutbound, Zone } from '../config/enums'
 import { getCardStackByUUID } from '../utils/utils';
 
 function getSocket(io, match: Match, playerNo: number) {
@@ -63,10 +62,9 @@ export function gameSocketListeners(io, socket): void {
             if (targetUUID == 'colony') { // TODO: Also accept opponent's colony
                 if (handCard.card.canBeAttachedToColony(player.cardStacks)) {
                     console.log(`Successfully played card ${handCard.card.name} on own colony`);
-                    // TODO: Implement logic to play card
+                    player.playCardToColonyZone(handCard);
                 } else {
                     console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on own colony, which is not a valid target`);
-                    this.emitState(io, match);
                 }
             } else {
                 const target = getCardStackByUUID(player.card_stack, targetUUID); // TODO: Also check opponent card stack
@@ -76,16 +74,14 @@ export function gameSocketListeners(io, socket): void {
                         // TODO: Implement logic to play card
                     } else {
                         console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
-                        this.emitState(io, match);
                     }
                 } else {
                     console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on an no-existing target ${targetUUID}`);
-                    this.emitState(io, match);
                 }
             }
         } else {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
-            this.emitState(io, match);
         }
+        this.emitState(io, match);
     });
 };

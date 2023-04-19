@@ -2,6 +2,7 @@ import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { rules } from '../config/rules';
 import { CardType, Zone } from '../config/enums'
+import { getCardStackByUUID, spliceCardStackByUUID } from '../utils/utils';
 
 export default class Player {
     id!: string;
@@ -34,6 +35,10 @@ export default class Player {
         const newCards = this.deck.splice(0, num).map((c: Card) => new CardStack(c, Zone.Hand));
         this.hand = this.hand.concat(newCards);
         return newCards;
+    }
+    playCardToColonyZone(handCard: CardStack): void {
+        handCard.zone = Zone.Colony;
+        this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     private shuffle<T>(array: Array<T>): Array<T> {
         return array.sort(() => Math.random() -0.5)
