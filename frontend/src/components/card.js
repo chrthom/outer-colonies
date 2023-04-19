@@ -3,7 +3,7 @@ const layout = {
     defaultDistance: 125,
     stackDistance: 30,
     hand: {
-        y: 620,
+        y: 700,
         defaultThreshold: 8,
         maxWidth: 1000
     },
@@ -11,16 +11,28 @@ const layout = {
         defaultThreshold: 10,
         maxWidth: 1250
     },
-    ownColonyZoneY: 450
+    zoneY: {
+        player: {
+            colony: 540,
+            orbital: 380,
+            neutral: 220
+        },
+        opponent: {
+            colony: 10,
+            orbital: 170,
+            neutral: 220
+        }
+    }
 }
 
 export class CardImage {
     sprite;
-    constructor(scene, x, y, cardId) {
+    constructor(scene, x, y, cardId, opponentCard) {
         this.sprite = scene.add.image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
-            .setScale(0.15, 0.15)
+            .setScale(0.12, 0.12)
             .setInteractive();
+        if (opponentCard) this.sprite.setAngle(180);
     }
     destroy() {
         this.sprite.destroy();
@@ -68,16 +80,17 @@ export class CardStack {
     cards;
     uuid;
     zone;
-    ownPlayer;
+    ownedByPlayer;
     damage;
-    constructor(scene, uuid, cardIds, zone, onClickAction, index, zoneCardsNum, ownPlayer, damage) {
+    constructor(scene, uuid, cardIds, zone, onClickAction, index, zoneCardsNum, ownedByPlayer, damage) {
         const self = this;
         const x = layout.xPadding + (
             zoneCardsNum <= layout.zones.defaultThreshold ? 
             index * layout.defaultDistance : 
             index * layout.zones.maxWidth / zoneCardsNum
         );
-        this.cards = cardIds.map((id, index) => new CardImage(scene, x, layout.ownColonyZoneY, id)); // TODO: Adjust y for multiple cards
+        const y = layout.zoneY[ownedByPlayer ? 'player' : 'opponent'][zone]; // TODO: Adjust y for multiple cards in stack
+        this.cards = cardIds.map((id, index) => new CardImage(scene, x, y, id, !ownedByPlayer));
         this.cards.forEach((c) => {
             c.sprite.setInteractive();
             c.sprite.on('pointerdown', () => {
@@ -86,7 +99,7 @@ export class CardStack {
         });
         this.uuid = uuid;
         this.zone = zone;
-        this.ownPlayer = ownPlayer;
+        this.ownedByPlayer = ownedByPlayer;
         this.damage = damage;
     }
     destroy() {

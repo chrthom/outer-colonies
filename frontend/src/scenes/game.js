@@ -77,7 +77,9 @@ export default class Game extends Phaser.Scene {
         });
         this.cardStacks.forEach(c => c.destroy());
         this.cardStacks = [ new CardStack(this, 'colony', [ 'colony' ], 'colony', this.cardStackClicked, 0, 1, true, 0) ];
-        //this.state
+        this.state.cardStacks.forEach(cs => 
+            this.cardStacks.push(new CardStack(
+                this, cs.uuid, cs.cardIds, cs.zone, this.cardStackClicked, cs.index, cs.zoneCardsNum, cs.ownedByPlayer, cs.damage)));
         if (state.playerIsActive) {
             switch (state.turnPhase) {
                 case 'build':
