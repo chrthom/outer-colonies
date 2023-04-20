@@ -2,6 +2,7 @@ import Match from '../game_state/match'
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { CardType, TurnPhase, Zone } from '../config/enums'
+import { consts } from '../config/consts';
 
 class FrontendOpponent {
     name!: string;
@@ -20,13 +21,7 @@ class FrontendHandCard {
     cardId!: string;
     index!: number;
     playable!: boolean;
-    validTargets!: FrontendHandCardTargets;
-}
-
-class FrontendHandCardTargets {
-    cardUUIDs!: Array<string>;
-    ownColony!: boolean;
-    opponentColony!: boolean;
+    validTargets!: Array<string>;
 }
 
 class FrontendCardStack {
@@ -55,20 +50,83 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
         return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap((zone: Zone) => {
             const zoneCardStacks = playerCardStacks.filter((cs: CardStack) => cs.zone == zone);
-            const colonyPlaceholder = (zone == Zone.Colony ? 1 : 0);
+            const colonyPlaceholder: Array<FrontendCardStack> = zone != Zone.Colony ? [] : [
+                {
+                    uuid: ownedByPlayer ? consts.colonyPlayer : consts.colonyOpponent,
+                    cardIds: [ 'colony' ],
+                    zone: Zone.Colony,
+                    index: 0,
+                    zoneCardsNum: zoneCardStacks.length + 1,
+                    ownedByPlayer: ownedByPlayer,
+                    damage: 0 // TODO: Implement once needed
+                }
+            ];
             return zoneCardStacks.map((cs: CardStack, index: number) => {
                 return {
                     uuid: cs.uuid,
                     cardIds: cs.getCards().map((c: Card) => String(c.id)),
                     zone: zone,
-                    index: index + colonyPlaceholder,
-                    zoneCardsNum: zoneCardStacks.length + colonyPlaceholder,
+                    index: index + colonyPlaceholder.length,
+                    zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
                     ownedByPlayer: ownedByPlayer,
                     damage: 0 // TODO: Implement once needed
                 };
-            });
+            }).concat(colonyPlaceholder);
         });
     });
+    /*
+    cardStacks = [ /// Overwrite for testing frontend layout
+        {
+            uuid: 'a1',
+            cardIds: [ '160', '163', '163' ],
+            zone: Zone.Colony,
+            index: 1,
+            zoneCardsNum: 2,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'b1',
+            cardIds: [ '160', '163', '163', '163', '163', '163' ],
+            zone: Zone.Oribital,
+            index: 0,
+            zoneCardsNum: 1,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'c1',
+            cardIds: [ '160', '163' ],
+            zone: Zone.Neutral,
+            index: 0,
+            zoneCardsNum: 1,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'd1',
+            cardIds: [ '160', '163' ],
+            zone: Zone.Neutral,
+            index: 0,
+            zoneCardsNum: 1,
+            ownedByPlayer: false,
+            damage: 0
+        }, {
+            uuid: 'e1',
+            cardIds: [ '160' ],
+            zone: Zone.Oribital,
+            index: 0,
+            zoneCardsNum: 1,
+            ownedByPlayer: false,
+            damage: 0
+        }, {
+            uuid: 'f1',
+            cardIds: [ '160', '163' ],
+            zone: Zone.Colony,
+            index: 1,
+            zoneCardsNum: 2,
+            ownedByPlayer: false,
+            damage: 0
+        }
+    ];
+    */
     return {
         playerIsActive: match.activePlayerNo == playerNo,
         turnPhase: match.turnPhase,
@@ -77,16 +135,14 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             handCardNo: opponent.hand.length
         },
         hand: player.hand.map((c: CardStack, index: number) => {
+            let validTargets = c.card.canBeAttachedTo(player.cardStacks).map((cs: CardStack) => cs.uuid);
+            if (c.card.canBeAttachedToColony(player.cardStacks)) validTargets.push(consts.colonyPlayer); // TODO: Implement opponent colony
             return {
                 uuid: c.uuid,
                 cardId: String(c.card.id),
                 index: index,
                 playable: c.card.isPlayable(match, playerNo),
-                validTargets: {
-                    cardUUIDs: c.card.canBeAttachedTo(player.cardStacks).map((cs: CardStack) => cs.uuid),
-                    ownColony: c.card.canBeAttachedToColony(player.cardStacks),
-                    opponentColony: false // TODO: Implement this when needed for tactic cards
-                }
+                validTargets: validTargets
             };
         }),
         cardStacks: cardStacks,

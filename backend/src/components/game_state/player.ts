@@ -41,6 +41,10 @@ export default class Player {
         handCard.zone = Zone.Colony;
         this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
+    attachCardToCardStack(handCard: CardStack, targetCardStack: CardStack): void {
+        this.remainingActions[handCard.card.type]--;
+        targetCardStack.attachedCards.push(spliceCardStackByUUID(this.hand, handCard.uuid));
+    }
     private shuffle<T>(array: Array<T>): Array<T> {
         return array.sort(() => Math.random() -0.5)
     }

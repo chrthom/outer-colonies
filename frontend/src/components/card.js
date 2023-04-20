@@ -1,26 +1,50 @@
 const layout = {
-    xPadding: 70,
-    defaultDistance: 125,
-    stackDistance: 30,
-    hand: {
-        y: 700,
-        defaultThreshold: 8,
-        maxWidth: 1000
-    },
-    zones: {
-        defaultThreshold: 10,
-        maxWidth: 1250
-    },
-    zoneY: {
-        player: {
-            colony: 540,
-            orbital: 380,
-            neutral: 220
+    stackYDistance: 20,
+    player: {
+        hand: {
+            x: 1300,
+            y: 720,
+            angleStep: -5,
+            xStep: -20,
+            yStep: 2,
+            startAngle: 10
         },
-        opponent: {
-            colony: 10,
-            orbital: 170,
-            neutral: 220
+        colony: {
+            x: 50,
+            y: 570,
+            maxWidth: 500
+        },
+        orbital: {
+            x: 550,
+            y: 570,
+            maxWidth: 500
+        },
+        neutral: {
+            x: 50,
+            y: 360,
+            maxWidth: 500
+        }
+    },
+    opponent: {
+        hand: {
+            x: 1050,
+            y: 70,
+            maxWidth: 500
+        },
+        colony: {
+            x: 550,
+            y: 150,
+            maxWidth: 500
+        },
+        orbital: {
+            x: 50,
+            y: 150,
+            maxWidth: 500
+        },
+        neutral: {
+            x: 550,
+            y: 360,
+            maxWidth: 500
         }
     }
 }
@@ -39,14 +63,13 @@ export class CardImage {
     }
     highlightDisabled() {
         this.highlightReset();
-        this.sprite.alpha = 0.5;
+        this.sprite.setTint(0x666666)
     }
     highlightSelected() {
         this.highlightReset();
         this.sprite.setTint(0xff6666, 0xff6666, 0xffffff, 0xffffff);
     }
     highlightReset() {
-        this.sprite.alpha = 1;
         this.sprite.setTint(0xffffff);
     }
     setClickable(onClickAction, parameter) {
@@ -60,12 +83,12 @@ export class HandCard extends CardImage {
     uuid;
     data;
     constructor(scene, handCardsNum, handCardData, onClickAction) {
-        const x = layout.xPadding + (
-            handCardsNum <= layout.hand.defaultThreshold ? 
-            handCardData.index * layout.defaultDistance : 
-            handCardData.index * layout.hand.maxWidth / handCardsNum
-        );
-        super(scene, x, layout.hand.y, handCardData.cardId);
+        const invIndex = handCardsNum - handCardData.index - 1;
+        const x = layout.player.hand.x + invIndex * layout.player.hand.xStep;
+        const y = layout.player.hand.y + invIndex * layout.player.hand.yStep;
+        const angle = layout.player.hand.startAngle + invIndex * layout.player.hand.angleStep;
+        super(scene, x, y, handCardData.cardId);
+        this.sprite.setOrigin(0.5, 1).setAngle(angle);
         this.data = handCardData;
         this.uuid = handCardData.uuid;
         if (handCardData.playable) this.setClickable(onClickAction, this);
@@ -84,15 +107,11 @@ export class CardStack {
     damage;
     constructor(scene, uuid, cardIds, zone, onClickAction, index, zoneCardsNum, ownedByPlayer, damage) {
         const self = this;
-        const x = layout.xPadding + (
-            zoneCardsNum <= layout.zones.defaultThreshold ? 
-            index * layout.defaultDistance : 
-            index * layout.zones.maxWidth / zoneCardsNum
-        );
-        const y = layout.zoneY[ownedByPlayer ? 'player' : 'opponent'][zone]; // TODO: Adjust y for multiple cards in stack
-        this.cards = cardIds.map((id, index) => new CardImage(scene, x, y, id, !ownedByPlayer));
+        const zoneLayout = layout[ownedByPlayer ? 'player' : 'opponent'][zone];
+        const x = zoneLayout.x + index * zoneLayout.maxWidth / zoneCardsNum;
+        const yDistance = layout.stackYDistance * (ownedByPlayer ? 1 : -1);
+        this.cards = cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !ownedByPlayer));
         this.cards.forEach((c) => {
-            c.sprite.setInteractive();
             c.sprite.on('pointerdown', () => {
                 onClickAction(self);
             });
@@ -108,7 +127,6 @@ export class CardStack {
     highlightDisabled() {
         this.cards.forEach((c) => {
             c.highlightDisabled();
-            c.sprite.setInteractive(false);
         });
     }
     highlightSelected() {
@@ -117,7 +135,6 @@ export class CardStack {
     highlightReset() {
         this.cards.forEach((c) => {
             c.highlightReset();
-            c.sprite.setInteractive();
         });
     }
 }

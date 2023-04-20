@@ -15,7 +15,7 @@ export class Card163 extends EquipmentCard {
                 theta: 0,
                 xi: 0,
                 phi: 0,
-                omega: 1,
+                omega: -1,
                 delta: 0,
                 psi: 0
             }

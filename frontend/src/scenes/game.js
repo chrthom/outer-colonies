@@ -35,7 +35,7 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
 
-        this.obj.deck = new CardImage(this, 1150, 620, 'back');
+        this.obj.deck = new CardImage(this, 1050, 500, 'back');
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
 
@@ -52,14 +52,9 @@ export default class Game extends Phaser.Scene {
         if (!reset) {
             this.activeCard = handCard.data.uuid;
             handCard.highlightSelected();
-            let nonAttachableCardStacks = [];
-            console.log('Can be attached to cards: ' + JSON.stringify(handCard.data.validTargets.cardUUIDs));
-            // TODO: Implement attaching to cards
-            console.log('Can be attached to colony: ' + handCard.data.validTargets.ownColony);
-            if (!handCard.data.validTargets.ownColony) {
-                nonAttachableCardStacks.push(this.cardStacks.find((cs) => cs.uuid == 'colony'));
-            }
-            nonAttachableCardStacks.forEach((cs) => cs.highlightDisabled());
+            this.cardStacks.forEach(cs => {
+                if (!handCard.data.validTargets.includes(cs.uuid)) cs.highlightDisabled()
+            });
         }
     }
 
@@ -68,18 +63,18 @@ export default class Game extends Phaser.Scene {
     }
 
     updateState(state) {
+        let self = this;
         this.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
         this.activeCard = null;
         this.hand.forEach(c => c.destroy());
         this.hand = state.hand.map((cardData) => {
-            return new HandCard(this, state.hand.length, cardData, this.handCardClicked);
+            return new HandCard(self, state.hand.length, cardData, self.handCardClicked);
         });
         this.cardStacks.forEach(c => c.destroy());
-        this.cardStacks = [ new CardStack(this, 'colony', [ 'colony' ], 'colony', this.cardStackClicked, 0, 1, true, 0) ];
         this.state.cardStacks.forEach(cs => 
-            this.cardStacks.push(new CardStack(
-                this, cs.uuid, cs.cardIds, cs.zone, this.cardStackClicked, cs.index, cs.zoneCardsNum, cs.ownedByPlayer, cs.damage)));
+            self.cardStacks.push(new CardStack(
+                self, cs.uuid, cs.cardIds, cs.zone, self.cardStackClicked, cs.index, cs.zoneCardsNum, cs.ownedByPlayer, cs.damage)));
         if (state.playerIsActive) {
             switch (state.turnPhase) {
                 case 'build':
