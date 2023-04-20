@@ -7,7 +7,7 @@ export default class Match {
     readonly room!: string;
     players: Array<Player> = [];
     activePlayerNo = 0;
-    turnPhase = TurnPhase.Start;
+    turnPhase = TurnPhase.Init;
     constructor(room: string) {
         this.room = room;
     }
@@ -38,5 +38,8 @@ export default class Match {
     execBuildPhase(): void {
         this.turnPhase = TurnPhase.Build;
         // TODO
+    }
+    execPlanPhase(): void {
+        this.turnPhase = TurnPhase.Plan;
     }
 }

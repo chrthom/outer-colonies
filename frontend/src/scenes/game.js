@@ -1,5 +1,5 @@
 import { Button } from '../components/button';
-import { CardImage, CardStack, HandCard } from '../components/card';
+import { CardImage, CardStack, HandCard, MaxCard } from '../components/card';
 import { Prompt } from '../components/prompt';
 
 export default class Game extends Phaser.Scene {
@@ -10,7 +10,8 @@ export default class Game extends Phaser.Scene {
     obj = {
         deck: null,
         prompt: null,
-        button: null
+        button: null,
+        maxCard: null
     };
 
     constructor () {
@@ -30,16 +31,14 @@ export default class Game extends Phaser.Scene {
     
     create () {
         let self = this;
-
         this.socket.on('state', (state) => {
             this.updateState(state);
         });
-
-        this.obj.deck = new CardImage(this, 1050, 500, 'back');
+        this.obj.deck = new CardImage(this, 1170, 520, 'back');
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
-
-        this.socket.emit('ready');
+        this.obj.maxCard = new MaxCard(this); // CONTINUE HERE!!!
+        this.socket.emit('ready', 'init');
     }
 
     update() {}
@@ -62,32 +61,37 @@ export default class Game extends Phaser.Scene {
         if (this.activeCard) this.socket.emit('handcard', this.activeCard, cardStack.uuid);
     }
 
+    nextPhase = () => {
+        console.log('Build phase completed');
+        this.socket.emit('ready', this.state.turnPhase);
+    }
+
     updateState(state) {
         let self = this;
-        this.state = state;
+        self.state = state;
         //console.log('Received new state: ' + JSON.stringify(state)); //
-        this.activeCard = null;
-        this.hand.forEach(c => c.destroy());
-        this.hand = state.hand.map((cardData) => {
+        self.activeCard = null;
+        self.hand.forEach(c => c.destroy());
+        self.obj.prompt.hide();
+        self.obj.button.hide();
+        self.hand = state.hand.map((cardData) => {
             return new HandCard(self, state.hand.length, cardData, self.handCardClicked);
         });
-        this.cardStacks.forEach(c => c.destroy());
-        this.state.cardStacks.forEach(cs => 
+        self.cardStacks.forEach(c => c.destroy());
+        self.state.cardStacks.forEach(cs => 
             self.cardStacks.push(new CardStack(
                 self, cs.uuid, cs.cardIds, cs.zone, self.cardStackClicked, cs.index, cs.zoneCardsNum, cs.ownedByPlayer, cs.damage)));
         if (state.playerIsActive) {
             switch (state.turnPhase) {
                 case 'build':
-                    this.hand.forEach((c) => c.highlightPlayability());
+                    self.hand.forEach((c) => c.highlightPlayability());
                     const promptText = 'Aufbauphase: Spiele Karten\n'
                         + `${state.remainingActions.hull}x Hülle, `
                         + `${state.remainingActions.equipment}x Ausrüstung, `
                         + `${state.remainingActions.colony}x Kolonie, `
-                        + `${state.remainingActions.tactic}x Taktik`
-                    this.obj.prompt.showText(promptText)
-                    this.obj.button.show('Aufbauphase beenden', () => {
-                        console.log('Aufbauphase beendet'); // TODO: Implement
-                    });
+                        + `${state.remainingActions.tactic}x Taktik`;
+                    self.obj.prompt.showText(promptText);
+                    self.obj.button.show('Aufbauphase beenden', self.nextPhase);
                     break;
             }
         }

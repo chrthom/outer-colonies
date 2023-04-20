@@ -2,7 +2,7 @@ import Player from '../game_state/player';
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
 import { rules } from '../config/rules';
-import { MsgTypeInbound, MsgTypeOutbound, Zone } from '../config/enums'
+import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
 import { getCardStackByUUID } from '../utils/utils';
 import { consts } from '../config/consts';
 
@@ -47,12 +47,20 @@ function nextTurn(io, match: Match): void {
 }
 
 export function gameSocketListeners(io, socket): void {
-    socket.on(MsgTypeInbound.Ready, () => {
+    socket.on(MsgTypeInbound.Ready, (turnPhase: string) => {
         const match = socket.data.match;
-        match.players[socket.data.playerNo].ready = true;
-        if (match.players[socket.data.opponentPlayerNo()].ready) {
-            console.log(`Game match ${match.matchName()} is ready to start`);
-            initMatch(io, match);
+        switch(turnPhase) {
+            case TurnPhase.Init:
+                match.players[socket.data.playerNo].ready = true;
+                if (match.players[socket.data.opponentPlayerNo()].ready) {
+                    console.log(`Game match ${match.matchName()} is ready to start`);
+                    initMatch(io, match);
+                }
+                break;
+            case TurnPhase.Build:
+                match.execPlanPhase();
+                emitState(io, match);
+                break;
         }
     });
     socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {

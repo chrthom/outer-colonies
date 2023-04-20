@@ -1,5 +1,13 @@
 const layout = {
     stackYDistance: 20,
+    cards: {
+        scale: 0.12
+    },
+    maxCard: {
+        x: 1150,
+        y: 475,
+        scale: 0.4
+    },
     player: {
         hand: {
             x: 1300,
@@ -51,12 +59,20 @@ const layout = {
 
 export class CardImage {
     sprite;
+    cardId;
     constructor(scene, x, y, cardId, opponentCard) {
+        this.cardId = cardId;
         this.sprite = scene.add.image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
-            .setScale(0.12, 0.12)
+            .setScale(layout.cards.scale, layout.cards.scale)
             .setInteractive();
         if (opponentCard) this.sprite.setAngle(180);
+        this.sprite.on('pointerover', (pointer) => {
+            scene.obj.maxCard.show(cardId);
+        })
+        this.sprite.on('pointerout', (pointer) => {
+            scene.obj.maxCard.hide();
+        })
     }
     destroy() {
         this.sprite.destroy();
@@ -96,6 +112,21 @@ export class HandCard extends CardImage {
     highlightPlayability() {
         if (this.data.playable) this.highlightReset();
         else this.highlightDisabled();
+    }
+}
+
+export class MaxCard extends CardImage {
+    constructor(scene) {
+        super(scene, layout.maxCard.x, layout.maxCard.y, 'back');
+        this.sprite.setOrigin(0.5, 1).setScale(layout.maxCard.scale);
+        this.hide();
+    }
+    hide() {
+        this.sprite.visible = false;
+    }
+    show(cardId) {
+        this.sprite.setTexture(`card_${cardId}`);
+        this.sprite.visible = true;
     }
 }
 
