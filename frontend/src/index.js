@@ -4,10 +4,13 @@ import GameScene from './scenes/game'
 
 const config = {
     type: Phaser.AUTO,
-    parent: 'game',
-    width: 1320,
-    height: 720,
-    scene: [ MatchmakingScene, GameScene ]
+    scene: [ MatchmakingScene, GameScene ],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        parent: 'game',
+        width: 1320,
+        height: 720,
+    }
 };
 
 const game = new Phaser.Game(config);
