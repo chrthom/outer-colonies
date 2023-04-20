@@ -88,8 +88,9 @@ export class CardStack {
     constructor(scene, uuid, cardIds, zone, onClickAction, index, zoneCardsNum, ownedByPlayer, damage) {
         const self = this;
         const zoneLayout = layout[ownedByPlayer ? 'player' : 'opponent'][zone];
-        const x = zoneLayout.x + index * zoneLayout.maxWidth / (zoneCardsNum - 1);
+        const x = zoneLayout.x + (zoneCardsNum == 1 ? zoneLayout.maxWidth / 2 : index * zoneLayout.maxWidth / (zoneCardsNum - 1));
         const yDistance = layout.stackYDistance * (ownedByPlayer ? 1 : -1);
+        console.log(`New Card Stack ${cardIds} | ${ownedByPlayer} | ${x} | ${zoneLayout.y}`); ////
         this.cards = cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !ownedByPlayer));
         this.cards.forEach((c) => {
             c.sprite.on('pointerdown', () => {
