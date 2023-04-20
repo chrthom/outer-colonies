@@ -1,5 +1,5 @@
 import { Button } from '../components/button';
-import { CardImage, CardStack, HandCard, MaxCard } from '../components/card';
+import { CardStack, DeckCard, HandCard, MaxCard } from '../components/card';
 import { Prompt } from '../components/prompt';
 
 export default class Game extends Phaser.Scene {
@@ -34,7 +34,7 @@ export default class Game extends Phaser.Scene {
         this.socket.on('state', (state) => {
             this.updateState(state);
         });
-        this.obj.deck = new CardImage(this, 1170, 520, 'back');
+        this.obj.deck = new DeckCard(this);
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
         this.obj.maxCard = new MaxCard(this); // CONTINUE HERE!!!

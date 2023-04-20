@@ -78,7 +78,15 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     cardStacks = [ /// Overwrite for testing frontend layout
         {
             uuid: 'a1',
-            cardIds: [ '160', '163', '163' ],
+            cardIds: [ 'colony' ],
+            zone: Zone.Colony,
+            index: 0,
+            zoneCardsNum: 2,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'a2',
+            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
             zone: Zone.Colony,
             index: 1,
             zoneCardsNum: 2,
@@ -86,31 +94,55 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             damage: 0
         }, {
             uuid: 'b1',
-            cardIds: [ '160', '163', '163', '163', '163', '163' ],
+            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
             zone: Zone.Oribital,
             index: 0,
-            zoneCardsNum: 1,
+            zoneCardsNum: 2,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'b2',
+            cardIds: [ '160' ],
+            zone: Zone.Oribital,
+            index: 1,
+            zoneCardsNum: 2,
             ownedByPlayer: true,
             damage: 0
         }, {
             uuid: 'c1',
-            cardIds: [ '160', '163' ],
+            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
             zone: Zone.Neutral,
             index: 0,
-            zoneCardsNum: 1,
+            zoneCardsNum: 2,
+            ownedByPlayer: true,
+            damage: 0
+        }, {
+            uuid: 'c2',
+            cardIds: [ '160' ],
+            zone: Zone.Neutral,
+            index: 1,
+            zoneCardsNum: 2,
             ownedByPlayer: true,
             damage: 0
         }, {
             uuid: 'd1',
-            cardIds: [ '160', '163' ],
-            zone: Zone.Neutral,
+            cardIds: [ 'colony' ],
+            zone: Zone.Colony,
             index: 0,
-            zoneCardsNum: 1,
+            zoneCardsNum: 2,
+            ownedByPlayer: false,
+            damage: 0
+        }, {
+            uuid: 'd2',
+            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
+            zone: Zone.Colony,
+            index: 1,
+            zoneCardsNum: 2,
             ownedByPlayer: false,
             damage: 0
         }, {
             uuid: 'e1',
-            cardIds: [ '160' ],
+            cardIds: [ '348', '163', '163', '163' ],
             zone: Zone.Oribital,
             index: 0,
             zoneCardsNum: 1,
@@ -118,8 +150,16 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             damage: 0
         }, {
             uuid: 'f1',
-            cardIds: [ '160', '163' ],
-            zone: Zone.Colony,
+            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
+            zone: Zone.Neutral,
+            index: 0,
+            zoneCardsNum: 2,
+            ownedByPlayer: false,
+            damage: 0
+        }, {
+            uuid: 'f2',
+            cardIds: [ '160', '163', '163' ],
+            zone: Zone.Neutral,
             index: 1,
             zoneCardsNum: 2,
             ownedByPlayer: false,

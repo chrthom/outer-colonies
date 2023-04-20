@@ -1,3 +1,5 @@
+import { layout } from "../config";
+
 export class Button {
     sprite;
     action = {
@@ -5,11 +7,11 @@ export class Button {
     };
     constructor(scene) {
         const self = this;
-        this.sprite = scene.add.text(1300, 20, [''])
-            .setAlign('right')
-            .setFontSize(18)
+        this.sprite = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
+            .setFontSize(layout.continueButton.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeeaa')
+            .setAlign('right')
             .setOrigin(1, 0)
             .setInteractive();
         this.sprite.on('pointerdown', () => {
