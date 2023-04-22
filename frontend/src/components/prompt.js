@@ -1,4 +1,4 @@
-import { layout } from "../config";
+import { layout } from "../config.js";
 
 export class Prompt {
     sprite;
@@ -11,7 +11,19 @@ export class Prompt {
             .setOrigin(1, 0);
         this.hide();
     }
-    showText(text) {
+    showBuildPhase(remainingActions) {
+        this.show(
+            'Aufbauphase: Spiele Karten\n'
+                + `- ${remainingActions.hull}x Hülle\n`
+                + `- ${remainingActions.equipment}x Ausrüstung\n`
+                + `- ${remainingActions.colony}x Kolonie\n`
+                + `- ${remainingActions.tactic}x Taktik`
+        );
+    }
+    showPlanPhase() {
+        this.show('Planungsphase: Plane Missionen und Überfälle');
+    }
+    show(text) {
         this.sprite.setText(text);
         this.sprite.visible = true;
     }

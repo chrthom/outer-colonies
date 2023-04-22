@@ -56,12 +56,12 @@ export const layout = {
     },
     prompt: {
         x: 2370,
-        y: 30,
+        y: 80,
         fontSize: 24
     },
     continueButton: {
         x: 2370,
-        y: 120,
+        y: 30,
         fontSize: 32
     }
 }

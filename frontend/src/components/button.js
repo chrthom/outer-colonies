@@ -1,4 +1,4 @@
-import { layout } from "../config";
+import { layout } from "../config.js";
 
 export class Button {
     sprite;
@@ -18,12 +18,18 @@ export class Button {
             self.action.onClick();
         });
         this.sprite.on('pointerover', () => {
-            self.sprite.setColor('#ff69b4');
+            self.sprite.setColor('#ff69b4');fälle
         });
         this.sprite.on('pointerout', () => {
             self.sprite.setColor('#eeeeaa');
         });
         this.hide();
+    }
+    showBuildPhase(onClickAction) {
+        this.show('Aufbauphase beenden', onClickAction);
+    }
+    showPlanPhase(onClickAction) {
+        this.show('Planungsphase beenden', onClickAction);
     }
     show(text, onClickAction) {
         this.action.onClick = onClickAction;

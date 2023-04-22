@@ -62,7 +62,7 @@ export default class Game extends Phaser.Scene {
     }
 
     nextPhase = () => {
-        console.log('Build phase completed');
+        console.log(`Completed ${this.state.turnPhase} phase`);
         this.socket.emit('ready', this.state.turnPhase);
     }
 
@@ -85,15 +85,14 @@ export default class Game extends Phaser.Scene {
             switch (state.turnPhase) {
                 case 'build':
                     self.hand.forEach((c) => c.highlightPlayability());
-                    const promptText = 'Aufbauphase: Spiele Karten\n'
-                        + `${state.remainingActions.hull}x Hülle, `
-                        + `${state.remainingActions.equipment}x Ausrüstung, `
-                        + `${state.remainingActions.colony}x Kolonie, `
-                        + `${state.remainingActions.tactic}x Taktik`;
-                    self.obj.prompt.showText(promptText);
-                    self.obj.button.show('Aufbauphase beenden', self.nextPhase);
+                    self.obj.prompt.showBuildPhase(self.state.remainingActions);
+                    break;
+                case 'plan':
+                    self.hand.forEach((c) => c.highlightDisabled());
+                    self.obj.prompt.showPlanPhase();
                     break;
             }
+            if (['build', 'plan'].includes(state.turnPhase)) self.obj.button.showPlanPhase(self.nextPhase);
         }
     }
 

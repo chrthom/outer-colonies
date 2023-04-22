@@ -1,4 +1,4 @@
-import { layout } from "../config";
+import { layout } from "../config.js";
 
 export class CardImage {
     sprite;
