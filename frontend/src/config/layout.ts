@@ -1,18 +1,18 @@
-export const layout = {
-    stackYDistance: 30,
-    cards: {
+export default class Layout {
+    stackYDistance = 30;
+    cards = {
         scale: 0.25
-    },
-    deck: {
+    };
+    deck = {
         x: 1930,
         y: 1070
-    },
-    maxCard: {
+    };
+    maxCard = {
         x: 2110,
         y: 820,
         scale: 0.75
-    },
-    player: {
+    };
+    player = {
         hand: {
             x: 2370,
             y: 1350,
@@ -36,8 +36,8 @@ export const layout = {
             y: 670,
             maxWidth: 650
         }
-    },
-    opponent: {
+    };
+    opponent = {
         colony: {
             x: 120,
             y: 100,
@@ -53,13 +53,13 @@ export const layout = {
             y: 670,
             maxWidth: 650
         }
-    },
-    prompt: {
+    };
+    prompt = {
         x: 2370,
         y: 80,
         fontSize: 24
-    },
-    continueButton: {
+    };
+    continueButton = {
         x: 2370,
         y: 30,
         fontSize: 32

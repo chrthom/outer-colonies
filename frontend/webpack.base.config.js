@@ -9,12 +9,10 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
-      },
+        test: /\.ts$/,
+        include: path.resolve(__dirname, 'src'),
+        loader: 'ts-loader'
+      }/*,
       {
         test: [/\.vert$/, /\.frag$/],
         use: "raw-loader"
@@ -22,12 +20,17 @@ module.exports = {
       {
         test: /\.(gif|png|jpe?g|svg|xml)$/i,
         use: "file-loader"
-      }
+      },
+      {
+        test: require.resolve('Phaser'),
+        loader: 'expose-loader',
+        options: { exposes: { globalName: 'Phaser', override: true } }
+      }*/
     ]
   },
   plugins: [
     new CleanWebpackPlugin({
-      root: path.resolve(__dirname, "../")
+      root: path.resolve(__dirname, "./")
     }),
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
@@ -36,5 +39,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./index.html"
     })
-  ]
+  ],
+  resolve: {
+    extensions: ['.ts', '.js']
+  }
 };

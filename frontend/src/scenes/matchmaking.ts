@@ -1,9 +1,14 @@
 import io from 'socket.io-client';
 
 export default class Matchmaking extends Phaser.Scene {
+    playerName: string;
+    statusText;
+    socket;
+    
+
     constructor () {
         super({
-            key: 'Login'
+            key: 'Matchmaking'
         });
     }
 

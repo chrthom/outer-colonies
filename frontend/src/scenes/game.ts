@@ -1,9 +1,11 @@
 import { Button } from '../components/button';
 import { CardStack, DeckCard, HandCard, MaxCard } from '../components/card';
 import { Prompt } from '../components/prompt';
+import FrontendState from '../types/frontend_state';
 
 export default class Game extends Phaser.Scene {
-    state = {};
+    socket = null;
+    state: FrontendState;
     activeCard = null;
     hand = [];
     cardStacks = [];

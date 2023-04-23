@@ -1,4 +1,6 @@
-import { layout } from "../config.js";
+import Layout from "../config/layout";
+
+const layout = new Layout();
 
 export class Button {
     sprite;
@@ -18,7 +20,7 @@ export class Button {
             self.action.onClick();
         });
         this.sprite.on('pointerover', () => {
-            self.sprite.setColor('#ff69b4');fälle
+            self.sprite.setColor('#ff69b4');
         });
         this.sprite.on('pointerout', () => {
             self.sprite.setColor('#eeeeaa');

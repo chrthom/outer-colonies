@@ -1,4 +1,6 @@
-import { layout } from "../config.js";
+import Layout from "../config/layout";
+
+const layout = new Layout();
 
 export class Prompt {
     sprite;

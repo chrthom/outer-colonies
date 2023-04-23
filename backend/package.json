@@ -1,6 +1,7 @@
 {
   "name": "outercolonies-server",
   "version": "1.0.0",
+  "description": "Outer Colonies Backend",
   "main": "dist/app.js",
   "scripts": {
     "start": "npx nodemon src/app.ts"

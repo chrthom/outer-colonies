@@ -1,9 +1,11 @@
-import { layout } from "../config.js";
+import Layout from "../config/layout";
+
+const layout = new Layout();
 
 export class CardImage {
     sprite;
     cardId;
-    constructor(scene, x, y, cardId, opponentCard, scale) {
+    constructor(scene, x, y, cardId, opponentCard?, scale?) {
         this.cardId = cardId;
         this.sprite = scene.add.image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
