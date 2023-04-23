@@ -5,12 +5,13 @@ import { rules } from '../config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
 import { getCardStackByUUID } from '../utils/utils';
 import { consts } from '../config/consts';
+import { Server, Socket } from 'socket.io';
 
-function getSocket(io, match: Match, playerNo: number) {
+function getSocket(io: Server, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
 }
 
-function getPlayer(socket) {
+function getPlayer(socket: Socket) {
     return socket.data.match.players[socket.data.playerNo];
 }
 
@@ -19,15 +20,15 @@ function forAllPlayers(f: (playerNo: number) => void): void {
     f(1);
 }
 
-function emitState(io, match: Match): void {
+function emitState(io: Server, match: Match): void {
     forAllPlayers((playerNo: number) => {
         getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
     });
 }
 
-function initMatch(io, match: Match): void {
+function initMatch(io: Server, match: Match): void {
     match.setStartPlayer();
-    match.players.forEach((player: Player) => {
+    match.players.forEach(player => {
         player.shuffleDeck();
         player.drawCards(rules.initialCardsToDraw);
     });
@@ -37,7 +38,7 @@ function initMatch(io, match: Match): void {
     nextTurn(io, match);
 }
 
-function nextTurn(io, match: Match): void {
+function nextTurn(io: Server, match: Match): void {
     match.execStartPhase();
     // TODO: Emit start phase event
     emitState(io, match);
@@ -46,7 +47,7 @@ function nextTurn(io, match: Match): void {
     emitState(io, match);
 }
 
-export function gameSocketListeners(io, socket): void {
+export function gameSocketListeners(io: Server, socket: Socket): void {
     socket.on(MsgTypeInbound.Ready, (turnPhase: string) => {
         const match = socket.data.match;
         switch(turnPhase) {

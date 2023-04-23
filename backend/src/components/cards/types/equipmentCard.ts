@@ -15,7 +15,7 @@ export default abstract class EquipmentCard extends Card {
         this.attackProfile = attackProfile;
     }
     canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
-        return cardStacks.filter((cs: CardStack) => 
+        return cardStacks.filter(cs => 
             cs.card.type == CardType.Hull 
             && cs.profileMatches(this.profile()));
     }

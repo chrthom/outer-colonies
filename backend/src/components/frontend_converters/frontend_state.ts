@@ -4,11 +4,11 @@ import CardStack from '../cards/card_stack';
 import { CardType, TurnPhase, Zone } from '../config/enums'
 import { consts } from '../config/consts';
 
-class FrontendOpponent {
+export class FrontendOpponent {
     name!: string;
     handCardNo!: number;
 }
-class FrontendActions {
+export class FrontendActions {
     hull!: number;
     equipment!: number;
     colony!: number;
@@ -16,7 +16,7 @@ class FrontendActions {
     orb!: number;
 }
 
-class FrontendHandCard {
+export class FrontendHandCard {
     uuid!: string;
     cardId!: string;
     index!: number;
@@ -24,7 +24,7 @@ class FrontendHandCard {
     validTargets!: Array<string>;
 }
 
-class FrontendCardStack {
+export class FrontendCardStack {
     uuid!: string;
     cardIds!: Array<string>;
     zone!: Zone;
@@ -34,7 +34,7 @@ class FrontendCardStack {
     damage!: number;
 }
 
-class FrontendState {
+export class FrontendState {
     playerIsActive!: boolean;
     turnPhase!: TurnPhase;
     opponent!: FrontendOpponent;
@@ -46,10 +46,10 @@ class FrontendState {
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
     const player = match.players[playerNo];
     const opponent = match.players[match.opponentPlayerNo(playerNo)];
-    let cardStacks = [true, false].flatMap((ownedByPlayer: boolean) => {
+    let cardStacks = [true, false].flatMap(ownedByPlayer => {
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
-        return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap((zone: Zone) => {
-            const zoneCardStacks = playerCardStacks.filter((cs: CardStack) => cs.zone == zone);
+        return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
+            const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
             const colonyPlaceholder: Array<FrontendCardStack> = zone != Zone.Colony ? [] : [
                 {
                     uuid: ownedByPlayer ? consts.colonyPlayer : consts.colonyOpponent,
@@ -61,10 +61,10 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     damage: 0 // TODO: Implement once needed
                 }
             ];
-            return zoneCardStacks.map((cs: CardStack, index: number) => {
+            return zoneCardStacks.map((cs, index) => {
                 return {
                     uuid: cs.uuid,
-                    cardIds: cs.getCards().map((c: Card) => String(c.id)),
+                    cardIds: cs.getCards().map(c => String(c.id)),
                     zone: zone,
                     index: index + colonyPlaceholder.length,
                     zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
@@ -174,8 +174,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             name: opponent.name,
             handCardNo: opponent.hand.length
         },
-        hand: player.hand.map((c: CardStack, index: number) => {
-            let validTargets = c.card.canBeAttachedTo(player.cardStacks).map((cs: CardStack) => cs.uuid);
+        hand: player.hand.map((c, index) => {
+            let validTargets = c.card.canBeAttachedTo(player.cardStacks).map(cs => cs.uuid);
             if (c.card.canBeAttachedToColony(player.cardStacks)) validTargets.push(consts.colonyPlayer); // TODO: Implement opponent colony
             return {
                 uuid: c.uuid,

@@ -2,7 +2,7 @@ import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { rules } from '../config/rules';
 import { CardType, Zone } from '../config/enums'
-import { getCardStackByUUID, spliceCardStackByUUID } from '../utils/utils';
+import { spliceCardStackByUUID } from '../utils/utils';
 
 export default class Player {
     id!: string;
@@ -32,7 +32,7 @@ export default class Player {
         this.deck = this.shuffle(this.deck);
     }
     drawCards(num: number): Array<CardStack> {
-        const newCards = this.deck.splice(0, num).map((c: Card) => new CardStack(c, Zone.Hand));
+        const newCards = this.deck.splice(0, num).map(c => new CardStack(c, Zone.Hand));
         this.hand = this.hand.concat(newCards);
         return newCards;
     }

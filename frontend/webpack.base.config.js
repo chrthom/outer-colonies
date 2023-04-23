@@ -12,19 +12,15 @@ module.exports = {
         test: /\.ts$/,
         include: path.resolve(__dirname, 'src'),
         loader: 'ts-loader'
-      }/*,
-      {
-        test: [/\.vert$/, /\.frag$/],
-        use: "raw-loader"
       },
       {
+        test: /\.ts$/,
+        include: path.resolve(__dirname, '../backend/src/components'),
+        loader: 'ts-loader'
+      }
+      /*{
         test: /\.(gif|png|jpe?g|svg|xml)$/i,
         use: "file-loader"
-      },
-      {
-        test: require.resolve('Phaser'),
-        loader: 'expose-loader',
-        options: { exposes: { globalName: 'Phaser', override: true } }
       }*/
     ]
   },

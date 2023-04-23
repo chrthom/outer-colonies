@@ -3,20 +3,21 @@ import Match from '../game_state/match';
 import Player from '../game_state/player';
 import { MsgTypeInbound, MsgTypeOutbound } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
+import { Server, Socket } from 'socket.io';
 
 const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
 
-function clientsInMatchMaking(io) {
+function clientsInMatchMaking(io: Server) {
     return io.sockets.adapter.rooms.get(matchmakingRoom);
 }
 
-function numberOfPlayersInMatchMaking(io): number {
+function numberOfPlayersInMatchMaking(io: Server): number {
     const clients = clientsInMatchMaking(io);
     return clients ? clients.size : 0;
 }
 
-function joinGame(socket, match: Match, playerNo: number): void {
+function joinGame(socket: Socket, match: Match, playerNo: number): void {
     socket.leave(matchmakingRoom);
     socket.join(match.room);
     socket.data.match = match;
@@ -24,14 +25,14 @@ function joinGame(socket, match: Match, playerNo: number): void {
     match.players[playerNo] = new Player(socket.id, socket.data.name, socket.data.activeDeck.slice());
 }
 
-function initGame(io, socket1, socket2): void {
+function initGame(io: Server, socket1: Socket, socket2: Socket): void {
     const match = new Match(`${gameRoomPrefix}-${uuidv4()}`);
     joinGame(socket1, match, 0);
     joinGame(socket2, match, 1);
     io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', match.matchName());
 }
 
-export function matchMakingSocketListeners(io, socket): void {
+export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     socket.on(MsgTypeInbound.Login, (name: string) => {
         if (name) {
             console.log(`Player logged in: ${name}`);
@@ -42,7 +43,7 @@ export function matchMakingSocketListeners(io, socket): void {
     });
 }
 
-export function matchMakingCron(io): void {
+export function matchMakingCron(io: Server): void {
     const clients = clientsInMatchMaking(io);
     const numClients = numberOfPlayersInMatchMaking(io);
     if (numClients > 1) {

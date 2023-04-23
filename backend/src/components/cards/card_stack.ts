@@ -16,14 +16,14 @@ export default class CardStack {
     }
     profile(): CardProfile {
         return this.getCards()
-            .map((c: Card) => c.profile())
-            .reduce((a: CardProfile, b: CardProfile) => this.combineCardProfiles(a, b));
+            .map(c => c.profile())
+            .reduce((a, b) => this.combineCardProfiles(a, b));
     }
     profileMatches(c: CardProfile): boolean {
-        return Object.values(this.combineCardProfiles(this.profile(), c)).filter((v: number) => v < 0).length == 0;
+        return Object.values(this.combineCardProfiles(this.profile(), c)).filter(v => v < 0).length == 0;
     }
     getCards(): Array<Card> {
-        return this.attachedCards.flatMap((cs: CardStack) => cs.getCards()).concat(this.card);
+        return this.attachedCards.flatMap(cs => cs.getCards()).concat(this.card);
     }
     private combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
         return {

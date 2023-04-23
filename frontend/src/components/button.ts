@@ -1,13 +1,14 @@
 import Layout from "../config/layout";
+import Game from "../scenes/game";
 
 const layout = new Layout();
 
 export class Button {
-    sprite;
+    sprite: Phaser.GameObjects.Text;
     action = {
         onClick: null
     };
-    constructor(scene) {
+    constructor(scene: Game) {
         const self = this;
         this.sprite = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
             .setFontSize(layout.continueButton.fontSize)
@@ -27,13 +28,13 @@ export class Button {
         });
         this.hide();
     }
-    showBuildPhase(onClickAction) {
+    showBuildPhase(onClickAction: () => void) {
         this.show('Aufbauphase beenden', onClickAction);
     }
-    showPlanPhase(onClickAction) {
+    showPlanPhase(onClickAction: () => void) {
         this.show('Planungsphase beenden', onClickAction);
     }
-    show(text, onClickAction) {
+    show(text: string, onClickAction: () => void) {
         this.action.onClick = onClickAction;
         this.sprite.setText(text);
         this.sprite.visible = true;

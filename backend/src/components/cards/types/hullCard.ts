@@ -13,10 +13,10 @@ export default abstract class HullCard extends Card {
         this.hullProfile = profile;
     }
     canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
-        return cardStacks.filter((cs: CardStack) =>
+        return cardStacks.filter(cs =>
             cs.card.type == CardType.Hull 
                 && (<HullCard> cs.card).multipart.neededParts.indexOf(this.id)
-                && cs.attachedCards.filter((c: CardStack) => c.card.name == this.name)); // TODO: Rethink if matching by name is a good idea
+                && cs.attachedCards.filter(c => c.card.name == this.name)); // TODO: Rethink if matching by name is a good idea
     }
     canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
         return this.hullProfile.energy >= 0 ? true : false;
