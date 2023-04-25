@@ -15,8 +15,8 @@ export default abstract class HullCard extends Card {
     canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
         return cardStacks.filter(cs =>
             cs.card.type == CardType.Hull 
-                && (<HullCard> cs.card).multipart.neededParts.indexOf(this.id)
-                && cs.attachedCards.filter(c => c.card.name == this.name)); // TODO: Rethink if matching by name is a good idea
+                && (<HullCard> cs.card).multipart.neededParts.includes(this.id)
+                && cs.attachedCards.filter(c => c.card.name == this.name).length == 0); // TODO: Rethink if matching by name is a good idea
     }
     canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
         return this.hullProfile.energy >= 0 ? true : false;

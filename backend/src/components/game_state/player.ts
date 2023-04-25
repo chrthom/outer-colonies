@@ -3,6 +3,7 @@ import CardStack from '../cards/card_stack';
 import { rules } from '../config/rules';
 import { CardType, Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
+import CardCollection from '../cards/collection/card_collection';
 
 export default class Player {
     id!: string;
@@ -17,6 +18,15 @@ export default class Player {
         this.name = name;
         this.deck = deck;
         this.resetRemainingActions();
+        this.setDummyCardStacks(); // Just for testing
+    }
+    private setDummyCardStacks(): void {
+        const ship1 = new CardStack(CardCollection.card160, Zone.Oribital);
+        ship1.attachedCards.push(new CardStack(CardCollection.card166, Zone.Hand));
+        const ship2 = new CardStack(CardCollection.card348, Zone.Oribital);
+        ship2.attachedCards.push(new CardStack(CardCollection.card130, Zone.Hand));
+        ship2.attachedCards.push(new CardStack(CardCollection.card163, Zone.Hand));
+        this.cardStacks.push(ship1, ship2);
     }
     totalActions(type: CardType): number {
         return rules.freeActions; // TODO: Dummy until logic is implemented
