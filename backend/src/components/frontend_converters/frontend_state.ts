@@ -1,14 +1,12 @@
 import Match from '../game_state/match'
-import CardStack from '../cards/card_stack';
 import { CardType, TurnPhase, Zone } from '../config/enums'
 import { consts } from '../config/consts';
-import Battle from '../game_state/battle';
-import Card from '../cards/card';
 
 export class FrontendOpponent {
     name!: string;
     handCardNo!: number;
 }
+
 export class FrontendActions {
     hull!: number;
     equipment!: number;
@@ -192,11 +190,11 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     */
     let battle = match.battle.isNoAction ? null : {
         playerShipIds: (match.activePlayerNo == playerNo ? match.battle.missionShips : match.battle.interveneShips)
-            .map((cs: CardStack) => cs.uuid),
+            .map(cs => cs.uuid),
         opponentShipIds: (match.activePlayerNo != playerNo ? match.battle.missionShips : match.battle.interveneShips)
-            .map((cs: CardStack) => cs.uuid),
+            .map(cs => cs.uuid),
         priceCards: match.battle.downsidePriceCards.map(() => 'back')
-            .concat(match.battle.upsidePriceCards.map((c: Card) => String(c.id))),
+            .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
         isRaid: match.battle.isRaid()
     };
     return {

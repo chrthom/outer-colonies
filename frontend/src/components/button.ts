@@ -4,7 +4,7 @@ import Game from "../scenes/game";
 
 const layout = new Layout();
 
-export class Button {
+export default class Button {
     sprite: Phaser.GameObjects.Text;
     action = {
         onClick: null

@@ -1,4 +1,6 @@
-export const consts = {
-    colonyPlayer: 'colony_player',
-    colonyOpponent: 'colony_opponent'
+class OCConsts {
+    readonly colonyPlayer = 'colony_player';
+    readonly colonyOpponent = 'colony_opponent';
 }
+
+export const consts = new OCConsts();

@@ -1,10 +1,10 @@
 import { FrontendActions } from "../../../backend/src/components/frontend_converters/frontend_state";
 import Layout from "../config/layout";
-import PlannedBattle from "../data/PlannedBattle";
+import PlannedBattle from "../data/planned_battle";
 
 const layout = new Layout();
 
-export class Prompt {
+export default class Prompt {
     sprite: Phaser.GameObjects.Text;
     constructor(scene) {
         this.sprite = scene.add.text(layout.prompt.x, layout.prompt.y, [''])

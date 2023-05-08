@@ -1,10 +1,14 @@
 import { Socket } from 'socket.io-client';
-import { Button } from '../components/button';
-import { CardStack, DeckCard, HandCard, MaxCard } from '../components/card';
-import { Prompt } from '../components/prompt';
+import Button from '../components/button';
+import Prompt from '../components/prompt';
 import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
 import { MsgTypeInbound, TurnPhase } from '../../../backend/src/components/config/enums';
-import PlannedBattle from '../data/PlannedBattle';
+import PlannedBattle from '../data/planned_battle';
+import HandCard from '../components/card/hand_card';
+import CardStack from '../components/card/card_stack';
+import DeckCard from '../components/card/deck_card';
+import MaxCard from '../components/card/max_card';
+import { consts } from '../../../backend/src/components/config/consts';
 
 class InitData {
     socket: Socket;
@@ -58,24 +62,6 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
-    handCardClicked = (handCard: HandCard) => {
-        const reset = this.activeCard == handCard.uuid;
-        this.activeCard = null;
-        this.hand.forEach(c => c.highlightPlayability());
-        this.cardStacks.forEach(cs => cs.highlightReset());
-        if (!reset) {
-            this.activeCard = handCard.data.uuid;
-            handCard.highlightSelected();
-            this.cardStacks.forEach(cs => {
-                if (!handCard.data.validTargets.includes(cs.uuid)) cs.highlightDisabled()
-            });
-        }
-    }
-
-    cardStackClicked = (cardStack: CardStack) => {
-        if (this.activeCard) this.socket.emit(MsgTypeInbound.Handcard, this.activeCard, cardStack.uuid);
-    }
-
     nextPhase = () => {
         console.log(`Completed ${this.state.turnPhase} phase`);
         this.socket.emit(MsgTypeInbound.Ready, this.state.turnPhase);
@@ -93,27 +79,28 @@ export default class Game extends Phaser.Scene {
             upsideCardsIndex: [], // TODO: Implement later
             shipIds: []
         }
-        // Reload hand cards
+        /// Reload hand cards
         self.hand.forEach(c => c.destroy());
         self.hand = state.hand.map(cardData => {
-            return new HandCard(self, state.hand.length, cardData, self.handCardClicked);
+            return new HandCard(self, state.hand.length, cardData);
         });
         /// Reload Card Stacks
         self.cardStacks.forEach(cs => cs.destroy());
         self.state.cardStacks.forEach(cs => 
-            self.cardStacks.push(new CardStack(
-                self, cs.uuid, cs.cardIds, cs.zone, self.cardStackClicked, cs.index, cs.zoneCardsNum, cs.ownedByPlayer, cs.damage)));
-        /// Reload prompt and button
+            self.cardStacks.push(new CardStack(self, cs)));
+        /// Hide prompt and button
         self.obj.prompt.hide();
         self.obj.button.hide();
+        /// Set visibility based on phase
         if (state.playerIsActive) {
             switch (state.turnPhase) {
                 case TurnPhase.Build:
-                    self.hand.forEach((c) => c.highlightPlayability());
+                    self.hand.forEach(c => c.highlightPlayability());
                     self.obj.prompt.showBuildPhase(self.state.remainingActions);
                     break;
                 case TurnPhase.Plan:
-                    self.hand.forEach((c) => c.highlightDisabled());
+                    self.hand.forEach(c => c.highlightDisabled());
+                    self.cardStacks.filter(c => c.uuid != consts.colonyOpponent).forEach(c => c.highlightMissionReady());
                     self.obj.prompt.showPlanPhase(this.plannedBattle);
                     break;
             }
@@ -123,6 +110,6 @@ export default class Game extends Phaser.Scene {
     }
 
     getCardStackByUUID(uuid: string) {
-        return this.cardStacks.find((cs) => cs.uuid == uuid);
+        return this.cardStacks.find(cs => cs.uuid == uuid);
     }
 }
