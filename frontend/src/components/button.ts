@@ -1,3 +1,4 @@
+import { TurnPhase } from "../../../backend/src/components/config/enums";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -28,11 +29,13 @@ export class Button {
         });
         this.hide();
     }
-    showBuildPhase(onClickAction: () => void) {
-        this.show('Aufbauphase beenden', onClickAction);
-    }
-    showPlanPhase(onClickAction: () => void) {
-        this.show('Planungsphase beenden', onClickAction);
+    showPhase(phase: TurnPhase, onClickAction: () => void) {
+        let phaseName: string;
+        switch (phase) {
+            case TurnPhase.Build: phaseName = 'Aufbauphase'; break;
+            case TurnPhase.Plan: phaseName = 'Planungsphase'; break;
+        }
+        this.show(`${phaseName} beenden`, onClickAction);
     }
     show(text: string, onClickAction: () => void) {
         this.action.onClick = onClickAction;

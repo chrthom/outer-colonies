@@ -44,5 +44,6 @@ export default class Match {
     execPlanPhase(): void {
         this.turnPhase = TurnPhase.Plan;
         this.battle = new BattleNone();
+        // TODO: Check if Mission is possible; else skip to End phase
     }
 }
