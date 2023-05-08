@@ -1,8 +1,9 @@
 import Match from '../game_state/match'
-import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { CardType, TurnPhase, Zone } from '../config/enums'
 import { consts } from '../config/consts';
+import Battle from '../game_state/battle';
+import Card from '../cards/card';
 
 export class FrontendOpponent {
     name!: string;
@@ -16,12 +17,11 @@ export class FrontendActions {
     orb!: number;
 }
 
-export class FrontendHandCard {
-    uuid!: string;
-    cardId!: string;
-    index!: number;
-    playable!: boolean;
-    validTargets!: Array<string>;
+export class FrontendBattle {
+    playerShipIds!: Array<string>;
+    opponentShipIds!: Array<string>;
+    priceCards!: Array<string>;
+    isRaid: boolean;
 }
 
 export class FrontendCardStack {
@@ -32,20 +32,41 @@ export class FrontendCardStack {
     zoneCardsNum!: number;
     ownedByPlayer!: boolean;
     damage!: number;
+    missionReady!: boolean;
+}
+
+export class FrontendHandCard {
+    uuid!: string;
+    cardId!: string;
+    index!: number;
+    playable!: boolean;
+    validTargets!: Array<string>;
 }
 
 export class FrontendState {
     playerIsActive!: boolean;
     turnPhase!: TurnPhase;
+    remainingActions: FrontendActions;
     opponent!: FrontendOpponent;
     hand!: Array<FrontendHandCard>;
     cardStacks!: Array<FrontendCardStack>;
-    remainingActions: FrontendActions;
+    battle?: FrontendBattle;
 }
 
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
     const player = match.players[playerNo];
     const opponent = match.players[match.opponentPlayerNo(playerNo)];
+    let hand = player.hand.map((c, index) => {
+        let validTargets = c.card.canBeAttachedTo(player.cardStacks).map(cs => cs.uuid);
+        if (c.card.canBeAttachedToColony(player.cardStacks)) validTargets.push(consts.colonyPlayer); // TODO: Implement opponent colony
+        return {
+            uuid: c.uuid,
+            cardId: String(c.card.id),
+            index: index,
+            playable: c.card.isPlayable(match, playerNo),
+            validTargets: validTargets
+        };
+    });
     let cardStacks = [true, false].flatMap(ownedByPlayer => {
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
         return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
@@ -58,7 +79,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     index: 0,
                     zoneCardsNum: zoneCardStacks.length + 1,
                     ownedByPlayer: ownedByPlayer,
-                    damage: 0 // TODO: Implement once needed
+                    damage: 0, // TODO: Implement once needed
+                    missionReady: false
                 }
             ];
             return zoneCardStacks.map((cs, index) => {
@@ -69,7 +91,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     index: index + colonyPlaceholder.length,
                     zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
                     ownedByPlayer: ownedByPlayer,
-                    damage: 0 // TODO: Implement once needed
+                    damage: 0, // TODO: Implement once needed
+                    missionReady: cs.isMissionReady()
                 };
             }).concat(colonyPlaceholder);
         });
@@ -167,31 +190,31 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         }
     ];
     */
+    let battle = match.battle.isNoAction ? null : {
+        playerShipIds: (match.activePlayerNo == playerNo ? match.battle.missionShips : match.battle.interveneShips)
+            .map((cs: CardStack) => cs.uuid),
+        opponentShipIds: (match.activePlayerNo != playerNo ? match.battle.missionShips : match.battle.interveneShips)
+            .map((cs: CardStack) => cs.uuid),
+        priceCards: match.battle.downsidePriceCards.map(() => 'back')
+            .concat(match.battle.upsidePriceCards.map((c: Card) => String(c.id))),
+        isRaid: match.battle.isRaid()
+    };
     return {
         playerIsActive: match.activePlayerNo == playerNo,
         turnPhase: match.turnPhase,
-        opponent: {
-            name: opponent.name,
-            handCardNo: opponent.hand.length
-        },
-        hand: player.hand.map((c, index) => {
-            let validTargets = c.card.canBeAttachedTo(player.cardStacks).map(cs => cs.uuid);
-            if (c.card.canBeAttachedToColony(player.cardStacks)) validTargets.push(consts.colonyPlayer); // TODO: Implement opponent colony
-            return {
-                uuid: c.uuid,
-                cardId: String(c.card.id),
-                index: index,
-                playable: c.card.isPlayable(match, playerNo),
-                validTargets: validTargets
-            };
-        }),
-        cardStacks: cardStacks,
         remainingActions: {
             hull: player.remainingActions[CardType.Hull],
             equipment: player.remainingActions[CardType.Equipment],
             colony: player.remainingActions[CardType.Colony],
             tactic: player.remainingActions[CardType.Tactic],
             orb: player.remainingActions[CardType.Orb]
-        }
+        },
+        opponent: {
+            name: opponent.name,
+            handCardNo: opponent.hand.length
+        },
+        hand: hand,
+        cardStacks: cardStacks,
+        battle: battle
     };
 }

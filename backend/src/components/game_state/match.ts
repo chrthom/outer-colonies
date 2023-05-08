@@ -1,15 +1,17 @@
 import Player from './player';
-import Card from '../cards/card';
 import { rules } from '../config/rules';
-import { CardType, TurnPhase } from '../config/enums'
+import { TurnPhase } from '../config/enums'
+import Battle, { BattleNone } from './battle';
 
 export default class Match {
     readonly room!: string;
     players: Array<Player> = [];
     activePlayerNo = 0;
     turnPhase = TurnPhase.Init;
+    battle!: Battle;
     constructor(room: string) {
         this.room = room;
+        this.battle = new BattleNone();
     }
     matchName(): string {
         return this.players[0].name + ' vs. ' + this.players[1].name;
@@ -41,5 +43,6 @@ export default class Match {
     }
     execPlanPhase(): void {
         this.turnPhase = TurnPhase.Plan;
+        this.battle = new BattleNone();
     }
 }

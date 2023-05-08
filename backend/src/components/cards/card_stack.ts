@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { Zone } from '../config/enums';
+import { CardType, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class CardStack {
@@ -24,6 +24,9 @@ export default class CardStack {
     }
     getCards(): Array<Card> {
         return this.attachedCards.flatMap(cs => cs.getCards()).concat(this.card);
+    }
+    isMissionReady(): boolean {
+        return this.zone == Zone.Oribital && this.card.type == CardType.Hull && this.profile().speed > 0;
     }
     private combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
         return {
