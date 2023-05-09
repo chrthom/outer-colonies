@@ -25,7 +25,7 @@ export enum TurnPhase {
     Start = 'start',
     Build = 'build',
     Plan = 'plan',
-    Fight = 'fight',
+    Combat = 'combat',
     End = 'end'
 }
 
@@ -34,4 +34,10 @@ export enum Zone {
     Colony = 'colony',
     Oribital = 'orbital',
     Neutral = 'neutral'
+}
+
+export enum BattleType {
+    None = 'none',
+    Mission = 'mission',
+    Raid = 'raid'
 }

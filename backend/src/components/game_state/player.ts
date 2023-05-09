@@ -41,10 +41,11 @@ export default class Player {
     shuffleDeck(): void {
         this.deck = this.shuffle(this.deck);
     }
-    drawCards(num: number): Array<CardStack> {
-        const newCards = this.deck.splice(0, num).map(c => new CardStack(c, Zone.Hand));
-        this.hand = this.hand.concat(newCards);
-        return newCards;
+    drawCards(num: number): void {
+        this.hand.push(...this.pickCardsFromDeck(num).map(c => new CardStack(c, Zone.Hand)));
+    }
+    pickCardsFromDeck(num: number): Array<Card> {
+        return this.deck.splice(0, num);
     }
     playCardToColonyZone(handCard: CardStack): void {
         this.remainingActions[handCard.card.type]--;

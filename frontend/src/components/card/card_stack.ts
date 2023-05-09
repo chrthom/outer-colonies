@@ -1,7 +1,7 @@
 import CardImage from "./card_image";
 import Layout from "../../config/layout";
 import Game from "../../scenes/game";
-import { MsgTypeInbound, TurnPhase, Zone } from "../../../../backend/src/components/config/enums";
+import { BattleType, MsgTypeInbound, TurnPhase, Zone } from "../../../../backend/src/components/config/enums";
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import { consts } from "../../../../backend/src/components/config/consts";
 
@@ -61,17 +61,15 @@ export default class CardStack {
                 break;
             case TurnPhase.Plan:
                 if (this.uuid == consts.colonyOpponent) {
-                    scene.resetPlannedBattle('raid');
+                    scene.resetPlannedBattle(BattleType.Raid);
                     this.highlightSelected();
-                } else if (scene.plannedBattle.type && this.ownedByPlayer && this.data.missionReady) { // TODO: Check if ship is already selected
+                } else if (scene.plannedBattle.type != BattleType.None && this.ownedByPlayer && this.data.missionReady) {
                     if (scene.plannedBattle.shipIds.includes(this.uuid)) {
                         this.highlightReset();
                         scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
-                        console.log(JSON.stringify(scene.plannedBattle.shipIds)); ////
                     } else {
                         this.highlightSelected();
                         scene.plannedBattle.shipIds.push(this.uuid);
-                        console.log(JSON.stringify(scene.plannedBattle.shipIds)); ////
                     }
                 }
         }

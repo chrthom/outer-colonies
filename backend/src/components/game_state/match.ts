@@ -22,12 +22,12 @@ export default class Match {
     getActivePlayer(): Player {
         return this.players[this.activePlayerNo];
     }
-    setStartPlayer(): void {
+    setStartPlayer() {
         if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
         else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
         else this.activePlayerNo = Math.round(Math.random());
     }
-    execStartPhase(): void { // TODO: Return Event to send to player
+    prepareStartPhase() { // TODO: Return Event to send to player
         this.activePlayerNo = this.activePlayerNo == 0 ? 1 : 0;
         this.turnPhase = TurnPhase.Start;
         this.getActivePlayer().resetRemainingActions();
@@ -37,13 +37,20 @@ export default class Match {
         // TODO: Check for effects on drawing a cards (like drawing an extra card)
         // TODO: Execute start of turn effects of cards
     }
-    execBuildPhase(): void {
+    prepareBuildPhase() {
         this.turnPhase = TurnPhase.Build;
-        // TODO
     }
-    execPlanPhase(): void {
+    preparePlanPhase() {
         this.turnPhase = TurnPhase.Plan;
         this.battle = new BattleNone();
-        // TODO: Check if Mission is possible; else skip to End phase
+        if (!this.getActivePlayer().cardStacks.some(cs => cs.isMissionReady()))
+            this.prepareEndPhase();
+    }
+    prepareCombatPhase() {
+        this.turnPhase = TurnPhase.Combat;
+        // TODO: CONTINUE HERE!!!
+    }
+    prepareEndPhase() {
+        this.turnPhase = TurnPhase.End;
     }
 }

@@ -1,6 +1,7 @@
+import { BattleType } from "../../../backend/src/components/config/enums";
+import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
 import { FrontendActions } from "../../../backend/src/components/frontend_converters/frontend_state";
 import Layout from "../config/layout";
-import PlannedBattle from "../data/planned_battle";
 
 const layout = new Layout();
 
@@ -17,21 +18,21 @@ export default class Prompt {
     }
     showBuildPhase(remainingActions: FrontendActions) {
         this.show(
-            'Aufbauphase: Spiele Karten\n'
+            'Spiele Karten\n'
                 + `- ${remainingActions.hull}x Hülle\n`
                 + `- ${remainingActions.equipment}x Ausrüstung\n`
                 + `- ${remainingActions.colony}x Kolonie\n`
                 + `- ${remainingActions.tactic}x Taktik`
         );
     }
-    showPlanPhase(plannedBattle: PlannedBattle) {
+    showPlanPhase(plannedBattle: FrontendPlannedBattle) {
         let actionText: string;
-        if (!plannedBattle.type)
+        if (plannedBattle.type == BattleType.None)
             actionText = 'Plane eine Mission oder einen Überfall.\n'
                 + '- Klicke dein Deck für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
-        else actionText = `Wähle Schiffe für ${plannedBattle.type == 'raid' ? 'den Überfall' : 'die Mission'}`;
-        this.show(`Planungsphase: ${actionText}`);
+        else actionText = `Wähle Schiffe für ${plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
+        this.show(actionText);
     }
     show(text: string) {
         this.sprite.setText(text);

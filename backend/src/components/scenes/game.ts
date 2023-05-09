@@ -1,4 +1,3 @@
-import Player from '../game_state/player';
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
 import { rules } from '../config/rules';
@@ -6,6 +5,7 @@ import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enum
 import { getCardStackByUUID } from '../utils/utils';
 import { consts } from '../config/consts';
 import { Server, Socket } from 'socket.io';
+import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 
 function getSocket(io: Server, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
@@ -39,29 +39,46 @@ function initMatch(io: Server, match: Match): void {
 }
 
 function nextTurn(io: Server, match: Match): void {
-    match.execStartPhase();
+    match.prepareStartPhase();
     // TODO: Emit start phase event
     emitState(io, match);
     // TODO: Wait for response to continue
-    match.execBuildPhase();
+    match.prepareBuildPhase();
     emitState(io, match);
 }
 
 export function gameSocketListeners(io: Server, socket: Socket): void {
-    socket.on(MsgTypeInbound.Ready, (turnPhase: string) => {
+    socket.on(MsgTypeInbound.Ready, (turnPhase: string, data: any) => {
         const match = socket.data.match;
-        switch(turnPhase) {
-            case TurnPhase.Init:
-                match.players[socket.data.playerNo].ready = true;
-                if (match.players[socket.data.opponentPlayerNo()].ready) {
-                    console.log(`Game match ${match.matchName()} is ready to start`);
-                    initMatch(io, match);
+        if (turnPhase == socket.data.match.turnPhase) {
+            if (socket.data.playerNo == match.activePlayerNo) {
+                switch(turnPhase) {
+                    case TurnPhase.Init:
+                        match.players[socket.data.playerNo].ready = true;
+                        if (match.players[socket.data.opponentPlayerNo()].ready) {
+                            console.log(`Game match ${match.matchName()} is ready to start`);
+                            initMatch(io, match);
+                        }
+                        break;
+                    case TurnPhase.Build:
+                        match.preparePlanPhase();
+                        emitState(io, match);
+                        break;
+                    case TurnPhase.Plan:
+                        match.battle = toBattle(match, <FrontendPlannedBattle> data);
+                        emitState(io, match);
+                        break;
                 }
-                break;
-            case TurnPhase.Build:
-                match.execPlanPhase();
-                emitState(io, match);
-                break;
+            } else {
+                switch(turnPhase) {
+                    case TurnPhase.Plan:
+                        // TODO: CONTINUE HERE!!!
+                        // TODO: Opponent reacting on planned mission
+                        match.prepareCombatPhase();
+                        emitState(io, match);
+                        break;
+                }
+            }
         }
     });
     socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
