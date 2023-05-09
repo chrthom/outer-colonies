@@ -16,7 +16,7 @@ export default class CardStack {
     data: FrontendCardStack;
     constructor(scene: Game, data: FrontendCardStack) {
         const self = this;
-        const zoneLayout = layout[data.ownedByPlayer ? 'player' : 'opponent'][data.zone];
+        const zoneLayout = data.ownedByPlayer ? layout.player[data.zone] : layout.opponent[data.zone];
         const x = zoneLayout.x + (data.zoneCardsNum == 1 ? zoneLayout.maxWidth / 2 : data.index * zoneLayout.maxWidth / (data.zoneCardsNum - 1));
         const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
         this.cards = data.cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !data.ownedByPlayer));
@@ -63,6 +63,16 @@ export default class CardStack {
                 if (this.uuid == consts.colonyOpponent) {
                     scene.resetPlannedBattle('raid');
                     this.highlightSelected();
+                } else if (scene.plannedBattle.type && this.ownedByPlayer && this.data.missionReady) { // TODO: Check if ship is already selected
+                    if (scene.plannedBattle.shipIds.includes(this.uuid)) {
+                        this.highlightReset();
+                        scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
+                        console.log(JSON.stringify(scene.plannedBattle.shipIds)); ////
+                    } else {
+                        this.highlightSelected();
+                        scene.plannedBattle.shipIds.push(this.uuid);
+                        console.log(JSON.stringify(scene.plannedBattle.shipIds)); ////
+                    }
                 }
         }
     }

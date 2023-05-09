@@ -96,7 +96,6 @@ export default class Game extends Phaser.Scene {
                     break;
                 case TurnPhase.Plan:
                     self.hand.forEach(c => c.highlightDisabled());
-                    self.cardStacks.filter(c => c.uuid != consts.colonyOpponent).forEach(c => c.highlightMissionReady());
                     this.resetPlannedBattle(null);
                     break;
             }
@@ -116,7 +115,10 @@ export default class Game extends Phaser.Scene {
             upsideCardsIndex: [], // TODO: Implement later
             shipIds: []
         }
-        this.cardStacks.filter(c => c.uuid == consts.colonyOpponent).forEach(c => c.highlightReset());
+        this.cardStacks.filter(c => c.uuid != consts.colonyOpponent).forEach(c => {
+            if (c.uuid == consts.colonyOpponent) c.highlightReset();
+            else c.highlightMissionReady();
+        });
         this.obj.deck.highlightReset();
         if (type == 'mission')
             this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // TODO: Add feature to also allow upside cards from discard pile
