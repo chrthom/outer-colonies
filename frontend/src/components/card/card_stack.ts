@@ -3,6 +3,7 @@ import Layout from "../../config/layout";
 import Game from "../../scenes/game";
 import { MsgTypeInbound, TurnPhase, Zone } from "../../../../backend/src/components/config/enums";
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { consts } from "../../../../backend/src/components/config/consts";
 
 const layout = new Layout();
 
@@ -23,7 +24,8 @@ export default class CardStack {
             c.sprite.on('pointerdown', () => {
                 this.onClickAction(scene);
             });
-            c.enableMouseover(scene);
+            if (data.uuid != consts.colonyPlayer && data.uuid != consts.colonyOpponent)
+                c.enableMouseover(scene);
         });
         this.uuid = data.uuid; // TODO: Remove, is in this.data
         this.zone = data.zone; // TODO: Remove, is in this.data
@@ -52,7 +54,16 @@ export default class CardStack {
         else this.highlightDisabled();
     }
     private onClickAction(scene: Game) {
-        if (scene.state.turnPhase == TurnPhase.Build && scene.activeCard)
-            scene.socket.emit(MsgTypeInbound.Handcard, scene.activeCard, this.uuid);
+        switch(scene.state.turnPhase) {
+            case TurnPhase.Build:
+                if (scene.activeCard)
+                    scene.socket.emit(MsgTypeInbound.Handcard, scene.activeCard, this.uuid);
+                break;
+            case TurnPhase.Plan:
+                if (this.uuid == consts.colonyOpponent) {
+                    scene.resetPlannedBattle('raid');
+                    this.highlightSelected();
+                }
+        }
     }
 }

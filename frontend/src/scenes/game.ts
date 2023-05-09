@@ -9,6 +9,7 @@ import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
 import { consts } from '../../../backend/src/components/config/consts';
+import { rules } from '../../../backend/src/components/config/rules';
 
 class InitData {
     socket: Socket;
@@ -18,12 +19,7 @@ export default class Game extends Phaser.Scene {
     socket: Socket;
     state: FrontendState;
     activeCard: string;
-    plannedBattle: PlannedBattle = {
-        type: null,
-        downsideCardsNum: 0,
-        upsideCardsIndex: [], // TODO: Implement later
-        shipIds: []
-    }
+    plannedBattle: PlannedBattle;
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
     obj = {
@@ -88,7 +84,7 @@ export default class Game extends Phaser.Scene {
         self.cardStacks.forEach(cs => cs.destroy());
         self.state.cardStacks.forEach(cs => 
             self.cardStacks.push(new CardStack(self, cs)));
-        /// Hide prompt and button
+        /// Reset other objects
         self.obj.prompt.hide();
         self.obj.button.hide();
         /// Set visibility based on phase
@@ -101,7 +97,7 @@ export default class Game extends Phaser.Scene {
                 case TurnPhase.Plan:
                     self.hand.forEach(c => c.highlightDisabled());
                     self.cardStacks.filter(c => c.uuid != consts.colonyOpponent).forEach(c => c.highlightMissionReady());
-                    self.obj.prompt.showPlanPhase(this.plannedBattle);
+                    this.resetPlannedBattle(null);
                     break;
             }
             if ([TurnPhase.Build, TurnPhase.Plan].includes(state.turnPhase))
@@ -111,5 +107,19 @@ export default class Game extends Phaser.Scene {
 
     getCardStackByUUID(uuid: string) {
         return this.cardStacks.find(cs => cs.uuid == uuid);
+    }
+
+    resetPlannedBattle(type: string) {
+        this.plannedBattle = {
+            type: type,
+            downsideCardsNum: 0,
+            upsideCardsIndex: [], // TODO: Implement later
+            shipIds: []
+        }
+        this.cardStacks.filter(c => c.uuid == consts.colonyOpponent).forEach(c => c.highlightReset());
+        this.obj.deck.highlightReset();
+        if (type == 'mission')
+            this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // TODO: Add feature to also allow upside cards from discard pile
+        this.obj.prompt.showPlanPhase(this.plannedBattle);
     }
 }
