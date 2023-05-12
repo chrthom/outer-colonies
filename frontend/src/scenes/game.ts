@@ -20,6 +20,7 @@ export default class Game extends Phaser.Scene {
     state: FrontendState;
     activeCard: string;
     plannedBattle: FrontendPlannedBattle;
+    interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
     obj = {
@@ -86,6 +87,12 @@ export default class Game extends Phaser.Scene {
         this.updateView();
     }
 
+    resetInterveneBattle() {
+        this.activeCard = null;
+        this.interveneShipIds = [];
+        this.updateView();
+    }
+
     updateView() {
         this.obj.button.update(this);
         this.obj.prompt.update(this);
@@ -99,7 +106,8 @@ export default class Game extends Phaser.Scene {
         if (this.state.playerPendingAction) {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
-            } else if (this.activeCard) {
+            } else if (this.activeCard
+                    || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)) {
                 this.obj.deck.highlightDisabled();
             }
             this.hand.forEach(c => {
@@ -123,6 +131,14 @@ export default class Game extends Phaser.Scene {
                     }
                 } else if (this.activeCard) {
                     if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
+                } else if (this.state.battle.type != BattleType.None 
+                        && this.state.turnPhase == TurnPhase.Build 
+                        && !this.state.playerIsActive) {
+                    if (!c.data.missionReady) {
+                        c.highlightDisabled();
+                    } else if (this.interveneShipIds.includes(c.uuid)) {
+                        c.highlightSelected();
+                    }
                 }
             })
         }

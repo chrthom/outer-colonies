@@ -56,6 +56,7 @@ export default class Match {
     }
     prepareCombatPhase() {
         this.turnPhase = TurnPhase.Combat;
+        this.actionPendingByPlayerNo = this.activePlayerNo;
         // TODO: CONTINUE HERE!!!
     }
     prepareEndPhase() {

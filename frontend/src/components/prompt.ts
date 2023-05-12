@@ -18,7 +18,8 @@ export default class Prompt {
     update(scene: Game) {
         if (scene.state.playerPendingAction) {
             if (scene.state.turnPhase == TurnPhase.Build) {
-                this.showBuildPhase(scene);
+                if (scene.state.playerIsActive) this.showBuildPhase(scene);
+                else this.showIntervenePhase(scene);
             } else {
                 this.hide();
             }
@@ -36,6 +37,12 @@ export default class Prompt {
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
         else battleText = `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
         this.show(`${actionText}\n${battleText}`);
+    }
+    private showIntervenePhase(scene: Game) {
+        const actions = scene.state.remainingActions;
+        const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
+        const battleText = scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';
+        this.show(`${actionText}\nWähle Schiffe zur ${battleText}`)
     }
     private show(text: string) {
         this.sprite.setText(text);

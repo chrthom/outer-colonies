@@ -66,6 +66,16 @@ export default class CardStack {
                         }
                     }
                 }
+            } else {
+                if (state.turnPhase == TurnPhase.Build) {
+                    if (this.data.missionReady) {
+                        if (scene.interveneShipIds.includes(this.uuid)) {
+                            scene.interveneShipIds = scene.interveneShipIds.filter(id => id != this.uuid);
+                        } else {
+                            scene.interveneShipIds.push(this.uuid);
+                        }
+                    }
+                }
             }
             scene.updateView();
         }

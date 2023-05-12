@@ -32,7 +32,8 @@ export default class Button {
     update(scene: Game) {
         if (scene.state.playerPendingAction) {
             if (scene.state.turnPhase == TurnPhase.Build) {
-                this.showNextPhase(scene);
+                if (scene.state.playerIsActive) this.showNextPhase(scene);
+                else this.showIntervene(scene);
             } else {
                 this.hide();
             }
@@ -46,6 +47,15 @@ export default class Button {
             `${scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
         this.show(text, () => {
             scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle);
+        });
+    }
+    private showIntervene(scene: Game) {
+        let text: string; 
+        if (scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
+        else if (scene.interveneShipIds.length > 0) text = 'Intervenieren';
+        else text = 'Überspringen';
+        this.show(text, () => {
+            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.interveneShipIds);
         });
     }
     private show(text: string, onClickAction: () => void) {
