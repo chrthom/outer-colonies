@@ -2,6 +2,7 @@ import CardImage from "./card_image";
 import Layout from "../../config/layout";
 import Game from "../../scenes/game";
 import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { BattleType, TurnPhase } from "../../../../backend/src/components/config/enums";
 
 const layout = new Layout();
 
@@ -17,7 +18,7 @@ export default class HandCard extends CardImage {
         this.sprite.setAngle(angle);
         this.data = handCardData;
         this.uuid = handCardData.uuid;
-        if (handCardData.playable) this.sprite.on('pointerdown', () => {
+        this.sprite.on('pointerdown', () => {
             this.onClickAction(scene);
         });
         this.enableMouseover(scene);
@@ -27,16 +28,13 @@ export default class HandCard extends CardImage {
         else this.highlightDisabled();
     }
     private onClickAction(scene: Game) {
-        const reset = scene.activeCard == this.uuid;
-        scene.activeCard = null;
-        scene.hand.forEach(c => c.highlightPlayability());
-        scene.cardStacks.forEach(cs => cs.highlightReset());
-        if (!reset) {
-            scene.activeCard = this.data.uuid;
-            this.highlightSelected();
-            scene.cardStacks.forEach(cs => {
-                if (!this.data.validTargets.includes(cs.uuid)) cs.highlightDisabled()
-            });
+        if (scene.state.playerPendingAction 
+                && this.data.playable 
+                && (scene.state.turnPhase != TurnPhase.Build || scene.plannedBattle.type == BattleType.None)) {
+            const reset = scene.activeCard == this.uuid;
+            scene.activeCard = null;
+            if (!reset) scene.activeCard = this.data.uuid;
+            scene.updateView();
         }
     }
 }

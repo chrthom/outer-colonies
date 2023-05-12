@@ -59,58 +59,76 @@ export default class Game extends Phaser.Scene {
     update() {}
 
     updateState(state: FrontendState) {
-        let self = this;
+        const self = this;
         self.state = state;
-        //console.log('Received new state: ' + JSON.stringify(state)); //
-        /// Reset temp states
-        self.activeCard = null;
-        /// Reload hand cards
-        self.hand.forEach(c => c.destroy());
-        self.hand = state.hand.map(cardData => {
-            return new HandCard(self, state.hand.length, cardData);
-        });
-        /// Reload Card Stacks
-        self.cardStacks.forEach(cs => cs.destroy());
-        self.state.cardStacks.forEach(cs => 
-            self.cardStacks.push(new CardStack(self, cs)));
-        /// Reset other objects
-        self.obj.prompt.hide();
-        self.obj.button.hide();
-        /// Set visibility based on phase
-        if (state.playerIsActive) {
-            switch (state.turnPhase) {
-                case TurnPhase.Build:
-                    self.hand.forEach(c => c.highlightPlayability());
-                    self.obj.prompt.showBuildPhase(self.state.remainingActions);
-                    self.obj.button.showEndBuildPhase(self);
-                    break;
-                case TurnPhase.Plan:
-                    self.hand.forEach(c => c.highlightDisabled());
-                    this.resetPlannedBattle(BattleType.None);
-                    self.obj.button.showEndPlanPhase(self);
-                    break;
-            }
-        }
+        this.recreateCards();
+        this.resetPlannedBattle(BattleType.None);
     }
 
-    getCardStackByUUID(uuid: string) {
-        return this.cardStacks.find(cs => cs.uuid == uuid);
+    recreateCards() {
+        const self = this;
+        self.hand.forEach(c => c.destroy());
+        self.hand = self.state.hand.map(cardData => new HandCard(self, self.state.hand.length, cardData));
+        self.cardStacks.forEach(cs => cs.destroy());
+        self.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
     }
 
     resetPlannedBattle(type: BattleType) {
+        this.activeCard = null;
         this.plannedBattle = {
             type: type,
             downsideCardsNum: 0,
             upsideCardsIndex: [], // TODO: Implement later
             shipIds: []
         }
-        this.cardStacks.filter(c => c.uuid != consts.colonyOpponent).forEach(c => {
-            if (c.uuid == consts.colonyOpponent) c.highlightReset();
-            else c.highlightMissionReady();
-        });
-        this.obj.deck.highlightReset();
-        if (type == BattleType.None)
+        if (type == BattleType.Mission)
             this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // TODO: Add feature to also allow upside cards from discard pile
-        this.obj.prompt.showPlanPhase(this.plannedBattle);
+        this.updateView();
+    }
+
+    updateView() {
+        this.obj.button.update(this);
+        this.obj.prompt.update(this);
+        this.updateHighlighting();
+    }
+
+    updateHighlighting() {
+        this.obj.deck.highlightReset();
+        this.hand.forEach(c => c.highlightReset());
+        this.cardStacks.forEach(c => c.highlightReset());
+        if (this.state.playerPendingAction) {
+            if (this.plannedBattle.type == BattleType.Mission) {
+                this.obj.deck.highlightSelected();
+            } else if (this.activeCard) {
+                this.obj.deck.highlightDisabled();
+            }
+            this.hand.forEach(c => {
+                if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
+                else if (this.activeCard == c.uuid) c.highlightSelected();
+                else c.highlightPlayability();
+            });
+            const activeCard = this.hand.find(c => c.uuid == this.activeCard);
+            this.cardStacks.forEach(c => {
+                if (this.plannedBattle.type != BattleType.None) {
+                    if (c.uuid == consts.colonyOpponent) {
+                        if (this.plannedBattle.type == BattleType.Raid) {
+                            c.highlightSelected();
+                        }
+                    } else {
+                        if (!c.data.missionReady) {
+                            c.highlightDisabled();
+                        } else if (this.plannedBattle.shipIds.includes(c.uuid)) {
+                            c.highlightSelected();
+                        }
+                    }
+                } else if (this.activeCard) {
+                    if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
+                }
+            })
+        }
+    }
+
+    getCardStackByUUID(uuid: string) {
+        return this.cardStacks.find(cs => cs.uuid == uuid);
     }
 }

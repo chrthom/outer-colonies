@@ -24,7 +24,6 @@ export enum TurnPhase {
     Init = 'init',
     Start = 'start',
     Build = 'build',
-    Plan = 'plan',
     Combat = 'combat',
     End = 'end'
 }

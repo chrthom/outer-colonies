@@ -1,6 +1,7 @@
 import Match from '../game_state/match'
-import { CardType, TurnPhase, Zone } from '../config/enums'
+import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import { consts } from '../config/consts';
+import Battle from '../game_state/battle';
 
 export class FrontendOpponent {
     name!: string;
@@ -16,10 +17,10 @@ export class FrontendActions {
 }
 
 export class FrontendBattle {
-    playerShipIds!: Array<string>;
-    opponentShipIds!: Array<string>;
-    priceCards!: Array<string>;
-    isRaid: boolean;
+    type!: BattleType;
+    playerShipIds: Array<string>;
+    opponentShipIds: Array<string>;
+    priceCards: Array<string>;
 }
 
 export class FrontendCardStack {
@@ -43,6 +44,7 @@ export class FrontendHandCard {
 
 export class FrontendState {
     playerIsActive!: boolean;
+    playerPendingAction!: boolean;
     turnPhase!: TurnPhase;
     remainingActions: FrontendActions;
     opponent!: FrontendOpponent;
@@ -90,115 +92,23 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
                     ownedByPlayer: ownedByPlayer,
                     damage: 0, // TODO: Implement once needed
-                    missionReady: cs.isMissionReady()
+                    missionReady: cs.isMissionReady() && ownedByPlayer
                 };
             }).concat(colonyPlaceholder);
         });
     });
-    /*
-    cardStacks = [ /// Overwrite for testing frontend layout
-        {
-            uuid: 'a1',
-            cardIds: [ 'colony' ],
-            zone: Zone.Colony,
-            index: 0,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'a2',
-            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
-            zone: Zone.Colony,
-            index: 1,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'b1',
-            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
-            zone: Zone.Oribital,
-            index: 0,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'b2',
-            cardIds: [ '160' ],
-            zone: Zone.Oribital,
-            index: 1,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'c1',
-            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
-            zone: Zone.Neutral,
-            index: 0,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'c2',
-            cardIds: [ '160' ],
-            zone: Zone.Neutral,
-            index: 1,
-            zoneCardsNum: 2,
-            ownedByPlayer: true,
-            damage: 0
-        }, {
-            uuid: 'd1',
-            cardIds: [ 'colony' ],
-            zone: Zone.Colony,
-            index: 0,
-            zoneCardsNum: 2,
-            ownedByPlayer: false,
-            damage: 0
-        }, {
-            uuid: 'd2',
-            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
-            zone: Zone.Colony,
-            index: 1,
-            zoneCardsNum: 2,
-            ownedByPlayer: false,
-            damage: 0
-        }, {
-            uuid: 'e1',
-            cardIds: [ '348', '163', '163', '163' ],
-            zone: Zone.Oribital,
-            index: 0,
-            zoneCardsNum: 1,
-            ownedByPlayer: false,
-            damage: 0
-        }, {
-            uuid: 'f1',
-            cardIds: [ '160', '163', '163', '163', '163', '163', '163', '163' ],
-            zone: Zone.Neutral,
-            index: 0,
-            zoneCardsNum: 2,
-            ownedByPlayer: false,
-            damage: 0
-        }, {
-            uuid: 'f2',
-            cardIds: [ '160', '163', '163' ],
-            zone: Zone.Neutral,
-            index: 1,
-            zoneCardsNum: 2,
-            ownedByPlayer: false,
-            damage: 0
-        }
-    ];
-    */
-    let battle = match.battle.isNoAction ? null : {
+    const battle: FrontendBattle = {
+        type: match.battle.type,
         playerShipIds: (match.activePlayerNo == playerNo ? match.battle.missionShips : match.battle.interveneShips)
             .map(cs => cs.uuid),
         opponentShipIds: (match.activePlayerNo != playerNo ? match.battle.missionShips : match.battle.interveneShips)
             .map(cs => cs.uuid),
         priceCards: match.battle.downsidePriceCards.map(() => 'back')
-            .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
-        isRaid: match.battle.isRaid()
+            .concat(match.battle.upsidePriceCards.map(c => String(c.id)))
     };
     return {
         playerIsActive: match.activePlayerNo == playerNo,
+        playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
         remainingActions: {
             hull: player.remainingActions[CardType.Hull],

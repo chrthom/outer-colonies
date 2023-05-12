@@ -13,9 +13,12 @@ export default class DeckCard extends CardImage {
         });
     }
     private onClickAction(scene: Game) {
-        if (scene.state.turnPhase == TurnPhase.Plan && scene.state.playerIsActive) {
-            scene.resetPlannedBattle(BattleType.Mission);
-            this.highlightSelected();
+        if (scene.state 
+                && scene.state.playerPendingAction 
+                && scene.state.playerIsActive 
+                && scene.state.turnPhase == TurnPhase.Build
+                && !scene.activeCard) {
+            scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission);
         }
     }
 }

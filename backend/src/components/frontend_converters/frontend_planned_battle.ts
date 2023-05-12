@@ -1,5 +1,5 @@
 import { BattleType } from "../config/enums";
-import Battle, { BattleMission, BattleNone, BattleRaid } from "../game_state/battle";
+import Battle from "../game_state/battle";
 import Match from "../game_state/match";
 import { getCardStackByUUID } from "../utils/utils";
 
@@ -12,14 +12,23 @@ export class FrontendPlannedBattle {
 
 export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
     const ships = plannedBattle.shipIds.map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id));
-    if (plannedBattle.shipIds.length == 0) return new BattleNone();
+    if (plannedBattle.shipIds.length == 0) 
+        return new Battle(BattleType.None);
     switch(plannedBattle.type) {
         case BattleType.Mission:
             const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
-            return new BattleMission(ships, downsideCards, []); // TODO: Also map upside price cards
+            return {
+                type: BattleType.Mission,
+                missionShips: ships,
+                downsidePriceCards: downsideCards,
+                upsidePriceCards: [], // TODO: Also map upside price cards
+                interveneShips: []
+            };
         case BattleType.Raid:
-            return new BattleRaid(ships);
+            let battle = new Battle(BattleType.Raid);
+            battle.missionShips = ships;
+            return battle;
         default:
-            return new BattleNone();
+            return new Battle(BattleType.None);
     }
 }

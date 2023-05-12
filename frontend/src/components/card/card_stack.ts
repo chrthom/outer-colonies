@@ -49,29 +49,25 @@ export default class CardStack {
             c.highlightReset();
         });
     }
-    highlightMissionReady() {
-        if (this.data.missionReady && this.data.ownedByPlayer) this.highlightReset();
-        else this.highlightDisabled();
-    }
     private onClickAction(scene: Game) {
-        switch(scene.state.turnPhase) {
-            case TurnPhase.Build:
-                if (scene.activeCard)
-                    scene.socket.emit(MsgTypeInbound.Handcard, scene.activeCard, this.uuid);
-                break;
-            case TurnPhase.Plan:
-                if (this.uuid == consts.colonyOpponent) {
-                    scene.resetPlannedBattle(BattleType.Raid);
-                    this.highlightSelected();
-                } else if (scene.plannedBattle.type != BattleType.None && this.ownedByPlayer && this.data.missionReady) {
-                    if (scene.plannedBattle.shipIds.includes(this.uuid)) {
-                        this.highlightReset();
-                        scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
-                    } else {
-                        this.highlightSelected();
-                        scene.plannedBattle.shipIds.push(this.uuid);
+        const state = scene.state;
+        if (state.playerPendingAction) {
+            if (state.playerIsActive) {
+                if (state.turnPhase == TurnPhase.Build) {
+                    if (scene.activeCard) {
+                        scene.socket.emit(MsgTypeInbound.Handcard, scene.activeCard, this.uuid);
+                    } else if (this.uuid == consts.colonyOpponent) {
+                        scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
+                    } else if (scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
+                        if (scene.plannedBattle.shipIds.includes(this.uuid)) {
+                            scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
+                        } else {
+                            scene.plannedBattle.shipIds.push(this.uuid);
+                        }
                     }
                 }
+            }
+            scene.updateView();
         }
     }
 }

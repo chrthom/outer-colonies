@@ -5,7 +5,7 @@ import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enum
 import { getCardStackByUUID } from '../utils/utils';
 import { consts } from '../config/consts';
 import { Server, Socket } from 'socket.io';
-import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
+import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 
 function getSocket(io: Server, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
@@ -33,62 +33,49 @@ function initMatch(io: Server, match: Match): void {
         player.drawCards(rules.initialCardsToDraw);
     });
     // TODO: Emit draw cards event
-    emitState(io, match);
     // TODO: Wait for respone for redrawing cards
-    nextTurn(io, match);
-}
-
-function nextTurn(io: Server, match: Match): void {
     match.prepareStartPhase();
-    // TODO: Emit start phase event
-    emitState(io, match);
-    // TODO: Wait for response to continue
-    match.prepareBuildPhase();
     emitState(io, match);
 }
 
 export function gameSocketListeners(io: Server, socket: Socket): void {
-    socket.on(MsgTypeInbound.Ready, (turnPhase: string, data: any) => {
+    socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
         const match = socket.data.match;
-        if (turnPhase == socket.data.match.turnPhase) {
-            if (socket.data.playerNo == match.activePlayerNo) {
-                switch(turnPhase) {
-                    case TurnPhase.Init:
-                        match.players[socket.data.playerNo].ready = true;
-                        if (match.players[socket.data.opponentPlayerNo()].ready) {
-                            console.log(`Game match ${match.matchName()} is ready to start`);
-                            initMatch(io, match);
-                        }
-                        break;
-                    case TurnPhase.Build:
-                        match.preparePlanPhase();
-                        emitState(io, match);
-                        break;
-                    case TurnPhase.Plan:
-                        match.battle = toBattle(match, <FrontendPlannedBattle> data);
-                        emitState(io, match);
-                        break;
-                }
-            } else {
-                switch(turnPhase) {
-                    case TurnPhase.Plan:
-                        // TODO: CONTINUE HERE!!!
-                        // TODO: Opponent reacting on planned mission
-                        match.prepareCombatPhase();
-                        emitState(io, match);
-                        break;
+        if (turnPhase == match.turnPhase) {
+            if (turnPhase == TurnPhase.Init) {
+                match.players[socket.data.playerNo].ready = true;
+                if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
+            } else if (socket.data.playerNo == match.actionPendingByPlayerNo) {
+                if (socket.data.playerNo == match.activePlayerNo) {
+                    switch(turnPhase) {
+                        case TurnPhase.Init:
+                            match.players[socket.data.playerNo].ready = true;
+                            if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
+                            break;
+                        case TurnPhase.Build:
+                            match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
+                            emitState(io, match);
+                            break;
+                    }
+                } else {
+                    switch(turnPhase) {
+                        case TurnPhase.Build:
+                            // TODO: Opponent reacting on planned mission
+                            match.prepareCombatPhase();
+                            emitState(io, match);
+                            break;
+                    }
                 }
             }
         }
     });
-    socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
+    socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => { // TODO: Add validation, for insufficient sockets
         const match = socket.data.match;
         const player = getPlayer(socket);
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
         if (handCard.card.isPlayable(match, socket.data.playerNo)) {
-            if (targetUUID == consts.colonyPlayer) { // TODO: Also accept opponent's colony
+            if (targetUUID == consts.colonyPlayer) { // TODO: Also accept opponent's colony for tactic cards
                 if (handCard.card.canBeAttachedToColony(player.cardStacks)) {
-                    console.log(`Successfully played card ${handCard.card.name} on own colony`); //
                     player.playCardToColonyZone(handCard);
                 } else {
                     console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on own colony, which is not a valid target`);
@@ -97,7 +84,6 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
                 const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO: Also check opponent card stack
                 if (target) {
                     if (handCard.card.canBeAttachedTo([ target ])) {
-                        console.log(`Successfully played card ${handCard.card.name} on target ${target.card.name}`); //
                         player.attachCardToCardStack(handCard, target);
                     } else {
                         console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);

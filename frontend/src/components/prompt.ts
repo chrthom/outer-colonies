@@ -1,7 +1,6 @@
-import { BattleType } from "../../../backend/src/components/config/enums";
-import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
-import { FrontendActions } from "../../../backend/src/components/frontend_converters/frontend_state";
+import { BattleType, TurnPhase } from "../../../backend/src/components/config/enums";
 import Layout from "../config/layout";
+import Game from "../scenes/game";
 
 const layout = new Layout();
 
@@ -16,29 +15,33 @@ export default class Prompt {
             .setOrigin(1, 0);
         this.hide();
     }
-    showBuildPhase(remainingActions: FrontendActions) {
-        this.show(
-            'Spiele Karten\n'
-                + `- ${remainingActions.hull}x Hülle\n`
-                + `- ${remainingActions.equipment}x Ausrüstung\n`
-                + `- ${remainingActions.colony}x Kolonie\n`
-                + `- ${remainingActions.tactic}x Taktik`
-        );
+    update(scene: Game) {
+        if (scene.state.playerPendingAction) {
+            if (scene.state.turnPhase == TurnPhase.Build) {
+                this.showBuildPhase(scene);
+            } else {
+                this.hide();
+            }
+        } else {
+            this.hide();
+        }
     }
-    showPlanPhase(plannedBattle: FrontendPlannedBattle) {
-        let actionText: string;
-        if (plannedBattle.type == BattleType.None)
-            actionText = 'Plane eine Mission oder einen Überfall.\n'
+    private showBuildPhase(scene: Game) {
+        const actions = scene.state.remainingActions;
+        const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
+        let battleText: string;
+        if (scene.plannedBattle.type == BattleType.None)
+            battleText = 'Plane eine Mission oder einen Überfall:\n'
                 + '- Klicke dein Deck für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
-        else actionText = `Wähle Schiffe für ${plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
-        this.show(actionText);
+        else battleText = `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
+        this.show(`${actionText}\n${battleText}`);
     }
-    show(text: string) {
+    private show(text: string) {
         this.sprite.setText(text);
         this.sprite.visible = true;
     }
-    hide() {
+    private hide() {
         this.sprite.visible = false;
     }
 }

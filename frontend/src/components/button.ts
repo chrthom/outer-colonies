@@ -1,4 +1,4 @@
-import { MsgTypeInbound, TurnPhase } from "../../../backend/src/components/config/enums";
+import { BattleType, MsgTypeInbound, TurnPhase } from "../../../backend/src/components/config/enums";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -29,22 +29,31 @@ export default class Button {
         });
         this.hide();
     }
-    showEndBuildPhase(scene: Game) {
-        this.show('Aufbauphase beenden', () => {
-            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build);
+    update(scene: Game) {
+        if (scene.state.playerPendingAction) {
+            if (scene.state.turnPhase == TurnPhase.Build) {
+                this.showNextPhase(scene);
+            } else {
+                this.hide();
+            }
+        } else {
+            this.hide();
+        }
+    }
+    private showNextPhase(scene: Game) {
+        const text = scene.plannedBattle.shipIds.length == 0 ? 
+            'Zug beenden' : 
+            `${scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
+        this.show(text, () => {
+            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle);
         });
     }
-    showEndPlanPhase(scene: Game) {
-        this.show('Planungsphase beenden', () => {
-            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Plan, scene.plannedBattle);
-        });
-    }
-    show(text: string, onClickAction: () => void) {
+    private show(text: string, onClickAction: () => void) {
         this.action.onClick = onClickAction;
         this.sprite.setText(text);
         this.sprite.visible = true;
     }
-    hide() {
+    private hide() {
         this.sprite.visible = false;
     }
 }
