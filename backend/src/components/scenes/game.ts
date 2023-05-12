@@ -69,7 +69,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             }
         }
     });
-    socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => { // TODO: Add validation, for insufficient sockets
+    socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
         const match = socket.data.match;
         const player = getPlayer(socket);
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
@@ -83,7 +83,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             } else {
                 const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO: Also check opponent card stack
                 if (target) {
-                    if (handCard.card.canBeAttachedTo([ target ])) {
+                    if (handCard.card.canBeAttachedTo([ target ]).length > 0) {
                         player.attachCardToCardStack(handCard, target);
                     } else {
                         console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
