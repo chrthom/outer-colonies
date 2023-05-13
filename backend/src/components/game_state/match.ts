@@ -27,6 +27,10 @@ export default class Match {
     getInactivePlayer(): Player {
         return this.players[this.opponentPlayerNo[this.activePlayerNo]];
     }
+    forAllPlayers(f: (playerNo: number) => void): void {
+        f(0);
+        f(1);
+    }
     setStartPlayer() {
         if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
         else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
@@ -61,6 +65,7 @@ export default class Match {
         this.turnPhase = TurnPhase.Combat;
         this.assignInterveningShips(interveningShipIds);
         this.actionPendingByPlayerNo = this.activePlayerNo;
+        this.forAllPlayers((playerNo: number) => this.players[playerNo].cardStacks.forEach(cs => cs.combatPhaseReset()));
         // TODO: CONTINUE HERE!!!
     }
     prepareEndPhase() {

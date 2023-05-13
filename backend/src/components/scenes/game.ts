@@ -15,13 +15,8 @@ function getPlayer(socket: Socket) {
     return socket.data.match.players[socket.data.playerNo];
 }
 
-function forAllPlayers(f: (playerNo: number) => void): void {
-    f(0);
-    f(1);
-}
-
 function emitState(io: Server, match: Match): void {
-    forAllPlayers((playerNo: number) => {
+    match.forAllPlayers((playerNo: number) => {
         getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
     });
 }

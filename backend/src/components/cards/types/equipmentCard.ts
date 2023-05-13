@@ -22,6 +22,9 @@ export default abstract class EquipmentCard extends Card {
     canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
         return false;
     }
+    canAttack(): boolean {
+        return Boolean(this.attackProfile);
+    }
     isPlayableDecorator(match: Match, playerNo: number): boolean {
         return this.canBeAttachedTo(match.players[playerNo].cardStacks).length > 0;
     }

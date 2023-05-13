@@ -27,6 +27,7 @@ export class FrontendBattle {
 export class FrontendCardStack {
     uuid!: string;
     cardIds!: Array<string>;
+    battleReadyCardIndexes!: Array<number>;
     zone!: Zone;
     index!: number;
     zoneCardsNum!: number;
@@ -70,12 +71,13 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     });
     let cardStacks = [true, false].flatMap(ownedByPlayer => {
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
-        return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
+        return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
             const colonyPlaceholder: Array<FrontendCardStack> = zone != Zone.Colony ? [] : [
                 {
                     uuid: ownedByPlayer ? consts.colonyPlayer : consts.colonyOpponent,
                     cardIds: [ 'colony' ],
+                    battleReadyCardIndexes: [],
                     zone: Zone.Colony,
                     index: 0,
                     zoneCardsNum: zoneCardStacks.length + 1,
@@ -85,9 +87,11 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                 }
             ];
             return zoneCardStacks.map((cs, index) => {
+                const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.attackAvailable ? [index] : []);
                 return {
                     uuid: cs.uuid,
                     cardIds: cs.getCards().map(c => String(c.id)),
+                    battleReadyCardIndexes: ownedByPlayer ? battleReadyCards : [],
                     zone: zone,
                     index: index + colonyPlaceholder.length,
                     zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,

@@ -15,6 +15,13 @@ export default abstract class Card {
     }
     abstract canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack>
     abstract canBeAttachedToColony(cardStacks: Array<CardStack>): boolean
+    canAttack(): boolean {
+        return false;
+    }
+    canDefend(): boolean {
+        const p = this.profile();
+        return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
+    }
     isPlayable(match: Match, playerNo: number): boolean {
         const player = match.players[playerNo];
         return player.remainingActions[this.type] > 0 

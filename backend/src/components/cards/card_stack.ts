@@ -9,6 +9,8 @@ export default class CardStack {
     uuid!: string;
     attachedCards: Array<CardStack> = [];
     damage: number = 0;
+    attackAvailable: boolean = false;
+    defenseAvailable: boolean = false;
     constructor(card: Card, zone: Zone) {
         this.card = card;
         this.zone = zone;
@@ -23,10 +25,18 @@ export default class CardStack {
         return Object.values(this.combineCardProfiles(this.profile(), c)).filter(v => v < 0).length == 0;
     }
     getCards(): Array<Card> {
-        return this.attachedCards.flatMap(cs => cs.getCards()).concat(this.card);
+        return this.getCardStacks().map(cs => cs.card);
+    }
+    getCardStacks(): Array<CardStack> {
+        return this.attachedCards.flatMap(cs => cs.getCardStacks()).concat(this);
     }
     isMissionReady(): boolean {
         return this.zone == Zone.Oribital && this.card.type == CardType.Hull && this.profile().speed > 0;
+    }
+    combatPhaseReset() {
+        this.attachedCards.forEach(cs => cs.combatPhaseReset());
+        if (this.card.canAttack) this.attackAvailable = true;
+        if (this.card.canDefend) this.defenseAvailable = true;
     }
     private combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
         return {
