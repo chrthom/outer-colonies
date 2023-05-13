@@ -3,6 +3,7 @@ import { rules } from '../config/rules';
 import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
 import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
+import { getCardStackByUUID } from '../utils/utils';
 
 export default class Match {
     readonly room!: string;
@@ -23,6 +24,9 @@ export default class Match {
     getActivePlayer(): Player {
         return this.players[this.activePlayerNo];
     }
+    getInactivePlayer(): Player {
+        return this.players[this.opponentPlayerNo[this.activePlayerNo]];
+    }
     setStartPlayer() {
         if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
         else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
@@ -36,7 +40,6 @@ export default class Match {
         this.battle = new Battle(BattleType.None);
         // TODO: Move ships from neutral zone to orbital zone
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
-        // TODO: Check if no cards are left in deck
         // TODO: Check for effects on drawing a cards (like drawing an extra card)
         // TODO: Execute start of turn effects of cards
         // TODO: Wait for response to continue
@@ -54,12 +57,27 @@ export default class Match {
             this.actionPendingByPlayerNo = this.opponentPlayerNo(this.activePlayerNo);
         }
     }
-    prepareCombatPhase() {
+    prepareCombatPhase(interveningShipIds: Array<string>) {
         this.turnPhase = TurnPhase.Combat;
+        this.assignInterveningShips(interveningShipIds);
         this.actionPendingByPlayerNo = this.activePlayerNo;
         // TODO: CONTINUE HERE!!!
     }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
+    }
+    private assignInterveningShips(interveneShipIds: Array<string>) {
+        if (this.battle.type == BattleType.Mission) {
+            this.battle.interveningShips = interveneShipIds
+            .map(id => getCardStackByUUID(this.getInactivePlayer().cardStacks, id))
+            .filter(cs => cs.isMissionReady);
+            this.battle.interveningShips.map(cs => cs.zone = Zone.Neutral);
+        } else if (this.battle.type == BattleType.Raid) {
+            this.getInactivePlayer().cardStacks
+                .filter(cs => cs.isMissionReady() && !interveneShipIds.includes(cs.uuid))
+                .forEach(cs => cs.zone = Zone.Neutral);
+            this.battle.interveningShips = this.getInactivePlayer().cardStacks
+                .filter(cs => cs.zone == Zone.Oribital);
+        }
     }
 }

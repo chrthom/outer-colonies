@@ -11,7 +11,9 @@ export class FrontendPlannedBattle {
 }
 
 export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
-    const ships = plannedBattle.shipIds.map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id));
+    const ships = plannedBattle.shipIds
+        .map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
+        .filter(cs => cs.isMissionReady());
     if (plannedBattle.shipIds.length == 0) 
         return new Battle(BattleType.None);
     switch(plannedBattle.type) {
@@ -22,7 +24,7 @@ export default function toBattle(match: Match, plannedBattle: FrontendPlannedBat
                 missionShips: ships,
                 downsidePriceCards: downsideCards,
                 upsidePriceCards: [], // TODO: Also map upside price cards
-                interveneShips: []
+                interveningShips: []
             };
         case BattleType.Raid:
             let battle = new Battle(BattleType.Raid);

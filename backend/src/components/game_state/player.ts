@@ -42,6 +42,7 @@ export default class Player {
         this.deck = this.shuffle(this.deck);
     }
     drawCards(num: number): void {
+        // TODO: Check if no cards are left in deck
         this.hand.push(...this.pickCardsFromDeck(num).map(c => new CardStack(c, Zone.Hand)));
     }
     pickCardsFromDeck(num: number): Array<Card> {

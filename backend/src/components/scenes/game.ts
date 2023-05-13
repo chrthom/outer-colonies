@@ -61,7 +61,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
                     switch(turnPhase) {
                         case TurnPhase.Build:
                             // TODO: Opponent reacting on planned mission
-                            match.prepareCombatPhase();
+                            match.prepareCombatPhase(<Array<string>> data);
                             emitState(io, match);
                             break;
                     }
