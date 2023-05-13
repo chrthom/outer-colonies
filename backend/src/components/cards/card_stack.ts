@@ -35,8 +35,8 @@ export default class CardStack {
     }
     combatPhaseReset() {
         this.attachedCards.forEach(cs => cs.combatPhaseReset());
-        if (this.card.canAttack) this.attackAvailable = true;
-        if (this.card.canDefend) this.defenseAvailable = true;
+        if (this.card.canAttack()) this.attackAvailable = true;
+        if (this.card.canDefend()) this.defenseAvailable = true;
     }
     private combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
         return {

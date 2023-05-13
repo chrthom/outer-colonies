@@ -107,7 +107,8 @@ export default class Game extends Phaser.Scene {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
             } else if (this.activeCard
-                    || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)) {
+                    || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)
+                    || this.state.turnPhase == TurnPhase.Combat) {
                 this.obj.deck.highlightDisabled();
             }
             this.hand.forEach(c => {
@@ -117,7 +118,9 @@ export default class Game extends Phaser.Scene {
             });
             const activeCard = this.hand.find(c => c.uuid == this.activeCard);
             this.cardStacks.forEach(c => {
-                if (this.plannedBattle.type != BattleType.None) {
+                if (this.activeCard) { // Choose target for hand card
+                    if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
+                } else if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
                     if (c.uuid == consts.colonyOpponent) {
                         if (this.plannedBattle.type == BattleType.Raid) {
                             c.highlightSelected();
@@ -129,18 +132,21 @@ export default class Game extends Phaser.Scene {
                             c.highlightSelected();
                         }
                     }
-                } else if (this.activeCard) {
-                    if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
-                } else if (this.state.battle.type != BattleType.None 
-                        && this.state.turnPhase == TurnPhase.Build 
+                } else if (this.state.turnPhase == TurnPhase.Build // Assign ships to intervene
+                        && this.state.battle.type != BattleType.None
                         && !this.state.playerIsActive) {
                     if (!c.data.missionReady) {
                         c.highlightDisabled();
                     } else if (this.interveneShipIds.includes(c.uuid)) {
                         c.highlightSelected();
                     }
+                } else if (this.state.turnPhase == TurnPhase.Combat) { // Choose weapon to use
+                    c.highlightDisabled();
+                    if (this.state.battle.playerShipIds.includes(c.uuid)) {
+                        c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());
+                    }
                 }
-            })
+            });
         }
     }
 

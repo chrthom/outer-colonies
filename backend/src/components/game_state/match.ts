@@ -25,7 +25,7 @@ export default class Match {
         return this.players[this.activePlayerNo];
     }
     getInactivePlayer(): Player {
-        return this.players[this.opponentPlayerNo[this.activePlayerNo]];
+        return this.players[this.opponentPlayerNo(this.activePlayerNo)];
     }
     forAllPlayers(f: (playerNo: number) => void): void {
         f(0);
@@ -71,15 +71,15 @@ export default class Match {
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
     }
-    private assignInterveningShips(interveneShipIds: Array<string>) {
+    private assignInterveningShips(interveningShipIds: Array<string>) {
         if (this.battle.type == BattleType.Mission) {
-            this.battle.interveningShips = interveneShipIds
-            .map(id => getCardStackByUUID(this.getInactivePlayer().cardStacks, id))
-            .filter(cs => cs.isMissionReady);
+            this.battle.interveningShips = interveningShipIds
+                .map(id => getCardStackByUUID(this.getInactivePlayer().cardStacks, id))
+                .filter(cs => cs.isMissionReady);
             this.battle.interveningShips.map(cs => cs.zone = Zone.Neutral);
         } else if (this.battle.type == BattleType.Raid) {
             this.getInactivePlayer().cardStacks
-                .filter(cs => cs.isMissionReady() && !interveneShipIds.includes(cs.uuid))
+                .filter(cs => cs.isMissionReady() && !interveningShipIds.includes(cs.uuid))
                 .forEach(cs => cs.zone = Zone.Neutral);
             this.battle.interveningShips = this.getInactivePlayer().cardStacks
                 .filter(cs => cs.zone == Zone.Oribital);
