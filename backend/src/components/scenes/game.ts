@@ -47,25 +47,13 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
                 if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
             } else if (socket.data.playerNo == match.actionPendingByPlayerNo) {
                 if (socket.data.playerNo == match.activePlayerNo) {
-                    switch(turnPhase) {
-                        case TurnPhase.Init:
-                            match.players[socket.data.playerNo].ready = true;
-                            if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
-                            break;
-                        case TurnPhase.Build:
-                            match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
-                            emitState(io, match);
-                            break;
-                    }
+                    if (turnPhase == TurnPhase.Build) 
+                        match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
                 } else {
-                    switch(turnPhase) {
-                        case TurnPhase.Build:
-                            // TODO: Opponent reacting on planned mission
-                            match.prepareCombatPhase(<Array<string>> data);
-                            emitState(io, match);
-                            break;
-                    }
+                    if (turnPhase == TurnPhase.Build) 
+                        match.prepareCombatPhase(<Array<string>> data);
                 }
+                emitState(io, match);
             }
         }
     });

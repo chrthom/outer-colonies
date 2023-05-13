@@ -21,6 +21,7 @@ export class FrontendBattle {
     playerShipIds: Array<string>;
     opponentShipIds: Array<string>;
     priceCards: Array<string>;
+    range: number;
 }
 
 export class FrontendCardStack {
@@ -104,7 +105,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         opponentShipIds: (match.activePlayerNo != playerNo ? match.battle.missionShips : match.battle.interveningShips)
             .map(cs => cs.uuid),
         priceCards: match.battle.downsidePriceCards.map(() => 'back')
-            .concat(match.battle.upsidePriceCards.map(c => String(c.id)))
+            .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
+        range: match.battle.range
     };
     return {
         playerIsActive: match.activePlayerNo == playerNo,

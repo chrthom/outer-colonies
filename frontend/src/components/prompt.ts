@@ -20,6 +20,8 @@ export default class Prompt {
             if (scene.state.turnPhase == TurnPhase.Build) {
                 if (scene.state.playerIsActive) this.showBuildPhase(scene);
                 else this.showIntervenePhase(scene);
+            } else if (scene.state.turnPhase == TurnPhase.Combat) {
+                this.showCombatPhase(scene);
             } else {
                 this.hide();
             }
@@ -43,6 +45,9 @@ export default class Prompt {
         const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
         const battleText = scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';
         this.show(`${actionText}\nWähle Schiffe zur ${battleText}`)
+    }
+    private showCombatPhase(scene: Game) {
+        this.show(`Aktuelle Reichweite der Kampfphase: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
     }
     private show(text: string) {
         this.sprite.setText(text);

@@ -34,6 +34,8 @@ export default class Button {
             if (scene.state.turnPhase == TurnPhase.Build) {
                 if (scene.state.playerIsActive) this.showNextPhase(scene);
                 else this.showIntervene(scene);
+            } else if (scene.state.turnPhase == TurnPhase.Combat) {
+                this.showNextCombatPhase(scene);
             } else {
                 this.hide();
             }
@@ -45,18 +47,17 @@ export default class Button {
         const text = scene.plannedBattle.shipIds.length == 0 ? 
             'Zug beenden' : 
             `${scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
-        this.show(text, () => {
-            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle);
-        });
+        this.show(text, () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle));
     }
     private showIntervene(scene: Game) {
         let text: string; 
         if (scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
         else if (scene.interveneShipIds.length > 0) text = 'Intervenieren';
         else text = 'Überspringen';
-        this.show(text, () => {
-            scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.interveneShipIds);
-        });
+        this.show(text, () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.interveneShipIds));
+    }
+    private showNextCombatPhase(scene: Game) {
+        this.show('Kampfphase beenden', () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
     }
     private show(text: string, onClickAction: () => void) {
         this.action.onClick = onClickAction;
