@@ -47,7 +47,7 @@ export default class Prompt {
         this.show(`${actionText}\nWähle Schiffe zur ${battleText}`)
     }
     private showCombatPhase(scene: Game) {
-        this.show(`Aktuelle Reichweite der Kampfphase: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
+        this.show(`Aktuelle Reichweite der Gefechts: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
     }
     private show(text: string) {
         this.sprite.setText(text);

@@ -20,9 +20,9 @@ export default class CardStack {
         const x = zoneLayout.x + (data.zoneCardsNum == 1 ? zoneLayout.maxWidth / 2 : data.index * zoneLayout.maxWidth / (data.zoneCardsNum - 1));
         const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
         this.cards = data.cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !data.ownedByPlayer));
-        this.cards.forEach(c => {
+        this.cards.forEach((c, index) => {
             c.sprite.on('pointerdown', () => {
-                this.onClickAction(scene);
+                this.onClickAction(scene, index);
             });
             if (data.uuid != consts.colonyPlayer && data.uuid != consts.colonyOpponent)
                 c.enableMouseover(scene);
@@ -49,33 +49,46 @@ export default class CardStack {
             c.highlightReset();
         });
     }
-    private onClickAction(scene: Game) {
+    private onClickAction(scene: Game, index: number) {
         const state = scene.state;
         if (state.playerPendingAction) {
-            if (state.playerIsActive) {
-                if (state.turnPhase == TurnPhase.Build) {
-                    if (scene.activeCard) {
-                        scene.socket.emit(MsgTypeInbound.Handcard, scene.activeCard, this.uuid);
-                    } else if (this.uuid == consts.colonyOpponent) {
-                        scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
-                    } else if (scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
-                        if (scene.plannedBattle.shipIds.includes(this.uuid)) {
-                            scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
-                        } else {
-                            scene.plannedBattle.shipIds.push(this.uuid);
+            switch (state.turnPhase) {
+                case TurnPhase.Build:
+                    if (state.playerIsActive) {
+                        if (scene.activeHandCard) {
+                            scene.socket.emit(MsgTypeInbound.Handcard, scene.activeHandCard, this.uuid);
+                        } else if (this.uuid == consts.colonyOpponent) {
+                            scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
+                        } else if (scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
+                            if (scene.plannedBattle.shipIds.includes(this.uuid)) {
+                                scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
+                            } else {
+                                scene.plannedBattle.shipIds.push(this.uuid);
+                            }
+                        }
+                    } else {
+                        if (this.data.missionReady) {
+                            if (scene.interveneShipIds.includes(this.uuid)) {
+                                scene.interveneShipIds = scene.interveneShipIds.filter(id => id != this.uuid);
+                            } else {
+                                scene.interveneShipIds.push(this.uuid);
+                            }
                         }
                     }
-                }
-            } else {
-                if (state.turnPhase == TurnPhase.Build) {
-                    if (this.data.missionReady) {
-                        if (scene.interveneShipIds.includes(this.uuid)) {
-                            scene.interveneShipIds = scene.interveneShipIds.filter(id => id != this.uuid);
-                        } else {
-                            scene.interveneShipIds.push(this.uuid);
-                        }
+                    break;
+                case TurnPhase.Combat:
+                    if (scene.activeCardStack == this.uuid && scene.activeCardStackIndex == index) {
+                        scene.activeCardStack = null;
+                        scene.activeCardStackIndex = null;
+                        scene.activeHandCard = null;
+                    } else if (this.data.battleReadyCardIndexes.includes(index)) {
+                        scene.activeCardStack = this.uuid;
+                        scene.activeCardStackIndex = index;
+                        scene.activeHandCard = null;
+                    } else if (scene.activeCardStack && scene.state.battle.playerShipIds.includes(this.uuid)) {
+                        // TODO: Add fire message to backend
                     }
-                }
+                    break;
             }
             scene.updateView();
         }

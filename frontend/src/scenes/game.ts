@@ -18,7 +18,9 @@ class InitData {
 export default class Game extends Phaser.Scene {
     socket: Socket;
     state: FrontendState;
-    activeCard: string;
+    activeHandCard: string;
+    activeCardStack: string;
+    activeCardStackIndex: number;
     plannedBattle: FrontendPlannedBattle;
     interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];
@@ -75,7 +77,7 @@ export default class Game extends Phaser.Scene {
     }
 
     resetPlannedBattle(type: BattleType) {
-        this.activeCard = null;
+        this.activeHandCard = null;
         this.plannedBattle = {
             type: type,
             downsideCardsNum: 0,
@@ -88,7 +90,7 @@ export default class Game extends Phaser.Scene {
     }
 
     resetInterveneBattle() {
-        this.activeCard = null;
+        this.activeHandCard = null;
         this.interveneShipIds = [];
         this.updateView();
     }
@@ -106,44 +108,44 @@ export default class Game extends Phaser.Scene {
         if (this.state.playerPendingAction) {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
-            } else if (this.activeCard
+            } else if (this.activeHandCard
                     || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)
                     || this.state.turnPhase == TurnPhase.Combat) {
                 this.obj.deck.highlightDisabled();
             }
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
-                else if (this.activeCard == c.uuid) c.highlightSelected();
+                else if (this.activeHandCard == c.uuid) c.highlightSelected();
                 else c.highlightPlayability();
             });
-            const activeCard = this.hand.find(c => c.uuid == this.activeCard);
             this.cardStacks.forEach(c => {
-                if (this.activeCard) { // Choose target for hand card
+                if (this.activeHandCard) { // Choose target for hand card
+                    const activeCard = this.hand.find(c => c.uuid == this.activeHandCard);
                     if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
-                } else if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
-                    if (c.uuid == consts.colonyOpponent) {
-                        if (this.plannedBattle.type == BattleType.Raid) {
-                            c.highlightSelected();
-                        }
-                    } else {
-                        if (!c.data.missionReady) {
+                } else {
+                    switch (this.state.turnPhase) {
+                        case TurnPhase.Build:
+                            if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
+                                if (c.uuid == consts.colonyOpponent) {
+                                    if (this.plannedBattle.type == BattleType.Raid) c.highlightSelected();
+                                } else {
+                                    if (!c.data.missionReady) c.highlightDisabled();
+                                    else if (this.plannedBattle.shipIds.includes(c.uuid)) c.highlightSelected();
+                                }
+                            } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) { // Assign ships to intervene
+                                if (!c.data.missionReady) c.highlightDisabled();
+                                else if (this.interveneShipIds.includes(c.uuid)) c.highlightSelected();
+                            }
+                            break;
+                        case TurnPhase.Combat:
                             c.highlightDisabled();
-                        } else if (this.plannedBattle.shipIds.includes(c.uuid)) {
-                            c.highlightSelected();
-                        }
-                    }
-                } else if (this.state.turnPhase == TurnPhase.Build // Assign ships to intervene
-                        && this.state.battle.type != BattleType.None
-                        && !this.state.playerIsActive) {
-                    if (!c.data.missionReady) {
-                        c.highlightDisabled();
-                    } else if (this.interveneShipIds.includes(c.uuid)) {
-                        c.highlightSelected();
-                    }
-                } else if (this.state.turnPhase == TurnPhase.Combat) { // Choose weapon to use
-                    c.highlightDisabled();
-                    if (this.state.battle.playerShipIds.includes(c.uuid)) {
-                        c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());
+                            if (this.activeCardStack == c.uuid) {
+                                c.cards[this.activeCardStackIndex].highlightSelected();
+                            } else if (this.state.battle.playerShipIds.includes(c.uuid)) {
+                                c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());
+                            }
+                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(c.uuid)) c.highlightReset();
+                            break;
                     }
                 }
             });

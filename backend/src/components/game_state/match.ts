@@ -4,6 +4,7 @@ import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
 import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import { getCardStackByUUID } from '../utils/utils';
+import EquipmentCard from '../cards/types/equipmentCard';
 
 export default class Match {
     readonly room!: string;
@@ -27,7 +28,10 @@ export default class Match {
     getInactivePlayer(): Player {
         return this.players[this.opponentPlayerNo(this.activePlayerNo)];
     }
-    forAllPlayers(f: (playerNo: number) => void): void {
+    getPendingActionPlayer(): Player {
+        return this.players[this.actionPendingByPlayerNo];
+    }
+    forAllPlayers(f: (playerNo: number) => void) {
         f(0);
         f(1);
     }
@@ -64,9 +68,25 @@ export default class Match {
     prepareCombatPhase(interveningShipIds: Array<string>) {
         this.turnPhase = TurnPhase.Combat;
         this.assignInterveningShips(interveningShipIds);
-        this.actionPendingByPlayerNo = this.activePlayerNo;
-        this.forAllPlayers((playerNo: number) => this.players[playerNo].cardStacks.forEach(cs => cs.combatPhaseReset()));
-        // TODO: CONTINUE HERE!!!
+        this.processBattleRound();
+    }
+    processBattleRound() {
+        if (this.actionPendingByPlayerNo == this.opponentPlayerNo(this.activePlayerNo)) {
+            // TODO: Remove destroyed ships
+            this.battle.range--;
+            this.forAllPlayers((playerNo: number) => this.players[playerNo].cardStacks.forEach(cs => cs.combatPhaseReset()));
+        }
+        this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
+        if (this.battle.range == 0) {
+            this.prepareEndPhase();
+            return;
+        }
+        const activeShips = this.actionPendingByPlayerNo == this.activePlayerNo ? this.battle.missionShips : this.battle.interveningShips;
+        const hasAttack = activeShips
+            .flatMap(cs => cs.getCardStacks())
+            .filter(cs => cs.attackAvailable)
+            .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
+        if (!hasAttack) this.processBattleRound();
     }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;

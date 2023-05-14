@@ -9,7 +9,7 @@ export default class Battle {
     interveningShips: Array<CardStack> = [];
     downsidePriceCards: Array<Card> = [];
     upsidePriceCards: Array<Card> = [];
-    range: number = rules.maxRange;
+    range: number = rules.maxRange + 1;
     constructor(type: BattleType) {
         this.type = type;
     }
