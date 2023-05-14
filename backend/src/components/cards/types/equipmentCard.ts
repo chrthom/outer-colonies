@@ -35,7 +35,23 @@ export default abstract class EquipmentCard extends Card {
         }
         // TODO: CONTINUE HERE!
         // Perform reductions for defense
-
+        if (this.attackProfile.pointDefense < 0) {
+            const bestPointDefense = opponentShips
+                .flatMap(cs => cs.getCardStacks())
+                .filter(cs => cs.defenseAvailable && cs.profile().pointDefense)
+                .sort((a: CardStack, b: CardStack) => a.profile().pointDefense - b.profile().pointDefense)
+                .pop();
+            if (bestPointDefense) {
+                const damageReduction = this.attackProfile.pointDefense * bestPointDefense.profile().pointDefense;
+                if (damage + damageReduction < 0) {
+                    damage = 0;
+                    return;
+                } else {
+                    damage += damageReduction;
+                    bestPointDefense.defenseAvailable = false;
+                }
+            }
+        }
     }
     isPlayableDecorator(match: Match, playerNo: number): boolean {
         return this.canBeAttachedTo(match.players[playerNo].cardStacks).length > 0;
