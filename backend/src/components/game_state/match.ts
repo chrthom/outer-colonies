@@ -31,6 +31,9 @@ export default class Match {
     getPendingActionPlayer(): Player {
         return this.players[this.actionPendingByPlayerNo];
     }
+    getWaitingPlayer(): Player {
+        return this.players[this.opponentPlayerNo(this.actionPendingByPlayerNo)];
+    }
     forAllPlayers(f: (playerNo: number) => void) {
         f(0);
         f(1);
@@ -79,14 +82,14 @@ export default class Match {
         this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
         if (this.battle.range == 0) {
             this.prepareEndPhase();
-            return;
+        } else {
+            const activeShips = this.actionPendingByPlayerNo == this.activePlayerNo ? this.battle.missionShips : this.battle.interveningShips;
+            const hasAttack = activeShips
+                .flatMap(cs => cs.getCardStacks())
+                .filter(cs => cs.attackAvailable)
+                .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
+            if (!hasAttack) this.processBattleRound();
         }
-        const activeShips = this.actionPendingByPlayerNo == this.activePlayerNo ? this.battle.missionShips : this.battle.interveningShips;
-        const hasAttack = activeShips
-            .flatMap(cs => cs.getCardStacks())
-            .filter(cs => cs.attackAvailable)
-            .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
-        if (!hasAttack) this.processBattleRound();
     }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;

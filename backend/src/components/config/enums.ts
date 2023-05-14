@@ -7,7 +7,8 @@ export enum CardType {
 }
 
 export enum MsgTypeInbound {
-    Connection = 'connection',
+    Attack = 'attack',
+    Connect = 'connect',
     Disconnect = 'disconnect',
     Handcard = 'handcard',
     Login = 'login',

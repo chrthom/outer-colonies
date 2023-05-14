@@ -25,6 +25,18 @@ export default abstract class EquipmentCard extends Card {
     canAttack(): boolean {
         return Boolean(this.attackProfile);
     }
+    attack(match: Match, src: CardStack, target: CardStack) {
+        const battle = match.battle;
+        const opponentShips = match.actionPendingByPlayerNo == match.activePlayerNo 
+            ? battle.missionShips : battle.interveningShips;
+        let damage = this.attackProfile.damage
+        if (src.profile().speed + battle.range <= target.profile().speed) {
+            damage = Math.round(damage / 2);
+        }
+        // TODO: CONTINUE HERE!
+        // Perform reductions for defense
+
+    }
     isPlayableDecorator(match: Match, playerNo: number): boolean {
         return this.canBeAttachedTo(match.players[playerNo].cardStacks).length > 0;
     }

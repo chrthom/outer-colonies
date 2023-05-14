@@ -6,6 +6,9 @@ import { getCardStackByUUID } from '../utils/utils';
 import { consts } from '../config/consts';
 import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
+import EquipmentCard from '../cards/types/equipmentCard';
+import CardStack from '../cards/card_stack';
+import Battle from '../game_state/battle';
 
 function getSocket(io: Server, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);
@@ -77,6 +80,35 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             }
         } else {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
+        }
+        emitState(io, match);
+    });
+    socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
+        const match = socket.data.match;
+        const player = getPlayer(socket);
+        const playerShips: Array<CardStack> = match.actionPendingByPlayerNo == match.activePlayerNo 
+            ? match.battle.missionShips : match.battle.interveningShips;
+        const opponentShips: Array<CardStack> = match.actionPendingByPlayerNo == match.activePlayerNo 
+            ? match.battle.interveningShips : match.battle.missionShips;
+        const srcShip = playerShips.find(cs => cs.uuid == srcId);
+        const srcWeapon = srcShip ? srcShip.getCardStacks()[srcIndex] : null;
+        const target = opponentShips.find(cs => cs.uuid == targetId)
+        if (!srcShip) {
+            console.log(`WARN: ${player.name} tried to attack from invalid ship ${srcId}`);
+        } else if (!srcWeapon) {
+            console.log(`WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcId}`);
+        } else if (!target) {
+            console.log(`WARN: ${player.name} tried to attack invalid ship ${targetId}`);
+        } else if (srcWeapon.attackAvailable) {
+            console.log(`WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} of ${srcId}`);
+        } else {
+            const srcWeaponCard = <EquipmentCard> srcWeapon.card;
+            if (srcWeaponCard.attackProfile.range < match.battle.range) {
+                console.log(`WARN: ${player.name} tried to attack with range ${srcWeaponCard.attackProfile.range} weapon at range ${match.battle.range}`);
+            } else {
+                srcWeaponCard.attack(match, srcShip, target);
+                srcWeapon.attackAvailable = false;
+            }
         }
         emitState(io, match);
     });

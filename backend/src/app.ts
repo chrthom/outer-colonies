@@ -18,7 +18,7 @@ const io = new Server(httpServer, {
     }
 });
 
-io.on(MsgTypeInbound.Connection, (socket) => {
+io.on(MsgTypeInbound.Connect, (socket) => {
     console.log(`Player connected: ${socket.id}`);
     socket.on(MsgTypeInbound.Disconnect, () => {
         console.log(`Player disconnected: ${socket.id}`);
