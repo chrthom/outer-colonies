@@ -1,7 +1,6 @@
 import Match from '../game_state/match'
 import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import { consts } from '../config/consts';
-import Battle from '../game_state/battle';
 
 export class FrontendOpponent {
     name!: string;
@@ -33,6 +32,7 @@ export class FrontendCardStack {
     zoneCardsNum!: number;
     ownedByPlayer!: boolean;
     damage!: number;
+    criticalDamage!: boolean;
     missionReady!: boolean;
 }
 
@@ -83,6 +83,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     zoneCardsNum: zoneCardStacks.length + 1,
                     ownedByPlayer: ownedByPlayer,
                     damage: 0, // TODO: Implement once needed
+                    criticalDamage: false, // TODO: Implement once needed
                     missionReady: false
                 }
             ];
@@ -96,7 +97,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     index: index + colonyPlaceholder.length,
                     zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
                     ownedByPlayer: ownedByPlayer,
-                    damage: 0, // TODO: Implement once needed
+                    damage: cs.damage,
+                    criticalDamage: cs.damage >= cs.profile().hp,
                     missionReady: cs.isMissionReady() && ownedByPlayer
                 };
             }).concat(colonyPlaceholder);

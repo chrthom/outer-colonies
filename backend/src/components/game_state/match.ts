@@ -75,6 +75,7 @@ export default class Match {
     }
     processBattleRound() {
         if (this.actionPendingByPlayerNo == this.opponentPlayerNo(this.activePlayerNo)) {
+            //this.battle.missionShips.forEach() // CONTINUE HERE!
             // TODO: Remove destroyed ships
             this.battle.range--;
             this.forAllPlayers((playerNo: number) => this.players[playerNo].cardStacks.forEach(cs => cs.combatPhaseReset()));
