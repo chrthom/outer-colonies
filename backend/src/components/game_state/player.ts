@@ -8,14 +8,16 @@ import CardCollection from '../cards/collection/card_collection';
 export default class Player {
     id!: string;
     name!: string;
+    no!: number;
     ready: boolean = false;
     deck!: Array<Card>;
     hand: Array<CardStack> = [];
     cardStacks: Array<CardStack> = [];
     remainingActions = {};
-    constructor(id: string, name: string, deck: Array<Card>) {
+    constructor(id: string, name: string, no: number, deck: Array<Card>) {
         this.id = id;
         this.name = name;
+        this.no = no;
         this.deck = deck;
         this.resetRemainingActions();
         this.setDummyCardStacks(); // Just for testing

@@ -22,7 +22,7 @@ function joinGame(socket: Socket, match: Match, playerNo: number): void {
     socket.join(match.room);
     socket.data.match = match;
     socket.data.playerNo = playerNo;
-    match.players[playerNo] = new Player(socket.id, socket.data.name, socket.data.activeDeck.slice());
+    match.players[playerNo] = new Player(socket.id, socket.data.name, playerNo, socket.data.activeDeck.slice());
 }
 
 function initGame(io: Server, socket1: Socket, socket2: Socket): void {
