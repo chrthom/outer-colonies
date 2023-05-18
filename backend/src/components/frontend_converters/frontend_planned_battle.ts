@@ -21,15 +21,16 @@ export default function toBattle(match: Match, plannedBattle: FrontendPlannedBat
         case BattleType.Mission:
             const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
             battle = new Battle(BattleType.Mission);
-            battle.missionShips = ships;
+            battle.ships[match.actionPendingByPlayerNo] = ships;
             battle.downsidePriceCards = downsideCards;
             // TODO: Also map upside price cards
-            return battle;
+            break;
         case BattleType.Raid:
             battle = new Battle(BattleType.Raid);
-            battle.missionShips = ships;
-            return battle;
+            battle.ships[match.actionPendingByPlayerNo] = ships;
+            break;
         default:
-            return new Battle(BattleType.None);
+            battle = new Battle(BattleType.None);
     }
+    return battle;
 }

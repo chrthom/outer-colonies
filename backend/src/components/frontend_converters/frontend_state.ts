@@ -106,10 +106,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     });
     const battle: FrontendBattle = {
         type: match.battle.type,
-        playerShipIds: (match.activePlayerNo == playerNo ? match.battle.missionShips : match.battle.interveningShips)
-            .map(cs => cs.uuid),
-        opponentShipIds: (match.activePlayerNo != playerNo ? match.battle.missionShips : match.battle.interveningShips)
-            .map(cs => cs.uuid),
+        playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
+        opponentShipIds: match.battle.ships[match.opponentPlayerNo(playerNo)].map(cs => cs.uuid),
         priceCards: match.battle.downsidePriceCards.map(() => 'back')
             .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
         range: match.battle.range

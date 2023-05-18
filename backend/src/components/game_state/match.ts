@@ -26,13 +26,19 @@ export default class Match {
         return this.players[this.activePlayerNo];
     }
     getInactivePlayer(): Player {
-        return this.players[this.opponentPlayerNo(this.activePlayerNo)];
+        return this.players[this.getInactivePlayerNo()];
+    }
+    getInactivePlayerNo(): number {
+        return this.opponentPlayerNo(this.activePlayerNo);
     }
     getPendingActionPlayer(): Player {
         return this.players[this.actionPendingByPlayerNo];
     }
     getWaitingPlayer(): Player {
-        return this.players[this.opponentPlayerNo(this.actionPendingByPlayerNo)];
+        return this.players[this.getWaitingPlayerNo()];
+    }
+    getWaitingPlayerNo(): number {
+        return this.opponentPlayerNo(this.actionPendingByPlayerNo);
     }
     forAllPlayers(f: (playerNo: number) => void) {
         f(0);
@@ -64,7 +70,7 @@ export default class Match {
         if (this.battle.type == BattleType.None) {
             this.prepareEndPhase();
         } else {
-            this.battle.missionShips.forEach(cs => cs.zone = Zone.Neutral);
+            this.battle.ships[this.actionPendingByPlayerNo].forEach(cs => cs.zone = Zone.Neutral);
             this.actionPendingByPlayerNo = this.opponentPlayerNo(this.activePlayerNo);
         }
     }
@@ -84,7 +90,7 @@ export default class Match {
         if (this.battle.range == 0) {
             this.prepareEndPhase();
         } else {
-            const activeShips = this.actionPendingByPlayerNo == this.activePlayerNo ? this.battle.missionShips : this.battle.interveningShips;
+            const activeShips = this.battle.ships[this.actionPendingByPlayerNo];
             const hasAttack = activeShips
                 .flatMap(cs => cs.getCardStacks())
                 .filter(cs => cs.attackAvailable)
@@ -97,15 +103,15 @@ export default class Match {
     }
     private assignInterveningShips(interveningShipIds: Array<string>) {
         if (this.battle.type == BattleType.Mission) {
-            this.battle.interveningShips = interveningShipIds
+            this.battle.ships[this.actionPendingByPlayerNo] = interveningShipIds
                 .map(id => getCardStackByUUID(this.getInactivePlayer().cardStacks, id))
                 .filter(cs => cs.isMissionReady);
-            this.battle.interveningShips.map(cs => cs.zone = Zone.Neutral);
+            this.battle.ships[this.actionPendingByPlayerNo].map(cs => cs.zone = Zone.Neutral);
         } else if (this.battle.type == BattleType.Raid) {
             this.getInactivePlayer().cardStacks
                 .filter(cs => cs.isMissionReady() && !interveningShipIds.includes(cs.uuid))
                 .forEach(cs => cs.zone = Zone.Neutral);
-            this.battle.interveningShips = this.getInactivePlayer().cardStacks
+            this.battle.ships[this.actionPendingByPlayerNo] = this.getInactivePlayer().cardStacks
                 .filter(cs => cs.zone == Zone.Oribital);
         }
     }

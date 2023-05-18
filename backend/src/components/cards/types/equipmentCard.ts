@@ -32,18 +32,14 @@ export default abstract class EquipmentCard extends Card {
         return <CardProfile> this.equipmentProfile;
     }
     attack(match: Match, src: CardStack, target: CardStack) {
-        const battle = match.battle;
-        const opponentShips = match.actionPendingByPlayerNo == match.activePlayerNo 
-            ? battle.missionShips : battle.interveningShips;
         let damage = this.attackProfile.damage
-        if (src.profile().speed + battle.range <= target.profile().speed) damage = Math.round(damage / 2);
+        if (src.profile().speed + match.battle.range <= target.profile().speed) damage = Math.round(damage / 2);
         let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
         // TODO: Emit event for all attack results (PD, shields, ...)
         target.damage += attackResult.damage;
     }
     private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
-        const defendingShips = match.actionPendingByPlayerNo == match.activePlayerNo 
-            ? match.battle.missionShips : match.battle.interveningShips;
+        const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
         const bestPointDefense = defendingShips
             .flatMap(cs => cs.getCardStacks())
             .filter(cs => cs.defenseAvailable && cs.profile().pointDefense)
