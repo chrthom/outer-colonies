@@ -42,4 +42,16 @@ export default class Battle {
             .filter(cs => cs.damage >= cs.profile().hp)
             .map(cs => spliceCardStackByUUID(this.ships[playerNo], cs.uuid));
     }
+    canInterveneMission(interveningPlayerNo: number, cardStack: CardStack): boolean {
+        return cardStack.isMissionReady() && (
+            this.type == BattleType.Raid
+                || this.type == BattleType.Mission
+                    && cardStack.profile().speed >= this.ships[this.opponentPlayerNo(interveningPlayerNo)]
+                        .map(cs => cs.profile().speed)
+                        .reduce((a, b) => Math.min(a, b))
+        );
+    }
+    private opponentPlayerNo(playerNo: number): number {
+        return playerNo == 0 ? 1 : 0;
+    }
 }

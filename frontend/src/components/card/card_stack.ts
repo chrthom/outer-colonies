@@ -70,7 +70,7 @@ export default class CardStack {
                         if (this.data.missionReady) {
                             if (scene.interveneShipIds.includes(this.uuid)) {
                                 scene.interveneShipIds = scene.interveneShipIds.filter(id => id != this.uuid);
-                            } else {
+                            } else if (this.data.interventionReady) {
                                 scene.interveneShipIds.push(this.uuid);
                             }
                         }

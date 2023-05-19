@@ -34,7 +34,7 @@ export class FrontendCardStack {
     damage!: number;
     criticalDamage!: boolean;
     missionReady!: boolean;
-    // TODO: Filter ships with insufficient speed for interventions
+    interventionReady!: boolean;
 }
 
 export class FrontendHandCard {
@@ -85,7 +85,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     ownedByPlayer: ownedByPlayer,
                     damage: 0, // TODO: Implement once needed
                     criticalDamage: false, // TODO: Implement once needed
-                    missionReady: false
+                    missionReady: false,
+                    interventionReady: false
                 }
             ];
             return zoneCardStacks.map((cs, index) => {
@@ -100,7 +101,10 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     ownedByPlayer: ownedByPlayer,
                     damage: cs.damage,
                     criticalDamage: cs.damage >= cs.profile().hp,
-                    missionReady: cs.isMissionReady() && ownedByPlayer
+                    missionReady: ownedByPlayer && cs.isMissionReady(),
+                    interventionReady: ownedByPlayer
+                        && match.getInactivePlayerNo() == playerNo
+                        && match.battle.canInterveneMission(playerNo, cs)
                 };
             }).concat(colonyPlaceholder);
         });

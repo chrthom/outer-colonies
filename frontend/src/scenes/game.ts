@@ -133,7 +133,7 @@ export default class Game extends Phaser.Scene {
                                     else if (this.plannedBattle.shipIds.includes(c.uuid)) c.highlightSelected();
                                 }
                             } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) { // Assign ships to intervene
-                                if (!c.data.missionReady) c.highlightDisabled();
+                                if (!c.data.interventionReady) c.highlightDisabled();
                                 else if (this.interveneShipIds.includes(c.uuid)) c.highlightSelected();
                             }
                             break;
