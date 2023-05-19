@@ -1,7 +1,9 @@
 import Card from "../cards/card";
 import CardStack from "../cards/card_stack";
-import { BattleType } from "../config/enums";
+import { BattleType, Zone } from "../config/enums";
 import { rules } from "../config/rules";
+import { getCardStackByUUID } from "../utils/utils";
+import Player from "./player";
 
 export default class Battle {
     type!: BattleType;
@@ -11,5 +13,20 @@ export default class Battle {
     range: number = rules.maxRange + 1;
     constructor(type: BattleType) {
         this.type = type;
+    }
+
+    assignInterveningShips(player: Player, interveningShipIds: Array<string>) {
+        if (this.type == BattleType.Mission) {
+            this.ships[player.id] = interveningShipIds
+                .map(id => getCardStackByUUID(player.cardStacks, id))
+                .filter(cs => cs.isMissionReady);
+            this.ships[player.id].map(cs => cs.zone = Zone.Neutral);
+        } else if (this.type == BattleType.Raid) {
+            player.cardStacks
+                .filter(cs => cs.isMissionReady() && !interveningShipIds.includes(cs.uuid))
+                .forEach(cs => cs.zone = Zone.Neutral);
+            this.ships[player.id] = player.cardStacks
+                .filter(cs => cs.zone == Zone.Oribital);
+        }
     }
 }

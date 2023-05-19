@@ -3,7 +3,6 @@ import { rules } from '../config/rules';
 import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
 import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import { getCardStackByUUID } from '../utils/utils';
 import EquipmentCard from '../cards/types/equipmentCard';
 
 export default class Match {
@@ -76,7 +75,7 @@ export default class Match {
     }
     prepareCombatPhase(interveningShipIds: Array<string>) {
         this.turnPhase = TurnPhase.Combat;
-        this.assignInterveningShips(interveningShipIds);
+        this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
         this.processBattleRound();
     }
     processBattleRound() {
@@ -100,19 +99,5 @@ export default class Match {
     }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
-    }
-    private assignInterveningShips(interveningShipIds: Array<string>) {
-        if (this.battle.type == BattleType.Mission) {
-            this.battle.ships[this.actionPendingByPlayerNo] = interveningShipIds
-                .map(id => getCardStackByUUID(this.getInactivePlayer().cardStacks, id))
-                .filter(cs => cs.isMissionReady);
-            this.battle.ships[this.actionPendingByPlayerNo].map(cs => cs.zone = Zone.Neutral);
-        } else if (this.battle.type == BattleType.Raid) {
-            this.getInactivePlayer().cardStacks
-                .filter(cs => cs.isMissionReady() && !interveningShipIds.includes(cs.uuid))
-                .forEach(cs => cs.zone = Zone.Neutral);
-            this.battle.ships[this.actionPendingByPlayerNo] = this.getInactivePlayer().cardStacks
-                .filter(cs => cs.zone == Zone.Oribital);
-        }
     }
 }
