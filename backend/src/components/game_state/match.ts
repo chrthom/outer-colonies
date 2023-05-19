@@ -2,7 +2,7 @@ import Player from './player';
 import { rules } from '../config/rules';
 import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
-import toBattle, { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
+import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import EquipmentCard from '../cards/types/equipmentCard';
 
 export default class Match {
@@ -65,13 +65,9 @@ export default class Match {
         this.turnPhase = TurnPhase.Build;
     }
     prepareBuildPhaseReaction(plannedBattle: FrontendPlannedBattle) {
-        this.battle = toBattle(this, plannedBattle);
-        if (this.battle.type == BattleType.None) {
-            this.prepareEndPhase();
-        } else {
-            this.battle.ships[this.actionPendingByPlayerNo].forEach(cs => cs.zone = Zone.Neutral);
-            this.actionPendingByPlayerNo = this.opponentPlayerNo(this.activePlayerNo);
-        }
+        this.battle = Battle.fromFrontendPlannedBattle(this, plannedBattle);
+        if (this.battle.type == BattleType.None) this.prepareEndPhase();
+        else this.actionPendingByPlayerNo = this.opponentPlayerNo(this.activePlayerNo);
     }
     prepareCombatPhase(interveningShipIds: Array<string>) {
         this.turnPhase = TurnPhase.Combat;

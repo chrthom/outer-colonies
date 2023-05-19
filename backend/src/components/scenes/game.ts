@@ -8,7 +8,6 @@ import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import EquipmentCard from '../cards/types/equipmentCard';
 import CardStack from '../cards/card_stack';
-import Battle from '../game_state/battle';
 
 function getSocket(io: Server, match: Match, playerNo: number) {
     return io.sockets.sockets.get(match.players[playerNo].id);

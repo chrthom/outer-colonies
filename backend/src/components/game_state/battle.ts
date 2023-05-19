@@ -2,7 +2,9 @@ import Card from "../cards/card";
 import CardStack from "../cards/card_stack";
 import { BattleType, Zone } from "../config/enums";
 import { rules } from "../config/rules";
+import toBattle, { FrontendPlannedBattle } from "../frontend_converters/frontend_planned_battle";
 import { getCardStackByUUID } from "../utils/utils";
+import Match from "./match";
 import Player from "./player";
 
 export default class Battle {
@@ -14,7 +16,13 @@ export default class Battle {
     constructor(type: BattleType) {
         this.type = type;
     }
-
+    static fromFrontendPlannedBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
+        let battle = toBattle(match, plannedBattle);
+        if (battle.type != BattleType.None) {
+            battle.ships[match.actionPendingByPlayerNo].forEach(cs => cs.zone = Zone.Neutral);
+        }
+        return battle;
+    }
     assignInterveningShips(player: Player, interveningShipIds: Array<string>) {
         if (this.type == BattleType.Mission) {
             this.ships[player.id] = interveningShipIds
@@ -29,4 +37,6 @@ export default class Battle {
                 .filter(cs => cs.zone == Zone.Oribital);
         }
     }
+
+    
 }
