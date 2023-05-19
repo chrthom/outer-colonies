@@ -85,10 +85,8 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
     socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
         const match = socket.data.match;
         const player = getPlayer(socket);
-        const playerShips: Array<CardStack> = match.actionPendingByPlayerNo == match.activePlayerNo 
-            ? match.battle.missionShips : match.battle.interveningShips;
-        const opponentShips: Array<CardStack> = match.actionPendingByPlayerNo == match.activePlayerNo 
-            ? match.battle.interveningShips : match.battle.missionShips;
+        const playerShips: Array<CardStack> = match.battle.ships[match.actionPendingByPlayerNo];
+        const opponentShips: Array<CardStack> = match.battle.ships[match.getWaitingPlayerNo()];
         const srcShip = playerShips.find(cs => cs.uuid == srcId);
         const srcWeapon = srcShip ? srcShip.getCardStacks()[srcIndex] : null;
         const target = opponentShips.find(cs => cs.uuid == targetId)
@@ -106,9 +104,11 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
                 console.log(`WARN: ${player.name} tried to attack with range ${srcWeaponCard.attackProfile.range} weapon at range ${match.battle.range}`);
             } else {
                 srcWeaponCard.attack(match, srcShip, target);
+                // TODO: Handle attacks on colony
                 srcWeapon.attackAvailable = false;
             }
         }
+        // TODO: Check if further weapons can be used, else end round
         emitState(io, match);
     });
 };

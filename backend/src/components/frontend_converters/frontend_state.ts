@@ -34,6 +34,7 @@ export class FrontendCardStack {
     damage!: number;
     criticalDamage!: boolean;
     missionReady!: boolean;
+    // TODO: Filter ships with insufficient speed for interventions
 }
 
 export class FrontendHandCard {
