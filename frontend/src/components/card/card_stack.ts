@@ -58,7 +58,7 @@ export default class CardStack {
                         if (scene.activeHandCard) {
                             scene.socket.emit(MsgTypeInbound.Handcard, scene.activeHandCard, this.uuid);
                         } else if (this.uuid == consts.colonyOpponent) {
-                            scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
+                            scene.resetWithBattleType(scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
                         } else if (scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
                             if (scene.plannedBattle.shipIds.includes(this.uuid)) {
                                 scene.plannedBattle.shipIds = scene.plannedBattle.shipIds.filter(id => id != this.uuid);
@@ -85,8 +85,9 @@ export default class CardStack {
                         scene.activeCardStack = this.uuid;
                         scene.activeCardStackIndex = index;
                         scene.activeHandCard = null;
-                    } else if (scene.activeCardStack && scene.state.battle.playerShipIds.includes(this.uuid)) {
-                        // TODO: Add fire message to backend
+                    } else if (scene.activeCardStack && scene.state.battle.opponentShipIds.includes(this.uuid)) {
+                        // TODO: Add fire on colony and cards in colony zone
+                        scene.socket.emit(MsgTypeInbound.Attack, scene.activeCardStack, scene.activeCardStackIndex, this.uuid);
                     }
                     break;
             }

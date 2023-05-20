@@ -62,10 +62,9 @@ export default class Game extends Phaser.Scene {
     update() {}
 
     updateState(state: FrontendState) {
-        const self = this;
-        self.state = state;
+        this.state = state;
         this.recreateCards();
-        this.resetPlannedBattle(BattleType.None);
+        this.resetSelections();
     }
 
     recreateCards() {
@@ -76,8 +75,15 @@ export default class Game extends Phaser.Scene {
         self.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
     }
 
-    resetPlannedBattle(type: BattleType) {
+    resetSelections() {
+        this.resetWithBattleType(BattleType.None);
+    }
+
+    resetWithBattleType(type: BattleType) {
         this.activeHandCard = null;
+        this.activeCardStack = null;
+        this.activeCardStackIndex = null;
+        this.interveneShipIds = [];
         this.plannedBattle = {
             type: type,
             downsideCardsNum: 0,
@@ -86,12 +92,6 @@ export default class Game extends Phaser.Scene {
         }
         if (type == BattleType.Mission)
             this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // TODO: Add feature to also allow upside cards from discard pile
-        this.updateView();
-    }
-
-    resetInterveneBattle() {
-        this.activeHandCard = null;
-        this.interveneShipIds = [];
         this.updateView();
     }
 

@@ -43,12 +43,17 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
                 match.players[socket.data.playerNo].ready = true;
                 if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
             } else if (socket.data.playerNo == match.actionPendingByPlayerNo) {
-                if (socket.data.playerNo == match.activePlayerNo) {
-                    if (turnPhase == TurnPhase.Build) 
-                        match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
-                } else {
-                    if (turnPhase == TurnPhase.Build) 
-                        match.prepareCombatPhase(<Array<string>> data);
+                switch (turnPhase) {
+                    case TurnPhase.Build:
+                        if (socket.data.playerNo == match.activePlayerNo) {
+                            match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
+                        } else {
+                            match.prepareCombatPhase(<Array<string>> data);
+                        }
+                        break;
+                    case TurnPhase.Combat:
+                        match.processBattleRound();
+                        break;
                 }
                 emitState(io, match);
             }
@@ -91,13 +96,13 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         const srcWeapon = srcShip ? srcShip.getCardStacks()[srcIndex] : null;
         const target = opponentShips.find(cs => cs.uuid == targetId)
         if (!srcShip) {
-            console.log(`WARN: ${player.name} tried to attack from invalid ship ${srcId}`);
+            console.log(`WARN: ${player.name} tried to attack from non-existing ship ${srcId}`);
         } else if (!srcWeapon) {
-            console.log(`WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcId}`);
+            console.log(`WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcShip.card.name}`);
         } else if (!target) {
-            console.log(`WARN: ${player.name} tried to attack invalid ship ${targetId}`);
-        } else if (srcWeapon.attackAvailable) {
-            console.log(`WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} of ${srcId}`);
+            console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
+        } else if (!srcWeapon.attackAvailable) {
+            console.log(`WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`);
         } else {
             const srcWeaponCard = <EquipmentCard> srcWeapon.card;
             if (srcWeaponCard.attackProfile.range < match.battle.range) {

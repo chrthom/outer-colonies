@@ -18,7 +18,7 @@ export default class DeckCard extends CardImage {
                 && scene.state.playerIsActive 
                 && scene.state.turnPhase == TurnPhase.Build
                 && !scene.activeHandCard) {
-            scene.resetPlannedBattle(scene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission);
+            scene.resetWithBattleType(scene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission);
         }
     }
 }
