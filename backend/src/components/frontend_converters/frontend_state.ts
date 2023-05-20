@@ -51,6 +51,7 @@ export class FrontendState {
     remainingActions: FrontendActions;
     opponent!: FrontendOpponent;
     hand!: Array<FrontendHandCard>;
+    discardPileIds!: Array<number>;
     cardStacks!: Array<FrontendCardStack>;
     battle?: FrontendBattle;
 }
@@ -116,6 +117,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             handCardNo: opponent.hand.length
         },
         hand: hand,
+        discardPileIds: player.discardPile.map(c => c.id),
         cardStacks: cardStacks,
         battle: battle
     };

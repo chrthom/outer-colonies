@@ -9,6 +9,7 @@ import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
 import { rules } from '../../../backend/src/components/config/rules';
 import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
+import DiscardPile from '../components/card/discard_pile';
 
 class InitData {
     socket: Socket;
@@ -26,6 +27,7 @@ export default class Game extends Phaser.Scene {
     cardStacks: Array<CardStack> = [];
     obj = {
         deck: null,
+        discardPile: null,
         prompt: null,
         button: null,
         maxCard: null
@@ -52,6 +54,7 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
         this.obj.deck = new DeckCard(this);
+        this.obj.discardPile = new DiscardPile(this, [])
         this.obj.prompt = new Prompt(this);
         this.obj.button = new Button(this);
         this.obj.maxCard = new MaxCard(this);
@@ -72,6 +75,8 @@ export default class Game extends Phaser.Scene {
         self.hand = self.state.hand.map(cardData => new HandCard(self, self.state.hand.length, cardData));
         self.cardStacks.forEach(cs => cs.destroy());
         self.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
+        self.obj.discardPile.destroy();
+        self.obj.discardPile = new DiscardPile(self, self.state.discardPileIds);
     }
 
     resetSelections() {
