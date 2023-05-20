@@ -43,6 +43,9 @@ export default class Player {
         this.remainingActions[CardType.Tactic] = this.totalActions(CardType.Tactic);
         this.remainingActions[CardType.Orb] = this.totalActions(CardType.Orb);
     }
+    callBackShipsFromNeutralZone() {
+        this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => cs.zone = Zone.Oribital);
+    }
     shuffleDeck() {
         this.deck = this.shuffle(this.deck);
     }

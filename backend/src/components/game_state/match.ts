@@ -52,8 +52,9 @@ export default class Match {
         this.activePlayerNo = this.opponentPlayerNo(this.activePlayerNo);
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.turnPhase = TurnPhase.Start;
-        this.getActivePlayer().resetRemainingActions();
         this.battle = new Battle(BattleType.None);
+        this.getActivePlayer().resetRemainingActions();
+        this.getActivePlayer().callBackShipsFromNeutralZone();
         // TODO: Move ships from neutral zone to orbital zone
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
         // TODO: Check for effects on drawing a cards (like drawing an extra card)
