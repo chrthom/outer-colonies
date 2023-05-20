@@ -85,13 +85,15 @@ export default class Match {
         }
         this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
         if (this.battle.range == 0) {
+            // TODO: Apply mission result
             this.prepareEndPhase();
         } else {
             const hasAttack = this.battle.ships[this.actionPendingByPlayerNo]
                 .flatMap(cs => cs.getCardStacks())
                 .filter(cs => cs.attackAvailable)
                 .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
-            if (!hasAttack) this.processBattleRound();
+            const hasTarget = this.battle.ships[this.getWaitingPlayerNo()].length > 0;
+            if (!hasAttack || !hasTarget) this.processBattleRound();
         }
     }
     prepareEndPhase() {
