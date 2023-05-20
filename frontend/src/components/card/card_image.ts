@@ -5,8 +5,8 @@ const layout = new Layout();
 
 export default class CardImage {
     sprite: Phaser.GameObjects.Image;
-    cardId: string;
-    constructor(scene: Game, x: number, y: number, cardId: string, opponentCard?: boolean, scale?: number) {
+    cardId: number;
+    constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
         this.cardId = cardId;
         this.sprite = scene.add.image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)

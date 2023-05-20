@@ -7,7 +7,6 @@ import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { consts } from '../../../backend/src/components/config/consts';
 import { rules } from '../../../backend/src/components/config/rules';
 import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
 
@@ -43,7 +42,7 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
-        [ 'back', 'colony', 130, 160, 163, 166, 348].forEach(id => // TODO: Determine cards to preload based on player decks
+        [ 0, 1, 130, 160, 163, 166, 348].forEach(id => // TODO: Determine cards to preload based on player decks
             this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
     }
     
@@ -126,7 +125,7 @@ export default class Game extends Phaser.Scene {
                     switch (this.state.turnPhase) {
                         case TurnPhase.Build:
                             if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
-                                if (c.uuid == consts.colonyOpponent) {
+                                if (c.isOpponentColony()) {
                                     if (this.plannedBattle.type == BattleType.Raid) c.highlightSelected();
                                 } else {
                                     if (!c.data.missionReady) c.highlightDisabled();

@@ -1,9 +1,8 @@
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
 import { rules } from '../config/rules';
-import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
+import { CardType, MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
 import { getCardStackByUUID } from '../utils/utils';
-import { consts } from '../config/consts';
 import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import EquipmentCard from '../cards/types/equipmentCard';
@@ -63,27 +62,19 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         const match = socket.data.match;
         const player = getPlayer(socket);
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
-        if (handCard.card.isPlayable(match, socket.data.playerNo)) {
-            if (targetUUID == consts.colonyPlayer) { // TODO: Also accept opponent's colony for tactic cards
-                if (handCard.card.canBeAttachedToColony(player.cardStacks)) {
-                    player.playCardToColonyZone(handCard);
-                } else {
-                    console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on own colony, which is not a valid target`);
-                }
-            } else {
-                const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO: Also check opponent card stack
-                if (target) {
-                    if (handCard.card.canBeAttachedTo([ target ]).length > 0) {
-                        player.attachCardToCardStack(handCard, target);
-                    } else {
-                        console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
-                    }
-                } else {
-                    console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`);
-                }
-            }
-        } else {
+        const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO: Also check opponent card stack (+colony) for tactic cards
+        if (!handCard) {
+            console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
+        } else if (!target) {
+            console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`);
+        } else if (!handCard.card.isPlayable(match, socket.data.playerNo)) {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
+        } else if (!handCard.card.canBeAttachedTo(target)) {
+            console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
+        } else if (target.card.type == CardType.Colony) {
+            player.playCardToColonyZone(handCard);
+        } else {
+            player.attachCardToCardStack(handCard, target);
         }
         emitState(io, match);
     });

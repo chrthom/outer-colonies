@@ -1,7 +1,8 @@
 export enum CardType {
-    Hull = 'hull',
-    Equipment = 'equipment',
     Colony = 'colony',
+    Equipment = 'equipment',
+    Hull = 'hull',
+    Infrastructure = 'infrastructure',
     Tactic = 'tactic',
     Orb = 'orb'
 }

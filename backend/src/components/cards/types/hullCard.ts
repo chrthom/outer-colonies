@@ -12,14 +12,19 @@ export default abstract class HullCard extends Card {
         this.multipart = multipart;
         this.hullProfile = profile;
     }
-    canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
+    filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack> {
+        return this.filterAttachableHull(cardStacks).concat(this.filterAttachableColony(cardStacks));
+    }
+    private filterAttachableHull(cardStacks: Array<CardStack>): Array<CardStack> {
         return cardStacks.filter(cs =>
             cs.card.type == CardType.Hull 
                 && (<HullCard> cs.card).multipart.neededParts.includes(this.id)
                 && cs.attachedCards.filter(c => c.card.name == this.name).length == 0); // TODO: Rethink if matching by name is a good idea
     }
-    canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
-        return this.hullProfile.energy >= 0 ? true : false;
+    private filterAttachableColony(cardStacks: Array<CardStack>): Array<CardStack> {
+        return cardStacks.filter(cs => 
+            cs.card.type == CardType.Colony 
+                && this.hullProfile.energy >= 0);
     }
     isPlayableDecorator(match: Match, playerNo: number): boolean {
         return true;

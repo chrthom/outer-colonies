@@ -13,8 +13,10 @@ export default abstract class Card {
         this.name = name;
         this.type = type;
     }
-    abstract canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack>
-    abstract canBeAttachedToColony(cardStacks: Array<CardStack>): boolean
+    abstract filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack>
+    canBeAttachedTo(cardStack: CardStack): boolean {
+        return this.filterValidAttachTargets([ cardStack ]).length > 0;
+    }
     canAttack(): boolean {
         return false;
     }

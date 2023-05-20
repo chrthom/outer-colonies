@@ -7,7 +7,7 @@ const layout = new Layout();
 
 export default class DeckCard extends CardImage {
     constructor(scene: Game) {
-        super(scene, layout.deck.x, layout.deck.y, 'back');
+        super(scene, layout.deck.x, layout.deck.y, 1);
         this.sprite.on('pointerdown', () => {
             this.onClickAction(scene);
         });

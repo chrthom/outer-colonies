@@ -4,6 +4,7 @@ import { rules } from '../config/rules';
 import { CardType, Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
+import ColonyCard from '../cards/types/colonyCard';
 
 export default class Player {
     id!: string;
@@ -13,13 +14,14 @@ export default class Player {
     deck!: Array<Card>;
     discardPile: Array<Card> = [];
     hand: Array<CardStack> = [];
-    cardStacks: Array<CardStack> = [];
+    cardStacks!: Array<CardStack>;
     remainingActions = {};
     constructor(id: string, name: string, no: number, deck: Array<Card>) {
         this.id = id;
         this.name = name;
         this.no = no;
         this.deck = deck;
+        this.cardStacks = [ new CardStack(new ColonyCard(), Zone.Colony) ];
         this.resetRemainingActions();
         this.setDummyCardStacks(); // Just for testing
     }
@@ -35,7 +37,7 @@ export default class Player {
         return rules.freeActions; // TODO: Dummy until logic is implemented
     }
     resetRemainingActions() {
-        this.remainingActions[CardType.Colony] = this.totalActions(CardType.Colony);
+        this.remainingActions[CardType.Infrastructure] = this.totalActions(CardType.Infrastructure);
         this.remainingActions[CardType.Hull] = this.totalActions(CardType.Hull);
         this.remainingActions[CardType.Equipment] = this.totalActions(CardType.Equipment);
         this.remainingActions[CardType.Tactic] = this.totalActions(CardType.Tactic);

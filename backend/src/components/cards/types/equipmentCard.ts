@@ -14,19 +14,16 @@ export default abstract class EquipmentCard extends Card {
         this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
     }
-    canBeAttachedTo(cardStacks: Array<CardStack>): Array<CardStack> {
+    filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack> {
         return cardStacks.filter(cs => 
             cs.card.type == CardType.Hull 
             && cs.profileMatches(this.profile()));
-    }
-    canBeAttachedToColony(cardStacks: Array<CardStack>): boolean {
-        return false;
     }
     canAttack(): boolean {
         return Boolean(this.attackProfile);
     }
     isPlayableDecorator(match: Match, playerNo: number): boolean {
-        return this.canBeAttachedTo(match.players[playerNo].cardStacks).length > 0;
+        return this.filterValidAttachTargets(match.players[playerNo].cardStacks).length > 0;
     }
     profile(): CardProfile {
         return <CardProfile> this.equipmentProfile;

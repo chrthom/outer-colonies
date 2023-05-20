@@ -1,6 +1,5 @@
 import Match from '../game_state/match'
 import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
-import { consts } from '../config/consts';
 
 export class FrontendOpponent {
     name!: string;
@@ -25,7 +24,7 @@ export class FrontendBattle {
 
 export class FrontendCardStack {
     uuid!: string;
-    cardIds!: Array<string>;
+    cardIds!: Array<number>;
     battleReadyCardIndexes!: Array<number>;
     zone!: Zone;
     index!: number;
@@ -39,7 +38,7 @@ export class FrontendCardStack {
 
 export class FrontendHandCard {
     uuid!: string;
-    cardId!: string;
+    cardId!: number;
     index!: number;
     playable!: boolean;
     validTargets!: Array<string>;
@@ -60,11 +59,10 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     const player = match.players[playerNo];
     const opponent = match.players[match.opponentPlayerNo(playerNo)];
     let hand = player.hand.map((c, index) => {
-        let validTargets = c.card.canBeAttachedTo(player.cardStacks).map(cs => cs.uuid);
-        if (c.card.canBeAttachedToColony(player.cardStacks)) validTargets.push(consts.colonyPlayer); // TODO: Implement opponent colony
+        let validTargets = c.card.filterValidAttachTargets(player.cardStacks).map(cs => cs.uuid);
         return {
             uuid: c.uuid,
-            cardId: String(c.card.id),
+            cardId: c.card.id,
             index: index,
             playable: c.card.isPlayable(match, playerNo),
             validTargets: validTargets
@@ -74,30 +72,15 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
         return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
-            const colonyPlaceholder: Array<FrontendCardStack> = zone != Zone.Colony ? [] : [
-                {
-                    uuid: ownedByPlayer ? consts.colonyPlayer : consts.colonyOpponent,
-                    cardIds: [ 'colony' ],
-                    battleReadyCardIndexes: [],
-                    zone: Zone.Colony,
-                    index: 0,
-                    zoneCardsNum: zoneCardStacks.length + 1,
-                    ownedByPlayer: ownedByPlayer,
-                    damage: 0, // TODO: Implement once needed
-                    criticalDamage: false, // TODO: Implement once needed
-                    missionReady: false,
-                    interventionReady: false
-                }
-            ];
             return zoneCardStacks.map((cs, index) => {
                 const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.attackAvailable ? [index] : []);
                 return {
                     uuid: cs.uuid,
-                    cardIds: cs.getCards().map(c => String(c.id)),
+                    cardIds: cs.getCards().map(c => c.id),
                     battleReadyCardIndexes: ownedByPlayer ? battleReadyCards : [],
                     zone: zone,
-                    index: index + colonyPlaceholder.length,
-                    zoneCardsNum: zoneCardStacks.length + colonyPlaceholder.length,
+                    index: index,
+                    zoneCardsNum: zoneCardStacks.length,
                     ownedByPlayer: ownedByPlayer,
                     damage: cs.damage,
                     criticalDamage: cs.damage >= cs.profile().hp,
@@ -106,7 +89,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                         && match.getInactivePlayerNo() == playerNo
                         && match.battle.canInterveneMission(playerNo, cs)
                 };
-            }).concat(colonyPlaceholder);
+            });
         });
     });
     const battle: FrontendBattle = {
@@ -124,7 +107,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         remainingActions: {
             hull: player.remainingActions[CardType.Hull],
             equipment: player.remainingActions[CardType.Equipment],
-            colony: player.remainingActions[CardType.Colony],
+            colony: player.remainingActions[CardType.Infrastructure],
             tactic: player.remainingActions[CardType.Tactic],
             orb: player.remainingActions[CardType.Orb]
         },
