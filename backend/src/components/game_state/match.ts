@@ -97,7 +97,7 @@ export default class Match {
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
-        // TODO: Move complete ships from colony zone to orbital zone 
+        this.getActivePlayer().moveFlightReadyShipsToOrbit();
         // TODO: Check hand card limit
         this.prepareStartPhase();
     }

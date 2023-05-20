@@ -30,20 +30,7 @@ export default abstract class HullCard extends Card {
         return true;
     }
     profile(): CardProfile {
-        return <CardProfile> this.hullProfile;
-        /*
-        return {
-            hp: this.hullProfile.hp,
-            speed: this.hullProfile.speed,
-            energy: this.hullProfile.energy,
-            theta: this.hullProfile.theta,
-            xi: this.hullProfile.xi,
-            phi: this.hullProfile.phi,
-            omega: this.hullProfile.omega,
-            delta: this.hullProfile.delta,
-            psi: this.hullProfile.psi,
-        }
-        */
+        return <CardProfile> this.hullProfile; // TODO: Check if this works properly
     }
 }
 

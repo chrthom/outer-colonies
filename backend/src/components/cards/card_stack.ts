@@ -2,6 +2,7 @@ import Card from './card';
 import CardProfile from './card_profile';
 import { CardType, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
+import HullCard from './types/hullCard';
 
 export default class CardStack {
     card!: Card;
@@ -32,6 +33,10 @@ export default class CardStack {
     }
     isMissionReady(): boolean {
         return this.zone == Zone.Oribital && this.card.type == CardType.Hull && this.profile().speed > 0;
+    }
+    isFlightReady(): boolean {
+        return this.card.type == CardType.Hull
+            && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo;
     }
     combatPhaseReset() {
         this.attachedCards.forEach(cs => cs.combatPhaseReset());
