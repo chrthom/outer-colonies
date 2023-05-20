@@ -48,7 +48,7 @@ export default class Match {
         else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
         else this.activePlayerNo = Math.round(Math.random());
     }
-    prepareStartPhase() { // TODO: Return Event to send to player
+    prepareStartPhase() {
         this.activePlayerNo = this.opponentPlayerNo(this.activePlayerNo);
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.turnPhase = TurnPhase.Start;
@@ -86,8 +86,7 @@ export default class Match {
         if (this.battle.range == 0) {
             this.prepareEndPhase();
         } else {
-            const activeShips = this.battle.ships[this.actionPendingByPlayerNo];
-            const hasAttack = activeShips
+            const hasAttack = this.battle.ships[this.actionPendingByPlayerNo]
                 .flatMap(cs => cs.getCardStacks())
                 .filter(cs => cs.attackAvailable)
                 .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
@@ -96,5 +95,9 @@ export default class Match {
     }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
+        this.actionPendingByPlayerNo = this.activePlayerNo;
+        // TODO: Move complete ships from colony zone to orbital zone 
+        // TODO: Check hand card limit
+        this.prepareStartPhase();
     }
 }
