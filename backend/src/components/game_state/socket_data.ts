@@ -27,6 +27,7 @@ const defaultDeck = [
     Cards.card163,
     Cards.card163,
     Cards.card163,
+    Cards.card135,
 ];
 
 export default class SocketData {

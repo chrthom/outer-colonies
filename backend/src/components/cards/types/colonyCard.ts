@@ -1,6 +1,7 @@
 import { CardType } from "../../config/enums";
 import { rules } from "../../config/rules";
 import Match from "../../game_state/match";
+import ActionPool, { CardAction } from "../action_pool";
 import Card from "../card";
 import CardProfile from "../card_profile";
 import CardStack from "../card_stack";
@@ -15,6 +16,7 @@ export default class ColonyCard extends Card {
     protected isPlayableDecorator(match: Match, playerNo: number): boolean {
         return false;
     }
+    immediateEffect(match: Match) {}
     profile(): CardProfile {
         return {
             energy: 0,
@@ -30,5 +32,14 @@ export default class ColonyCard extends Card {
             delta: 99,
             psi: 99
         }
+    }
+    actionPool(): ActionPool {
+        return new ActionPool(
+            new CardAction(CardType.Equipment),
+            new CardAction(CardType.Hull),
+            new CardAction(CardType.Infrastructure),
+            new CardAction(CardType.Orb),
+            new CardAction(CardType.Tactic)
+        );
     }
 }

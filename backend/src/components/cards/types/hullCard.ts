@@ -1,5 +1,5 @@
 import Card from '../card';
-import CardProfile from '../card_profile';
+import CardProfile, { HullProfile } from '../card_profile';
 import CardStack from '../card_stack';
 import Match from '../../game_state/match'
 import { CardType } from '../../config/enums';
@@ -26,24 +26,10 @@ export default abstract class HullCard extends Card {
             cs.card.type == CardType.Colony 
                 && this.hullProfile.energy >= 0);
     }
-    isPlayableDecorator(match: Match, playerNo: number): boolean {
-        return true;
-    }
+    immediateEffect(match: Match) {}
     profile(): CardProfile {
-        return <CardProfile> this.hullProfile; // TODO: Check if this works properly
+        return CardProfile.fromHullProfile(this.hullProfile);
     }
-}
-
-export class HullProfile {
-    readonly hp: number = 0;
-    readonly speed: number = 0;
-    readonly energy: number = 0;
-    readonly theta: number = 0;
-    readonly xi: number = 0;
-    readonly phi: number = 0;
-    readonly omega: number = 0;
-    readonly delta: number = 0;
-    readonly psi: number = 0;
 }
 
 export class HullMultipart {

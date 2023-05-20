@@ -48,7 +48,7 @@ export class FrontendState {
     playerIsActive!: boolean;
     playerPendingAction!: boolean;
     turnPhase!: TurnPhase;
-    remainingActions: FrontendActions;
+    //remainingActions: FrontendActions;
     opponent!: FrontendOpponent;
     hand!: Array<FrontendHandCard>;
     discardPileIds!: Array<number>;
@@ -105,13 +105,14 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         playerIsActive: match.activePlayerNo == playerNo,
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
-        remainingActions: {
-            hull: player.remainingActions[CardType.Hull],
-            equipment: player.remainingActions[CardType.Equipment],
-            colony: player.remainingActions[CardType.Infrastructure],
-            tactic: player.remainingActions[CardType.Tactic],
-            orb: player.remainingActions[CardType.Orb]
-        },
+        /*actionPool: {
+            hull: player.actionPool[CardType.Hull],
+            equipment: player.actionPool[CardType.Equipment],
+            colony: player.actionPool[CardType.Infrastructure],
+            tactic: player.actionPool[CardType.Tactic],
+            orb: player.actionPool[CardType.Orb]
+        },*/
+        // TODO: Encode frontend identifier for remaining actions
         opponent: {
             name: opponent.name,
             handCardNo: opponent.hand.length

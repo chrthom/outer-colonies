@@ -30,21 +30,21 @@ export default class Prompt {
         }
     }
     private showBuildPhase(scene: Game) {
-        const actions = scene.state.remainingActions;
-        const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
+        //const actions = scene.state.remainingActions;
+        //const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
         let battleText: string;
         if (scene.plannedBattle.type == BattleType.None)
             battleText = 'Plane eine Mission oder einen Überfall:\n'
                 + '- Klicke dein Deck für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
         else battleText = `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
-        this.show(`${actionText}\n${battleText}`);
+        this.show(`${battleText}`);
     }
     private showIntervenePhase(scene: Game) {
-        const actions = scene.state.remainingActions;
-        const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
+        //const actions = scene.state.remainingActions;
+        //const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
         const battleText = scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';
-        this.show(`${actionText}\nWähle Schiffe zur ${battleText}`)
+        this.show(`Wähle Schiffe zur ${battleText}`)
     }
     private showCombatPhase(scene: Game) {
         this.show(`Aktuelle Reichweite der Gefechts: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);

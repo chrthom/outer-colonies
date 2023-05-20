@@ -1,10 +1,10 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
-import { rules } from '../config/rules';
-import { CardType, Zone } from '../config/enums'
+import { Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colonyCard';
+import ActionPool from '../cards/action_pool';
 
 export default class Player {
     id!: string;
@@ -15,7 +15,7 @@ export default class Player {
     discardPile: Array<Card> = [];
     hand: Array<CardStack> = [];
     cardStacks!: Array<CardStack>;
-    remainingActions = {};
+    actionPool!: ActionPool;
     constructor(id: string, name: string, no: number, deck: Array<Card>) {
         this.id = id;
         this.name = name;
@@ -33,15 +33,8 @@ export default class Player {
         ship2.attachedCards.push(new CardStack(CardCollection.card163, Zone.Hand));
         this.cardStacks.push(ship1, ship2);
     }
-    totalActions(type: CardType): number {
-        return rules.freeActions; // TODO: Dummy until logic is implemented
-    }
     resetRemainingActions() {
-        this.remainingActions[CardType.Infrastructure] = this.totalActions(CardType.Infrastructure);
-        this.remainingActions[CardType.Hull] = this.totalActions(CardType.Hull);
-        this.remainingActions[CardType.Equipment] = this.totalActions(CardType.Equipment);
-        this.remainingActions[CardType.Tactic] = this.totalActions(CardType.Tactic);
-        this.remainingActions[CardType.Orb] = this.totalActions(CardType.Orb);
+        this.actionPool = this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b));
     }
     callBackShipsFromNeutralZone() {
         this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => cs.zone = Zone.Oribital);
@@ -60,12 +53,12 @@ export default class Player {
         return this.deck.splice(0, num);
     }
     playCardToColonyZone(handCard: CardStack) {
-        this.remainingActions[handCard.card.type]--;
+        this.actionPool.activate(handCard.card.type);
         handCard.zone = Zone.Colony;
         this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     attachCardToCardStack(handCard: CardStack, targetCardStack: CardStack) {
-        this.remainingActions[handCard.card.type]--;
+        this.actionPool.activate(handCard.card.type);
         targetCardStack.attachedCards.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     discardCardStack(uuid: string) {

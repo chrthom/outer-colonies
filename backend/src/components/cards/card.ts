@@ -2,6 +2,7 @@ import CardStack from './card_stack';
 import CardProfile from './card_profile';
 import Match from '../game_state/match';
 import { CardType, TurnPhase } from '../config/enums';
+import ActionPool from './action_pool';
 
 export default abstract class Card {
     readonly id!: number;
@@ -14,6 +15,7 @@ export default abstract class Card {
         this.type = type;
     }
     abstract filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack>
+    abstract immediateEffect(match: Match)
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.filterValidAttachTargets([ cardStack ]).length > 0;
     }
@@ -26,10 +28,16 @@ export default abstract class Card {
     }
     isPlayable(match: Match, playerNo: number): boolean {
         const player = match.players[playerNo];
-        return player.remainingActions[this.type] > 0 
+        return player.actionPool.hasActionFor(this.type)
             && (this.playableOutsideBuildPhase || (playerNo == match.activePlayerNo && match.turnPhase == TurnPhase.Build))
+            && this.filterValidAttachTargets(match.players[playerNo].cardStacks).length > 0
             && this.isPlayableDecorator(match, playerNo);
     }
-    protected abstract isPlayableDecorator(match: Match, playerNo: number): boolean
+    protected isPlayableDecorator(match: Match, playerNo: number): boolean {
+        return true;
+    }
     abstract profile(): CardProfile
+    actionPool(): ActionPool {
+        return new ActionPool();
+    }
 }
