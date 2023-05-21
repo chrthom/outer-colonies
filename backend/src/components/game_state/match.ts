@@ -82,6 +82,11 @@ export default class Match {
                 player.cardStacks.forEach(cs => cs.combatPhaseReset());
             });
             this.battle.range--;
+            if (this.battle.range == 1 && this.battle.type == BattleType.Raid) {
+                this.battle.ships[this.actionPendingByPlayerNo].push(
+                    ...this.players[this.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
+                );
+            }
         }
         this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
         if (this.battle.range == 0) {

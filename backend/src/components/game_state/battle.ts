@@ -39,7 +39,7 @@ export default class Battle {
     }
     removeDestroyedCardStacks(playerNo: number): Array<CardStack> {
         return this.ships[playerNo]
-            .filter(cs => cs.damage >= cs.profile().hp)
+            .filter(cs => cs.damage > 0 && cs.damage >= cs.profile().hp)
             .map(cs => spliceCardStackByUUID(this.ships[playerNo], cs.uuid));
     }
     canInterveneMission(interveningPlayerNo: number, cardStack: CardStack): boolean {
