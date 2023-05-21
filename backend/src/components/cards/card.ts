@@ -15,9 +15,9 @@ export default abstract class Card {
         this.type = type;
     }
     abstract filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack>
-    abstract immediateEffect(match: Match)
-    canBeAttachedTo(cardStack: CardStack): boolean {
-        return this.filterValidAttachTargets([ cardStack ]).length > 0;
+    abstract immediateEffect(match: Match): void
+    canBeAttachedTo(allCardStacks: Array<CardStack>, uuid: string): boolean {
+        return this.filterValidAttachTargets(allCardStacks).map(cs => cs.uuid).includes(uuid);
     }
     canAttack(): boolean {
         return false;

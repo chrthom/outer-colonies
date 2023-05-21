@@ -7,8 +7,6 @@ const defaultDeck = [
     Cards.card160,
     Cards.card160,
     Cards.card160,
-    Cards.card160,
-    Cards.card348,
     Cards.card348,
     Cards.card348,
     Cards.card348,
@@ -17,8 +15,6 @@ const defaultDeck = [
     Cards.card130,
     Cards.card130,
     Cards.card130,
-    Cards.card130,
-    Cards.card166,
     Cards.card166,
     Cards.card166,
     Cards.card166,
@@ -28,6 +24,12 @@ const defaultDeck = [
     Cards.card163,
     Cards.card163,
     Cards.card135,
+    Cards.card135,
+    Cards.card135,
+    Cards.card185,
+    Cards.card348,
+    Cards.card242,
+    Cards.card453,
 ];
 
 export default class SocketData {

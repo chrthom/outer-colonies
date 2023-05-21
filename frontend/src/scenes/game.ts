@@ -44,7 +44,7 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
-        [ 0, 1, 130, 160, 163, 166, 348].forEach(id => // TODO: Determine cards to preload based on player decks
+        [ 0, 1, 130, 135, 160, 163, 166, 185, 242, 348, 350, 453].forEach(id => // TODO: Determine cards to preload based on player decks
             this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
     }
     

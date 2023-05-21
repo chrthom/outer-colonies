@@ -69,7 +69,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`);
         } else if (!handCard.card.isPlayable(match, socket.data.playerNo)) {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
-        } else if (!handCard.card.canBeAttachedTo(target)) {
+        } else if (!handCard.card.canBeAttachedTo(player.cardStacks, targetUUID)) {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
         } else if (target.card.type == CardType.Colony) {
             player.playCardToColonyZone(handCard);
