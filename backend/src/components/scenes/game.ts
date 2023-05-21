@@ -5,7 +5,7 @@ import { CardType, MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../c
 import { getCardStackByUUID } from '../utils/utils';
 import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import EquipmentCard from '../cards/types/equipmentCard';
+import EquipmentCard from '../cards/types/equipment_card';
 import CardStack from '../cards/card_stack';
 
 function getSocket(io: Server, match: Match, playerNo: number) {
@@ -71,10 +71,17 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
         } else if (!handCard.card.canBeAttachedTo(player.cardStacks, targetUUID)) {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
-        } else if (target.card.type == CardType.Colony) {
-            player.playCardToColonyZone(handCard);
-        } else {
-            player.attachCardToCardStack(handCard, target);
+        } else { // TODO: Refator whole else block into single method under player class
+            handCard.card.immediateEffect(match);
+            if (handCard.card.staysInPlay) {
+                if (target.card.type == CardType.Colony) { // TODO: Unify this and attaching to other cards into one method
+                    player.playCardToColonyZone(handCard);
+                } else {
+                    player.attachCardToCardStack(handCard, target);
+                }
+            } else {
+                player.discardHandCard(handCardUUID);
+            }
         }
         emitState(io, match);
     });

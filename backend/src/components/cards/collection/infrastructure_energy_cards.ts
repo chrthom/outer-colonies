@@ -1,5 +1,5 @@
 import Match from "../../game_state/match";
-import InfrastructureCard from "../types/infrastructureCard";
+import InfrastructureCard from "../types/infrastructure_card";
 
 abstract class CardPowerPlant extends InfrastructureCard {
     constructor(id: number) {

@@ -1,5 +1,5 @@
-import HullCard from '../types/hullCard';
-import { HullMultipart } from '../types/hullCard';
+import HullCard from '../types/hull_card';
+import { HullMultipart } from '../types/hull_card';
 
 export class Card160 extends HullCard {
     constructor() {

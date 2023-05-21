@@ -2,7 +2,7 @@ import Card from './card';
 import CardProfile from './card_profile';
 import { CardType, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
-import HullCard from './types/hullCard';
+import HullCard from './types/hull_card';
 import ActionPool from './action_pool';
 
 export default class CardStack {

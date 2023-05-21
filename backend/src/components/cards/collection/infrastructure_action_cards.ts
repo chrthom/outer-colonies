@@ -1,7 +1,7 @@
 import { CardType } from "../../config/enums";
 import Match from "../../game_state/match";
 import ActionPool, { CardAction } from "../action_pool";
-import InfrastructureCard from "../types/infrastructureCard";
+import InfrastructureCard from "../types/infrastructure_card";
 
 export class Card135 extends InfrastructureCard {
     constructor() {

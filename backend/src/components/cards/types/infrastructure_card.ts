@@ -6,7 +6,7 @@ import CardStack from "../card_stack";
 export default abstract class InfrastructureCard extends Card {
     readonly infrastructureProfile!: InfrastructureProfile;
     onlyAttachableToColony: boolean = false;
-    constructor(id: number, name: string, profile: InfrastructureProfile, ) {
+    constructor(id: number, name: string, profile: InfrastructureProfile) {
         super(id, name, CardType.Infrastructure);
         this.infrastructureProfile = profile;
     }

@@ -3,7 +3,7 @@ import CardStack from '../cards/card_stack';
 import { Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
-import ColonyCard from '../cards/types/colonyCard';
+import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 
 export default class Player {
@@ -63,6 +63,9 @@ export default class Player {
     }
     discardCardStack(uuid: string) {
         this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());
+    }
+    discardHandCard(uuid: string) {
+        this.discardPile.push(spliceCardStackByUUID(this.hand, uuid).card);
     }
     private shuffle<T>(array: Array<T>): Array<T> {
         return array.sort(() => Math.random() -0.5)

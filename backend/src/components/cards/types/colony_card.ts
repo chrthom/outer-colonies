@@ -13,9 +13,6 @@ export default class ColonyCard extends Card {
     filterValidAttachTargets(cardStacks: CardStack[]): CardStack[] {
         return [];
     }
-    protected isPlayableDecorator(match: Match, playerNo: number): boolean {
-        return false;
-    }
     immediateEffect(match: Match) {}
     profile(): CardProfile {
         return {

@@ -9,6 +9,7 @@ export default abstract class Card {
     readonly name!: string;
     readonly type!: CardType;
     playableOutsideBuildPhase: boolean = false;
+    staysInPlay: boolean = true;
     constructor(id: number, name: string, type: CardType) {
         this.id = id;
         this.name = name;
@@ -30,11 +31,7 @@ export default abstract class Card {
         const player = match.players[playerNo];
         return player.actionPool.hasActionFor(this.type)
             && (this.playableOutsideBuildPhase || (playerNo == match.activePlayerNo && match.turnPhase == TurnPhase.Build))
-            && this.filterValidAttachTargets(match.players[playerNo].cardStacks).length > 0
-            && this.isPlayableDecorator(match, playerNo);
-    }
-    protected isPlayableDecorator(match: Match, playerNo: number): boolean {
-        return true;
+            && this.filterValidAttachTargets(match.players[playerNo].cardStacks).length > 0;
     }
     abstract profile(): CardProfile
     actionPool(): ActionPool {

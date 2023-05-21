@@ -3,7 +3,7 @@ import { rules } from '../config/rules';
 import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import EquipmentCard from '../cards/types/equipmentCard';
+import EquipmentCard from '../cards/types/equipment_card';
 
 export default class Match {
     readonly room!: string;
