@@ -7,22 +7,23 @@ import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import EquipmentCard from '../cards/types/equipment_card';
 import CardStack from '../cards/card_stack';
+import Player from '../game_state/player';
 
-function getSocket(io: Server, match: Match, playerNo: number) {
+function getSocket(io: Server, match: Match, playerNo: number): Socket {
     return io.sockets.sockets.get(match.players[playerNo].id);
 }
 
-function getPlayer(socket: Socket) {
+function getPlayer(socket: Socket): Player {
     return socket.data.match.players[socket.data.playerNo];
 }
 
-function emitState(io: Server, match: Match): void {
+function emitState(io: Server, match: Match) {
     match.forAllPlayers((playerNo: number) => {
         getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
     });
 }
 
-function initMatch(io: Server, match: Match): void {
+function initMatch(io: Server, match: Match) {
     match.setStartPlayer();
     match.players.forEach(player => {
         player.shuffleDeck();
@@ -34,9 +35,9 @@ function initMatch(io: Server, match: Match): void {
     emitState(io, match);
 }
 
-export function gameSocketListeners(io: Server, socket: Socket): void {
+export function gameSocketListeners(io: Server, socket: Socket) {
     socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
-        const match = socket.data.match;
+        const match = <Match> socket.data.match;
         if (turnPhase == match.turnPhase) {
             if (turnPhase == TurnPhase.Init) {
                 match.players[socket.data.playerNo].ready = true;
@@ -59,10 +60,10 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         }
     });
     socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-        const match = socket.data.match;
+        const match = <Match> socket.data.match;
         const player = getPlayer(socket);
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
-        const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO NEXT: Also check opponent card stack (+colony) for tactic cards
+        const target = getCardStackByUUID(match.getInPlayCardStacks(), targetUUID);
         if (!handCard) {
             console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
         } else if (!target) {
@@ -77,7 +78,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         emitState(io, match);
     });
     socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
-        const match = socket.data.match;
+        const match = <Match> socket.data.match;
         const player = getPlayer(socket);
         const playerShips: Array<CardStack> = match.battle.ships[match.actionPendingByPlayerNo];
         const opponentShips: Array<CardStack> = match.battle.ships[match.getWaitingPlayerNo()];

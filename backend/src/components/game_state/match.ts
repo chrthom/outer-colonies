@@ -4,6 +4,7 @@ import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
 import EquipmentCard from '../cards/types/equipment_card';
+import CardStack from '../cards/card_stack';
 
 export default class Match {
     readonly room!: string;
@@ -29,6 +30,9 @@ export default class Match {
     }
     getInactivePlayerNo(): number {
         return this.opponentPlayerNo(this.activePlayerNo);
+    }
+    getInPlayCardStacks(): CardStack[] {
+        return this.players.flatMap(p => p.cardStacks);
     }
     getPendingActionPlayer(): Player {
         return this.players[this.actionPendingByPlayerNo];
