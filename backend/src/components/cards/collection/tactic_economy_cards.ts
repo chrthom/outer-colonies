@@ -19,7 +19,7 @@ export class Card141 extends TacticCard {
         )
     }
     immediateEffect(player: Player) {
-        player.actionPool.pool.push(...this.oneTimeActionPool.pool);
+        player.actionPool.push(...this.oneTimeActionPool.getPool());
     }
     getValidTargets(player: Player): CardStack[] {
         return this.onlyColonyTarget(player.cardStacks);

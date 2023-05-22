@@ -22,7 +22,7 @@ export class Card135 extends InfrastructureCard {
         )
     }
     immediateEffect(player: Player) {
-        player.actionPool.pool.push(...this.actionPool().pool);
+        player.actionPool.push(...this.actionPool().getPool());
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Hull));

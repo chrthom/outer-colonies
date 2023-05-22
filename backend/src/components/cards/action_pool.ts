@@ -12,19 +12,16 @@ export class CardAction {
     priority(): number {
         return this.possibleCardTypes.length;
     }
+    toString(): string {
+        return this.possibleCardTypes.sort().join('_');
+    }
 }
 
 export default class ActionPool {
-    pool!: Array<CardAction>;
+    private pool!: Array<CardAction>;
     constructor(...cardActions: Array<CardAction>) {
         if (cardActions) this.pool = cardActions;
         else this.pool = [];
-    }
-    getActionsFor(cardType: CardType): Array<CardAction> {
-        return this.pool.filter(ap => !ap.depleted && ap.canBeUsedFor(cardType));
-    }
-    hasActionFor(cardType: CardType): boolean {
-        return this.getActionsFor(cardType).length > 0;
     }
     activate(cardType: CardType): boolean {
         const availablePools = this.getActionsFor(cardType);
@@ -37,5 +34,26 @@ export default class ActionPool {
     }
     combine(ap: ActionPool): ActionPool {
         return new ActionPool(...this.pool.concat(ap.pool));
+    }
+    getActionsFor(cardType: CardType): Array<CardAction> {
+        return this.getPool().filter(ap => ap.canBeUsedFor(cardType));
+    }
+    getPool() {
+        return this.pool.filter(a => !a.depleted);
+    }
+    hasActionFor(cardType: CardType): boolean {
+        return this.getActionsFor(cardType).length > 0;
+    }
+    push(...pool: CardAction[]) {
+        this.pool.push(...pool);
+    }
+    static sortOrder(a: CardAction, b: CardAction): number {
+        if (a.priority() == b.priority()) {
+            if (a.toString() < b.toString()) return -1;
+            else if (a.toString() > b.toString()) return 1;
+            else return 0;
+        } else {
+            return a.priority() - b.priority();
+        }
     }
 }

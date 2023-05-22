@@ -30,15 +30,14 @@ export default class Prompt {
         }
     }
     private showBuildPhase(scene: Game) {
-        //const actions = scene.state.remainingActions;
-        //const actionText = `Aktionen: ${actions.hull}H ${actions.equipment}A ${actions.colony}C ${actions.tactic}T`;
+        const actionsText = scene.state.actionPool.map(a => `- ${a}`).join('\n');
         let battleText: string;
         if (scene.plannedBattle.type == BattleType.None)
             battleText = 'Plane eine Mission oder einen Überfall:\n'
                 + '- Klicke dein Deck für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
         else battleText = `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
-        this.show(`${battleText}`);
+        this.show(`${battleText}\nAktionen:\n${actionsText}`);
     }
     private showIntervenePhase(scene: Game) {
         //const actions = scene.state.remainingActions;

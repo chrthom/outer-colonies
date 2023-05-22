@@ -1,31 +1,24 @@
 import Match from '../game_state/match'
 import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
+import ActionPool from '../cards/action_pool';
 
 export class FrontendOpponent {
     name!: string;
     handCardNo!: number;
 }
 
-export class FrontendActions {
-    hull!: number;
-    equipment!: number;
-    colony!: number;
-    tactic!: number;
-    orb!: number;
-}
-
 export class FrontendBattle {
     type!: BattleType;
-    playerShipIds: Array<string>;
-    opponentShipIds: Array<string>;
-    priceCards: Array<string>;
+    playerShipIds: string[];
+    opponentShipIds: string[];
+    priceCards: string[];
     range: number;
 }
 
 export class FrontendCardStack {
     uuid!: string;
-    cardIds!: Array<number>;
-    battleReadyCardIndexes!: Array<number>;
+    cardIds!: number[];
+    battleReadyCardIndexes!: number[];
     zone!: Zone;
     index!: number;
     zoneCardsNum!: number;
@@ -41,18 +34,18 @@ export class FrontendHandCard {
     cardId!: number;
     index!: number;
     playable!: boolean;
-    validTargets!: Array<string>;
+    validTargets!: string[];
 }
 
 export class FrontendState {
     playerIsActive!: boolean;
     playerPendingAction!: boolean;
     turnPhase!: TurnPhase;
-    //remainingActions: FrontendActions;
+    actionPool: string[];
     opponent!: FrontendOpponent;
-    hand!: Array<FrontendHandCard>;
-    discardPileIds!: Array<number>;
-    cardStacks!: Array<FrontendCardStack>;
+    hand!: FrontendHandCard[];
+    discardPileIds!: number[];
+    cardStacks!: FrontendCardStack[];
     battle?: FrontendBattle;
 }
 
@@ -104,14 +97,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         playerIsActive: match.activePlayerNo == playerNo,
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
-        /*actionPool: {
-            hull: player.actionPool[CardType.Hull],
-            equipment: player.actionPool[CardType.Equipment],
-            colony: player.actionPool[CardType.Infrastructure],
-            tactic: player.actionPool[CardType.Tactic],
-            orb: player.actionPool[CardType.Orb]
-        },*/
-        // TODO: Encode frontend identifier for remaining actions
+        actionPool: player.actionPool.getPool().sort(ActionPool.sortOrder).map(a => a.toString()),
         opponent: {
             name: opponent.name,
             handCardNo: opponent.hand.length
