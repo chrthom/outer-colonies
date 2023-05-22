@@ -29,7 +29,7 @@ function initMatch(io: Server, match: Match): void {
         player.drawCards(rules.initialCardsToDraw);
     });
     // TODO: Emit draw cards event
-    // TODO: Wait for respone for redrawing cards
+    // TODO: Wait for response for redrawing cards
     match.prepareStartPhase();
     emitState(io, match);
 }
@@ -62,7 +62,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         const match = socket.data.match;
         const player = getPlayer(socket);
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
-        const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO: Also check opponent card stack (+colony) for tactic cards
+        const target = getCardStackByUUID(player.cardStacks, targetUUID); // TODO NEXT: Also check opponent card stack (+colony) for tactic cards
         if (!handCard) {
             console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
         } else if (!target) {
@@ -71,7 +71,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
         } else if (!handCard.canBeAttachedTo(target)) {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
-        } else { // TODO: Refactor whole else block into single method under player class
+        } else {
             player.playHandCard(handCard, target);
         }
         emitState(io, match);
@@ -93,12 +93,11 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         } else if (!srcWeapon.attackAvailable) {
             console.log(`WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`);
         } else {
-            const srcWeaponCard = <EquipmentCard> srcWeapon.card;
+            const srcWeaponCard = <EquipmentCard> srcWeapon.card; // TODO NEXT: Move this to CardStack class 
             if (srcWeaponCard.attackProfile.range < match.battle.range) {
                 console.log(`WARN: ${player.name} tried to attack with range ${srcWeaponCard.attackProfile.range} weapon at range ${match.battle.range}`);
-            } else {
+            } else { // TODO NEXT: Unify this in method in CardStack class
                 srcWeaponCard.attack(match, srcShip, target);
-                // TODO: Handle attacks on colony
                 srcWeapon.attackAvailable = false;
             }
         }

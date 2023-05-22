@@ -55,7 +55,6 @@ export default class Match {
         this.battle = new Battle(BattleType.None);
         this.getActivePlayer().resetRemainingActions();
         this.getActivePlayer().callBackShipsFromNeutralZone();
-        // TODO: Move ships from neutral zone to orbital zone
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
         // TODO: Check for effects on drawing a cards (like drawing an extra card)
         // TODO: Execute start of turn effects of cards
@@ -90,7 +89,7 @@ export default class Match {
         }
         this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
         if (this.battle.range == 0) {
-            // TODO: Apply mission result
+            // TODO NEXT: Apply mission result
             this.prepareEndPhase();
         } else {
             const hasAttack = this.battle.ships[this.actionPendingByPlayerNo]

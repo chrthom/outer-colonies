@@ -52,7 +52,7 @@ export default class CardStack {
         }
     }
     isFlightReady(): boolean {
-        return this.type() == CardType.Hull // TODO: Move this to HullCard class
+        return this.type() == CardType.Hull // TODO NEXT: Move this to HullCard class
             && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo; 
     }
     isMissionReady(): boolean {

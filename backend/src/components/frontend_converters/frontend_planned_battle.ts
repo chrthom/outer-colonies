@@ -11,7 +11,6 @@ export class FrontendPlannedBattle {
 }
 
 export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
-    // TODO: For Raids also add all cards in colony zone 
     const ships = plannedBattle.shipIds
         .map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
         .filter(cs => cs.isMissionReady());
