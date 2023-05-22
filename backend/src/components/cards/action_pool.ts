@@ -1,9 +1,9 @@
 import { CardType } from "../config/enums";
 
 export class CardAction {
-    possibleCardTypes!: Array<CardType>;
+    possibleCardTypes!: CardType[];
     depleted: boolean = false;
-    constructor(...possibleCardTypes: Array<CardType>) {
+    constructor(...possibleCardTypes: CardType[]) {
         this.possibleCardTypes = possibleCardTypes;
     }
     canBeUsedFor(cardType: CardType): boolean {
@@ -18,8 +18,8 @@ export class CardAction {
 }
 
 export default class ActionPool {
-    private pool!: Array<CardAction>;
-    constructor(...cardActions: Array<CardAction>) {
+    private pool!: CardAction[];
+    constructor(...cardActions: CardAction[]) {
         if (cardActions) this.pool = cardActions;
         else this.pool = [];
     }
@@ -35,7 +35,7 @@ export default class ActionPool {
     combine(ap: ActionPool): ActionPool {
         return new ActionPool(...this.pool.concat(ap.pool));
     }
-    getActionsFor(cardType: CardType): Array<CardAction> {
+    getActionsFor(cardType: CardType): CardAction[] {
         return this.getPool().filter(ap => ap.canBeUsedFor(cardType));
     }
     getPool() {

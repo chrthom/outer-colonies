@@ -9,9 +9,9 @@ import Player from "./player";
 
 export default class Battle {
     type!: BattleType;
-    ships: Array<Array<CardStack>> = [ [], [] ];
-    downsidePriceCards: Array<Card> = [];
-    upsidePriceCards: Array<Card> = [];
+    ships: CardStack[][] = [ [], [] ];
+    downsidePriceCards: Card[] = [];
+    upsidePriceCards: Card[] = [];
     range: number = rules.maxRange + 1;
     constructor(type: BattleType) {
         this.type = type;
@@ -23,7 +23,7 @@ export default class Battle {
         }
         return battle;
     }
-    assignInterveningShips(player: Player, interveningShipIds: Array<string>) {
+    assignInterveningShips(player: Player, interveningShipIds: string[]) {
         if (this.type == BattleType.Mission) {
             this.ships[player.no] = interveningShipIds
                 .map(id => getCardStackByUUID(player.cardStacks, id))
@@ -37,7 +37,7 @@ export default class Battle {
                 .filter(cs => cs.zone == Zone.Oribital);
         }
     }
-    removeDestroyedCardStacks(playerNo: number): Array<CardStack> {
+    removeDestroyedCardStacks(playerNo: number): CardStack[] {
         return this.ships[playerNo]
             .filter(cs => cs.damage > 0 && cs.damage >= cs.profile().hp)
             .map(cs => spliceCardStackByUUID(this.ships[playerNo], cs.uuid));

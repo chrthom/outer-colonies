@@ -1,7 +1,7 @@
 import Card from '../cards/card';
 import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import { CardType, Zone } from '../config/enums'
-import { spliceCardStackByUUID } from '../utils/utils';
+import { shuffle, spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -13,12 +13,12 @@ export default class Player {
     match!: Match;
     no!: number;
     ready: boolean = false;
-    deck!: Array<Card>;
-    discardPile: Array<Card> = [];
-    hand: Array<CardStack> = [];
-    cardStacks!: Array<CardStack>;
+    deck!: Card[];
+    discardPile: Card[] = [];
+    hand: CardStack[] = [];
+    cardStacks!: CardStack[];
     actionPool!: ActionPool;
-    constructor(id: string, name: string, match: Match, playerNo: number, deck: Array<Card>) {
+    constructor(id: string, name: string, match: Match, playerNo: number, deck: Card[]) {
         this.id = id;
         this.name = name;
         this.match = match;
@@ -46,7 +46,7 @@ export default class Player {
         this.cardStacks.filter(cs => cs.zone == Zone.Colony && cs.isFlightReady()).forEach(cs => cs.zone = Zone.Oribital);
     }
     shuffleDeck() {
-        this.deck = this.shuffle(this.deck);
+        this.deck = shuffle(this.deck);
     }
     drawCards(num: number) {
         // TODO: Check if no cards are left in deck
@@ -55,7 +55,7 @@ export default class Player {
     takeCards(cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
-    pickCardsFromDeck(num: number): Array<Card> {
+    pickCardsFromDeck(num: number): Card[] {
         return this.deck.splice(0, num);
     }
     playHandCard(handCard: CardStack, target: CardStack) { // TODO: Somehow any number of tactic cards can be played - fix it!
@@ -76,8 +76,5 @@ export default class Player {
     }
     discardCardStack(uuid: string) {
         this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());
-    }
-    private shuffle<T>(array: Array<T>): Array<T> {
-        return array.sort(() => Math.random() -0.5)
     }
 }

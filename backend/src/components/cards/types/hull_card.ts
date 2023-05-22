@@ -1,7 +1,6 @@
 import Card from '../card';
 import CardProfile, { HullProfile } from '../card_profile';
 import CardStack from '../card_stack';
-import Match from '../../game_state/match'
 import { CardType } from '../../config/enums';
 import Player from '../../game_state/player';
 
@@ -13,16 +12,16 @@ export default abstract class HullCard extends Card {
         this.multipart = multipart;
         this.hullProfile = profile;
     }
-    getValidTargets(player: Player): Array<CardStack> {
+    getValidTargets(player: Player): CardStack[] {
         return this.filterAttachableHull(player.cardStacks).concat(this.filterAttachableColony(player.cardStacks));
     }
-    private filterAttachableHull(cardStacks: Array<CardStack>): Array<CardStack> {
+    private filterAttachableHull(cardStacks: CardStack[]): CardStack[] {
         return cardStacks.filter(cs =>
             cs.type() == CardType.Hull 
-                && (<HullCard> cs.card).multipart.neededParts.includes(this.id)
+                && (<HullCard> cs.card).multipart.neededPartIds.includes(this.id)
                 && cs.attachedCards.filter(c => c.card.name == this.name).length == 0); // TODO: Rethink if matching by name is a good idea
     }
-    private filterAttachableColony(cardStacks: Array<CardStack>): Array<CardStack> {
+    private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
         return cardStacks.filter(cs => 
             cs.type() == CardType.Colony 
                 && this.hullProfile.energy >= 0);
@@ -38,9 +37,9 @@ export default abstract class HullCard extends Card {
 
 export class HullMultipart {
     partNo!: number;
-    neededParts!: Array<number>;
+    neededPartIds!: number[];
     static noMultipart: HullMultipart = {
         partNo: 1,
-        neededParts: []
+        neededPartIds: []
     };
 }

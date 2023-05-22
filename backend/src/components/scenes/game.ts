@@ -80,8 +80,8 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
         const match = <Match> socket.data.match;
         const player = getPlayer(socket);
-        const playerShips: Array<CardStack> = match.battle.ships[match.actionPendingByPlayerNo];
-        const opponentShips: Array<CardStack> = match.battle.ships[match.getWaitingPlayerNo()];
+        const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
+        const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
         const srcShip = playerShips.find(cs => cs.uuid == srcId);
         const srcWeapon = srcShip ? srcShip.getCardStacks()[srcIndex] : null;
         const target = opponentShips.find(cs => cs.uuid == targetId)
@@ -96,7 +96,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else {
             srcWeapon.attack(target);
         }
-        // TODO: Check if further weapons can be used, else end round
+        // TODO: Check if further weapons or tactic cards can be used, else end round
         emitState(io, match);
     });
 };

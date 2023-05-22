@@ -8,7 +8,7 @@ import CardStack from '../cards/card_stack';
 
 export default class Match {
     readonly room!: string;
-    players: Array<Player> = [];
+    players: Player[] = [];
     activePlayerNo = 0;
     actionPendingByPlayerNo = 0;
     turnPhase = TurnPhase.Init;
@@ -73,7 +73,7 @@ export default class Match {
         if (this.battle.type == BattleType.None) this.prepareEndPhase();
         else this.actionPendingByPlayerNo = this.opponentPlayerNo(this.activePlayerNo);
     }
-    prepareCombatPhase(interveningShipIds: Array<string>) {
+    prepareCombatPhase(interveningShipIds: string[]) {
         this.turnPhase = TurnPhase.Combat;
         this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
         this.players.forEach(player => {

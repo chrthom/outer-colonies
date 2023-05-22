@@ -9,7 +9,7 @@ export default class CardStack {
     card!: Card;
     zone: Zone;
     uuid!: string;
-    attachedCards: Array<CardStack> = [];
+    attachedCards: CardStack[] = [];
     damage: number = 0;
     attackAvailable: boolean = false;
     defenseAvailable: boolean = false;
@@ -46,10 +46,10 @@ export default class CardStack {
             if (this.card.canDefend()) this.defenseAvailable = true;
         }
     }
-    getCards(): Array<Card> {
+    getCards(): Card[] {
         return this.getCardStacks().map(cs => cs.card);
     }
-    getCardStacks(): Array<CardStack> {
+    getCardStacks(): CardStack[] {
         return this.attachedCards.flatMap(cs => cs.getCardStacks()).concat(this);
     }
     getPlayer(): Player {

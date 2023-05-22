@@ -6,8 +6,8 @@ import { getCardStackByUUID } from "../utils/utils";
 export class FrontendPlannedBattle {
     type: BattleType;
     downsideCardsNum: number;
-    upsideCardsIndex: Array<number>;
-    shipIds: Array<string>;
+    upsideCardsIndex: number[];
+    shipIds: string[];
 }
 
 export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {

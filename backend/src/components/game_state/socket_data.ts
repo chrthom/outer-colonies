@@ -28,7 +28,7 @@ const defaultDeck = [
 
 export default class SocketData {
     name!: string;
-    activeDeck!: Array<Card>;
+    activeDeck!: Card[];
     playerNo: number;
     match: Match;
     constructor(name: string) {
