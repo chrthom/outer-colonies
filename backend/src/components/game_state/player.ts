@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
-import { Zone } from '../config/enums'
+import { CardType, Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colony_card';
@@ -55,20 +55,21 @@ export default class Player {
     pickCardsFromDeck(num: number): Array<Card> {
         return this.deck.splice(0, num);
     }
-    playCardToColonyZone(handCard: CardStack) {
-        this.actionPool.activate(handCard.type()); // TODO: Somehow any number of tactic cards can be played - fix it!
-        handCard.zone = Zone.Colony;
-        this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
-    }
-    attachCardToCardStack(handCard: CardStack, targetCardStack: CardStack) {
+    playHandCard(handCard: CardStack, target: CardStack) { // TODO: Somehow any number of tactic cards can be played - fix it!
         this.actionPool.activate(handCard.type());
-        targetCardStack.attach(spliceCardStackByUUID(this.hand, handCard.uuid));
+        spliceCardStackByUUID(this.hand, handCard.uuid)
+        handCard.performImmediateEffect();
+        if (!handCard.card.staysInPlay) {
+            this.discardPile.push(handCard.card);
+        } else if (target.type() == CardType.Colony) {
+            handCard.zone = Zone.Colony;
+            this.cardStacks.push(handCard);
+        } else {
+            target.attach(handCard);
+        }
     }
     discardCardStack(uuid: string) {
         this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());
-    }
-    discardHandCard(uuid: string) {
-        this.discardPile.push(spliceCardStackByUUID(this.hand, uuid).card);
     }
     private shuffle<T>(array: Array<T>): Array<T> {
         return array.sort(() => Math.random() -0.5)
