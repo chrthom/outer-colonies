@@ -9,6 +9,7 @@ export default abstract class Card {
     readonly name!: string;
     readonly type!: CardType;
     playableOutsideBuildPhase: boolean = false;
+    doesRechargeBetweenCombatPhases: boolean = false;
     staysInPlay: boolean = true;
     constructor(id: number, name: string, type: CardType) {
         this.id = id;
@@ -18,12 +19,15 @@ export default abstract class Card {
     abstract getValidTargets(player: Player): CardStack[]
     abstract immediateEffect(player: Player): void
     attack(attackingShip: CardStack, target: CardStack) {}
-    canAttack(weapon: CardStack): boolean {
+    canAttack(): boolean {
         return false;
     }
     canDefend(): boolean {
         const p = this.profile();
         return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
+    }
+    isInRange(range: number): boolean {
+        return false;
     }
     isPlayable(player: Player): boolean {
         return player.actionPool.hasActionFor(this.type)

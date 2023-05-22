@@ -18,7 +18,8 @@ export class Card163 extends EquipmentCard {
                 omega: -1,
                 delta: 0,
                 psi: 0
-            }
+            },
+            false
         )
     }
 }

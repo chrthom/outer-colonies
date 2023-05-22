@@ -9,18 +9,20 @@ import Player from '../../game_state/player';
 export default abstract class EquipmentCard extends Card {
     readonly equipmentProfile!: EquipmentProfile;
     readonly attackProfile?: AttackProfile;
-    constructor(id: number, name: string, profile: EquipmentProfile, attackProfile?: AttackProfile) {
+    constructor(id: number, name: string, profile: EquipmentProfile, doesRechargeBetweenCombatPhases: boolean, attackProfile?: AttackProfile) {
         super(id, name, CardType.Equipment);
         this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
+        this.doesRechargeBetweenCombatPhases = doesRechargeBetweenCombatPhases;
     }
     getValidTargets(player: Player): CardStack[] {
         return player.cardStacks.filter(cs => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
     }
-    canAttack(weapon: CardStack): boolean {
-        const attackingShip = weapon.getRootCardStack();
-        const match = attackingShip.getPlayer().match;
-        return Boolean(this.attackProfile) && this.attackProfile.range >= match.battle.range;
+    canAttack(): boolean {
+        return Boolean(this.attackProfile);
+    }
+    isInRange(range: number): boolean {
+        return this.attackProfile.range >= range;
     }
     immediateEffect(_: Player) {}
     profile(): CardProfile {

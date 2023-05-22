@@ -76,6 +76,9 @@ export default class Match {
     prepareCombatPhase(interveningShipIds: Array<string>) {
         this.turnPhase = TurnPhase.Combat;
         this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
+        this.players.forEach(player => {
+            player.cardStacks.forEach(cs => cs.combatPhaseReset(true));
+        });
         this.processBattleRound();
     }
     processBattleRound() {
@@ -83,7 +86,7 @@ export default class Match {
             this.battle.range--;
             this.players.forEach(player => {
                 this.battle.removeDestroyedCardStacks(player.no).forEach(cs => player.discardCardStack(cs.uuid));
-                player.cardStacks.forEach(cs => cs.combatPhaseReset());
+                player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
             });
             if (this.battle.range == 1 && this.battle.type == BattleType.Raid) {
                 this.battle.ships[this.actionPendingByPlayerNo].push(

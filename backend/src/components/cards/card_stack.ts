@@ -28,20 +28,24 @@ export default class CardStack {
         this.attachedCards.push(cardStack);
     }
     attack(target: CardStack) {
-        if (this.card.canAttack(this)) {
+        if (!this.card.canAttack()) {
+            console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`);
+        } else if (!this.card.isInRange(this.getPlayer().match.battle.range)) {
+            console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name} at wrong range`);
+        } else {
             this.card.attack(this, target);
             this.attackAvailable = false;
-        } else {
-            console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`);
         }
     }
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);
     }
-    combatPhaseReset() {
-        this.attachedCards.forEach(cs => cs.combatPhaseReset());
-        if (this.card.canAttack(this)) this.attackAvailable = true; // TODO: Do not reset weapons, which only have one attack per battle
-        if (this.card.canDefend()) this.defenseAvailable = true;
+    combatPhaseReset(initial: boolean) {
+        this.attachedCards.forEach(cs => cs.combatPhaseReset(initial));
+        if (initial || this.card.doesRechargeBetweenCombatPhases) {
+            if (this.card.canAttack()) this.attackAvailable = true;
+            if (this.card.canDefend()) this.defenseAvailable = true;
+        }
     }
     getCards(): Array<Card> {
         return this.getCardStacks().map(cs => cs.card);

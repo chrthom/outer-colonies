@@ -19,6 +19,7 @@ export class Card166 extends EquipmentCard {
                 delta: 0,
                 psi: 0
             },
+            true,
             {
                 range: 2,
                 damage: 3,
@@ -49,6 +50,7 @@ export class Card130 extends EquipmentCard {
                 delta: 0,
                 psi: 0
             },
+            true,
             {
                 range: 2,
                 damage: 3,
