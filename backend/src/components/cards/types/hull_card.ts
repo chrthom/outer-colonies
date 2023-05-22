@@ -3,6 +3,7 @@ import CardProfile, { HullProfile } from '../card_profile';
 import CardStack from '../card_stack';
 import Match from '../../game_state/match'
 import { CardType } from '../../config/enums';
+import Player from '../../game_state/player';
 
 export default abstract class HullCard extends Card {
     readonly multipart!: HullMultipart;
@@ -12,7 +13,7 @@ export default abstract class HullCard extends Card {
         this.multipart = multipart;
         this.hullProfile = profile;
     }
-    filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack> {
+    getValidTargets(cardStacks: Array<CardStack>): Array<CardStack> {
         return this.filterAttachableHull(cardStacks).concat(this.filterAttachableColony(cardStacks));
     }
     private filterAttachableHull(cardStacks: Array<CardStack>): Array<CardStack> {
@@ -26,7 +27,7 @@ export default abstract class HullCard extends Card {
             cs.type() == CardType.Colony 
                 && this.hullProfile.energy >= 0);
     }
-    immediateEffect(match: Match) {}
+    immediateEffect(_: Player) {}
     profile(): CardProfile {
         return CardProfile.fromHullProfile(this.hullProfile);
     }

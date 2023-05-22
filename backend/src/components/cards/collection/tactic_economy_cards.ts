@@ -1,5 +1,5 @@
 import { CardType } from "../../config/enums";
-import Match from "../../game_state/match";
+import Player from "../../game_state/player";
 import ActionPool, { CardAction } from "../action_pool";
 import CardStack from "../card_stack";
 import TacticCard from "../types/tactic_card";
@@ -18,10 +18,10 @@ export class Card141 extends TacticCard {
             false
         )
     }
-    immediateEffect(match: Match) {
-        match.players[match.actionPendingByPlayerNo].actionPool.pool.push(...this.oneTimeActionPool.pool);
+    immediateEffect(player: Player) {
+        player.actionPool.pool.push(...this.oneTimeActionPool.pool);
     }
-    filterValidAttachTargets(cardStacks: CardStack[]): CardStack[] {
+    getValidTargets(cardStacks: CardStack[]): CardStack[] {
         return this.onlyColonyTarget(cardStacks);
     }
 }
@@ -36,10 +36,10 @@ export class Card232 extends TacticCard {
             false
         )
     }
-    immediateEffect(match: Match) {
-        match.players[match.actionPendingByPlayerNo].drawCards(this.cardsToDraw);
+    immediateEffect(player: Player) {
+        player.drawCards(this.cardsToDraw);
     }
-    filterValidAttachTargets(cardStacks: CardStack[]): CardStack[] {
+    getValidTargets(cardStacks: CardStack[]): CardStack[] {
         return this.onlyColonyTarget(cardStacks);
     }
 }

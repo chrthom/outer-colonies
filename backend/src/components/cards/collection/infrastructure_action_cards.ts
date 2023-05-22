@@ -1,5 +1,5 @@
 import { CardType } from "../../config/enums";
-import Match from "../../game_state/match";
+import Player from "../../game_state/player";
 import ActionPool, { CardAction } from "../action_pool";
 import InfrastructureCard from "../types/infrastructure_card";
 
@@ -21,8 +21,8 @@ export class Card135 extends InfrastructureCard {
             }
         )
     }
-    immediateEffect(match: Match) {
-        match.players[match.actionPendingByPlayerNo].actionPool.pool.push(...this.actionPool().pool);
+    immediateEffect(player: Player) {
+        player.actionPool.pool.push(...this.actionPool().pool);
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Hull));

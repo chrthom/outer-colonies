@@ -1,4 +1,4 @@
-import Match from "../../game_state/match";
+import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
 abstract class CardPowerPlant extends InfrastructureCard {
@@ -20,7 +20,7 @@ abstract class CardPowerPlant extends InfrastructureCard {
         )
         this.onlyAttachableToColony = true;
     }
-    immediateEffect(match: Match) {}
+    immediateEffect(_: Player) {}
 }
 
 export class Card185 extends CardPowerPlant {

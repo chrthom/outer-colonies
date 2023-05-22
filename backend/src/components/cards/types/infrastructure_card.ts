@@ -10,7 +10,7 @@ export default abstract class InfrastructureCard extends Card {
         super(id, name, CardType.Infrastructure);
         this.infrastructureProfile = profile;
     }
-    filterValidAttachTargets(cardStacks: CardStack[]): CardStack[] {
+    getValidTargets(cardStacks: CardStack[]): CardStack[] {
         return cardStacks
             .filter(cs => (!this. onlyAttachableToColony && cs.type() == CardType.Hull) || cs.type() == CardType.Colony)
             .filter(cs => cs.profileMatches(this.profile()));

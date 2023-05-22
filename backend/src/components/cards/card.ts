@@ -16,10 +16,10 @@ export default abstract class Card {
         this.name = name;
         this.type = type;
     }
-    abstract filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack>
-    abstract immediateEffect(match: Match): void
+    abstract getValidTargets(cardStacks: Array<CardStack>): Array<CardStack>
+    abstract immediateEffect(player: Player): void
     canBeAttachedTo(allCardStacks: Array<CardStack>, uuid: string): boolean {
-        return this.filterValidAttachTargets(allCardStacks).map(cs => cs.uuid).includes(uuid);
+        return this.getValidTargets(allCardStacks).map(cs => cs.uuid).includes(uuid);
     }
     canAttack(): boolean {
         return false;
@@ -31,7 +31,7 @@ export default abstract class Card {
     isPlayable(player: Player): boolean {
         return player.actionPool.hasActionFor(this.type)
             && (this.playableOutsideBuildPhase || (player.no == player.match.activePlayerNo && player.match.turnPhase == TurnPhase.Build))
-            && this.filterValidAttachTargets(player.cardStacks).length > 0;
+            && this.getValidTargets(player.cardStacks).length > 0;
     }
     abstract profile(): CardProfile
     actionPool(): ActionPool {

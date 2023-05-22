@@ -60,7 +60,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     const player = match.players[playerNo];
     const opponent = match.players[match.opponentPlayerNo(playerNo)];
     let hand = player.hand.map((c, index) => {
-        let validTargets = c.card.filterValidAttachTargets(player.cardStacks).map(cs => cs.uuid);
+        let validTargets = c.card.getValidTargets(player.cardStacks).map(cs => cs.uuid);
         return {
             uuid: c.uuid,
             cardId: c.card.id,

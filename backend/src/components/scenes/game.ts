@@ -72,7 +72,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
         } else if (!handCard.card.canBeAttachedTo(player.cardStacks, targetUUID)) {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
         } else { // TODO: Refactor whole else block into single method under player class
-            handCard.card.immediateEffect(match);
+            handCard.performImmediateEffect();
             if (handCard.card.staysInPlay) {
                 if (target.type() == CardType.Colony) { // TODO: Unify this and attaching to other cards into one method
                     player.playCardToColonyZone(handCard);

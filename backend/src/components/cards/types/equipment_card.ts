@@ -4,6 +4,7 @@ import CardStack from '../card_stack';
 import Match from '../../game_state/match'
 import { AttackProfile } from '../card_profile';
 import { CardType } from '../../config/enums';
+import Player from '../../game_state/player';
 
 export default abstract class EquipmentCard extends Card {
     readonly equipmentProfile!: EquipmentProfile;
@@ -13,13 +14,13 @@ export default abstract class EquipmentCard extends Card {
         this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
     }
-    filterValidAttachTargets(cardStacks: Array<CardStack>): Array<CardStack> {
+    getValidTargets(cardStacks: Array<CardStack>): Array<CardStack> {
         return cardStacks.filter(cs => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
     }
     canAttack(): boolean {
         return Boolean(this.attackProfile);
     }
-    immediateEffect(match: Match) {}
+    immediateEffect(_: Player) {}
     profile(): CardProfile {
         return CardProfile.fromEquipmentProfile(this.equipmentProfile);
     }
