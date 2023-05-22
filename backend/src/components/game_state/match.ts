@@ -80,11 +80,11 @@ export default class Match {
     }
     processBattleRound() {
         if (this.actionPendingByPlayerNo == this.opponentPlayerNo(this.activePlayerNo)) {
+            this.battle.range--;
             this.players.forEach(player => {
                 this.battle.removeDestroyedCardStacks(player.no).forEach(cs => player.discardCardStack(cs.uuid));
                 player.cardStacks.forEach(cs => cs.combatPhaseReset());
             });
-            this.battle.range--;
             if (this.battle.range == 1 && this.battle.type == BattleType.Raid) {
                 this.battle.ships[this.actionPendingByPlayerNo].push(
                     ...this.players[this.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
