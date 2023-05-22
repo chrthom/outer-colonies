@@ -50,7 +50,10 @@ export default class Player {
     }
     drawCards(num: number) {
         // TODO: Check if no cards are left in deck
-        this.hand.push(...this.pickCardsFromDeck(num).map(c => new RootCardStack(c, Zone.Hand, this)));
+        this.takeCards(this.pickCardsFromDeck(num));
+    }
+    takeCards(cards: Card[]) {
+        this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Array<Card> {
         return this.deck.splice(0, num);
@@ -60,13 +63,16 @@ export default class Player {
         spliceCardStackByUUID(this.hand, handCard.uuid)
         handCard.performImmediateEffect();
         if (!handCard.card.staysInPlay) {
-            this.discardPile.push(handCard.card);
+            this.discardCards(handCard.card);
         } else if (target.type() == CardType.Colony) {
             handCard.zone = Zone.Colony;
             this.cardStacks.push(handCard);
         } else {
             target.attach(handCard);
         }
+    }
+    discardCards(...cards: Card[]) {
+        this.discardPile.push(...cards);
     }
     discardCardStack(uuid: string) {
         this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());

@@ -96,7 +96,7 @@ export default class Match {
         }
         this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
         if (this.battle.range == 0) {
-            // TODO NEXT: Apply mission result
+            if (this.battle.type == BattleType.Mission) this.applyMissionResult();
             this.prepareEndPhase();
         } else {
             const hasAttack = this.battle.ships[this.actionPendingByPlayerNo]
@@ -113,5 +113,12 @@ export default class Match {
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
         // TODO: Check hand card limit
         this.prepareStartPhase();
+    }
+    private applyMissionResult() {
+        if (this.battle.ships[this.activePlayerNo].length > 0) {
+            this.getActivePlayer().takeCards(this.battle.downsidePriceCards);
+        } else {
+            this.getActivePlayer().discardCards(...this.battle.downsidePriceCards);
+        }
     }
 }
