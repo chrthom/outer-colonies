@@ -42,14 +42,17 @@ export default class CardStack {
         return this.parentCardStack ? this.parentCardStack.getPlayer() : this.parentPlayer;
     }
     isFlightReady(): boolean {
-        return this.card.type == CardType.Hull
+        return this.type() == CardType.Hull
             && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo;
     }
     isMissionReady(): boolean {
-        return this.zone == Zone.Oribital && this.card.type == CardType.Hull && this.profile().speed > 0;
+        return this.zone == Zone.Oribital && this.type() == CardType.Hull && this.profile().speed > 0;
+    }
+    isPlayable(): boolean {
+        return this.zone == Zone.Hand && this.card.isPlayable(this.getPlayer());
     }
     profile(): CardProfile {
-        if (this.card.type == CardType.Colony) {
+        if (this.type() == CardType.Colony) {
             const colonyCardsProfile = this.getPlayer().cardStacks
                 .filter(cs => cs.zone == Zone.Colony)
                 .filter(cs => [ CardType.Orb, CardType.Infrastructure ].includes(cs.type()))

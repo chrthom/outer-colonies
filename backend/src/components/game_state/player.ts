@@ -5,10 +5,12 @@ import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
+import Match from './match';
 
 export default class Player {
     id!: string;
     name!: string;
+    match!: Match;
     no!: number;
     ready: boolean = false;
     deck!: Array<Card>;
@@ -16,10 +18,11 @@ export default class Player {
     hand: Array<CardStack> = [];
     cardStacks!: Array<CardStack>;
     actionPool!: ActionPool;
-    constructor(id: string, name: string, no: number, deck: Array<Card>) {
+    constructor(id: string, name: string, match: Match, playerNo: number, deck: Array<Card>) {
         this.id = id;
         this.name = name;
-        this.no = no;
+        this.match = match;
+        this.no = playerNo;
         this.deck = deck;
         this.cardStacks = [ new RootCardStack(new ColonyCard(), Zone.Colony, this) ];
         this.resetRemainingActions();
@@ -53,12 +56,12 @@ export default class Player {
         return this.deck.splice(0, num);
     }
     playCardToColonyZone(handCard: CardStack) {
-        this.actionPool.activate(handCard.card.type);
+        this.actionPool.activate(handCard.type()); // TODO: Somehow any number of tactic cards can be played - fix it!
         handCard.zone = Zone.Colony;
         this.cardStacks.push(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     attachCardToCardStack(handCard: CardStack, targetCardStack: CardStack) {
-        this.actionPool.activate(handCard.card.type);
+        this.actionPool.activate(handCard.type());
         targetCardStack.attach(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     discardCardStack(uuid: string) {

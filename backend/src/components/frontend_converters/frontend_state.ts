@@ -65,7 +65,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             uuid: c.uuid,
             cardId: c.card.id,
             index: index,
-            playable: c.card.isPlayable(match, playerNo),
+            playable: c.isPlayable(),
             validTargets: validTargets
         };
     });
