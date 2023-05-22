@@ -27,12 +27,20 @@ export default class CardStack {
         cardStack.parentCardStack = this;
         this.attachedCards.push(cardStack);
     }
+    attack(target: CardStack) {
+        if (this.card.canAttack(this)) {
+            this.card.attack(this, target);
+            this.attackAvailable = false;
+        } else {
+            console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`);
+        }
+    }
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);
     }
     combatPhaseReset() {
         this.attachedCards.forEach(cs => cs.combatPhaseReset());
-        if (this.card.canAttack()) this.attackAvailable = true; // TODO: Do not reset weapons, which only have one attack per battle
+        if (this.card.canAttack(this)) this.attackAvailable = true; // TODO: Do not reset weapons, which only have one attack per battle
         if (this.card.canDefend()) this.defenseAvailable = true;
     }
     getCards(): Array<Card> {
@@ -43,6 +51,10 @@ export default class CardStack {
     }
     getPlayer(): Player {
         return this.parentCardStack ? this.parentCardStack.getPlayer() : this.parentPlayer;
+    }
+    getRootCardStack(): CardStack {
+        if (this.parentCardStack) return this.parentCardStack.getRootCardStack();
+        else return this;
     }
     getValidTargets(): CardStack[] {
         if (this.zone == Zone.Hand) {

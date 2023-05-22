@@ -17,7 +17,8 @@ export default abstract class Card {
     }
     abstract getValidTargets(player: Player): CardStack[]
     abstract immediateEffect(player: Player): void
-    canAttack(): boolean {
+    attack(attackingShip: CardStack, target: CardStack) {}
+    canAttack(weapon: CardStack): boolean {
         return false;
     }
     canDefend(): boolean {

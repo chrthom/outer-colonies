@@ -94,13 +94,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else if (!srcWeapon.attackAvailable) {
             console.log(`WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`);
         } else {
-            const srcWeaponCard = <EquipmentCard> srcWeapon.card; // TODO NEXT: Move this to CardStack class 
-            if (srcWeaponCard.attackProfile.range < match.battle.range) {
-                console.log(`WARN: ${player.name} tried to attack with range ${srcWeaponCard.attackProfile.range} weapon at range ${match.battle.range}`);
-            } else { // TODO NEXT: Unify this in method in CardStack class
-                srcWeaponCard.attack(match, srcShip, target);
-                srcWeapon.attackAvailable = false;
-            }
+            srcWeapon.attack(target);
         }
         // TODO: Check if further weapons can be used, else end round
         emitState(io, match);

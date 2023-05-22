@@ -17,16 +17,20 @@ export default abstract class EquipmentCard extends Card {
     getValidTargets(player: Player): CardStack[] {
         return player.cardStacks.filter(cs => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
     }
-    canAttack(): boolean {
-        return Boolean(this.attackProfile);
+    canAttack(weapon: CardStack): boolean {
+        const attackingShip = weapon.getRootCardStack();
+        const match = attackingShip.getPlayer().match;
+        return Boolean(this.attackProfile) && this.attackProfile.range >= match.battle.range;
     }
     immediateEffect(_: Player) {}
     profile(): CardProfile {
         return CardProfile.fromEquipmentProfile(this.equipmentProfile);
     }
-    attack(match: Match, src: CardStack, target: CardStack) {
-        let damage = this.attackProfile.damage
-        if (src.profile().speed + match.battle.range <= target.profile().speed) damage = Math.round(damage / 2);
+    attack(weapon: CardStack, target: CardStack) {
+        const attackingShip = weapon.getRootCardStack();
+        const match = attackingShip.getPlayer().match;
+        let damage = this.attackProfile.damage;
+        if (attackingShip.profile().speed + match.battle.range <= target.profile().speed) damage = Math.round(damage / 2);
         let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
         // TODO: Emit event for all attack results (PD, shields, ...)
         target.damage += attackResult.damage;
