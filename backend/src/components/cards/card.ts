@@ -29,6 +29,9 @@ export default abstract class Card {
             && (this.playableOutsideBuildPhase || (player.no == player.match.activePlayerNo && player.match.turnPhase == TurnPhase.Build))
             && this.getValidTargets(player).length > 0;
     }
+    isFlightReady(cards: Card[]): boolean {
+        return false;
+    }
     abstract profile(): CardProfile
     actionPool(): ActionPool {
         return new ActionPool();

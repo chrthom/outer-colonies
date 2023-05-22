@@ -52,8 +52,7 @@ export default class CardStack {
         }
     }
     isFlightReady(): boolean {
-        return this.type() == CardType.Hull // TODO NEXT: Move this to HullCard class
-            && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo; 
+        return this.card.isFlightReady(this.getCards());
     }
     isMissionReady(): boolean {
         return this.zone == Zone.Oribital && this.type() == CardType.Hull && this.profile().speed > 0;
