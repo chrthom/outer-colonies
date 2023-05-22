@@ -49,12 +49,24 @@ export default class CardStack {
         return this.zone == Zone.Oribital && this.card.type == CardType.Hull && this.profile().speed > 0;
     }
     profile(): CardProfile {
-        return this.getCards()
-            .map(c => c.profile())
-            .reduce((a, b) => CardProfile.combineCardProfiles(a, b));
+        if (this.card.type == CardType.Colony) {
+            const colonyCardsProfile = this.getPlayer().cardStacks
+                .filter(cs => cs.zone == Zone.Colony)
+                .filter(cs => [ CardType.Orb, CardType.Infrastructure ].includes(cs.type()))
+                .map(cs => cs.profile())
+                .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
+            return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile());
+        } else {
+            return this.getCards()
+                .map(c => c.profile())
+                .reduce((a, b) => CardProfile.combineCardProfiles(a, b));
+        }
     }
     profileMatches(c: CardProfile): boolean {
         return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile(), c));
+    }
+    type(): CardType {
+        return this.card.type;
     }
 }
 
