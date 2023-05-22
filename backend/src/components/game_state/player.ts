@@ -1,5 +1,5 @@
 import Card from '../cards/card';
-import CardStack from '../cards/card_stack';
+import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import { Zone } from '../config/enums'
 import { spliceCardStackByUUID } from '../utils/utils';
 import CardCollection from '../cards/collection/card_collection';
@@ -21,16 +21,16 @@ export default class Player {
         this.name = name;
         this.no = no;
         this.deck = deck;
-        this.cardStacks = [ new CardStack(new ColonyCard(), Zone.Colony) ];
+        this.cardStacks = [ new RootCardStack(new ColonyCard(), Zone.Colony, this) ];
         this.resetRemainingActions();
         this.setDummyCardStacks(); // Just for testing
     }
     private setDummyCardStacks() {
-        const ship1 = new CardStack(CardCollection.card160, Zone.Oribital);
-        ship1.attachedCards.push(new CardStack(CardCollection.card166, Zone.Hand));
-        const ship2 = new CardStack(CardCollection.card348, Zone.Oribital);
-        ship2.attachedCards.push(new CardStack(CardCollection.card130, Zone.Hand));
-        ship2.attachedCards.push(new CardStack(CardCollection.card163, Zone.Hand));
+        const ship1 = new RootCardStack(CardCollection.card160, Zone.Oribital, this);
+        ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card166, ship1));
+        const ship2 = new RootCardStack(CardCollection.card348, Zone.Oribital, this);
+        ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card130, ship2));
+        ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card163, ship2));
         this.cardStacks.push(ship1, ship2);
     }
     resetRemainingActions() {
@@ -47,7 +47,7 @@ export default class Player {
     }
     drawCards(num: number) {
         // TODO: Check if no cards are left in deck
-        this.hand.push(...this.pickCardsFromDeck(num).map(c => new CardStack(c, Zone.Hand)));
+        this.hand.push(...this.pickCardsFromDeck(num).map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Array<Card> {
         return this.deck.splice(0, num);
@@ -59,7 +59,7 @@ export default class Player {
     }
     attachCardToCardStack(handCard: CardStack, targetCardStack: CardStack) {
         this.actionPool.activate(handCard.card.type);
-        targetCardStack.attachedCards.push(spliceCardStackByUUID(this.hand, handCard.uuid));
+        targetCardStack.attach(spliceCardStackByUUID(this.hand, handCard.uuid));
     }
     discardCardStack(uuid: string) {
         this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());
