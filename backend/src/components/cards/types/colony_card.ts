@@ -11,7 +11,7 @@ export default class ColonyCard extends Card {
     constructor() {
         super(0, 'Colony', CardType.Colony);
     }
-    getValidTargets(cardStacks: CardStack[]): CardStack[] {
+    getValidTargets(_: Player): CardStack[] {
         return [];
     }
     immediateEffect(_: Player) {}

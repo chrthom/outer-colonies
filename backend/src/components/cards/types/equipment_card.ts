@@ -14,8 +14,8 @@ export default abstract class EquipmentCard extends Card {
         this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
     }
-    getValidTargets(cardStacks: Array<CardStack>): Array<CardStack> {
-        return cardStacks.filter(cs => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
+    getValidTargets(player: Player): CardStack[] {
+        return player.cardStacks.filter(cs => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
     }
     canAttack(): boolean {
         return Boolean(this.attackProfile);

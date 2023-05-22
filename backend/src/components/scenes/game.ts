@@ -69,7 +69,7 @@ export function gameSocketListeners(io: Server, socket: Socket): void {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`);
         } else if (!handCard.isPlayable()) {
             console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
-        } else if (!handCard.card.canBeAttachedTo(player.cardStacks, targetUUID)) {
+        } else if (!handCard.canBeAttachedTo(target)) {
             console.log(`WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`);
         } else { // TODO: Refactor whole else block into single method under player class
             handCard.performImmediateEffect();

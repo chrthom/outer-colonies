@@ -21,8 +21,8 @@ export class Card141 extends TacticCard {
     immediateEffect(player: Player) {
         player.actionPool.pool.push(...this.oneTimeActionPool.pool);
     }
-    getValidTargets(cardStacks: CardStack[]): CardStack[] {
-        return this.onlyColonyTarget(cardStacks);
+    getValidTargets(player: Player): CardStack[] {
+        return this.onlyColonyTarget(player.cardStacks);
     }
 }
 
@@ -39,7 +39,7 @@ export class Card232 extends TacticCard {
     immediateEffect(player: Player) {
         player.drawCards(this.cardsToDraw);
     }
-    getValidTargets(cardStacks: CardStack[]): CardStack[] {
-        return this.onlyColonyTarget(cardStacks);
+    getValidTargets(player: Player): CardStack[] {
+        return this.onlyColonyTarget(player.cardStacks);
     }
 }

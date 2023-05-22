@@ -13,8 +13,8 @@ export default abstract class HullCard extends Card {
         this.multipart = multipart;
         this.hullProfile = profile;
     }
-    getValidTargets(cardStacks: Array<CardStack>): Array<CardStack> {
-        return this.filterAttachableHull(cardStacks).concat(this.filterAttachableColony(cardStacks));
+    getValidTargets(player: Player): Array<CardStack> {
+        return this.filterAttachableHull(player.cardStacks).concat(this.filterAttachableColony(player.cardStacks));
     }
     private filterAttachableHull(cardStacks: Array<CardStack>): Array<CardStack> {
         return cardStacks.filter(cs =>

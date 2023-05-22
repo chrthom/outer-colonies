@@ -27,6 +27,9 @@ export default class CardStack {
         cardStack.parentCardStack = this;
         this.attachedCards.push(cardStack);
     }
+    canBeAttachedTo(cardStack: CardStack): boolean {
+        return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);
+    }
     combatPhaseReset() {
         this.attachedCards.forEach(cs => cs.combatPhaseReset());
         if (this.card.canAttack()) this.attackAvailable = true; // TODO: Do not reset weapons, which only have one attack per battle
@@ -41,9 +44,16 @@ export default class CardStack {
     getPlayer(): Player {
         return this.parentCardStack ? this.parentCardStack.getPlayer() : this.parentPlayer;
     }
+    getValidTargets(): CardStack[] {
+        if (this.zone == Zone.Hand) {
+            return this.card.getValidTargets(this.getPlayer());
+        } else {
+            return []; // TODO: Reuse this method later do determine valid attack targets in battle
+        }
+    }
     isFlightReady(): boolean {
-        return this.type() == CardType.Hull
-            && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo;
+        return this.type() == CardType.Hull // TODO: Move this to HullCard class
+            && this.getCards().filter(c => c.type == CardType.Hull).length == (<HullCard> this.card).multipart.partNo; 
     }
     isMissionReady(): boolean {
         return this.zone == Zone.Oribital && this.type() == CardType.Hull && this.profile().speed > 0;

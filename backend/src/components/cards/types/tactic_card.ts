@@ -12,7 +12,7 @@ export default abstract class TacticCard extends Card {
     profile(): CardProfile {
         return new CardProfile();
     }
-    protected onlyColonyTarget(cardStacks): CardStack[] {
-        return cardStacks.filter(cs => cs.card.type == CardType.Colony);
+    protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {
+        return playersCardStacks.filter(cs => cs.card.type == CardType.Colony);
     }
 }
