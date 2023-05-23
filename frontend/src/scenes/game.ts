@@ -10,6 +10,7 @@ import MaxCard from '../components/card/max_card';
 import { rules } from '../../../backend/src/components/config/rules';
 import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
 import DiscardPile from '../components/card/discard_pile';
+import ActionPool from '../components/action_pool';
 
 class InitData {
     socket: Socket;
@@ -26,10 +27,11 @@ export default class Game extends Phaser.Scene {
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
     obj = {
+        actionPool: null,
+        button: null,
         deck: null,
         discardPile: null,
         prompt: null,
-        button: null,
         maxCard: null
     };
 
@@ -46,6 +48,15 @@ export default class Game extends Phaser.Scene {
     preload () {
         [ 0, 1, 130, 135, 141, 160, 163, 166, 185, 232, 242, 348, 350, 453].forEach(id => // TODO: Determine cards to preload based on player decks
             this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
+        [ 'equipment', 'hull', 'infrastructure', 'orb', 'tactic' ].forEach(name =>
+            this.load.image(`icon_${name}`, `http://localhost:3000/cardimages/icons/${name}.png`));
+        /*
+        this.load.image(`icon_equipment`, `src/assets/icons/equipment.png`);
+        this.load.image(`icon_hull`, iconHull);
+        this.load.image(`icon_infrastructure`, `../assets/icons/infrastructure.png`);
+        this.load.image(`icon_orb`, `./assets/icons/orb.png`);
+        this.load.image(`icon_tactic`, `../../assets/icons/tactic.png`);
+        */
     }
     
     create () {
@@ -53,10 +64,11 @@ export default class Game extends Phaser.Scene {
         this.socket.on('state', (state: FrontendState) => {
             this.updateState(state);
         });
+        this.obj.actionPool = new ActionPool(this);
+        this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
         this.obj.discardPile = new DiscardPile(this, [])
         this.obj.prompt = new Prompt(this);
-        this.obj.button = new Button(this);
         this.obj.maxCard = new MaxCard(this);
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
     }
@@ -100,6 +112,7 @@ export default class Game extends Phaser.Scene {
     }
 
     updateView() {
+        this.obj.actionPool.update(this);
         this.obj.button.update(this);
         this.obj.prompt.update(this);
         this.updateHighlighting();

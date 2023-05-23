@@ -17,11 +17,11 @@ module.exports = {
         test: /\.ts$/,
         include: path.resolve(__dirname, '../backend/src/components'),
         loader: 'ts-loader'
-      }
-      /*{
+      },
+      {
         test: /\.(gif|png|jpe?g|svg|xml)$/i,
         use: "file-loader"
-      }*/
+      }
     ]
   },
   plugins: [

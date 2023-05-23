@@ -1,9 +1,16 @@
 export default class Layout {
     colors = {
-        primary: 0x337777,
-        secondary: 0x773333
+        alpha: 0.8,
+        primary: 0x119999,
+        secondary: 0x991111
     }
     stackYDistance = 30;
+
+    actionPool = {
+        x: 2370,
+        y: 1040,
+        yDistance: -55
+    }
     cards = {
         scale: 0.25,
         damageIndicator: {
@@ -12,6 +19,11 @@ export default class Layout {
             yOffsetOpponent: -15,
             fontSize: 20
         }
+    };
+    continueButton = {
+        x: 2370,
+        y: 30,
+        fontSize: 32
     };
     deck = {
         x: 1930,
@@ -73,9 +85,4 @@ export default class Layout {
         y: 80,
         fontSize: 24
     };
-    continueButton = {
-        x: 2370,
-        y: 30,
-        fontSize: 32
-    }
 }

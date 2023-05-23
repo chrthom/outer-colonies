@@ -97,7 +97,10 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         playerIsActive: match.activePlayerNo == playerNo,
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
-        actionPool: player.actionPool.getPool().sort(ActionPool.sortOrder).map(a => a.toString()),
+        actionPool: player.actionPool.getPool()
+            .filter(a => a.possibleCardTypes[0] != CardType.Orb)
+            .sort(ActionPool.sortOrder)
+            .map(a => a.toString()),
         opponent: {
             name: opponent.name,
             handCardNo: opponent.hand.length

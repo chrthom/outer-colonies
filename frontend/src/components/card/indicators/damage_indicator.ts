@@ -9,8 +9,16 @@ export default class DamageIndicator {
     constructor(scene: Game, damage: number, critical: boolean, cardX: number, cardY: number) {
         const x = cardX;
         const y = cardY;
-        this.shape = scene.add.star(x, y, 12, 16, 22, critical ? layout.colors.secondary : layout.colors.primary, 0.8)
-            .setOrigin(0.5, 0.5);
+        this.shape = scene.add
+            .star(
+                x,
+                y,
+                12,
+                16,
+                22,
+                critical ? layout.colors.secondary : layout.colors.primary,
+                layout.colors.alpha
+            ).setOrigin(0.5, 0.5);
         this.text = scene.add.text(x, y, String(damage))
             .setFontSize(layout.cards.damageIndicator.fontSize)
             .setFontFamily('Impact')
