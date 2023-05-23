@@ -6,9 +6,9 @@ const layout = new Layout();
 export default class DamageIndicator {
     shape: Phaser.GameObjects.Star;
     text: Phaser.GameObjects.Text;
-    constructor(scene: Game, damage: number, critical: boolean, cardX: number, cardY: number) {
-        const x = cardX;
-        const y = cardY;
+    constructor(scene: Game, damage: number, critical: boolean, cardX: number, cardY: number, ownedByPlayer: boolean) {
+        const x = cardX + layout.cards.damageIndicator.xOffset;
+        const y = cardY + (ownedByPlayer ? layout.cards.damageIndicator.yOffsetPlayer : layout.cards.damageIndicator.yOffsetOpponent);
         this.shape = scene.add
             .star(
                 x,

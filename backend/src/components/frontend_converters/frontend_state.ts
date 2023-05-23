@@ -27,6 +27,12 @@ export class FrontendCardStack {
     criticalDamage!: boolean;
     missionReady!: boolean;
     interventionReady!: boolean;
+    defenseIcons!: FrontendDefenseIcon[];
+}
+
+export class FrontendDefenseIcon {
+    icon!: string;
+    depleted!: boolean;
 }
 
 export class FrontendHandCard {
@@ -52,7 +58,7 @@ export class FrontendState {
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
     const player = match.players[playerNo];
     const opponent = match.players[match.opponentPlayerNo(playerNo)];
-    let hand = player.hand.map((c, index) => {
+    const hand: FrontendHandCard[] = player.hand.map((c, index) => {
         return {
             uuid: c.uuid,
             cardId: c.card.id,
@@ -61,12 +67,28 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             validTargets: c.getValidTargets().map(cs => cs.uuid)
         };
     });
-    let cardStacks = [true, false].flatMap(ownedByPlayer => {
+    const cardStacks: FrontendCardStack[] = [true, false].flatMap(ownedByPlayer => {
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
         return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
             return zoneCardStacks.map((cs, index) => {
                 const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.attackAvailable ? [index] : []);
+                const interventionReady = ownedByPlayer
+                    && match.getInactivePlayerNo() == playerNo
+                    && match.battle.canInterveneMission(playerNo, cs);
+                const defenseIcons: FrontendDefenseIcon[] = cs.getCardStacks()
+                    .filter(c => c.card.canDefend())
+                    .map(c => {
+                        let icon: string;
+                        if (c.profile().armour > 0) icon = `armour_${c.profile().armour}`;
+                        else if (c.profile().shield > 0) icon = `shield_${c.profile().shield}`;
+                        else icon = `point_defense_${c.profile().pointDefense}`;
+                        return {
+                            icon: icon,
+                            depleted: !c.defenseAvailable
+                        };
+                    })
+                    .sort();
                 return {
                     uuid: cs.uuid,
                     cardIds: cs.getCards().map(c => c.id),
@@ -78,9 +100,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     damage: cs.damage,
                     criticalDamage: cs.damage >= cs.profile().hp,
                     missionReady: ownedByPlayer && cs.isMissionReady(),
-                    interventionReady: ownedByPlayer
-                        && match.getInactivePlayerNo() == playerNo
-                        && match.battle.canInterveneMission(playerNo, cs)
+                    interventionReady: interventionReady,
+                    defenseIcons: defenseIcons
                 };
             });
         });

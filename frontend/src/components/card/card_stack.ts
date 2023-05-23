@@ -4,6 +4,7 @@ import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import DamageIndicator from "./indicators/damage_indicator";
+import DefenseIndicator from "./indicators/defense_indicator";
 
 const layout = new Layout();
 
@@ -12,6 +13,7 @@ export default class CardStack {
     uuid!: string;
     data!: FrontendCardStack;
     damageIndicator?: DamageIndicator;
+    defenseIndicator?: DefenseIndicator;
     constructor(scene: Game, data: FrontendCardStack) {
         this.uuid = data.uuid;
         this.data = data;
@@ -31,14 +33,27 @@ export default class CardStack {
                 scene, 
                 this.data.damage, 
                 this.data.criticalDamage, 
-                x + layout.cards.damageIndicator.xOffset, 
-                zoneLayout.y + (data.ownedByPlayer ? layout.cards.damageIndicator.yOffsetPlayer : layout.cards.damageIndicator.yOffsetOpponent)
+                x,
+                zoneLayout.y,
+                data.ownedByPlayer
+            );
+        }
+        if (scene.state.turnPhase == TurnPhase.Combat 
+            && scene.state.battle.playerShipIds.concat(scene.state.battle.opponentShipIds).includes(this.uuid)
+        ) {
+            this.defenseIndicator = new DefenseIndicator(
+                scene,
+                data.defenseIcons,
+                x,
+                zoneLayout.y,
+                data.ownedByPlayer
             );
         }
     }
     destroy() {
         this.cards.forEach(c => c.destroy());
         if (this.damageIndicator) this.damageIndicator.destroy();
+        if (this.defenseIndicator) this.defenseIndicator.destroy();
     }
     highlightDisabled() {
         this.cards.forEach(c => {

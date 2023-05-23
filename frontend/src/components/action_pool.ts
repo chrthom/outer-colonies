@@ -11,16 +11,14 @@ export default class ActionPool {
     }
     update(scene: Game) {
         this.destroy();
-        this.sprites = scene.state.actionPool.map((action, index) => {
-            console.log(`icon_${action}`); //////
-            return scene.add
-                .image(
-                    layout.actionPool.x,
-                    layout.actionPool.y + index * layout.actionPool.yDistance,
-                    `icon_${action}`
-                ).setOrigin(0.5, 0.5)
-                .setTint(layout.colors.primary)
-                .setAlpha(layout.colors.alpha);
-        });
+        this.sprites = scene.state.actionPool.map((action, index) => scene.add
+            .image(
+                layout.actionPool.x,
+                layout.actionPool.y + index * layout.actionPool.yDistance,
+                `icon_${action}`
+            ).setOrigin(0.5, 0.5)
+            .setTint(layout.colors.primary)
+            .setAlpha(layout.colors.alpha)
+        );
     }
 }

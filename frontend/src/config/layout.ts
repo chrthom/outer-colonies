@@ -18,6 +18,12 @@ export default class Layout {
             yOffsetPlayer: -240,
             yOffsetOpponent: -15,
             fontSize: 20
+        },
+        defenseIndicator: {
+            xOffset: 90,
+            yOffsetPlayer: -190,
+            yOffsetOpponent: 35,
+            yDistance: 50
         }
     };
     continueButton = {

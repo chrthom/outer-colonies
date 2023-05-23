@@ -46,17 +46,13 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
-        [ 0, 1, 130, 135, 141, 160, 163, 166, 185, 232, 242, 348, 350, 453].forEach(id => // TODO: Determine cards to preload based on player decks
-            this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
-        [ 'equipment', 'hull', 'infrastructure', 'orb', 'tactic' ].forEach(name =>
-            this.load.image(`icon_${name}`, `http://localhost:3000/cardimages/icons/${name}.png`));
-        /*
-        this.load.image(`icon_equipment`, `src/assets/icons/equipment.png`);
-        this.load.image(`icon_hull`, iconHull);
-        this.load.image(`icon_infrastructure`, `../assets/icons/infrastructure.png`);
-        this.load.image(`icon_orb`, `./assets/icons/orb.png`);
-        this.load.image(`icon_tactic`, `../../assets/icons/tactic.png`);
-        */
+        [ // TODO: Determine cards to preload based on player decks
+            0, 1, 130, 135, 141, 160, 163, 166, 185, 232, 242, 348, 350, 453
+        ].forEach(id => this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
+        [ 
+            'equipment', 'hull', 'infrastructure', 'orb', 'tactic', 
+            'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2'
+        ].forEach(name => this.load.image(`icon_${name}`, `http://localhost:3000/cardimages/icons/${name}.png`));
     }
     
     create () {
