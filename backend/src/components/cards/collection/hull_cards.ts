@@ -30,7 +30,7 @@ export class Card348 extends HullCard {
             HullMultipart.noMultipart,
             {
                 hp: 5,
-                speed: 3,
+                speed: 2,
                 energy: 0,
                 theta: 0,
                 xi: 1,
