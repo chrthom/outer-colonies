@@ -14,6 +14,7 @@ const defaultDeck = [
     Cards.card166,
     Cards.card166,
     Cards.card163,
+    Cards.card170,
     Cards.card135,
     Cards.card135,
     Cards.card185,

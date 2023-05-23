@@ -23,3 +23,27 @@ export class Card163 extends EquipmentCard {
         )
     }
 }
+
+export class Card170 extends EquipmentCard {
+    constructor() {
+        super(
+            170,
+            'Strahlenschilde',
+            {
+                energy: 0,
+                hp: 0,
+                speed: 0,
+                pointDefense: 0,
+                shield: 1,
+                armour: 0,
+                theta: 0,
+                xi: 0,
+                phi: 0,
+                omega: -1,
+                delta: 0,
+                psi: 0
+            },
+            true
+        )
+    }
+}

@@ -1,6 +1,7 @@
 export default class Layout {
     colors = {
         alpha: 0.8,
+        neutral: 0xffffff,
         primary: 0x119999,
         secondary: 0x991111
     }
