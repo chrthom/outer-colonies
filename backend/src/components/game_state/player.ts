@@ -60,7 +60,7 @@ export default class Player {
     pickCardsFromDeck(num: number): Card[] {
         return this.deck.splice(0, num);
     }
-    playHandCard(handCard: CardStack, target: CardStack) { // TODO: Somehow any number of tactic cards can be played - fix it!
+    playHandCard(handCard: CardStack, target: CardStack) {
         this.actionPool.activate(handCard.type());
         spliceCardStackByUUID(this.hand, handCard.uuid)
         handCard.performImmediateEffect();
