@@ -111,7 +111,6 @@ export default class CardStack {
                         scene.activeCardStackIndex = index;
                         scene.activeHandCard = null;
                     } else if (scene.activeCardStack && scene.state.battle.opponentShipIds.includes(this.uuid)) {
-                        // TODO: Add fire on colony and cards in colony zone
                         scene.socket.emit(MsgTypeInbound.Attack, scene.activeCardStack, scene.activeCardStackIndex, this.uuid);
                     }
                     break;

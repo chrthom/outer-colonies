@@ -57,9 +57,8 @@ export default class Match {
         this.getActivePlayer().resetRemainingActions();
         this.getActivePlayer().callBackShipsFromNeutralZone();
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
-        // TODO: Check for effects on drawing a cards (like drawing an extra card)
-        // TODO: Execute start of turn effects of cards
-        // TODO: Wait for response to continue
+        // FEATURE: Check for effects on drawing a cards (like drawing an extra card) and execute start of turn effects of cards
+        // + Wait for response to continue
         this.prepareBuildPhase();
     }
     prepareBuildPhase() {
@@ -108,7 +107,7 @@ export default class Match {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
-        // TODO: Check hand card limit
+        // FEATURE: Check hand card limit
         this.prepareStartPhase();
     }
     private applyMissionResult() {

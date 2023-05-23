@@ -29,8 +29,7 @@ function initMatch(io: Server, match: Match) {
         player.shuffleDeck();
         player.drawCards(rules.initialCardsToDraw);
     });
-    // TODO: Emit draw cards event
-    // TODO: Wait for response for redrawing cards
+    // FEATURE: Wait for response for redrawing cards
     match.prepareStartPhase();
     emitState(io, match);
 }
@@ -96,7 +95,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else {
             srcWeapon.attack(target);
         }
-        // TODO: Check if further weapons or tactic cards can be used, else end round
+        // FEATURE: Check if further weapons or tactic cards can be used, else end round
         emitState(io, match);
     });
 };

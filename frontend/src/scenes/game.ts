@@ -102,11 +102,12 @@ export default class Game extends Phaser.Scene {
         this.plannedBattle = {
             type: type,
             downsideCardsNum: 0,
-            upsideCardsIndex: [], // TODO: Implement later
+            upsideCardsIndex: [],
             shipIds: []
         }
-        if (type == BattleType.Mission)
-            this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // TODO: Add feature to also allow upside cards from discard pile
+        if (type == BattleType.Mission) {
+            this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // FEATURE: Allow upside cards from discard pile
+        }
         this.updateView();
     }
 

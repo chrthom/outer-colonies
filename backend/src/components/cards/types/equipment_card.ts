@@ -34,7 +34,6 @@ export default abstract class EquipmentCard extends Card {
         let damage = this.attackProfile.damage;
         if (attackingShip.profile().speed + match.battle.range <= target.profile().speed) damage = Math.round(damage / 2);
         let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
-        // TODO: Emit event for all attack results (PD, shields, ...)
         target.damage += attackResult.damage;
     }
     private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {

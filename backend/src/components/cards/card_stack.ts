@@ -63,7 +63,7 @@ export default class CardStack {
         if (this.zone == Zone.Hand) {
             return this.card.getValidTargets(this.getPlayer());
         } else {
-            return []; // TODO: Reuse this method later do determine valid attack targets in battle
+            return []; // TODO: Reuse this method to determine valid attack targets in battle
         }
     }
     isFlightReady(): boolean {
