@@ -16,9 +16,6 @@ export default class Match {
     constructor(room: string) {
         this.room = room;
     }
-    matchName(): string {
-        return this.players[0].name + ' vs. ' + this.players[1].name;
-    }
     opponentPlayerNo(playerNo: number): number {
         return playerNo == 0 ? 1 : 0;
     }

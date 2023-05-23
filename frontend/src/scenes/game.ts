@@ -9,15 +9,18 @@ import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
 import { rules } from '../../../backend/src/components/config/rules';
 import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
+import { FrontendGameParams } from '../../../backend/src/components/frontend_converters/frontend_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 
 class InitData {
     socket: Socket;
+    gameParams: FrontendGameParams;
 }
 
 export default class Game extends Phaser.Scene {
     socket: Socket;
+    gameParams: FrontendGameParams;
     state: FrontendState;
     activeHandCard: string;
     activeCardStack: string;
@@ -43,16 +46,16 @@ export default class Game extends Phaser.Scene {
 
     init(data: InitData) {
         this.socket = data.socket;
+        this.gameParams = data.gameParams;
     }
 
     preload () {
-        [ // TODO: Determine cards to preload based on player decks
-            0, 1, 130, 135, 141, 160, 163, 166, 170, 185, 232, 242, 348, 350, 453
-        ].forEach(id => this.load.image(`card_${id}`, `http://localhost:3000/cardimages/${id}.png`));
+        this.load.baseURL = 'http://localhost:3000/cardimages/';
+        [ 0, 1 ].concat(this.gameParams.preloadCardIds).forEach(id => this.load.image(`card_${id}`, `${id}.png`));
         [ 
-            'equipment', 'hull', 'infrastructure', 'orb', 'tactic', 
+            'equipment', 'hull', 'infrastructure', 'tactic', 
             'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2'
-        ].forEach(name => this.load.image(`icon_${name}`, `http://localhost:3000/cardimages/icons/${name}.png`));
+        ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
     }
     
     create () {
