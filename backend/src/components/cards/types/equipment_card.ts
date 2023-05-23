@@ -83,7 +83,7 @@ export default abstract class EquipmentCard extends Card {
         if (attackResult.damage == 0 || this.attackProfile.armour == 0 || !bestArmour) {
             return attackResult;
         } else {
-            const damageReduction = this.attackProfile.shield * (-bestArmour.profile().shield);
+            const damageReduction = this.attackProfile.armour * (-bestArmour.profile().armour);
             if (attackResult.damage >= damageReduction) bestArmour.defenseAvailable = false;
             const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
             attackResult.armour += adjustedDamageReduction;
