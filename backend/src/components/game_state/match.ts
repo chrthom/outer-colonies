@@ -107,6 +107,7 @@ export default class Match {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
+        // TODO: Check if enemy colony is destroyed
         // FEATURE: Check hand card limit
         this.prepareStartPhase();
     }
