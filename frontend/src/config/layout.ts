@@ -1,7 +1,17 @@
 export default class Layout {
+    colors = {
+        primary: 0x337777,
+        secondary: 0x773333
+    }
     stackYDistance = 30;
     cards = {
-        scale: 0.25
+        scale: 0.25,
+        damageIndicator: {
+            xOffset: 90,
+            yOffsetPlayer: -240,
+            yOffsetOpponent: -15,
+            fontSize: 20
+        }
     };
     deck = {
         x: 1930,

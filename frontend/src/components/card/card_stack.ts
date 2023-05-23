@@ -1,17 +1,18 @@
 import CardImage from "./card_image";
 import Layout from "../../config/layout";
 import Game from "../../scenes/game";
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from "../../../../backend/src/components/config/enums";
+import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import DamageIndicator from "./indicators/damage_indicator";
 
 const layout = new Layout();
 
 export default class CardStack {
-    cards: Array<CardImage>;
-    uuid: string;
-    data: FrontendCardStack;
+    cards!: Array<CardImage>;
+    uuid!: string;
+    data!: FrontendCardStack;
+    damageIndicator?: DamageIndicator;
     constructor(scene: Game, data: FrontendCardStack) {
-        const self = this;
         this.uuid = data.uuid;
         this.data = data;
         const zoneLayout = data.ownedByPlayer ? layout.player[data.zone] : layout.opponent[data.zone];
@@ -25,10 +26,19 @@ export default class CardStack {
             if (!this.isPlayerColony() && !this.isOpponentColony())
                 c.enableMouseover(scene);
         });
-        
+        if (data.damage > 0) {
+            this.damageIndicator = new DamageIndicator(
+                scene, 
+                this.data.damage, 
+                this.data.criticalDamage, 
+                x + layout.cards.damageIndicator.xOffset, 
+                zoneLayout.y + (data.ownedByPlayer ? layout.cards.damageIndicator.yOffsetPlayer : layout.cards.damageIndicator.yOffsetOpponent)
+            );
+        }
     }
     destroy() {
         this.cards.forEach(c => c.destroy());
+        if (this.damageIndicator) this.damageIndicator.destroy();
     }
     highlightDisabled() {
         this.cards.forEach(c => {

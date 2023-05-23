@@ -7,7 +7,7 @@ const layout = new Layout();
 export default class Prompt {
     sprite: Phaser.GameObjects.Text;
     constructor(scene) {
-        this.sprite = scene.add.text(layout.prompt.x, layout.prompt.y, [''])
+        this.sprite = scene.add.text(layout.prompt.x, layout.prompt.y, '')
             .setFontSize(layout.prompt.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeeaa')

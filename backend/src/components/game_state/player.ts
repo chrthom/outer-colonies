@@ -30,7 +30,8 @@ export default class Player {
     }
     private setDummyCardStacks() {
         const ship1 = new RootCardStack(CardCollection.card160, Zone.Oribital, this);
-        ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card166, ship1));
+        ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card166, ship1));666666
+        ship1.damage = 2;
         const ship2 = new RootCardStack(CardCollection.card348, Zone.Oribital, this);
         ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card130, ship2));
         ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card163, ship2));
