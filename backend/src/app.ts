@@ -27,7 +27,7 @@ io.on(MsgTypeInbound.Connect, (socket) => {
     gameSocketListeners(io, socket);
 });
 
-setInterval(matchMakingCron, 3000, io);
+setInterval(matchMakingCron, 1000, io);
 
 app.get('/cardimages/*', (req, res) => {
     const file = req.path.replace('/cardimages/', '');
