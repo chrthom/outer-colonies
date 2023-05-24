@@ -13,6 +13,7 @@ import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipmen
 import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import { Card131, Card132, Card177, Card178, Card213, Card221, Card226, Card326, Card327, Card328, Card329, Card418, Card444, Card445 } from './hull_2_part_cards';
+import { Card116, Card117, Card120, Card121, Card122, Card133, Card134, Card306, Card308, Card309, Card313, Card314, Card315 } from './hull_3_part_cards';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
@@ -21,14 +22,21 @@ export default class CardCollection {
     static card106 = new Card106();
     static card107 = new Card107();
     static card109 = new Card109();
+    static card116 = new Card116();
+    static card117 = new Card117();
     static card118 = new Card118();
     static card119 = new Card119();
+    static card120 = new Card120();
+    static card121 = new Card121();
+    static card122 = new Card122();
     static card125 = new Card125();
     static card126 = new Card126();
     static card127 = new Card127();
     static card130 = new Card130();
     static card131 = new Card131();
     static card132 = new Card132();
+    static card133 = new Card133();
+    static card134 = new Card134();
     static card135 = new Card135();
     static card136 = new Card136();
     static card140 = new Card140();
@@ -76,7 +84,13 @@ export default class CardCollection {
     static card244 = new Card244();
     static card303 = new Card303();
     static card304 = new Card304();
+    static card306 = new Card306();
+    static card308 = new Card308();
+    static card309 = new Card309();
     static card310 = new Card310();
+    static card313 = new Card313();
+    static card314 = new Card314();
+    static card315 = new Card315();
     static card326 = new Card326();
     static card327 = new Card327();
     static card328 = new Card328();
