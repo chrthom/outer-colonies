@@ -19,7 +19,7 @@ export default abstract class Card {
         this.rarity = rarity;
     }
     abstract getValidTargets(player: Player): CardStack[]
-    abstract immediateEffect(player: Player): void
+    abstract immediateEffect(player: Player, target: CardStack): void
     attack(attackingShip: CardStack, target: CardStack) {}
     canAttack(): boolean {
         return false;

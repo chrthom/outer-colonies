@@ -75,8 +75,8 @@ export default class CardStack {
     isPlayable(): boolean {
         return this.zone == Zone.Hand && this.card.isPlayable(this.getPlayer());
     }
-    performImmediateEffect() {
-        this.card.immediateEffect(this.getPlayer());
+    performImmediateEffect(target: CardStack) {
+        this.card.immediateEffect(this.getPlayer(), target);
     }
     profile(): CardProfile {
         if (this.type() == CardType.Colony) {

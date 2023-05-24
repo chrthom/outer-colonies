@@ -63,7 +63,7 @@ export default class Player {
     playHandCard(handCard: CardStack, target: CardStack) {
         this.actionPool.activate(handCard.type());
         spliceCardStackByUUID(this.hand, handCard.uuid)
-        handCard.performImmediateEffect();
+        handCard.performImmediateEffect(target);
         if (!handCard.card.staysInPlay) {
             this.discardCards(handCard.card);
         } else if (target.type() == CardType.Colony) {

@@ -14,6 +14,7 @@ import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import { Card131, Card132, Card177, Card178, Card213, Card221, Card226, Card326, Card327, Card328, Card329, Card418, Card444, Card445 } from './hull_2_part_cards';
 import { Card116, Card117, Card120, Card121, Card122, Card133, Card134, Card306, Card308, Card309, Card313, Card314, Card315 } from './hull_3_part_cards';
+import { Card174, Card337, Card338 } from './tactic_military_cards';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
@@ -56,6 +57,7 @@ export default class CardCollection {
     static card168 = new Card168();
     static card170 = new Card170();
     static card171 = new Card171();
+    static card174 = new Card174();
     static card177 = new Card177();
     static card178 = new Card178();
     static card179 = new Card179();
@@ -97,6 +99,8 @@ export default class CardCollection {
     static card327 = new Card327();
     static card328 = new Card328();
     static card329 = new Card329();
+    static card337 = new Card337();
+    static card338 = new Card338();
     static card339 = new Card339();
     static card340 = new Card340();
     static card342 = new Card342();
