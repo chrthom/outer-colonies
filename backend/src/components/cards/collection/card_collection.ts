@@ -1,7 +1,7 @@
 import ColonyCard from '../types/colony_card';
 import { Card160, Card186, Card220, Card243, Card342, Card348, Card351, Card436, Card439, Card450 } from './hull_1_part_cards';
 import { Card103, Card140, Card163, Card170, Card171, Card184, Card240, Card349, Card406, Card447 } from './equipment_defense_cards';
-import { Card130 } from './equipment_weapon_point_defense_cards';
+import { Card130, Card168, Card181, Card234, Card237, Card339, Card340, Card424, Card440, Card441 } from './equipment_weapon_point_defense_cards';
 import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
 import { Card185, Card242, Card350, Card453 } from './infrastructure_energy_cards';
 import { Card141, Card232 } from './tactic_economy_cards';
@@ -41,10 +41,12 @@ export default class CardCollection {
     static card163 = new Card163();
     static card164 = new Card164();
     static card166 = new Card166();
+    static card168 = new Card168();
     static card170 = new Card170();
     static card171 = new Card171();
     static card179 = new Card179();
     static card180 = new Card180();
+    static card181 = new Card181();
     static card182 = new Card182();
     static card183 = new Card183();
     static card184 = new Card184();
@@ -58,6 +60,8 @@ export default class CardCollection {
     static card223 = new Card223();
     static card228 = new Card228();
     static card232 = new Card232();
+    static card234 = new Card234();
+    static card237 = new Card237();
     static card240 = new Card240();
     static card242 = new Card242();
     static card243 = new Card243();
@@ -65,6 +69,8 @@ export default class CardCollection {
     static card303 = new Card303();
     static card304 = new Card304();
     static card310 = new Card310();
+    static card339 = new Card339();
+    static card340 = new Card340();
     static card342 = new Card342();
     static card343 = new Card343();
     static card344 = new Card344();
@@ -79,9 +85,12 @@ export default class CardCollection {
     static card412 = new Card412();
     static card420 = new Card420();
     static card421 = new Card421();
+    static card424 = new Card424();
     static card434 = new Card434();
     static card436 = new Card436();
     static card439 = new Card439();
+    static card440 = new Card440();
+    static card441 = new Card441();
     static card446 = new Card446();
     static card447 = new Card447();
     static card449 = new Card449();
