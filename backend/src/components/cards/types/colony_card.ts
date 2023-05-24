@@ -9,7 +9,7 @@ import CardStack from "../card_stack";
 
 export default class ColonyCard extends Card {
     constructor() {
-        super(0, 'Colony', CardType.Colony);
+        super(0, 'Colony', CardType.Colony, 0);
     }
     getValidTargets(_: Player): CardStack[] {
         return [];

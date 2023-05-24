@@ -7,8 +7,8 @@ import Player from '../../game_state/player';
 export default abstract class HullCard extends Card {
     readonly multipart!: HullMultipart;
     readonly hullProfile!: HullProfile;
-    constructor(id: number, name: string, multipart: HullMultipart, profile: HullProfile) {
-        super(id, name, CardType.Hull);
+    constructor(id: number, name: string, rarity: number, multipart: HullMultipart, profile: HullProfile) {
+        super(id, name, CardType.Hull, rarity);
         this.multipart = multipart;
         this.hullProfile = profile;
     }

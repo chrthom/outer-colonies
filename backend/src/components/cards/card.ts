@@ -8,13 +8,15 @@ export default abstract class Card {
     readonly id!: number;
     readonly name!: string;
     readonly type!: CardType;
+    readonly rarity!: number;
     playableOutsideBuildPhase: boolean = false;
     doesRechargeBetweenCombatPhases: boolean = false;
     staysInPlay: boolean = true;
-    constructor(id: number, name: string, type: CardType) {
+    constructor(id: number, name: string, type: CardType, rarity: number) {
         this.id = id;
         this.name = name;
         this.type = type;
+        this.rarity = rarity;
     }
     abstract getValidTargets(player: Player): CardStack[]
     abstract immediateEffect(player: Player): void

@@ -5,6 +5,7 @@ export class Card166 extends EquipmentCard {
         super(
             166, 
             'Laserkanone',
+            1,
             {
                 energy: 0,
                 hp: 0,
@@ -36,6 +37,7 @@ export class Card130 extends EquipmentCard {
         super(
             130, 
             'Flakartillerie',
+            2,
             {
                 energy: 0,
                 hp: 0,

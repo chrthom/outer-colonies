@@ -9,8 +9,15 @@ import Player from '../../game_state/player';
 export default abstract class EquipmentCard extends Card {
     readonly equipmentProfile!: EquipmentProfile;
     readonly attackProfile?: AttackProfile;
-    constructor(id: number, name: string, profile: EquipmentProfile, doesRechargeBetweenCombatPhases: boolean, attackProfile?: AttackProfile) {
-        super(id, name, CardType.Equipment);
+    constructor(
+        id: number,
+        name: string,
+        rarity: number,
+        profile: EquipmentProfile,
+        doesRechargeBetweenCombatPhases: boolean,
+        attackProfile?: AttackProfile
+    ) {
+        super(id, name, CardType.Equipment, rarity);
         this.equipmentProfile = profile;
         this.attackProfile = attackProfile;
         this.doesRechargeBetweenCombatPhases = doesRechargeBetweenCombatPhases;

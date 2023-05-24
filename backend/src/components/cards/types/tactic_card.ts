@@ -4,8 +4,8 @@ import CardProfile from "../card_profile";
 import CardStack from "../card_stack";
 
 export default abstract class TacticCard extends Card {
-    constructor(id: number, name: string, playableOutsideBuildPhase: boolean, staysInPlay: boolean) {
-        super(id, name, CardType.Tactic);
+    constructor(id: number, name: string, rarity: number, playableOutsideBuildPhase: boolean, staysInPlay: boolean) {
+        super(id, name, CardType.Tactic, rarity);
         this.playableOutsideBuildPhase = playableOutsideBuildPhase;
         this.staysInPlay = staysInPlay;
     }

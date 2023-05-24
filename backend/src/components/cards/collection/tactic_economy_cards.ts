@@ -14,6 +14,7 @@ export class Card141 extends TacticCard {
         super(
             141, 
             'Externe Arbeitskräfte',
+            2,
             false,
             false
         )
@@ -32,6 +33,7 @@ export class Card232 extends TacticCard {
         super(
             232, 
             'Warenlieferung',
+            1,
             false,
             false
         )

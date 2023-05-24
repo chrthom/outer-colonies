@@ -6,6 +6,7 @@ abstract class CardPowerPlant extends InfrastructureCard {
         super(
             id, 
             'Kraftwerk',
+            0,
             {
                 energy: 4,
                 hp: 0,

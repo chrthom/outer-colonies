@@ -8,6 +8,7 @@ export class Card135 extends InfrastructureCard {
         super(
             135, 
             'Schiffswerft',
+            2,
             {
                 energy: -2,
                 hp: 0,

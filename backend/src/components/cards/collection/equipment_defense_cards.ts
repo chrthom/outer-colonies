@@ -5,6 +5,7 @@ export class Card163 extends EquipmentCard {
         super(
             163, 
             'Verbundpanzerung',
+            1,
             {
                 energy: 0,
                 hp: 2,
@@ -29,6 +30,7 @@ export class Card170 extends EquipmentCard {
         super(
             170,
             'Strahlenschilde',
+            1,
             {
                 energy: 0,
                 hp: 0,
