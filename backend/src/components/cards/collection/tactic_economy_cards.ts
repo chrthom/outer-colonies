@@ -27,6 +27,32 @@ export class Card141 extends TacticCard {
     }
 }
 
+export class Card165 extends TacticCard {
+    private readonly cardsToDrawPerPsiSocket = 2;
+    constructor() {
+        super(
+            165, 
+            'Konvoi',
+            1,
+            false,
+            false
+        )
+    }
+    immediateEffect(player: Player) {
+        const freePsiSockets = player.cardStacks
+            .map(cs => cs.profile())
+            .filter(p => p.speed >= 2 && p.psi > 0)
+            .map(p => p.psi)
+            .reduce(psi => psi + psi, 0);
+        if (freePsiSockets) {
+            player.drawCards(freePsiSockets * this.cardsToDrawPerPsiSocket);
+        }
+    }
+    getValidTargets(player: Player): CardStack[] {
+        return this.onlyColonyTarget(player.cardStacks);
+    }
+}
+
 export class Card232 extends TacticCard {
     private readonly cardsToDraw = 2;
     constructor() {
@@ -40,6 +66,53 @@ export class Card232 extends TacticCard {
     }
     immediateEffect(player: Player) {
         player.drawCards(this.cardsToDraw);
+    }
+    getValidTargets(player: Player): CardStack[] {
+        return this.onlyColonyTarget(player.cardStacks);
+    }
+}
+
+export class Card321 extends TacticCard {
+    private readonly cardsToRestore = 6;
+    constructor() {
+        super(
+            321,
+            'Recycling',
+            2,
+            false,
+            false
+        )
+    }
+    immediateEffect(player: Player) {
+        for (let i = 0; i < this.cardsToRestore; i++) {
+            player.deck.push(player.discardPile.pop());
+        }
+    }
+    getValidTargets(player: Player): CardStack[] {
+        return this.onlyColonyTarget(player.cardStacks);
+    }
+}
+
+export class Card427 extends TacticCard {
+    private readonly cardsToDraw = 2;
+    constructor() {
+        super(
+            2427,
+            'Immigranten von der Erde',
+            2,
+            false,
+            false
+        )
+    }
+    immediateEffect(player: Player) {
+        let foundCards = 0;
+        for (let i = 0; i < player.deck.length; i++) {
+            if (player.deck[i].type == CardType.Infrastructure) {
+                player.takeCards(player.deck.splice(i, 1));
+                if (++foundCards == this.cardsToDraw) break;
+            }
+        }
+        player.shuffleDeck();
     }
     getValidTargets(player: Player): CardStack[] {
         return this.onlyColonyTarget(player.cardStacks);

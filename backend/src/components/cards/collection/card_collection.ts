@@ -4,7 +4,7 @@ import { Card103, Card140, Card163, Card170, Card171, Card184, Card240, Card349,
 import { Card130, Card168, Card181, Card234, Card237, Card339, Card340, Card424, Card440, Card441 } from './equipment_weapon_point_defense_cards';
 import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
 import { Card185, Card242, Card350, Card453 } from './infrastructure_energy_cards';
-import { Card141, Card232 } from './tactic_economy_cards';
+import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
 import { Card126, Card151, Card179, Card180, Card223, Card310, Card420 } from './equipment_weapon_kinetic_cards';
@@ -51,6 +51,7 @@ export default class CardCollection {
     static card161 = new Card161();
     static card163 = new Card163();
     static card164 = new Card164();
+    static card165 = new Card165();
     static card166 = new Card166();
     static card168 = new Card168();
     static card170 = new Card170();
@@ -91,6 +92,7 @@ export default class CardCollection {
     static card313 = new Card313();
     static card314 = new Card314();
     static card315 = new Card315();
+    static card321 = new Card321();
     static card326 = new Card326();
     static card327 = new Card327();
     static card328 = new Card328();
@@ -113,6 +115,7 @@ export default class CardCollection {
     static card420 = new Card420();
     static card421 = new Card421();
     static card424 = new Card424();
+    static card427 = new Card427();
     static card434 = new Card434();
     static card436 = new Card436();
     static card439 = new Card439();
