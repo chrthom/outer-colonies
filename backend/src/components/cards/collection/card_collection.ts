@@ -10,10 +10,13 @@ import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipmen
 import { Card126, Card151, Card179, Card180, Card223, Card310, Card420 } from './equipment_weapon_kinetic_cards';
 import { Card109, Card145, Card161, Card187, Card244, Card352, Card434, Card449, Card451 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
+import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
     static card103 = new Card103();
+    static card106 = new Card106();
+    static card107 = new Card107();
     static card109 = new Card109();
     static card118 = new Card118();
     static card119 = new Card119();
@@ -44,6 +47,7 @@ export default class CardCollection {
     static card185 = new Card185();
     static card186 = new Card186();
     static card187 = new Card187();
+    static card207 = new Card207();
     static card209 = new Card209();
     static card220 = new Card220();
     static card223 = new Card223();
