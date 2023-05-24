@@ -12,6 +12,7 @@ import { Card109, Card145, Card161, Card187, Card244, Card352, Card434, Card449,
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
+import { Card131, Card132, Card177, Card178, Card213, Card221, Card226, Card326, Card327, Card328, Card329, Card418, Card444, Card445 } from './hull_2_part_cards';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
@@ -26,6 +27,8 @@ export default class CardCollection {
     static card126 = new Card126();
     static card127 = new Card127();
     static card130 = new Card130();
+    static card131 = new Card131();
+    static card132 = new Card132();
     static card135 = new Card135();
     static card136 = new Card136();
     static card140 = new Card140();
@@ -44,6 +47,8 @@ export default class CardCollection {
     static card168 = new Card168();
     static card170 = new Card170();
     static card171 = new Card171();
+    static card177 = new Card177();
+    static card178 = new Card178();
     static card179 = new Card179();
     static card180 = new Card180();
     static card181 = new Card181();
@@ -55,9 +60,12 @@ export default class CardCollection {
     static card187 = new Card187();
     static card207 = new Card207();
     static card209 = new Card209();
+    static card213 = new Card213();
     static card216 = new Card216();
     static card220 = new Card220();
+    static card221 = new Card221();
     static card223 = new Card223();
+    static card226 = new Card226();
     static card228 = new Card228();
     static card232 = new Card232();
     static card234 = new Card234();
@@ -69,6 +77,10 @@ export default class CardCollection {
     static card303 = new Card303();
     static card304 = new Card304();
     static card310 = new Card310();
+    static card326 = new Card326();
+    static card327 = new Card327();
+    static card328 = new Card328();
+    static card329 = new Card329();
     static card339 = new Card339();
     static card340 = new Card340();
     static card342 = new Card342();
@@ -83,6 +95,7 @@ export default class CardCollection {
     static card406 = new Card406();
     static card409 = new Card409();
     static card412 = new Card412();
+    static card418 = new Card418();
     static card420 = new Card420();
     static card421 = new Card421();
     static card424 = new Card424();
@@ -91,6 +104,8 @@ export default class CardCollection {
     static card439 = new Card439();
     static card440 = new Card440();
     static card441 = new Card441();
+    static card444 = new Card444();
+    static card445 = new Card445();
     static card446 = new Card446();
     static card447 = new Card447();
     static card449 = new Card449();
