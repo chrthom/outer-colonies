@@ -20,7 +20,7 @@ export class Card141 extends TacticCard {
         )
     }
     immediateEffect(player: Player) {
-        player.actionPool.push(...this.oneTimeActionPool.getPool());
+        player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
     }
     getValidTargets(player: Player): CardStack[] {
         return this.onlyColonyTarget(player.cardStacks);
@@ -39,17 +39,20 @@ export class Card165 extends TacticCard {
         )
     }
     immediateEffect(player: Player) {
-        const freePsiSockets = player.cardStacks
-            .map(cs => cs.profile())
-            .filter(p => p.speed >= 2 && p.psi > 0)
-            .map(p => p.psi)
-            .reduce(psi => psi + psi, 0);
+        const freePsiSockets = this.calcFreePsiSockets(player);
         if (freePsiSockets) {
             player.drawCards(freePsiSockets * this.cardsToDrawPerPsiSocket);
         }
     }
     getValidTargets(player: Player): CardStack[] {
-        return this.onlyColonyTarget(player.cardStacks);
+        return this.calcFreePsiSockets(player) > 0 ? this.onlyColonyTarget(player.cardStacks) : [];
+    }
+    private calcFreePsiSockets(player: Player): number {
+        return player.cardStacks
+            .map(cs => cs.profile())
+            .filter(p => p.speed >= 2 && p.psi > 0)
+            .map(p => p.psi)
+            .reduce(psi => psi + psi, 0);
     }
 }
 
@@ -97,7 +100,7 @@ export class Card427 extends TacticCard {
     private readonly cardsToDraw = 2;
     constructor() {
         super(
-            2427,
+            427,
             'Immigranten von der Erde',
             2,
             false,

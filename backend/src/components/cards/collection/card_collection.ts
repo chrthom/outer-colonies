@@ -16,6 +16,7 @@ import { Card131, Card132, Card177, Card178, Card213, Card221, Card226, Card326,
 import { Card116, Card117, Card120, Card121, Card122, Card133, Card134, Card306, Card308, Card309, Card313, Card314, Card315 } from './hull_3_part_cards';
 import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110 } from './tactic_science_cards';
+import Card from '../card';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
@@ -135,4 +136,77 @@ export default class CardCollection {
     static card450 = new Card450();
     static card451 = new Card451();
     static card453 = new Card453();
+
+    static starterDeckSettlers = [
+        // Hull (18)
+        Array(6).fill(this.card186), // Korvette
+        Array(4).fill(this.card160), // Leichter Frachter
+        Array(3).fill(this.card177), // Zerstörer
+        Array(3).fill(this.card178), // Zerstörer
+        Array(2).fill(this.card446), // Außenposten
+        // Equipment (29 - 17/23 Theta, 2/3 Xi, 2/3 Phi, 8/17 Omega)
+        Array(2).fill(this.card340), // Abfangraketenwerfer
+        Array(2).fill(this.card347), // Impulslaser
+        Array(6).fill(this.card441), // Flechettewerfer
+        Array(4).fill(this.card234), // Punktabwehrlaser
+        Array(7).fill(this.card237), // Fokus-Laser
+        Array(4).fill(this.card170), // Strahlenschilde
+        Array(4).fill(this.card184), // Rumpferweiterung
+        // Infrastructure (6)
+        Array(3).fill(this.card185), // Kraftwerk
+        Array(3).fill(this.card183), // Industriekomplex
+        // Tactic (7)
+        Array(4).fill(this.card232), // Warenlieferung
+        Array(3).fill(this.card321), // Recycling
+    ].flat();
+    
+    static starterDeckTraders = [
+        // Hull (18)
+        Array(6).fill(this.card243), // Korvette
+        Array(4).fill(this.card348), // Kanonenboot
+        Array(3).fill(this.card221), // Schwerer Frachter
+        Array(3).fill(this.card327), // Schwerer Frachter
+        Array(2).fill(this.card446), // Außenposten
+        // Equipment (28 - 16/19 Theta, 4/4 Xi, 8/17 Omega)
+        Array(4).fill(this.card180), // Railgun
+        Array(5).fill(this.card237), // Mini-Railgun
+        Array(3).fill(this.card339), // Gatling
+        Array(8).fill(this.card166), // Laserkanone
+        Array(5).fill(this.card240), // Ceramo-Stahl
+        Array(3).fill(this.card171), // Titanplattenpanzer
+        // Tactic (14)
+        Array(7).fill(this.card337), // Militärpioniere
+        Array(4).fill(this.card165), // Konvoi
+        Array(3).fill(this.card321), // Recycling
+    ].flat();
+    
+    static starterDeckExpedition = [
+        // Hull (18)
+        Array(6).fill(this.card351), // Korvette
+        Array(4).fill(this.card439), // Mittelschwerer Frachter
+        Array(3).fill(this.card444), // Zerstörer
+        Array(3).fill(this.card445), // Zerstörer
+        Array(2).fill(this.card446), // Außenposten
+        // Equipment (30 - 16/23 Theta, 2/3 Xi, 2/3 Phi, 10/21 Omega)
+        Array(2).fill(this.card340), // Abfangraketenwerfer
+        Array(2).fill(this.card182), // Dual-Lasergeschütz
+        Array(6).fill(this.card440), // Impulskanone
+        Array(4).fill(this.card168), // Automatikkanone
+        Array(4).fill(this.card179), // Pulskanone
+        Array(2).fill(this.card343), // Laserphalanx
+        Array(4).fill(this.card163), // Verbundpanzerung
+        Array(6).fill(this.card187), // Atomreaktor
+        // Infrastructure (4)
+        Array(1).fill(this.card453), // Kraftwerk
+        Array(3).fill(this.card164), // Rüstungsschmiede
+        // Tactic (8)
+        Array(2).fill(this.card337), // Militärpioniere
+        Array(3).fill(this.card338), // Nachschub
+        Array(3).fill(this.card321), // Recycling
+    ].flat();
+
+    static pickRandomDeck(): Card[] {
+        const allDecks = [ this.starterDeckExpedition, this.starterDeckSettlers, this.starterDeckTraders ];
+        return allDecks[Math.floor(Math.random() * allDecks.length)].slice();
+    }
 }

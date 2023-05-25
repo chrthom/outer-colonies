@@ -27,7 +27,7 @@ export default class CardStack {
         this.attachedCards.push(cardStack);
     }
     attack(target: CardStack) {
-        if (!this.card.canAttack()) {
+        if (!this.attackAvailable) {
             console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`);
         } else if (!this.card.isInRange(this.getPlayer().match.battle.range)) {
             console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name} at wrong range`);
@@ -35,6 +35,9 @@ export default class CardStack {
             this.card.attack(this, target);
             this.attackAvailable = false;
         }
+    }
+    canAttack(player: Player) {
+        return this.attackAvailable && this.card.isInRange(player.match.battle.range);
     }
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);

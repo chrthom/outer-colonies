@@ -156,7 +156,7 @@ export default class Game extends Phaser.Scene {
                             break;
                         case TurnPhase.Combat:
                             c.highlightDisabled();
-                            if (this.activeCardStack == c.uuid) {
+                            if (this.activeCardStack == c.uuid && this.activeCardStackIndex) {
                                 c.cards[this.activeCardStackIndex].highlightSelected();
                             } else if (this.state.battle.playerShipIds.includes(c.uuid)) {
                                 c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());

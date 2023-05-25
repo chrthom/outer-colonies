@@ -72,7 +72,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
             return zoneCardStacks.map((cs, index) => {
-                const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.attackAvailable ? [index] : []);
+                const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.canAttack(player) ? [index] : []);
                 const interventionReady = ownedByPlayer
                     && match.getInactivePlayerNo() == playerNo
                     && match.battle.canInterveneMission(playerNo, cs);

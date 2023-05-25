@@ -9,5 +9,5 @@ export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): Ca
 }
 
 export function shuffle<T>(array: T[]): T[] {
-    return array.sort(() => Math.random() -0.5)
+    return array.sort(() => Math.random() - 0.5)
 }

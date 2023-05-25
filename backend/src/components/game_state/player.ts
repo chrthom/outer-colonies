@@ -26,8 +26,9 @@ export default class Player {
         this.deck = deck;
         this.cardStacks = [ new RootCardStack(new ColonyCard(), Zone.Colony, this) ];
         this.resetRemainingActions();
-        this.setDummyCardStacks(); // Just for testing
+        //this.setDummyCardStacks(); // Just for testing
     }
+    /*
     private setDummyCardStacks() {
         const ship1 = new RootCardStack(CardCollection.card160, Zone.Oribital, this);
         ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card166, ship1));
@@ -38,6 +39,7 @@ export default class Player {
         ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card163, ship2));
         this.cardStacks.push(ship1, ship2);
     }
+    */
     resetRemainingActions() {
         this.actionPool = this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b));
     }
