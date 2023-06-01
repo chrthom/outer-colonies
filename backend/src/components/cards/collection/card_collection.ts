@@ -3,12 +3,12 @@ import { Card160, Card186, Card220, Card243, Card342, Card348, Card351, Card436,
 import { Card103, Card140, Card163, Card170, Card171, Card184, Card240, Card349, Card406, Card447 } from './equipment_defense_cards';
 import { Card130, Card168, Card181, Card234, Card237, Card339, Card340, Card424, Card440, Card441 } from './equipment_weapon_point_defense_cards';
 import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
-import { Card185, Card242, Card350, Card453 } from './infrastructure_energy_cards';
+import { Card145, Card185, Card187, Card188, Card242, Card244, Card245, Card350, Card352, Card353, Card451, Card452, Card453 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
 import { Card126, Card151, Card179, Card180, Card223, Card310, Card420 } from './equipment_weapon_kinetic_cards';
-import { Card109, Card145, Card161, Card187, Card244, Card352, Card434, Card449, Card451 } from './equipment_util_cards';
+import { Card109, Card161, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
@@ -72,6 +72,7 @@ export default class CardCollection {
     static card185 = new Card185();
     static card186 = new Card186();
     static card187 = new Card187();
+    static card188 = new Card188();
     static card207 = new Card207();
     static card209 = new Card209();
     static card213 = new Card213();
@@ -88,6 +89,7 @@ export default class CardCollection {
     static card242 = new Card242();
     static card243 = new Card243();
     static card244 = new Card244();
+    static card245 = new Card245();
     static card303 = new Card303();
     static card304 = new Card304();
     static card306 = new Card306();
@@ -115,6 +117,7 @@ export default class CardCollection {
     static card350 = new Card350();
     static card351 = new Card351();
     static card352 = new Card352();
+    static card353 = new Card353();
     static card406 = new Card406();
     static card409 = new Card409();
     static card412 = new Card412();
@@ -135,6 +138,7 @@ export default class CardCollection {
     static card449 = new Card449();
     static card450 = new Card450();
     static card451 = new Card451();
+    static card452 = new Card452();
     static card453 = new Card453();
 
     static starterDeckSettlers = [
@@ -144,7 +148,7 @@ export default class CardCollection {
         Array(3).fill(this.card177), // Zerstörer
         Array(3).fill(this.card178), // Zerstörer
         Array(2).fill(this.card446), // Außenposten
-        // Equipment (29 - 17/23 Theta, 2/3 Xi, 2/3 Phi, 8/17 Omega)
+        // Equipment (29 - 17/23 Theta, 2/3 Xi, 2/3 Phi)
         Array(2).fill(this.card340), // Abfangraketenwerfer
         Array(2).fill(this.card347), // Impulslaser
         Array(6).fill(this.card441), // Flechettewerfer
@@ -167,7 +171,7 @@ export default class CardCollection {
         Array(3).fill(this.card221), // Schwerer Frachter
         Array(3).fill(this.card327), // Schwerer Frachter
         Array(2).fill(this.card446), // Außenposten
-        // Equipment (28 - 16/19 Theta, 4/4 Xi, 8/17 Omega)
+        // Equipment (28 - 16/19 Theta, 4/4 Xi)
         Array(4).fill(this.card180), // Railgun
         Array(5).fill(this.card237), // Mini-Railgun
         Array(3).fill(this.card339), // Gatling
@@ -187,7 +191,7 @@ export default class CardCollection {
         Array(3).fill(this.card444), // Zerstörer
         Array(3).fill(this.card445), // Zerstörer
         Array(2).fill(this.card446), // Außenposten
-        // Equipment (30 - 16/23 Theta, 2/3 Xi, 2/3 Phi, 10/21 Omega)
+        // Equipment (24 - 16/23 Theta, 2/3 Xi, 2/3 Phi)
         Array(2).fill(this.card340), // Abfangraketenwerfer
         Array(2).fill(this.card182), // Dual-Lasergeschütz
         Array(6).fill(this.card440), // Impulskanone
@@ -195,8 +199,8 @@ export default class CardCollection {
         Array(4).fill(this.card179), // Pulskanone
         Array(2).fill(this.card343), // Laserphalanx
         Array(4).fill(this.card163), // Verbundpanzerung
+        // Infrastructure (10)
         Array(6).fill(this.card187), // Atomreaktor
-        // Infrastructure (4)
         Array(1).fill(this.card453), // Kraftwerk
         Array(3).fill(this.card164), // Rüstungsschmiede
         // Tactic (8)

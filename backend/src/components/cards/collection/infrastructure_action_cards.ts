@@ -95,7 +95,7 @@ export class Card183 extends InfrastructureCard {
             'Industriekomplex',
             1,
             {
-                energy: -4,
+                energy: -5,
                 hp: 0,
                 speed: 0,
                 theta: 0,

@@ -8,7 +8,7 @@ abstract class CardPowerPlant extends InfrastructureCard {
             'Kraftwerk',
             0,
             {
-                energy: 4,
+                energy: 5,
                 hp: 0,
                 speed: 0,
                 theta: 0,
@@ -24,9 +24,87 @@ abstract class CardPowerPlant extends InfrastructureCard {
     immediateEffect(_: Player) {}
 }
 
+abstract class NuclearReactorCard extends InfrastructureCard {
+    constructor(id: number) {
+        super(
+            id, 
+            'Atomreaktor',
+            0,
+            {
+                energy: 2,
+                hp: 0,
+                speed: 0,
+                theta: 0,
+                xi: 0,
+                phi: 0,
+                omega: -1,
+                delta: 0,
+                psi: 0
+            }
+        );
+    }
+    immediateEffect(_: Player) {}
+}
+
+abstract class SolarPanelCard extends InfrastructureCard {
+    constructor(id: number) {
+        super(
+            id, 
+            'Solarpanele',
+            0,
+            {
+                energy: 1,
+                hp: 0,
+                speed: 0,
+                theta: 0,
+                xi: 0,
+                phi: 0,
+                omega: 0,
+                delta: 0,
+                psi: 0
+            }
+        );
+    }
+    immediateEffect(_: Player) {}
+}
+
+export class Card145 extends InfrastructureCard {
+    constructor() {
+        super(
+            145, 
+            'Fusionsreaktor',
+            2,
+            {
+                energy: 4,
+                hp: 0,
+                speed: 0,
+                theta: 0,
+                xi: 0,
+                phi: 0,
+                omega: -2,
+                delta: 0,
+                psi: 0
+            }
+        );
+    }
+    immediateEffect(_: Player) {}
+}
+
 export class Card185 extends CardPowerPlant {
     constructor() {
         super(185)
+    }
+}
+
+export class Card187 extends NuclearReactorCard {
+    constructor() {
+        super(187);
+    }
+}
+
+export class Card188 extends SolarPanelCard {
+    constructor() {
+        super(188);
     }
 }
 
@@ -36,9 +114,45 @@ export class Card242 extends CardPowerPlant {
     }
 }
 
+export class Card244 extends NuclearReactorCard {
+    constructor() {
+        super(244);
+    }
+}
+
+export class Card245 extends SolarPanelCard {
+    constructor() {
+        super(245);
+    }
+}
+
 export class Card350 extends CardPowerPlant {
     constructor() {
         super(350)
+    }
+}
+
+export class Card352 extends NuclearReactorCard {
+    constructor() {
+        super(352);
+    }
+}
+
+export class Card353 extends SolarPanelCard {
+    constructor() {
+        super(353);
+    }
+}
+
+export class Card451 extends NuclearReactorCard {
+    constructor() {
+        super(451);
+    }
+}
+
+export class Card452 extends SolarPanelCard {
+    constructor() {
+        super(452);
     }
 }
 
