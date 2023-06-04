@@ -114,6 +114,7 @@ export default class Game extends Phaser.Scene {
     updateView() {
         this.obj.actionPool.update(this);
         this.obj.button.update(this);
+        this.obj.deck.update(this);
         this.obj.prompt.update(this);
         this.updateHighlighting();
     }

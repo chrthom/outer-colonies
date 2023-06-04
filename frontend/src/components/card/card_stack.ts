@@ -3,7 +3,7 @@ import Layout from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
-import DamageIndicator from "./indicators/damage_indicator";
+import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
 
 const layout = new Layout();
@@ -12,7 +12,7 @@ export default class CardStack {
     cards!: Array<CardImage>;
     uuid!: string;
     data!: FrontendCardStack;
-    damageIndicator?: DamageIndicator;
+    damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
     constructor(scene: Game, data: FrontendCardStack) {
         this.uuid = data.uuid;
@@ -25,17 +25,17 @@ export default class CardStack {
             c.sprite.on('pointerdown', () => {
                 this.onClickAction(scene, index);
             });
-            if (!this.isPlayerColony() && !this.isOpponentColony())
-                c.enableMouseover(scene);
+            c.enableMouseover(scene);
         });
         if (data.damage > 0) {
-            this.damageIndicator = new DamageIndicator(
+            this.damageIndicator = new ValueIndicator(
                 scene, 
                 this.data.damage, 
                 this.data.criticalDamage, 
                 x,
                 zoneLayout.y,
-                data.ownedByPlayer
+                data.ownedByPlayer,
+                false
             );
         }
         if (scene.state.turnPhase == TurnPhase.Combat 
@@ -67,9 +67,6 @@ export default class CardStack {
         this.cards.forEach(c => {
             c.highlightReset();
         });
-    }
-    isPlayerColony() {
-        return this.data.ownedByPlayer && this.data.cardIds[0] == 0;
     }
     isOpponentColony() {
         return !this.data.ownedByPlayer && this.data.cardIds[0] == 0;

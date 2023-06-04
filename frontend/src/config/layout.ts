@@ -37,7 +37,7 @@ export default class Layout {
         y: 1070
     };
     discardPile = {
-        x: 2200,
+        x: 2190,
         y: 1070
     };
     maxCard = {
