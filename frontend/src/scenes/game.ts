@@ -85,6 +85,7 @@ export default class Game extends Phaser.Scene {
         self.hand.forEach(c => c.destroy());
         self.hand = self.state.hand.map(cardData => new HandCard(self, self.state.hand.length, cardData));
         self.cardStacks.forEach(cs => cs.destroy());
+        self.cardStacks = [];
         self.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
         self.obj.discardPile.destroy();
         self.obj.discardPile = new DiscardPile(self, self.state.discardPileIds);
@@ -157,7 +158,7 @@ export default class Game extends Phaser.Scene {
                             break;
                         case TurnPhase.Combat:
                             c.highlightDisabled();
-                            if (this.activeCardStack == c.uuid && this.activeCardStackIndex) {
+                            if (this.activeCardStack == c.uuid && this.activeCardStackIndex >= 0) {
                                 c.cards[this.activeCardStackIndex].highlightSelected();
                             } else if (this.state.battle.playerShipIds.includes(c.uuid)) {
                                 c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());

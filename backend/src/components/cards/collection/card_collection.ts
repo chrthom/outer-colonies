@@ -162,9 +162,7 @@ export default class CardCollection {
         // Tactic (7)
         Array(4).fill(this.card232), // Warenlieferung
         Array(3).fill(this.card321), // Recycling
-        // TEST
-        Array(6).fill(this.card177), // Zerstörer
-        Array(6).fill(this.card178), // Zerstörer
+        // TEST CARDS
     ].flat();
     
     static starterDeckTraders = [
@@ -185,9 +183,7 @@ export default class CardCollection {
         Array(7).fill(this.card337), // Militärpioniere
         Array(4).fill(this.card165), // Konvoi
         Array(3).fill(this.card321), // Recycling
-        // TEST
-        Array(6).fill(this.card177), // Zerstörer
-        Array(6).fill(this.card178), // Zerstörer
+        // TEST CARDS
     ].flat();
     
     static starterDeckExpedition = [
@@ -213,9 +209,7 @@ export default class CardCollection {
         Array(2).fill(this.card337), // Militärpioniere
         Array(3).fill(this.card338), // Nachschub
         Array(3).fill(this.card321), // Recycling
-        // TEST
-        Array(6).fill(this.card177), // Zerstörer
-        Array(6).fill(this.card178), // Zerstörer
+        // TEST CARDS
     ].flat();
 
     static pickRandomDeck(): Card[] {

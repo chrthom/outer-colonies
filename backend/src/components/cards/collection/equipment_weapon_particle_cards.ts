@@ -25,8 +25,8 @@ export class Card106 extends EquipmentCard {
                 range: 4,
                 damage: 8,
                 pointDefense: 0,
-                shield: 5,
-                armour: 1
+                shield: -5,
+                armour: -1
             }
         )
     }
@@ -57,8 +57,8 @@ export class Card107 extends EquipmentCard {
                 range: 3,
                 damage: 7,
                 pointDefense: 0,
-                shield: 5,
-                armour: 1
+                shield: -5,
+                armour: -1
             }
         )
     }
@@ -89,8 +89,8 @@ export class Card207 extends EquipmentCard {
                 range: 3,
                 damage: 4,
                 pointDefense: 0,
-                shield: 99,
-                armour: 2
+                shield: -99,
+                armour: -2
             }
         )
     }
