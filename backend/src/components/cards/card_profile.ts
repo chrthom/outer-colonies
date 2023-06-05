@@ -12,16 +12,20 @@ export default class CardProfile implements HullProfile, EquipmentProfile, Infra
     delta: number = 0;
     psi: number = 0;
     static fromBaseProfile(baseProfile: BaseProfile): CardProfile {
-        return <CardProfile> baseProfile;
+        let profile = <CardProfile> baseProfile;
+        profile.pointDefense = 0;
+        profile.shield = 0;
+        profile.armour = 0;
+        return profile;
     }
     static fromEquipmentProfile(equipmentProfile: EquipmentProfile): CardProfile {
         return <CardProfile> equipmentProfile;
     }
     static fromHullProfile(hullProfile: HullProfile): CardProfile {
-        return <CardProfile> hullProfile;
+        return this.fromBaseProfile(hullProfile);
     }
     static fromInfrastructureProfile(infrastructureProfile: InfrastructureProfile): CardProfile {
-        return <CardProfile> infrastructureProfile;
+        return this.fromBaseProfile(infrastructureProfile);
     }
     static combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
         return {
