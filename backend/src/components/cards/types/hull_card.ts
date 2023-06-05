@@ -19,7 +19,7 @@ export default abstract class HullCard extends Card {
         return cardStacks.filter(cs =>
             cs.type() == CardType.Hull 
                 && (<HullCard> cs.card).multipart.neededPartIds.includes(this.id)
-                && cs.attachedCards.filter(c => c.card.name == this.name).length == 0); // Reconsider if matching by name is a bad idea
+                && !cs.getCards().some(c => c.name == this.name)); // Reconsider if matching by name is a bad idea
     }
     private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
         return cardStacks.filter(cs => 

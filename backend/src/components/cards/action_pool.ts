@@ -27,7 +27,9 @@ export default class ActionPool {
         const availablePools = this.getActionsFor(cardType);
         if (availablePools.length > 0) {
             availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
+            const depleted = this.pool.filter(a => a.depleted);
             this.pool = this.pool.filter(a => !a.depleted);
+            depleted.forEach(a => a.depleted = false);
             return true;
         } else {
             return false;
