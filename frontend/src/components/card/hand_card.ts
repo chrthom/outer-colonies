@@ -2,7 +2,7 @@ import CardImage from "./card_image";
 import Layout from "../../config/layout";
 import Game from "../../scenes/game";
 import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
-import { BattleType, TurnPhase } from "../../../../backend/src/components/config/enums";
+import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 
 const layout = new Layout();
 
@@ -28,16 +28,19 @@ export default class HandCard extends CardImage {
         else this.highlightDisabled();
     }
     private onClickAction(scene: Game) {
-        if (scene.state.playerPendingAction 
-                && this.data.playable 
-                && (scene.state.turnPhase != TurnPhase.Build || scene.plannedBattle.type == BattleType.None)) {
-            const reset = scene.activeHandCard == this.uuid;
-            scene.activeCardStack = null;
-            scene.activeHandCard = null;
-            if (!reset) {
-                scene.activeHandCard = this.data.uuid;
+        if (scene.state.playerPendingAction) {
+            if (this.data.playable
+                    && (scene.state.turnPhase != TurnPhase.Build || scene.plannedBattle.type == BattleType.None)) {
+                const reset = scene.activeHandCard == this.uuid;
+                scene.activeCardStack = null;
+                scene.activeHandCard = null;
+                if (!reset) {
+                    scene.activeHandCard = this.uuid;
+                }
+                scene.updateView();
+            } else if (scene.state.turnPhase == TurnPhase.End) {
+                scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
             }
-            scene.updateView();
         }
     }
 }

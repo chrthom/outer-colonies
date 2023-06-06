@@ -11,6 +11,7 @@ export enum MsgTypeInbound {
     Attack = 'attack',
     Connect = 'connect',
     Disconnect = 'disconnect',
+    Discard = 'discard',
     Handcard = 'handcard',
     Login = 'login',
     Ready = 'ready'

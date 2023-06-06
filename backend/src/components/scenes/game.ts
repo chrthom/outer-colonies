@@ -76,6 +76,18 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         }
         emitState(io, match);
     });
+    socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
+        const match = <Match> socket.data.match;
+        const player = getPlayer(socket);
+        const handCard = getCardStackByUUID(player.hand, handCardUUID);
+        if (!handCard) {
+            console.log(`WARN: ${player.name} tried to discard non-existing card ${handCardUUID}`);
+        } else {
+            player.discardHandCards(handCardUUID);
+            match.prepareEndPhase();
+        }
+        emitState(io, match);
+    });
     socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
         const match = <Match> socket.data.match;
         const player = getPlayer(socket);

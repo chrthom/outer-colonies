@@ -81,7 +81,7 @@ export default class Match {
         if (this.actionPendingByPlayerNo == this.opponentPlayerNo(this.activePlayerNo)) {
             this.battle.range--;
             this.players.forEach(player => {
-                this.battle.removeDestroyedCardStacks(player.no).forEach(cs => player.discardCardStack(cs.uuid));
+                this.battle.removeDestroyedCardStacks(player.no).forEach(cs => player.discardCardStacks(cs.uuid));
                 player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
             });
             if (this.battle.range == 1 && this.battle.type == BattleType.Raid) {
@@ -108,8 +108,7 @@ export default class Match {
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
         // TODO: Check if enemy colony is destroyed
-        // FEATURE: Check hand card limit
-        this.prepareStartPhase();
+        if (this.getActivePlayer().hand.length <= rules.maxHandCards) this.prepareStartPhase();
     }
     private applyMissionResult() {
         if (this.battle.ships[this.activePlayerNo].length > 0) {

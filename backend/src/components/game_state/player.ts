@@ -56,6 +56,15 @@ export default class Player {
         // TODO: Check if no cards are left in deck
         this.takeCards(this.pickCardsFromDeck(num));
     }
+    discardCards(...cards: Card[]) {
+        this.discardPile.push(...cards);
+    }
+    discardHandCards(...uuids: string[]) {
+        uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).getCards()));
+    }
+    discardCardStacks(...uuids: string[]) {
+        uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards()));
+    }
     takeCards(cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
@@ -74,11 +83,5 @@ export default class Player {
         } else {
             target.attach(handCard);
         }
-    }
-    discardCards(...cards: Card[]) {
-        this.discardPile.push(...cards);
-    }
-    discardCardStack(uuid: string) {
-        this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards());
     }
 }
