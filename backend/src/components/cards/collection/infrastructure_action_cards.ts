@@ -22,7 +22,8 @@ export class Card135 extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: -1
+                psi: -1,
+                handCardLimit: 0
             }
         )
     }
@@ -49,7 +50,8 @@ export class Card154 extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: -1
+                psi: -1,
+                handCardLimit: 0
             }
         )
     }
@@ -76,7 +78,8 @@ export class Card164 extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: -1
+                psi: -1,
+                handCardLimit: 0
             }
         )
     }
@@ -103,7 +106,8 @@ export class Card183 extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: 0
+                psi: 0,
+                handCardLimit: 0
             }
         )
         this.onlyAttachableToColony = true;

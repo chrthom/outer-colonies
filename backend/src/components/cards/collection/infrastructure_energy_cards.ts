@@ -16,7 +16,8 @@ abstract class CardPowerPlant extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: 0
+                psi: 0,
+                handCardLimit: 0
             }
         )
         this.onlyAttachableToColony = true;
@@ -39,7 +40,8 @@ abstract class NuclearReactorCard extends InfrastructureCard {
                 phi: 0,
                 omega: -1,
                 delta: 0,
-                psi: 0
+                psi: 0,
+                handCardLimit: 0
             }
         );
     }
@@ -61,7 +63,8 @@ abstract class SolarPanelCard extends InfrastructureCard {
                 phi: 0,
                 omega: 0,
                 delta: 0,
-                psi: 0
+                psi: 0,
+                handCardLimit: 0
             }
         );
     }
@@ -83,7 +86,8 @@ export class Card145 extends InfrastructureCard {
                 phi: 0,
                 omega: -2,
                 delta: 0,
-                psi: 0
+                psi: 0,
+                handCardLimit: 0
             }
         );
     }

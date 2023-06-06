@@ -19,6 +19,7 @@ import { Card110 } from './tactic_science_cards';
 import Card from '../card';
 import { CardType } from '../../config/enums';
 import EquipmentCard from '../types/equipment_card';
+import { Card172 } from './infrastructure_util.cards';
 
 export default class CardCollection {
     static cardColony = new ColonyCard();
@@ -62,6 +63,7 @@ export default class CardCollection {
     static card168 = new Card168();
     static card170 = new Card170();
     static card171 = new Card171();
+    static card172 = new Card172();
     static card174 = new Card174();
     static card177 = new Card177();
     static card178 = new Card178();
@@ -184,6 +186,7 @@ export default class CardCollection {
         this.card168,
         this.card170,
         this.card171,
+        this.card172,
         this.card174,
         this.card177,
         this.card178,
@@ -281,9 +284,10 @@ export default class CardCollection {
         Array(7).fill(this.card237), // Fokus-Laser
         Array(4).fill(this.card170), // Strahlenschilde
         Array(4).fill(this.card184), // Rumpferweiterung
-        // Infrastructure (6)
+        // Infrastructure (8)
         Array(3).fill(this.card185), // Kraftwerk
         Array(3).fill(this.card183), // Industriekomplex
+        Array(2).fill(this.card172), // Ressourcensilo
         // Tactic (7)
         Array(4).fill(this.card232), // Warenlieferung
         Array(3).fill(this.card321), // Recycling
@@ -304,6 +308,8 @@ export default class CardCollection {
         Array(8).fill(this.card166), // Laserkanone
         Array(5).fill(this.card240), // Ceramo-Stahl
         Array(3).fill(this.card171), // Titanplattenpanzer
+        // Infrastructure (3)
+        Array(3).fill(this.card172), // Ressourcensilo
         // Tactic (14)
         Array(7).fill(this.card337), // Militärpioniere
         Array(4).fill(this.card165), // Konvoi

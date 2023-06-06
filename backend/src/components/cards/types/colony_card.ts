@@ -28,7 +28,8 @@ export default class ColonyCard extends Card {
             phi: 99,
             omega: 99,
             delta: 99,
-            psi: 99
+            psi: 99,
+            handCardLimit: rules.maxHandCards
         }
     }
     actionPool(): ActionPool {

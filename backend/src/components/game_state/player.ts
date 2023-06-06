@@ -66,6 +66,9 @@ export default class Player {
     discardCardStacks(...uuids: string[]) {
         uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards()));
     }
+    getColonyCardStack(): CardStack {
+        return this.cardStacks.filter(c => c.card.type == CardType.Colony)[0];
+    }
     takeCards(cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
@@ -86,6 +89,6 @@ export default class Player {
         }
     }
     handCardLimit(): number {
-        return rules.maxHandCards;
+        return this.getColonyCardStack().profile().handCardLimit;
     }
 }
