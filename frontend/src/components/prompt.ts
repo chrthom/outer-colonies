@@ -1,5 +1,4 @@
 import { BattleType, TurnPhase } from "../../../backend/src/components/config/enums";
-import { rules } from "../../../backend/src/components/config/rules";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -53,7 +52,7 @@ export default class Prompt {
         this.show(`Aktuelle Reichweite der Gefechts: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
     }
     private showEndPhase(scene: Game) {
-        const cardsToDrop = scene.state.hand.length - rules.maxHandCards;
+        const cardsToDrop = scene.state.hand.length - scene.state.handCardLimit;
         this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
     }
     private show(text: string) {

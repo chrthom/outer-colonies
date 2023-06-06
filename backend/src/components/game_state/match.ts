@@ -108,7 +108,7 @@ export default class Match {
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
         // TODO: Check if enemy colony is destroyed
-        if (this.getActivePlayer().hand.length <= rules.maxHandCards) this.prepareStartPhase();
+        if (this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit()) this.prepareStartPhase();
     }
     private applyMissionResult() {
         if (this.battle.ships[this.activePlayerNo].length > 0) {

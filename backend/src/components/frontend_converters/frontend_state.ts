@@ -50,6 +50,7 @@ export class FrontendState {
     actionPool: string[];
     opponent!: FrontendOpponent;
     hand!: FrontendHandCard[];
+    handCardLimit!: number;
     deckSize!: number;
     discardPileIds!: number[];
     cardStacks!: FrontendCardStack[];
@@ -128,6 +129,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             handCardNo: opponent.hand.length
         },
         hand: hand,
+        handCardLimit: player.handCardLimit(),
         deckSize: player.deck.length,
         discardPileIds: player.discardPile.map(c => c.id),
         cardStacks: cardStacks,

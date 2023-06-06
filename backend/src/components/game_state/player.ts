@@ -6,6 +6,7 @@ import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
+import { rules } from '../config/rules';
 
 export default class Player {
     id!: string;
@@ -83,5 +84,8 @@ export default class Player {
         } else {
             target.attach(handCard);
         }
+    }
+    handCardLimit(): number {
+        return rules.maxHandCards;
     }
 }
