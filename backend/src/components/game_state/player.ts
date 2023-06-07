@@ -42,7 +42,7 @@ export default class Player {
     }
     */
     resetRemainingActions() {
-        this.actionPool = this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b));
+        this.actionPool = this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b), new ActionPool());
     }
     callBackShipsFromNeutralZone() {
         this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => cs.zone = Zone.Oribital);
@@ -89,6 +89,6 @@ export default class Player {
         }
     }
     handCardLimit(): number {
-        return this.getColonyCardStack().profile().handCardLimit;
+        return this.getColonyCardStack() ? this.getColonyCardStack().profile().handCardLimit : 0;
     }
 }
