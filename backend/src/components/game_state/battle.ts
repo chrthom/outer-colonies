@@ -1,5 +1,6 @@
 import Card from "../cards/card";
 import CardStack from "../cards/card_stack";
+import EquipmentCard from "../cards/types/equipment_card";
 import { BattleType, Zone } from "../config/enums";
 import { rules } from "../config/rules";
 import toBattle, { FrontendPlannedBattle } from "../frontend_converters/frontend_planned_battle";
@@ -37,11 +38,6 @@ export default class Battle {
                 .filter(cs => cs.zone == Zone.Oribital);
         }
     }
-    removeDestroyedCardStacks(playerNo: number): CardStack[] {
-        return this.ships[playerNo]
-            .filter(cs => cs.damage > 0 && cs.damage >= cs.profile().hp)
-            .map(cs => spliceCardStackByUUID(this.ships[playerNo], cs.uuid));
-    }
     canInterveneMission(interveningPlayerNo: number, cardStack: CardStack): boolean {
         return cardStack.isMissionReady() && (
             this.type == BattleType.Raid
@@ -50,6 +46,45 @@ export default class Battle {
                         .map(cs => cs.profile().speed)
                         .reduce((a, b) => Math.min(a, b))
         );
+    }
+    processBattleRound(match: Match) {
+        if (match.actionPendingByPlayerNo == this.opponentPlayerNo(match.activePlayerNo)) {
+            this.range--;
+            match.players.forEach(player => {
+                this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
+            })
+            match.players.forEach(player => {
+                this.getDestroyedCardStacks(player.no).map(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
+                player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
+            });
+            if (this.range == 1 && this.type == BattleType.Raid) {
+                this.ships[match.actionPendingByPlayerNo].push(
+                    ...match.players[match.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
+                );
+            }
+        }
+        match.actionPendingByPlayerNo = this.opponentPlayerNo(match.actionPendingByPlayerNo);
+        if (this.range == 0) {
+            if (this.type == BattleType.Mission) this.applyMissionResult(match);
+            match.prepareEndPhase();
+        } else {
+            const hasAttack = this.ships[match.actionPendingByPlayerNo]
+                .flatMap(cs => cs.getCardStacks())
+                .filter(cs => cs.attackAvailable)
+                .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.range);
+            const hasTarget = this.ships[match.getWaitingPlayerNo()].length > 0;
+            if (!hasAttack || !hasTarget) this.processBattleRound(match);
+        }
+    }
+    private applyMissionResult(match: Match) {
+        if (this.ships[match.activePlayerNo].length > 0) {
+            match.getActivePlayer().takeCards(this.downsidePriceCards); // FEATURE: Support upside price cards
+        } else {
+            match.getActivePlayer().discardCards(...this.downsidePriceCards);
+        }
+    }
+    private getDestroyedCardStacks(playerNo: number): CardStack[] {
+        return this.ships[playerNo].filter(cs => cs.damage > 0 && cs.damage >= cs.profile().hp);
     }
     private opponentPlayerNo(playerNo: number): number {
         return playerNo == 0 ? 1 : 0;

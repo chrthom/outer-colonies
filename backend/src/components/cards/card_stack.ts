@@ -78,6 +78,10 @@ export default class CardStack {
     isPlayable(): boolean {
         return this.zone == Zone.Hand && this.card.isPlayable(this.getPlayer());
     }
+    onDestruction() {
+        this.card.onDestruction(this.getPlayer());
+        this.attachedCards.forEach(cs => cs.onDestruction());
+    }
     performImmediateEffect(target: CardStack) {
         this.card.immediateEffect(this.getPlayer(), target);
     }

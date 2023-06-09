@@ -39,6 +39,7 @@ export default abstract class Card {
     isFlightReady(cards: Card[]): boolean {
         return false;
     }
+    onDestruction(player: Player) {}
     abstract profile(): CardProfile
     actionPool(): ActionPool {
         return new ActionPool();

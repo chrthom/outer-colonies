@@ -2,8 +2,7 @@ import Player from './player';
 import { rules } from '../config/rules';
 import { BattleType, TurnPhase, Zone } from '../config/enums'
 import Battle from './battle';
-import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import EquipmentCard from '../cards/types/equipment_card';
+import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';55
 import CardStack from '../cards/card_stack';
 
 export default class Match {
@@ -77,32 +76,6 @@ export default class Match {
         });
         this.processBattleRound();
     }
-    processBattleRound() {
-        if (this.actionPendingByPlayerNo == this.opponentPlayerNo(this.activePlayerNo)) {
-            this.battle.range--;
-            this.players.forEach(player => {
-                this.battle.removeDestroyedCardStacks(player.no).forEach(cs => player.discardCardStacks(cs.uuid));
-                player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
-            });
-            if (this.battle.range == 1 && this.battle.type == BattleType.Raid) {
-                this.battle.ships[this.actionPendingByPlayerNo].push(
-                    ...this.players[this.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
-                );
-            }
-        }
-        this.actionPendingByPlayerNo = this.opponentPlayerNo(this.actionPendingByPlayerNo);
-        if (this.battle.range == 0) {
-            if (this.battle.type == BattleType.Mission) this.applyMissionResult();
-            this.prepareEndPhase();
-        } else {
-            const hasAttack = this.battle.ships[this.actionPendingByPlayerNo]
-                .flatMap(cs => cs.getCardStacks())
-                .filter(cs => cs.attackAvailable)
-                .some(cs => (<EquipmentCard> cs.card).attackProfile.range >= this.battle.range);
-            const hasTarget = this.battle.ships[this.getWaitingPlayerNo()].length > 0;
-            if (!hasAttack || !hasTarget) this.processBattleRound();
-        }
-    }
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
@@ -110,11 +83,7 @@ export default class Match {
         // TODO: Check if enemy colony is destroyed
         if (this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit()) this.prepareStartPhase();
     }
-    private applyMissionResult() {
-        if (this.battle.ships[this.activePlayerNo].length > 0) {
-            this.getActivePlayer().takeCards(this.battle.downsidePriceCards);
-        } else {
-            this.getActivePlayer().discardCards(...this.battle.downsidePriceCards);
-        }
+    processBattleRound() {
+        this.battle.processBattleRound(this);
     }
 }
