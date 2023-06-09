@@ -52,9 +52,12 @@ export default class Battle {
             this.range--;
             match.players.forEach(player => {
                 this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
-            })
+            });
             match.players.forEach(player => {
-                this.getDestroyedCardStacks(player.no).map(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
+                const destroyedCardStacks = this.getDestroyedCardStacks(player.no);
+                destroyedCardStacks.forEach(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
+                destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
+                player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.getCards()));
                 player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
             });
             if (this.range == 1 && this.type == BattleType.Raid) {
