@@ -1,3 +1,4 @@
+import { BattleType, TurnPhase } from "../../config/enums";
 import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
@@ -69,6 +70,35 @@ abstract class SolarPanelCard extends InfrastructureCard {
         );
     }
     immediateEffect(_: Player) {}
+}
+
+export class Card105 extends InfrastructureCard {
+    constructor() {
+        super(
+            105, 
+            'Antimateriereaktor',
+            5,
+            {
+                energy: 10,
+                hp: 0,
+                speed: 0,
+                theta: 0,
+                xi: 0,
+                phi: 0,
+                omega: -3,
+                delta: 0,
+                psi: 0,
+                handCardLimit: 0
+            }
+        );
+    }
+    immediateEffect(_: Player) {}
+    onDestruction(player: Player) {
+        const battle = player.match.battle;
+        if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
+            battle.ships.flat().forEach(cs => cs.damage++);
+        }
+    }
 }
 
 export class Card145 extends InfrastructureCard {

@@ -3,7 +3,7 @@ import { Card160, Card186, Card220, Card243, Card342, Card348, Card351, Card436,
 import { Card103, Card140, Card163, Card170, Card171, Card184, Card240, Card349, Card406, Card447 } from './equipment_defense_cards';
 import { Card130, Card168, Card181, Card234, Card237, Card339, Card340, Card424, Card440, Card441 } from './equipment_weapon_point_defense_cards';
 import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
-import { Card145, Card185, Card187, Card188, Card242, Card244, Card245, Card350, Card352, Card353, Card451, Card452, Card453 } from './infrastructure_energy_cards';
+import { Card105, Card145, Card185, Card187, Card188, Card242, Card244, Card245, Card350, Card352, Card353, Card451, Card452, Card453 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
@@ -25,6 +25,7 @@ export default class CardCollection {
     static cardColony = new ColonyCard();
     static card101 = new Card101();
     static card103 = new Card103();
+    static card105 = new Card105();
     static card106 = new Card106();
     static card107 = new Card107();
     static card109 = new Card109();
@@ -148,6 +149,7 @@ export default class CardCollection {
     static allCards = [
         this.card101,
         this.card103,
+        this.card105,
         this.card106,
         this.card107,
         this.card109,
