@@ -1,35 +1,30 @@
-import CardImage from "./card_image";
 import Layout from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
-import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { FrontendCard, FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
-import RetractCardButton from "./indicators/retract_card_button";
+import Card from "./card";
 
 const layout = new Layout();
 
 export default class CardStack {
-    cards!: Array<CardImage>;
+    cards!: Array<Card>;
     uuid!: string;
     data!: FrontendCardStack;
     damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
-    retractCardButtons!: RetractCardButton[];
     constructor(scene: Game, data: FrontendCardStack) {
         this.uuid = data.uuid;
         this.data = data;
         const zoneLayout = data.ownedByPlayer ? layout.player[data.zone] : layout.opponent[data.zone];
         const x = zoneLayout.x + (data.zoneCardsNum == 1 ? zoneLayout.maxWidth / 2 : data.index * zoneLayout.maxWidth / (data.zoneCardsNum - 1));
         const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
-        this.cards = data.cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !data.ownedByPlayer));
-        this.cards.forEach((c, index) => {
-            c.sprite.on('pointerdown', () => this.onClickAction(scene, index));
+        this.cards = data.cards.map(c => new Card(scene, x, zoneLayout.y + c.index * yDistance, !data.ownedByPlayer, this.uuid, c));
+        this.cards.forEach(c => {
+            c.sprite.on('pointerdown', () => this.onClickAction(scene, c.data));
             c.enableMouseover(scene);
         });
-        this.retractCardButtons = this.data.retractableCardIndexes.map(index =>
-            new RetractCardButton(scene, x, zoneLayout.y + index * yDistance, this.uuid, index)
-        );
         if (data.damage > 0) {
             this.damageIndicator = new ValueIndicator(
                 scene, 
@@ -57,7 +52,6 @@ export default class CardStack {
         this.cards.forEach(c => c.destroy());
         if (this.damageIndicator) this.damageIndicator.destroy();
         if (this.defenseIndicator) this.defenseIndicator.destroy();
-        this.retractCardButtons.forEach(i => i.destroy());
     }
     highlightDisabled() {
         this.cards.forEach(c => {
@@ -73,9 +67,9 @@ export default class CardStack {
         });
     }
     isOpponentColony() {
-        return !this.data.ownedByPlayer && this.data.cardIds[0] == 0;
+        return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
     }
-    private onClickAction(scene: Game, index: number) {
+    private onClickAction(scene: Game, cardData: FrontendCard) {
         const state = scene.state;
         if (state.playerPendingAction) {
             switch (state.turnPhase) {
@@ -103,13 +97,13 @@ export default class CardStack {
                     }
                     break;
                 case TurnPhase.Combat:
-                    if (scene.activeCardStack == this.uuid && scene.activeCardStackIndex == index) {
+                    if (scene.activeCardStack == this.uuid && scene.activeCardStackIndex == cardData.index) {
                         scene.activeCardStack = null;
                         scene.activeCardStackIndex = null;
                         scene.activeHandCard = null;
-                    } else if (this.data.battleReadyCardIndexes.includes(index)) {
+                    } else if (cardData.battleReady) {
                         scene.activeCardStack = this.uuid;
-                        scene.activeCardStackIndex = index;
+                        scene.activeCardStackIndex = cardData.index;
                         scene.activeHandCard = null;
                     } else if (scene.activeCardStack && scene.state.battle.opponentShipIds.includes(this.uuid)) {
                         scene.socket.emit(MsgTypeInbound.Attack, scene.activeCardStack, scene.activeCardStackIndex, this.uuid);

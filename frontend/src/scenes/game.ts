@@ -139,33 +139,33 @@ export default class Game extends Phaser.Scene {
                 else if (this.activeHandCard == c.uuid) c.highlightSelected();
                 else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
             });
-            this.cardStacks.forEach(c => {
+            this.cardStacks.forEach(cs => {
                 if (this.activeHandCard) { // Choose target for hand card
                     const activeCard = this.hand.find(c => c.uuid == this.activeHandCard);
-                    if (!activeCard.data.validTargets.includes(c.uuid)) c.highlightDisabled();
+                    if (!activeCard.data.validTargets.includes(cs.uuid)) cs.highlightDisabled();
                 } else {
                     switch (this.state.turnPhase) {
                         case TurnPhase.Build:
                             if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
-                                if (c.isOpponentColony()) {
-                                    if (this.plannedBattle.type == BattleType.Raid) c.highlightSelected();
+                                if (cs.isOpponentColony()) {
+                                    if (this.plannedBattle.type == BattleType.Raid) cs.highlightSelected();
                                 } else {
-                                    if (!c.data.missionReady) c.highlightDisabled();
-                                    else if (this.plannedBattle.shipIds.includes(c.uuid)) c.highlightSelected();
+                                    if (!cs.data.missionReady) cs.highlightDisabled();
+                                    else if (this.plannedBattle.shipIds.includes(cs.uuid)) cs.highlightSelected();
                                 }
                             } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) { // Assign ships to intervene
-                                if (!c.data.interventionReady) c.highlightDisabled();
-                                else if (this.interveneShipIds.includes(c.uuid)) c.highlightSelected();
+                                if (!cs.data.interventionReady) cs.highlightDisabled();
+                                else if (this.interveneShipIds.includes(cs.uuid)) cs.highlightSelected();
                             }
                             break;
                         case TurnPhase.Combat:
-                            c.highlightDisabled();
-                            if (this.activeCardStack == c.uuid && this.activeCardStackIndex >= 0) {
-                                c.cards[this.activeCardStackIndex].highlightSelected();
-                            } else if (this.state.battle.playerShipIds.includes(c.uuid)) {
-                                c.data.battleReadyCardIndexes.forEach(i => c.cards[i].highlightReset());
+                            cs.highlightDisabled();
+                            if (this.activeCardStack == cs.uuid && this.activeCardStackIndex >= 0) {
+                                cs.cards[this.activeCardStackIndex].highlightSelected();
+                            } else if (this.state.battle.playerShipIds.includes(cs.uuid)) {
+                                cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightReset());
                             }
-                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(c.uuid)) c.highlightReset();
+                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(cs.uuid)) cs.highlightReset();
                             break;
                     }
                 }

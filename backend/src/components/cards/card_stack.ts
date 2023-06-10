@@ -77,6 +77,16 @@ export default class CardStack {
             return []; // FEATURE: Reuse this method to determine valid attack targets in battle
         }
     }
+    hasInsufficientEnergy(): boolean {
+        const rootCardStack = this.getRootCardStack();
+        if (this.type() == CardType.Colony) {
+            return false;
+        } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type() == CardType.Infrastructure) {
+            return this.card.profile().energy < 0 && this.getPlayer().getColonyCardStack().profile().energy < 0;
+        } else {
+            return this.card.profile().energy < 0 && rootCardStack.profile().energy < 0;
+        }
+    }
     isFlightReady(): boolean {
         return this.card.isFlightReady(this.getCards());
     }

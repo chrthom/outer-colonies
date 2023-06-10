@@ -6,7 +6,7 @@ const layout = new Layout();
 
 export default class RetractCardButton {
     sprite: Phaser.GameObjects.Image;
-    constructor(scene: Game, cardX: number, cardY: number, cardStackUUID: string, cardIndex: number) {
+    constructor(scene: Game, cardX: number, cardY: number, cardStackUUID: string, cardIndex: number, crititcal: boolean) {
         this.sprite = scene.add
             .image(
                 cardX + layout.cards.retractCardButton.xOffset,
@@ -17,15 +17,18 @@ export default class RetractCardButton {
             .setAlpha(layout.colors.alpha)
             .setInteractive()
             .on('pointerover', () => this.setTintHover())
-            .on('pointerout', () => this.setTintNormal())
+            .on('pointerout', () => crititcal ? this.setTintCritical : this.setTintNormal())
             .on('pointerdown', () => scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex));
-        this.setTintNormal();
+        crititcal ? this.setTintCritical() : this.setTintNormal();
     }
     destroy() {
         this.sprite.destroy();
     }
     setTintNormal() {
         this.sprite.setTint(layout.colors.primary, layout.colors.neutral, layout.colors.primary, layout.colors.primary);
+    }
+    setTintCritical() {
+        this.sprite.setTint(layout.colors.secondary, layout.colors.neutral, layout.colors.secondary, layout.colors.secondary);
     }
     setTintHover() {
         this.sprite.setTint(layout.colors.neutral);

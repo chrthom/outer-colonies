@@ -16,10 +16,17 @@ export class FrontendBattle {
     range: number;
 }
 
+export class FrontendCard {
+    id!: number;
+    index!: number;
+    battleReady!: boolean;
+    retractable!: boolean;
+    insufficientEnergy!: boolean;
+}
+
 export class FrontendCardStack {
     uuid!: string;
-    cardIds!: number[];
-    battleReadyCardIndexes!: number[];
+    cards!: FrontendCard[];
     zone!: Zone;
     index!: number;
     zoneCardsNum!: number;
@@ -29,7 +36,6 @@ export class FrontendCardStack {
     missionReady!: boolean;
     interventionReady!: boolean;
     defenseIcons!: FrontendDefenseIcon[];
-    retractableCardIndexes!: number[];
 }
 
 export class FrontendDefenseIcon {
@@ -98,10 +104,18 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                         };
                     })
                     .sort();
+                const cards = cs.getCardStacks().map((cs, index) => {
+                    return {
+                        id: cs.card.id,
+                        index: index,
+                        battleReady: cs.canAttack(player),
+                        retractable: cs.canBeRetracted(),
+                        insufficientEnergy: cs.hasInsufficientEnergy()
+                    }
+                });
                 return {
                     uuid: cs.uuid,
-                    cardIds: cs.getCards().map(c => c.id),
-                    battleReadyCardIndexes: ownedByPlayer ? battleReadyCards : [],
+                    cards: cards,
                     zone: zone,
                     index: index,
                     zoneCardsNum: zoneCardStacks.length,
@@ -110,8 +124,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     criticalDamage: cs.damage >= cs.profile().hp,
                     missionReady: ownedByPlayer && cs.isMissionReady(),
                     interventionReady: interventionReady,
-                    defenseIcons: defenseIcons,
-                    retractableCardIndexes: cs.getCardStacks().flatMap((c, index) => c.canBeRetracted() ? [ index ] : [])
+                    defenseIcons: defenseIcons
                 };
             });
         });
