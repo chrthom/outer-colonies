@@ -41,6 +41,9 @@ export default class ColonyCard extends Card {
             new CardAction(CardType.Tactic)
         );
     }
+    canBeRetracted(): boolean {
+        return false;
+    }
     onDestruction(player: Player) {
         player.match.gameResult.setWinnerByDestruction(player);
     }

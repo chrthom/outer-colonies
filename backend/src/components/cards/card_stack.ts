@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { CardType, Zone } from '../config/enums';
+import { CardType, TurnPhase, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -41,6 +41,13 @@ export default class CardStack {
     }
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);
+    }
+    canBeRetracted(): boolean {
+        const player = this.getPlayer();
+        return player.isActivePlayer()
+            && player.match.turnPhase == TurnPhase.Build
+            && this.card.canBeRetracted()
+            && player.actionPool.getPool().join('_') == player.getOriginalActions().getPool().join('_'); // TODO: Check if this can be done easier
     }
     combatPhaseReset(initial: boolean) {
         this.attachedCards.forEach(cs => cs.combatPhaseReset(initial));

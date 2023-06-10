@@ -17,8 +17,6 @@ import { Card116, Card117, Card120, Card121, Card122, Card133, Card134, Card306,
 import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110 } from './tactic_science_cards';
 import Card from '../card';
-import { CardType } from '../../config/enums';
-import EquipmentCard from '../types/equipment_card';
 import { Card172 } from './infrastructure_util.cards';
 
 export default class CardCollection {

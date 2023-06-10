@@ -30,11 +30,8 @@ export default class CardImage {
         this.sprite.setTint(0xffffff);
     }
     enableMouseover(scene: Game) {
-        this.sprite.on('pointerover', () => {
-            scene.obj.maxCard.show(this.cardId);
-        });
-        this.sprite.on('pointerout', () => {
-            scene.obj.maxCard.hide();
-        });
+        this.sprite
+            .on('pointerover', () => scene.obj.maxCard.show(this.cardId))
+            .on('pointerout', () => scene.obj.maxCard.hide());
     }
 }

@@ -54,7 +54,8 @@ export default class Game extends Phaser.Scene {
         [ 0, 1 ].concat(this.gameParams.preloadCardIds).forEach(id => this.load.image(`card_${id}`, `${id}.png`));
         [ 
             'equipment', 'hull', 'infrastructure', 'tactic', 'equipment_hull_infrastructure',
-            'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2'
+            'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2',
+            'retract_card'
         ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
     }
     
@@ -76,6 +77,7 @@ export default class Game extends Phaser.Scene {
 
     updateState(state: FrontendState) {
         this.state = state;
+        //console.log(JSON.stringify(state.cardStacks)); /////
         this.recreateCards();
         this.resetSelections();
     }

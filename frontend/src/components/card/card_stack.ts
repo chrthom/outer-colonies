@@ -5,6 +5,7 @@ import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/c
 import { FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
+import RetractCardButton from "./indicators/retract_card_button";
 
 const layout = new Layout();
 
@@ -14,6 +15,7 @@ export default class CardStack {
     data!: FrontendCardStack;
     damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
+    retractCardButtons!: RetractCardButton[];
     constructor(scene: Game, data: FrontendCardStack) {
         this.uuid = data.uuid;
         this.data = data;
@@ -22,11 +24,12 @@ export default class CardStack {
         const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
         this.cards = data.cardIds.map((id, index) => new CardImage(scene, x, zoneLayout.y + index * yDistance, id, !data.ownedByPlayer));
         this.cards.forEach((c, index) => {
-            c.sprite.on('pointerdown', () => {
-                this.onClickAction(scene, index);
-            });
+            c.sprite.on('pointerdown', () => this.onClickAction(scene, index));
             c.enableMouseover(scene);
         });
+        this.retractCardButtons = this.data.retractableCardIndexes.map(index =>
+            new RetractCardButton(scene, x, zoneLayout.y + index * yDistance, this.uuid, index)
+        );
         if (data.damage > 0) {
             this.damageIndicator = new ValueIndicator(
                 scene, 
@@ -54,6 +57,7 @@ export default class CardStack {
         this.cards.forEach(c => c.destroy());
         if (this.damageIndicator) this.damageIndicator.destroy();
         if (this.defenseIndicator) this.defenseIndicator.destroy();
+        this.retractCardButtons.forEach(i => i.destroy());
     }
     highlightDisabled() {
         this.cards.forEach(c => {

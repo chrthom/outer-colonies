@@ -1,12 +1,10 @@
 import Card from '../cards/card';
-import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
+import CardStack, { RootCardStack } from '../cards/card_stack';
 import { CardType, Zone } from '../config/enums'
 import { shuffle, spliceCardStackByUUID } from '../utils/utils';
-import CardCollection from '../cards/collection/card_collection';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
-import { rules } from '../config/rules';
 
 export default class Player {
     id!: string;
@@ -42,7 +40,7 @@ export default class Player {
     }
     */
     resetRemainingActions() {
-        this.actionPool = this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b), new ActionPool());
+        this.actionPool = this.getOriginalActions();
     }
     callBackShipsFromNeutralZone() {
         this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => cs.zone = Zone.Oribital);
@@ -68,6 +66,9 @@ export default class Player {
     getColonyCardStack(): CardStack {
         return this.cardStacks.filter(c => c.card.type == CardType.Colony)[0];
     }
+    isActivePlayer(): boolean {
+        return this.no == this.match.activePlayerNo;
+    }
     takeCards(cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
@@ -90,5 +91,8 @@ export default class Player {
     }
     handCardLimit(): number {
         return this.getColonyCardStack() ? this.getColonyCardStack().profile().handCardLimit : 0;
+    }
+    getOriginalActions(): ActionPool {
+        return this.cardStacks.map(cs => cs.actionPool()).reduce((a, b) => a.combine(b), new ActionPool());
     }
 }

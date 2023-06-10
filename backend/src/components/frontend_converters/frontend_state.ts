@@ -29,6 +29,7 @@ export class FrontendCardStack {
     missionReady!: boolean;
     interventionReady!: boolean;
     defenseIcons!: FrontendDefenseIcon[];
+    retractableCardIndexes!: number[];
 }
 
 export class FrontendDefenseIcon {
@@ -109,11 +110,16 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                     criticalDamage: cs.damage >= cs.profile().hp,
                     missionReady: ownedByPlayer && cs.isMissionReady(),
                     interventionReady: interventionReady,
-                    defenseIcons: defenseIcons
+                    defenseIcons: defenseIcons,
+                    retractableCardIndexes: cs.getCardStacks().flatMap((c, index) => c.canBeRetracted() ? [ index ] : [])
                 };
             });
         });
     });
+    const actionPool = player.actionPool.getPool()
+        .filter(a => a.possibleCardTypes[0] != CardType.Orb)
+        .sort(ActionPool.sortOrder)
+        .map(a => a.toString());
     const battle: FrontendBattle = {
         type: match.battle.type,
         playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
@@ -129,10 +135,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         playerIsActive: match.activePlayerNo == playerNo,
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
-        actionPool: player.actionPool.getPool()
-            .filter(a => a.possibleCardTypes[0] != CardType.Orb)
-            .sort(ActionPool.sortOrder)
-            .map(a => a.toString()),
+        actionPool: actionPool,
         opponent: {
             name: opponent.name,
             handCardNo: opponent.hand.length

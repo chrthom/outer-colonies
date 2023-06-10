@@ -25,6 +25,10 @@ export default class Layout {
             yOffsetPlayer: -190,
             yOffsetOpponent: 35,
             yDistance: 50
+        },
+        retractCardButton: {
+            xOffset: -80,
+            yOffset: -245
         }
     };
     continueButton = {

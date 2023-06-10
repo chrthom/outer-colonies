@@ -9,6 +9,9 @@ export default abstract class TacticCard extends Card {
         this.playableOutsideBuildPhase = playableOutsideBuildPhase;
         this.staysInPlay = staysInPlay;
     }
+    canBeRetracted(): boolean {
+        return false;
+    }
     profile(): CardProfile {
         return new CardProfile();
     }

@@ -28,6 +28,9 @@ export default abstract class Card {
         const p = this.profile();
         return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
     }
+    canBeRetracted(): boolean {
+        return true;
+    }
     isInRange(range: number): boolean {
         return false;
     }
