@@ -54,7 +54,6 @@ export default class Player {
         this.deck = shuffle(this.deck);
     }
     drawCards(num: number) {
-        // TODO: Check if no cards are left in deck
         this.takeCards(this.pickCardsFromDeck(num));
     }
     discardCards(...cards: Card[]) {
@@ -73,7 +72,8 @@ export default class Player {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Card[] {
-        return this.deck.splice(0, num);
+        if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);
+        return this.deck.splice(0, Math.min(num, this.deck.length));
     }
     playHandCard(handCard: CardStack, target: CardStack) {
         this.actionPool.activate(handCard.type());

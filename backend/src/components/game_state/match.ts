@@ -98,4 +98,8 @@ export class GameResult {
         this.gameOver = true;
         this.winnerNo = opponentPlayerNo(destroyedPlayer.no);
     }
+    setWinnerByDeckDepletion(depletedPlayer: Player) {
+        this.gameOver = true;
+        this.winnerNo = opponentPlayerNo(depletedPlayer.no);
+    }
 }
