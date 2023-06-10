@@ -30,5 +30,4 @@ export default class RetractCardButton {
     setTintHover() {
         this.sprite.setTint(layout.colors.neutral);
     }
-
 }

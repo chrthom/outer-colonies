@@ -76,6 +76,23 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         }
         emitState(io, match);
     });
+    socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
+        const match = <Match> socket.data.match;
+        const player = getPlayer(socket);
+        const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
+        const targetCardStack = rootCardStack && rootCardStack.getCardStacks().length > cardIndex 
+            ? rootCardStack.getCardStacks()[cardIndex] : null;
+        if (!rootCardStack) {
+            console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
+        } else if (!targetCardStack) {
+            console.log(`WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`);
+        } else if (!targetCardStack.canBeRetracted()) {
+            console.log(`WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`);
+        } else {
+            targetCardStack.retract();
+        }
+        emitState(io, match);
+    });
     socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
         const match = <Match> socket.data.match;
         const player = getPlayer(socket);

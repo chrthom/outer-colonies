@@ -8,7 +8,8 @@ export default class CardImage {
     cardId: number;
     constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
         this.cardId = cardId;
-        this.sprite = scene.add.image(x, y, `card_${cardId}`)
+        this.sprite = scene.add
+            .image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
             .setOrigin(0.5, 1)
             .setScale(scale ? scale : layout.cards.scale)

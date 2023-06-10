@@ -4,6 +4,7 @@ import { CardType, TurnPhase, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
+import { spliceCardStackByUUID } from '../utils/utils';
 
 export default class CardStack {
     card!: Card;
@@ -114,6 +115,15 @@ export default class CardStack {
     }
     profileMatches(c: CardProfile): boolean {
         return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile(), c));
+    }
+    retract() {
+        if (this.parentCardStack) {
+            spliceCardStackByUUID(this.parentCardStack.attachedCards, this.uuid);
+        } else {
+            spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
+        }
+        this.getPlayer().takeCards(...this.getCards().filter(c => c.canBeRetracted()));
+        this.getPlayer().discardCards(...this.getCards().filter(c => !c.canBeRetracted()));
     }
     type(): CardType {
         return this.card.type;

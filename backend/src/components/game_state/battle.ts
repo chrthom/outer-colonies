@@ -81,7 +81,7 @@ export default class Battle {
     }
     private applyMissionResult(match: Match) {
         if (this.ships[match.activePlayerNo].length > 0) {
-            match.getActivePlayer().takeCards(this.downsidePriceCards); // FEATURE: Support upside price cards
+            match.getActivePlayer().takeCards(...this.downsidePriceCards); // FEATURE: Support upside price cards
         } else {
             match.getActivePlayer().discardCards(...this.downsidePriceCards);
         }

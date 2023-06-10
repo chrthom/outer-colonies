@@ -52,7 +52,7 @@ export default class Player {
         this.deck = shuffle(this.deck);
     }
     drawCards(num: number) {
-        this.takeCards(this.pickCardsFromDeck(num));
+        this.takeCards(...this.pickCardsFromDeck(num));
     }
     discardCards(...cards: Card[]) {
         this.discardPile.push(...cards);
@@ -69,7 +69,7 @@ export default class Player {
     isActivePlayer(): boolean {
         return this.no == this.match.activePlayerNo;
     }
-    takeCards(cards: Card[]) {
+    takeCards(...cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Card[] {

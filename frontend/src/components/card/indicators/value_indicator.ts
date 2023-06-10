@@ -26,7 +26,8 @@ export default class ValueIndicator {
                     32,
                     critical ? layout.colors.secondary : layout.colors.primary,
                     layout.colors.alpha
-                ).setOrigin(0.5, 0.5);
+                )
+                .setOrigin(0.5, 0.5);
         } else {
             this.shape = scene.add
                 .star(
@@ -37,9 +38,11 @@ export default class ValueIndicator {
                     22,
                     critical ? layout.colors.secondary : layout.colors.primary,
                     layout.colors.alpha
-                ).setOrigin(0.5, 0.5);
+                )
+                .setOrigin(0.5, 0.5);
         }
-        this.text = scene.add.text(x, y, String(value))
+        this.text = scene.add
+            .text(x, y, String(value))
             .setFontSize(layout.cards.damageIndicator.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeecc')

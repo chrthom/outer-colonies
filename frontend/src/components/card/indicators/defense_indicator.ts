@@ -15,7 +15,8 @@ export default class DefenseIndicator {
                     cardY + (ownedByPlayer ? layout.cards.defenseIndicator.yOffsetPlayer : layout.cards.defenseIndicator.yOffsetOpponent)
                         + index * layout.cards.defenseIndicator.yDistance,
                     `icon_${icon.icon}`
-                ).setOrigin(0.5, 0.5)
+                )
+                .setOrigin(0.5, 0.5)
                 .setTint(color, layout.colors.neutral, color, color)
                 .setAlpha(layout.colors.alpha)
         });
