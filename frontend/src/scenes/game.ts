@@ -2,7 +2,7 @@ import { Socket } from 'socket.io-client';
 import Button from '../components/button';
 import Prompt from '../components/prompt';
 import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
-import { BattleType, MsgTypeInbound, TurnPhase } from '../../../backend/src/components/config/enums';
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
@@ -60,7 +60,7 @@ export default class Game extends Phaser.Scene {
     
     create () {
         let self = this;
-        this.socket.on('state', (state: FrontendState) => {
+        this.socket.on(MsgTypeOutbound.State, (state: FrontendState) => {
             this.updateState(state);
         });
         this.obj.actionPool = new ActionPool(this);
@@ -169,9 +169,5 @@ export default class Game extends Phaser.Scene {
                 }
             });
         }
-    }
-
-    getCardStackByUUID(uuid: string) {
-        return this.cardStacks.find(cs => cs.uuid == uuid);
     }
 }

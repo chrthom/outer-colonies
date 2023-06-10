@@ -1,4 +1,4 @@
-import { BattleType, MsgTypeInbound, TurnPhase } from "../../../backend/src/components/config/enums";
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../backend/src/components/config/enums";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -30,7 +30,9 @@ export default class Button {
         this.hide();
     }
     update(scene: Game) {
-        if (scene.state.playerPendingAction) {
+        if (scene.state.gameResult) {
+            this.showGameOver(scene);
+        } else if (scene.state.playerPendingAction) {
             if (scene.state.turnPhase == TurnPhase.Build) {
                 if (scene.state.playerIsActive) this.showNextPhase(scene);
                 else this.showIntervene(scene);
@@ -58,6 +60,12 @@ export default class Button {
     }
     private showNextCombatPhase(scene: Game) {
         this.show('Kampfphase beenden', () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
+    }
+    private showGameOver(scene: Game) {
+        this.show('Neuen Gegner suchen', () => {
+            scene.socket.off(MsgTypeOutbound.State);
+            scene.scene.start('Matchmaking');
+        });
     }
     private show(text: string, onClickAction: () => void) {
         this.action.onClick = onClickAction;

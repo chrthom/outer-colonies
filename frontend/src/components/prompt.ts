@@ -1,4 +1,5 @@
 import { BattleType, TurnPhase } from "../../../backend/src/components/config/enums";
+import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -16,7 +17,9 @@ export default class Prompt {
         this.hide();
     }
     update(scene: Game) {
-        if (scene.state.playerPendingAction) {
+        if (scene.state.gameResult) {
+            this.showGameOver(scene.state.gameResult);
+        } else if (scene.state.playerPendingAction) {
             switch (scene.state.turnPhase) {
                 case TurnPhase.Build:
                     if (scene.state.playerIsActive) this.showBuildPhase(scene);
@@ -54,6 +57,9 @@ export default class Prompt {
     private showEndPhase(scene: Game) {
         const cardsToDrop = scene.state.hand.length - scene.state.handCardLimit;
         this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
+    }
+    private showGameOver(gameResult: FrontendGameResult) {
+        this.show(`GAME OVER: Du hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
     }
     private show(text: string) {
         this.sprite.setText(text);

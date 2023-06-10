@@ -4,7 +4,7 @@ import EquipmentCard from "../cards/types/equipment_card";
 import { BattleType, Zone } from "../config/enums";
 import { rules } from "../config/rules";
 import toBattle, { FrontendPlannedBattle } from "../frontend_converters/frontend_planned_battle";
-import { getCardStackByUUID, spliceCardStackByUUID } from "../utils/utils";
+import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from "../utils/utils";
 import Match from "./match";
 import Player from "./player";
 
@@ -42,13 +42,13 @@ export default class Battle {
         return cardStack.isMissionReady() && (
             this.type == BattleType.Raid
                 || this.type == BattleType.Mission
-                    && cardStack.profile().speed >= this.ships[this.opponentPlayerNo(interveningPlayerNo)]
+                    && cardStack.profile().speed >= this.ships[opponentPlayerNo(interveningPlayerNo)]
                         .map(cs => cs.profile().speed)
                         .reduce((a, b) => Math.min(a, b))
         );
     }
     processBattleRound(match: Match) {
-        if (match.actionPendingByPlayerNo == this.opponentPlayerNo(match.activePlayerNo)) {
+        if (match.actionPendingByPlayerNo == opponentPlayerNo(match.activePlayerNo)) {
             this.range--;
             match.players.forEach(player => {
                 this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
@@ -66,7 +66,7 @@ export default class Battle {
                 );
             }
         }
-        match.actionPendingByPlayerNo = this.opponentPlayerNo(match.actionPendingByPlayerNo);
+        match.actionPendingByPlayerNo = opponentPlayerNo(match.actionPendingByPlayerNo);
         if (this.range == 0) {
             if (this.type == BattleType.Mission) this.applyMissionResult(match);
             match.prepareEndPhase();
@@ -88,8 +88,5 @@ export default class Battle {
     }
     private getDestroyedCardStacks(playerNo: number): CardStack[] {
         return this.ships[playerNo].filter(cs => cs.damage > 0 && cs.damage >= cs.profile().hp);
-    }
-    private opponentPlayerNo(playerNo: number): number {
-        return playerNo == 0 ? 1 : 0;
     }
 }

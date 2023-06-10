@@ -1,6 +1,7 @@
 import Card from '../cards/card'
 import Match from '../game_state/match'
 import CardCollection from '../cards/collection/card_collection';
+import { opponentPlayerNo } from '../utils/utils';
 
 export default class SocketData {
     name!: string;
@@ -12,6 +13,6 @@ export default class SocketData {
         this.activeDeck = CardCollection.pickRandomDeck();
     }
     opponentPlayerNo(): number {
-        return this.match.opponentPlayerNo(this.playerNo);
+        return opponentPlayerNo(this.playerNo);
     }
 }

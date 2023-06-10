@@ -1,6 +1,7 @@
 import Match from '../game_state/match'
 import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import ActionPool from '../cards/action_pool';
+import { opponentPlayerNo } from '../utils/utils';
 
 export class FrontendOpponent {
     name!: string;
@@ -43,6 +44,10 @@ export class FrontendHandCard {
     validTargets!: string[];
 }
 
+export class FrontendGameResult {
+    won: boolean;
+}
+
 export class FrontendState {
     playerIsActive!: boolean;
     playerPendingAction!: boolean;
@@ -55,11 +60,12 @@ export class FrontendState {
     discardPileIds!: number[];
     cardStacks!: FrontendCardStack[];
     battle?: FrontendBattle;
+    gameResult?: FrontendGameResult;
 }
 
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
     const player = match.players[playerNo];
-    const opponent = match.players[match.opponentPlayerNo(playerNo)];
+    const opponent = match.players[opponentPlayerNo(playerNo)];
     const hand: FrontendHandCard[] = player.hand.map((c, index) => {
         return {
             uuid: c.uuid,
@@ -111,11 +117,14 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
     const battle: FrontendBattle = {
         type: match.battle.type,
         playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
-        opponentShipIds: match.battle.ships[match.opponentPlayerNo(playerNo)].map(cs => cs.uuid),
+        opponentShipIds: match.battle.ships[opponentPlayerNo(playerNo)].map(cs => cs.uuid),
         priceCards: match.battle.downsidePriceCards.map(() => 'back')
             .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
         range: match.battle.range
     };
+    const gameResult = match.gameResult.gameOver ? {
+        won: match.gameResult.winnerNo == player.no
+    } : null;
     return {
         playerIsActive: match.activePlayerNo == playerNo,
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
@@ -133,6 +142,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         deckSize: player.deck.length,
         discardPileIds: player.discardPile.map(c => c.id),
         cardStacks: cardStacks,
-        battle: battle
+        battle: battle,
+        gameResult: gameResult
     };
 }

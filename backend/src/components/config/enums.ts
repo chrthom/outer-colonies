@@ -1,3 +1,9 @@
+export enum BattleType {
+    None = 'none',
+    Mission = 'mission',
+    Raid = 'raid'
+}
+
 export enum CardType {
     Colony = 'colony',
     Equipment = 'equipment',
@@ -36,10 +42,4 @@ export enum Zone {
     Colony = 'colony',
     Oribital = 'orbital',
     Neutral = 'neutral'
-}
-
-export enum BattleType {
-    None = 'none',
-    Mission = 'mission',
-    Raid = 'raid'
 }
