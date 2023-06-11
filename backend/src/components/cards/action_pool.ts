@@ -52,6 +52,9 @@ export default class ActionPool {
             this.removeDepleted();
         });
     }
+    toString(): string {
+        return this.getPool().map(ca => ca.toString()).join('__');
+    }
     private removeDepleted() {
         const depleted = this.pool.filter(a => a.depleted);
         this.pool = this.pool.filter(a => !a.depleted);

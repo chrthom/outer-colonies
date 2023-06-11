@@ -29,7 +29,6 @@ function initMatch(io: Server, match: Match) {
         player.shuffleDeck();
         player.drawCards(rules.initialCardsToDraw);
     });
-    // FEATURE: Wait for response for redrawing cards
     match.prepareStartPhase();
     emitState(io, match);
 }
@@ -124,7 +123,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else {
             srcWeapon.attack(target);
         }
-        // FEATURE: Check if further weapons or tactic cards can be used, else end round
+        // ISSUE #33: Check if further weapons or tactic cards can be used, else end round
         emitState(io, match);
     });
 };

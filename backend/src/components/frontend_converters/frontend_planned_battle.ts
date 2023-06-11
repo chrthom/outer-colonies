@@ -23,7 +23,7 @@ export default function toBattle(match: Match, plannedBattle: FrontendPlannedBat
             battle = new Battle(BattleType.Mission);
             battle.ships[match.actionPendingByPlayerNo] = ships;
             battle.downsidePriceCards = downsideCards;
-            // FEATURE: Also map upside price cards
+            // ISSUE #1: Also map upside price cards
             break;
         case BattleType.Raid:
             battle = new Battle(BattleType.Raid);

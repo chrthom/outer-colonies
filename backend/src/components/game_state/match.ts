@@ -57,7 +57,7 @@ export default class Match {
         this.getActivePlayer().resetRemainingActions();
         this.getActivePlayer().callBackShipsFromNeutralZone();
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
-        // FEATURE: Check for effects on drawing a cards (like drawing an extra card) and execute start of turn effects of cards
+        // ISSUE #32: Check for effects on drawing a cards (like drawing an extra card) and execute start of turn effects of cards
         // + Wait for response to continue
         this.prepareBuildPhase();
     }
@@ -81,7 +81,6 @@ export default class Match {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
-        // TODO: Check if enemy colony is destroyed
         if (this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() && !this.gameResult.gameOver) {
             this.prepareStartPhase();
         }

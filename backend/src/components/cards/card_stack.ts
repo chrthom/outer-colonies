@@ -49,7 +49,7 @@ export default class CardStack {
             && player.isPendingPlayer()
             && player.match.turnPhase == TurnPhase.Build
             && this.card.canBeRetracted()
-            && player.actionPool.getPool().join('_') == player.getOriginalActions().getPool().join('_'); // TODO: Check if this can be done easier
+            && player.actionPool.toString() == player.getOriginalActions().toString();
     }
     combatPhaseReset(initial: boolean) {
         this.attachedCards.forEach(cs => cs.combatPhaseReset(initial));
@@ -75,7 +75,7 @@ export default class CardStack {
         if (this.zone == Zone.Hand) {
             return this.card.getValidTargets(this.getPlayer());
         } else {
-            return []; // FEATURE: Reuse this method to determine valid attack targets in battle
+            return []; // TODO: Reuse this method to determine valid attack targets in battle
         }
     }
     hasInsufficientEnergy(): boolean {
