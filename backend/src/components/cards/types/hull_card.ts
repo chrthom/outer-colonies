@@ -26,7 +26,8 @@ export default abstract class HullCard extends Card {
             cs.type() == CardType.Colony 
                 && this.hullProfile.energy >= 0);
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
     isFlightReady(cards: Card[]): boolean {
         return cards.filter(c => c.type == CardType.Hull).length == this.multipart.partNo;
     }

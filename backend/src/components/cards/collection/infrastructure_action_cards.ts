@@ -7,6 +7,10 @@ function addToActionPool(player: Player, card: InfrastructureCard) {
     player.actionPool.push(...card.actionPool().getPool());
 }
 
+function removeFromActionPool(player: Player, card: InfrastructureCard) {
+    player.actionPool.remove(...card.actionPool().getPool());
+}
+
 export class Card135 extends InfrastructureCard {
     constructor() {
         super(
@@ -27,8 +31,11 @@ export class Card135 extends InfrastructureCard {
             }
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         addToActionPool(player, this);
+    }
+    onRetraction(player: Player) {
+        removeFromActionPool(player, this);
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Hull));
@@ -55,8 +62,11 @@ export class Card154 extends InfrastructureCard {
             }
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         addToActionPool(player, this);
+    }
+    onRetraction(player: Player) {
+        removeFromActionPool(player, this);
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Infrastructure));
@@ -83,8 +93,11 @@ export class Card164 extends InfrastructureCard {
             }
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         addToActionPool(player, this);
+    }
+    onRetraction(player: Player) {
+        removeFromActionPool(player, this);
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Equipment));
@@ -112,8 +125,11 @@ export class Card183 extends InfrastructureCard {
         )
         this.onlyAttachableToColony = true;
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         addToActionPool(player, this);
+    }
+    onRetraction(player: Player) {
+        removeFromActionPool(player, this);
     }
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(CardType.Equipment, CardType.Infrastructure, CardType.Hull));

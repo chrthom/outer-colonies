@@ -19,7 +19,7 @@ export class Card141 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
     }
     getValidTargets(player: Player): CardStack[] {
@@ -38,7 +38,7 @@ export class Card165 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         const freePsiSockets = this.calcFreePsiSockets(player);
         if (freePsiSockets) {
             player.drawCards(freePsiSockets * this.cardsToDrawPerPsiSocket);
@@ -67,7 +67,7 @@ export class Card232 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         player.drawCards(this.cardsToDraw);
     }
     getValidTargets(player: Player): CardStack[] {
@@ -86,7 +86,7 @@ export class Card321 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         for (let i = 0; i < this.cardsToRestore; i++) {
             player.deck.push(player.discardPile.pop());
         }
@@ -107,7 +107,7 @@ export class Card427 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         let foundCards = 0;
         for (let i = 0; i < player.deck.length; i++) {
             if (player.deck[i].type == CardType.Infrastructure) {

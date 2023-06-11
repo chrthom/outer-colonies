@@ -23,7 +23,8 @@ abstract class CardPowerPlant extends InfrastructureCard {
         )
         this.onlyAttachableToColony = true;
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
 }
 
 abstract class NuclearReactorCard extends InfrastructureCard {
@@ -46,7 +47,8 @@ abstract class NuclearReactorCard extends InfrastructureCard {
             }
         );
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
 }
 
 abstract class SolarPanelCard extends InfrastructureCard {
@@ -69,7 +71,8 @@ abstract class SolarPanelCard extends InfrastructureCard {
             }
         );
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
 }
 
 export class Card105 extends InfrastructureCard {
@@ -92,7 +95,8 @@ export class Card105 extends InfrastructureCard {
             }
         );
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
     onDestruction(player: Player) {
         const battle = player.match.battle;
         if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
@@ -121,7 +125,8 @@ export class Card145 extends InfrastructureCard {
             }
         );
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
 }
 
 export class Card185 extends CardPowerPlant {

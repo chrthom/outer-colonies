@@ -1,6 +1,5 @@
 import { CardType } from "../../config/enums";
 import { rules } from "../../config/rules";
-import Match from "../../game_state/match";
 import Player from "../../game_state/player";
 import ActionPool, { CardAction } from "../action_pool";
 import Card from "../card";
@@ -14,7 +13,8 @@ export default class ColonyCard extends Card {
     getValidTargets(_: Player): CardStack[] {
         return [];
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
     profile(): CardProfile {
         return {
             energy: 0,

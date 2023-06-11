@@ -1,4 +1,5 @@
 import { CardType } from "../../config/enums";
+import Player from "../../game_state/player";
 import Card from "../card";
 import CardProfile from "../card_profile";
 import CardStack from "../card_stack";
@@ -9,6 +10,7 @@ export default abstract class TacticCard extends Card {
         this.playableOutsideBuildPhase = playableOutsideBuildPhase;
         this.staysInPlay = staysInPlay;
     }
+    onRetraction(_: Player) {}
     canBeRetracted(): boolean {
         return false;
     }

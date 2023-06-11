@@ -31,7 +31,8 @@ export default abstract class EquipmentCard extends Card {
     isInRange(range: number): boolean {
         return this.attackProfile.range >= range;
     }
-    immediateEffect(_: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
     profile(): CardProfile {
         return CardProfile.fromEquipmentProfile(this.equipmentProfile);
     }

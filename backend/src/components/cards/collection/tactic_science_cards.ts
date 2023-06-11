@@ -14,7 +14,7 @@ export class Card110 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         player.cardStacks
             .filter(cs => cs.type() == CardType.Hull)
             .forEach(cs => {

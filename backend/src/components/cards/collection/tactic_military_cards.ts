@@ -15,7 +15,7 @@ export class Card174 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player, target: CardStack) {
+    onUtilizaton(player: Player, target: CardStack) {
         target.damage -= Math.min(this.damageToRepair, target.damage);
     }
     getValidTargets(player: Player): CardStack[] {
@@ -37,7 +37,7 @@ export class Card337 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
     }
     getValidTargets(player: Player): CardStack[] {
@@ -56,7 +56,7 @@ export class Card338 extends TacticCard {
             false
         )
     }
-    immediateEffect(player: Player) {
+    onUtilizaton(player: Player) {
         player.drawCards(this.cardsToDraw);
     }
     getValidTargets(player: Player): CardStack[] {

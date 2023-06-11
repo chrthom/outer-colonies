@@ -102,7 +102,7 @@ export default class CardStack {
         this.attachedCards.forEach(cs => cs.onDestruction());
     }
     performImmediateEffect(target: CardStack) {
-        this.card.immediateEffect(this.getPlayer(), target);
+        this.card.onUtilizaton(this.getPlayer(), target);
     }
     profile(): CardProfile {
         if (this.type() == CardType.Colony) {
@@ -133,6 +133,7 @@ export default class CardStack {
         } else {
             spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
         }
+        this.getCards().forEach(c => c.onRetraction(this.getPlayer()));
         this.getPlayer().takeCards(...this.getCards().filter(c => c.canBeRetracted()));
         this.getPlayer().discardCards(...this.getCards().filter(c => !c.canBeRetracted()));
     }

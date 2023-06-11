@@ -21,5 +21,6 @@ export class Card172 extends InfrastructureCard {
             }
         )
     }
-    immediateEffect(player: Player) {}
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
 }

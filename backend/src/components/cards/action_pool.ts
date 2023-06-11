@@ -23,16 +23,11 @@ export default class ActionPool {
         if (cardActions) this.pool = cardActions;
         else this.pool = [];
     }
-    activate(cardType: CardType): boolean {
+    activate(cardType: CardType) {
         const availablePools = this.getActionsFor(cardType);
         if (availablePools.length > 0) {
             availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
-            const depleted = this.pool.filter(a => a.depleted);
-            this.pool = this.pool.filter(a => !a.depleted);
-            depleted.forEach(a => a.depleted = false);
-            return true;
-        } else {
-            return false;
+            this.removeDepleted();
         }
     }
     combine(ap: ActionPool): ActionPool {
@@ -49,6 +44,18 @@ export default class ActionPool {
     }
     push(...pool: CardAction[]) {
         this.pool.push(...pool);
+    }
+    remove(...cardActions: CardAction[]) {
+        cardActions.map(a => a.toString()).forEach(s => {
+            console.log(`Remove ${s} | Found ${this.pool.filter(p => p.toString() == s)}`); /////
+            this.pool.filter(p => p.toString() == s)[0].depleted = true;
+            this.removeDepleted();
+        });
+    }
+    private removeDepleted() {
+        const depleted = this.pool.filter(a => a.depleted);
+        this.pool = this.pool.filter(a => !a.depleted);
+        depleted.forEach(a => a.depleted = false);
     }
     static sortOrder(a: CardAction, b: CardAction): number {
         if (a.priority() == b.priority()) {
