@@ -34,8 +34,9 @@ export default class Button {
             this.showGameOver(scene);
         } else if (scene.state.playerPendingAction) {
             if (scene.state.turnPhase == TurnPhase.Build) {
-                if (scene.state.playerIsActive) this.showNextPhase(scene);
-                else this.showIntervene(scene);
+                if (!scene.state.playerIsActive) this.showIntervene(scene);
+                else if (scene.state.hasToRetractCards) this.hide();
+                else this.showNextPhase(scene);
             } else if (scene.state.turnPhase == TurnPhase.Combat) {
                 this.showNextCombatPhase(scene);
             } else {

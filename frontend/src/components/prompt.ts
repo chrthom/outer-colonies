@@ -39,13 +39,18 @@ export default class Prompt {
         }
     }
     private showBuildPhase(scene: Game) {
-        let battleText: string;
-        if (scene.plannedBattle.type == BattleType.None)
-            battleText = 'Plane eine Mission oder einen Überfall:\n'
+        let text: string = '';
+        if (scene.plannedBattle.type == BattleType.None) {
+            if (scene.state.hasToRetractCards) {
+                text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
+            }
+            text += 'Plane eine Mission oder einen Überfall:\n'
                 + '- Klicke dein Deck für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
-        else battleText = `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
-        this.show(battleText);
+        } else {
+            text += `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
+        }
+        this.show(text);
     }
     private showIntervenePhase(scene: Game) {
         const battleText = scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';

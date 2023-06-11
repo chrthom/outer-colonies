@@ -68,6 +68,7 @@ export class FrontendState {
     cardStacks!: FrontendCardStack[];
     battle?: FrontendBattle;
     gameResult?: FrontendGameResult;
+    hasToRetractCards: boolean;
 }
 
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
@@ -159,6 +160,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         discardPileIds: player.discardPile.map(c => c.id),
         cardStacks: cardStacks,
         battle: battle,
-        gameResult: gameResult
+        gameResult: gameResult,
+        hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
     };
 }

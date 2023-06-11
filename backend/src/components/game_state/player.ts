@@ -69,6 +69,9 @@ export default class Player {
     isActivePlayer(): boolean {
         return this.no == this.match.activePlayerNo;
     }
+    isPendingPlayer(): boolean {
+        return this.no == this.match.actionPendingByPlayerNo;
+    }
     takeCards(...cards: Card[]) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }

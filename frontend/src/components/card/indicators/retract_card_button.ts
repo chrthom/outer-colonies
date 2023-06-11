@@ -17,7 +17,7 @@ export default class RetractCardButton {
             .setAlpha(layout.colors.alpha)
             .setInteractive()
             .on('pointerover', () => this.setTintHover())
-            .on('pointerout', () => crititcal ? this.setTintCritical : this.setTintNormal())
+            .on('pointerout', () => crititcal ? this.setTintCritical() : this.setTintNormal())
             .on('pointerdown', () => scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex));
         crititcal ? this.setTintCritical() : this.setTintNormal();
     }

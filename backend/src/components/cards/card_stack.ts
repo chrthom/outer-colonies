@@ -46,6 +46,7 @@ export default class CardStack {
     canBeRetracted(): boolean {
         const player = this.getPlayer();
         return player.isActivePlayer()
+            && player.isPendingPlayer()
             && player.match.turnPhase == TurnPhase.Build
             && this.card.canBeRetracted()
             && player.actionPool.getPool().join('_') == player.getOriginalActions().getPool().join('_'); // TODO: Check if this can be done easier
