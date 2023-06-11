@@ -106,17 +106,18 @@ export default class CardStack {
     }
     profile(): CardProfile {
         if (this.type() == CardType.Colony) {
-            const handCardLimitOutsideColonyZone = this.getPlayer().cardStacks
+            const handCardLimitOutsideColonyZone = this.getPlayer().cardStacks // Silos in orbit also increase hand card limit
                 .filter(cs => cs.zone != Zone.Colony)
                 .filter(cs => cs.type() == CardType.Infrastructure)
                 .map(cs => cs.profile().handCardLimit)
                 .reduce((a, b) => a + b, 0);
-            let colonyCardsProfile = this.getPlayer().cardStacks
+            const colonyCardsProfile = this.getPlayer().cardStacks
                 .filter(cs => cs.zone == Zone.Colony)
                 .filter(cs => [ CardType.Orb, CardType.Infrastructure ].includes(cs.type()))
                 .map(cs => cs.profile())
                 .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
             colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
+            colonyCardsProfile.hp = 0; // Else Building HP would increase the colony's HP
             return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile());
         } else {
             return this.getCards()
