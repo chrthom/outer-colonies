@@ -28,7 +28,7 @@ export default class CardStack {
         if (data.damage > 0) {
             this.damageIndicator = new ValueIndicator(
                 scene, 
-                this.data.damage, 
+                String(this.data.damage), 
                 this.data.criticalDamage, 
                 x,
                 zoneLayout.y,

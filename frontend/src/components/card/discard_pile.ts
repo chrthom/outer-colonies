@@ -18,18 +18,24 @@ export default class DiscardPile extends CardImage {
             this.sprite.visible = false;
         } else {
             this.enableMouseover(scene);
+            this.sprite.on('pointerdown', () => {
+                this.onClickAction(scene);
+            });
+        }
+    }
+    update(scene: Game) {
+        if (this.indicator) this.indicator.destroy();
+        if (this.cardIds.length > 0) {
+            const cardsForMission = scene.plannedBattle.upsideCardsNum;
             this.indicator = new ValueIndicator(
                 scene,
-                cardIds.length,
+                this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
                 false,
                 layout.discardPile.x,
                 layout.discardPile.y,
                 true,
                 true
             );
-            this.sprite.on('pointerdown', () => {
-                this.onClickAction(scene);
-            });
         }
     }
     destroy() {

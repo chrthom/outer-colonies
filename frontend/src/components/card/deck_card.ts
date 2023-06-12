@@ -17,10 +17,11 @@ export default class DeckCard extends CardImage {
     }
     update(scene: Game) {
         if (this.indicator) this.indicator.destroy();
+        const cardsForMission = scene.plannedBattle.downsideCardsNum;
         this.indicator = new ValueIndicator(
             scene,
-            scene.state.deckSize,
-            scene.state.deckSize < 10,
+            scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
+            scene.state.deckSize - cardsForMission < 10,
             layout.deck.x,
             layout.deck.y,
             true,

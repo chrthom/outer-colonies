@@ -8,7 +8,7 @@ export default class ValueIndicator {
     text: Phaser.GameObjects.Text;
     constructor(
         scene: Game,
-        value: number,
+        value: string,
         critical: boolean,
         cardX: number,
         cardY: number,
@@ -22,7 +22,7 @@ export default class ValueIndicator {
                 .ellipse(
                     x,
                     y,
-                    48,
+                    64,
                     32,
                     critical ? layout.colors.secondary : layout.colors.primary,
                     layout.colors.alpha
@@ -42,7 +42,7 @@ export default class ValueIndicator {
                 .setOrigin(0.5, 0.5);
         }
         this.text = scene.add
-            .text(x, y, String(value))
+            .text(x, y, value)
             .setFontSize(layout.cards.damageIndicator.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeecc')
