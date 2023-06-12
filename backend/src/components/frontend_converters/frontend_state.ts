@@ -12,7 +12,7 @@ export class FrontendBattle {
     type!: BattleType;
     playerShipIds: string[];
     opponentShipIds: string[];
-    priceCards: string[];
+    priceCardIds: number[];
     range: number;
 }
 
@@ -138,8 +138,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         type: match.battle.type,
         playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
         opponentShipIds: match.battle.ships[opponentPlayerNo(playerNo)].map(cs => cs.uuid),
-        priceCards: match.battle.downsidePriceCards.map(() => 'back')
-            .concat(match.battle.upsidePriceCards.map(c => String(c.id))),
+        priceCardIds: match.battle.downsidePriceCards.map(() => 1)
+            .concat(match.battle.upsidePriceCards.map(c => c.id)),
         range: match.battle.range
     };
     const gameResult = match.gameResult.gameOver ? {

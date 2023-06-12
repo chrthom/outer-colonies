@@ -11,6 +11,7 @@ import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_
 import { FrontendGameParams } from '../../../backend/src/components/frontend_converters/frontend_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
+import MissionCards from '../components/card/mission_cards';
 
 class InitData {
     socket: Socket;
@@ -34,7 +35,8 @@ export default class Game extends Phaser.Scene {
         deck: null,
         discardPile: null,
         prompt: null,
-        maxCard: null
+        maxCard: null,
+        missionCards: null
     };
 
     constructor () {
@@ -69,6 +71,7 @@ export default class Game extends Phaser.Scene {
         this.obj.discardPile = new DiscardPile(this, [])
         this.obj.prompt = new Prompt(this);
         this.obj.maxCard = new MaxCard(this);
+        this.obj.missionCards = new MissionCards();
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
     }
 
@@ -115,6 +118,7 @@ export default class Game extends Phaser.Scene {
         this.obj.button.update(this);
         this.obj.deck.update(this);
         this.obj.discardPile.update(this);
+        this.obj.missionCards.update(this);
         this.obj.prompt.update(this);
         this.updateHighlighting();
     }

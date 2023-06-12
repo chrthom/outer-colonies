@@ -12,7 +12,7 @@ export default class CardImage {
             .image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
             .setOrigin(0.5, 1)
-            .setScale(scale ? scale : layout.cards.scale)
+            .setScale(scale ? scale : layout.cards.scale.normal)
             .setInteractive();
         if (opponentCard) this.sprite.setAngle(180);
     }

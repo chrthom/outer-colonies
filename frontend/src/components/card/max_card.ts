@@ -6,7 +6,7 @@ const layout = new Layout();
 
 export default class MaxCard extends CardImage {
     constructor(scene: Game) {
-        super(scene, layout.maxCard.x, layout.maxCard.y, 1, false, layout.maxCard.scale);
+        super(scene, layout.maxCard.x, layout.maxCard.y, layout.cards.scale.max, false, layout.maxCard.scale);
         this.hide();
     }
     hide() {

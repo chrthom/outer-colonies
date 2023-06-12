@@ -4,7 +4,7 @@ export default class Layout {
         neutral: 0xffffff,
         primary: 0x119999,
         secondary: 0x991111
-    }
+    };
     stackYDistance = 30;
 
     actionPool = {
@@ -13,7 +13,11 @@ export default class Layout {
         yDistance: -55
     }
     cards = {
-        scale: 0.25,
+        scale: {
+            min: 0.1,
+            normal: 0.25,
+            max: 1
+        },
         damageIndicator: {
             xOffset: 90,
             yOffsetPlayer: -240,
@@ -48,6 +52,12 @@ export default class Layout {
         x: 2110,
         y: 820,
         scale: 0.75
+    };
+    missionCards = {
+        x: 1700,
+        y: 650,
+        xDistance: 20,
+        yDistance: 10
     };
     player = {
         hand: {
