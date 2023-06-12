@@ -7,7 +7,6 @@ import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { rules } from '../../../backend/src/components/config/rules';
 import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
 import { FrontendGameParams } from '../../../backend/src/components/frontend_converters/frontend_game_params';
 import DiscardPile from '../components/card/discard_pile';
@@ -105,12 +104,14 @@ export default class Game extends Phaser.Scene {
         this.plannedBattle = {
             type: type,
             downsideCardsNum: 0,
-            upsideCardsIndex: [],
+            upsideCardsNum: 0,
             shipIds: []
         }
+        /*
         if (type == BattleType.Mission) {
             this.plannedBattle.downsideCardsNum = rules.cardsPerMission; // FEATURE: Allow upside cards from discard pile
         }
+        */
         this.updateView();
     }
 
@@ -124,15 +125,18 @@ export default class Game extends Phaser.Scene {
 
     updateHighlighting() {
         this.obj.deck.highlightReset();
+        this.obj.discardPile.highlightReset();
         this.hand.forEach(c => c.highlightReset());
         this.cardStacks.forEach(c => c.highlightReset());
         if (this.state.playerPendingAction) {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
+                this.obj.discardPile.highlightSelected();
             } else if (this.activeHandCard
                     || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)
                     || this.state.turnPhase == TurnPhase.Combat) {
                 this.obj.deck.highlightDisabled();
+                this.obj.discardPile.highlightDisabled();
             }
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();

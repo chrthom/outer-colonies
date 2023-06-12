@@ -79,6 +79,9 @@ export default class Player {
         if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);
         return this.deck.splice(0, Math.min(num, this.deck.length));
     }
+    pickCardsFromTopOfDiscardPile(num: number): Card[] {
+        return this.discardPile.splice(-Math.min(num, this.discardPile.length));
+    }
     playHandCard(handCard: CardStack, target: CardStack) {
         this.actionPool.activate(handCard.type());
         spliceCardStackByUUID(this.hand, handCard.uuid)

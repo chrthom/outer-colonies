@@ -1,12 +1,10 @@
 import Match from '../game_state/match';
 import toFrontendState from '../frontend_converters/frontend_state';
 import { rules } from '../config/rules';
-import { CardType, MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
+import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
 import { getCardStackByUUID } from '../utils/utils';
 import { Server, Socket } from 'socket.io';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import EquipmentCard from '../cards/types/equipment_card';
-import CardStack from '../cards/card_stack';
 import Player from '../game_state/player';
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket {

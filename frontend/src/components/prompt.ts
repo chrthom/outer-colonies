@@ -1,4 +1,5 @@
 import { BattleType, TurnPhase } from "../../../backend/src/components/config/enums";
+import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
 import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
@@ -45,8 +46,11 @@ export default class Prompt {
                 text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
             }
             text += 'Plane eine Mission oder einen Überfall:\n'
-                + '- Klicke dein Deck für eine Mission\n'
+                + '- Klicke dein Deck oder Ablagestapel für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
+        } else if (scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
+            const missingCards = FrontendPlannedBattle.missingCards(scene.plannedBattle);
+            text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
         } else {
             text += `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
         }

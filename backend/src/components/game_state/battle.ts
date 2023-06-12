@@ -80,10 +80,12 @@ export default class Battle {
         }
     }
     private applyMissionResult(match: Match) {
+        const player = match.getActivePlayer();
         if (this.ships[match.activePlayerNo].length > 0) {
-            match.getActivePlayer().takeCards(...this.downsidePriceCards); // ISSUE #1: Support upside price cards
+            player.takeCards(...this.downsidePriceCards);
+            player.deck.push(...this.upsidePriceCards);
         } else {
-            match.getActivePlayer().discardCards(...this.downsidePriceCards);
+            player.discardCards(...this.downsidePriceCards.concat(this.upsidePriceCards));
         }
     }
     private getDestroyedCardStacks(playerNo: number): CardStack[] {

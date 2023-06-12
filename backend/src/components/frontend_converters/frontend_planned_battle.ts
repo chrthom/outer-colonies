@@ -1,4 +1,5 @@
 import { BattleType } from "../config/enums";
+import { rules } from "../config/rules";
 import Battle from "../game_state/battle";
 import Match from "../game_state/match";
 import { getCardStackByUUID } from "../utils/utils";
@@ -6,8 +7,14 @@ import { getCardStackByUUID } from "../utils/utils";
 export class FrontendPlannedBattle {
     type: BattleType;
     downsideCardsNum: number;
-    upsideCardsIndex: number[];
+    upsideCardsNum: number;
     shipIds: string[];
+    static cardLimitReached(plannedBattle: FrontendPlannedBattle): boolean {
+        return FrontendPlannedBattle.missingCards(plannedBattle) == 0;
+    }
+    static missingCards(plannedBattle: FrontendPlannedBattle): number {
+        return rules.cardsPerMission - plannedBattle.downsideCardsNum - plannedBattle.upsideCardsNum;
+    }
 }
 
 export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
@@ -20,10 +27,13 @@ export default function toBattle(match: Match, plannedBattle: FrontendPlannedBat
     switch(plannedBattle.type) {
         case BattleType.Mission:
             const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
+            const upsideCards = match.getActivePlayer().pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
+            console.log(plannedBattle); ////
+            console.log(upsideCards); ////
             battle = new Battle(BattleType.Mission);
             battle.ships[match.actionPendingByPlayerNo] = ships;
             battle.downsidePriceCards = downsideCards;
-            // ISSUE #1: Also map upside price cards
+            battle.upsidePriceCards = upsideCards;
             break;
         case BattleType.Raid:
             battle = new Battle(BattleType.Raid);

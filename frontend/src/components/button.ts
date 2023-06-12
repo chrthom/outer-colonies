@@ -1,4 +1,6 @@
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../backend/src/components/config/enums";
+import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
+import { FrontendBattle } from "../../../backend/src/components/frontend_converters/frontend_state";
 import Layout from "../config/layout";
 import Game from "../scenes/game";
 
@@ -47,8 +49,9 @@ export default class Button {
         }
     }
     private showNextPhase(scene: Game) {
-        const text = scene.plannedBattle.shipIds.length == 0 ? 
-            'Zug beenden' : 
+        const text = scene.plannedBattle.shipIds.length == 0 
+                || scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(scene.plannedBattle) ? 
+            'Zug beenden' :
             `${scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
         this.show(text, () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle));
     }

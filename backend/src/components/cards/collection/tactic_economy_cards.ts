@@ -87,9 +87,7 @@ export class Card321 extends TacticCard {
         )
     }
     onUtilizaton(player: Player) {
-        for (let i = 0; i < this.cardsToRestore; i++) {
-            player.deck.push(player.discardPile.pop());
-        }
+        player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
     }
     getValidTargets(player: Player): CardStack[] {
         return this.onlyColonyTarget(player.cardStacks);
