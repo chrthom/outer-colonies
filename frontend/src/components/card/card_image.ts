@@ -5,6 +5,7 @@ const layout = new Layout();
 
 export default class CardImage {
     sprite: Phaser.GameObjects.Image;
+    glow?: Phaser.FX.Glow;
     cardId: number;
     constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
         this.cardId = cardId;
@@ -25,10 +26,14 @@ export default class CardImage {
     }
     highlightSelected() {
         this.highlightReset();
-        this.sprite.setTint(0xff6666, 0xff6666, 0xffffff, 0xffffff);
+        this.glow = this.sprite.postFX.addGlow(layout.colors.secondary, 2, 0, false, 0.05, 16);
     }
     highlightReset() {
-        this.sprite.setTint(0xffffff);
+        if (this.glow) {
+            this.sprite.postFX.remove(this.glow);
+            this.glow = null;
+        }
+        this.sprite.setTint(layout.colors.neutral);
     }
     enableMouseover(scene: Game) {
         this.sprite
