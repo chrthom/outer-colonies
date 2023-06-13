@@ -80,6 +80,7 @@ export default class Match {
     prepareEndPhase() {
         this.turnPhase = TurnPhase.End;
         this.actionPendingByPlayerNo = this.activePlayerNo;
+        this.battle = new Battle(BattleType.None);
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
         if (this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() && !this.gameResult.gameOver) {
             this.prepareStartPhase();

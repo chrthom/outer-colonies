@@ -28,6 +28,8 @@ export default function toBattle(match: Match, plannedBattle: FrontendPlannedBat
         case BattleType.Mission:
             const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
             const upsideCards = match.getActivePlayer().pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
+            console.log(plannedBattle.upsideCardsNum); ////
+            console.log(upsideCards); ////
             battle = new Battle(BattleType.Mission);
             battle.ships[match.actionPendingByPlayerNo] = ships;
             battle.downsidePriceCards = downsideCards;

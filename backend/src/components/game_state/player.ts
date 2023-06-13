@@ -80,7 +80,7 @@ export default class Player {
         return this.deck.splice(0, Math.min(num, this.deck.length));
     }
     pickCardsFromTopOfDiscardPile(num: number): Card[] {
-        return this.discardPile.splice(-Math.min(num, this.discardPile.length));
+        return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
     }
     playHandCard(handCard: CardStack, target: CardStack) {
         this.actionPool.activate(handCard.type());

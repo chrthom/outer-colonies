@@ -9,6 +9,7 @@ export default class MissionCards {
     update(scene: Game) {
         if (scene.state && scene.state.battle) {
             const battle = scene.state.battle;
+            if (this.minCards) this.minCards.forEach(c => c.destroy());
             this.minCards = battle.priceCardIds.map((id, index) => {
                 return new CardImage(
                     scene,
