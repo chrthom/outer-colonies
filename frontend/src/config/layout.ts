@@ -1,6 +1,7 @@
 export default class Layout {
     colors = {
         alpha: 0.8,
+        fadedAlpha: 0.3,
         fadedTint: 0x666666,
         neutral: 0xffffff,
         primary: 0x119999,
@@ -8,11 +9,16 @@ export default class Layout {
     };
     stackYDistance = 30;
 
+    font = {
+        family: 'Impact',
+        color: '#eeeeaa'
+    };
+
     actionPool = {
         x: 2370,
         y: 1040,
         yDistance: -55
-    }
+    };
     cards = {
         scale: {
             min: 0.1,
@@ -60,6 +66,23 @@ export default class Layout {
         xDistance: 20,
         yDistance: 10
     };
+    opponent = {
+        colony: {
+            x: 120,
+            y: 100,
+            maxWidth: 650
+        },
+        orbital: {
+            x: 1000,
+            y: 100,
+            maxWidth: 650
+        },
+        neutral: {
+            x: 120,
+            y: 670,
+            maxWidth: 650
+        }
+    };
     player = {
         hand: {
             x: 2370,
@@ -85,23 +108,14 @@ export default class Layout {
             maxWidth: 650
         }
     };
-    opponent = {
-        colony: {
-            x: 120,
-            y: 100,
-            maxWidth: 650
-        },
-        orbital: {
-            x: 1000,
-            y: 100,
-            maxWidth: 650
-        },
-        neutral: {
-            x: 120,
-            y: 670,
-            maxWidth: 650
-        }
-    };
+    preloader = {
+        x: 1200,
+        y: 700,
+        width: 500,
+        height: 50,
+        boxPadding: 10,
+        textOffsetY: -50
+    }
     prompt = {
         x: 2370,
         y: 80,

@@ -12,6 +12,7 @@ import { FrontendGameParams } from '../../../backend/src/components/frontend_con
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';
+import Preloader from '../components/preloader';
 
 class InitData {
     socket: Socket;
@@ -21,6 +22,7 @@ class InitData {
 export default class Game extends Phaser.Scene {
     socket: Socket;
     gameParams: FrontendGameParams;
+    preloader: Preloader;
     state: FrontendState;
     activeHandCard: string;
     activeCardStack: string;
@@ -51,6 +53,7 @@ export default class Game extends Phaser.Scene {
     }
 
     preload () {
+        this.preloader = new Preloader(this);
         this.load.baseURL = 'http://localhost:3000/cardimages/';
         [ 0, 1 ].concat(this.gameParams.preloadCardIds).forEach(id => this.load.image(`card_${id}`, `${id}.png`));
         [ 
@@ -61,10 +64,10 @@ export default class Game extends Phaser.Scene {
     }
     
     create () {
-        let self = this;
         this.socket.on(MsgTypeOutbound.State, (state: FrontendState) => {
             this.updateState(state);
         });
+        this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
         this.obj.actionPool = new ActionPool(this);
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
@@ -72,7 +75,6 @@ export default class Game extends Phaser.Scene {
         this.obj.prompt = new Prompt(this);
         this.obj.maxCard = new MaxCard(this);
         this.obj.missionCards = new MissionCards();
-        this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
     }
 
     update() {}
@@ -80,6 +82,7 @@ export default class Game extends Phaser.Scene {
     updateState(state: FrontendState) {
         this.state = state;
         //console.log(JSON.stringify(state.cardStacks)); /////
+        this.preloader.destroy();
         this.recreateCards();
         this.resetSelections();
     }
@@ -132,12 +135,7 @@ export default class Game extends Phaser.Scene {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
                 this.obj.discardPile.highlightSelected();
-            }/* else if (this.activeHandCard
-                    || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)
-                    || this.state.turnPhase == TurnPhase.Combat) {
-                this.obj.deck.highlightDisabled();
-                this.obj.discardPile.highlightDisabled();
-            }*/
+            }
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
                 else if (this.activeHandCard == c.uuid) c.highlightSelected();

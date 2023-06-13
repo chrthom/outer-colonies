@@ -8,11 +8,11 @@ const layout = new Layout();
 
 export default class Prompt {
     sprite: Phaser.GameObjects.Text;
-    constructor(scene) {
+    constructor(scene: Game) {
         this.sprite = scene.add.text(layout.prompt.x, layout.prompt.y, '')
             .setFontSize(layout.prompt.fontSize)
-            .setFontFamily('Impact')
-            .setColor('#eeeeaa')
+            .setFontFamily(layout.font.family)
+            .setColor(layout.font.color)
             .setAlign('right')
             .setOrigin(1, 0);
         this.hide();
