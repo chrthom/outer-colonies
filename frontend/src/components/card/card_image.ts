@@ -22,11 +22,15 @@ export default class CardImage {
     }
     highlightDisabled() {
         this.highlightReset();
-        this.sprite.setTint(0x666666)
+        this.sprite.setTint(layout.colors.fadedTint);
+    }
+    highlightSelectable() {
+        this.highlightReset();
+        this.glow = this.sprite.postFX.addGlow(layout.colors.neutral, 3, 0, false, 0.1, 12);
     }
     highlightSelected() {
         this.highlightReset();
-        this.glow = this.sprite.postFX.addGlow(layout.colors.secondary, 2, 0, false, 0.05, 16);
+        this.glow = this.sprite.postFX.addGlow(layout.colors.secondary, 3, 0, false, 0.1, 12);
     }
     highlightReset() {
         if (this.glow) {

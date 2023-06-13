@@ -132,12 +132,12 @@ export default class Game extends Phaser.Scene {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
                 this.obj.discardPile.highlightSelected();
-            } else if (this.activeHandCard
+            }/* else if (this.activeHandCard
                     || (this.state.turnPhase == TurnPhase.Build && !this.state.playerIsActive)
                     || this.state.turnPhase == TurnPhase.Combat) {
                 this.obj.deck.highlightDisabled();
                 this.obj.discardPile.highlightDisabled();
-            }
+            }*/
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
                 else if (this.activeHandCard == c.uuid) c.highlightSelected();
@@ -146,30 +146,38 @@ export default class Game extends Phaser.Scene {
             this.cardStacks.forEach(cs => {
                 if (this.activeHandCard) { // Choose target for hand card
                     const activeCard = this.hand.find(c => c.uuid == this.activeHandCard);
-                    if (!activeCard.data.validTargets.includes(cs.uuid)) cs.highlightDisabled();
+                    if (activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
                 } else {
                     switch (this.state.turnPhase) {
                         case TurnPhase.Build:
                             if (this.plannedBattle.type != BattleType.None) { // Assign ships for battle
-                                if (cs.isOpponentColony()) {
-                                    if (this.plannedBattle.type == BattleType.Raid) cs.highlightSelected();
-                                } else {
-                                    if (!cs.data.missionReady) cs.highlightDisabled();
-                                    else if (this.plannedBattle.shipIds.includes(cs.uuid)) cs.highlightSelected();
+                                if (cs.isOpponentColony() && this.plannedBattle.type == BattleType.Raid
+                                        || this.plannedBattle.shipIds.includes(cs.uuid)) {
+                                    cs.highlightSelected();
+                                } else if (cs.data.missionReady) {
+                                    cs.highlightSelectable();
                                 }
                             } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) { // Assign ships to intervene
-                                if (!cs.data.interventionReady) cs.highlightDisabled();
-                                else if (this.interveneShipIds.includes(cs.uuid)) cs.highlightSelected();
+                                if (this.interveneShipIds.includes(cs.uuid)) {
+                                    cs.highlightSelected();
+                                } else if (cs.data.interventionReady) {
+                                    cs.highlightSelectable();
+                                }
                             }
                             break;
                         case TurnPhase.Combat:
-                            cs.highlightDisabled();
+                            const allShips = this.state.battle.playerShipIds.concat(this.state.battle.opponentShipIds);
+                            if (!allShips.includes(cs.uuid)) {
+                                cs.highlightDisabled();
+                            }
                             if (this.activeCardStack == cs.uuid && this.activeCardStackIndex >= 0) {
                                 cs.cards[this.activeCardStackIndex].highlightSelected();
                             } else if (this.state.battle.playerShipIds.includes(cs.uuid)) {
-                                cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightReset());
+                                cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
                             }
-                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(cs.uuid)) cs.highlightReset();
+                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(cs.uuid)) {
+                                cs.highlightSelectable();
+                            }
                             break;
                     }
                 }

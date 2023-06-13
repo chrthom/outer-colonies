@@ -24,8 +24,8 @@ export default class HandCard extends CardImage {
         this.enableMouseover(scene);
     }
     highlightPlayability() {
-        if (this.data.playable) this.highlightReset();
-        else this.highlightDisabled();
+        this.highlightReset();
+        if (this.data.playable) this.highlightSelectable();
     }
     private onClickAction(scene: Game) {
         if (scene.state.playerPendingAction) {

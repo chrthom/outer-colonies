@@ -58,6 +58,9 @@ export default class CardStack {
             c.highlightDisabled();
         });
     }
+    highlightSelectable() {
+        this.cards.forEach(c => c.highlightSelectable());
+    }
     highlightSelected() {
         this.cards.forEach(c => c.highlightSelected());
     }
