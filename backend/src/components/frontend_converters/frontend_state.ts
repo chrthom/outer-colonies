@@ -1,5 +1,5 @@
 import Match from '../game_state/match'
-import { AnimatedEvent, BattleType, CardType, TurnPhase, Zone } from '../config/enums'
+import { EventType, BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/utils';
 
@@ -52,7 +52,8 @@ export class FrontendHandCard {
 }
 
 export class FrontendEvent {
-    type: AnimatedEvent;
+    type: EventType;
+    playerEvent: boolean;
     oldUUID?: string;
     newUUID?: string;
     target?: string;
@@ -149,6 +150,15 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             .concat(match.battle.upsidePriceCards.map(c => c.id)),
         range: match.battle.range
     };
+    const events: FrontendEvent[] = match.eventBuffer.map(e => {
+        return {
+            type: e.type,
+            playerEvent: e.player.no == playerNo,
+            oldUUID: e.oldUUID,
+            newUUID: e.newUUID,
+            target: e.target
+        };
+    });
     const gameResult = match.gameResult.gameOver ? {
         won: match.gameResult.winnerNo == player.no
     } : null;
@@ -169,6 +179,6 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         battle: battle,
         gameResult: gameResult,
         hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
-        events: match.eventBuffer.map(e => <FrontendEvent> e)
+        events: events
     };
 }

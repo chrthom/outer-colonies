@@ -1,8 +1,6 @@
 import { MsgTypeInbound } from "../../../../../backend/src/components/config/enums";
-import Layout from "../../../config/layout";
+import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
-
-const layout = new Layout();
 
 export default class RetractCardButton {
     sprite: Phaser.GameObjects.Image;

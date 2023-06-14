@@ -1,8 +1,6 @@
 import CardImage from "./card_image";
-import Layout from "../../config/layout";
+import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
-
-const layout = new Layout();
 
 export default class MissionCards {
     minCards: CardImage[] = [];

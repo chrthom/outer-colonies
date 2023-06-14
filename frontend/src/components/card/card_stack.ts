@@ -1,12 +1,10 @@
-import Layout from "../../config/layout";
+import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendCard, FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
 import Card from "./card";
-
-const layout = new Layout();
 
 export default class CardStack {
     cards!: Array<Card>;

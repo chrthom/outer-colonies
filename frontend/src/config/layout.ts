@@ -1,5 +1,5 @@
-export default class Layout {
-    colors = {
+class Layout {
+    readonly colors = {
         alpha: 0.8,
         fadedAlpha: 0.3,
         fadedTint: 0x666666,
@@ -7,19 +7,19 @@ export default class Layout {
         primary: 0x119999,
         secondary: 0x991111
     };
-    stackYDistance = 30;
+    readonly stackYDistance = 30;
 
-    font = {
+    readonly font = {
         family: 'Impact',
         color: '#eeeeaa'
     };
 
-    actionPool = {
+    readonly actionPool = {
         x: 2370,
         y: 1040,
         yDistance: -55
     };
-    cards = {
+    readonly cards = {
         scale: {
             min: 0.1,
             normal: 0.25,
@@ -42,31 +42,31 @@ export default class Layout {
             yOffset: -245
         }
     };
-    continueButton = {
+    readonly continueButton = {
         x: 2370,
         y: 30,
         fontSize: 32
     };
-    deck = {
+    readonly deck = {
         x: 1930,
         y: 1070
     };
-    discardPile = {
+    readonly discardPile = {
         x: 2190,
         y: 1070
     };
-    maxCard = {
+    readonly maxCard = {
         x: 2110,
         y: 820,
         scale: 0.75
     };
-    missionCards = {
+    readonly missionCards = {
         x: 1700,
         y: 650,
         xDistance: 20,
         yDistance: 10
     };
-    opponent = {
+    readonly opponent = {
         colony: {
             x: 120,
             y: 100,
@@ -83,7 +83,7 @@ export default class Layout {
             maxWidth: 650
         }
     };
-    player = {
+    readonly player = {
         hand: {
             x: 2370,
             y: 1350,
@@ -108,7 +108,7 @@ export default class Layout {
             maxWidth: 650
         }
     };
-    preloader = {
+    readonly preloader = {
         x: 1200,
         y: 700,
         width: 500,
@@ -116,9 +116,11 @@ export default class Layout {
         boxPadding: 10,
         textOffsetY: -50
     }
-    prompt = {
+    readonly prompt = {
         x: 2370,
         y: 80,
         fontSize: 24
     };
 }
+
+export const layout = new Layout();

@@ -1,10 +1,8 @@
 import { BattleType, TurnPhase } from "../../../backend/src/components/config/enums";
 import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
 import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
-import Layout from "../config/layout";
+import { layout } from "../config/layout";
 import Game from "../scenes/game";
-
-const layout = new Layout();
 
 export default class Prompt {
     sprite: Phaser.GameObjects.Text;

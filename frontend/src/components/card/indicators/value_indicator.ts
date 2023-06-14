@@ -1,7 +1,5 @@
-import Layout from "../../../config/layout";
+import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
-
-const layout = new Layout();
 
 export default class ValueIndicator {
     shape: Phaser.GameObjects.Shape;

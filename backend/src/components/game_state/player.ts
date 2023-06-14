@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { AnimatedEvent, CardType, Zone } from '../config/enums'
+import { EventType, CardType, Zone } from '../config/enums'
 import { shuffle, spliceCardStackByUUID } from '../utils/utils';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -76,7 +76,7 @@ export default class Player {
     takeCards(cards: Card[]) {
         const newHandCards = cards.map(c => new RootCardStack(c, Zone.Hand, this));
         this.hand.push(...newHandCards);
-        const events = newHandCards.map(cs => new DrawCardEvent(cs.uuid));
+        const events = newHandCards.map(cs => new DrawCardEvent(this, cs.uuid));
         this.match.eventBuffer.push(...events);
     }
     pickCardsFromDeck(num: number): Card[] {

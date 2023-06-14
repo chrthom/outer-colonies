@@ -2,7 +2,7 @@ import { Socket } from 'socket.io-client';
 import Button from '../components/button';
 import Prompt from '../components/prompt';
 import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
+import { EventType as EventType, BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
@@ -24,6 +24,7 @@ export default class Game extends Phaser.Scene {
     gameParams: FrontendGameParams;
     preloader: Preloader;
     state: FrontendState;
+    oldState: FrontendState;
     activeHandCard: string;
     activeCardStack: string;
     activeCardStackIndex: number;
@@ -80,23 +81,52 @@ export default class Game extends Phaser.Scene {
     update() {}
 
     updateState(state: FrontendState) {
+        this.oldState = this.state;
         this.state = state;
-        //console.log(JSON.stringify(state.cardStacks)); /////
-        console.log(JSON.stringify(state.events)); ////
+        //console.log(JSON.stringify(state.cardStacks)); ////
         this.preloader.destroy();
         this.recreateCards();
+        this.createEventAnimations();
         this.resetSelections();
     }
 
     recreateCards() {
         const self = this;
-        self.hand.forEach(c => c.destroy());
-        self.hand = self.state.hand.map(cardData => new HandCard(self, self.state.hand.length, cardData));
-        self.cardStacks.forEach(cs => cs.destroy());
-        self.cardStacks = [];
-        self.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
-        self.obj.discardPile.destroy();
-        self.obj.discardPile = new DiscardPile(self, self.state.discardPileIds);
+        
+        this.hand.forEach(h => {
+            const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
+            if (newData) h.update(self, newData);
+            else h.destroy(); // ISSUE #19: Actual logic on playing hand card event
+        });
+        this.state.hand
+            .filter(c => !self.hand.some(h => h.uuid == c.uuid))
+            .map(c => new HandCard(self, c))
+            .forEach(h => self.hand.push(h));
+        //this.hand.forEach(c => c.destroy());
+        //this.hand = this.state.hand.map(cardData => new HandCard(self, cardData));
+
+        this.cardStacks.forEach(cs => cs.destroy());
+        this.cardStacks = [];
+        this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
+        this.obj.discardPile.destroy();
+        this.obj.discardPile = new DiscardPile(this, this.state.discardPileIds);
+    }
+
+    createEventAnimations() { // Not used yet
+        this.state.events.forEach(e => {
+            if (e.playerEvent) {
+                switch (e.type) {
+                    case EventType.Draw:
+                        const handCard = this.hand.find(c => c.uuid == e.newUUID);
+                        if (handCard) {
+                            // Draw tween
+                        }
+                        break;
+                }
+            } else {
+                // Opponent events
+            }
+        });
     }
 
     resetSelections() {

@@ -1,9 +1,7 @@
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../backend/src/components/config/enums";
 import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
-import Layout from "../config/layout";
+import { layout } from "../config/layout";
 import Game from "../scenes/game";
-
-const layout = new Layout();
 
 export default class Button {
     sprite: Phaser.GameObjects.Text;

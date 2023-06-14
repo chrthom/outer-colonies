@@ -13,7 +13,7 @@ export enum CardType {
     Orb = 'orb'
 }
 
-export enum AnimatedEvent {
+export enum EventType {
     Attach = 'attach',
     Attack = 'attack',
     Draw = 'draw',

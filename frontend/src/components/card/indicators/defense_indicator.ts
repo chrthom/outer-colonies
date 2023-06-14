@@ -1,8 +1,6 @@
 import { FrontendDefenseIcon } from "../../../../../backend/src/components/frontend_converters/frontend_state";
-import Layout from "../../../config/layout";
+import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
-
-const layout = new Layout();
 
 export default class DefenseIndicator {
     sprites: Phaser.GameObjects.Image[];

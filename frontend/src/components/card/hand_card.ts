@@ -1,31 +1,54 @@
 import CardImage from "./card_image";
-import Layout from "../../config/layout";
+import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
-
-const layout = new Layout();
+import { animationConfig } from "../../config/animation";
 
 export default class HandCard extends CardImage {
-    uuid: string;
-    data: FrontendHandCard;
-    constructor(scene: Game, handCardsNum: number, handCardData: FrontendHandCard) {
-        const invIndex = handCardsNum - handCardData.index - 1;
-        const x = layout.player.hand.x + invIndex * layout.player.hand.xStep;
-        const y = layout.player.hand.y + invIndex * layout.player.hand.yStep;
-        const angle = layout.player.hand.startAngle + invIndex * layout.player.hand.angleStep;
-        super(scene, x, y, handCardData.cardId);
-        this.sprite.setAngle(angle);
-        this.data = handCardData;
-        this.uuid = handCardData.uuid;
+    uuid!: string;
+    data!: FrontendHandCard;
+    animation!: Phaser.Tweens.Tween;
+    constructor(scene: Game, data: FrontendHandCard) {
+        super(scene, layout.deck.x, layout.deck.y, data.cardId);
+        this.data = data;
+        this.uuid = data.uuid;
+        this.update(scene, data);
         this.sprite.on('pointerdown', () => {
             this.onClickAction(scene);
         });
         this.enableMouseover(scene);
     }
+    update(scene: Game, data: FrontendHandCard) {
+        this.animation = scene.tweens.add({
+            targets: this.sprite,
+            duration: animationConfig.duration.draw,
+            x: this.x(scene, data),
+            y: this.y(scene, data),
+            angle: this.angle(scene, data)
+        });
+        /*
+        this.sprite
+            .setX(this.x(scene, data))
+            .setY(this.y(scene, data))
+            .setAngle(this.angle(scene, data));
+        */
+    }
     highlightPlayability() {
         this.highlightReset();
         if (this.data.playable) this.highlightSelectable();
+    }
+    private invIndex(scene: Game, data: FrontendHandCard) {
+        return scene.state.hand.length - data.index - 1;
+    }
+    private x(scene: Game, data: FrontendHandCard) {
+        return layout.player.hand.x + this.invIndex(scene, data) * layout.player.hand.xStep;
+    }
+    private y(scene: Game, data: FrontendHandCard) {
+        return layout.player.hand.y + this.invIndex(scene, data) * layout.player.hand.yStep;
+    }
+    private angle(scene: Game, data: FrontendHandCard) {
+        return layout.player.hand.startAngle + this.invIndex(scene, data) * layout.player.hand.angleStep;
     }
     private onClickAction(scene: Game) {
         if (scene.state.playerPendingAction) {

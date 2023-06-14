@@ -1,11 +1,9 @@
 import { BattleType, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendPlannedBattle } from "../../../../backend/src/components/frontend_converters/frontend_planned_battle";
-import Layout from "../../config/layout";
+import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";
 import ValueIndicator from "./indicators/value_indicator";
-
-const layout = new Layout();
 
 export default class DiscardPile extends CardImage {
     cardIds: Array<number>;
