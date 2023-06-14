@@ -109,7 +109,7 @@ export class Card427 extends TacticCard {
         let foundCards = 0;
         for (let i = 0; i < player.deck.length; i++) {
             if (player.deck[i].type == CardType.Infrastructure) {
-                player.takeCards(...player.deck.splice(i, 1));
+                player.takeCards(player.deck.splice(i, 1));
                 if (++foundCards == this.cardsToDraw) break;
             }
         }

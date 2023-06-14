@@ -5,6 +5,7 @@ import Battle from './battle';
 import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';55
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/utils';
+import CardEvent from '../cards/card_event';
 
 export default class Match {
     readonly room!: string;
@@ -13,6 +14,7 @@ export default class Match {
     actionPendingByPlayerNo: number = 0;
     turnPhase!: TurnPhase;
     battle: Battle;
+    eventBuffer: CardEvent[] = [];
     gameResult!: GameResult;
     constructor(room: string) {
         this.room = room;

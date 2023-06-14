@@ -135,7 +135,7 @@ export default class CardStack {
             spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
         }
         this.getCards().forEach(c => c.onRetraction(this.getPlayer()));
-        this.getPlayer().takeCards(...this.getCards().filter(c => c.canBeRetracted()));
+        this.getPlayer().takeCards(this.getCards().filter(c => c.canBeRetracted()));
         this.getPlayer().discardCards(...this.getCards().filter(c => !c.canBeRetracted()));
     }
     type(): CardType {

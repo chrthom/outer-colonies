@@ -82,7 +82,7 @@ export default class Battle {
     private applyMissionResult(match: Match) {
         const player = match.getActivePlayer();
         if (this.ships[match.activePlayerNo].length > 0) {
-            player.takeCards(...this.downsidePriceCards);
+            player.takeCards(this.downsidePriceCards);
             player.deck.push(...this.upsidePriceCards);
         } else {
             player.discardCards(...this.downsidePriceCards.concat(this.upsidePriceCards));

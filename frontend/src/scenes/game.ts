@@ -82,6 +82,7 @@ export default class Game extends Phaser.Scene {
     updateState(state: FrontendState) {
         this.state = state;
         //console.log(JSON.stringify(state.cardStacks)); /////
+        console.log(JSON.stringify(state.events)); ////
         this.preloader.destroy();
         this.recreateCards();
         this.resetSelections();

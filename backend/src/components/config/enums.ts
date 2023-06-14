@@ -13,6 +13,15 @@ export enum CardType {
     Orb = 'orb'
 }
 
+export enum AnimatedEvent {
+    Attach = 'attach',
+    Attack = 'attack',
+    Draw = 'draw',
+    Discard = 'discard',
+    Destroy = 'destroy',
+    Retract = 'retract'
+}
+
 export enum MsgTypeInbound {
     Attack = 'attack',
     Connect = 'connect',

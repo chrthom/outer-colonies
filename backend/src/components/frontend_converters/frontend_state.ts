@@ -1,5 +1,5 @@
 import Match from '../game_state/match'
-import { BattleType, CardType, TurnPhase, Zone } from '../config/enums'
+import { AnimatedEvent, BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/utils';
 
@@ -51,6 +51,13 @@ export class FrontendHandCard {
     validTargets!: string[];
 }
 
+export class FrontendEvent {
+    type: AnimatedEvent;
+    oldUUID?: string;
+    newUUID?: string;
+    target?: string;
+}
+
 export class FrontendGameResult {
     won: boolean;
 }
@@ -69,6 +76,7 @@ export class FrontendState {
     battle?: FrontendBattle;
     gameResult?: FrontendGameResult;
     hasToRetractCards: boolean;
+    events: FrontendEvent[];
 }
 
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
@@ -88,7 +96,6 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
             return zoneCardStacks.map((cs, index) => {
-                const battleReadyCards = cs.getCardStacks().flatMap((cs, index) => cs.canAttack(player) ? [index] : []);
                 const interventionReady = ownedByPlayer
                     && match.getInactivePlayerNo() == playerNo
                     && match.battle.canInterveneMission(playerNo, cs);
@@ -161,6 +168,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         cardStacks: cardStacks,
         battle: battle,
         gameResult: gameResult,
-        hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
+        hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
+        events: match.eventBuffer.map(e => <FrontendEvent> e)
     };
 }
