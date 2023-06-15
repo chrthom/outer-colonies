@@ -5,6 +5,7 @@ import { FrontendCard, FrontendCardStack } from "../../../../backend/src/compone
 import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
 import Card from "./card";
+import { animationConfig } from "../../config/animation";
 
 export default class CardStack {
     cards!: Array<Card>;
@@ -17,41 +18,34 @@ export default class CardStack {
         this.scene = scene;
         this.uuid = data.uuid;
         this.data = data;
-        const zoneLayout = data.ownedByPlayer ? layout.player[data.zone] : layout.opponent[data.zone];
-        const x = zoneLayout.x + (data.zoneCardsNum == 1 ? zoneLayout.maxWidth / 2 : data.index * zoneLayout.maxWidth / (data.zoneCardsNum - 1));
-        const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
-        this.cards = data.cards.map(c => new Card(scene, x, zoneLayout.y + c.index * yDistance, !data.ownedByPlayer, this.uuid, c));
-        this.cards.forEach(c => {
-            c.image.on('pointerdown', () => this.onClickAction(c.data));
-            c.enableMaximizeOnMouseover();
-        });
-        if (data.damage > 0) {
-            this.damageIndicator = new ValueIndicator(
-                scene, 
-                String(this.data.damage), 
-                this.data.criticalDamage, 
-                x,
-                zoneLayout.y,
-                data.ownedByPlayer,
-                false
-            );
-        }
-        if (scene.state.turnPhase == TurnPhase.Combat 
-            && scene.state.battle.playerShipIds.concat(scene.state.battle.opponentShipIds).includes(this.uuid)
-        ) {
-            this.defenseIndicator = new DefenseIndicator(
-                scene,
-                data.defenseIcons,
-                x,
-                zoneLayout.y,
-                data.ownedByPlayer
-            );
-        }
+        this.createCards();
     }
     destroy() {
-        this.cards.forEach(c => c.destroy());
         if (this.damageIndicator) this.damageIndicator.destroy();
         if (this.defenseIndicator) this.defenseIndicator.destroy();
+        this.cards.forEach(c => c.destroy());
+    }
+    update(data: FrontendCardStack) {
+        this.destroy();
+        this.data.cards = data.cards;
+        this.data.damage = data.damage;
+        this.data.defenseIcons = data.defenseIcons;
+        this.createCards();
+        this.data = data;
+        this.cards.forEach((c, index) => {
+            c.tween({
+                targets: undefined,
+                duration: animationConfig.duration.move,
+                x: this.x(),
+                y: this.y(index)
+            });
+        });
+        if (this.damageIndicator) {
+            this.damageIndicator.update(this.x(), this.zoneLayout().y, String(this.data.damage), this.data.criticalDamage);
+        }
+        if (this.defenseIndicator) {
+            this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
+        }
     }
     highlightDisabled() {
         this.cards.forEach(c => {
@@ -71,6 +65,49 @@ export default class CardStack {
     }
     isOpponentColony() {
         return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
+    }
+    private createCards() {
+        this.cards = this.data.cards.map(c => 
+            new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
+        );
+        this.cards.forEach(c => {
+            c.image.on('pointerdown', () => this.onClickAction(c.data));
+            c.enableMaximizeOnMouseover();
+        });
+        if (this.data.damage > 0) {
+            this.damageIndicator = new ValueIndicator(
+                this.scene, 
+                String(this.data.damage), 
+                this.data.criticalDamage, 
+                this.x(),
+                this.zoneLayout().y,
+                this.data.ownedByPlayer,
+                false
+            );
+        }
+        if (this.scene.state.turnPhase == TurnPhase.Combat 
+            && this.scene.state.battle.playerShipIds.concat(this.scene.state.battle.opponentShipIds).includes(this.uuid)
+        ) {
+            this.defenseIndicator = new DefenseIndicator(
+                this.scene,
+                this.data.defenseIcons,
+                this.x(),
+                this.zoneLayout().y,
+                this.data.ownedByPlayer
+            );
+        }
+    }
+    private x() {
+        return this.zoneLayout().x + (this.data.zoneCardsNum == 1 
+            ? this.zoneLayout().maxWidth / 2 
+            : this.data.index * this.zoneLayout().maxWidth / (this.data.zoneCardsNum - 1));
+    }
+    private y(index: number) {
+        const yDistance = layout.stackYDistance * (this. data.ownedByPlayer ? 1 : -1);
+        return this.zoneLayout().y + index * yDistance;
+    }
+    private zoneLayout() {
+        return this.data.ownedByPlayer ? layout.player[this.data.zone] : layout.opponent[this.data.zone];
     }
     private onClickAction(cardData: FrontendCard) {
         const state = this.scene.state;

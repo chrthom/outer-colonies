@@ -118,7 +118,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                         id: cs.card.id,
                         index: index,
                         battleReady: cs.canAttack(player),
-                        retractable: cs.canBeRetracted(),
+                        retractable: ownedByPlayer && cs.canBeRetracted(),
                         insufficientEnergy: cs.hasInsufficientEnergy()
                     }
                 });

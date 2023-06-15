@@ -1,9 +1,12 @@
+import { animationConfig } from "../../../config/animation";
 import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
 
 export default class ValueIndicator {
-    shape: Phaser.GameObjects.Shape;
-    text: Phaser.GameObjects.Text;
+    shape!: Phaser.GameObjects.Shape;
+    text!: Phaser.GameObjects.Text;
+    private scene!: Game;
+    private ownedByPlayer!: boolean;
     constructor(
         scene: Game,
         value: string,
@@ -13,13 +16,13 @@ export default class ValueIndicator {
         ownedByPlayer: boolean,
         hasEllipseShape: boolean
     ) {
-        const x = cardX + layout.cards.damageIndicator.xOffset;
-        const y = cardY + (ownedByPlayer ? layout.cards.damageIndicator.yOffsetPlayer : layout.cards.damageIndicator.yOffsetOpponent);
+        this.scene = scene;
+        this.ownedByPlayer = ownedByPlayer;
         if (hasEllipseShape) {
             this.shape = scene.add
                 .ellipse(
-                    x,
-                    y,
+                    this.x(cardX),
+                    this.y(cardY),
                     64,
                     32,
                     critical ? layout.colors.secondary : layout.colors.primary,
@@ -29,8 +32,8 @@ export default class ValueIndicator {
         } else {
             this.shape = scene.add
                 .star(
-                    x,
-                    y,
+                    this.x(cardX),
+                    this.y(cardY),
                     12,
                     16,
                     22,
@@ -40,7 +43,7 @@ export default class ValueIndicator {
                 .setOrigin(0.5, 0.5);
         }
         this.text = scene.add
-            .text(x, y, value)
+            .text(this.x(cardX), this.y(cardY), value)
             .setFontSize(layout.cards.damageIndicator.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeecc')
@@ -51,5 +54,20 @@ export default class ValueIndicator {
         this.shape.destroy();
         this.text.destroy();
     }
-
+    update(cardX: number, cardY: number, text: string, critical: boolean) {
+        this.text.setText(text);
+        this.shape.fillColor = critical ? layout.colors.secondary : layout.colors.primary;
+        this.scene.tweens.add({
+            targets: [ this.text, this.shape ],
+            duration: animationConfig.duration.move,
+            x: this.x(cardX),
+            y: this.y(cardY)
+        });
+    }
+    private x(cardX: number) {
+        return cardX + layout.cards.damageIndicator.xOffset;
+    }
+    private y(cardY: number) {
+        return cardY + (this.ownedByPlayer ? layout.cards.damageIndicator.yOffsetPlayer : layout.cards.damageIndicator.yOffsetOpponent);
+    }
 }

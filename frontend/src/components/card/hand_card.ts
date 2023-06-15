@@ -33,9 +33,9 @@ export default class HandCard extends CardImage {
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.draw,
-            x: this.x(data),
-            y: this.y(data),
-            angle: this.angle(data)
+            x: this.x(),
+            y: this.y(),
+            angle: this.angle()
         });
     }
     highlightPlayability() {
@@ -45,14 +45,14 @@ export default class HandCard extends CardImage {
     private invIndex(data: FrontendHandCard) {
         return this.scene.state.hand.length - data.index - 1;
     }
-    private x(data: FrontendHandCard) {
-        return layout.player.hand.x + this.invIndex(data) * layout.player.hand.xStep;
+    private x() {
+        return layout.player.hand.x + this.invIndex(this.data) * layout.player.hand.xStep;
     }
-    private y(data: FrontendHandCard) {
-        return layout.player.hand.y + this.invIndex(data) * layout.player.hand.yStep;
+    private y() {
+        return layout.player.hand.y + this.invIndex(this.data) * layout.player.hand.yStep;
     }
-    private angle(data: FrontendHandCard) {
-        return layout.player.hand.startAngle + this.invIndex(data) * layout.player.hand.angleStep;
+    private angle() {
+        return layout.player.hand.startAngle + this.invIndex(this.data) * layout.player.hand.angleStep;
     }
     private onClickAction() {
         if (this.scene.state.playerPendingAction) {

@@ -15,13 +15,13 @@ export default class DiscardPile extends CardImage {
     update() {
         if (this.indicator) this.indicator.destroy();
         if (this.cardIds.length == 0) {
-            this.image.setVisible(false);
+            this.setVisible(false);
         } else {
             this.setCardId(this.getTopCard());
             this.image
-                .setVisible(true)
                 .off('pointerdown')
                 .on('pointerdown', () => this.onClickAction());
+            this.setVisible(true);
             this.enableMaximizeOnMouseover();
             const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
             this.indicator = new ValueIndicator(

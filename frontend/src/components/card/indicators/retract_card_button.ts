@@ -1,11 +1,14 @@
 import { MsgTypeInbound } from "../../../../../backend/src/components/config/enums";
+import { animationConfig } from "../../../config/animation";
 import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
 
 export default class RetractCardButton {
-    sprite: Phaser.GameObjects.Image;
+    image: Phaser.GameObjects.Image;
+    private scene!: Game;
     constructor(scene: Game, cardX: number, cardY: number, cardStackUUID: string, cardIndex: number, crititcal: boolean) {
-        this.sprite = scene.add
+        this.scene = scene;
+        this.image = scene.add
             .image(
                 cardX + layout.cards.retractCardButton.xOffset,
                 cardY + layout.cards.retractCardButton.yOffset,
@@ -20,15 +23,23 @@ export default class RetractCardButton {
         crititcal ? this.setTintCritical() : this.setTintNormal();
     }
     destroy() {
-        this.sprite.destroy();
+        this.image.destroy();
     }
     setTintNormal() {
-        this.sprite.setTint(layout.colors.primary, layout.colors.neutral, layout.colors.primary, layout.colors.primary);
+        this.image.setTint(layout.colors.primary, layout.colors.neutral, layout.colors.primary, layout.colors.primary);
     }
     setTintCritical() {
-        this.sprite.setTint(layout.colors.secondary, layout.colors.neutral, layout.colors.secondary, layout.colors.secondary);
+        this.image.setTint(layout.colors.secondary, layout.colors.neutral, layout.colors.secondary, layout.colors.secondary);
     }
     setTintHover() {
-        this.sprite.setTint(layout.colors.neutral);
+        this.image.setTint(layout.colors.neutral);
+    }
+    tween(cardX: number, cardY: number) {
+        this.scene.tweens.add({
+            targets: this.image,
+            duration: animationConfig.duration.move,
+            x: cardX + layout.cards.retractCardButton.xOffset,
+            y: cardY + layout.cards.retractCardButton.yOffset
+        });
     }
 }

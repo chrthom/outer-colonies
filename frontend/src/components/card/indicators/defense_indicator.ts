@@ -1,17 +1,21 @@
 import { FrontendDefenseIcon } from "../../../../../backend/src/components/frontend_converters/frontend_state";
+import { animationConfig } from "../../../config/animation";
 import { layout } from "../../../config/layout";
 import Game from "../../../scenes/game";
 
 export default class DefenseIndicator {
-    sprites: Phaser.GameObjects.Image[];
+    images: Phaser.GameObjects.Image[];
+    private scene!: Game;
+    private ownedByPlayer!: boolean;
     constructor(scene: Game, defenseIcons: FrontendDefenseIcon[], cardX: number, cardY: number, ownedByPlayer: boolean) {
-        this.sprites = defenseIcons.map((icon, index) => {
+        this.scene = scene;
+        this.ownedByPlayer = ownedByPlayer;
+        this.images = defenseIcons.map((icon, index) => {
             const color = icon.depleted ? layout.colors.secondary : layout.colors.primary;
             return scene.add
                 .image(
-                    cardX + layout.cards.defenseIndicator.xOffset,
-                    cardY + (ownedByPlayer ? layout.cards.defenseIndicator.yOffsetPlayer : layout.cards.defenseIndicator.yOffsetOpponent)
-                        + index * layout.cards.defenseIndicator.yDistance,
+                    this.x(cardX),
+                    this.y(cardY, index),
                     `icon_${icon.icon}`
                 )
                 .setOrigin(0.5, 0.5)
@@ -20,7 +24,24 @@ export default class DefenseIndicator {
         });
     }
     destroy() {
-        this.sprites.forEach(i => i.destroy());
+        this.images.forEach(i => i.destroy());
     }
-
+    tween(cardX: number, cardY: number) {
+        this.images.forEach((image, index) => {
+            this.scene.tweens.add({
+                targets: [ image ],
+                duration: animationConfig.duration.move,
+                x: this.x(cardX),
+                y: this.y(cardY, index)
+            });
+        });
+    }
+    private x(cardX: number) {
+        return cardX + layout.cards.defenseIndicator.xOffset;
+    }
+    private y(cardY: number, index: number) {
+        return cardY 
+            + (this.ownedByPlayer ? layout.cards.defenseIndicator.yOffsetPlayer : layout.cards.defenseIndicator.yOffsetOpponent)
+            + index * layout.cards.defenseIndicator.yDistance;
+    }
 }

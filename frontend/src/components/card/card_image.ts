@@ -64,6 +64,10 @@ export default class CardImage {
             .setScale(scale)
             .setInteractive();
     }
+    setVisible(visible: boolean) {
+        this.image.setVisible(visible);
+        if (!visible) this.imageHighlight.setVisible(visible);
+    }
     enableMaximizeOnMouseover() {
         this.image.off('pointerover');
         this.image.off('pointerout');
@@ -71,7 +75,7 @@ export default class CardImage {
             .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
             .on('pointerout', () => this.scene.obj.maxCard.hide());
     }
-    protected tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
+    tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
         tweenConfig.targets = [ this.image, this.imageHighlight, this.imageMask ];
         this.scene.tweens.add(tweenConfig);
     }
