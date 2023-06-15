@@ -120,11 +120,6 @@ export default class Game extends Phaser.Scene {
             .map(cs => new CardStack(self, cs))
             .forEach(cs => self.cardStacks.push(cs));
         this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid));
-        /*
-        this.cardStacks.forEach(cs => cs.destroy());
-        this.cardStacks = [];
-        this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
-        */
 
         this.resetView();
         setTimeout(function() {
@@ -165,7 +160,7 @@ export default class Game extends Phaser.Scene {
         if (this.state.playerPendingAction) {
             if (this.plannedBattle.type == BattleType.Mission) {
                 this.obj.deck.highlightSelected();
-                this.obj.discardPile.highlightSelected();
+                if (this.obj.discardPile.cardIds.length > 0) this.obj.discardPile.highlightSelected();
             }
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
