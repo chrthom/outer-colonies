@@ -89,10 +89,6 @@ export default class Game extends Phaser.Scene {
         this.state = state;
         //console.log(JSON.stringify(state.cardStacks)); ////
         this.preloader.destroy();
-        this.performStateChanges();
-    }
-
-    performStateChanges() {
         const self = this;
         this.hand.forEach(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
@@ -113,24 +109,20 @@ export default class Game extends Phaser.Scene {
         this.cardStacks = [];
         this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
 
-        self.resetSelections();
+        this.resetView();
         setTimeout(function() {
             self.obj.discardPile.cardIds = self.state.discardPileIds;
             self.obj.discardPile.update(self);
         }, animationConfig.duration.cleanup); // ISSUE #43: Perform check if all animations are done
     }
 
-    resetSelections() {
-        this.resetWithBattleType(BattleType.None);
-    }
-
-    resetWithBattleType(type: BattleType) {
+    resetView(battleType?: BattleType) {
         this.activeHandCard = null;
         this.activeCardStack = null;
         this.activeCardStackIndex = null;
         this.interveneShipIds = [];
         this.plannedBattle = {
-            type: type,
+            type: battleType ? battleType : BattleType.None,
             downsideCardsNum: 0,
             upsideCardsNum: 0,
             shipIds: []
@@ -148,7 +140,7 @@ export default class Game extends Phaser.Scene {
         this.updateHighlighting();
     }
 
-    updateHighlighting() {
+    private updateHighlighting() {
         this.obj.deck.highlightReset();
         this.obj.discardPile.highlightReset();
         this.hand.forEach(c => c.highlightReset());

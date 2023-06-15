@@ -81,7 +81,7 @@ export default class CardStack {
                         if (this.scene.activeHandCard) {
                             this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeHandCard, this.uuid);
                         } else if (this.isOpponentColony()) {
-                            this.scene.resetWithBattleType(this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
+                            this.scene.resetView(this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
                         } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
                             if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
                                 this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(id => id != this.uuid);

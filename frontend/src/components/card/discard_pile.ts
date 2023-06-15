@@ -53,10 +53,10 @@ export default class DiscardPile extends CardImage {
                 && this.scene.state.turnPhase == TurnPhase.Build
                 && !this.scene.activeHandCard) {
             if (FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
-                this.scene.resetWithBattleType(BattleType.None);
+                this.scene.resetView(BattleType.None);
             } else if (this.scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
                 if (this.scene.plannedBattle.type != BattleType.Mission) {
-                    this.scene.resetWithBattleType(BattleType.Mission);
+                    this.scene.resetView(BattleType.Mission);
                 }
                 if (!FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
                     this.scene.plannedBattle.upsideCardsNum++;
