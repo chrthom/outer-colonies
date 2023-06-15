@@ -10,7 +10,6 @@ export default class HandCard extends CardImage {
     data!: FrontendHandCard;
     constructor(scene: Game, data: FrontendHandCard) {
         super(scene, layout.deck.x, layout.deck.y, data.cardId);
-        this.data = data;
         this.uuid = data.uuid;
         this.update(scene, data);
         this.image.on('pointerdown', () => {
@@ -19,6 +18,7 @@ export default class HandCard extends CardImage {
         this.enableMouseover(scene);
     }
     update(scene: Game, data: FrontendHandCard) {
+        this.data = data;
         this.tween(scene, this.x(scene, data), this.y(scene, data), this.angle(scene, data));
         /*
         this.sprite
