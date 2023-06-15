@@ -8,10 +8,10 @@ export default class MaxCard extends CardImage {
         this.hide();
     }
     hide() {
-        this.sprite.visible = false;
+        this.image.visible = false;
     }
     show(cardId: string) {
-        this.sprite.setTexture(`card_${cardId}`);
-        this.sprite.visible = true;
+        this.image.setTexture(`card_${cardId}`);
+        this.image.visible = true;
     }
 }

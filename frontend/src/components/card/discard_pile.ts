@@ -13,10 +13,10 @@ export default class DiscardPile extends CardImage {
         super(scene, layout.discardPile.x, layout.discardPile.y, topCard);
         this.cardIds = cardIds;
         if (cardIds.length == 0) {
-            this.sprite.visible = false;
+            this.image.visible = false;
         } else {
             this.enableMouseover(scene);
-            this.sprite.on('pointerdown', () => {
+            this.image.on('pointerdown', () => {
                 this.onClickAction(scene);
             });
         }

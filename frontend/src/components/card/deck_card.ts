@@ -9,7 +9,7 @@ export default class DeckCard extends CardImage {
     indicator: ValueIndicator;
     constructor(scene: Game) {
         super(scene, layout.deck.x, layout.deck.y, 1);
-        this.sprite.on('pointerdown', () => {
+        this.image.on('pointerdown', () => {
             this.onClickAction(scene);
         });
     }

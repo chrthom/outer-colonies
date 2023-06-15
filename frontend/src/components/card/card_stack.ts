@@ -20,7 +20,7 @@ export default class CardStack {
         const yDistance = layout.stackYDistance * (data.ownedByPlayer ? 1 : -1);
         this.cards = data.cards.map(c => new Card(scene, x, zoneLayout.y + c.index * yDistance, !data.ownedByPlayer, this.uuid, c));
         this.cards.forEach(c => {
-            c.sprite.on('pointerdown', () => this.onClickAction(scene, c.data));
+            c.image.on('pointerdown', () => this.onClickAction(scene, c.data));
             c.enableMouseover(scene);
         });
         if (data.damage > 0) {

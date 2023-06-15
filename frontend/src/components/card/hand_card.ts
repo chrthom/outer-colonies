@@ -13,7 +13,7 @@ export default class HandCard extends CardImage {
         this.data = data;
         this.uuid = data.uuid;
         this.update(scene, data);
-        this.sprite.on('pointerdown', () => {
+        this.image.on('pointerdown', () => {
             this.onClickAction(scene);
         });
         this.enableMouseover(scene);
