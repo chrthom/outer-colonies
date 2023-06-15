@@ -3,7 +3,6 @@ import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
-import { animationConfig } from "../../config/animation";
 
 export default class HandCard extends CardImage {
     uuid!: string;
@@ -20,12 +19,6 @@ export default class HandCard extends CardImage {
     update(scene: Game, data: FrontendHandCard) {
         this.data = data;
         this.tween(scene, this.x(scene, data), this.y(scene, data), this.angle(scene, data));
-        /*
-        this.sprite
-            .setX(this.x(scene, data))
-            .setY(this.y(scene, data))
-            .setAngle(this.angle(scene, data));
-        */
     }
     highlightPlayability() {
         this.highlightReset();

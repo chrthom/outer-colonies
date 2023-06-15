@@ -4,11 +4,10 @@ import Game from "../../scenes/game";
 
 export default class CardImage {
     image!: Phaser.GameObjects.Image;
-    imageHighlight!: Phaser.GameObjects.Image;
-    imageMask!: Phaser.GameObjects.Image;
-    mask!: Phaser.Display.Masks.BitmapMask;
     cardId!: number;
-    animation?: Phaser.Tweens.Tween;
+    private imageHighlight!: Phaser.GameObjects.Image;
+    private imageMask!: Phaser.GameObjects.Image;
+    private animation?: Phaser.Tweens.Tween;
     constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
         this.cardId = cardId;
         const setImageProps = (image: Phaser.GameObjects.Image) => image
@@ -28,8 +27,7 @@ export default class CardImage {
             .image(x, y, 'card_mask')
             .setVisible(false)
         );
-        this.mask = this.imageMask.createBitmapMask();
-        this.image.setMask(this.mask);
+        this.image.setMask(this.imageMask.createBitmapMask());
     }
     destroy() {
         this.image.destroy();
