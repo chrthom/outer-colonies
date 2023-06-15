@@ -6,30 +6,26 @@ import CardImage from "./card_image";
 import ValueIndicator from "./indicators/value_indicator";
 
 export default class DiscardPile extends CardImage {
-    cardIds: Array<number>;
+    cardIds: Array<number> = [];
     indicator: ValueIndicator;
-    constructor(scene: Game, cardIds: Array<number>) {
-        const topCard = cardIds.length == 0 ? 1 : cardIds[cardIds.length - 1];
+    constructor(scene: Game) {
         super(scene, layout.discardPile.x, layout.discardPile.y, 1);
-        this.cardIds = cardIds;
-        this.update(scene);
+        this.update();
     }
-    update(scene: Game) {
+    update() {
         if (this.indicator) this.indicator.destroy();
         if (this.cardIds.length == 0) {
             this.image.setVisible(false);
         } else {
-            this.setCardId(scene, this.getTopCard());
+            this.setCardId(this.getTopCard());
             this.image
                 .setVisible(true)
                 .off('pointerdown')
-                .on('pointerdown', () => {
-                    this.onClickAction(scene);
-                });
-            this.enableMouseover(scene);
-            const cardsForMission = scene.plannedBattle.upsideCardsNum;
+                .on('pointerdown', () => this.onClickAction());
+            this.enableMaximizeOnMouseover();
+            const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
             this.indicator = new ValueIndicator(
-                scene,
+                this.scene,
                 this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
                 false,
                 layout.discardPile.x,
@@ -43,28 +39,28 @@ export default class DiscardPile extends CardImage {
         super.destroy();
         if (this.indicator) this.indicator.destroy();
     }
-    addCard(scene: Game, cardId: number) {
+    addCard(cardId: number) {
         this.cardIds.push(cardId);
-        this.update(scene);
+        this.update();
     }
     private getTopCard() {
         return this.cardIds.length == 0 ? 1 : this.cardIds[this.cardIds.length - 1];
     }
-    private onClickAction(scene: Game) {
-        if (scene.state 
-                && scene.state.playerPendingAction 
-                && scene.state.playerIsActive 
-                && scene.state.turnPhase == TurnPhase.Build
-                && !scene.activeHandCard) {
-            if (FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
-                scene.resetWithBattleType(BattleType.None);
-            } else if (scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
-                if (scene.plannedBattle.type != BattleType.Mission) {
-                    scene.resetWithBattleType(BattleType.Mission);
+    private onClickAction() {
+        if (this.scene.state 
+                && this.scene.state.playerPendingAction 
+                && this.scene.state.playerIsActive 
+                && this.scene.state.turnPhase == TurnPhase.Build
+                && !this.scene.activeHandCard) {
+            if (FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+                this.scene.resetWithBattleType(BattleType.None);
+            } else if (this.scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
+                if (this.scene.plannedBattle.type != BattleType.Mission) {
+                    this.scene.resetWithBattleType(BattleType.Mission);
                 }
-                if (!FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
-                    scene.plannedBattle.upsideCardsNum++;
-                    scene.updateView();
+                if (!FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+                    this.scene.plannedBattle.upsideCardsNum++;
+                    this.scene.updateView();
                 }
             }
         }

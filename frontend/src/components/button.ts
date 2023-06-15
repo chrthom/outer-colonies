@@ -5,10 +5,10 @@ import Game from "../scenes/game";
 
 export default class Button {
     sprite: Phaser.GameObjects.Text;
-    action = {
-        onClick: null
-    };
+    private scene: Game;
+    private onClickAction: () => void = () => {};
     constructor(scene: Game) {
+        this.scene = scene;
         const self = this;
         this.sprite = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
             .setFontSize(layout.continueButton.fontSize)
@@ -18,7 +18,7 @@ export default class Button {
             .setOrigin(1, 0)
             .setInteractive();
         this.sprite.on('pointerdown', () => {
-            self.action.onClick();
+            self.onClickAction();
         });
         this.sprite.on('pointerover', () => {
             self.sprite.setColor('#ff69b4');
@@ -28,16 +28,16 @@ export default class Button {
         });
         this.hide();
     }
-    update(scene: Game) {
-        if (scene.state.gameResult) {
-            this.showGameOver(scene);
-        } else if (scene.state.playerPendingAction) {
-            if (scene.state.turnPhase == TurnPhase.Build) {
-                if (!scene.state.playerIsActive) this.showIntervene(scene);
-                else if (scene.state.hasToRetractCards) this.hide();
-                else this.showNextPhase(scene);
-            } else if (scene.state.turnPhase == TurnPhase.Combat) {
-                this.showNextCombatPhase(scene);
+    update() {
+        if (this.scene.state.gameResult) {
+            this.showGameOver();
+        } else if (this.scene.state.playerPendingAction) {
+            if (this.scene.state.turnPhase == TurnPhase.Build) {
+                if (!this.scene.state.playerIsActive) this.showIntervene();
+                else if (this.scene.state.hasToRetractCards) this.hide();
+                else this.showNextPhase();
+            } else if (this.scene.state.turnPhase == TurnPhase.Combat) {
+                this.showNextCombatPhase();
             } else {
                 this.hide();
             }
@@ -45,31 +45,31 @@ export default class Button {
             this.hide();
         }
     }
-    private showNextPhase(scene: Game) {
-        const text = scene.plannedBattle.shipIds.length == 0 
-                || scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(scene.plannedBattle) ? 
+    private showNextPhase() {
+        const text = this.scene.plannedBattle.shipIds.length == 0 
+                || this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle) ? 
             'Zug beenden' :
-            `${scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
-        this.show(text, () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.plannedBattle));
+            `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
+        this.show(text, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle));
     }
-    private showIntervene(scene: Game) {
+    private showIntervene() {
         let text: string; 
-        if (scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
-        else if (scene.interveneShipIds.length > 0) text = 'Intervenieren';
+        if (this.scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
+        else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
         else text = 'Überspringen';
-        this.show(text, () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, scene.interveneShipIds));
+        this.show(text, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds));
     }
-    private showNextCombatPhase(scene: Game) {
-        this.show('Kampfphase beenden', () => scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
+    private showNextCombatPhase() {
+        this.show('Kampfphase beenden', () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
     }
-    private showGameOver(scene: Game) {
+    private showGameOver() {
         this.show('Neuen Gegner suchen', () => {
-            scene.socket.off(MsgTypeOutbound.State);
-            scene.scene.start('Matchmaking');
+            this.scene.socket.off(MsgTypeOutbound.State);
+            this.scene.scene.start('Matchmaking');
         });
     }
     private show(text: string, onClickAction: () => void) {
-        this.action.onClick = onClickAction;
+        this.onClickAction = onClickAction;
         this.sprite.setText(text);
         this.sprite.visible = true;
     }

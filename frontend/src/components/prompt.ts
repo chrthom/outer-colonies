@@ -5,9 +5,11 @@ import { layout } from "../config/layout";
 import Game from "../scenes/game";
 
 export default class Prompt {
-    sprite: Phaser.GameObjects.Text;
+    private scene: Game;
+    private text: Phaser.GameObjects.Text;
     constructor(scene: Game) {
-        this.sprite = scene.add.text(layout.prompt.x, layout.prompt.y, '')
+        this.scene = scene;
+        this.text = scene.add.text(layout.prompt.x, layout.prompt.y, '')
             .setFontSize(layout.prompt.fontSize)
             .setFontFamily(layout.font.family)
             .setColor(layout.font.color)
@@ -15,20 +17,20 @@ export default class Prompt {
             .setOrigin(1, 0);
         this.hide();
     }
-    update(scene: Game) {
-        if (scene.state.gameResult) {
-            this.showGameOver(scene.state.gameResult);
-        } else if (scene.state.playerPendingAction) {
-            switch (scene.state.turnPhase) {
+    update() {
+        if (this.scene.state.gameResult) {
+            this.showGameOver(this.scene.state.gameResult);
+        } else if (this.scene.state.playerPendingAction) {
+            switch (this.scene.state.turnPhase) {
                 case TurnPhase.Build:
-                    if (scene.state.playerIsActive) this.showBuildPhase(scene);
-                    else this.showIntervenePhase(scene);
+                    if (this.scene.state.playerIsActive) this.showBuildPhase();
+                    else this.showIntervenePhase();
                     break;
                 case TurnPhase.Combat:
-                    this.showCombatPhase(scene);
+                    this.showCombatPhase();
                     break;
                 case TurnPhase.End:
-                    this.showEndPhase(scene);
+                    this.showEndPhase();
                     break;
                 default:
                     this.hide();
@@ -37,42 +39,42 @@ export default class Prompt {
             this.hide();
         }
     }
-    private showBuildPhase(scene: Game) {
+    private showBuildPhase() {
         let text: string = '';
-        if (scene.plannedBattle.type == BattleType.None) {
-            if (scene.state.hasToRetractCards) {
+        if (this.scene.plannedBattle.type == BattleType.None) {
+            if (this.scene.state.hasToRetractCards) {
                 text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
             }
             text += 'Plane eine Mission oder einen Überfall:\n'
                 + '- Klicke dein Deck oder Ablagestapel für eine Mission\n'
                 + '- Klicke die gegnerische Kolonie für einen Überfall';
-        } else if (scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
-            const missingCards = FrontendPlannedBattle.missingCards(scene.plannedBattle);
+        } else if (this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+            const missingCards = FrontendPlannedBattle.missingCards(this.scene.plannedBattle);
             text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
         } else {
-            text += `Wähle Schiffe für ${scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
+            text += `Wähle Schiffe für ${this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
         }
         this.show(text);
     }
-    private showIntervenePhase(scene: Game) {
-        const battleText = scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';
+    private showIntervenePhase() {
+        const battleText = this.scene.state.battle.type == BattleType.Raid ? 'Verteidigung deiner Kolonie' : 'Intervention der gegenerischen Mission';
         this.show(`Wähle Schiffe zur ${battleText}`)
     }
-    private showCombatPhase(scene: Game) {
-        this.show(`Aktuelle Reichweite der Gefechts: ${scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
+    private showCombatPhase() {
+        this.show(`Aktuelle Reichweite der Gefechts: ${this.scene.state.battle.range}\nFühre Angriffe mit deinen Waffensystemen durch`);
     }
-    private showEndPhase(scene: Game) {
-        const cardsToDrop = scene.state.hand.length - scene.state.handCardLimit;
+    private showEndPhase() {
+        const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
         this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
     }
     private showGameOver(gameResult: FrontendGameResult) {
         this.show(`GAME OVER: Du hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
     }
     private show(text: string) {
-        this.sprite.setText(text);
-        this.sprite.visible = true;
+        this.text.setText(text);
+        this.text.visible = true;
     }
     private hide() {
-        this.sprite.visible = false;
+        this.text.visible = false;
     }
 }

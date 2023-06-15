@@ -3,13 +3,16 @@ import Game from "../scenes/game";
 
 export default class ActionPool {
     sprites: Phaser.GameObjects.Image[] = [];
-    constructor(scene: Game) {}
+    private scene!: Game;
+    constructor(scene: Game) {
+        this.scene = scene;
+    }
     destroy() {
         this.sprites.forEach(s => s.destroy());
     }
-    update(scene: Game) {
+    update() {
         this.destroy();
-        this.sprites = scene.state.actionPool.map((action, index) => scene.add
+        this.sprites = this.scene.state.actionPool.map((action, index) => this.scene.add
             .image(
                 layout.actionPool.x,
                 layout.actionPool.y + index * layout.actionPool.yDistance,

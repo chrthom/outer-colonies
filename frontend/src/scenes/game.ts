@@ -76,10 +76,10 @@ export default class Game extends Phaser.Scene {
         this.obj.actionPool = new ActionPool(this);
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
-        this.obj.discardPile = new DiscardPile(this, [])
+        this.obj.discardPile = new DiscardPile(this)
         this.obj.prompt = new Prompt(this);
         this.obj.maxCard = new MaxCard(this);
-        this.obj.missionCards = new MissionCards();
+        this.obj.missionCards = new MissionCards(this);
     }
 
     update() {}
@@ -97,9 +97,9 @@ export default class Game extends Phaser.Scene {
         this.hand.forEach(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
             if (newData)
-                h.update(self, newData); // Move hand cards to new position
+                h.update(newData); // Move hand cards to new position
             else if (this.state.events.some(e => e.type == EventType.Discard && e.oldUUID == h.uuid)) 
-                h.discard(self); // Discard hand cards
+                h.discard(); // Discard hand cards
             else
                 h.destroy(); // ISSUE #19: Actual logic on playing hand card event
         });
@@ -113,10 +113,10 @@ export default class Game extends Phaser.Scene {
         this.cardStacks = [];
         this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
 
+        self.resetSelections();
         setTimeout(function() {
             self.obj.discardPile.cardIds = self.state.discardPileIds;
             self.obj.discardPile.update(self);
-            self.resetSelections();
         }, animationConfig.duration.cleanup); // ISSUE #43: Perform check if all animations are done
     }
 
@@ -139,12 +139,12 @@ export default class Game extends Phaser.Scene {
     }
 
     updateView() {
-        this.obj.actionPool.update(this);
-        this.obj.button.update(this);
-        this.obj.deck.update(this);
-        this.obj.discardPile.update(this);
-        this.obj.missionCards.update(this);
-        this.obj.prompt.update(this);
+        this.obj.actionPool.update();
+        this.obj.button.update();
+        this.obj.deck.update();
+        this.obj.discardPile.update();
+        this.obj.missionCards.update();
+        this.obj.prompt.update();
         this.updateHighlighting();
     }
 

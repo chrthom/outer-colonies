@@ -9,38 +9,36 @@ export default class DeckCard extends CardImage {
     indicator: ValueIndicator;
     constructor(scene: Game) {
         super(scene, layout.deck.x, layout.deck.y, 1);
-        this.image.on('pointerdown', () => {
-            this.onClickAction(scene);
-        });
+        this.image.on('pointerdown', () => this.onClickAction());
     }
-    update(scene: Game) {
+    update() {
         if (this.indicator) this.indicator.destroy();
-        const cardsForMission = scene.plannedBattle.downsideCardsNum;
+        const cardsForMission = this.scene.plannedBattle.downsideCardsNum;
         this.indicator = new ValueIndicator(
-            scene,
-            scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
-            scene.state.deckSize - cardsForMission < 10,
+            this.scene,
+            this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
+            this.scene.state.deckSize - cardsForMission < 10,
             layout.deck.x,
             layout.deck.y,
             true,
             true
         );
     }
-    private onClickAction(scene: Game) {
-        if (scene.state 
-                && scene.state.playerPendingAction 
-                && scene.state.playerIsActive 
-                && scene.state.turnPhase == TurnPhase.Build
-                && !scene.activeHandCard) {
-            if (FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
-                scene.resetWithBattleType(BattleType.None);
+    private onClickAction() {
+        if (this.scene.state 
+                && this.scene.state.playerPendingAction 
+                && this.scene.state.playerIsActive 
+                && this.scene.state.turnPhase == TurnPhase.Build
+                && !this.scene.activeHandCard) {
+            if (FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+                this.scene.resetWithBattleType(BattleType.None);
             } else {
-                if (scene.plannedBattle.type != BattleType.Mission) {
-                    scene.resetWithBattleType(BattleType.Mission);
+                if (this.scene.plannedBattle.type != BattleType.Mission) {
+                    this.scene.resetWithBattleType(BattleType.Mission);
                 }
-                if (!FrontendPlannedBattle.cardLimitReached(scene.plannedBattle)) {
-                    scene.plannedBattle.downsideCardsNum++;
-                    scene.updateView();
+                if (!FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+                    this.scene.plannedBattle.downsideCardsNum++;
+                    this.scene.updateView();
                 }
             }
         }

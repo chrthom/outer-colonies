@@ -4,9 +4,11 @@ import Game from "../../scenes/game";
 export default class CardImage {
     image!: Phaser.GameObjects.Image;
     cardId!: number;
+    protected scene!: Game;
     private imageHighlight!: Phaser.GameObjects.Image;
     private imageMask!: Phaser.GameObjects.Image;
     constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
+        this.scene = scene;
         this.cardId = cardId;
         const setImageProps = (image: Phaser.GameObjects.Image) => image
             .setOrigin(0.5, 1)
@@ -48,13 +50,13 @@ export default class CardImage {
         this.imageHighlight.setVisible(false);
         this.image.setTint(layout.colors.neutral);
     }
-    setCardId(scene: Game, cardId: number) {
+    setCardId(cardId: number) {
         const x = this.image.x;
         const y = this.image.y;
         const angle = this.image.angle;
         const scale = this.image.scale;
         this.image.destroy();
-        this.image = scene.add
+        this.image = this.scene.add
             .image(x, y, `card_${cardId}`)
             .setCrop(41, 41, 740, 1040)
             .setOrigin(0.5, 1)
@@ -62,15 +64,15 @@ export default class CardImage {
             .setScale(scale)
             .setInteractive();
     }
-    enableMouseover(scene: Game) {
+    enableMaximizeOnMouseover() {
         this.image.off('pointerover');
         this.image.off('pointerout');
         this.image
-            .on('pointerover', () => scene.obj.maxCard.show(this.cardId))
-            .on('pointerout', () => scene.obj.maxCard.hide());
+            .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
+            .on('pointerout', () => this.scene.obj.maxCard.hide());
     }
-    protected tween(scene: Game, tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
+    protected tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
         tweenConfig.targets = [ this.image, this.imageHighlight, this.imageMask ];
-        scene.tweens.add(tweenConfig);
+        this.scene.tweens.add(tweenConfig);
     }
 }

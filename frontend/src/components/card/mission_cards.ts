@@ -4,13 +4,17 @@ import Game from "../../scenes/game";
 
 export default class MissionCards {
     minCards: CardImage[] = [];
-    update(scene: Game) {
-        if (scene.state && scene.state.battle) {
-            const battle = scene.state.battle;
+    private scene!: Game;
+    constructor(scene: Game) {
+        this.scene = scene;
+    }
+    update() {
+        if (this.scene.state && this.scene.state.battle) {
+            const battle = this.scene.state.battle;
             if (this.minCards) this.minCards.forEach(c => c.destroy());
             this.minCards = battle.priceCardIds.map((id, index) => {
                 return new CardImage(
-                    scene,
+                    this.scene,
                     layout.missionCards.x + index * layout.missionCards.xDistance,
                     layout.missionCards.y + index * layout.missionCards.yDistance,
                     id,
@@ -18,7 +22,7 @@ export default class MissionCards {
                     layout.cards.scale.min
                 )
             });
-            this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMouseover(scene));
+            this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());
         }
     }
 }
