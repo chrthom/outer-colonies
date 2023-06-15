@@ -16,9 +16,7 @@ export enum CardType {
 export enum EventType {
     Attach = 'attach',
     Attack = 'attack',
-    Draw = 'draw',
     Discard = 'discard',
-    Destroy = 'destroy',
     Retract = 'retract'
 }
 

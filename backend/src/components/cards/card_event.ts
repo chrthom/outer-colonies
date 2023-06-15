@@ -13,9 +13,9 @@ export default class CardEvent {
     }
 }
 
-export class DrawCardEvent extends CardEvent {
+export class DiscardCardEvent extends CardEvent {
     constructor(player: Player, uuid: string) {
-        super(EventType.Draw, player);
-        this.newUUID = uuid;
+        super(EventType.Discard, player);
+        this.oldUUID = uuid;
     }
 }

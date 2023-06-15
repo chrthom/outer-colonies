@@ -1,11 +1,10 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { EventType, CardType, Zone } from '../config/enums'
+import { CardType, Zone } from '../config/enums'
 import { shuffle, spliceCardStackByUUID } from '../utils/utils';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
-import CardEvent, { DrawCardEvent } from '../cards/card_event';
 
 export default class Player {
     id!: string;
@@ -74,10 +73,7 @@ export default class Player {
         return this.no == this.match.actionPendingByPlayerNo;
     }
     takeCards(cards: Card[]) {
-        const newHandCards = cards.map(c => new RootCardStack(c, Zone.Hand, this));
-        this.hand.push(...newHandCards);
-        const events = newHandCards.map(cs => new DrawCardEvent(this, cs.uuid));
-        this.match.eventBuffer.push(...events);
+        this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Card[] {
         if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);

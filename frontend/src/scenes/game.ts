@@ -97,10 +97,10 @@ export default class Game extends Phaser.Scene {
         
         this.hand.forEach(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-            if (newData) h.update(self, newData);
+            if (newData) h.update(self, newData); // Move hand cards to new position
             else h.destroy(); // ISSUE #19: Actual logic on playing hand card event
         });
-        this.state.hand
+        this.state.hand // Draw new hand cards
             .filter(c => !self.hand.some(h => h.uuid == c.uuid))
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
@@ -118,7 +118,7 @@ export default class Game extends Phaser.Scene {
         this.state.events.forEach(e => {
             if (e.playerEvent) {
                 switch (e.type) {
-                    case EventType.Draw:
+                    case EventType.Discard:
                         const handCard = this.hand.find(c => c.uuid == e.newUUID);
                         if (handCard) {
                             // Draw tween
