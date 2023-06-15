@@ -1,4 +1,3 @@
-import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 
@@ -7,7 +6,6 @@ export default class CardImage {
     cardId!: number;
     private imageHighlight!: Phaser.GameObjects.Image;
     private imageMask!: Phaser.GameObjects.Image;
-    private animation?: Phaser.Tweens.Tween;
     constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
         this.cardId = cardId;
         const setImageProps = (image: Phaser.GameObjects.Image) => image
@@ -32,6 +30,7 @@ export default class CardImage {
     destroy() {
         this.image.destroy();
         this.imageHighlight.destroy();
+        this.imageMask.destroy();
     }
     highlightDisabled() {
         this.highlightReset();
@@ -49,19 +48,29 @@ export default class CardImage {
         this.imageHighlight.setVisible(false);
         this.image.setTint(layout.colors.neutral);
     }
+    setCardId(scene: Game, cardId: number) {
+        const x = this.image.x;
+        const y = this.image.y;
+        const angle = this.image.angle;
+        const scale = this.image.scale;
+        this.image.destroy();
+        this.image = scene.add
+            .image(x, y, `card_${cardId}`)
+            .setCrop(41, 41, 740, 1040)
+            .setOrigin(0.5, 1)
+            .setAngle(angle)
+            .setScale(scale)
+            .setInteractive();
+    }
     enableMouseover(scene: Game) {
+        this.image.off('pointerover');
+        this.image.off('pointerout');
         this.image
             .on('pointerover', () => scene.obj.maxCard.show(this.cardId))
             .on('pointerout', () => scene.obj.maxCard.hide());
     }
-    protected tween(scene: Game, x: number, y: number, angle: number, scale?: number) {
-        this.animation = scene.tweens.add({
-            targets: [ this.image, this.imageHighlight, this.imageMask ],
-            duration: animationConfig.duration.draw,
-            x: x,
-            y: y,
-            angle: angle,
-            scale: scale ? scale : this.image.scale
-        });
+    protected tween(scene: Game, tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
+        tweenConfig.targets = [ this.image, this.imageHighlight, this.imageMask ];
+        scene.tweens.add(tweenConfig);
     }
 }

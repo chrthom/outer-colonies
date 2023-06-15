@@ -1,6 +1,7 @@
 class AnimationConfig {
     readonly duration = {
-        draw: 800
+        draw: 500,
+        cleanup: 600
     }
 }
 

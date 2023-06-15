@@ -10,20 +10,23 @@ export default class DiscardPile extends CardImage {
     indicator: ValueIndicator;
     constructor(scene: Game, cardIds: Array<number>) {
         const topCard = cardIds.length == 0 ? 1 : cardIds[cardIds.length - 1];
-        super(scene, layout.discardPile.x, layout.discardPile.y, topCard);
+        super(scene, layout.discardPile.x, layout.discardPile.y, 1);
         this.cardIds = cardIds;
-        if (cardIds.length == 0) {
-            this.image.visible = false;
-        } else {
-            this.enableMouseover(scene);
-            this.image.on('pointerdown', () => {
-                this.onClickAction(scene);
-            });
-        }
+        this.update(scene);
     }
     update(scene: Game) {
         if (this.indicator) this.indicator.destroy();
-        if (this.cardIds.length > 0) {
+        if (this.cardIds.length == 0) {
+            this.image.setVisible(false);
+        } else {
+            this.setCardId(scene, this.getTopCard());
+            this.image
+                .setVisible(true)
+                .off('pointerdown')
+                .on('pointerdown', () => {
+                    this.onClickAction(scene);
+                });
+            this.enableMouseover(scene);
             const cardsForMission = scene.plannedBattle.upsideCardsNum;
             this.indicator = new ValueIndicator(
                 scene,
@@ -39,6 +42,13 @@ export default class DiscardPile extends CardImage {
     destroy() {
         super.destroy();
         if (this.indicator) this.indicator.destroy();
+    }
+    addCard(scene: Game, cardId: number) {
+        this.cardIds.push(cardId);
+        this.update(scene);
+    }
+    private getTopCard() {
+        return this.cardIds.length == 0 ? 1 : this.cardIds[this.cardIds.length - 1];
     }
     private onClickAction(scene: Game) {
         if (scene.state 

@@ -3,6 +3,7 @@ import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
+import { animationConfig } from "../../config/animation";
 
 export default class HandCard extends CardImage {
     uuid!: string;
@@ -16,9 +17,28 @@ export default class HandCard extends CardImage {
         });
         this.enableMouseover(scene);
     }
+    discard(scene: Game) {
+        this.tween(scene, {
+            targets: undefined,
+            duration: animationConfig.duration.draw,
+            x: layout.discardPile.x,
+            y: layout.discardPile.y,
+            angle: 0,
+            onComplete: () => {
+                scene.obj.discardPile.addCard(scene, this.data.cardId);
+                this.destroy();
+            }
+        });
+    }
     update(scene: Game, data: FrontendHandCard) {
         this.data = data;
-        this.tween(scene, this.x(scene, data), this.y(scene, data), this.angle(scene, data));
+        this.tween(scene, {
+            targets: undefined,
+            duration: animationConfig.duration.draw,
+            x: this.x(scene, data),
+            y: this.y(scene, data),
+            angle: this.angle(scene, data)
+        });
     }
     highlightPlayability() {
         this.highlightReset();

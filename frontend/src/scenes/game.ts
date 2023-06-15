@@ -13,6 +13,8 @@ import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
+import { layout } from '../config/layout';
+import { animationConfig } from '../config/animation';
 
 class InitData {
     socket: Socket;
@@ -87,48 +89,35 @@ export default class Game extends Phaser.Scene {
         this.state = state;
         //console.log(JSON.stringify(state.cardStacks)); ////
         this.preloader.destroy();
-        this.recreateCards();
-        this.createEventAnimations();
-        this.resetSelections();
+        this.performStateChanges();
     }
 
-    recreateCards() {
+    performStateChanges() {
         const self = this;
-        
         this.hand.forEach(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-            if (newData) h.update(self, newData); // Move hand cards to new position
-            else h.destroy(); // ISSUE #19: Actual logic on playing hand card event
+            if (newData)
+                h.update(self, newData); // Move hand cards to new position
+            else if (this.state.events.some(e => e.type == EventType.Discard && e.oldUUID == h.uuid)) 
+                h.discard(self); // Discard hand cards
+            else
+                h.destroy(); // ISSUE #19: Actual logic on playing hand card event
         });
         this.state.hand // Draw new hand cards
             .filter(c => !self.hand.some(h => h.uuid == c.uuid))
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
-        //this.hand.forEach(c => c.destroy());
-        //this.hand = this.state.hand.map(cardData => new HandCard(self, cardData));
 
+        // ISSUE #22: Move card stacks animation
         this.cardStacks.forEach(cs => cs.destroy());
         this.cardStacks = [];
         this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));
-        this.obj.discardPile.destroy();
-        this.obj.discardPile = new DiscardPile(this, this.state.discardPileIds);
-    }
 
-    createEventAnimations() { // Not used yet
-        this.state.events.forEach(e => {
-            if (e.playerEvent) {
-                switch (e.type) {
-                    case EventType.Discard:
-                        const handCard = this.hand.find(c => c.uuid == e.newUUID);
-                        if (handCard) {
-                            // Draw tween
-                        }
-                        break;
-                }
-            } else {
-                // Opponent events
-            }
-        });
+        setTimeout(function() {
+            self.obj.discardPile.cardIds = self.state.discardPileIds;
+            self.obj.discardPile.update(self);
+            self.resetSelections();
+        }, animationConfig.duration.cleanup); // ISSUE #43: Perform check if all animations are done
     }
 
     resetSelections() {
