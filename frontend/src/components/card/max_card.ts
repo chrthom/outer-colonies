@@ -10,7 +10,7 @@ export default class MaxCard extends CardImage {
     hide() {
         this.image.visible = false;
     }
-    show(cardId: string) {
+    show(cardId: number) {
         this.image.setTexture(`card_${cardId}`);
         this.image.visible = true;
     }

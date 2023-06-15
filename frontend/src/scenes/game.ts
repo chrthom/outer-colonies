@@ -21,6 +21,16 @@ class InitData {
     gameParams: FrontendGameParams;
 }
 
+class StaticObjects {
+    actionPool?: ActionPool;
+    button?: Button;
+    deck?: DeckCard;
+    discardPile?: DiscardPile;
+    prompt?: Prompt;
+    maxCard?: MaxCard;
+    missionCards?: MissionCards;
+}
+
 export default class Game extends Phaser.Scene {
     socket: Socket;
     gameParams: FrontendGameParams;
@@ -34,15 +44,7 @@ export default class Game extends Phaser.Scene {
     interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
-    obj = {
-        actionPool: null,
-        button: null,
-        deck: null,
-        discardPile: null,
-        prompt: null,
-        maxCard: null,
-        missionCards: null
-    };
+    obj: StaticObjects = new StaticObjects();
 
     constructor () {
         super({
@@ -90,7 +92,7 @@ export default class Game extends Phaser.Scene {
         //console.log(JSON.stringify(state.cardStacks)); ////
         this.preloader.destroy();
         const self = this;
-        this.hand.forEach(h => {
+        this.hand.map(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
             if (newData)
                 h.update(newData); // Move hand cards to new position
@@ -103,8 +105,10 @@ export default class Game extends Phaser.Scene {
             .filter(c => !self.hand.some(h => h.uuid == c.uuid))
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
+        this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid));
 
         // ISSUE #22: Move card stacks animation
+        //this.cardStacks.forEach()
         this.cardStacks.forEach(cs => cs.destroy());
         this.cardStacks = [];
         this.state.cardStacks.forEach(cs => self.cardStacks.push(new CardStack(self, cs)));

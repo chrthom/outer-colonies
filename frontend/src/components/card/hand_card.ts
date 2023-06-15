@@ -23,7 +23,7 @@ export default class HandCard extends CardImage {
             y: layout.discardPile.y,
             angle: 0,
             onComplete: () => {
-                this.scene.obj.discardPile.addCard(this.scene, this.data.cardId);
+                this.scene.obj.discardPile.addCard(this.data.cardId);
                 this.destroy();
             }
         });
