@@ -62,6 +62,8 @@ export default class Game extends Phaser.Scene {
             'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2',
             'retract_card'
         ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
+        this.load.image('card_mask', 'utils/card_mask.png');
+        this.load.image('card_glow', 'utils/card_glow.png');
     }
     
     create () {

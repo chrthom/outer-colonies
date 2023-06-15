@@ -8,7 +8,6 @@ import { animationConfig } from "../../config/animation";
 export default class HandCard extends CardImage {
     uuid!: string;
     data!: FrontendHandCard;
-    animation!: Phaser.Tweens.Tween;
     constructor(scene: Game, data: FrontendHandCard) {
         super(scene, layout.deck.x, layout.deck.y, data.cardId);
         this.data = data;
@@ -20,13 +19,7 @@ export default class HandCard extends CardImage {
         this.enableMouseover(scene);
     }
     update(scene: Game, data: FrontendHandCard) {
-        this.animation = scene.tweens.add({
-            targets: this.sprite,
-            duration: animationConfig.duration.draw,
-            x: this.x(scene, data),
-            y: this.y(scene, data),
-            angle: this.angle(scene, data)
-        });
+        this.tween(scene, this.x(scene, data), this.y(scene, data), this.angle(scene, data));
         /*
         this.sprite
             .setX(this.x(scene, data))
