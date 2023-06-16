@@ -68,6 +68,18 @@ export default class CardImage {
         this.image.setVisible(visible);
         if (!visible) this.imageHighlight.setVisible(visible);
     }
+    setX(x: number): this {
+        this.forAllImages(i => i.setX(x));
+        return this;
+    }
+    setY(y: number): this {
+        this.forAllImages(i => i.setY(y));
+        return this;
+    }
+    setAngle(angle: number): this {
+        this.forAllImages(i => i.setAngle(angle));
+        return this;
+    }
     enableMaximizeOnMouseover() {
         this.image.off('pointerover');
         this.image.off('pointerout');
@@ -78,5 +90,8 @@ export default class CardImage {
     tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
         tweenConfig.targets = [ this.image, this.imageHighlight, this.imageMask ];
         this.scene.tweens.add(tweenConfig);
+    }
+    private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
+        [ this.image, this.imageHighlight, this.imageMask ].forEach(f);
     }
 }

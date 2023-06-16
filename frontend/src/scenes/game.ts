@@ -92,6 +92,18 @@ export default class Game extends Phaser.Scene {
         //console.log(JSON.stringify(state.cardStacks)); ////
         this.preloader.destroy();
         const self = this;
+        this.cardStacks.forEach(cs => {
+            const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
+            if (newData)
+                cs.update(newData); // Move card stacks
+            else
+                cs.destroy(); // ISSUE #34: Retract card stacks animation
+        });
+        this.state.cardStacks // ISSUE #19: Play hand card animation
+            .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
+            .map(cs => new CardStack(self, cs, this.hand.find(h => h.uuid == cs.uuid)))
+            .forEach(cs => self.cardStacks.push(cs));
+        this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid));
         this.hand.map(h => {
             const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
             if (newData)
@@ -106,20 +118,6 @@ export default class Game extends Phaser.Scene {
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
         this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid));
-
-        // ISSUE #22: Move card stacks animation
-        this.cardStacks.forEach(cs => {
-            const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-            if (newData)
-                cs.update(newData);
-            else
-                cs.destroy(); // ISSUE #34: Retract card stacks animation
-        });
-        this.state.cardStacks // ISSUE #19: Play hand card animation
-            .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
-            .map(cs => new CardStack(self, cs))
-            .forEach(cs => self.cardStacks.push(cs));
-        this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid));
 
         this.resetView();
         setTimeout(function() {

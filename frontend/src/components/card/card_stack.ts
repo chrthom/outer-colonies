@@ -6,6 +6,7 @@ import ValueIndicator from "./indicators/value_indicator";
 import DefenseIndicator from "./indicators/defense_indicator";
 import Card from "./card";
 import { animationConfig } from "../../config/animation";
+import HandCard from "./hand_card";
 
 export default class CardStack {
     cards!: Array<Card>;
@@ -14,11 +15,11 @@ export default class CardStack {
     damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
     private scene!: Game;
-    constructor(scene: Game, data: FrontendCardStack) {
+    constructor(scene: Game, data: FrontendCardStack, origin?: HandCard) {
         this.scene = scene;
         this.uuid = data.uuid;
         this.data = data;
-        this.createCards();
+        this.createCards(origin);
     }
     destroy() {
         if (this.damageIndicator) this.damageIndicator.destroy();
@@ -32,20 +33,7 @@ export default class CardStack {
         this.data.defenseIcons = data.defenseIcons;
         this.createCards();
         this.data = data;
-        this.cards.forEach((c, index) => {
-            c.tween({
-                targets: undefined,
-                duration: animationConfig.duration.move,
-                x: this.x(),
-                y: this.y(index)
-            });
-        });
-        if (this.damageIndicator) {
-            this.damageIndicator.update(this.x(), this.zoneLayout().y, String(this.data.damage), this.data.criticalDamage);
-        }
-        if (this.defenseIndicator) {
-            this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
-        }
+        this.tween();
     }
     highlightDisabled() {
         this.cards.forEach(c => {
@@ -66,7 +54,20 @@ export default class CardStack {
     isOpponentColony() {
         return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
     }
-    private createCards() {
+    private tween() {
+        this.cards.forEach((c, index) => {
+            c.tween({
+                targets: undefined,
+                duration: animationConfig.duration.move,
+                x: this.x(),
+                y: this.y(index),
+                angle: this.data.ownedByPlayer ? 0 : 180
+            });
+        });
+        if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
+        if (this.defenseIndicator) this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
+    }
+    private createCards(origin?: HandCard) {
         this.cards = this.data.cards.map(c => 
             new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
         );
@@ -95,6 +96,13 @@ export default class CardStack {
                 this.zoneLayout().y,
                 this.data.ownedByPlayer
             );
+        }
+        if (origin) {
+            this.cards[0]
+                .setX(origin.image.x)
+                .setY(origin.image.y)
+                .setAngle(origin.image.angle);
+            this.tween();
         }
     }
     private x() {

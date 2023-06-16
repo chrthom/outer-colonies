@@ -17,7 +17,8 @@ export enum EventType {
     Attach = 'attach',
     Attack = 'attack',
     Discard = 'discard',
-    Retract = 'retract'
+    Retract = 'retract',
+    Tactic = 'tactic',
 }
 
 export enum MsgTypeInbound {

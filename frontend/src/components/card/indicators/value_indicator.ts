@@ -54,9 +54,7 @@ export default class ValueIndicator {
         this.shape.destroy();
         this.text.destroy();
     }
-    update(cardX: number, cardY: number, text: string, critical: boolean) {
-        this.text.setText(text);
-        this.shape.fillColor = critical ? layout.colors.secondary : layout.colors.primary;
+    tween(cardX: number, cardY: number) {
         this.scene.tweens.add({
             targets: [ this.text, this.shape ],
             duration: animationConfig.duration.move,
