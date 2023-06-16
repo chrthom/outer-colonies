@@ -117,7 +117,6 @@ export default class Game extends Phaser.Scene {
                 const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
                 if (newData) h.update(newData); // Move hand cards to new position
                 else if (oldState.turnPhase == TurnPhase.Build) {
-                    console.log(`Destroy ${h.data.cardId}`); /////
                     h.destroy();
                     // ISSUE #19: Playing tactic card event
                     // ISSUE #49: Attach card to card stack

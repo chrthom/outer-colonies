@@ -30,7 +30,6 @@ export default class CardStack {
         this.destroyIndicators();
         const [removedCardIds, newCardIds] = arrayDiff(this.cards.map(c => c.cardId), data.cards.map(c => c.id));
         this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
-        // TODO: Filter removed cards
         if (removedCardIds.length) this.scene.retractCardsExists = true;
         this.filterCardsByIdList(removedCardIds).forEach(c => c.discard(this.data.ownedByPlayer, true));
         this.data.cards = data.cards;

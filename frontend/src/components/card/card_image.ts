@@ -51,6 +51,7 @@ export default class CardImage {
         this.image.setTint(layout.colors.neutral);
     }
     setCardId(cardId: number) {
+        this.cardId = cardId;
         const x = this.image.x;
         const y = this.image.y;
         const angle = this.image.angle;
