@@ -15,6 +15,9 @@ export default class Card extends CardImage {
     }
     destroy() {
         super.destroy();
+        this.destroyButton();
+    }
+    destroyButton() {
         if (this.retractCardButton) this.retractCardButton.destroy();
     }
     tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {

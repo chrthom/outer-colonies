@@ -22,9 +22,20 @@ export default class CardStack {
         this.createCards(origin);
     }
     destroy() {
-        if (this.damageIndicator) this.damageIndicator.destroy();
-        if (this.defenseIndicator) this.defenseIndicator.destroy();
+        this.destroyIndicators();
         this.cards.forEach(c => c.destroy());
+    }
+    discard() {
+        this.destroyIndicators();
+        this.cards.forEach(c => {
+            c.tween({
+                targets: undefined,
+                duration: animationConfig.duration.move,
+                x: this.scene.obj.discardPile.image.x,
+                y: this.data.ownedByPlayer ? this.scene.obj.discardPile.image.y : layout.discardPile.opponentY,
+                angle: this.data.ownedByPlayer ? 0 : 180
+            });
+        });
     }
     update(data: FrontendCardStack) {
         this.destroy();
@@ -116,6 +127,11 @@ export default class CardStack {
     }
     private zoneLayout() {
         return this.data.ownedByPlayer ? layout.player[this.data.zone] : layout.opponent[this.data.zone];
+    }
+    private destroyIndicators() {
+        if (this.damageIndicator) this.damageIndicator.destroy();
+        if (this.defenseIndicator) this.defenseIndicator.destroy();
+        this.cards.forEach(c => c.destroyButton());
     }
     private onClickAction(cardData: FrontendCard) {
         const state = this.scene.state;

@@ -96,8 +96,10 @@ export default class Game extends Phaser.Scene {
             const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
             if (newData)
                 cs.update(newData); // Move card stacks
-            else
+            else if (this.state.events.some(e => e.type == EventType.Retract && e.oldUUID == cs.uuid))
                 cs.destroy(); // ISSUE #34: Retract card stacks animation
+            else 
+                cs.discard(); // ISSUE #21: Discard card stack
         });
         this.state.cardStacks // ISSUE #19: Play hand card animation
             .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))

@@ -53,7 +53,8 @@ class Layout {
     };
     readonly discardPile = {
         x: 2190,
-        y: 1070
+        y: 1070,
+        opponentY: -400
     };
     readonly maxCard = {
         x: 2110,
