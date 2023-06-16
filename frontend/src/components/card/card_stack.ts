@@ -21,22 +21,9 @@ export default class CardStack {
         this.data = data;
         this.createCards(origin);
     }
-    destroy() {
-        this.destroyIndicators();
-        this.cards.forEach(c => c.destroy());
-    }
     discard(toDeck?: boolean) {
         this.destroyIndicators();
-        this.cards.forEach(c => {
-            c.tween({
-                targets: undefined,
-                duration: animationConfig.duration.move,
-                x: toDeck ? layout.deck.x : layout.discardPile.x,
-                y: this.data.ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.opponentY,
-                angle: this.data.ownedByPlayer ? 0 : 180,
-                onComplete: () => this.destroy()
-            });
-        });
+        this.cards.forEach(c => c.discard(this.data.ownedByPlayer, toDeck));
     }
     update(data: FrontendCardStack) {
         this.destroy();
@@ -65,6 +52,10 @@ export default class CardStack {
     }
     isOpponentColony() {
         return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
+    }
+    private destroy() {
+        this.destroyIndicators();
+        this.cards.forEach(c => c.destroy());
     }
     private tween() {
         this.cards.forEach((c, index) => {

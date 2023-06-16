@@ -1,4 +1,6 @@
 import { FrontendCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { animationConfig } from "../../config/animation";
+import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";
 import RetractCardButton from "./indicators/retract_card_button";
@@ -16,6 +18,16 @@ export default class Card extends CardImage {
     destroy() {
         super.destroy();
         this.destroyButton();
+    }
+    discard(ownedByPlayer: boolean, toDeck?: boolean) {
+        this.tween({
+            targets: undefined,
+            duration: animationConfig.duration.move,
+            x: toDeck ? layout.deck.x : layout.discardPile.x,
+            y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.opponentY,
+            angle: ownedByPlayer ? 0 : 180,
+            onComplete: () => this.destroy()
+        });
     }
     destroyButton() {
         if (this.retractCardButton) this.retractCardButton.destroy();
