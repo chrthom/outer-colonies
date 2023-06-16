@@ -2,9 +2,10 @@ import CardStack from "../cards/card_stack";
 export function arrayDiff<T>(array1: T[], array2: T[]): [ T[], T[] ] {
     let a1 = array1.slice();
     let a2 = array2.slice();
-    a1.forEach((v1, i1) => {
+    a1.slice().forEach(v1 => {
+        const i1 = a1.indexOf(v1);
         const i2 = a2.indexOf(v1);
-        if (i2 >= 0) {
+        if (i1 >= 0 && i2 >= 0) {
             a1.splice(i1, 1);
             a2.splice(i2, 1);
         }
