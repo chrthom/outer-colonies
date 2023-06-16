@@ -7,6 +7,7 @@ import DefenseIndicator from "./indicators/defense_indicator";
 import Card from "./card";
 import { animationConfig } from "../../config/animation";
 import HandCard from "./hand_card";
+import { arrayDiff } from "../../../../backend/src/components/utils/utils";
 
 export default class CardStack {
     cards!: Array<Card>;
@@ -26,12 +27,24 @@ export default class CardStack {
         this.cards.forEach(c => c.discard(this.data.ownedByPlayer, toDeck));
     }
     update(data: FrontendCardStack) {
-        this.destroy();
+        this.destroyIndicators();
+        const [removedCardIds, newCardIds] = arrayDiff(this.cards.map(c => c.cardId), data.cards.map(c => c.id));
+        this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
+        // TODO: Filter removed cards
+        if (removedCardIds.length) this.scene.retractCardsExists = true;
+        this.filterCardsByIdList(removedCardIds).forEach(c => c.discard(this.data.ownedByPlayer, true));
         this.data.cards = data.cards;
         this.data.damage = data.damage;
         this.data.defenseIcons = data.defenseIcons;
         this.createCards();
         this.data = data;
+        // TODO: Filter new cards -> Compare with handcards
+        /*
+        this.filterCardsByIdList(newCardIds).forEach(c => c
+            .setX(layout.deck.x)
+            .setY(layout.deck.y)
+            .setAngle(0));
+            */
         this.tween();
     }
     highlightDisabled() {
@@ -52,6 +65,17 @@ export default class CardStack {
     }
     isOpponentColony() {
         return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
+    }
+    private filterCardsByIdList(list: number[]) {
+        let l = list.slice();
+        return this.cards.filter(c => {
+            if (l.includes(c.cardId)) {
+                l.splice(l.indexOf(c.cardId), 1);
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
     private destroy() {
         this.destroyIndicators();

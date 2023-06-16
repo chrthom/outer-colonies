@@ -36,7 +36,6 @@ export default class Game extends Phaser.Scene {
     gameParams: FrontendGameParams;
     preloader: Preloader;
     state: FrontendState;
-    oldState: FrontendState;
     activeHandCard: string;
     activeCardStack: string;
     activeCardStackIndex: number;
@@ -45,6 +44,7 @@ export default class Game extends Phaser.Scene {
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
     obj: StaticObjects = new StaticObjects();
+    retractCardsExists: boolean = false;
 
     constructor () {
         super({
@@ -88,19 +88,19 @@ export default class Game extends Phaser.Scene {
 
     updateState(state: FrontendState) {
         const self = this;
-        this.oldState = this.state;
+        const oldState = this.state;
         this.state = state;
         //console.log(JSON.stringify(state)); ////
         this.preloader.destroy();
         const newHandCards = this.state.hand
             .filter(c => !self.hand.some(h => h.uuid == c.uuid));
-        let retractCardsExists = false; // If true, then the hand animations are delayed
+        this.retractCardsExists = false; // If true, then the hand animations are delayed
         this.cardStacks.forEach(cs => {
             const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
             if (newData) cs.update(newData); // Move card stacks
             else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
                 cs.discard(true);
-                retractCardsExists = true;
+                this.retractCardsExists = true;
             } else cs.discard(); // Discard card stack
         });
         this.state.cardStacks
@@ -115,18 +115,20 @@ export default class Game extends Phaser.Scene {
         setTimeout(function() {
             self.hand.map(h => {
                 const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
-                if (newData)
-                    h.update(newData); // Move hand cards to new position
-                else
-                    h.discard(); // Discard hand cards
-                // ISSUE #19: Playing tactic card event
+                if (newData) h.update(newData); // Move hand cards to new position
+                else if (oldState.turnPhase == TurnPhase.Build) {
+                    console.log(`Destroy ${h.data.cardId}`); /////
+                    h.destroy();
+                    // ISSUE #19: Playing tactic card event
+                    // ISSUE #49: Attach card to card stack
+                } else h.discard(); // Discard hand cards
             });
             newHandCards // Draw new hand cards
                 .map(c => new HandCard(self, c))
                 .forEach(h => self.hand.push(h));
             self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
             self.resetView();
-        }, retractCardsExists ? animationConfig.duration.move : 0);
+        }, this.retractCardsExists ? animationConfig.duration.move : 0);
     }
 
     resetView(battleType?: BattleType) {
