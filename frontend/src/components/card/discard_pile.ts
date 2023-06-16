@@ -6,13 +6,14 @@ import CardImage from "./card_image";
 import ValueIndicator from "./indicators/value_indicator";
 
 export default class DiscardPile extends CardImage {
-    cardIds: Array<number> = [];
+    cardIds: number[] = [];
     indicator: ValueIndicator;
     constructor(scene: Game) {
         super(scene, layout.discardPile.x, layout.discardPile.y, 1);
-        this.update();
+        this.update([]);
     }
-    update() {
+    update(cardIds: number[]) {
+        this.cardIds = cardIds;
         if (this.indicator) this.indicator.destroy();
         if (this.cardIds.length == 0) {
             this.setVisible(false);
@@ -38,10 +39,6 @@ export default class DiscardPile extends CardImage {
     destroy() {
         super.destroy();
         if (this.indicator) this.indicator.destroy();
-    }
-    addCard(cardId: number) {
-        this.cardIds.push(cardId);
-        this.update();
     }
     private getTopCard() {
         return this.cardIds.length == 0 ? 1 : this.cardIds[this.cardIds.length - 1];

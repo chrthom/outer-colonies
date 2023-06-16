@@ -98,8 +98,8 @@ export default class Game extends Phaser.Scene {
         this.cardStacks.forEach(cs => {
             const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
             if (newData) cs.update(newData); // Move card stacks
-            else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack to hand
-                cs.discard(true); // Retract card stack
+            else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
+                cs.discard(true);
                 retractCardsExists = true;
             } else cs.discard(); // Discard card stack
         });
@@ -126,10 +126,6 @@ export default class Game extends Phaser.Scene {
                 .forEach(h => self.hand.push(h));
             self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
             self.resetView();
-            setTimeout(function() {
-                self.obj.discardPile.cardIds = self.state.discardPileIds;
-                self.obj.discardPile.update();
-            }, animationConfig.duration.draw + animationConfig.duration.buffer); // ISSUE #43: Perform check if all animations are done
         }, retractCardsExists ? animationConfig.duration.move : 0);
     }
 
@@ -151,7 +147,7 @@ export default class Game extends Phaser.Scene {
         this.obj.actionPool.update();
         this.obj.button.update();
         this.obj.deck.update();
-        this.obj.discardPile.update();
+        //this.obj.discardPile.update(this.state.discardPileIds);
         this.obj.missionCards.update();
         this.obj.prompt.update();
         this.updateHighlighting();

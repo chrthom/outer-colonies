@@ -16,6 +16,7 @@ export default class HandCard extends CardImage {
         this.enableMaximizeOnMouseover();
     }
     discard() {
+        const discardPileIds = this.scene.state.discardPileIds.slice();
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.draw,
@@ -23,7 +24,7 @@ export default class HandCard extends CardImage {
             y: layout.discardPile.y,
             angle: 0,
             onComplete: () => {
-                this.scene.obj.discardPile.addCard(this.data.cardId);
+                this.scene.obj.discardPile.update(discardPileIds);
                 this.destroy();
             }
         });
