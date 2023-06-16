@@ -77,7 +77,6 @@ export class FrontendState {
     battle?: FrontendBattle;
     gameResult?: FrontendGameResult;
     hasToRetractCards: boolean;
-    events: FrontendEvent[];
 }
 
 export default function toFrontendState(match: Match, playerNo: number): FrontendState {
@@ -150,15 +149,6 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             .concat(match.battle.upsidePriceCards.map(c => c.id)),
         range: match.battle.range
     };
-    const events: FrontendEvent[] = match.eventBuffer.map(e => {
-        return {
-            type: e.type,
-            playerEvent: e.player.no == playerNo,
-            oldUUID: e.oldUUID,
-            newUUID: e.newUUID,
-            target: e.target
-        };
-    });
     const gameResult = match.gameResult.gameOver ? {
         won: match.gameResult.winnerNo == player.no
     } : null;
@@ -178,7 +168,6 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         cardStacks: cardStacks,
         battle: battle,
         gameResult: gameResult,
-        hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
-        events: events
+        hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
     };
 }

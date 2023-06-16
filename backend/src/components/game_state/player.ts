@@ -5,7 +5,6 @@ import { shuffle, spliceCardStackByUUID } from '../utils/utils';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
-import { DiscardCardEvent } from '../cards/card_event';
 
 export default class Player {
     id!: string;
@@ -59,10 +58,7 @@ export default class Player {
         this.discardPile.push(...cards);
     }
     discardHandCards(...uuids: string[]) {
-        uuids.forEach(uuid => {
-            this.match.eventBuffer.push(new DiscardCardEvent(this, uuid));
-            this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).getCards())
-        });
+        uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).getCards()));
     }
     discardCardStacks(...uuids: string[]) {
         uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards()));
