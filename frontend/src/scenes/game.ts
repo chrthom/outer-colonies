@@ -87,45 +87,50 @@ export default class Game extends Phaser.Scene {
     update() {}
 
     updateState(state: FrontendState) {
+        const self = this;
         this.oldState = this.state;
         this.state = state;
-        //console.log(JSON.stringify(state.cardStacks)); ////
+        //console.log(JSON.stringify(state)); ////
         this.preloader.destroy();
-        const self = this;
+        const newHandCards = this.state.hand
+            .filter(c => !self.hand.some(h => h.uuid == c.uuid));
+        let retractCardsExists = false; // If true, then the hand animations are delayed
         this.cardStacks.forEach(cs => {
             const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-            if (newData)
-                cs.update(newData); // Move card stacks
-            else if (this.state.events.some(e => e.type == EventType.Retract && e.oldUUID == cs.uuid))
-                cs.destroy(); // ISSUE #34: Retract card stacks animation
-            else 
-                cs.discard(); // ISSUE #21: Discard card stack
+            if (newData) cs.update(newData); // Move card stacks
+            else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack to hand
+                cs.discard(true); // Retract card stack
+                retractCardsExists = true;
+            } else cs.discard(); // Discard card stack
         });
-        this.state.cardStacks // ISSUE #19: Play hand card animation
+        this.state.cardStacks
             .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
-            .map(cs => new CardStack(self, cs, this.hand.find(h => h.uuid == cs.uuid)))
+            .map(cs => {
+                const originHandCard = this.hand.find(h => h.uuid == cs.uuid);
+                if (originHandCard) originHandCard.destroy();
+                return new CardStack(self, cs, originHandCard);
+            })
             .forEach(cs => self.cardStacks.push(cs));
         this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid));
-        this.hand.map(h => {
-            const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-            if (newData)
-                h.update(newData); // Move hand cards to new position
-            else if (this.state.events.some(e => e.type == EventType.Discard && e.oldUUID == h.uuid)) 
-                h.discard(); // Discard hand cards
-            else
-                h.destroy(); // ISSUE #19: Actual logic on playing hand card event
-        });
-        this.state.hand // Draw new hand cards
-            .filter(c => !self.hand.some(h => h.uuid == c.uuid))
-            .map(c => new HandCard(self, c))
-            .forEach(h => self.hand.push(h));
-        this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid));
-
-        this.resetView();
         setTimeout(function() {
-            self.obj.discardPile.cardIds = self.state.discardPileIds;
-            self.obj.discardPile.update();
-        }, animationConfig.duration.cleanup); // ISSUE #43: Perform check if all animations are done
+            self.hand.map(h => {
+                const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
+                if (newData)
+                    h.update(newData); // Move hand cards to new position
+                else
+                    h.discard(); // Discard hand cards
+                // ISSUE #19: Playing tactic card event
+            });
+            newHandCards // Draw new hand cards
+                .map(c => new HandCard(self, c))
+                .forEach(h => self.hand.push(h));
+            self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
+            self.resetView();
+            setTimeout(function() {
+                self.obj.discardPile.cardIds = self.state.discardPileIds;
+                self.obj.discardPile.update();
+            }, animationConfig.duration.draw + animationConfig.duration.buffer); // ISSUE #43: Perform check if all animations are done
+        }, retractCardsExists ? animationConfig.duration.move : 0);
     }
 
     resetView(battleType?: BattleType) {

@@ -76,7 +76,7 @@ export default class Player {
     isPendingPlayer(): boolean {
         return this.no == this.match.actionPendingByPlayerNo;
     }
-    takeCards(cards: Card[]) {
+    takeCards(cards: Card[], originUUID?: string) {
         this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
     }
     pickCardsFromDeck(num: number): Card[] {

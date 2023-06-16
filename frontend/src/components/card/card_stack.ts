@@ -25,15 +25,16 @@ export default class CardStack {
         this.destroyIndicators();
         this.cards.forEach(c => c.destroy());
     }
-    discard() {
+    discard(toDeck?: boolean) {
         this.destroyIndicators();
         this.cards.forEach(c => {
             c.tween({
                 targets: undefined,
                 duration: animationConfig.duration.move,
-                x: this.scene.obj.discardPile.image.x,
-                y: this.data.ownedByPlayer ? this.scene.obj.discardPile.image.y : layout.discardPile.opponentY,
-                angle: this.data.ownedByPlayer ? 0 : 180
+                x: toDeck ? layout.deck.x : layout.discardPile.x,
+                y: this.data.ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.opponentY,
+                angle: this.data.ownedByPlayer ? 0 : 180,
+                onComplete: () => this.destroy()
             });
         });
     }
