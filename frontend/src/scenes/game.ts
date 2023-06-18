@@ -2,7 +2,7 @@ import { Socket } from 'socket.io-client';
 import Button from '../components/button';
 import Prompt from '../components/prompt';
 import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
-import { EventType as EventType, BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
@@ -13,7 +13,6 @@ import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
-import { layout } from '../config/layout';
 import { animationConfig } from '../config/animation';
 
 class InitData {
@@ -90,43 +89,51 @@ export default class Game extends Phaser.Scene {
         const self = this;
         const oldState = this.state;
         this.state = state;
-        console.log(JSON.stringify(state.battle)); ////
+        //console.log(JSON.stringify(state.battle)); ////
         this.preloader.destroy();
-        const newHandCards = this.state.hand
-            .filter(c => !self.hand.some(h => h.uuid == c.uuid));
-        this.retractCardsExists = false; // If true, then the hand animations are delayed
-        this.cardStacks.forEach(cs => {
-            const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-            if (newData) cs.update(newData); // Move card stacks
-            else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
-                cs.discard(true);
-                this.retractCardsExists = true;
-            } else cs.discard(); // Discard card stack
-        });
-        this.state.cardStacks
-            .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
-            .map(cs => {
-                const originHandCard = this.hand.find(h => h.uuid == cs.uuid);
-                if (originHandCard) originHandCard.destroy();
-                return new CardStack(self, cs, originHandCard);
-            })
-            .forEach(cs => self.cardStacks.push(cs));
-        this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid));
-        setTimeout(function() {
-            self.hand.map(h => {
-                const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
-                const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
-                if (newData) h.update(newData); // Move hand cards to new position
-                else if (isTacticCard) h.showAndDiscardTacticCard();
-                else if (oldState.turnPhase == TurnPhase.Build) h.destroy();
-                else h.discard(); // Discard hand cards
+
+        const attack = this.state.battle ? this.state.battle.recentAttack : null;
+        if (attack) {
+            this.cardStacks.find(cs => cs.uuid == attack.sourceUUID).animateAttack();
+            this.cardStacks.find(cs => cs.uuid == attack.targetUUID).animateDamage(attack);
+        }
+        setTimeout(() => {
+            const newHandCards = self.state.hand
+                .filter(c => !self.hand.some(h => h.uuid == c.uuid));
+            self.retractCardsExists = false; // If true, then the hand animations are delayed
+            self.cardStacks.forEach(cs => {
+                const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
+                if (newData) cs.update(newData); // Move card stacks
+                else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
+                    cs.discard(true);
+                    self.retractCardsExists = true;
+                } else cs.discard(); // Discard card stack
             });
-            newHandCards // Draw new hand cards
-                .map(c => new HandCard(self, c))
-                .forEach(h => self.hand.push(h));
-            self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
-            self.resetView();
-        }, this.retractCardsExists ? animationConfig.duration.move : 0);
+            self.state.cardStacks
+                .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
+                .map(cs => {
+                    const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
+                    if (originHandCard) originHandCard.destroy();
+                    return new CardStack(self, cs, originHandCard);
+                })
+                .forEach(cs => self.cardStacks.push(cs));
+            self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
+            setTimeout(() => {
+                self.hand.map(h => {
+                    const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
+                    const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
+                    if (newData) h.update(newData); // Move hand card to new position
+                    else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(); // Play tactic card
+                    else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
+                    else h.discard(); // Discard hand card
+                });
+                newHandCards // Draw new hand cards
+                    .map(c => new HandCard(self, c))
+                    .forEach(h => self.hand.push(h));
+                self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
+                self.resetView();
+            }, self.retractCardsExists ? animationConfig.duration.move : 0);
+        }, attack ? animationConfig.duration.attack : 0);
     }
 
     resetView(battleType?: BattleType) {

@@ -19,6 +19,15 @@ class Layout {
         y: 1040,
         yDistance: -55
     };
+    readonly attack = {
+        fontSize: 30,
+        color: {
+            pointDefense: '#999911',
+            shield: '#119999',
+            armour: '#999999',
+            damage: '#991111'
+        }
+    };
     readonly cards = {
         scale: {
             min: 0.1,
