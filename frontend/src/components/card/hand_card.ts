@@ -23,9 +23,24 @@ export default class HandCard extends CardImage {
             x: layout.discardPile.x,
             y: layout.discardPile.y,
             angle: 0,
+            scale: layout.cards.scale.normal,
             onComplete: () => {
                 this.scene.obj.discardPile.update(discardPileIds);
                 this.destroy();
+            }
+        });
+    }
+    showAndDiscardTacticCard() {
+        this.tween({
+            targets: undefined,
+            duration: animationConfig.duration.showTacticCard,
+            x: layout.maxedTacticCard.x,
+            y: layout.maxedTacticCard.y,
+            angle: 0,
+            scale: layout.maxedTacticCard.scale,
+            completeDelay: animationConfig.duration.waitBeforeDiscard,
+            onComplete: () => {
+                this.discard();
             }
         });
     }

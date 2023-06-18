@@ -115,12 +115,11 @@ export default class Game extends Phaser.Scene {
         setTimeout(function() {
             self.hand.map(h => {
                 const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
+                const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
                 if (newData) h.update(newData); // Move hand cards to new position
-                else if (oldState.turnPhase == TurnPhase.Build) {
-                    h.destroy();
-                    // ISSUE #19: Playing tactic card event
-                    // ISSUE #49: Attach card to card stack
-                } else h.discard(); // Discard hand cards
+                else if (isTacticCard) h.showAndDiscardTacticCard();
+                else if (oldState.turnPhase == TurnPhase.Build) h.destroy();
+                else h.discard(); // Discard hand cards
             });
             newHandCards // Draw new hand cards
                 .map(c => new HandCard(self, c))

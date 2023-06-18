@@ -42,6 +42,12 @@ class Layout {
             yOffset: -245
         }
     };
+    readonly maxedTacticCard = {
+        x: 1200,
+        y: 900,
+        yOpponent: 300,
+        scale: 0.8
+    }
     readonly continueButton = {
         x: 2370,
         y: 30,
@@ -54,7 +60,7 @@ class Layout {
     readonly discardPile = {
         x: 2190,
         y: 1070,
-        opponentY: -400
+        yOpponent: -400
     };
     readonly maxCard = {
         x: 2110,

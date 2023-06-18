@@ -40,7 +40,7 @@ export default class CardStack {
         this.filterCardsByIdList(newCardIds).forEach(c => {
             const handCard = this.scene.hand.find(h => h.cardId == c.cardId);
             const x = this.data.ownedByPlayer ? (handCard ? handCard.image.x : layout.deck.x) : layout.discardPile.x;
-            const y = this.data.ownedByPlayer ? (handCard ? handCard.image.y : layout.deck.y) : layout.discardPile.opponentY;
+            const y = this.data.ownedByPlayer ? (handCard ? handCard.image.y : layout.deck.y) : layout.discardPile.yOpponent;
             const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
             c.setX(x).setY(y).setAngle(angle)
         });

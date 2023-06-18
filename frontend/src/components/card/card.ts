@@ -24,7 +24,7 @@ export default class Card extends CardImage {
             targets: undefined,
             duration: animationConfig.duration.move,
             x: toDeck ? layout.deck.x : layout.discardPile.x,
-            y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.opponentY,
+            y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.yOpponent,
             angle: ownedByPlayer ? 0 : 180,
             onComplete: () => this.destroy()
         });

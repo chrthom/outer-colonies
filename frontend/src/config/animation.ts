@@ -1,7 +1,9 @@
 class AnimationConfig {
     readonly duration = {
-        draw: 500,
+        draw: 400,
         move: 500,
+        showTacticCard: 600,
+        waitBeforeDiscard: 2000,
         buffer: 50
     }
 }
