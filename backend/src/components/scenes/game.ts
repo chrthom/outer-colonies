@@ -19,6 +19,7 @@ function emitState(io: Server, match: Match) {
     match.forAllPlayers((playerNo: number) => {
         getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
     });
+    match.battle.resetRecentEvents();
 }
 
 function initMatch(io: Server, match: Match) {

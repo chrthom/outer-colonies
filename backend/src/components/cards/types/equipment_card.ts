@@ -1,4 +1,4 @@
-import Card from '../card';
+import Card, { AttackResult } from '../card';
 import CardProfile, { EquipmentProfile } from '../card_profile';
 import CardStack from '../card_stack';
 import Match from '../../game_state/match'
@@ -36,13 +36,14 @@ export default abstract class EquipmentCard extends Card {
     profile(): CardProfile {
         return CardProfile.fromEquipmentProfile(this.equipmentProfile);
     }
-    attack(weapon: CardStack, target: CardStack) {
+    attack(weapon: CardStack, target: CardStack): AttackResult {
         const attackingShip = weapon.getRootCardStack();
         const match = attackingShip.getPlayer().match;
         let damage = this.attackProfile.damage;
         if (attackingShip.profile().speed + match.battle.range <= target.profile().speed) damage = Math.round(damage / 2);
         let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
         target.damage += attackResult.damage;
+        return attackResult;
     }
     private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
         const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
@@ -97,15 +98,5 @@ export default abstract class EquipmentCard extends Card {
             attackResult.damage -= adjustedDamageReduction;
             return this.attackArmour(target, attackResult);
         }
-    }
-}
-
-export class AttackResult {
-    pointDefense: number = 0;
-    shield: number = 0;
-    armour: number = 0;
-    damage: number = 0;
-    constructor(initialDamage: number) {
-        this.damage = initialDamage;
     }
 }

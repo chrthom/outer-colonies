@@ -33,7 +33,16 @@ export default class CardStack {
         } else if (!this.card.isInRange(this.getPlayer().match.battle.range)) {
             console.log(`WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name} at wrong range`);
         } else {
-            this.card.attack(this, target);
+            const attackResult = this.card.attack(this, target);
+            this.getPlayer().match.battle.recentAttack = {
+                sourceUUID: this.getRootCardStack().uuid,
+                sourceIndex: this.getRootCardStack().getCardStacks().findIndex(cs => cs.uuid == this.uuid),
+                targetUUID: target.uuid,
+                pointDefense: attackResult.pointDefense,
+                shield: attackResult.shield,
+                armour: attackResult.armour,
+                damage: attackResult.damage
+            }
             this.attackAvailable = false;
         }
     }

@@ -90,7 +90,7 @@ export default class Game extends Phaser.Scene {
         const self = this;
         const oldState = this.state;
         this.state = state;
-        //console.log(JSON.stringify(state)); ////
+        console.log(JSON.stringify(state.battle)); ////
         this.preloader.destroy();
         const newHandCards = this.state.hand
             .filter(c => !self.hand.some(h => h.uuid == c.uuid));

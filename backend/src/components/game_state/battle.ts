@@ -8,12 +8,23 @@ import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from "../
 import Match from "./match";
 import Player from "./player";
 
+export class Attack {
+    sourceUUID: string;
+    sourceIndex: number;
+    targetUUID: string;
+    pointDefense: number;
+    shield: number;
+    armour: number;
+    damage: number;
+}
+
 export default class Battle {
     type!: BattleType;
     ships: CardStack[][] = [ [], [] ];
     downsidePriceCards: Card[] = [];
     upsidePriceCards: Card[] = [];
     range: number = rules.maxRange + 1;
+    recentAttack?: Attack;
     constructor(type: BattleType) {
         this.type = type;
     }
@@ -78,6 +89,9 @@ export default class Battle {
             const hasTarget = this.ships[match.getWaitingPlayerNo()].length > 0;
             if (!hasAttack || !hasTarget) this.processBattleRound(match);
         }
+    }
+    resetRecentEvents() {
+        this.recentAttack = null;
     }
     private applyMissionResult(match: Match) {
         const player = match.getActivePlayer();

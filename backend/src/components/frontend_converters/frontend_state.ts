@@ -2,56 +2,60 @@ import Match from '../game_state/match'
 import { EventType, BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/utils';
+import { Attack } from '../game_state/battle';
 
-export class FrontendOpponent {
-    name!: string;
-    handCardNo!: number;
+export interface FrontendOpponent {
+    name: string;
+    handCardNo: number;
 }
 
-export class FrontendBattle {
-    type!: BattleType;
+export interface FrontendAttack extends Attack {}
+
+export interface FrontendBattle {
+    type: BattleType;
     playerShipIds: string[];
     opponentShipIds: string[];
     priceCardIds: number[];
     range: number;
+    recentAttack?: FrontendAttack;
 }
 
-export class FrontendCard {
-    id!: number;
-    index!: number;
-    battleReady!: boolean;
-    retractable!: boolean;
-    insufficientEnergy!: boolean;
+export interface FrontendCard {
+    id: number;
+    index: number;
+    battleReady: boolean;
+    retractable: boolean;
+    insufficientEnergy: boolean;
 }
 
-export class FrontendCardStack {
-    uuid!: string;
-    cards!: FrontendCard[];
-    zone!: Zone;
-    index!: number;
-    zoneCardsNum!: number;
-    ownedByPlayer!: boolean;
-    damage!: number;
-    criticalDamage!: boolean;
-    missionReady!: boolean;
-    interventionReady!: boolean;
-    defenseIcons!: FrontendDefenseIcon[];
+export interface FrontendCardStack {
+    uuid: string;
+    cards: FrontendCard[];
+    zone: Zone;
+    index: number;
+    zoneCardsNum: number;
+    ownedByPlayer: boolean;
+    damage: number;
+    criticalDamage: boolean;
+    missionReady: boolean;
+    interventionReady: boolean;
+    defenseIcons: FrontendDefenseIcon[];
 }
 
-export class FrontendDefenseIcon {
-    icon!: string;
-    depleted!: boolean;
+export interface FrontendDefenseIcon {
+    icon: string;
+    depleted: boolean;
 }
 
-export class FrontendHandCard {
-    uuid!: string;
-    cardId!: number;
-    index!: number;
-    playable!: boolean;
-    validTargets!: string[];
+export interface FrontendHandCard {
+    uuid: string;
+    cardId: number;
+    index: number;
+    playable: boolean;
+    validTargets: string[];
 }
 
-export class FrontendEvent {
+export interface FrontendEvent {
     type: EventType;
     playerEvent: boolean;
     oldUUID?: string;
@@ -59,21 +63,21 @@ export class FrontendEvent {
     target?: string;
 }
 
-export class FrontendGameResult {
+export interface FrontendGameResult {
     won: boolean;
 }
 
-export class FrontendState {
-    playerIsActive!: boolean;
-    playerPendingAction!: boolean;
-    turnPhase!: TurnPhase;
+export interface FrontendState {
+    playerIsActive: boolean;
+    playerPendingAction: boolean;
+    turnPhase: TurnPhase;
     actionPool: string[];
-    opponent!: FrontendOpponent;
-    hand!: FrontendHandCard[];
-    handCardLimit!: number;
-    deckSize!: number;
-    discardPileIds!: number[];
-    cardStacks!: FrontendCardStack[];
+    opponent: FrontendOpponent;
+    hand: FrontendHandCard[];
+    handCardLimit: number;
+    deckSize: number;
+    discardPileIds: number[];
+    cardStacks: FrontendCardStack[];
     battle?: FrontendBattle;
     gameResult?: FrontendGameResult;
     hasToRetractCards: boolean;
@@ -147,7 +151,8 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         opponentShipIds: match.battle.ships[opponentPlayerNo(playerNo)].map(cs => cs.uuid),
         priceCardIds: match.battle.downsidePriceCards.map(() => 1)
             .concat(match.battle.upsidePriceCards.map(c => c.id)),
-        range: match.battle.range
+        range: match.battle.range,
+        recentAttack: match.battle.recentAttack
     };
     const gameResult = match.gameResult.gameOver ? {
         won: match.gameResult.winnerNo == player.no

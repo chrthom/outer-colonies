@@ -19,7 +19,9 @@ export default abstract class Card {
         this.rarity = rarity;
     }
     abstract getValidTargets(player: Player): CardStack[]
-    attack(attackingShip: CardStack, target: CardStack) {}
+    attack(attackingShip: CardStack, target: CardStack): AttackResult {
+        return new AttackResult(0);
+    }
     canAttack(): boolean {
         return false;
     }
@@ -47,5 +49,15 @@ export default abstract class Card {
     abstract profile(): CardProfile
     actionPool(): ActionPool {
         return new ActionPool();
+    }
+}
+
+export class AttackResult {
+    pointDefense: number = 0;
+    shield: number = 0;
+    armour: number = 0;
+    damage: number = 0;
+    constructor(initialDamage: number) {
+        this.damage = initialDamage;
     }
 }
