@@ -12,8 +12,8 @@ export default class DiscardPile extends CardImage {
         super(scene, layout.discardPile.x, layout.discardPile.y, 1);
         this.update([]);
     }
-    update(cardIds: number[]) {
-        this.cardIds = cardIds;
+    update(cardIds?: number[]) {
+        if (cardIds) this.cardIds = cardIds;
         if (this.indicator) this.indicator.destroy();
         if (this.cardIds.length == 0) {
             this.setVisible(false);

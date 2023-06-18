@@ -154,7 +154,7 @@ export default class Game extends Phaser.Scene {
         this.obj.actionPool.update();
         this.obj.button.update();
         this.obj.deck.update();
-        //this.obj.discardPile.update(this.state.discardPileIds);
+        this.obj.discardPile.update();
         this.obj.missionCards.update();
         this.obj.prompt.update();
         this.updateHighlighting();
