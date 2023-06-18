@@ -77,7 +77,7 @@ class Layout {
         scale: 0.75
     };
     readonly missionCards = {
-        x: 1700,
+        x: 1760,
         y: 650,
         xDistance: 20,
         yDistance: 10
