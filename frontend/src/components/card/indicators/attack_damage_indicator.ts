@@ -19,6 +19,36 @@ export default class AttackDamageIndicator {
                     self.tween(this.createIndicator(value, color)), animationConfig.attack.indicator.spawnInterval * index
                 )
             );
+        const particleEmitters = [
+            [ 'red', Math.round(attack.shield + attack.armour + attack.damage / 3) ],
+            [ 'blue', attack.shield ],
+            [ 'yellow', attack.armour ],
+            [ 'white', attack.damage ]
+        ]
+            .filter(([_, n]) => Number(n) > 0)
+            .map(([color, n]) => {
+                const emitter = this.createParticleEmitter(String(color));
+                emitter.explode(Number(n));
+                return emitter;
+            });
+        setTimeout(() => {
+            particleEmitters.forEach(pe => pe.destroy());
+        }, animationConfig.duration.attack);
+    }
+    private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
+        return this.scene.add.particles(
+            this.cardImage.x, 
+            this.cardImage.y + animationConfig.attack.flare.yOffset,
+            `flare_${color}`,
+            {
+                lifespan: animationConfig.attack.flare.lifetime,
+                speed: { min: 150, max: 300 },
+                scale: { start: 0.8, end: 0 },
+                gravityY: 15,
+                blendMode: 'ADD',
+                emitting: false
+            }
+        );
     }
     private createIndicator(value: number, color: string) {
         return this.scene.add.text(this.cardImage.x, this.cardImage.y, String(value))

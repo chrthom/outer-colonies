@@ -77,6 +77,7 @@ export default class Game extends Phaser.Scene {
         ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
         this.load.image('card_mask', 'utils/card_mask.png');
         this.load.image('card_glow', 'utils/card_glow.png');
+        [ 'red', 'yellow', 'blue', 'white' ].forEach(color => this.load.image(`flare_${color}`, `utils/flare_${color}.png`));
     }
     
     create () {

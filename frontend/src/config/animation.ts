@@ -11,6 +11,10 @@ class AnimationConfig {
         indicator: {
             yTween: 100,
             spawnInterval: 200
+        },
+        flare: {
+            yOffset: 120,
+            lifetime: 800
         }
     }
 }
