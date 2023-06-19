@@ -81,6 +81,10 @@ export default class CardImage {
         this.forAllImages(i => i.setAngle(angle));
         return this;
     }
+    setDepth(depth: number): this {
+        this.forAllImages(i => i.setDepth(depth));
+        return this;
+    }
     enableMaximizeOnMouseover() {
         this.image.off('pointerover');
         this.image.off('pointerout');

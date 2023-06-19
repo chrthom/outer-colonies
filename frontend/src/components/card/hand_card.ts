@@ -17,6 +17,7 @@ export default class HandCard extends CardImage {
     }
     discard() {
         const discardPileIds = this.scene.state.discardPileIds.slice();
+        this.setDepth(layout.depth.discardCard);
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.draw,
@@ -31,6 +32,7 @@ export default class HandCard extends CardImage {
         });
     }
     showAndDiscardTacticCard() {
+        this.setDepth(layout.depth.maxedTacticCard);
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.showTacticCard,

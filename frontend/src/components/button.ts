@@ -4,27 +4,27 @@ import { layout } from "../config/layout";
 import Game from "../scenes/game";
 
 export default class Button {
-    sprite: Phaser.GameObjects.Text;
+    text: Phaser.GameObjects.Text;
     private scene: Game;
     private onClickAction: () => void = () => {};
     constructor(scene: Game) {
         this.scene = scene;
         const self = this;
-        this.sprite = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
+        this.text = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
             .setFontSize(layout.continueButton.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeeaa')
             .setAlign('right')
             .setOrigin(1, 0)
             .setInteractive();
-        this.sprite.on('pointerdown', () => {
+        this.text.on('pointerdown', () => {
             self.onClickAction();
         });
-        this.sprite.on('pointerover', () => {
-            self.sprite.setColor('#ff69b4');
+        this.text.on('pointerover', () => {
+            self.text.setColor('#ff69b4');
         });
-        this.sprite.on('pointerout', () => {
-            self.sprite.setColor('#eeeeaa');
+        this.text.on('pointerout', () => {
+            self.text.setColor('#eeeeaa');
         });
         this.hide();
     }
@@ -70,10 +70,10 @@ export default class Button {
     }
     private show(text: string, onClickAction: () => void) {
         this.onClickAction = onClickAction;
-        this.sprite.setText(text);
-        this.sprite.visible = true;
+        this.text.setText(text);
+        this.text.visible = true;
     }
     private hide() {
-        this.sprite.visible = false;
+        this.text.visible = false;
     }
 }

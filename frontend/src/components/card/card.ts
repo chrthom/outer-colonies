@@ -21,6 +21,7 @@ export default class Card extends CardImage {
     }
     discard(ownedByPlayer: boolean, toDeck?: boolean) {
         const discardPileIds = this.scene.state.discardPileIds.slice();
+        this.setDepth(layout.depth.discardCard);
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.move,

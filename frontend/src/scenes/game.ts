@@ -15,7 +15,7 @@ import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
 
-class InitData {
+interface InitData {
     socket: Socket;
     gameParams: FrontendGameParams;
 }
@@ -36,15 +36,18 @@ class ActiveCards {
     stackIndex?: number;
 }
 
+interface Layers {
+    background: Phaser.GameObjects.Layer;
+    cards: Phaser.GameObjects.Layer;
+    interface: Phaser.GameObjects.Layer;
+}
+
 export default class Game extends Phaser.Scene {
     socket: Socket;
     gameParams: FrontendGameParams;
     preloader: Preloader;
     state: FrontendState;
-    activeCards: ActiveCards;
-
-    activeCardStackIndex: number;
-
+    activeCards: ActiveCards = new ActiveCards();
     plannedBattle: FrontendPlannedBattle;
     interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];

@@ -14,6 +14,11 @@ class Layout {
         color: '#eeeeaa'
     };
 
+    readonly depth = {
+        discardCard: 5,
+        maxedTacticCard: 10
+    };
+
     readonly actionPool = {
         x: 2370,
         y: 1040,
