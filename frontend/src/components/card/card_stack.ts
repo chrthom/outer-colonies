@@ -158,8 +158,8 @@ export default class CardStack {
             switch (state.turnPhase) {
                 case TurnPhase.Build:
                     if (state.playerIsActive) {
-                        if (this.scene.activeHandCard) {
-                            this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeHandCard, this.uuid);
+                        if (this.scene.activeCards.hand) {
+                            this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
                         } else if (this.isOpponentColony()) {
                             this.scene.resetView(this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid);
                         } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
@@ -180,16 +180,21 @@ export default class CardStack {
                     }
                     break;
                 case TurnPhase.Combat:
-                    if (this.scene.activeCardStack == this.uuid && this.scene.activeCardStackIndex == cardData.index) {
-                        this.scene.activeCardStack = null;
-                        this.scene.activeCardStackIndex = null;
-                        this.scene.activeHandCard = null;
+                    if (this.scene.activeCards.stack == this.uuid && this.scene.activeCards.stackIndex == cardData.index) {
+                        this.scene.activeCards.stack = null;
+                        this.scene.activeCards.stackIndex = null;
+                        this.scene.activeCards.hand = null;
                     } else if (cardData.battleReady) {
-                        this.scene.activeCardStack = this.uuid;
-                        this.scene.activeCardStackIndex = cardData.index;
-                        this.scene.activeHandCard = null;
-                    } else if (this.scene.activeCardStack && this.scene.state.battle.opponentShipIds.includes(this.uuid)) {
-                        this.scene.socket.emit(MsgTypeInbound.Attack, this.scene.activeCardStack, this.scene.activeCardStackIndex, this.uuid);
+                        this.scene.activeCards.stack = this.uuid;
+                        this.scene.activeCards.stackIndex = cardData.index;
+                        this.scene.activeCards.hand = null;
+                    } else if (this.scene.activeCards.stack && this.scene.state.battle.opponentShipIds.includes(this.uuid)) {
+                        this.scene.socket.emit(
+                            MsgTypeInbound.Attack,
+                            this.scene.activeCards.stack,
+                            this.scene.activeCards.stackIndex,
+                            this.uuid
+                        );
                     }
                     break;
             }

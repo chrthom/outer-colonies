@@ -30,14 +30,21 @@ class StaticObjects {
     missionCards?: MissionCards;
 }
 
+class ActiveCards {
+    hand?: string;
+    stack?: string;
+    stackIndex?: number;
+}
+
 export default class Game extends Phaser.Scene {
     socket: Socket;
     gameParams: FrontendGameParams;
     preloader: Preloader;
     state: FrontendState;
-    activeHandCard: string;
-    activeCardStack: string;
+    activeCards: ActiveCards;
+
     activeCardStackIndex: number;
+
     plannedBattle: FrontendPlannedBattle;
     interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];
@@ -137,9 +144,9 @@ export default class Game extends Phaser.Scene {
     }
 
     resetView(battleType?: BattleType) {
-        this.activeHandCard = null;
-        this.activeCardStack = null;
-        this.activeCardStackIndex = null;
+        this.activeCards.hand = null;
+        this.activeCards.stack = null;
+        this.activeCards.stackIndex = null;
         this.interveneShipIds = [];
         this.plannedBattle = {
             type: battleType ? battleType : BattleType.None,
@@ -172,12 +179,12 @@ export default class Game extends Phaser.Scene {
             }
             this.hand.forEach(c => {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
-                else if (this.activeHandCard == c.uuid) c.highlightSelected();
+                else if (this.activeCards.hand == c.uuid) c.highlightSelected();
                 else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
             });
             this.cardStacks.forEach(cs => {
-                if (this.activeHandCard) { // Choose target for hand card
-                    const activeCard = this.hand.find(c => c.uuid == this.activeHandCard);
+                if (this.activeCards.hand) { // Choose target for hand card
+                    const activeCard = this.hand.find(c => c.uuid == this.activeCards.hand);
                     if (activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
                 } else {
                     switch (this.state.turnPhase) {
@@ -202,12 +209,12 @@ export default class Game extends Phaser.Scene {
                             if (!allShips.includes(cs.uuid)) {
                                 cs.highlightDisabled();
                             }
-                            if (this.activeCardStack == cs.uuid && this.activeCardStackIndex >= 0) {
-                                cs.cards[this.activeCardStackIndex].highlightSelected();
+                            if (this.activeCards.stack == cs.uuid && this.activeCards.stackIndex >= 0) {
+                                cs.cards[this.activeCards.stackIndex].highlightSelected();
                             } else if (this.state.battle.playerShipIds.includes(cs.uuid)) {
                                 cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
                             }
-                            if (this.activeCardStack && this.state.battle.opponentShipIds.includes(cs.uuid)) {
+                            if (this.activeCards.stack && this.state.battle.opponentShipIds.includes(cs.uuid)) {
                                 cs.highlightSelectable();
                             }
                             break;

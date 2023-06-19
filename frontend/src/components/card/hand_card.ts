@@ -74,10 +74,10 @@ export default class HandCard extends CardImage {
         if (this.scene.state.playerPendingAction) {
             if (this.data.playable
                     && (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)) {
-                const reset = this.scene.activeHandCard == this.uuid;
-                this.scene.activeCardStack = null;
-                this.scene.activeHandCard = null;
-                if (!reset) this.scene.activeHandCard = this.uuid;
+                const reset = this.scene.activeCards.hand == this.uuid;
+                this.scene.activeCards.stack = null;
+                this.scene.activeCards.hand = null;
+                if (!reset) this.scene.activeCards.hand = this.uuid;
                 this.scene.updateView();
             } else if (this.scene.state.turnPhase == TurnPhase.End) {
                 this.scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
