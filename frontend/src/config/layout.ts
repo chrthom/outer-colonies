@@ -81,6 +81,10 @@ class Layout {
         y: 820,
         scale: 0.75
     };
+    readonly combatRange = {
+        x: 1760,
+        y: 730
+    }
     readonly missionCards = {
         x: 1760,
         y: 650,

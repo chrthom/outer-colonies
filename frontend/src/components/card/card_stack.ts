@@ -2,13 +2,13 @@ import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
 import { FrontendAttack, FrontendCard, FrontendCardStack } from "../../../../backend/src/components/frontend_converters/frontend_state";
-import ValueIndicator from "./indicators/value_indicator";
-import DefenseIndicator from "./indicators/defense_indicator";
+import ValueIndicator from "../indicators/value_indicator";
+import DefenseIndicator from "../indicators/defense_indicator";
 import Card from "./card";
 import { animationConfig } from "../../config/animation";
 import HandCard from "./hand_card";
 import { arrayDiff } from "../../../../backend/src/components/utils/utils";
-import AttackDamageIndicator from "./indicators/attack_damage_indicator";
+import AttackDamageIndicator from "../indicators/attack_damage_indicator";
 
 export default class CardStack {
     cards!: Array<Card>;

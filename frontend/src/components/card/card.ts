@@ -3,7 +3,7 @@ import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";
-import RetractCardButton from "./indicators/retract_card_button";
+import RetractCardButton from "../indicators/retract_card_button";
 
 export default class Card extends CardImage {
     data: FrontendCard;

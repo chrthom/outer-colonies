@@ -1,7 +1,7 @@
-import { MsgTypeInbound } from "../../../../../backend/src/components/config/enums";
-import { animationConfig } from "../../../config/animation";
-import { layout } from "../../../config/layout";
-import Game from "../../../scenes/game";
+import { MsgTypeInbound } from "../../../../backend/src/components/config/enums";
+import { animationConfig } from "../../config/animation";
+import { layout } from "../../config/layout";
+import Game from "../../scenes/game";
 
 export default class RetractCardButton {
     image: Phaser.GameObjects.Image;

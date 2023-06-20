@@ -1,8 +1,8 @@
-import { FrontendAttack } from "../../../../../backend/src/components/frontend_converters/frontend_state";
-import { animationConfig } from "../../../config/animation";
-import { layout } from "../../../config/layout";
-import Game from "../../../scenes/game";
-import CardStack from "../card_stack";
+import { FrontendAttack } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { animationConfig } from "../../config/animation";
+import { layout } from "../../config/layout";
+import Game from "../../scenes/game";
+import CardStack from "../card/card_stack";
 
 export default class AttackDamageIndicator {
     private scene!: Game;

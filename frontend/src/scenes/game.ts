@@ -15,6 +15,7 @@ import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
 import Background from '../components/background';
+import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 
 interface InitData {
     socket: Socket;
@@ -25,6 +26,7 @@ class StaticObjects {
     actionPool?: ActionPool;
     background?: Background;
     button?: Button;
+    combatRangeIndicator?: CombatRangeIndicator;
     deck?: DeckCard;
     discardPile?: DiscardPile;
     prompt?: Prompt;
@@ -83,6 +85,7 @@ export default class Game extends Phaser.Scene {
         [ 'red', 'yellow', 'blue', 'white' ].forEach(color => this.load.image(`flare_${color}`, `utils/flare_${color}.png`));
         this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
         this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
+        [ 1, 2, 3, 4 ].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     }
     
     create () {
@@ -92,6 +95,7 @@ export default class Game extends Phaser.Scene {
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
         this.obj.background.initInterface();
         this.obj.actionPool = new ActionPool(this);
+        this.obj.combatRangeIndicator = new CombatRangeIndicator(this);
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
         this.obj.discardPile = new DiscardPile(this)
@@ -170,6 +174,7 @@ export default class Game extends Phaser.Scene {
     updateView() {
         this.obj.actionPool.update();
         this.obj.button.update();
+        this.obj.combatRangeIndicator.update();
         this.obj.deck.update();
         this.obj.discardPile.update();
         this.obj.missionCards.update();

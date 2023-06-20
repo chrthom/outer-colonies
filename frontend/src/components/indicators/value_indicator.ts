@@ -1,6 +1,6 @@
-import { animationConfig } from "../../../config/animation";
-import { layout } from "../../../config/layout";
-import Game from "../../../scenes/game";
+import { animationConfig } from "../../config/animation";
+import { layout } from "../../config/layout";
+import Game from "../../scenes/game";
 
 export default class ValueIndicator {
     shape!: Phaser.GameObjects.Shape;

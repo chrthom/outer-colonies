@@ -3,7 +3,7 @@ import { FrontendPlannedBattle } from "../../../../backend/src/components/fronte
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";
-import ValueIndicator from "./indicators/value_indicator";
+import ValueIndicator from "../indicators/value_indicator";
 
 export default class DiscardPile extends CardImage {
     cardIds: number[] = [];
