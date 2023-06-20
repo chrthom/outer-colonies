@@ -91,12 +91,24 @@ class Layout {
         colony: {
             x: 120,
             y: 100,
-            maxWidth: 650
+            maxWidth: 650,
+            corners: {
+                xLeft: 10,
+                xRight: 873,
+                yTop: 10,
+                yBottom: 373
+            }
         },
         orbital: {
             x: 1000,
             y: 100,
-            maxWidth: 650
+            maxWidth: 650,
+            corners: {
+                xLeft: 897,
+                xRight: 1760,
+                yTop: 10,
+                yBottom: 373
+            }
         },
         neutral: {
             x: 120,
@@ -116,17 +128,35 @@ class Layout {
         colony: {
             x: 1000,
             y: 1250,
-            maxWidth: 650
+            maxWidth: 650,
+            corners: {
+                xLeft: 897,
+                xRight: 1760,
+                yTop: 977,
+                yBottom: 1340
+            }
         },
         orbital: {
             x: 120,
             y: 1250,
-            maxWidth: 650
+            maxWidth: 650,
+            corners: {
+                xLeft: 10,
+                xRight: 873,
+                yTop: 977,
+                yBottom: 1340
+            }
         },
         neutral: {
             x: 1000,
             y: 670,
-            maxWidth: 650
+            maxWidth: 650,
+            corners: {
+                xLeft: 10,
+                xRight: 1760,
+                yTop: 397,
+                yBottom: 953
+            }
         }
     };
     readonly preloader = {

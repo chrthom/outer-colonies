@@ -81,6 +81,8 @@ export default class Game extends Phaser.Scene {
         this.load.image('card_mask', 'utils/card_mask.png');
         this.load.image('card_glow', 'utils/card_glow.png');
         [ 'red', 'yellow', 'blue', 'white' ].forEach(color => this.load.image(`flare_${color}`, `utils/flare_${color}.png`));
+        this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
+        this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
     }
     
     create () {
@@ -88,6 +90,7 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
+        this.obj.background.initInterface();
         this.obj.actionPool = new ActionPool(this);
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
