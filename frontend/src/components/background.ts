@@ -26,16 +26,34 @@ export default class Background {
         };
         const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
             this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
-        const addCorners = (c: CornerConfig, opponent: boolean) => [
+        const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
+            this.scene.add.text(c.xLeft, c.yBottom, caption)
+                .setFontSize(layout.prompt.fontSize)
+                .setFontFamily(layout.font.family)
+                .setColor(opponent ? layout.opponent.color : layout.player.color)
+                .setAlpha(layout.colors.alpha)
+                .setAlign('right')
+                .setOrigin(0, 1);
+        const addZoneElements = (c: CornerConfig, opponent: boolean) => [
             addCorner(c.xLeft, c.yTop, 0, opponent),
             addCorner(c.xRight, c.yTop, 90, opponent),
             addCorner(c.xLeft, c.yBottom, 270, opponent),
             addCorner(c.xRight, c.yBottom, 180, opponent)
         ];
-        this.zoneMarkers.addMultiple(
-            [ l.pColony, l.pOrbital, l.pNeutral ]
-                .flatMap(c => addCorners(c, false))
-                .concat([ l.oColony, l.oOrbital ].flatMap(c => addCorners(c, true)))
-        );
+        const corners: Phaser.GameObjects.GameObject[] = [
+            addZoneElements(l.pColony, false),
+            addZoneElements(l.pOrbital, false),
+            addZoneElements(l.pNeutral, false),
+            addZoneElements(l.oColony, true),
+            addZoneElements(l.oOrbital, true)
+        ].flat();
+        const captions: Phaser.GameObjects.GameObject[] = [
+            addCaption(l.pColony, 'Koloniezone', false),
+            addCaption(l.pOrbital, 'Orbitale Zone', false),
+            addCaption(l.pNeutral, 'Neutrale Zone', false),
+            addCaption(l.oColony, 'Koloniezone', true),
+            addCaption(l.oOrbital, 'Orbitale Zone', true),
+        ];
+        this.zoneMarkers.addMultiple(corners.concat(captions));
     }
 }

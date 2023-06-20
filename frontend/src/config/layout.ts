@@ -88,6 +88,7 @@ class Layout {
         yDistance: 10
     };
     readonly opponent = {
+        color: '#991111',
         colony: {
             x: 120,
             y: 100,
@@ -117,6 +118,7 @@ class Layout {
         }
     };
     readonly player = {
+        color: '#119999',
         hand: {
             x: 2370,
             y: 1350,
