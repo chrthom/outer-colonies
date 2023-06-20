@@ -33,6 +33,7 @@ export default class HandCard extends CardImage {
     }
     showAndDiscardTacticCard() {
         this.setDepth(layout.depth.maxedTacticCard);
+        this.highlightReset();
         this.tween({
             targets: undefined,
             duration: animationConfig.duration.showTacticCard,
