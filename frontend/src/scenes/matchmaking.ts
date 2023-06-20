@@ -1,4 +1,6 @@
 import io, { Socket } from 'socket.io-client';
+import Background from '../components/background';
+import { layout } from '../config/layout';
 
 export default class Matchmaking extends Phaser.Scene {
     playerName: string;
@@ -11,11 +13,18 @@ export default class Matchmaking extends Phaser.Scene {
         });
     }
 
-    preload () {}
+    preload () {
+        this.load.baseURL = 'http://localhost:3000/cardimages/';
+        this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
+    }
 
     create () {
         this.playerName = window.location.search.substring(1);
-        this.statusText = this.add.text(100, 300, ['Hallo ' + this.playerName]).setFontSize(18).setFontFamily('Trebuchet MS').setColor('#ffff99');
+        this.statusText = this.add
+            .text(100, 300, ['Hallo ' + this.playerName])
+            .setFontSize(layout.prompt.fontSize)
+            .setFontFamily(layout.font.family)
+            .setColor(layout.font.color);
         this.socket = io('http://localhost:3000');
         this.socket.on('connect', () => {
         	console.log('Connected to backend!');
@@ -36,6 +45,7 @@ export default class Matchmaking extends Phaser.Scene {
                     break;
             }
         });
+        new Background(this);
     }
 
     update () {}

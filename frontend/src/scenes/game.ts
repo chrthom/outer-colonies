@@ -66,6 +66,7 @@ export default class Game extends Phaser.Scene {
     init(data: InitData) {
         this.socket = data.socket;
         this.gameParams = data.gameParams;
+        this.obj.background = new Background(this);
     }
 
     preload () {
@@ -80,7 +81,6 @@ export default class Game extends Phaser.Scene {
         this.load.image('card_mask', 'utils/card_mask.png');
         this.load.image('card_glow', 'utils/card_glow.png');
         [ 'red', 'yellow', 'blue', 'white' ].forEach(color => this.load.image(`flare_${color}`, `utils/flare_${color}.png`));
-        this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     }
     
     create () {
@@ -88,7 +88,6 @@ export default class Game extends Phaser.Scene {
             this.updateState(state);
         });
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
-        this.obj.background = new Background(this);
         this.obj.actionPool = new ActionPool(this);
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
