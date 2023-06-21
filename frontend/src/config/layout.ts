@@ -11,7 +11,8 @@ class Layout {
 
     readonly font = {
         family: 'Impact',
-        color: '#eeeeaa'
+        color: '#ffffff',
+        colorHover: '#eeeeaa'
     };
 
     readonly depth = {
@@ -176,7 +177,7 @@ class Layout {
     }
     readonly prompt = {
         x: 2370,
-        y: 80,
+        y: 110,
         fontSize: 24
     };
 }

@@ -41,20 +41,24 @@ export default class Button {
                 ['']
             )
             .setFontSize(layout.continueButton.fontSize)
-            .setFontFamily('Impact')
-            .setColor('#eeeeaa')
+            .setFontFamily(layout.font.family)
+            .setColor(layout.font.color)
             .setAlign('right')
             .setOrigin(1, 0.5)
             .setInteractive();
-        this.text.on('pointerdown', () => {
-            self.onClickAction();
-        });
-        this.text.on('pointerover', () => {
-            self.text.setColor('#ff69b4');
-        });
-        this.text.on('pointerout', () => {
-            self.text.setColor('#eeeeaa');
-        });
+        (<Phaser.GameObjects.GameObject[]> Object.values(this.images))
+            .concat([ this.text ])
+            .forEach(o => o
+                .on('pointerdown', () => {
+                    self.onClickAction();
+                })
+                .on('pointerover', () => {
+                    self.text.setColor(layout.font.colorHover);
+                })
+                .on('pointerout', () => {
+                    self.text.setColor(layout.font.color);
+                })
+            );
         this.waitState();
     }
     update() {
@@ -78,6 +82,7 @@ export default class Button {
         return this.scene.add
             .image(layout.continueButton.x, layout.continueButton.y, `button_${name}`)
             .setOrigin(1, 0.5)
+            .setInteractive()
             .setVisible(false);
     }
     private showNextPhase() {
