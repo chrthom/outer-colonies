@@ -65,14 +65,20 @@ export default class Button {
         if (this.scene.state.gameResult) {
             this.showGameOver(this.scene.state.gameResult);
         } else if (this.scene.state.playerPendingAction) {
-            if (this.scene.state.turnPhase == TurnPhase.Build) {
-                if (!this.scene.state.playerIsActive) this.showIntervene();
-                else if (this.scene.state.hasToRetractCards) this.waitState();
-                else this.showNextPhase();
-            } else if (this.scene.state.turnPhase == TurnPhase.Combat) {
-                this.showNextCombatPhase();
-            } else {
-                this.waitState();
+            switch (this.scene.state.turnPhase) {
+                case TurnPhase.Build:
+                    if (!this.scene.state.playerIsActive) this.showIntervene();
+                    else if (this.scene.state.hasToRetractCards) this.waitState();
+                    else this.showNextPhase();
+                    break;
+                case TurnPhase.Combat:
+                    this.showNextCombatPhase();
+                    break;
+                case TurnPhase.End:
+                    this.showEndPhase();
+                    break;
+                default:
+                    this.waitState();
             }
         } else {
             this.waitState();
@@ -103,6 +109,9 @@ export default class Button {
     private showNextCombatPhase() {
         const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
         this.show('Kampfphase beenden', button, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
+    }
+    private showEndPhase() {
+        this.show('', 'active_select', () => {});
     }
     private showGameOver(gameResult: FrontendGameResult) {
         this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {

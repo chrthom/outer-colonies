@@ -177,7 +177,7 @@ class Layout {
     }
     readonly prompt = {
         x: 2370,
-        y: 110,
+        y: 120,
         fontSize: 24
     };
 }
