@@ -86,6 +86,10 @@ export default class Game extends Phaser.Scene {
         this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
         this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
         [ 1, 2, 3, 4 ].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
+        [ 
+            'active_build', 'active_combat', 'active_select', 'active_wait', 'won',
+            'inactive_combat', 'inactive_select', 'inactive_wait', 'lost' 
+        ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
     }
     
     create () {

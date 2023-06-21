@@ -1,21 +1,50 @@
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../backend/src/components/config/enums";
 import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
+import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
+
+interface ButtonImages {
+    active_build: Phaser.GameObjects.Image;
+    active_combat: Phaser.GameObjects.Image;
+    active_select: Phaser.GameObjects.Image;
+    active_wait: Phaser.GameObjects.Image;
+    inactive_combat: Phaser.GameObjects.Image;
+    inactive_select: Phaser.GameObjects.Image;
+    inactive_wait: Phaser.GameObjects.Image;
+    won: Phaser.GameObjects.Image;
+    lost: Phaser.GameObjects.Image;
+}
 
 export default class Button {
     text: Phaser.GameObjects.Text;
     private scene: Game;
+    private images!: ButtonImages;
     private onClickAction: () => void = () => {};
     constructor(scene: Game) {
         this.scene = scene;
         const self = this;
-        this.text = scene.add.text(layout.continueButton.x, layout.continueButton.y, [''])
+        this.images = {
+            active_build: this.createButtonImage('active_build'),
+            active_combat: this.createButtonImage('active_combat'),
+            active_select: this.createButtonImage('active_select'),
+            active_wait: this.createButtonImage('active_wait'),
+            inactive_combat: this.createButtonImage('inactive_combat'),
+            inactive_select: this.createButtonImage('inactive_select'),
+            inactive_wait: this.createButtonImage('inactive_wait'),
+            won: this.createButtonImage('won'),
+            lost: this.createButtonImage('lost')
+        }
+        this.text = scene.add.text(
+                layout.continueButton.x + layout.continueButton.xTextOffset,
+                layout.continueButton.y,
+                ['']
+            )
             .setFontSize(layout.continueButton.fontSize)
             .setFontFamily('Impact')
             .setColor('#eeeeaa')
             .setAlign('right')
-            .setOrigin(1, 0)
+            .setOrigin(1, 0.5)
             .setInteractive();
         this.text.on('pointerdown', () => {
             self.onClickAction();
@@ -26,54 +55,67 @@ export default class Button {
         this.text.on('pointerout', () => {
             self.text.setColor('#eeeeaa');
         });
-        this.hide();
+        this.waitState();
     }
     update() {
         if (this.scene.state.gameResult) {
-            this.showGameOver();
+            this.showGameOver(this.scene.state.gameResult);
         } else if (this.scene.state.playerPendingAction) {
             if (this.scene.state.turnPhase == TurnPhase.Build) {
                 if (!this.scene.state.playerIsActive) this.showIntervene();
-                else if (this.scene.state.hasToRetractCards) this.hide();
+                else if (this.scene.state.hasToRetractCards) this.waitState();
                 else this.showNextPhase();
             } else if (this.scene.state.turnPhase == TurnPhase.Combat) {
                 this.showNextCombatPhase();
             } else {
-                this.hide();
+                this.waitState();
             }
         } else {
-            this.hide();
+            this.waitState();
         }
+    }
+    private createButtonImage(name: string) {
+        return this.scene.add
+            .image(layout.continueButton.x, layout.continueButton.y, `button_${name}`)
+            .setOrigin(1, 0.5)
+            .setVisible(false);
     }
     private showNextPhase() {
         const text = this.scene.plannedBattle.shipIds.length == 0 
                 || this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle) ? 
             'Zug beenden' :
             `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
-        this.show(text, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle));
+        this.show(text, 'active_build', () => 
+            this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle));
     }
     private showIntervene() {
         let text: string; 
         if (this.scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
         else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
         else text = 'Überspringen';
-        this.show(text, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds));
+        this.show(text, 'inactive_select', () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds));
     }
     private showNextCombatPhase() {
-        this.show('Kampfphase beenden', () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
+        const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
+        this.show('Kampfphase beenden', button, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
     }
-    private showGameOver() {
-        this.show('Neuen Gegner suchen', () => {
+    private showGameOver(gameResult: FrontendGameResult) {
+        this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
             this.scene.socket.off(MsgTypeOutbound.State);
             this.scene.scene.start('Matchmaking');
         });
     }
-    private show(text: string, onClickAction: () => void) {
+    private show(text: string, button: string, onClickAction: () => void) {
         this.onClickAction = onClickAction;
+        this.showButton(button);
         this.text.setText(text);
-        this.text.visible = true;
     }
-    private hide() {
-        this.text.visible = false;
+    private showButton(name: string) {
+        Object.values(this.images).forEach(i => i.setVisible(false));
+        this.images[name].setVisible(true);
+    }
+    private waitState() {
+        const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
+        this.show('', button, () => {});
     }
 }

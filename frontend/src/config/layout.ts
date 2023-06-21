@@ -64,7 +64,8 @@ class Layout {
     }
     readonly continueButton = {
         x: 2370,
-        y: 30,
+        y: 50,
+        xTextOffset: -120,
         fontSize: 32
     };
     readonly deck = {
