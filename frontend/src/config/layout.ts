@@ -64,7 +64,7 @@ class Layout {
     }
     readonly continueButton = {
         x: 2370,
-        y: 50,
+        y: 60,
         xTextOffset: -120,
         fontSize: 32
     };
