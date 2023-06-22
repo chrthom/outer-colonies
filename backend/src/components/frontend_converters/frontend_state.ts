@@ -6,7 +6,9 @@ import { Attack } from '../game_state/battle';
 
 export interface FrontendOpponent {
     name: string;
-    handCardNo: number;
+    handCardSize: number;
+    deckSize: number;
+    discardPileIds: number[];
 }
 
 export interface FrontendAttack extends Attack {}
@@ -154,7 +156,13 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         range: match.battle.range,
         recentAttack: match.battle.recentAttack
     };
-    const gameResult = match.gameResult.gameOver ? {
+    const opponentData: FrontendOpponent = {
+        name: opponent.name,
+        handCardSize: opponent.hand.length,
+        deckSize: opponent.deck.length,
+        discardPileIds: opponent.discardPile.map(c => c.id)
+    };
+    const gameResult: FrontendGameResult = match.gameResult.gameOver ? {
         won: match.gameResult.winnerNo == player.no
     } : null;
     return {
@@ -162,10 +170,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         playerPendingAction: match.actionPendingByPlayerNo == playerNo,
         turnPhase: match.turnPhase,
         actionPool: actionPool,
-        opponent: {
-            name: opponent.name,
-            handCardNo: opponent.hand.length
-        },
+        opponent: opponentData,
         hand: hand,
         handCardLimit: player.handCardLimit(),
         deckSize: player.deck.length,
