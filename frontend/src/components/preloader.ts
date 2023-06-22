@@ -16,10 +16,15 @@ export default class Preloader {
                 layout.preloader.width + 2 * layout.preloader.boxPadding,
                 layout.preloader.height + 2 * layout.preloader.boxPadding
             );
-        this.text = scene.add.text(layout.preloader.x, layout.preloader.y + layout.preloader.textOffsetY, 'Lade Spieldaten...')
+        this.text = scene.add.text(
+            layout.preloader.x,
+            layout.preloader.y + layout.preloader.textOffsetY,
+            'Lade Spieldaten...'
+        )
             .setFontSize(layout.font.size)
             .setFontFamily(layout.font.family)
             .setColor(layout.font.color)
+            .setAlign('center')
             .setOrigin(0.5, 0.5);
         scene.load.on('progress', (value: number) => {
             self.progressBar.clear()

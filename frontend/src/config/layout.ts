@@ -64,6 +64,10 @@ class Layout {
         yOpponent: 300,
         scale: 0.8
     }
+    readonly combatRange = {
+        x: 1760,
+        y: 730
+    }
     readonly continueButton = {
         x: 2370,
         y: 60,
@@ -79,15 +83,18 @@ class Layout {
         y: 1070,
         yOpponent: -400
     };
+    readonly loadingAnimation = {
+        x: 1200,
+        y: 750,
+        radius: 64,
+        barWidth: 10,
+        textOffsetY: -120
+    };
     readonly maxCard = {
         x: 2110,
         y: 820,
         scale: 0.75
     };
-    readonly combatRange = {
-        x: 1760,
-        y: 730
-    }
     readonly missionCards = {
         x: 1760,
         y: 650,
