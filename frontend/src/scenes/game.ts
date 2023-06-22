@@ -114,7 +114,7 @@ export default class Game extends Phaser.Scene {
         const self = this;
         const oldState = this.state ? this.state : state;
         this.state = state;
-        //console.log(JSON.stringify(state.battle)); ////
+        //console.log(JSON.stringify(state)); ////
         this.preloader.destroy();
         const attackPerformed = this.animateAttack();
         setTimeout(() => {
@@ -124,6 +124,7 @@ export default class Game extends Phaser.Scene {
             self.updateCardStacks(newHandCards);
             setTimeout(() => {
                 self.updateHandCards(newHandCards, oldState);
+                self.showOpponentTacticCardAction(oldState);
                 self.resetView();
             }, self.retractCardsExists ? animationConfig.duration.move : 0);
         }, attackPerformed ? animationConfig.duration.attack : 0);
@@ -198,19 +199,24 @@ export default class Game extends Phaser.Scene {
         newHandCards // Draw new hand cards
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
-            const opponent = self.state.opponent;
-            const oldOpponent = oldState.opponent;
-        if (opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize
-                && opponent.discardPileIds.length > oldOpponent.discardPileIds.length
-                && oldState.turnPhase == TurnPhase.Build) { // Opponent playing tactic card
-            const cardId = opponent.discardPileIds.length > 0
-                ? opponent.discardPileIds[opponent.discardPileIds.length - 1] : null;
-            if (cardId && !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(cardId)) {
-                new CardImage(self, layout.discardPile.x, layout.discardPile.yOpponent, cardId, true)
-                        .showAndDiscardTacticCard(false);
-            }
-        }
         self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
+    }
+
+    private showOpponentTacticCardAction(oldState: FrontendState) {
+        const self = this;
+        const opponent = self.state.opponent;
+        const oldOpponent = oldState.opponent;
+        if (opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize
+            && opponent.discardPileIds.length > oldOpponent.discardPileIds.length
+            && self.state.turnPhase == TurnPhase.Build
+            && oldState.turnPhase == TurnPhase.Build) { // Opponent playing tactic card
+        const cardId = opponent.discardPileIds.length > 0
+            ? opponent.discardPileIds[opponent.discardPileIds.length - 1] : null;
+        if (cardId && !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(cardId)) {
+            new CardImage(self, layout.discardPile.x, layout.discardPile.yOpponent, cardId, true)
+                    .showAndDiscardTacticCard(false);
+        }
+    }
     }
 
     private updateHighlighting() {

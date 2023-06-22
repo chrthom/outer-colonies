@@ -52,7 +52,7 @@ export class Card165 extends TacticCard {
             .map(cs => cs.profile())
             .filter(p => p.speed >= 2 && p.psi > 0)
             .map(p => p.psi)
-            .reduce(psi => psi + psi, 0);
+            .reduce((psi1, psi2) => psi1 + psi2, 0);
     }
 }
 
