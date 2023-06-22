@@ -6,9 +6,9 @@ import ValueIndicator from "../indicators/value_indicator";
 import DefenseIndicator from "../indicators/defense_indicator";
 import Card from "./card";
 import { animationConfig } from "../../config/animation";
-import HandCard from "./hand_card";
 import { arrayDiff } from "../../../../backend/src/components/utils/utils";
 import AttackDamageIndicator from "../indicators/attack_damage_indicator";
+import CardImage from "./card_image";
 
 export default class CardStack {
     cards!: Array<Card>;
@@ -17,11 +17,11 @@ export default class CardStack {
     damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
     private scene!: Game;
-    constructor(scene: Game, data: FrontendCardStack, origin?: HandCard) {
+    constructor(scene: Game, data: FrontendCardStack, fromHand?: boolean, origin?: CardImage) {
         this.scene = scene;
         this.uuid = data.uuid;
         this.data = data;
-        this.createCards(origin);
+        this.createCards(origin, fromHand);
     }
     discard(toDeck?: boolean) {
         this.destroyIndicators();
@@ -43,7 +43,7 @@ export default class CardStack {
             const x = this.data.ownedByPlayer ? (handCard ? handCard.image.x : layout.deck.x) : layout.discardPile.x;
             const y = this.data.ownedByPlayer ? (handCard ? handCard.image.y : layout.deck.y) : layout.discardPile.yOpponent;
             const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
-            c.setX(x).setY(y).setAngle(angle)
+            c.setX(x).setY(y).setAngle(angle);
         });
         this.tween();
     }
@@ -97,7 +97,7 @@ export default class CardStack {
         if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
         if (this.defenseIndicator) this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
     }
-    private createCards(origin?: HandCard) {
+    private createCards(origin?: CardImage, fromHand?: boolean) {
         this.cards = this.data.cards.map(c => 
             new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
         );
@@ -127,12 +127,21 @@ export default class CardStack {
                 this.data.ownedByPlayer
             );
         }
-        if (origin) {
-            this.cards[0]
-                .setX(origin.image.x)
-                .setY(origin.image.y)
-                .setAngle(origin.image.angle);
-            this.tween();
+        if (fromHand) {
+            if (origin) {
+                this.cards[0]
+                    .setX(origin.image.x)
+                    .setY(origin.image.y)
+                    .setAngle(origin.image.angle);
+                this.tween();
+            }
+            if (!this.data.ownedByPlayer) {
+                this.cards[0]
+                    .setX(layout.discardPile.x)
+                    .setY(layout.discardPile.yOpponent)
+                    .setAngle(180);
+                this.tween();
+            }
         }
     }
     private x() {

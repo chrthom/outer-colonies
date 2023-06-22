@@ -177,7 +177,7 @@ export default class Game extends Phaser.Scene {
             .map(cs => {
                 const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
                 if (originHandCard) originHandCard.destroy();
-                return new CardStack(self, cs, originHandCard);
+                return new CardStack(self, cs, true, originHandCard);
             })
             .forEach(cs => self.cardStacks.push(cs));
         self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
