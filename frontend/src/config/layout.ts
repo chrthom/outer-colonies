@@ -12,7 +12,8 @@ class Layout {
     readonly font = {
         family: 'Impact',
         color: '#ffffff',
-        colorHover: '#eeeeaa'
+        colorHover: '#eeeeaa',
+        size: 28
     };
 
     readonly depth = {
@@ -182,7 +183,7 @@ class Layout {
         },
         x: 1875,
         y: 165,
-        fontSize: 24
+        fontSize: 22
     };
 }
 

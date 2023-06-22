@@ -22,7 +22,7 @@ export default class Matchmaking extends Phaser.Scene {
         this.playerName = window.location.search.substring(1);
         this.statusText = this.add
             .text(100, 300, ['Hallo ' + this.playerName])
-            .setFontSize(layout.prompt.fontSize)
+            .setFontSize(layout.font.size)
             .setFontFamily(layout.font.family)
             .setColor(layout.font.color);
         this.socket = io('http://localhost:3000');

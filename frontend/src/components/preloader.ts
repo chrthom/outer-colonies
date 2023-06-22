@@ -17,7 +17,7 @@ export default class Preloader {
                 layout.preloader.height + 2 * layout.preloader.boxPadding
             );
         this.text = scene.add.text(layout.preloader.x, layout.preloader.y + layout.preloader.textOffsetY, 'Lade Spieldaten...')
-            .setFontSize(layout.prompt.fontSize) // TODO: Change
+            .setFontSize(layout.font.size)
             .setFontFamily(layout.font.family)
             .setColor(layout.font.color)
             .setOrigin(0.5, 0.5);

@@ -28,7 +28,7 @@ export default class Background {
             this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
         const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
             this.scene.add.text(c.xLeft, c.yBottom, caption)
-                .setFontSize(layout.prompt.fontSize)
+                .setFontSize(layout.font.size)
                 .setFontFamily(layout.font.family)
                 .setColor(opponent ? layout.opponent.color : layout.player.color)
                 .setAlpha(layout.colors.alpha)
