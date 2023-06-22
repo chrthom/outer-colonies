@@ -117,7 +117,7 @@ export default class Button {
         this.show('Kampfphase beenden', button, () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat));
     }
     private showEndPhase() {
-        this.show('', 'active_select', () => {});
+        this.show('Karten ablegen', 'active_select', () => {});
     }
     private showGameOver(gameResult: FrontendGameResult) {
         this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {

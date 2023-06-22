@@ -233,6 +233,7 @@ export default class Game extends Phaser.Scene {
                 if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
                 else if (this.activeCards.hand == c.uuid) c.highlightSelected();
                 else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
+                else c.highlightSelectable();
             });
             this.cardStacks.forEach(cs => {
                 if (this.activeCards.hand) { // Choose target for hand card
