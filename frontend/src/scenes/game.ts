@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import Button from '../components/button';
-import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
+import { FrontendHandCard, FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
@@ -114,49 +114,17 @@ export default class Game extends Phaser.Scene {
         this.state = state;
         //console.log(JSON.stringify(state.battle)); ////
         this.preloader.destroy();
-
-        const attack = this.state.battle ? this.state.battle.recentAttack : null;
-        if (attack) {
-            this.cardStacks.find(cs => cs.uuid == attack.sourceUUID).animateAttack();
-            this.cardStacks.find(cs => cs.uuid == attack.targetUUID).animateDamage(attack);
-        }
+        const attackPerformed = this.animateAttack();
         setTimeout(() => {
             const newHandCards = self.state.hand
                 .filter(c => !self.hand.some(h => h.uuid == c.uuid));
             self.retractCardsExists = false; // If true, then the hand animations are delayed
-            self.cardStacks.forEach(cs => {
-                const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-                if (newData) cs.update(newData); // Move card stacks
-                else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
-                    cs.discard(true);
-                    self.retractCardsExists = true;
-                } else cs.discard(); // Discard card stack
-            });
-            self.state.cardStacks
-                .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
-                .map(cs => {
-                    const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
-                    if (originHandCard) originHandCard.destroy();
-                    return new CardStack(self, cs, originHandCard);
-                })
-                .forEach(cs => self.cardStacks.push(cs));
-            self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
+            self.updateCardStacks(newHandCards);
             setTimeout(() => {
-                self.hand.map(h => {
-                    const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
-                    const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
-                    if (newData) h.update(newData); // Move hand card to new position
-                    else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(); // Play tactic card
-                    else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
-                    else h.discard(); // Discard hand card
-                });
-                newHandCards // Draw new hand cards
-                    .map(c => new HandCard(self, c))
-                    .forEach(h => self.hand.push(h));
-                self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
+                self.updateHandCards(newHandCards, oldState);
                 self.resetView();
             }, self.retractCardsExists ? animationConfig.duration.move : 0);
-        }, attack ? animationConfig.duration.attack : 0);
+        }, attackPerformed ? animationConfig.duration.attack : 0);
     }
 
     resetView(battleType?: BattleType) {
@@ -181,6 +149,54 @@ export default class Game extends Phaser.Scene {
         this.obj.discardPile.update();
         this.obj.missionCards.update();
         this.updateHighlighting();
+    }
+
+    private animateAttack(): boolean {
+        const attack = this.state.battle ? this.state.battle.recentAttack : null;
+        if (attack) {
+            this.cardStacks.find(cs => cs.uuid == attack.sourceUUID).animateAttack();
+            this.cardStacks.find(cs => cs.uuid == attack.targetUUID).animateDamage(attack);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private updateCardStacks(newHandCards: FrontendHandCard[]) {
+        const self = this;
+        self.cardStacks.forEach(cs => {
+            const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
+            if (newData) cs.update(newData); // Move card stacks
+            else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) { // Retract card stack (to deck first)
+                cs.discard(true);
+                self.retractCardsExists = true;
+            } else cs.discard(); // Discard card stack
+        });
+        self.state.cardStacks
+            .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
+            .map(cs => {
+                const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
+                if (originHandCard) originHandCard.destroy();
+                return new CardStack(self, cs, originHandCard);
+            })
+            .forEach(cs => self.cardStacks.push(cs));
+        self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
+    }
+
+    private updateHandCards(newHandCards: FrontendHandCard[], oldState: FrontendState) {
+        const self = this;
+        self.hand.map(h => {
+            const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
+            const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
+            if (newData) h.update(newData); // Move hand card to new position
+            else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(); // Play tactic card
+            else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
+            else h.discard(); // Discard hand card
+        });
+        newHandCards // Draw new hand cards
+            .map(c => new HandCard(self, c))
+            .forEach(h => self.hand.push(h));
+        self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
     }
 
     private updateHighlighting() {
