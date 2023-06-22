@@ -15,6 +15,8 @@ import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
 import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
+import CardImage from '../components/card/card_image';
+import { layout } from '../config/layout';
 
 interface InitData {
     socket: Socket;
@@ -189,7 +191,7 @@ export default class Game extends Phaser.Scene {
             const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
             const isTacticCard = !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(h.cardId);
             if (newData) h.update(newData); // Move hand card to new position
-            else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(); // Play tactic card
+            else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(true); // Play tactic card
             else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
             else h.discard(true); // Discard hand card
         });
@@ -199,12 +201,13 @@ export default class Game extends Phaser.Scene {
             const opponent = self.state.opponent;
             const oldOpponent = oldState.opponent;
         if (opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize
-                && opponent.discardPileIds.length > oldState.discardPileIds.length) {
-            const topOpponentDiscardPileCardId = opponent.discardPileIds.length > 0
+                && opponent.discardPileIds.length > oldOpponent.discardPileIds.length
+                && oldState.turnPhase == TurnPhase.Build) { // Opponent playing tactic card
+            const cardId = opponent.discardPileIds.length > 0
                 ? opponent.discardPileIds[opponent.discardPileIds.length - 1] : null;
-            if (topOpponentDiscardPileCardId
-                    && !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(topOpponentDiscardPileCardId)) {
-                // TODO: Opponent playing tactic card
+            if (cardId && !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(cardId)) {
+                new CardImage(self, layout.discardPile.x, layout.discardPile.yOpponent, cardId, true)
+                        .showAndDiscardTacticCard(false);
             }
         }
         self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));

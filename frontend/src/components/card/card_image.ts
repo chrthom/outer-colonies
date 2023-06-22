@@ -46,8 +46,24 @@ export default class CardImage {
             angle: ownedByPlayer ? 0 : 180,
             scale: layout.cards.scale.normal,
             onComplete: () => {
-                if (!toDeck) this.scene.obj.discardPile.update(discardPileIds);
+                if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
                 this.destroy();
+            }
+        });
+    }
+    showAndDiscardTacticCard(ownedByPlayer: boolean) {
+        this.setDepth(layout.depth.maxedTacticCard);
+        this.highlightReset();
+        this.tween({
+            targets: undefined,
+            duration: animationConfig.duration.showTacticCard,
+            x: layout.maxedTacticCard.x,
+            y: layout.maxedTacticCard.y,
+            angle: 0,
+            scale: layout.maxedTacticCard.scale,
+            completeDelay: animationConfig.duration.waitBeforeDiscard,
+            onComplete: () => {
+                this.discard(ownedByPlayer);
             }
         });
     }

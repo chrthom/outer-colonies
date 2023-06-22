@@ -15,22 +15,6 @@ export default class HandCard extends CardImage {
         this.image.on('pointerdown', () => this.onClickAction());
         this.enableMaximizeOnMouseover();
     }
-    showAndDiscardTacticCard() {
-        this.setDepth(layout.depth.maxedTacticCard);
-        this.highlightReset();
-        this.tween({
-            targets: undefined,
-            duration: animationConfig.duration.showTacticCard,
-            x: layout.maxedTacticCard.x,
-            y: layout.maxedTacticCard.y,
-            angle: 0,
-            scale: layout.maxedTacticCard.scale,
-            completeDelay: animationConfig.duration.waitBeforeDiscard,
-            onComplete: () => {
-                this.discard(true);
-            }
-        });
-    }
     update(data: FrontendHandCard) {
         this.data = data;
         this.tween({
