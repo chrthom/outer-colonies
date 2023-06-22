@@ -15,22 +15,6 @@ export default class HandCard extends CardImage {
         this.image.on('pointerdown', () => this.onClickAction());
         this.enableMaximizeOnMouseover();
     }
-    discard() {
-        const discardPileIds = this.scene.state.discardPileIds.slice();
-        this.setDepth(layout.depth.discardCard);
-        this.tween({
-            targets: undefined,
-            duration: animationConfig.duration.draw,
-            x: layout.discardPile.x,
-            y: layout.discardPile.y,
-            angle: 0,
-            scale: layout.cards.scale.normal,
-            onComplete: () => {
-                this.scene.obj.discardPile.update(discardPileIds);
-                this.destroy();
-            }
-        });
-    }
     showAndDiscardTacticCard() {
         this.setDepth(layout.depth.maxedTacticCard);
         this.highlightReset();
@@ -43,7 +27,7 @@ export default class HandCard extends CardImage {
             scale: layout.maxedTacticCard.scale,
             completeDelay: animationConfig.duration.waitBeforeDiscard,
             onComplete: () => {
-                this.discard();
+                this.discard(true);
             }
         });
     }

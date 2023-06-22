@@ -1,3 +1,4 @@
+import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 
@@ -33,6 +34,22 @@ export default class CardImage {
         this.image.destroy();
         this.imageHighlight.destroy();
         this.imageMask.destroy();
+    }
+    discard(ownedByPlayer: boolean, toDeck?: boolean) {
+        const discardPileIds = this.scene.state.discardPileIds.slice();
+        this.setDepth(layout.depth.discardCard);
+        this.tween({
+            targets: undefined,
+            duration: animationConfig.duration.move,
+            x: toDeck ? layout.deck.x : layout.discardPile.x,
+            y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.yOpponent,
+            angle: ownedByPlayer ? 0 : 180,
+            scale: layout.cards.scale.normal,
+            onComplete: () => {
+                if (!toDeck) this.scene.obj.discardPile.update(discardPileIds);
+                this.destroy();
+            }
+        });
     }
     highlightDisabled() {
         this.highlightReset();

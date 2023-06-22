@@ -110,7 +110,7 @@ export default class Game extends Phaser.Scene {
 
     updateState(state: FrontendState) {
         const self = this;
-        const oldState = this.state;
+        const oldState = this.state ? this.state : state;
         this.state = state;
         //console.log(JSON.stringify(state.battle)); ////
         this.preloader.destroy();
@@ -191,11 +191,22 @@ export default class Game extends Phaser.Scene {
             if (newData) h.update(newData); // Move hand card to new position
             else if (oldState.turnPhase == TurnPhase.Build && isTacticCard) h.showAndDiscardTacticCard(); // Play tactic card
             else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
-            else h.discard(); // Discard hand card
+            else h.discard(true); // Discard hand card
         });
         newHandCards // Draw new hand cards
             .map(c => new HandCard(self, c))
             .forEach(h => self.hand.push(h));
+            const opponent = self.state.opponent;
+            const oldOpponent = oldState.opponent;
+        if (opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize
+                && opponent.discardPileIds.length > oldState.discardPileIds.length) {
+            const topOpponentDiscardPileCardId = opponent.discardPileIds.length > 0
+                ? opponent.discardPileIds[opponent.discardPileIds.length - 1] : null;
+            if (topOpponentDiscardPileCardId
+                    && !self.state.cardStacks.flatMap(cs => cs.cards).map(c => c.id).includes(topOpponentDiscardPileCardId)) {
+                // TODO: Opponent playing tactic card
+            }
+        }
         self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
     }
 
