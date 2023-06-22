@@ -7,15 +7,21 @@ import Game from "../scenes/game";
 export default class Prompt {
     private scene: Game;
     private text: Phaser.GameObjects.Text;
+    private image!: Phaser.GameObjects.Image;
     constructor(scene: Game) {
         this.scene = scene;
-        this.text = scene.add.text(layout.prompt.x, layout.prompt.y, '')
+        this.image = this.scene.add
+            .image(layout.prompt.box.x, layout.prompt.box.y, 'prompt_box')
+            .setOrigin(0, 0)
+            .setScale(0.8)
+            .setVisible(true);
+        this.text = scene.add.text(layout.prompt.x, layout.prompt.y, 'Lädt...')
             .setFontSize(layout.prompt.fontSize)
             .setFontFamily(layout.font.family)
             .setColor(layout.font.color)
-            .setAlign('right')
-            .setOrigin(1, 0);
-        this.hide();
+            .setAlign('left')
+            .setOrigin(0, 0);
+        this.setVisible(false);
     }
     update() {
         if (this.scene.state.gameResult) {
@@ -33,11 +39,15 @@ export default class Prompt {
                     this.showEndPhase();
                     break;
                 default:
-                    this.hide();
+                    this.show('Lädt...');
             }
         } else {
-            this.hide();
+            this.show('Warte auf Gegenspieler...');
         }
+    }
+    setVisible(visible: boolean) {
+        this.text.setVisible(visible);
+        this.image.setVisible(visible);
     }
     private showBuildPhase() {
         let text: string = '';
@@ -45,9 +55,10 @@ export default class Prompt {
             if (this.scene.state.hasToRetractCards) {
                 text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
             }
-            text += 'Plane eine Mission oder einen Überfall:\n'
-                + '- Klicke dein Deck oder Ablagestapel für eine Mission\n'
-                + '- Klicke die gegnerische Kolonie für einen Überfall';
+            text += 'Spiele Karten von deiner Hand aus.\n'
+                + 'Plane dann eine Mission oder Überfall.\n'
+                + 'Klicke die gegnerische Kolonie für einen Überfall\n'
+                + 'bzw. dein Deck oder Ablagestapel für eine Mission.';
         } else if (this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
             const missingCards = FrontendPlannedBattle.missingCards(this.scene.plannedBattle);
             text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
@@ -68,13 +79,9 @@ export default class Prompt {
         this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
     }
     private showGameOver(gameResult: FrontendGameResult) {
-        this.show(`GAME OVER: Du hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
+        this.show(`GAME OVER\nDu hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
     }
     private show(text: string) {
         this.text.setText(text);
-        this.text.visible = true;
-    }
-    private hide() {
-        this.text.visible = false;
     }
 }

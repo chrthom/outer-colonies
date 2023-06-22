@@ -3,6 +3,7 @@ import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_
 import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
+import Prompt from "./prompt";
 
 interface ButtonImages {
     active_build: Phaser.GameObjects.Image;
@@ -18,13 +19,15 @@ interface ButtonImages {
 
 export default class Button {
     text: Phaser.GameObjects.Text;
-    private scene: Game;
-    private images!: ButtonImages;
+    private scene!: Game;
+    private buttonImages!: ButtonImages;
+    private prompt!: Prompt;
     private onClickAction: () => void = () => {};
     constructor(scene: Game) {
         this.scene = scene;
         const self = this;
-        this.images = {
+        this.prompt = new Prompt(scene);
+        this.buttonImages = {
             active_build: this.createButtonImage('active_build'),
             active_combat: this.createButtonImage('active_combat'),
             active_select: this.createButtonImage('active_select'),
@@ -46,7 +49,7 @@ export default class Button {
             .setAlign('right')
             .setOrigin(1, 0.5)
             .setInteractive();
-        (<Phaser.GameObjects.GameObject[]> Object.values(this.images))
+        (<Phaser.GameObjects.GameObject[]> Object.values(this.buttonImages))
             .concat([ this.text ])
             .forEach(o => o
                 .on('pointerdown', () => {
@@ -54,14 +57,17 @@ export default class Button {
                 })
                 .on('pointerover', () => {
                     self.text.setColor(layout.font.colorHover);
+                    self.prompt.setVisible(true);
                 })
                 .on('pointerout', () => {
                     self.text.setColor(layout.font.color);
+                    self.prompt.setVisible(false);
                 })
             );
         this.waitState();
     }
     update() {
+        this.prompt.update();
         if (this.scene.state.gameResult) {
             this.showGameOver(this.scene.state.gameResult);
         } else if (this.scene.state.playerPendingAction) {
@@ -125,8 +131,8 @@ export default class Button {
         this.text.setText(text);
     }
     private showButton(name: string) {
-        Object.values(this.images).forEach(i => i.setVisible(false));
-        this.images[name].setVisible(true);
+        Object.values(this.buttonImages).forEach(i => i.setVisible(false));
+        this.buttonImages[name].setVisible(true);
     }
     private waitState() {
         const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;

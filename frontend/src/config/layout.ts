@@ -176,8 +176,12 @@ class Layout {
         textOffsetY: -50
     }
     readonly prompt = {
-        x: 2370,
-        y: 120,
+        box: {
+            x: 1850,
+            y: 120
+        },
+        x: 1875,
+        y: 165,
         fontSize: 24
     };
 }

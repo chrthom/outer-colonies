@@ -1,6 +1,5 @@
 import { Socket } from 'socket.io-client';
 import Button from '../components/button';
-import Prompt from '../components/prompt';
 import { FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
@@ -29,7 +28,6 @@ class StaticObjects {
     combatRangeIndicator?: CombatRangeIndicator;
     deck?: DeckCard;
     discardPile?: DiscardPile;
-    prompt?: Prompt;
     maxCard?: MaxCard;
     missionCards?: MissionCards;
 }
@@ -90,6 +88,7 @@ export default class Game extends Phaser.Scene {
             'active_build', 'active_combat', 'active_select', 'active_wait', 'won',
             'inactive_combat', 'inactive_select', 'inactive_wait', 'lost' 
         ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
+        this.load.image('prompt_box', 'utils/prompt_box.png');
     }
     
     create () {
@@ -103,7 +102,6 @@ export default class Game extends Phaser.Scene {
         this.obj.button = new Button(this);
         this.obj.deck = new DeckCard(this);
         this.obj.discardPile = new DiscardPile(this)
-        this.obj.prompt = new Prompt(this);
         this.obj.maxCard = new MaxCard(this);
         this.obj.missionCards = new MissionCards(this);
     }
@@ -182,7 +180,6 @@ export default class Game extends Phaser.Scene {
         this.obj.deck.update();
         this.obj.discardPile.update();
         this.obj.missionCards.update();
-        this.obj.prompt.update();
         this.updateHighlighting();
     }
 
