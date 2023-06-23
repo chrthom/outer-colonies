@@ -7,6 +7,7 @@
     "start": "npx nodemon src/app.ts",
     "test": "npx jest"
   },
+  "private": true,
   "author": "Christopher Thomsen",
   "dependencies": {
     "cors": "^2.8.5",
