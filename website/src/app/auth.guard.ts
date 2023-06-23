@@ -1,13 +1,11 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router, CanActivateFn } from '@angular/router';
-import { Observable } from 'rxjs';
 import AuthService from './auth.service';
-import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PermissionsService {
+export class AuthGuard {
 
   constructor(private router: Router, private authService: AuthService) { }
 
@@ -20,8 +18,4 @@ export class PermissionsService {
 		if (!success) this.router.navigate(['/login']);
     return success;
   }
-}
-
-export const AuthGuard: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
-  return inject(PermissionsService).canActivate(next, state);
 }
