@@ -1,7 +1,7 @@
 {
-  "name": "outercolonies-frontend",
+  "name": "outercolonies-client",
   "version": "1.0.0",
-  "description": "Outer Colonies Frontend",
+  "description": "Outer Colonies Game Client",
   "main": "src/index.js",
   "scripts": {
     "build": "webpack --config webpack.prod.config.js ",
