@@ -4,9 +4,8 @@ import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 
-const canActivateFn: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
-  return inject(AuthGuard).canActivate(next, state);
-}
+const canActivateFn: CanActivateFn =
+  (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => inject(AuthGuard).canActivate(next, state);
 const routes: Routes = [
   {
     path: 'login',

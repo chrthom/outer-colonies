@@ -1,0 +1,42 @@
+#background-stars {
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: auto;
+    min-height: 100vh;
+}
+
+.background-stars-0 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars0.jpg');
+}
+
+.background-stars-1 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars1.jpg');
+}
+
+.background-stars-2 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars2.jpg');
+}
+
+.background-stars-3 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars3.jpg');
+}
+
+.background-stars-4 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars4.jpg');
+}
+
+.background-stars-5 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars5.jpg');
+}
+
+.background-stars-6 {
+    background-image: url('https://thomsen.in/outercolonies/background/stars6.jpg');
+}
+
+#root-content {
+    margin: auto;
+    padding: 10px;
+    width: min(1400px, 90%);
+    min-height: calc(100vh - 20px);
+    background-color: rgba(0, 0, 0, 0.5);
+}

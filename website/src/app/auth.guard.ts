@@ -14,7 +14,6 @@ export class AuthGuard {
     state: RouterStateSnapshot
 	): boolean {
 		const success = this.authService.check();
-		console.log(`AUTH success: ${success}`); ///
 		if (!success) this.router.navigate(['/login']);
     return success;
   }
