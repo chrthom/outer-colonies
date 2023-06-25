@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/scenes/matchmaking';
 import { gameSocketListeners } from './components/scenes/game';
 import { MsgTypeInbound } from './components/config/enums';
+import DBConnection from './components/utils/db_connector';
 
 const app = express();
 app.use(cors());
@@ -37,3 +38,6 @@ app.get('/cardimages/*', (req, res) => {
 httpServer.listen(3000, () => {
     console.log('Server started!');
 });
+
+const dbConnection = DBConnection.getInstance(); // Just a test
+dbConnection.query('SELECT * FROM credentials').then(v => console.log(v)); // TODO: Remove
