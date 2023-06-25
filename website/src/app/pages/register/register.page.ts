@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 
@@ -12,7 +12,8 @@ export class RegisterErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'oc-page-register',
   templateUrl: './register.page.html',
-  styleUrls: ['./register.page.scss']
+  styleUrls: ['./register.page.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class RegisterPage {
   username: string = '';
@@ -32,6 +33,10 @@ export class RegisterPage {
     Validators.required,
     Validators.email,
     Validators.maxLength(60)
+  ]);
+  startDeck: number = 0;
+  startDeckFormControl = new FormControl('', [
+    Validators.required
   ]);
   matcher: ErrorStateMatcher = new RegisterErrorStateMatcher();
 }

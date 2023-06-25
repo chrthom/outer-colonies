@@ -5,6 +5,14 @@
     left: 25%;
 }
 
-.username-form-field, .password-form-field, .email-form-field {
+#register-form mat-form-field {
+    margin-bottom: 15px;
+}
+
+.username-form-field, .password-form-field, .email-form-field, .start-deck-form-field {
     width: 100%;
+}
+
+mat-error {
+    font-size: 12px;
 }
