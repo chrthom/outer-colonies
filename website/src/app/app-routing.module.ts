@@ -1,19 +1,19 @@
 import { NgModule, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, PreloadAllModules, RouterModule, RouterStateSnapshot, Routes } from '@angular/router';
 import { AuthGuard } from './auth.guard';
-import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home/home.component';
+import { LoginPage } from './pages/login/login.page';
+import { HomePage } from './pages/home/home.page';
 
 const canActivateFn: CanActivateFn =
   (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => inject(AuthGuard).canActivate(next, state);
 const routes: Routes = [
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginPage
   }, {
     path: '',
     canActivate: [canActivateFn],
-    component: HomeComponent,
+    component: HomePage,
     pathMatch: 'full'
   }, {
     path: '**',
