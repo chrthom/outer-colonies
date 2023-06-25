@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 
 export class RegisterErrorStateMatcher implements ErrorStateMatcher {
@@ -16,28 +16,40 @@ export class RegisterErrorStateMatcher implements ErrorStateMatcher {
   encapsulation: ViewEncapsulation.None
 })
 export class RegisterPage {
-  username: string = '';
-  usernameFormControl = new FormControl('', [ 
-    Validators.required,
-    Validators.minLength(3),
-    Validators.maxLength(20)
-  ]);
-  password: string = '';
-  passwordFormControl = new FormControl('', [ 
-    Validators.required,
-    Validators.minLength(8),
-    Validators.maxLength(40)
-  ]);
-  email: string = '';
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-    Validators.maxLength(60)
-  ]);
-  startDeck: number = 0;
-  startDeckFormControl = new FormControl('', [
-    Validators.required
-  ]);
+  registerForm: FormGroup = new FormGroup({
+    username: new FormControl('', [ 
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(20)
+    ]),
+    password: new FormControl('', [ 
+      Validators.required,
+      Validators.minLength(8),
+      Validators.maxLength(40)
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(60)
+    ]),
+    startDeck: new FormControl('', [
+      Validators.required
+    ])
+  });
   matcher: ErrorStateMatcher = new RegisterErrorStateMatcher();
-  constructor() {}
+  get username(): any {
+    return this.registerForm.get('username');
+  }
+  get password(): any {
+    return this.registerForm.get('password');
+  }
+  get email(): any {
+    return this.registerForm.get('email');
+  }
+  get startDeck(): any {
+    return this.registerForm.get('startDeck');
+  }
+  submit() {
+    console.log('SUBMIT'); //// TODO: Continue here
+  }
 }

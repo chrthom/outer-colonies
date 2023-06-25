@@ -1,8 +1,9 @@
 #register-box {
     position: relative;
     width: 50%;
-    top: 50px;
-    left: 25%;
+    margin: auto;
+    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
 #register-form mat-form-field {
@@ -15,4 +16,8 @@
 
 .username-form-field, .password-form-field, .email-form-field, .start-deck-form-field {
     width: 100%;
+}
+
+.md-button.md-raised.md-primary.formPage {
+    background-color: #f00; 
 }
