@@ -1,0 +1,54 @@
+<div id="register-box">
+    <oc-content-box title="Registrierung">
+        <form>
+            <mat-form-field class="username-form-field">
+                <mat-label>Nutzername</mat-label>
+                <input matInput
+                    [formControl]="usernameFormControl"
+                    [errorStateMatcher]="matcher"
+                    [(ngModel)]="username">
+                <mat-error *ngIf="usernameFormControl.hasError('maxlength')">
+                    Dein Nutzername kann nicht länger als 20 Zeichen sein
+                </mat-error>
+                <mat-error *ngIf="usernameFormControl.hasError('minlength') && !usernameFormControl.hasError('required')">
+                    Dein Nutzername muss mindestens 3 Zeichen lang sein
+                </mat-error>
+                <mat-error *ngIf="usernameFormControl.hasError('required')">
+                    Bitte wähle einen Nutzernamen
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="password-form-field">
+                <mat-label>Passwort</mat-label>
+                <input matInput type="password"
+                    [formControl]="passwordFormControl"
+                    [errorStateMatcher]="matcher"
+                    [(ngModel)]="password">
+                <mat-error *ngIf="passwordFormControl.hasError('maxlength')">
+                    Dein Passwort kann nicht länger als 40 Zeichen sein
+                </mat-error>
+                <mat-error *ngIf="passwordFormControl.hasError('minlength') && !passwordFormControl.hasError('required')">
+                    Dein Passwort sollte mindestens 8 Zeichen lang sein
+                </mat-error>
+                <mat-error *ngIf="passwordFormControl.hasError('required')">
+                    Bitte wähle einen Nutzernamen
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="email-form-field">
+                <mat-label>E-Mail</mat-label>
+                <input matInput
+                    [formControl]="emailFormControl"
+                    [errorStateMatcher]="matcher"
+                    [(ngModel)]="email">
+                <mat-error *ngIf="emailFormControl.hasError('maxlength') && !emailFormControl.hasError('email')">
+                    Die E-Mail Adresse darf maximal 60 Zeichen lang sein
+                </mat-error>
+                <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+                    Dies ist keine valide E-Mail Adresse
+                </mat-error>
+                <mat-error *ngIf="emailFormControl.hasError('required')">
+                    Bitte gib eine valide E-Mail Adresse an
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </oc-content-box>
+</div>

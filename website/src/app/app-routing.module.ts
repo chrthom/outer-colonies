@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivateFn, PreloadAllModules, RouterModule,
 import { AuthGuard } from './auth.guard';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
+import { RegisterPage } from './pages/register/register.page';
 
 const canActivateFn: CanActivateFn =
   (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => inject(AuthGuard).canActivate(next, state);
@@ -10,6 +11,9 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginPage
+  }, {
+    path: 'register',
+    component: RegisterPage
   }, {
     path: '',
     canActivate: [canActivateFn],

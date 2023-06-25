@@ -7,18 +7,27 @@ import { HomePage } from './pages/home/home.page';
 import { LoginPage } from './pages/login/login.page';
 import { HttpClientModule } from '@angular/common/http';
 import { ContentBoxComponent } from './components/content-box/content-box.component';
+import { RegisterPage } from './pages/register/register.page';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomePage,
     LoginPage,
-    ContentBoxComponent
+    ContentBoxComponent,
+    RegisterPage
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]
