@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'oc-content-box',
@@ -6,5 +6,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./content-box.component.scss']
 })
 export class ContentBoxComponent {
-
+  @Input() title: string = '';
+  constructor() {}
 }
