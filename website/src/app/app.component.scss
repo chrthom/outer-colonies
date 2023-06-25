@@ -44,20 +44,20 @@
     left: max(calc(50% - 700px), 5%);
     margin: auto;
     width: min(1400px, 90%);
-    min-height: calc(100vh - 20px);
+    min-height: 100vh;
     background-image: url('../assets/background_squares_transparent.png');
 }
 
+/////////////
+
 #box-1 {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+    position: relative;
     width: calc(50% - 40px);
 }
 
 .content-box {
-    position: absolute;
     width: 100%;
+    padding: 81px 42px 42px 43px;
 }
 
 .content-box-top-left {
@@ -97,7 +97,6 @@
 }
 
 .content-box-center {
-    margin: 81px 42px 42px 43px;
     background-color: rgba(17, 153, 153, 0.08);
 }
 

@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { HomePage } from './pages/home/home.page';
 import { LoginPage } from './pages/login/login.page';
 import { HttpClientModule } from '@angular/common/http';
+import { ContentBoxComponent } from './components/content-box/content-box.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomePage,
-    LoginPage
+    LoginPage,
+    ContentBoxComponent
   ],
   imports: [
     BrowserModule,

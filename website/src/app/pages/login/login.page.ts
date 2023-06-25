@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-login',
+  selector: 'oc-page-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
