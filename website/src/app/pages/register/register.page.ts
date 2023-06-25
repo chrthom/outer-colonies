@@ -39,4 +39,5 @@ export class RegisterPage {
     Validators.required
   ]);
   matcher: ErrorStateMatcher = new RegisterErrorStateMatcher();
+  constructor() {}
 }

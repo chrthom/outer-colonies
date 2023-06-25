@@ -32,17 +32,19 @@ $outercolonies-website-theme: mat.define-light-theme((
 @include mat.all-component-themes($outercolonies-website-theme);
 
 * {
-    color: white;
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
-    background: transparent;
 }
-mat-label {
+a, a:visited, mat-label {
   color: oc.$primary-color;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%;
+}
+body {
+  color: white;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

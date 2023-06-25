@@ -6,15 +6,13 @@ import AuthService from './auth.service';
   providedIn: 'root'
 })
 export class AuthGuard {
-
   constructor(private router: Router, private authService: AuthService) { }
-
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 	): boolean {
 		const success = this.authService.check();
-		if (!success) this.router.navigate(['/login']);
+		if (!success) this.router.navigate([ '/login' ]);
     return success;
   }
 }
