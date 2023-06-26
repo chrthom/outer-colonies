@@ -16,7 +16,7 @@ export default class ApiService {
   readonly apiHost = 'http://localhost:3000';
   constructor(private http: HttpClient) {}
   register(body: RegisterRequest): Observable<boolean> {
-    return this.post('register', body).pipe(map(res => {
+    return this.post('auth/register', body).pipe(map(res => {
       const success = res.status >= 200 && res.status < 300;
       if (!success) console.log(`Register API call returned with HTTP ${res.status}: ${res.statusText}`);
       return success;

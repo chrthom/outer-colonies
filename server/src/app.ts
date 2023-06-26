@@ -37,9 +37,22 @@ app.get('/cardimages/*', (req, res) => {
     fetch(`https://thomsen.in/outercolonies/${file}`).then(actual => actual.body.pipe(res));
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/auth/register', (req, res) => {
     console.log(`Registration request: ${Object.keys(req)} | ${JSON.stringify(req.body)}`); ////
     res.send({ foo: 'bar' }); ////
+});
+
+app.get('/api/auth/exists', (req, res) => {
+    const dbConnection = DBConnection.getInstance();
+    if (req.query.username) {
+        dbConnection.query(`SELECT 1 FROM credentials WHERE username = '${req.query.username}'`)
+                    .then((v: any[]) => res.send({ exists: v.length > 0 }));
+    } else if (req.query.email) {
+        dbConnection.query(`SELECT 1 FROM credentials WHERE email = '${req.query.email}'`)
+                    .then((v: any[]) => res.send({ exists: v.length > 0 }));
+    } else {
+        res.sendStatus(400);
+    }
 });
 
 httpServer.listen(3000, () => {
