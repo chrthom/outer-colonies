@@ -1,6 +1,7 @@
 <div id="register-box">
     <oc-content-box title="Registrierung">
-        <form id="register-form" 
+        <form id="register-form"
+                *ngIf="!registrationSuccessful"
                 [formGroup]="registerForm"
                 (ngSubmit)="registerForm.valid ? submit() : {}">
             <mat-form-field class="username-form-field">
@@ -64,7 +65,11 @@
                     [color]="registerForm.valid ? 'primary' : 'accent'">
                 Neuen Nutzer registrieren
             </button>
-            <p id="back-link"><a routerLink="/login">&lt; Zur&uuml;ck</a></p>
+            <mat-error *ngIf="registrationSuccessful == false">
+                Ein unerwarteter Fehler ist bei der Registirerung aufgetreten. Bitte versuchen sie es sp&auml;ter erneut.
+            </mat-error>
         </form>
+        <p *ngIf="registrationSuccessful">Registrierung erfolgreich</p>
+        <p id="back-link"><a routerLink="/login">&lt; Zur&uuml;ck</a></p>
     </oc-content-box>
 </div>

@@ -30,9 +30,16 @@ io.on(MsgTypeInbound.Connect, (socket) => {
 
 setInterval(matchMakingCron, 1000, io);
 
+app.use(express.json());
+
 app.get('/cardimages/*', (req, res) => {
     const file = req.path.replace('/cardimages/', '');
     fetch(`https://thomsen.in/outercolonies/${file}`).then(actual => actual.body.pipe(res));
+});
+
+app.post('/api/register', (req, res) => {
+    console.log(`Registration request: ${Object.keys(req)} | ${JSON.stringify(req.body)}`); ////
+    res.send({ foo: 'bar' }); ////
 });
 
 httpServer.listen(3000, () => {
