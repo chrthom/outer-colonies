@@ -18,7 +18,8 @@ export class LoginPage {
     ]),
     password: new FormControl('', [ 
       Validators.required
-    ])
+    ]),
+    remember: new FormControl(false, [])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   constructor(private authService: AuthService, private router: Router) {}
@@ -32,7 +33,7 @@ export class LoginPage {
     this.authService.login(
       this.loginForm.value.username,
       this.loginForm.value.password,
-      false
+      this.loginForm.value.remember
     ).subscribe(success => {
       if (success) this.router.navigate([ '/' ]);
       else this.loginFailed = true;

@@ -4,7 +4,7 @@
                 *ngIf="!registrationSuccessful"
                 [formGroup]="registerForm"
                 (ngSubmit)="registerForm.valid ? submit() : {}">
-            <mat-form-field class="username-form-field">
+            <mat-form-field>
                 <mat-label>Nutzername</mat-label>
                 <input matInput
                     formControlName="username"
@@ -22,7 +22,7 @@
                     Bitte w&auml;hle einen Nutzernamen
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="password-form-field">
+            <mat-form-field>
                 <mat-label>Passwort</mat-label>
                 <input matInput type="password"
                     formControlName="password"
@@ -37,7 +37,7 @@
                     Bitte w&auml;hle ein Passwort
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="email-form-field">
+            <mat-form-field>
                 <mat-label>E-Mail</mat-label>
                 <input matInput
                     formControlName="email"
@@ -55,7 +55,7 @@
                     Bitte gib eine valide E-Mail Adresse an
                 </mat-error>
             </mat-form-field>
-            <mat-form-field class="start-deck-form-field">
+            <mat-form-field>
                 <mat-label>Start Deck</mat-label>
                 <mat-select formControlName="startDeck">
                     <mat-option value="0">Terranische Siedler</mat-option>

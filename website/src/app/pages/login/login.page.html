@@ -3,18 +3,20 @@
         <form id="login-form"
                 [formGroup]="loginForm"
                 (ngSubmit)="loginForm.valid ? submit() : {}">
-            <mat-form-field class="username-form-field">
+            <mat-form-field>
                 <mat-label>Nutzername oder E-Mail Adresse</mat-label>
                 <input matInput
-                    formControlName="username"
-                    [errorStateMatcher]="matcher">
+                    formControlName="username">
             </mat-form-field>
-            <mat-form-field class="password-form-field">
+            <mat-form-field>
                 <mat-label>Passwort</mat-label>
                 <input matInput type="password"
-                    formControlName="password"
-                    [errorStateMatcher]="matcher">
+                    formControlName="password">
             </mat-form-field>
+            <mat-slide-toggle color="primary"
+                            formControlName="remember">
+                <mat-label>Zugangsdaten merken</mat-label>
+            </mat-slide-toggle>
             <button mat-raised-button 
                     type="submit"
                     [color]="loginForm.valid ? 'primary' : 'accent'">

@@ -6,14 +6,11 @@
     margin-bottom: 20px;
 }
 
-#register-form mat-form-field {
-    margin-bottom: 15px;
-}
-
 #register-link {
     margin-top: 20px;
 }
 
-.username-form-field, .password-form-field {
+#login-form mat-form-field, #login-form mat-slide-toggle {
     width: 100%;
+    margin-bottom: 15px;
 }
