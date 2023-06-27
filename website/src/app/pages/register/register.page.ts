@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { Observable, lastValueFrom, map } from 'rxjs';
 import ApiService from 'src/app/api.service';
 
 export class RegisterErrorStateMatcher implements ErrorStateMatcher {
@@ -23,6 +24,8 @@ export class RegisterPage {
       Validators.required,
       Validators.minLength(3),
       Validators.maxLength(20)
+    ], [
+      this.usernameExistsValidator
     ]),
     password: new FormControl('', [ 
       Validators.required,
@@ -33,6 +36,8 @@ export class RegisterPage {
       Validators.required,
       Validators.email,
       Validators.maxLength(60)
+    ], [
+      this.emailExistsValidator
     ]),
     startDeck: new FormControl('', [
       Validators.required
@@ -52,6 +57,9 @@ export class RegisterPage {
   get startDeck(): any {
     return this.registerForm.get('startDeck');
   }
+  get usernameErrors(): string {
+    return JSON.stringify(this.username.errors);
+  }
   submit() {
     console.log(this.registerForm.value.username);
     this.apiService.register({
@@ -60,5 +68,19 @@ export class RegisterPage {
       email: this.registerForm.value.email,
       startDeck: this.registerForm.value.startDeck
     }).subscribe(success => this.registrationSuccessful = success);
+  }
+  private get usernameExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+      return this.apiService.checkUsernameExists(control.value).pipe(map(exists => {
+        return exists ? { exists: true } : null;
+      }));
+    }
+  }
+  private get emailExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+      return this.apiService.checkEmailExists(control.value).pipe(map(exists => {
+        return exists ? { exists: true } : null;
+      }));
+    }
   }
 }

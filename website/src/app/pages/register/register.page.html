@@ -9,6 +9,9 @@
                 <input matInput
                     formControlName="username"
                     [errorStateMatcher]="matcher">
+                <mat-error *ngIf="username.hasError('exists') && !username.hasError('required')">
+                    Der gew&auml;hlte Nutzername ist bereits vergeben
+                </mat-error>
                 <mat-error *ngIf="username.hasError('maxlength')">
                     Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein
                 </mat-error>
@@ -39,6 +42,9 @@
                 <input matInput
                     formControlName="email"
                     [errorStateMatcher]="matcher">
+                <mat-error *ngIf="email.hasError('exists') && !email.hasError('required')">
+                    Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet
+                </mat-error>
                 <mat-error *ngIf="email.hasError('maxlength') && !email.hasError('email')">
                     Die E-Mail Adresse darf maximal 60 Zeichen lang sein
                 </mat-error>
