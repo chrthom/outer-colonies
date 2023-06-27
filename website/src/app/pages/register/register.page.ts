@@ -1,21 +1,14 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { Observable, lastValueFrom, map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import ApiService from 'src/app/api.service';
-
-export class RegisterErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+import OCErrorStateMatcher from '../error-state-matcher';
 
 @Component({
   selector: 'oc-page-register',
   templateUrl: './register.page.html',
-  styleUrls: ['./register.page.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./register.page.scss']
 })
 export class RegisterPage {
   registrationSuccessful: boolean | undefined = undefined;
@@ -43,7 +36,7 @@ export class RegisterPage {
       Validators.required
     ])
   });
-  matcher: ErrorStateMatcher = new RegisterErrorStateMatcher();
+  matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   constructor(private apiService: ApiService) {}
   get username(): any {
     return this.registerForm.get('username');

@@ -5,10 +5,19 @@ export interface RegisterRequest {
     startDeck: number;
 }
 
-export interface ExistsResponse {
-    exists: boolean;
-}
-
 export interface RegisterResponse {
     success: boolean;
+}
+
+export interface LoginRequest {
+    username: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    success: boolean;
+}
+
+export interface ExistsResponse {
+    exists: boolean;
 }

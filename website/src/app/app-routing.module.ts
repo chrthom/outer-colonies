@@ -4,9 +4,10 @@ import { AuthGuard } from './auth.guard';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
+import { Observable } from 'rxjs';
 
 const canActivateFn: CanActivateFn =
-  (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => inject(AuthGuard).canActivate(next, state);
+  (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> => inject(AuthGuard).canActivate(next, state);
 const routes: Routes = [
   {
     path: 'login',

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Router, CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import AuthService from './auth.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class AuthGuard {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-	): boolean {
+	): Observable<boolean> {
 		const success = this.authService.check();
 		if (!success) this.router.navigate([ '/login' ]);
     return success;

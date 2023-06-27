@@ -8,7 +8,7 @@ import { gameSocketListeners } from './components/scenes/game';
 import { MsgTypeInbound } from './components/config/enums';
 import DBConnection from './components/utils/db_connector';
 import Auth from './components/utils/auth';
-import { ExistsResponse, RegisterRequest, RegisterResponse } from './components/utils/api';
+import { ExistsResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './components/utils/api';
 
 const app = express();
 app.use(cors());
@@ -41,12 +41,21 @@ app.get('/cardimages/*', (req, res) => {
 });
 
 app.post('/api/auth/register', (req, res) => {
-    auth.register(<RegisterRequest>req.body).then(success => {
+    auth.register(<RegisterRequest> req.body).then(success => {
         const payload: RegisterResponse = {
             success: success
         };
         res.send(payload);
     });
+});
+
+app.post('/api/auth/login', (req, res) => {
+    auth.login(<LoginRequest> req.body).then(success => {
+        const payload: LoginResponse = {
+            success: success
+        };
+        res.send(payload);
+    })
 });
 
 app.get('/api/auth/exists', (req, res) => {

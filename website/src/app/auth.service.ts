@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { HttpClient } from '@angular/common/http';
+import ApiService from './api.service';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,25 +13,21 @@ export default class AuthService {
   password?: string;
   error?: string;
 
-  constructor(private cookieService: CookieService, private http: HttpClient) { }
+  constructor(private cookieService: CookieService, private apiService: ApiService) {}
 
-  private checkCache(): boolean {
-    if (!this.username || !this.password) {
-      this.username = this.cookieService.get('u');
-      this.password = this.cookieService.get('p');
-    }
-    return !(!this.username || !this.password);
-  }
-
-  login(username: string, password: string, remember: boolean): boolean {
+  login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;
     this.password = password;
-    const success = this.check();
-    if (success && remember) {
-      this.cookieService.set('u', username, this.cookieExpiry);
-      this.cookieService.set('p', password, this.cookieExpiry);
+    const loginAttempt = this.check();
+    if (loginAttempt && remember) {
+      loginAttempt.subscribe(success => {
+        if (success) {
+          this.cookieService.set('u', username, this.cookieExpiry);
+          this.cookieService.set('p', password, this.cookieExpiry);
+        }
+      });
     }
-    return success;
+    return loginAttempt;
   }
 
   logout() {
@@ -40,48 +37,18 @@ export default class AuthService {
     this.cookieService.delete('p');
   }
 
-  check(): boolean {
-    if (!this.checkCache()) {
-      return false;
-    } else {
-      // TODO
-      return false;
-      /*
-      return this.callLDAPAuthService(this.username, this.password).pipe(
-        map(resp => {
-          if (resp.success) {
-            this.usernr = resp.usernr;
-            this.displayname = resp.displayname;
-            this.group = resp.group;
-            this.error = undefined;
-            return true;
-          } else {
-            this.error = resp.error;
-            return of(false);
-          }
-        }),
-        flatMap(success => {
-          if (success) {
-            return this.callSynologyAuthService(this.username, this.password).pipe(
-              map(token => {
-                this.synologyHeaders.headers['X-SYNO-TOKEN'] = token;
-                return true;
-              }),
-              catchError(x => {
-                this.error = 'Synology login failed';
-                return of(false);
-              })
-            );
-          } else {
-            return of(false);
-          }
-        }),
-        catchError(x => {
-          this.error = 'internal server error';
-          return of(false);
-        })
-      );
-      */
+  check(): Observable<boolean> {
+    return !this.checkCache() ? of(false) : this.apiService.login({
+      username: this.username ? this.username : '',
+      password: this.password ? this.password : ''
+    });
+  }
+
+  private checkCache(): boolean {
+    if (!this.username || !this.password) {
+      this.username = this.cookieService.get('u');
+      this.password = this.cookieService.get('p');
     }
+    return !(!this.username || !this.password);
   }
 }
