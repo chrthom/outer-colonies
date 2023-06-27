@@ -61,9 +61,8 @@ export class RegisterPage {
     return JSON.stringify(this.username.errors);
   }
   submit() {
-    console.log(this.registerForm.value.username);
     this.apiService.register({
-      username: this.registerForm.value.username,
+      username: this.registerForm.value.username.trim(),
       password: this.registerForm.value.password,
       email: this.registerForm.value.email,
       startDeck: this.registerForm.value.startDeck

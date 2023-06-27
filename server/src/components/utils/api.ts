@@ -8,3 +8,7 @@ export interface RegisterRequest {
 export interface ExistsResponse {
     exists: boolean;
 }
+
+export interface RegisterResponse {
+    success: boolean;
+}

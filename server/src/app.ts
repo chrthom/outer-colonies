@@ -8,7 +8,7 @@ import { gameSocketListeners } from './components/scenes/game';
 import { MsgTypeInbound } from './components/config/enums';
 import DBConnection from './components/utils/db_connector';
 import Auth from './components/utils/auth';
-import { ExistsResponse } from './components/utils/api';
+import { ExistsResponse, RegisterRequest, RegisterResponse } from './components/utils/api';
 
 const app = express();
 app.use(cors());
@@ -41,12 +41,15 @@ app.get('/cardimages/*', (req, res) => {
 });
 
 app.post('/api/auth/register', (req, res) => {
-    console.log(`Registration request: ${Object.keys(req)} | ${JSON.stringify(req.body)}`); ////
-    res.send({ foo: 'bar' }); ////
+    auth.register(<RegisterRequest>req.body).then(success => {
+        const payload: RegisterResponse = {
+            success: success
+        };
+        res.send(payload);
+    });
 });
 
 app.get('/api/auth/exists', (req, res) => {
-    const dbConnection = DBConnection.getInstance();
     const sendExistsResponse = (exists: boolean) => {
         const payload: ExistsResponse = {
             exists: exists
@@ -61,6 +64,3 @@ app.get('/api/auth/exists', (req, res) => {
 httpServer.listen(3000, () => {
     console.log('Server started!');
 });
-
-const dbConnection = DBConnection.getInstance(); // Just a test
-dbConnection.query('SELECT * FROM credentials').then(v => console.log(v)); // TODO: Remove
