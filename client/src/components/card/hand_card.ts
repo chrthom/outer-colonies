@@ -1,8 +1,8 @@
 import CardImage from "./card_image";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
-import { FrontendHandCard } from "../../../../backend/src/components/frontend_converters/frontend_state";
-import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../backend/src/components/config/enums";
+import { FrontendHandCard } from "../../../../server/src/components/frontend_converters/frontend_state";
+import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../server/src/components/config/enums";
 import { animationConfig } from "../../config/animation";
 
 export default class HandCard extends CardImage {

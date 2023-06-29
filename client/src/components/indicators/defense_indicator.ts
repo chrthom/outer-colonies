@@ -1,4 +1,4 @@
-import { FrontendDefenseIcon } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { FrontendDefenseIcon } from "../../../../server/src/components/frontend_converters/frontend_state";
 import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";

@@ -1,6 +1,6 @@
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../backend/src/components/config/enums";
-import { FrontendPlannedBattle } from "../../../backend/src/components/frontend_converters/frontend_planned_battle";
-import { FrontendGameResult } from "../../../backend/src/components/frontend_converters/frontend_state";
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../server/src/components/config/enums";
+import { FrontendPlannedBattle } from "../../../server/src/components/frontend_converters/frontend_planned_battle";
+import { FrontendGameResult } from "../../../server/src/components/frontend_converters/frontend_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
 import Prompt from "./prompt";

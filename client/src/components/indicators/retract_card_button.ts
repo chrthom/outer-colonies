@@ -1,4 +1,4 @@
-import { MsgTypeInbound } from "../../../../backend/src/components/config/enums";
+import { MsgTypeInbound } from "../../../../server/src/components/config/enums";
 import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";

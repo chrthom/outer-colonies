@@ -1,13 +1,13 @@
 import { Socket } from 'socket.io-client';
 import Button from '../components/button';
-import { FrontendHandCard, FrontendState } from '../../../backend/src/components/frontend_converters/frontend_state';
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../backend/src/components/config/enums';
+import { FrontendHandCard, FrontendState } from '../../../server/src/components/frontend_converters/frontend_state';
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../server/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { FrontendPlannedBattle } from '../../../backend/src/components/frontend_converters/frontend_planned_battle';
-import { FrontendGameParams } from '../../../backend/src/components/frontend_converters/frontend_game_params';
+import { FrontendPlannedBattle } from '../../../server/src/components/frontend_converters/frontend_planned_battle';
+import { FrontendGameParams } from '../../../server/src/components/frontend_converters/frontend_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';

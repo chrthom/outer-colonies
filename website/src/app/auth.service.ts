@@ -19,14 +19,12 @@ export default class AuthService {
     this.username = username;
     this.password = password;
     const loginAttempt = this.check();
-    if (remember) {
-      loginAttempt.subscribe(success => {
-        if (success) {
-          this.cookieService.set('u', username, this.cookieExpiry);
-          this.cookieService.set('p', password, this.cookieExpiry);
-        }
-      });
-    }
+    loginAttempt.subscribe(success => {
+      if (success && remember) {
+        this.cookieService.set('u', username, this.cookieExpiry);
+        this.cookieService.set('p', password, this.cookieExpiry);
+      }
+    });
     return loginAttempt;
   }
 

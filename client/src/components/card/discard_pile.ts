@@ -1,5 +1,5 @@
-import { BattleType, TurnPhase } from "../../../../backend/src/components/config/enums";
-import { FrontendPlannedBattle } from "../../../../backend/src/components/frontend_converters/frontend_planned_battle";
+import { BattleType, TurnPhase } from "../../../../server/src/components/config/enums";
+import { FrontendPlannedBattle } from "../../../../server/src/components/frontend_converters/frontend_planned_battle";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";

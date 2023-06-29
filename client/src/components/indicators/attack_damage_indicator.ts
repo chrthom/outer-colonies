@@ -1,4 +1,4 @@
-import { FrontendAttack } from "../../../../backend/src/components/frontend_converters/frontend_state";
+import { FrontendAttack } from "../../../../server/src/components/frontend_converters/frontend_state";
 import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
