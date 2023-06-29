@@ -18,6 +18,7 @@ const routes: Routes = [
     component: RegisterPage
   }, {
     path: 'deck',
+    canActivate: [canActivateFn],
     component: DeckPage
   }, {
     path: '',
