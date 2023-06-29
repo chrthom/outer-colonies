@@ -13,8 +13,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { DeckPage } from './pages/deck/deck.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     LoginPage,
     ContentBoxComponent,
     RegisterPage,
-    NavbarComponent
+    NavbarComponent,
+    DeckPage
   ],
   imports: [
     BrowserModule,
@@ -35,7 +38,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]

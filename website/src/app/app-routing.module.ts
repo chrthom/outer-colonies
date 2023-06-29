@@ -5,6 +5,7 @@ import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
 import { Observable } from 'rxjs';
+import { DeckPage } from './pages/deck/deck.component';
 
 const canActivateFn: CanActivateFn =
   (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> => inject(AuthGuard).canActivate(next, state);
@@ -15,6 +16,9 @@ const routes: Routes = [
   }, {
     path: 'register',
     component: RegisterPage
+  }, {
+    path: 'deck',
+    component: DeckPage
   }, {
     path: '',
     canActivate: [canActivateFn],
