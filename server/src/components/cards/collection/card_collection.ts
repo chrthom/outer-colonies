@@ -269,7 +269,7 @@ export default class CardCollection {
         this.card453
     ];
 
-    static starterDeckSettlers = [
+    static starterDeckSettlers: Card[] = [
         // Hull (18)
         Array(6).fill(this.card186), // Korvette
         Array(4).fill(this.card160), // Leichter Frachter
@@ -294,7 +294,7 @@ export default class CardCollection {
         // TEST CARDS
     ].flat();
     
-    static starterDeckTraders = [
+    static starterDeckTraders: Card[] = [
         // Hull (18)
         Array(6).fill(this.card243), // Korvette
         Array(4).fill(this.card348), // Kanonenboot
@@ -317,7 +317,7 @@ export default class CardCollection {
         // TEST CARDS
     ].flat();
     
-    static starterDeckExpedition = [
+    static starterDeckExpedition: Card[] = [
         // Hull (18)
         Array(6).fill(this.card351), // Korvette
         Array(4).fill(this.card439), // Mittelschwerer Frachter
@@ -343,8 +343,9 @@ export default class CardCollection {
         // TEST CARDS
     ].flat();
 
+    static starterDecks: Card[][] = [ this.starterDeckSettlers, this.starterDeckTraders, this.starterDeckExpedition ]
+
     static pickRandomDeck(): Card[] {
-        const allDecks = [ this.starterDeckExpedition, this.starterDeckSettlers, this.starterDeckTraders ];
-        return allDecks[Math.floor(Math.random() * allDecks.length)].slice();
+        return this.starterDecks[Math.floor(Math.random() * this.starterDecks.length)].slice();
     }
 }
