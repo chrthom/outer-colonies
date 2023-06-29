@@ -1,6 +1,7 @@
 import CardCollection from "../cards/collection/card_collection";
 import { LoginRequest, RegisterRequest } from "./api";
 import DBConnection from "./db_connector";
+import { v4 as uuidv4 } from 'uuid';
 
 export default class Auth {
     private dbConnection: DBConnection;
@@ -22,17 +23,15 @@ export default class Auth {
         return true;
     }
     async login(loginData: LoginRequest): Promise<boolean> {
-        let query: any[] = await this.dbConnection.query(
-            `SELECT 1 FROM credentials WHERE username = '${loginData.username}' AND password = '${loginData.password}'`
-        );
-        if (query.length > 0) {
-            return true;
-        } else {
-            query = await this.dbConnection.query(
-                `SELECT 1 FROM credentials WHERE email = '${loginData.username}' AND password = '${loginData.password}'`
-            );
-            return query.length > 0;
+        let userId = await this.getUserIdByWhereClause(`username = '${loginData.username}' AND password = '${loginData.password}'`);
+        if (userId == -1) {
+            userId = await this.getUserIdByWhereClause(`email = '${loginData.username}' AND password = '${loginData.password}'`);
         }
+        const sessionToken = uuidv4();
+        await this.dbConnection.query(
+            'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, '
+            + `session_token = '${sessionToken}' WHERE user_id = ${userId}`);
+        return userId > 0;
     }
     private async getUserIdByUsername(username: string): Promise<number> {
         return this.getUserIdByWhereClause(`username = '${username}'`);
