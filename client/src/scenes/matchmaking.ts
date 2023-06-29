@@ -1,6 +1,5 @@
 import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
-import { layout } from '../config/layout';
 import LoadingStatus from '../components/loading_status';
 
 export default class Matchmaking extends Phaser.Scene {
