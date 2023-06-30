@@ -2,7 +2,9 @@
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
 // Plus imports for other components in your app.
-@use './color.scss' as oc;
+@use './style/color.scss' as oc;
+
+@import './style/fonts.scss';
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
@@ -37,6 +39,7 @@ $outercolonies-website-theme: mat.define-light-theme((
     border: 0;
     outline: 0;
     vertical-align: baseline;
+    font-family: "latin_modern_sans";
 }
 a, a:visited, mat-label {
   color: oc.$primary-color;
@@ -50,4 +53,5 @@ body {
 }
 h1, h2, h3, h4, h5, h6 {
   display: inline;
+  font-family: "latin_modern_mono_caps";
 }
