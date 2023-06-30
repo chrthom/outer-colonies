@@ -1,6 +1,6 @@
 import { BattleType, TurnPhase } from "../../../server/src/components/config/enums";
-import { FrontendPlannedBattle } from "../../../server/src/components/frontend_converters/frontend_planned_battle";
-import { FrontendGameResult } from "../../../server/src/components/frontend_converters/frontend_state";
+import { ClientPlannedBattle } from "../../../server/src/components/api/client_planned_battle";
+import { ClientGameResult } from "../../../server/src/components/api/client_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
 
@@ -59,8 +59,8 @@ export default class Prompt {
                 + 'Plane dann eine Mission oder Überfall.\n'
                 + 'Klicke die gegnerische Kolonie für einen Überfall\n'
                 + 'bzw. dein Deck oder Ablagestapel für eine Mission.';
-        } else if (this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
-            const missingCards = FrontendPlannedBattle.missingCards(this.scene.plannedBattle);
+        } else if (this.scene.plannedBattle.type == BattleType.Mission && !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+            const missingCards = ClientPlannedBattle.missingCards(this.scene.plannedBattle);
             text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
         } else {
             text += `Wähle Schiffe für ${this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'}`;
@@ -78,7 +78,7 @@ export default class Prompt {
         const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
         this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
     }
-    private showGameOver(gameResult: FrontendGameResult) {
+    private showGameOver(gameResult: ClientGameResult) {
         this.show(`GAME OVER\nDu hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
     }
     private show(text: string) {

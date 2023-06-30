@@ -1,6 +1,6 @@
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../server/src/components/config/enums";
-import { FrontendPlannedBattle } from "../../../server/src/components/frontend_converters/frontend_planned_battle";
-import { FrontendGameResult } from "../../../server/src/components/frontend_converters/frontend_state";
+import { ClientPlannedBattle } from "../../../server/src/components/api/client_planned_battle";
+import { ClientGameResult } from "../../../server/src/components/api/client_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
 import Prompt from "./prompt";
@@ -99,7 +99,7 @@ export default class Button {
     }
     private showNextPhase() {
         const text = this.scene.plannedBattle.shipIds.length == 0 
-                || this.scene.plannedBattle.type == BattleType.Mission && !FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle) ? 
+                || this.scene.plannedBattle.type == BattleType.Mission && !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle) ? 
             'Zug beenden' :
             `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
         this.show(text, 'active_build', () => 
@@ -119,7 +119,7 @@ export default class Button {
     private showEndPhase() {
         this.show('Karten ablegen', 'active_select', () => {});
     }
-    private showGameOver(gameResult: FrontendGameResult) {
+    private showGameOver(gameResult: ClientGameResult) {
         this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
             this.scene.socket.off(MsgTypeOutbound.State);
             this.scene.scene.start('Matchmaking');

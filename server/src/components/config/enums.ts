@@ -33,9 +33,10 @@ export enum MsgTypeInbound {
 }
 
 export enum MsgTypeOutbound {
+    CardRequest = 'card_request',
+    Connect = 'connect',
     Matchmaking = 'matchmaking',
-    State = 'state',
-    CardRequest = 'card_request'
+    State = 'state'
 }
 
 export enum TurnPhase {

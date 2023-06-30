@@ -3,7 +3,7 @@ import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, TurnPhase } from "../../../../server/src/components/config/enums";
 import ValueIndicator from "../indicators/value_indicator";
-import { FrontendPlannedBattle } from "../../../../server/src/components/frontend_converters/frontend_planned_battle";
+import { ClientPlannedBattle } from "../../../../server/src/components/api/client_planned_battle";
 
 export default class DeckCard extends CardImage {
     indicator: ValueIndicator;
@@ -30,13 +30,13 @@ export default class DeckCard extends CardImage {
                 && this.scene.state.playerIsActive 
                 && this.scene.state.turnPhase == TurnPhase.Build
                 && !this.scene.activeCards.hand) {
-            if (FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+            if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
                 this.scene.resetView(BattleType.None);
             } else {
                 if (this.scene.plannedBattle.type != BattleType.Mission) {
                     this.scene.resetView(BattleType.Mission);
                 }
-                if (!FrontendPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+                if (!ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
                     this.scene.plannedBattle.downsideCardsNum++;
                     this.scene.updateView();
                 }

@@ -1,21 +1,21 @@
 import CardImage from "./card_image";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
-import { FrontendHandCard } from "../../../../server/src/components/frontend_converters/frontend_state";
+import { ClientHandCard } from "../../../../server/src/components/api/client_state";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../server/src/components/config/enums";
 import { animationConfig } from "../../config/animation";
 
 export default class HandCard extends CardImage {
     uuid!: string;
-    data!: FrontendHandCard;
-    constructor(scene: Game, data: FrontendHandCard) {
+    data!: ClientHandCard;
+    constructor(scene: Game, data: ClientHandCard) {
         super(scene, layout.deck.x, layout.deck.y, data.cardId);
         this.uuid = data.uuid;
         this.update(data);
         this.image.on('pointerdown', () => this.onClickAction());
         this.enableMaximizeOnMouseover();
     }
-    update(data: FrontendHandCard) {
+    update(data: ClientHandCard) {
         this.data = data;
         this.tween({
             targets: undefined,
@@ -29,7 +29,7 @@ export default class HandCard extends CardImage {
         this.highlightReset();
         if (this.data.playable) this.highlightSelectable();
     }
-    private invIndex(data: FrontendHandCard) {
+    private invIndex(data: ClientHandCard) {
         return this.scene.state.hand.length - data.index - 1;
     }
     private x() {

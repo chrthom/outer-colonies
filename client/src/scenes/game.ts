@@ -1,13 +1,13 @@
 import { Socket } from 'socket.io-client';
 import Button from '../components/button';
-import { FrontendHandCard, FrontendState } from '../../../server/src/components/frontend_converters/frontend_state';
+import { ClientHandCard, ClientState } from '../../../server/src/components/api/client_state';
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../server/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { FrontendPlannedBattle } from '../../../server/src/components/frontend_converters/frontend_planned_battle';
-import { FrontendGameParams } from '../../../server/src/components/frontend_converters/frontend_game_params';
+import { ClientPlannedBattle } from '../../../server/src/components/api/client_planned_battle';
+import { ClientGameParams } from '../../../server/src/components/api/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';
@@ -20,7 +20,7 @@ import { layout } from '../config/layout';
 
 interface InitData {
     socket: Socket;
-    gameParams: FrontendGameParams;
+    gameParams: ClientGameParams;
 }
 
 class StaticObjects {
@@ -48,11 +48,11 @@ interface Layers {
 
 export default class Game extends Phaser.Scene {
     socket: Socket;
-    gameParams: FrontendGameParams;
+    gameParams: ClientGameParams;
     preloader: Preloader;
-    state: FrontendState;
+    state: ClientState;
     activeCards: ActiveCards = new ActiveCards();
-    plannedBattle: FrontendPlannedBattle;
+    plannedBattle: ClientPlannedBattle;
     interveneShipIds: Array<string> = [];
     hand: Array<HandCard> = [];
     cardStacks: Array<CardStack> = [];
@@ -94,7 +94,7 @@ export default class Game extends Phaser.Scene {
     }
     
     create () {
-        this.socket.on(MsgTypeOutbound.State, (state: FrontendState) => {
+        this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
             this.updateState(state);
         });
         this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
@@ -110,7 +110,7 @@ export default class Game extends Phaser.Scene {
 
     update() {}
 
-    updateState(state: FrontendState) {
+    updateState(state: ClientState) {
         const self = this;
         const oldState = this.state ? this.state : state;
         this.state = state;
@@ -165,7 +165,7 @@ export default class Game extends Phaser.Scene {
         }
     }
 
-    private updateCardStacks(newHandCards: FrontendHandCard[]) {
+    private updateCardStacks(newHandCards: ClientHandCard[]) {
         const self = this;
         self.cardStacks.forEach(cs => {
             const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
@@ -186,7 +186,7 @@ export default class Game extends Phaser.Scene {
         self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
     }
 
-    private updateHandCards(newHandCards: FrontendHandCard[], oldState: FrontendState) {
+    private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
         const self = this;
         self.hand.map(h => {
             const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
@@ -202,7 +202,7 @@ export default class Game extends Phaser.Scene {
         self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
     }
 
-    private showOpponentTacticCardAction(oldState: FrontendState) {
+    private showOpponentTacticCardAction(oldState: ClientState) {
         const self = this;
         const opponent = self.state.opponent;
         const oldOpponent = oldState.opponent;

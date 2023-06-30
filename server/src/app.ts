@@ -3,12 +3,12 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { matchMakingSocketListeners, matchMakingCron } from './components/scenes/matchmaking';
-import { gameSocketListeners } from './components/scenes/game';
+import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
+import { gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './components/config/enums';
-import DBConnection from './components/utils/db_connector';
+import DBConnection from './components/persistence/db_connector';
 import Auth from './components/utils/auth';
-import { ExistsResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './components/utils/api';
+import { ExistsResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './components/api/rest_api';
 
 const app = express();
 app.use(cors());
@@ -23,9 +23,9 @@ const io = new Server(httpServer, {
 const auth = new Auth(DBConnection.getInstance());
 
 io.on(MsgTypeInbound.Connect, (socket) => {
-    console.log(`Player connected: ${socket.id}`);
+    console.log(`Client connected: ${socket.id}`);
     socket.on(MsgTypeInbound.Disconnect, () => {
-        console.log(`Player disconnected: ${socket.id}`);
+        console.log(`Client disconnected: ${socket.id}`);
     });
     matchMakingSocketListeners(io, socket);
     gameSocketListeners(io, socket);

@@ -1,39 +1,40 @@
 import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
+import { MsgTypeInbound, MsgTypeOutbound } from '../../../server/src/components/config/enums';
 
 export default class Matchmaking extends Phaser.Scene {
-    playerName: string;
+    sessionToken: string;
     status: LoadingStatus;
     socket: Socket;
 
-    constructor () {
+    constructor() {
         super({
             key: 'Matchmaking'
         });
     }
 
-    preload () {
+    preload() {
         this.load.baseURL = 'http://localhost:3000/cardimages/';
         this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     }
 
-    create () {
-        this.playerName = window.location.search.substring(1);
+    create() {
+        this.sessionToken = window.location.search.substring(1);
         this.status = new LoadingStatus(this);
         this.socket = io('http://localhost:3000');
-        this.socket.on('connect', () => {
+        this.socket.on(MsgTypeOutbound.Connect, () => {
             this.status.setText('Mit Matchmaking Server verbunden')
-            this.socket.emit('login', this.playerName);
+            this.socket.emit(MsgTypeInbound.Login, this.sessionToken);
         });
-        this.socket.on('matchmaking', (status, params) => {
+        this.socket.on(MsgTypeOutbound.Matchmaking, (status, params) => {
             switch(status) {
                 case 'search':
                     this.status.setText('Suche Gegner...\nDerzeit mit ' + params + ' anderen Spielern im Matchmaking');
                     break;
                 case 'start':
-                    this.socket.off('connect');
-                    this.socket.off('matchmaking');
+                    this.socket.off(MsgTypeOutbound.Connect);
+                    this.socket.off(MsgTypeOutbound.Matchmaking);
                     this.scene.start('Game', {
                         socket: this.socket,
                         gameParams: params
@@ -44,5 +45,5 @@ export default class Matchmaking extends Phaser.Scene {
         new Background(this);
     }
 
-    update () {}
+    update() {}
 }

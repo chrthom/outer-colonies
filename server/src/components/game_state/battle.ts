@@ -3,8 +3,8 @@ import CardStack from "../cards/card_stack";
 import EquipmentCard from "../cards/types/equipment_card";
 import { BattleType, Zone } from "../config/enums";
 import { rules } from "../config/rules";
-import toBattle, { FrontendPlannedBattle } from "../frontend_converters/frontend_planned_battle";
-import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from "../utils/utils";
+import toBattle, { ClientPlannedBattle } from "../api/client_planned_battle";
+import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from "../utils/helpers";
 import Match from "./match";
 import Player from "./player";
 
@@ -28,7 +28,7 @@ export default class Battle {
     constructor(type: BattleType) {
         this.type = type;
     }
-    static fromFrontendPlannedBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
+    static fromClientPlannedBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
         let battle = toBattle(match, plannedBattle);
         if (battle.type != BattleType.None) {
             battle.ships[match.actionPendingByPlayerNo].forEach(cs => cs.zone = Zone.Neutral);

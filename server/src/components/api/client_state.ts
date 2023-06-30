@@ -1,28 +1,28 @@
 import Match from '../game_state/match'
 import { EventType, BattleType, CardType, TurnPhase, Zone } from '../config/enums'
 import ActionPool from '../cards/action_pool';
-import { opponentPlayerNo } from '../utils/utils';
+import { opponentPlayerNo } from '../utils/helpers';
 import { Attack } from '../game_state/battle';
 
-export interface FrontendOpponent {
+export interface ClientOpponent {
     name: string;
     handCardSize: number;
     deckSize: number;
     discardPileIds: number[];
 }
 
-export interface FrontendAttack extends Attack {}
+export interface ClientAttack extends Attack {}
 
-export interface FrontendBattle {
+export interface ClientBattle {
     type: BattleType;
     playerShipIds: string[];
     opponentShipIds: string[];
     priceCardIds: number[];
     range: number;
-    recentAttack?: FrontendAttack;
+    recentAttack?: ClientAttack;
 }
 
-export interface FrontendCard {
+export interface ClientCard {
     id: number;
     index: number;
     battleReady: boolean;
@@ -30,9 +30,9 @@ export interface FrontendCard {
     insufficientEnergy: boolean;
 }
 
-export interface FrontendCardStack {
+export interface ClientCardStack {
     uuid: string;
-    cards: FrontendCard[];
+    cards: ClientCard[];
     zone: Zone;
     index: number;
     zoneCardsNum: number;
@@ -41,15 +41,15 @@ export interface FrontendCardStack {
     criticalDamage: boolean;
     missionReady: boolean;
     interventionReady: boolean;
-    defenseIcons: FrontendDefenseIcon[];
+    defenseIcons: ClientDefenseIcon[];
 }
 
-export interface FrontendDefenseIcon {
+export interface ClientDefenseIcon {
     icon: string;
     depleted: boolean;
 }
 
-export interface FrontendHandCard {
+export interface ClientHandCard {
     uuid: string;
     cardId: number;
     index: number;
@@ -57,7 +57,7 @@ export interface FrontendHandCard {
     validTargets: string[];
 }
 
-export interface FrontendEvent {
+export interface ClientEvent {
     type: EventType;
     playerEvent: boolean;
     oldUUID?: string;
@@ -65,30 +65,30 @@ export interface FrontendEvent {
     target?: string;
 }
 
-export interface FrontendGameResult {
+export interface ClientGameResult {
     won: boolean;
 }
 
-export interface FrontendState {
+export interface ClientState {
     playerIsActive: boolean;
     playerPendingAction: boolean;
     turnPhase: TurnPhase;
     actionPool: string[];
-    opponent: FrontendOpponent;
-    hand: FrontendHandCard[];
+    opponent: ClientOpponent;
+    hand: ClientHandCard[];
     handCardLimit: number;
     deckSize: number;
     discardPileIds: number[];
-    cardStacks: FrontendCardStack[];
-    battle?: FrontendBattle;
-    gameResult?: FrontendGameResult;
+    cardStacks: ClientCardStack[];
+    battle?: ClientBattle;
+    gameResult?: ClientGameResult;
     hasToRetractCards: boolean;
 }
 
-export default function toFrontendState(match: Match, playerNo: number): FrontendState {
+export default function toClientState(match: Match, playerNo: number): ClientState {
     const player = match.players[playerNo];
     const opponent = match.players[opponentPlayerNo(playerNo)];
-    const hand: FrontendHandCard[] = player.hand.map((c, index) => {
+    const hand: ClientHandCard[] = player.hand.map((c, index) => {
         return {
             uuid: c.uuid,
             cardId: c.card.id,
@@ -97,7 +97,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
             validTargets: c.getValidTargets().map(cs => cs.uuid)
         };
     });
-    const cardStacks: FrontendCardStack[] = [true, false].flatMap(ownedByPlayer => {
+    const cardStacks: ClientCardStack[] = [true, false].flatMap(ownedByPlayer => {
         const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
         return [ Zone.Colony, Zone.Oribital, Zone.Neutral ].flatMap(zone => {
             const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
@@ -105,7 +105,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
                 const interventionReady = ownedByPlayer
                     && match.getInactivePlayerNo() == playerNo
                     && match.battle.canInterveneMission(playerNo, cs);
-                const defenseIcons: FrontendDefenseIcon[] = cs.getCardStacks()
+                const defenseIcons: ClientDefenseIcon[] = cs.getCardStacks()
                     .filter(c => c.card.canDefend())
                     .map(c => {
                         let icon: string;
@@ -147,7 +147,7 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         .filter(a => a.possibleCardTypes[0] != CardType.Orb)
         .sort(ActionPool.sortOrder)
         .map(a => a.toString());
-    const battle: FrontendBattle = {
+    const battle: ClientBattle = {
         type: match.battle.type,
         playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
         opponentShipIds: match.battle.ships[opponentPlayerNo(playerNo)].map(cs => cs.uuid),
@@ -156,13 +156,13 @@ export default function toFrontendState(match: Match, playerNo: number): Fronten
         range: match.battle.range,
         recentAttack: match.battle.recentAttack
     };
-    const opponentData: FrontendOpponent = {
+    const opponentData: ClientOpponent = {
         name: opponent.name,
         handCardSize: opponent.hand.length,
         deckSize: opponent.deck.length,
         discardPileIds: opponent.discardPile.map(c => c.id)
     };
-    const gameResult: FrontendGameResult = match.gameResult.gameOver ? {
+    const gameResult: ClientGameResult = match.gameResult.gameOver ? {
         won: match.gameResult.winnerNo == player.no
     } : null;
     return {

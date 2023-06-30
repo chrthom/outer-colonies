@@ -1,10 +1,12 @@
-import SocketData from '../game_state/socket_data';
-import Match from '../game_state/match';
-import Player from '../game_state/player';
-import { MsgTypeInbound, MsgTypeOutbound } from '../config/enums';
+import SocketData from './game_state/socket_data';
+import Match from './game_state/match';
+import Player from './game_state/player';
+import { MsgTypeInbound, MsgTypeOutbound } from './config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
-import { FrontendGameParams } from '../frontend_converters/frontend_game_params';
+import { ClientGameParams } from './api/client_game_params';
+import Auth from './utils/auth';
+import DBConnection from './persistence/db_connector';
 
 const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
@@ -30,19 +32,26 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
     const match = new Match(`${gameRoomPrefix}-${uuidv4()}`);
     joinGame(socket1, match, 0);
     joinGame(socket2, match, 1);
-    const gameParams: FrontendGameParams = {
+    const gameParams: ClientGameParams = {
         preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
     };
     io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', gameParams);
 }
 
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
-    socket.on(MsgTypeInbound.Login, (name: string) => {
-        if (name) {
-            console.log(`Player logged in: ${name}`);
-            socket.data = new SocketData(name);
-            socket.join(matchmakingRoom);
-            socket.emit(MsgTypeOutbound.Matchmaking, 'search', numberOfPlayersInMatchMaking(io) - 1);
+    const auth = new Auth(DBConnection.getInstance());
+    socket.on(MsgTypeInbound.Login, (sessionToken: string) => {
+        if (sessionToken) {
+            auth.getUserBySessionToken(sessionToken).then(user => {
+                if (user) {
+                    console.log(`Player logged in: ${user.username}`);
+                    socket.data = new SocketData(user);
+                    socket.join(matchmakingRoom);
+                    socket.emit(MsgTypeOutbound.Matchmaking, 'search', numberOfPlayersInMatchMaking(io) - 1);
+                } else {
+                    console.log(`WARN: Invalid session token ${sessionToken} provided`);
+                }
+            });
         }
     });
 }

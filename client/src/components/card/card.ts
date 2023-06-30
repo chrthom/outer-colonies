@@ -1,14 +1,12 @@
-import { FrontendCard } from "../../../../server/src/components/frontend_converters/frontend_state";
-import { animationConfig } from "../../config/animation";
-import { layout } from "../../config/layout";
+import { ClientCard } from "../../../../server/src/components/api/client_state";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";
 import RetractCardButton from "../indicators/retract_card_button";
 
 export default class Card extends CardImage {
-    data: FrontendCard;
+    data: ClientCard;
     retractCardButton?: RetractCardButton;
-    constructor(scene: Game, x: number, y: number, opponentCard: boolean, cardStackUUID: string, data: FrontendCard) {
+    constructor(scene: Game, x: number, y: number, opponentCard: boolean, cardStackUUID: string, data: ClientCard) {
         super(scene, x, y, data.id, opponentCard);
         this.data = data;
         if (data.retractable) {

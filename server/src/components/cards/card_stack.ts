@@ -4,7 +4,7 @@ import { CardType, TurnPhase, Zone } from '../config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
-import { spliceCardStackByUUID } from '../utils/utils';
+import { spliceCardStackByUUID } from '../utils/helpers';
 
 export default class CardStack {
     card!: Card;

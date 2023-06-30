@@ -1,11 +1,11 @@
-import Match from '../game_state/match';
-import toFrontendState from '../frontend_converters/frontend_state';
-import { rules } from '../config/rules';
-import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from '../config/enums'
-import { getCardStackByUUID } from '../utils/utils';
+import Match from './game_state/match';
+import toClientState from './api/client_state';
+import { rules } from './config/rules';
+import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from './config/enums'
+import { getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
-import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';
-import Player from '../game_state/player';
+import { ClientPlannedBattle } from './api/client_planned_battle';
+import Player from './game_state/player';
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket {
     return io.sockets.sockets.get(match.players[playerNo].id);
@@ -17,7 +17,7 @@ function getPlayer(socket: Socket): Player {
 
 function emitState(io: Server, match: Match) {
     match.forAllPlayers((playerNo: number) => {
-        getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toFrontendState(match, playerNo));
+        getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toClientState(match, playerNo));
     });
     match.battle.resetRecentEvents();
 }
@@ -43,7 +43,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
                 switch (turnPhase) {
                     case TurnPhase.Build:
                         if (socket.data.playerNo == match.activePlayerNo) {
-                            match.prepareBuildPhaseReaction(<FrontendPlannedBattle> data);
+                            match.prepareBuildPhaseReaction(<ClientPlannedBattle> data);
                         } else {
                             match.prepareCombatPhase(<string[]> data);
                         }

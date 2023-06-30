@@ -2,9 +2,9 @@ import Player from './player';
 import { rules } from '../config/rules';
 import { BattleType, TurnPhase } from '../config/enums'
 import Battle from './battle';
-import { FrontendPlannedBattle } from '../frontend_converters/frontend_planned_battle';55
+import { ClientPlannedBattle } from '../api/client_planned_battle';55
 import CardStack from '../cards/card_stack';
-import { opponentPlayerNo } from '../utils/utils';
+import { opponentPlayerNo } from '../utils/helpers';
 
 export default class Match {
     readonly room!: string;
@@ -64,8 +64,8 @@ export default class Match {
     prepareBuildPhase() {
         this.turnPhase = TurnPhase.Build;
     }
-    prepareBuildPhaseReaction(plannedBattle: FrontendPlannedBattle) {
-        this.battle = Battle.fromFrontendPlannedBattle(this, plannedBattle);
+    prepareBuildPhaseReaction(plannedBattle: ClientPlannedBattle) {
+        this.battle = Battle.fromClientPlannedBattle(this, plannedBattle);
         if (this.battle.type == BattleType.None) this.prepareEndPhase();
         else this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
     }

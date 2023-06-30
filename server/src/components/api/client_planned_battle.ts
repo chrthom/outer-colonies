@@ -2,22 +2,22 @@ import { BattleType } from "../config/enums";
 import { rules } from "../config/rules";
 import Battle from "../game_state/battle";
 import Match from "../game_state/match";
-import { getCardStackByUUID } from "../utils/utils";
+import { getCardStackByUUID } from "../utils/helpers";
 
-export class FrontendPlannedBattle {
+export class ClientPlannedBattle {
     type: BattleType;
     downsideCardsNum: number;
     upsideCardsNum: number;
     shipIds: string[];
-    static cardLimitReached(plannedBattle: FrontendPlannedBattle): boolean {
-        return FrontendPlannedBattle.missingCards(plannedBattle) == 0;
+    static cardLimitReached(plannedBattle: ClientPlannedBattle): boolean {
+        return ClientPlannedBattle.missingCards(plannedBattle) == 0;
     }
-    static missingCards(plannedBattle: FrontendPlannedBattle): number {
+    static missingCards(plannedBattle: ClientPlannedBattle): number {
         return rules.cardsPerMission - plannedBattle.downsideCardsNum - plannedBattle.upsideCardsNum;
     }
 }
 
-export default function toBattle(match: Match, plannedBattle: FrontendPlannedBattle): Battle {
+export default function toBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
     const ships = plannedBattle.shipIds
         .map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
         .filter(cs => cs.isMissionReady());

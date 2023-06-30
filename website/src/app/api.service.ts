@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { RegisterRequest, ExistsResponse, LoginRequest, RegisterResponse, LoginResponse } from '../../../server/src/components/utils/api';
+import { RegisterRequest, ExistsResponse, LoginRequest, RegisterResponse, LoginResponse } from '../../../server/src/components/api/rest_api';
 
 @Injectable({
   providedIn: 'root'

@@ -1,4 +1,4 @@
-import { FrontendDefenseIcon } from "../../../../server/src/components/frontend_converters/frontend_state";
+import { ClientDefenseIcon } from "../../../../server/src/components/api/client_state";
 import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
@@ -7,7 +7,7 @@ export default class DefenseIndicator {
     images: Phaser.GameObjects.Image[];
     private scene!: Game;
     private ownedByPlayer!: boolean;
-    constructor(scene: Game, defenseIcons: FrontendDefenseIcon[], cardX: number, cardY: number, ownedByPlayer: boolean) {
+    constructor(scene: Game, defenseIcons: ClientDefenseIcon[], cardX: number, cardY: number, ownedByPlayer: boolean) {
         this.scene = scene;
         this.ownedByPlayer = ownedByPlayer;
         this.images = defenseIcons.map((icon, index) => {

@@ -1,23 +1,23 @@
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../server/src/components/config/enums";
-import { FrontendAttack, FrontendCard, FrontendCardStack } from "../../../../server/src/components/frontend_converters/frontend_state";
+import { ClientAttack, ClientCard, ClientCardStack } from "../../../../server/src/components/api/client_state";
 import ValueIndicator from "../indicators/value_indicator";
 import DefenseIndicator from "../indicators/defense_indicator";
 import Card from "./card";
 import { animationConfig } from "../../config/animation";
-import { arrayDiff } from "../../../../server/src/components/utils/utils";
+import { arrayDiff } from "../../../../server/src/components/utils/helpers";
 import AttackDamageIndicator from "../indicators/attack_damage_indicator";
 import CardImage from "./card_image";
 
 export default class CardStack {
     cards!: Array<Card>;
     uuid!: string;
-    data!: FrontendCardStack;
+    data!: ClientCardStack;
     damageIndicator?: ValueIndicator;
     defenseIndicator?: DefenseIndicator;
     private scene!: Game;
-    constructor(scene: Game, data: FrontendCardStack, fromHand?: boolean, origin?: CardImage) {
+    constructor(scene: Game, data: ClientCardStack, fromHand?: boolean, origin?: CardImage) {
         this.scene = scene;
         this.uuid = data.uuid;
         this.data = data;
@@ -27,7 +27,7 @@ export default class CardStack {
         this.destroyIndicators();
         this.cards.forEach(c => c.discard(this.data.ownedByPlayer, toDeck));
     }
-    update(data: FrontendCardStack) {
+    update(data: ClientCardStack) {
         this.destroyIndicators();
         const [removedCardIds, newCardIds] = arrayDiff(this.cards.map(c => c.cardId), data.cards.map(c => c.id));
         this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
@@ -51,7 +51,7 @@ export default class CardStack {
         this.highlightSelected();
         setTimeout(() => this.highlightReset(), animationConfig.duration.attack);
     }
-    animateDamage(attack: FrontendAttack) {
+    animateDamage(attack: ClientAttack) {
         new AttackDamageIndicator(this.scene, this, attack);
     }
     highlightDisabled() {
@@ -161,7 +161,7 @@ export default class CardStack {
         if (this.defenseIndicator) this.defenseIndicator.destroy();
         this.cards.forEach(c => c.destroyButton());
     }
-    private onClickAction(cardData: FrontendCard) {
+    private onClickAction(cardData: ClientCard) {
         const state = this.scene.state;
         if (state.playerPendingAction) {
             switch (state.turnPhase) {
