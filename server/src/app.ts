@@ -50,9 +50,10 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-    auth.login(<LoginRequest> req.body).then(success => {
+    auth.login(<LoginRequest> req.body).then(sessionToken => {
         const payload: LoginResponse = {
-            success: success
+            success: sessionToken != null,
+            sessionToken: sessionToken
         };
         res.send(payload);
     })

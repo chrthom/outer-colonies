@@ -24,11 +24,11 @@ export default class ApiService {
       return success;
     }));
   }
-  login(body: LoginRequest): Observable<boolean> {
+  login(body: LoginRequest): Observable<string | undefined> {
     return this.post<LoginResponse>('auth/login', body).pipe(map(res => {
-      const success = res.status >= 200 && res.status < 300 && res.body != null && res.body.success;
-      if (!success) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
-      return success;
+      const sessionToken = res.status >= 200 && res.status < 300 && res.body != null ? res.body.sessionToken : undefined;
+      if (!sessionToken) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
+      return sessionToken;
     }));
   }
   private post<T>(path: string, body?: any): Observable<HttpResponse<T>> {

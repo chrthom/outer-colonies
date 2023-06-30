@@ -16,6 +16,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     success: boolean;
+    sessionToken: string;
 }
 
 export interface ExistsResponse {

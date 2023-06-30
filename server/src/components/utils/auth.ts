@@ -22,16 +22,20 @@ export default class Auth {
             this.dbConnection.query(`INSERT INTO decks (card_id, user_id) VALUES (${id}, ${userId})`));
         return true;
     }
-    async login(loginData: LoginRequest): Promise<boolean> {
+    async login(loginData: LoginRequest): Promise<string> {
         let userId = await this.getUserIdByWhereClause(`username = '${loginData.username}' AND password = '${loginData.password}'`);
         if (userId == -1) {
             userId = await this.getUserIdByWhereClause(`email = '${loginData.username}' AND password = '${loginData.password}'`);
         }
-        const sessionToken = uuidv4();
-        await this.dbConnection.query(
-            'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, '
-            + `session_token = '${sessionToken}' WHERE user_id = ${userId}`);
-        return userId > 0;
+        if (userId > 0) {
+            const sessionToken = uuidv4();
+            await this.dbConnection.query(
+                'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, '
+                + `session_token = '${sessionToken}' WHERE user_id = ${userId}`);
+            return sessionToken;
+        } else {
+            return null;
+        }
     }
     private async getUserIdByUsername(username: string): Promise<number> {
         return this.getUserIdByWhereClause(`username = '${username}'`);

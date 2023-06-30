@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import AuthService from 'src/app/auth.service';
 
 @Component({
   selector: 'oc-page-home',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./home.page.scss']
 })
 export class HomePage {
-  startGame() {}
+  constructor(public authService: AuthService) {}
 }
