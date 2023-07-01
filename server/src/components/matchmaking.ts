@@ -5,7 +5,7 @@ import { MsgTypeInbound, MsgTypeOutbound } from './config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
 import { ClientGameParams } from './api/client_game_params';
-import DBCredentialDAO from './persistence/db_credentials';
+import DBCredentialsDAO from './persistence/db_credentials';
 
 const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
@@ -40,7 +40,7 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     socket.on(MsgTypeInbound.Login, (sessionToken: string) => {
         if (sessionToken) {
-            DBCredentialDAO.getBySessionToken(sessionToken).then(user => {
+            DBCredentialsDAO.getBySessionToken(sessionToken).then(user => {
                 if (user) {
                     console.log(`Player logged in: ${user.username}`);
                     socket.data = new SocketData(user);
