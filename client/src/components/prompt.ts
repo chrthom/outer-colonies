@@ -17,7 +17,7 @@ export default class Prompt {
             .setVisible(true);
         this.text = scene.add.text(layout.prompt.x, layout.prompt.y, 'Lädt...')
             .setFontSize(layout.prompt.fontSize)
-            .setFontFamily(layout.font.family)
+            .setFontFamily(layout.font.textFamily)
             .setColor(layout.font.color)
             .setAlign('left')
             .setOrigin(0, 0);

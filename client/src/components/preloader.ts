@@ -22,7 +22,7 @@ export default class Preloader {
             'Lade Spieldaten...'
         )
             .setFontSize(layout.font.size)
-            .setFontFamily(layout.font.family)
+            .setFontFamily(layout.font.textFamily)
             .setColor(layout.font.color)
             .setAlign('center')
             .setOrigin(0.5, 0.5);

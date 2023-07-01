@@ -44,7 +44,7 @@ export default class Button {
                 ['']
             )
             .setFontSize(layout.continueButton.fontSize)
-            .setFontFamily(layout.font.family)
+            .setFontFamily(layout.font.captionFamily)
             .setColor(layout.font.color)
             .setAlign('right')
             .setOrigin(1, 0.5)

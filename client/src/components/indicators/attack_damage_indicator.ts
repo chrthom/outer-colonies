@@ -53,7 +53,7 @@ export default class AttackDamageIndicator {
     private createIndicator(value: number, color: string) {
         return this.scene.add.text(this.cardImage.x, this.cardImage.y, String(value))
             .setFontSize(layout.attack.fontSize)
-            .setFontFamily(layout.font.family)
+            .setFontFamily(layout.font.captionFamily)
             .setColor(color)
             .setAlign('center')
             .setOrigin(0.5, 1);

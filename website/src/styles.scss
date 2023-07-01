@@ -39,7 +39,7 @@ $outercolonies-website-theme: mat.define-light-theme((
     border: 0;
     outline: 0;
     vertical-align: baseline;
-    font-family: "latin_modern_sans";
+    font-family: "Latin Modern Sans";
 }
 a, a:visited, mat-label {
   color: oc.$primary-color;
@@ -53,5 +53,5 @@ body {
 }
 h1, h2, h3, h4, h5, h6 {
   display: inline;
-  font-family: "latin_modern_mono_caps";
+  font-family: "Latin Modern Mono Caps";
 }

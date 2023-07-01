@@ -45,7 +45,7 @@ export default class ValueIndicator {
         this.text = scene.add
             .text(this.x(cardX), this.y(cardY), value)
             .setFontSize(layout.cards.damageIndicator.fontSize)
-            .setFontFamily('Impact')
+            .setFontFamily(layout.font.captionFamily)
             .setColor('#eeeecc')
             .setAlign('center')
             .setOrigin(0.5, 0.5);

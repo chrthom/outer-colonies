@@ -24,7 +24,7 @@ export default class Matchmaking extends Phaser.Scene {
         this.status = new LoadingStatus(this);
         this.socket = io('http://localhost:3000');
         this.socket.on(MsgTypeOutbound.Connect, () => {
-            this.status.setText('Mit Matchmaking Server verbunden')
+            this.status.setText('Authentifiziere Nutzer...')
             this.socket.emit(MsgTypeInbound.Login, this.sessionToken);
         });
         this.socket.on(MsgTypeOutbound.Matchmaking, (status, params) => {

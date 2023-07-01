@@ -29,7 +29,7 @@ export default class Background {
         const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
             this.scene.add.text(c.xLeft, c.yBottom, caption)
                 .setFontSize(layout.font.size)
-                .setFontFamily(layout.font.family)
+                .setFontFamily(layout.font.captionFamily)
                 .setColor(opponent ? layout.opponent.color : layout.player.color)
                 .setAlpha(layout.colors.alpha)
                 .setAlign('right')

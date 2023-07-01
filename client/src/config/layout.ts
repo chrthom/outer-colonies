@@ -10,7 +10,8 @@ class Layout {
     readonly stackYDistance = 30;
 
     readonly font = {
-        family: 'Impact',
+        captionFamily: 'latin-modern-mono-caps',
+        textFamily: 'latin-modern-sans',
         color: '#ffffff',
         colorHover: '#eeeeaa',
         size: 28
@@ -72,7 +73,7 @@ class Layout {
         x: 2370,
         y: 60,
         xTextOffset: -120,
-        fontSize: 32
+        fontSize: 36
     };
     readonly deck = {
         x: 1930,
