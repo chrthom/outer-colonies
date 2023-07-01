@@ -6,7 +6,6 @@ import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
 import { gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './components/config/enums';
-import DBConnection from './components/persistence/db_connector';
 import Auth from './components/utils/auth';
 import { ExistsResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './components/api/rest_api';
 
@@ -20,7 +19,6 @@ const io = new Server(httpServer, {
         credentials: false
     }
 });
-const auth = new Auth(DBConnection.getInstance());
 
 io.on(MsgTypeInbound.Connect, (socket) => {
     console.log(`Client connected: ${socket.id}`);
@@ -41,7 +39,7 @@ app.get('/cardimages/*', (req, res) => {
 });
 
 app.post('/api/auth/register', (req, res) => {
-    auth.register(<RegisterRequest> req.body).then(success => {
+    Auth.register(<RegisterRequest> req.body).then(success => {
         const payload: RegisterResponse = {
             success: success
         };
@@ -50,7 +48,7 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-    auth.login(<LoginRequest> req.body).then(sessionToken => {
+    Auth.login(<LoginRequest> req.body).then(sessionToken => {
         const payload: LoginResponse = {
             success: sessionToken != null,
             sessionToken: sessionToken
@@ -66,8 +64,8 @@ app.get('/api/auth/exists', (req, res) => {
         };
         res.send(payload);
     }
-    if (req.query.username) auth.checkUsernameExists(String(req.query.username)).then(sendExistsResponse);
-    else if (req.query.email) auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
+    if (req.query.username) Auth.checkUsernameExists(String(req.query.username)).then(sendExistsResponse);
+    else if (req.query.email) Auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
     else res.sendStatus(400);
 });
 
