@@ -6,8 +6,7 @@ import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
 import { gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './components/config/enums';
-import Auth from './components/utils/auth';
-import { ExistsResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './components/api/rest_api';
+import restAPI from './components/rest_api';
 
 const app = express();
 app.use(cors());
@@ -33,41 +32,7 @@ setInterval(matchMakingCron, 1000, io);
 
 app.use(express.json());
 
-app.get('/cardimages/*', (req, res) => {
-    const file = req.path.replace('/cardimages/', '');
-    fetch(`https://thomsen.in/outercolonies/${file}`).then(actual => actual.body.pipe(res));
-});
-
-app.post('/api/auth/register', (req, res) => {
-    Auth.register(<RegisterRequest> req.body).then(success => {
-        const payload: RegisterResponse = {
-            success: success
-        };
-        res.send(payload);
-    });
-});
-
-app.post('/api/auth/login', (req, res) => {
-    Auth.login(<LoginRequest> req.body).then(sessionToken => {
-        const payload: LoginResponse = {
-            success: sessionToken != null,
-            sessionToken: sessionToken
-        };
-        res.send(payload);
-    })
-});
-
-app.get('/api/auth/exists', (req, res) => {
-    const sendExistsResponse = (exists: boolean) => {
-        const payload: ExistsResponse = {
-            exists: exists
-        };
-        res.send(payload);
-    }
-    if (req.query.username) Auth.checkUsernameExists(String(req.query.username)).then(sendExistsResponse);
-    else if (req.query.email) Auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
-    else res.sendStatus(400);
-});
+restAPI(app);
 
 httpServer.listen(3000, () => {
     console.log('Server started!');

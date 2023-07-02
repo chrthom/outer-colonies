@@ -1,10 +1,10 @@
 import Match from './game_state/match';
-import toClientState from './api/client_state';
+import toClientState from './shared_interfaces/client_state';
 import { rules } from './config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from './config/enums'
 import { getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
-import { ClientPlannedBattle } from './api/client_planned_battle';
+import { ClientPlannedBattle } from './shared_interfaces/client_planned_battle';
 import Player from './game_state/player';
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket {

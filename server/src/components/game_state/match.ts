@@ -2,7 +2,7 @@ import Player from './player';
 import { rules } from '../config/rules';
 import { BattleType, TurnPhase } from '../config/enums'
 import Battle from './battle';
-import { ClientPlannedBattle } from '../api/client_planned_battle';55
+import { ClientPlannedBattle } from '../shared_interfaces/client_planned_battle';55
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
 

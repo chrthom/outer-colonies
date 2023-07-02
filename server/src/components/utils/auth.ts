@@ -1,5 +1,5 @@
 import CardCollection from "../cards/collection/card_collection";
-import { LoginRequest, RegisterRequest } from "../api/rest_api";
+import { AuthLoginRequest, AuthRegisterRequest } from "../shared_interfaces/rest_api";
 import DBConnection from "../persistence/db_connector";
 import { v4 as uuidv4 } from 'uuid';
 import DBCredentialsDAO from "../persistence/db_credentials";
@@ -11,7 +11,7 @@ export default class Auth {
     static async checkEmailExists(email: string): Promise<boolean> {
         return await DBCredentialsDAO.getByEmail(email) != null;
     }
-    static async register(registrationData: RegisterRequest): Promise<boolean> {
+    static async register(registrationData: AuthRegisterRequest): Promise<boolean> {
         await DBConnection.getInstance().query('INSERT INTO credentials (username, password, email) VALUES '
             + `('${registrationData.username}', '${registrationData.password}', '${registrationData.email}')`);
         const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
@@ -19,7 +19,7 @@ export default class Auth {
             DBConnection.getInstance().query(`INSERT INTO decks (card_id, user_id, in_use) VALUES (${id}, ${credential.userId}, 1)`));
         return true;
     }
-    static async login(loginData: LoginRequest): Promise<string | null> {
+    static async login(loginData: AuthLoginRequest): Promise<string | null> {
         let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
         if (!credential) credential = await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
         if (credential) {
