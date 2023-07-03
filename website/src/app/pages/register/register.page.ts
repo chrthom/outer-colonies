@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
-import ApiService from 'src/app/api.service';
+import ApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../error-state-matcher';
 
 @Component({
@@ -37,7 +37,7 @@ export class RegisterPage {
     ])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private apiService: ApiService) {}
+  constructor(private authAPIService: ApiService) {}
   get username(): any {
     return this.registerForm.get('username');
   }
@@ -54,7 +54,7 @@ export class RegisterPage {
     return JSON.stringify(this.username.errors);
   }
   submit() {
-    this.apiService.register({
+    this.authAPIService.register({
       username: this.registerForm.value.username.trim(),
       password: this.registerForm.value.password,
       email: this.registerForm.value.email,
@@ -63,14 +63,14 @@ export class RegisterPage {
   }
   private get usernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.apiService.checkUsernameExists(control.value).pipe(map(exists => {
+      return this.authAPIService.checkUsernameExists(control.value).pipe(map(exists => {
         return exists ? { exists: true } : null;
       }));
     }
   }
   private get emailExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.apiService.checkEmailExists(control.value).pipe(map(exists => {
+      return this.authAPIService.checkEmailExists(control.value).pipe(map(exists => {
         return exists ? { exists: true } : null;
       }));
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import ApiService from './api.service';
+import AuthApiService from './api/auth-api.service';
 import { Observable, map, of, tap } from 'rxjs';
 
 @Injectable({
@@ -14,7 +14,7 @@ export default class AuthService {
   sessionToken?: string;
   error?: string;
 
-  constructor(private cookieService: CookieService, private apiService: ApiService) {}
+  constructor(private cookieService: CookieService, private authAPIService: AuthApiService) {}
 
   login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;
@@ -38,7 +38,7 @@ export default class AuthService {
   }
 
   check(): Observable<boolean> {
-    return !this.checkCache() ? of(false) : this.apiService.login({
+    return !this.checkCache() ? of(false) : this.authAPIService.login({
       username: this.username ? this.username : '',
       password: this.password ? this.password : ''
     }).pipe(
