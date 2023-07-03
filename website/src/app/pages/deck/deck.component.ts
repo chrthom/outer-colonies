@@ -23,7 +23,13 @@ export class DeckPage implements OnInit {
       }
     });
   }
-  removeCard(card: DeckCard) {
+  activateCard(card: DeckCard) {
+    if (this.authService.sessionToken)
+      this.deckAPService
+        .activateCard(card.id)
+        .subscribe(_ => this.reload());
+  }
+  deactivateCard(card: DeckCard) {
     if (this.authService.sessionToken)
       this.deckAPService
         .deactivateCard(card.id)
