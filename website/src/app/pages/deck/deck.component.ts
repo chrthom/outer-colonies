@@ -12,17 +12,19 @@ export class DeckPage implements OnInit {
   activeCards!: DeckCard[];
   reserveCards!: DeckCard[];
   constructor(private apiService: ApiService, private authService: AuthService) {}
-  ngOnInit(): void {
+  ngOnInit() {
     this.reload();
   }
   reload() {
-    console.log(this.authService.sessionToken); ////
     this.apiService.listDeck(this.authService.sessionToken).subscribe(res => {
       if (res) {
         this.activeCards = res.cards.filter(c => c.inUse).sort(this.cardSortFn);
         this.reserveCards = res.cards.filter(c => !c.inUse).sort(this.cardSortFn);
       }
     });
+  }
+  removeCard(card: DeckCard) {
+    // TODO: CONTINUE HERE
   }
   private cardSortFn(a: DeckCard, b:DeckCard): number {
     if (a.type > b.type) return -1;

@@ -3,7 +3,7 @@
     <oc-content-box title="Aktives Deck">
         <div class="scroll">
             <div *ngFor="let card of activeCards">
-                <mat-card>
+                <mat-card (click)="removeCard(card)">
                     <img mat-card-image [src]="'https://thomsen.in/outercolonies/' + card.cardId + '.png'" [alt]="card.name">
                 </mat-card>                  
             </div>
