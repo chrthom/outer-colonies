@@ -16,11 +16,19 @@ export class DeckPage implements OnInit {
     this.reload();
   }
   reload() {
+    console.log(this.authService.sessionToken); ////
     this.apiService.listDeck(this.authService.sessionToken).subscribe(res => {
       if (res) {
-        this.activeCards = res.activeCards;
-        this.reserveCards = res.reserveCards;
+        this.activeCards = res.cards.filter(c => c.inUse).sort(this.cardSortFn);
+        this.reserveCards = res.cards.filter(c => !c.inUse).sort(this.cardSortFn);
       }
     });
+  }
+  private cardSortFn(a: DeckCard, b:DeckCard): number {
+    if (a.type > b.type) return -1;
+    else if (a.type < b.type) return 1;
+    else if (a.name < b.name) return -1;
+    else if (a.name > b.name) return 1;
+    else return 0;
   }
 }

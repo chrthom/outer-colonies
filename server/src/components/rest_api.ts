@@ -4,6 +4,8 @@ import Auth from './utils/auth';
 import { AuthExistsResponse, AuthLoginRequest, AuthLoginResponse, AuthRegisterRequest, AuthRegisterResponse, DeckCard, DeckListResponse } from './shared_interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO from './persistence/db_credentials';
+import CardCollection from './cards/collection/card_collection';
+import Card from './cards/card';
 
 export default function restAPI(app: Express) {
     app.get('/cardimages/*', (req, res) => {
@@ -43,10 +45,20 @@ export default function restAPI(app: Express) {
     });
 
     app.get('/api/deck', (req, res) => {
+        const toDeckCard = (c: DBDeck) => {
+            const cardData: Card = CardCollection.cards[c.cardId];
+            return {
+                id: c.cardInstanceId,
+                cardId: c.cardId,
+                name: cardData.name,
+                rarity: cardData.rarity,
+                type: cardData.type,
+                inUse: c.inUse
+            }
+        }
         const sendDeckResponse = (cards: DBDeck[]) => {
             const payload: DeckListResponse = {
-                activeCards: cards.filter(c => c.inUse).map(c => <DeckCard> c),
-                reserveCards: cards.filter(c => !c.inUse).map(c => <DeckCard> c)
+                cards: cards.map(toDeckCard)
             };
             res.send(payload);
         }

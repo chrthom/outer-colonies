@@ -1,3 +1,5 @@
+import { CardType } from "../config/enums";
+
 export interface AuthRegisterRequest {
     username: string;
     password: string;
@@ -24,11 +26,14 @@ export interface AuthExistsResponse {
 }
 
 export interface DeckCard {
-    cardInstanceId: number;
+    id: number;
     cardId: number;
+    name: string;
+    rarity: number;
+    type: CardType;
+    inUse: boolean;
 }
 
 export interface DeckListResponse {
-    activeCards: DeckCard[],
-    reserveCards: DeckCard[]
+    cards: DeckCard[]
 }

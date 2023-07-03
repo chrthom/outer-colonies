@@ -49,7 +49,10 @@ html, body {
 }
 body {
   color: white;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+mat-card-title, mat-card-subtitle {
+  color: white !important;
+  font-family: "Latin Modern Mono Caps" !important;
 }
 h1, h2, h3, h4, h5, h6 {
   display: inline;

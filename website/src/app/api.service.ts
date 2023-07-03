@@ -32,7 +32,7 @@ export default class ApiService {
       return sessionToken;
     }));
   }
-  listDeck(sessionToken?: string): Observable<DeckListResponse | undefined> {
+  listDeck(sessionToken?: string, doNotRetry?: boolean): Observable<DeckListResponse | undefined> {
     return this.get<DeckListResponse>('deck', sessionToken).pipe(map(res => {
       const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
       return result;

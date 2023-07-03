@@ -1,8 +1,12 @@
 <oc-navbar active="deck"></oc-navbar>
 <div id="deck-box">
     <oc-content-box title="Aktives Deck">
-        <div *ngFor="let card of activeCards">
-            {{ card.cardId }}
+        <div class="scroll">
+            <div *ngFor="let card of activeCards">
+                <mat-card>
+                    <img mat-card-image [src]="'https://thomsen.in/outercolonies/' + card.cardId + '.png'" [alt]="card.name">
+                </mat-card>                  
+            </div>
         </div>
     </oc-content-box>
 </div>
