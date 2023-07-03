@@ -19,35 +19,50 @@ export default class ApiService {
       .pipe(map(res => res.body ? res.body.exists : false));
   }
   register(body: AuthRegisterRequest): Observable<boolean> {
-    return this.post<AuthRegisterResponse>('auth/register', body).pipe(map(res => {
+    return this.post<AuthRegisterResponse>('auth/register', undefined, body).pipe(map(res => {
       const success = res.status >= 200 && res.status < 300 && res.body != null && res.body.success;
       if (!success) console.log(`Register API call failed with HTTP ${res.status}: ${res.statusText}`);
       return success;
     }));
   }
   login(body: AuthLoginRequest): Observable<string | undefined> {
-    return this.post<AuthLoginResponse>('auth/login', body).pipe(map(res => {
+    return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(map(res => {
       const sessionToken = res.status >= 200 && res.status < 300 && res.body != null ? res.body.sessionToken : undefined;
       if (!sessionToken) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
       return sessionToken;
     }));
   }
-  listDeck(sessionToken?: string, doNotRetry?: boolean): Observable<DeckListResponse | undefined> {
+  listDeck(sessionToken: string): Observable<DeckListResponse | undefined> {
     return this.get<DeckListResponse>('deck', sessionToken).pipe(map(res => {
       const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
       return result;
     }));
   }
-  private post<T>(path: string, body?: any): Observable<HttpResponse<T>> {
+  activateCard(sessionToken: string, cardInstanceId: number): Observable<void> {
+    return this.post(`deck/${cardInstanceId}`, sessionToken).pipe(map(_ => {}));
+  }
+  deactivateCard(sessionToken: string, cardInstanceId: number): Observable<void> {
+    return this.delete(`deck/${cardInstanceId}`, sessionToken).pipe(map(_ => {}));
+  }
+  private post<T>(path: string, sessionToken?: string, body?: any): Observable<HttpResponse<T>> {
     return this.http.post<T>(`${this.apiHost}/api/${path}`, body, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'session-token': sessionToken ? sessionToken : ''
       },
       observe: 'response'
     });
   }
   private get<T>(path: string, sessionToken?: string): Observable<HttpResponse<T>> {
     return this.http.get<T>(`${this.apiHost}/api/${path}`, { 
+      observe: 'response',
+      headers: {
+        'session-token': sessionToken ? sessionToken : ''
+      }
+    });
+  }
+  private delete<T>(path: string, sessionToken?: string): Observable<HttpResponse<T>> {
+    return this.http.delete<T>(`${this.apiHost}/api/${path}`, { 
       observe: 'response',
       headers: {
         'session-token': sessionToken ? sessionToken : ''

@@ -75,4 +75,12 @@ export default function restAPI(app: Express) {
             res.sendStatus(400);
         }
     });
+
+    app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
+        DBDecksDAO.setInUse(Number(req.params.cardInstanceId), true).then(_ => res.sendStatus(204));
+    });
+
+    app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
+        DBDecksDAO.setInUse(Number(req.params.cardInstanceId), false).then(_ => res.sendStatus(204));
+    });
 }

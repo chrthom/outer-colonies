@@ -16,15 +16,22 @@ export class DeckPage implements OnInit {
     this.reload();
   }
   reload() {
-    this.apiService.listDeck(this.authService.sessionToken).subscribe(res => {
-      if (res) {
-        this.activeCards = res.cards.filter(c => c.inUse).sort(this.cardSortFn);
-        this.reserveCards = res.cards.filter(c => !c.inUse).sort(this.cardSortFn);
-      }
-    });
+    if (this.authService.sessionToken) {
+      this.apiService.listDeck(this.authService.sessionToken).subscribe(res => {
+        if (res) {
+          this.activeCards = res.cards.filter(c => c.inUse).sort(this.cardSortFn);
+          this.reserveCards = res.cards.filter(c => !c.inUse).sort(this.cardSortFn);
+        }
+      });
+    } else {
+      setTimeout(this.reload, 300);
+    }
   }
   removeCard(card: DeckCard) {
-    // TODO: CONTINUE HERE
+    if (this.authService.sessionToken)
+      this.apiService
+        .deactivateCard(this.authService.sessionToken, card.id)
+        .subscribe(_ => this.reload());
   }
   private cardSortFn(a: DeckCard, b:DeckCard): number {
     if (a.type > b.type) return -1;
