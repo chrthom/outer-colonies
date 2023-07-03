@@ -1,6 +1,13 @@
 <oc-navbar active="deck"></oc-navbar>
 <div id="deck-box">
-    <oc-content-box title="Deck">
+    <oc-content-box title="Aktives Deck">
+        <div *ngFor="let card of activeCards">
+            {{ card.cardId }}
+        </div>
+    </oc-content-box>
+</div>
+<div id="reserve-box">
+    <oc-content-box title="Reserve Karten">
         <p>TBD</p>
     </oc-content-box>
 </div>

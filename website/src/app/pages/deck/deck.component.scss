@@ -1,6 +1,6 @@
-#deck-box {
+#deck-box, #reserve-box {
     position: relative;
-    width: 50%;
+    width: calc(100% -  50px);
     margin: auto;
     margin-top: 40px;
     margin-bottom: 20px;
