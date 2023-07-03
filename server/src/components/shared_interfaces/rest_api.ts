@@ -7,7 +7,7 @@ export interface AuthRegisterRequest {
     startDeck: number;
 }
 
-export interface AuthRegisterResponse {
+export interface AuthRegisterResponse { // ISSUE #91: Remove and just send HTTP status
     success: boolean;
 }
 
@@ -21,7 +21,7 @@ export interface AuthLoginResponse {
     sessionToken: string;
 }
 
-export interface AuthExistsResponse {
+export interface AuthExistsResponse { // ISSUE #91: Remove and just send HTTP status
     exists: boolean;
 }
 
