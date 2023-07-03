@@ -9,6 +9,8 @@ import { DeckApiService } from 'src/app/api/deck-api.service';
   styleUrls: ['./deck.component.scss']
 })
 export class DeckPage implements OnInit {
+  readonly minCards = 60;
+  readonly maxCards = 100;
   activeCards!: DeckCard[];
   reserveCards!: DeckCard[];
   constructor(private deckAPService: DeckApiService, private authService: AuthService) {}
@@ -24,13 +26,13 @@ export class DeckPage implements OnInit {
     });
   }
   activateCard(card: DeckCard) {
-    if (this.authService.sessionToken)
+    if (this.activeCards.length < this.maxCards)
       this.deckAPService
         .activateCard(card.id)
         .subscribe(_ => this.reload());
   }
   deactivateCard(card: DeckCard) {
-    if (this.authService.sessionToken)
+    if (this.activeCards.length > this.minCards)
       this.deckAPService
         .deactivateCard(card.id)
         .subscribe(_ => this.reload());

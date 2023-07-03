@@ -1,6 +1,6 @@
 <oc-navbar active="deck"></oc-navbar>
 <div id="deck-box">
-    <oc-content-box title="Aktives Deck">
+    <oc-content-box [title]="'Karten im aktiven Deck (' + activeCards.length + ')'">
         <div class="scroll">
             <div *ngFor="let card of activeCards">
                 <mat-card (click)="deactivateCard(card)">
@@ -11,7 +11,7 @@
     </oc-content-box>
 </div>
 <div id="reserve-box">
-    <oc-content-box title="Reserve Karten">
+    <oc-content-box [title]="'Reserve Karten (' + reserveCards.length + ')'">
         <div class="scroll">
             <div *ngFor="let card of reserveCards">
                 <mat-card (click)="activateCard(card)">
