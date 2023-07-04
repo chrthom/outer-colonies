@@ -1,6 +1,6 @@
 import express from 'express';
-import fetch from 'node-fetch';
 import cors from 'cors';
+import config from 'config';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
@@ -34,6 +34,6 @@ app.use(express.json());
 
 restAPI(app);
 
-httpServer.listen(3000, () => {
-    console.log('Server started!');
+httpServer.listen(config.get<number>('server.port'), () => {
+    console.log(`Server started on stage ${config.get('stage')}`);
 });

@@ -1,0 +1,6 @@
+{
+    "stage": "development",
+    "server": {
+        "port": 3000
+    }
+}
