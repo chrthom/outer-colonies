@@ -3,7 +3,7 @@ import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, TurnPhase } from "../../../../server/src/components/config/enums";
 import ValueIndicator from "../indicators/value_indicator";
-import { ClientPlannedBattle } from "../../../../server/src/components/api/client_planned_battle";
+import { ClientPlannedBattle } from "../../../../server/src/components/shared_interfaces/client_planned_battle";
 
 export default class DeckCard extends CardImage {
     indicator: ValueIndicator;

@@ -1,5 +1,5 @@
 import { BattleType, TurnPhase } from "../../../../server/src/components/config/enums";
-import { ClientPlannedBattle } from "../../../../server/src/components/api/client_planned_battle";
+import { ClientPlannedBattle } from "../../../../server/src/components/shared_interfaces/client_planned_battle";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import CardImage from "./card_image";

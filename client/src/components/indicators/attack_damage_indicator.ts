@@ -1,4 +1,4 @@
-import { ClientAttack } from "../../../../server/src/components/api/client_state";
+import { ClientAttack } from "../../../../server/src/components/shared_interfaces/client_state";
 import { animationConfig } from "../../config/animation";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";

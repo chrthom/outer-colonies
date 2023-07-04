@@ -1,13 +1,13 @@
 import { Socket } from 'socket.io-client';
 import Button from '../components/button';
-import { ClientHandCard, ClientState } from '../../../server/src/components/api/client_state';
+import { ClientHandCard, ClientState } from '../../../server/src/components/shared_interfaces/client_state';
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../server/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { ClientPlannedBattle } from '../../../server/src/components/api/client_planned_battle';
-import { ClientGameParams } from '../../../server/src/components/api/client_game_params';
+import { ClientPlannedBattle } from '../../../server/src/components/shared_interfaces/client_planned_battle';
+import { ClientGameParams } from '../../../server/src/components/shared_interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';

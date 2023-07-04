@@ -1,7 +1,7 @@
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../server/src/components/config/enums";
-import { ClientAttack, ClientCard, ClientCardStack } from "../../../../server/src/components/api/client_state";
+import { ClientAttack, ClientCard, ClientCardStack } from "../../../../server/src/components/shared_interfaces/client_state";
 import ValueIndicator from "../indicators/value_indicator";
 import DefenseIndicator from "../indicators/defense_indicator";
 import Card from "./card";

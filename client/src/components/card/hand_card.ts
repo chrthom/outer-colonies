@@ -1,7 +1,7 @@
 import CardImage from "./card_image";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
-import { ClientHandCard } from "../../../../server/src/components/api/client_state";
+import { ClientHandCard } from "../../../../server/src/components/shared_interfaces/client_state";
 import { BattleType, MsgTypeInbound, TurnPhase } from "../../../../server/src/components/config/enums";
 import { animationConfig } from "../../config/animation";
 

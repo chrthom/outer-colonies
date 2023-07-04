@@ -1,6 +1,6 @@
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../server/src/components/config/enums";
-import { ClientPlannedBattle } from "../../../server/src/components/api/client_planned_battle";
-import { ClientGameResult } from "../../../server/src/components/api/client_state";
+import { ClientPlannedBattle } from "../../../server/src/components/shared_interfaces/client_planned_battle";
+import { ClientGameResult } from "../../../server/src/components/shared_interfaces/client_state";
 import { layout } from "../config/layout";
 import Game from "../scenes/game";
 import Prompt from "./prompt";
