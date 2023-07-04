@@ -35,7 +35,7 @@ function initMatch(io: Server, match: Match) {
 export function gameSocketListeners(io: Server, socket: Socket) {
     socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
         const match = <Match> socket.data.match;
-        if (turnPhase == match.turnPhase) {
+        if (match && turnPhase == match.turnPhase) {
             if (turnPhase == TurnPhase.Init) {
                 match.players[socket.data.playerNo].ready = true;
                 if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
