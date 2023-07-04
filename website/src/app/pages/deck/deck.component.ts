@@ -11,8 +11,8 @@ import { DeckApiService } from 'src/app/api/deck-api.service';
 export class DeckPage implements OnInit {
   readonly minCards = 60;
   readonly maxCards = 100;
-  activeCards!: DeckCard[];
-  reserveCards!: DeckCard[];
+  activeCards: DeckCard[] = [];
+  reserveCards: DeckCard[] = [];
   constructor(private deckAPService: DeckApiService, private authService: AuthService) {}
   ngOnInit() {
     this.reload();
