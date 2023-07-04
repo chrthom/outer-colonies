@@ -19,7 +19,8 @@ export default class DBConnection {
           conn = await this.pool.getConnection();
           return conn.query(query);
         } catch (err) {
-          throw err;
+          if (err.code == 'ER_GET_CONNECTION_TIMEOUT') return this.query<T>(query);
+          else throw err;
         } finally {
           if (conn) conn.end();
         }
