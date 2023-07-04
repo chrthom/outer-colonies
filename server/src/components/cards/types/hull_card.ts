@@ -28,6 +28,9 @@ export default abstract class HullCard extends Card {
     }
     onUtilizaton(_: Player) {}
     onRetraction(_: Player) {}
+    canBeRetracted(isRootCard: boolean): boolean {
+        return isRootCard;
+    }
     isFlightReady(cards: Card[]): boolean {
         return cards.filter(c => c.type == CardType.Hull).length == this.multipart.partNo;
     }

@@ -57,7 +57,7 @@ export default class CardStack {
         return player.isActivePlayer()
             && player.isPendingPlayer()
             && player.match.turnPhase == TurnPhase.Build
-            && this.card.canBeRetracted()
+            && this.card.canBeRetracted(this.isRootCard)
             && player.actionPool.toString() == player.getOriginalActions().toString();
     }
     combatPhaseReset(initial: boolean) {
@@ -144,11 +144,14 @@ export default class CardStack {
             spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
         }
         this.getCards().forEach(c => c.onRetraction(this.getPlayer()));
-        this.getPlayer().takeCards(this.getCards().filter(c => c.canBeRetracted()));
-        this.getPlayer().discardCards(...this.getCards().filter(c => !c.canBeRetracted()));
+        this.getPlayer().takeCards(this.getCards().filter(c => c.canBeRetracted(this.isRootCard)));
+        this.getPlayer().discardCards(...this.getCards().filter(c => !c.canBeRetracted(this.isRootCard)));
     }
     type(): CardType {
         return this.card.type;
+    }
+    private get isRootCard() {
+        return !this.parentCardStack;
     }
 }
 
