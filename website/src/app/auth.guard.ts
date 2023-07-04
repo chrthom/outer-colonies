@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import AuthService from './auth.service';
-import { Observable, filter } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +12,6 @@ export class AuthGuard {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 	): Observable<boolean> {
-		const success = this.authService.check();
-    success.pipe(filter(b => !b)).subscribe(_ => this.router.navigate([ '/login' ]));
-    return success;
+    return this.authService.check().pipe(tap(b => !b ? this.router.navigate([ '/login' ]) : {}));
   }
 }
