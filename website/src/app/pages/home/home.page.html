@@ -1,8 +1,19 @@
 <oc-navbar active="home"></oc-navbar>
-<div id="game-box">
-    <oc-content-box title="Gegnersuche">
-        <a mat-raised-button color="primary" [href]="gameUrl + '/?' + authService.sessionToken">
-            Suche n&auml;chstes Spiel
-        </a>
-    </oc-content-box>
+<div id="outer-box">
+    <div id="game-box">
+        <oc-content-box title="Gegnersuche">
+            <a mat-raised-button color="primary" [href]="gameUrl + '/?' + authService.sessionToken">
+                Suche n&auml;chstes Spiel
+            </a>
+        </oc-content-box>
+    </div>
+    <div id="note-box">
+        <oc-content-box title="Feedback erw&uuml;nscht">
+            Die derzeitige Version von Outer Colonies befindet sich noch in der Beta Phase.
+            Es kann zwischenzeitlich zu Ausfällen und Fehlern in der Programmausführung kommen.
+            Ihr könnt die Weiterentwcklung und Stabilisierung des Projektes unterstützen, indem ihr 
+            <a href="https://github.com/chrthom/outer-colonies/issues/new/choose" target="_blank">Fehler 
+                meldet sowie neue Funktionalitäten und Verbesserungen vorschlagt</a>.
+        </oc-content-box>
+    </div>
 </div>
