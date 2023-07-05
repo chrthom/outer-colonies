@@ -15,14 +15,14 @@ export default class Matchmaking extends Phaser.Scene {
     }
 
     preload() {
-        this.load.baseURL = 'http://localhost:3000/assets/';
+        this.load.baseURL = 'https://api.outercolonies.thomsen.in/assets/';
         this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     }
 
     create() {
         this.sessionToken = window.location.search.substring(1);
         this.status = new LoadingStatus(this);
-        this.socket = io('http://localhost:3000');
+        this.socket = io('https://api.outercolonies.thomsen.in');
         this.socket.on(MsgTypeOutbound.Connect, () => {
             this.status.setText('Authentifiziere Nutzer...')
             this.socket.emit(MsgTypeInbound.Login, this.sessionToken);
