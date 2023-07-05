@@ -1,8 +1,9 @@
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { environment } from "src/environments/environment";
 
 export default class OCApi {
-  protected readonly apiHost = 'http://localhost:3000';
+  protected readonly apiHost = environment.url.api;
   constructor(protected http: HttpClient) {}
   protected post<T>(path: string, sessionToken?: string, body?: any): Observable<HttpResponse<T>> {
     return this.http.post<T>(`${this.apiHost}/api/${path}`, body, {

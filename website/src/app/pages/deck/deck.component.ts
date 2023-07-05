@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import AuthService from 'src/app/auth.service';
 import { DeckCard } from '../../../../../server/src/components/shared_interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'oc-page-deck',
@@ -36,6 +37,12 @@ export class DeckPage implements OnInit {
       this.deckAPService
         .deactivateCard(card.id)
         .subscribe(_ => this.reload());
+  }
+  toAssetUrl(cardId: number): string {
+    return `${this.assetsUrl}/${cardId}.png`;
+  }
+  get assetsUrl(): string {
+    return environment.url.assets;
   }
   private cardSortFn(a: DeckCard, b:DeckCard): number {
     if (a.type > b.type) return -1;

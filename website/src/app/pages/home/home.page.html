@@ -1,7 +1,7 @@
 <oc-navbar active="home"></oc-navbar>
 <div id="game-box">
     <oc-content-box title="Gegnersuche">
-        <a mat-raised-button color="primary" [href]="'http://localhost:8080/?' + authService.sessionToken">
+        <a mat-raised-button color="primary" [href]="gameUrl + '/?' + authService.sessionToken">
             Suche n&auml;chstes Spiel
         </a>
     </oc-content-box>
