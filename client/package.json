@@ -4,7 +4,7 @@
   "description": "Outer Colonies Game Client",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack --config webpack.prod.config.js ",
+    "build": "webpack --config webpack.prod.config.js",
     "start": "webpack-dev-server --config webpack.base.config.js --open"
   },
   "private": true,
