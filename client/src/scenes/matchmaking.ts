@@ -15,7 +15,7 @@ export default class Matchmaking extends Phaser.Scene {
     }
 
     preload() {
-        this.load.baseURL = 'http://localhost:3000/cardimages/';
+        this.load.baseURL = 'http://localhost:3000/assets/';
         this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     }
 

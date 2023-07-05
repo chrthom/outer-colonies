@@ -73,7 +73,7 @@ export default class Game extends Phaser.Scene {
 
     preload () {
         this.preloader = new Preloader(this);
-        this.load.baseURL = 'http://localhost:3000/cardimages/';
+        this.load.baseURL = 'http://localhost:3000/assets/';
         [ 0, 1 ].concat(this.gameParams.preloadCardIds).forEach(id => this.load.image(`card_${id}`, `${id}.png`));
         [ 
             'equipment', 'hull', 'infrastructure', 'tactic', 'equipment_hull_infrastructure',

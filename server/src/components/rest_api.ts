@@ -1,16 +1,17 @@
 import { Express } from 'express';
 import fetch from 'node-fetch';
 import Auth from './utils/auth';
-import { AuthExistsResponse, AuthLoginRequest, AuthLoginResponse, AuthRegisterRequest, AuthRegisterResponse, DeckCard, DeckListResponse } from './shared_interfaces/rest_api';
+import { AuthExistsResponse, AuthLoginRequest, AuthLoginResponse, AuthRegisterRequest, AuthRegisterResponse, DeckListResponse } from './shared_interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO from './persistence/db_credentials';
 import CardCollection from './cards/collection/card_collection';
 import Card from './cards/card';
+import config from 'config';
 
 export default function restAPI(app: Express) {
-    app.get('/cardimages/*', (req, res) => {
-        const file = req.path.replace('/cardimages/', '');
-        fetch(`https://thomsen.in/outercolonies/${file}`).then(actual => actual.body.pipe(res));
+    app.get('/assets/*', (req, res) => {
+        const file = req.path.replace('/assets/', '');
+        fetch(`${config.get('url.assets')}/${file}`).then(actual => actual.body.pipe(res));
     });
 
     app.post('/api/auth/register', (req, res) => {

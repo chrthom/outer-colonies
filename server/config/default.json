@@ -2,5 +2,8 @@
     "stage": "development",
     "server": {
         "port": 3000
+    },
+    "url": {
+        "assets": "https://assets.outercolonies.thomsen.in"
     }
 }
