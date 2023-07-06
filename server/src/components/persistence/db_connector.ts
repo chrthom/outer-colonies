@@ -13,15 +13,20 @@ export default class DBConnection {
             connectionLimit: 20
        });
     }
-    async query<T>(query: string): Promise<T> {
+    async query<T>(query: string, noRetry?: boolean): Promise<T> {
         let conn: mariadb.PoolConnection;
         try {
           conn = await this.pool.getConnection();
           return conn.query(query);
         } catch (err) {
-          if (err.code == 'ER_GET_CONNECTION_TIMEOUT' || err.code == 'ER_SOCKET_UNEXPECTED_CLOSE')
+          console.log(`WARN: DB error ${err.code}`);
+          if (err.code == 'ER_GET_CONNECTION_TIMEOUT' || err.code == 'ER_SOCKET_UNEXPECTED_CLOSE') {
             return this.query<T>(query);
-          else throw err;
+          } else if (!noRetry) {
+            return this.query(query, true);
+          } else {
+            throw err;
+          }
         } finally {
           if (conn) conn.end();
         }
