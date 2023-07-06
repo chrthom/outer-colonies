@@ -6,6 +6,7 @@ import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
 import { Observable } from 'rxjs';
 import { DeckPage } from './pages/deck/deck.component';
+import { ImprintComponent as ImprintPage } from './pages/imprint/imprint.page';
 
 const canActivateFn: CanActivateFn =
   (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> => inject(AuthGuard).canActivate(next, state);
@@ -20,6 +21,9 @@ const routes: Routes = [
     path: 'deck',
     canActivate: [canActivateFn],
     component: DeckPage
+  }, {
+    path: 'imprint',
+    component: ImprintPage
   }, {
     path: '',
     canActivate: [canActivateFn],

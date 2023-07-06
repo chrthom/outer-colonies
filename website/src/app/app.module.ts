@@ -19,7 +19,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.component';
-import { FooterComponent } from './components/footer/footer.component';
+import { ImprintComponent } from './pages/imprint/imprint.page';
+import { DataPrivacyComponent } from './pages/data-privacy/data-privacy.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { FooterComponent } from './components/footer/footer.component';
     RegisterPage,
     NavbarComponent,
     DeckPage,
-    FooterComponent
+    ImprintComponent,
+    DataPrivacyComponent
   ],
   imports: [
     BrowserModule,
