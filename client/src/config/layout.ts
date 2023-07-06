@@ -193,6 +193,10 @@ class Layout {
         y: 165,
         fontSize: 22
     };
+    readonly version = {
+        x: 2360,
+        y: 1340
+    };
 }
 
 export const layout = new Layout();

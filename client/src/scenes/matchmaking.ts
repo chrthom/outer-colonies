@@ -2,6 +2,7 @@ import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
 import { MsgTypeInbound, MsgTypeOutbound } from '../../../server/src/components/config/enums';
+import VersonIndicator from '../components/indicators/version_indicator';
 
 export default class Matchmaking extends Phaser.Scene {
     sessionToken: string;
@@ -22,6 +23,7 @@ export default class Matchmaking extends Phaser.Scene {
     create() {
         this.sessionToken = window.location.search.substring(1);
         this.status = new LoadingStatus(this);
+        new VersonIndicator(this);
         this.socket = io('https://api.outercolonies.thomsen.in');
         this.socket.on(MsgTypeOutbound.Connect, () => {
             this.status.setText('Authentifiziere Nutzer...')

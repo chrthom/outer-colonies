@@ -16,8 +16,10 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
+import { MatBadgeModule } from '@angular/material/badge';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import { DeckPage } from './pages/deck/deck.component';
     ContentBoxComponent,
     RegisterPage,
     NavbarComponent,
-    DeckPage
+    DeckPage,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
@@ -41,7 +44,8 @@ import { DeckPage } from './pages/deck/deck.component';
     MatSelectModule,
     MatSlideToggleModule,
     MatIconModule,
-    MatCardModule
+    MatCardModule,
+    MatBadgeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
