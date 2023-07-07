@@ -12,11 +12,11 @@ export default class Auth {
         return await DBCredentialsDAO.getByEmail(email) != null;
     }
     static async register(registrationData: AuthRegisterRequest): Promise<boolean> {
-        await DBConnection.getInstance().query('INSERT INTO credentials (username, password, email) VALUES '
+        await DBConnection.instance.query('INSERT INTO credentials (username, password, email) VALUES '
             + `('${registrationData.username}', '${registrationData.password}', '${registrationData.email}')`);
         const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
         CardCollection.starterDecks[registrationData.startDeck].map(c => c.id).forEach(id => 
-            DBConnection.getInstance().query(`INSERT INTO decks (card_id, user_id, in_use) VALUES (${id}, ${credential.userId}, 1)`));
+            DBConnection.instance.query(`INSERT INTO decks (card_id, user_id, in_use) VALUES (${id}, ${credential.userId}, 1)`));
         return true;
     }
     static async login(loginData: AuthLoginRequest): Promise<string | null> {
@@ -24,7 +24,7 @@ export default class Auth {
         if (!credential) credential = await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
         if (credential) {
             const sessionToken = uuidv4();
-            await DBConnection.getInstance().query(
+            await DBConnection.instance.query(
                 'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, '
                 + `session_token = '${sessionToken}' WHERE user_id = ${credential.userId}`);
             return sessionToken;

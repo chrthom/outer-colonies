@@ -1,7 +1,7 @@
 import mariadb from 'mariadb';
 
 export default class DBConnection {
-    private static instance: DBConnection; 
+    private static con: DBConnection; 
     pool!: mariadb.Pool;
     private constructor() {
         this.pool = mariadb.createPool({
@@ -11,7 +11,7 @@ export default class DBConnection {
             user:'outercolonies',
             password: '}MrM<wiT,w?Eh&CS)27,',
             connectionLimit: 20
-       });
+        });
     }
     async query<T>(query: string, noRetry?: boolean): Promise<T> {
         let conn: mariadb.PoolConnection;
@@ -20,7 +20,7 @@ export default class DBConnection {
           return conn.query(query);
         } catch (err) {
           console.log(`WARN: DB error ${err.code}`);
-          if (err.code == 'ER_GET_CONNECTION_TIMEOUT' || err.code == 'ER_SOCKET_UNEXPECTED_CLOSE') {
+          if (err.code == 'ER_GET_CONNECTION_TIMEOUT') {
             return this.query<T>(query);
           } else if (!noRetry) {
             return this.query(query, true);
@@ -31,8 +31,8 @@ export default class DBConnection {
           if (conn) conn.end();
         }
     }
-    static getInstance(): DBConnection {
-        if (!DBConnection.instance) DBConnection.instance = new DBConnection();
-        return DBConnection.instance;
+    static get instance(): DBConnection {
+        if (!DBConnection.con) DBConnection.con = new DBConnection();
+        return DBConnection.con;
     }
 }

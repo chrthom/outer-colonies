@@ -11,11 +11,11 @@ export default class DBDecksDAO {
         return this.getBy(`user_id = '${userId}'`);
     }
     static async setInUse(cardInstanceId: number, inUse: boolean) {
-        await DBConnection.getInstance().query(
+        await DBConnection.instance.query(
             `UPDATE decks SET in_use = ${inUse ? 1 : 0} WHERE card_instance_id = ${cardInstanceId}`);
     }
     private static async getBy(whereClause: string): Promise<DBDeck[]> {
-        const queryResult: any[] = await DBConnection.getInstance().query(
+        const queryResult: any[] = await DBConnection.instance.query(
             `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`);
         return queryResult.map(r => {
             return {
