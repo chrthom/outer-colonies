@@ -163,7 +163,8 @@ export default class CardCollection {
         Array(4).fill(this.cards[237]), // Fokus-Laser
         Array(4).fill(this.cards[157]), // Plasmawerfer
         Array(2).fill(this.cards[151]), // Kinetikwaffenbatterie
-        Array(4).fill(this.cards[170]), // Strahlenschilde
+        Array(2).fill(this.cards[170]), // Strahlenschilde
+        Array(2).fill(this.cards[447]), // Schildgondel
         Array(4).fill(this.cards[184]), // Rumpferweiterung
         // Infrastructure (13)
         Array(3).fill(this.cards[185]), // Kraftwerk
