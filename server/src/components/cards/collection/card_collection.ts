@@ -148,77 +148,99 @@ export default class CardCollection {
 
     static allCards = Object.values(this.cards);
 
-    static starterDeckSettlers: Card[] = [
+    static starterDeckSettlers: Card[] = [ // 70 cards
         // Hull (18)
         Array(6).fill(this.cards[186]), // Korvette
         Array(4).fill(this.cards[160]), // Leichter Frachter
-        Array(3).fill(this.cards[177]), // Zerstörer
-        Array(3).fill(this.cards[178]), // Zerstörer
+        Array(2).fill(this.cards[133]), // Kreuzer
+        Array(2).fill(this.cards[116]), // Kreuzer
+        Array(2).fill(this.cards[134]), // Kreuzer
         Array(2).fill(this.cards[446]), // Außenposten
-        // Equipment (29 - 17/23 Theta, 2/3 Xi, 2/3 Phi)
-        Array(2).fill(this.cards[340]), // Abfangraketenwerfer
-        Array(2).fill(this.cards[347]), // Impulslaser
-        Array(6).fill(this.cards[441]), // Flechettewerfer
-        Array(4).fill(this.cards[234]), // Punktabwehrlaser
-        Array(7).fill(this.cards[237]), // Fokus-Laser
+        // Equipment (27 - 19/24 Theta, 2/4 Xi)
+        Array(2).fill(this.cards[421]), // Salvenlaser
+        Array(4).fill(this.cards[441]), // Flechettewerfer
+        Array(3).fill(this.cards[234]), // Punktabwehrlaser
+        Array(4).fill(this.cards[237]), // Fokus-Laser
+        Array(4).fill(this.cards[157]), // Plasmawerfer
+        Array(2).fill(this.cards[151]), // Kinetikwaffenbatterie
         Array(4).fill(this.cards[170]), // Strahlenschilde
         Array(4).fill(this.cards[184]), // Rumpferweiterung
-        // Infrastructure (8)
+        // Infrastructure (13)
         Array(3).fill(this.cards[185]), // Kraftwerk
         Array(3).fill(this.cards[183]), // Industriekomplex
+        Array(2).fill(this.cards[187]), // Atomreaktor
+        Array(2).fill(this.cards[188]), // Solarpanele
         Array(2).fill(this.cards[172]), // Ressourcensilo
-        // Tactic (7)
+        Array(1).fill(this.cards[164]), // Rüstungsschmiede
+        // Tactic (12)
         Array(4).fill(this.cards[232]), // Warenlieferung
-        Array(3).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[165]), // Konvoi
+        Array(2).fill(this.cards[427]), // Immigranten von der Erde
+        Array(2).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[174]), // Feldreperaturen
         // TEST CARDS
     ].flat();
     
-    static starterDeckTraders: Card[] = [
+    static starterDeckTraders: Card[] = [ // 70 cards
         // Hull (18)
         Array(6).fill(this.cards[243]), // Korvette
         Array(4).fill(this.cards[348]), // Kanonenboot
         Array(3).fill(this.cards[221]), // Schwerer Frachter
         Array(3).fill(this.cards[327]), // Schwerer Frachter
         Array(2).fill(this.cards[446]), // Außenposten
-        // Equipment (28 - 16/19 Theta, 4/4 Xi)
+        // Equipment (27 - 16/19 Theta, 4/4 Xi)
         Array(4).fill(this.cards[180]), // Railgun
-        Array(5).fill(this.cards[237]), // Mini-Railgun
+        Array(4).fill(this.cards[224]), // Bergbaulaser
+        Array(4).fill(this.cards[237]), // Mini-Railgun
         Array(3).fill(this.cards[339]), // Gatling
-        Array(8).fill(this.cards[166]), // Laserkanone
+        Array(3).fill(this.cards[166]), // Laserkanone
+        Array(2).fill(this.cards[166]), // Laserphalanx
         Array(5).fill(this.cards[240]), // Ceramo-Stahl
-        Array(3).fill(this.cards[171]), // Titanplattenpanzer
-        // Infrastructure (3)
-        Array(3).fill(this.cards[172]), // Ressourcensilo
-        // Tactic (14)
-        Array(7).fill(this.cards[337]), // Militärpioniere
-        Array(4).fill(this.cards[165]), // Konvoi
-        Array(3).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[171]), // Titanplattenpanzer
+        // Infrastructure (15)
+        Array(1).fill(this.cards[242]), // Kraftwerk
+        Array(1).fill(this.cards[183]), // Industriekomplex
+        Array(5).fill(this.cards[244]), // Atomreaktor
+        Array(2).fill(this.cards[245]), // Solarpanele
+        Array(2).fill(this.cards[172]), // Ressourcensilo
+        Array(1).fill(this.cards[135]), // Werft
+        Array(3).fill(this.cards[164]), // Rüstungsschmiede
+        // Tactic (10)
+        Array(2).fill(this.cards[232]), // Warenlieferung
+        Array(2).fill(this.cards[165]), // Konvoi
+        Array(2).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[174]), // Feldreperaturen
+        Array(2).fill(this.cards[141]), // Externe Arbeitskräfte
         // TEST CARDS
     ].flat();
     
-    static starterDeckExpedition: Card[] = [
+    static starterDeckExpedition: Card[] = [ // 70 cards
         // Hull (18)
         Array(6).fill(this.cards[351]), // Korvette
-        Array(4).fill(this.cards[439]), // Mittelschwerer Frachter
+        Array(4).fill(this.cards[342]), // Torpedoboot
         Array(3).fill(this.cards[444]), // Zerstörer
         Array(3).fill(this.cards[445]), // Zerstörer
         Array(2).fill(this.cards[446]), // Außenposten
-        // Equipment (24 - 16/23 Theta, 2/3 Xi, 2/3 Phi)
+        // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
         Array(2).fill(this.cards[340]), // Abfangraketenwerfer
+        Array(3).fill(this.cards[136]), // Plasmatorpedos
         Array(2).fill(this.cards[182]), // Dual-Lasergeschütz
-        Array(6).fill(this.cards[440]), // Impulskanone
+        Array(5).fill(this.cards[440]), // Impulskanone
         Array(4).fill(this.cards[168]), // Automatikkanone
-        Array(4).fill(this.cards[179]), // Pulskanone
-        Array(2).fill(this.cards[343]), // Laserphalanx
+        Array(5).fill(this.cards[179]), // Pulskanone
         Array(4).fill(this.cards[163]), // Verbundpanzerung
-        // Infrastructure (10)
-        Array(6).fill(this.cards[187]), // Atomreaktor
-        Array(1).fill(this.cards[453]), // Kraftwerk
-        Array(3).fill(this.cards[164]), // Rüstungsschmiede
-        // Tactic (8)
-        Array(2).fill(this.cards[337]), // Militärpioniere
-        Array(3).fill(this.cards[338]), // Nachschub
-        Array(3).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[170]), // Strahlenschilde
+        // Infrastructure (11)
+        Array(2).fill(this.cards[350]), // Kraftwerk
+        Array(2).fill(this.cards[183]), // Industriekomplex
+        Array(3).fill(this.cards[352]), // Atomreaktor
+        Array(2).fill(this.cards[353]), // Solarpanele
+        Array(2).fill(this.cards[172]), // Ressourcensilo
+        // Tactic (14)
+        Array(6).fill(this.cards[337]), // Militärpioniere
+        Array(4).fill(this.cards[338]), // Nachschub
+        Array(2).fill(this.cards[321]), // Recycling
+        Array(2).fill(this.cards[174]), // Feldreperaturen
         // TEST CARDS
     ].flat();
 
