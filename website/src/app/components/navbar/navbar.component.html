@@ -2,7 +2,6 @@
     <div class="navbar-element" routerLink="/">
         <div class="navbar-left" [class.active]="active == 'home'"></div>
         <div class="navbar-center" [class.active]="active == 'home'">
-            <mat-icon>explore</mat-icon>
             <h1>Spielen</h1>
         </div>
         <div class="navbar-right" [class.active]="active == 'home'"></div>
@@ -10,7 +9,6 @@
     <div class="navbar-element" routerLink="/deck">
         <div class="navbar-left" [class.active]="active == 'deck'"></div>
         <div class="navbar-center" [class.active]="active == 'deck'">
-            <mat-icon>group_work</mat-icon>
             <h1>Deck</h1>
         </div>
         <div class="navbar-right" [class.active]="active == 'deck'"></div>
@@ -18,7 +16,6 @@
     <div class="navbar-element" (click)="logout()">
         <div class="navbar-left"></div>
         <div class="navbar-center">
-            <mat-icon>highlight_off</mat-icon>
             <h1>Abmelden</h1>
         </div>
         <div class="navbar-right"></div>
