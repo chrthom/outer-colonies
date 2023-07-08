@@ -47,7 +47,9 @@ export default class CardStack {
         }
     }
     canAttack(player: Player) {
-        return this.attackAvailable && this.card.isInRange(player.match.battle.range);
+        return this.attackAvailable 
+            && this.card.isInRange(player.match.battle.range)
+            && this.getRootCardStack().isFlightReady();
     }
     canBeAttachedTo(cardStack: CardStack): boolean {
         return this.zone == Zone.Hand && this.getValidTargets().map(cs => cs.uuid).includes(cardStack.uuid);
