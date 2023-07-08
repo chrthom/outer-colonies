@@ -191,7 +191,8 @@ class Layout {
         },
         x: 1875,
         y: 165,
-        fontSize: 22
+        fontSize: 22,
+        fontSizeBig: 30
     };
     readonly version = {
         x: 2360,

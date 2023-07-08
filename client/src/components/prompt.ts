@@ -13,15 +13,13 @@ export default class Prompt {
         this.image = this.scene.add
             .image(layout.prompt.box.x, layout.prompt.box.y, 'prompt_box')
             .setOrigin(0, 0)
-            .setScale(0.8)
-            .setVisible(true);
+            .setScale(0.8);
         this.text = scene.add.text(layout.prompt.x, layout.prompt.y, 'Lädt...')
             .setFontSize(layout.prompt.fontSize)
             .setFontFamily(layout.font.textFamily)
             .setColor(layout.font.color)
             .setAlign('left')
             .setOrigin(0, 0);
-        this.setVisible(false);
     }
     update() {
         if (this.scene.state.gameResult) {
@@ -80,6 +78,7 @@ export default class Prompt {
     }
     private showGameOver(gameResult: ClientGameResult) {
         this.show(`GAME OVER\nDu hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
+        this.text.setFontSize(layout.prompt.fontSizeBig);
     }
     private show(text: string) {
         this.text.setText(text);

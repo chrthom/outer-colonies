@@ -57,11 +57,9 @@ export default class Button {
                 })
                 .on('pointerover', () => {
                     self.text.setColor(layout.font.colorHover);
-                    self.prompt.setVisible(true);
                 })
                 .on('pointerout', () => {
                     self.text.setColor(layout.font.color);
-                    self.prompt.setVisible(false);
                 })
             );
         this.waitState();
@@ -89,6 +87,12 @@ export default class Button {
         } else {
             this.waitState();
         }
+    }
+    showPrompt() {
+        this.prompt.setVisible(true);
+    }
+    hidePrompt() {
+        this.prompt.setVisible(false);
     }
     private createButtonImage(name: string) {
         return this.scene.add
