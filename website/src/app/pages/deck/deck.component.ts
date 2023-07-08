@@ -38,11 +38,11 @@ export class DeckPage implements OnInit {
         .deactivateCard(card.id)
         .subscribe(_ => this.reload());
   }
-  toAssetUrl(cardId: number): string {
-    return `${this.assetsUrl}/${cardId}.png`;
+  toCardUrl(cardId: number): string {
+    return `${this.cardsUrl}/${cardId}.png`;
   }
-  get assetsUrl(): string {
-    return environment.url.assets;
+  get cardsUrl(): string {
+    return `${environment.url.assets}/cards`;
   }
   private cardSortFn(a: DeckCard, b:DeckCard): number {
     if (a.type > b.type) return -1;
