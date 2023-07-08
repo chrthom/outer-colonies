@@ -55,7 +55,7 @@ export class Card125 extends EquipmentCard {
             true,
             {
                 range: 1,
-                damage: 8,
+                damage: 14,
                 pointDefense: 0,
                 shield: -6,
                 armour: -1
@@ -87,7 +87,7 @@ export class Card157 extends EquipmentCard {
             true,
             {
                 range: 1,
-                damage: 13,
+                damage: 8,
                 pointDefense: 0,
                 shield: -6,
                 armour: -1
