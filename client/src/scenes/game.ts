@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io-client';
-import Button from '../components/button';
+import ContinueButton from '../components/buttons/continue_button';
 import { ClientHandCard, ClientState } from '../../../server/src/components/shared_interfaces/client_state';
 import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../../../server/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
@@ -17,6 +17,7 @@ import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 import CardImage from '../components/card/card_image';
 import { layout } from '../config/layout';
+import ExitButton from '../components/buttons/exit_button';
 
 interface InitData {
     socket: Socket;
@@ -26,10 +27,11 @@ interface InitData {
 class StaticObjects {
     actionPool?: ActionPool;
     background?: Background;
-    button?: Button;
+    continueButton?: ContinueButton;
     combatRangeIndicator?: CombatRangeIndicator;
     deck?: DeckCard;
     discardPile?: DiscardPile;
+    exitButton?: ExitButton;
     maxCard?: MaxCard;
     missionCards?: MissionCards;
 }
@@ -78,7 +80,7 @@ export default class Game extends Phaser.Scene {
         [ 
             'equipment', 'hull', 'infrastructure', 'tactic', 'equipment_hull_infrastructure',
             'armour_1', 'armour_2', 'armour_3', 'shield_1', 'shield_2', 'point_defense_1', 'point_defense_2',
-            'retract_card'
+            'retract_card', 'exit'
         ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
         this.load.image('card_mask', 'utils/card_mask.png');
         this.load.image('card_glow', 'utils/card_glow.png');
@@ -101,9 +103,10 @@ export default class Game extends Phaser.Scene {
         this.obj.background.initInterface();
         this.obj.actionPool = new ActionPool(this);
         this.obj.combatRangeIndicator = new CombatRangeIndicator(this);
-        this.obj.button = new Button(this);
+        this.obj.continueButton = new ContinueButton(this);
         this.obj.deck = new DeckCard(this);
         this.obj.discardPile = new DiscardPile(this)
+        this.obj.exitButton = new ExitButton(this);
         this.obj.maxCard = new MaxCard(this);
         this.obj.missionCards = new MissionCards(this);
     }
@@ -146,7 +149,7 @@ export default class Game extends Phaser.Scene {
 
     updateView() {
         this.obj.actionPool.update();
-        this.obj.button.update();
+        this.obj.continueButton.update();
         this.obj.combatRangeIndicator.update();
         this.obj.deck.update();
         this.obj.discardPile.update();

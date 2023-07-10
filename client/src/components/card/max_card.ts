@@ -9,11 +9,11 @@ export default class MaxCard extends CardImage {
     }
     hide() {
         this.image.setVisible(false);
-        this.scene.obj.button.showPrompt();
+        this.scene.obj.continueButton.showPrompt();
     }
     show(cardId: number) {
         this.image.setTexture(`card_${cardId}`);
         this.image.setVisible(true);
-        this.scene.obj.button.hidePrompt();
+        this.scene.obj.continueButton.hidePrompt();
     }
 }

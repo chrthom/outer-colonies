@@ -14,6 +14,7 @@ class Layout {
         textFamily: 'latin-modern-sans',
         color: '#ffffff',
         colorHover: '#eeeeaa',
+        colorWarn: '#991111',
         size: 28
     };
 
@@ -83,6 +84,13 @@ class Layout {
         x: 2190,
         y: 1070,
         yOpponent: -400
+    };
+    readonly exitButton = {
+        x: 2350,
+        y: 450,
+        xTextOffset: -30,
+        yTextOffset: -4,
+        fontSize: 30
     };
     readonly loadingAnimation = {
         x: 1200,

@@ -1,9 +1,9 @@
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../server/src/components/config/enums";
-import { ClientPlannedBattle } from "../../../server/src/components/shared_interfaces/client_planned_battle";
-import { ClientGameResult } from "../../../server/src/components/shared_interfaces/client_state";
-import { layout } from "../config/layout";
-import Game from "../scenes/game";
-import Prompt from "./prompt";
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../../server/src/components/config/enums";
+import { ClientPlannedBattle } from "../../../../server/src/components/shared_interfaces/client_planned_battle";
+import { ClientGameResult } from "../../../../server/src/components/shared_interfaces/client_state";
+import { layout } from "../../config/layout";
+import Game from "../../scenes/game";
+import Prompt from "../prompt";
 
 interface ButtonImages {
     active_build: Phaser.GameObjects.Image;
@@ -17,10 +17,10 @@ interface ButtonImages {
     lost: Phaser.GameObjects.Image;
 }
 
-export default class Button {
-    text: Phaser.GameObjects.Text;
+export default class ContinueButton {
     private scene!: Game;
     private buttonImages!: ButtonImages;
+    private text: Phaser.GameObjects.Text;
     private prompt!: Prompt;
     private onClickAction: () => void = () => {};
     constructor(scene: Game) {
@@ -41,7 +41,7 @@ export default class Button {
         this.text = scene.add.text(
                 layout.continueButton.x + layout.continueButton.xTextOffset,
                 layout.continueButton.y,
-                ['']
+                [ '' ]
             )
             .setFontSize(layout.continueButton.fontSize)
             .setFontFamily(layout.font.captionFamily)
