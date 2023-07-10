@@ -153,6 +153,7 @@ export default class Game extends Phaser.Scene {
         this.obj.combatRangeIndicator.update();
         this.obj.deck.update();
         this.obj.discardPile.update();
+        this.obj.exitButton.update();
         this.obj.missionCards.update();
         this.updateHighlighting();
     }
