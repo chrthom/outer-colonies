@@ -3,6 +3,7 @@ import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
 import { MsgTypeInbound, MsgTypeOutbound } from '../../../server/src/components/config/enums';
 import VersonIndicator from '../components/indicators/version_indicator';
+import { environment } from '../config/environment';
 
 export default class Matchmaking extends Phaser.Scene {
     sessionToken: string;
@@ -16,7 +17,7 @@ export default class Matchmaking extends Phaser.Scene {
     }
 
     preload() {
-        this.load.baseURL = 'https://api.outercolonies.thomsen.in/assets/';
+        this.load.baseURL = `${environment.urls.api}/assets/`;
         this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     }
 
@@ -24,7 +25,7 @@ export default class Matchmaking extends Phaser.Scene {
         this.sessionToken = window.location.search.substring(1);
         this.status = new LoadingStatus(this);
         new VersonIndicator(this);
-        this.socket = io('https://api.outercolonies.thomsen.in');
+        this.socket = io(environment.urls.api);
         //this.socket = io('http://localhost:3000');
         this.socket.on(MsgTypeOutbound.Connect, () => {
             this.status.setText('Authentifiziere Nutzer...')

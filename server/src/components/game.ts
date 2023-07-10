@@ -56,6 +56,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
             }
         }
     });
+    socket.on(MsgTypeInbound.Disconnect, () => {
+        if (socket.data.match) {
+            const match = <Match> socket.data.match;
+            if (!match.gameResult.gameOver) {
+                const player = getPlayer(socket);
+                console.log(`Player ${player.name} disconnected from active game`);
+                match.gameResult.setWinnerBySurrender(player);
+                emitState(io, match);
+            }
+        }
+    });
     socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
         const match = <Match> socket.data.match;
         const player = getPlayer(socket);

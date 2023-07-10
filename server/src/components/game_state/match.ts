@@ -102,4 +102,8 @@ export class GameResult {
         this.gameOver = true;
         this.winnerNo = opponentPlayerNo(depletedPlayer.no);
     }
+    setWinnerBySurrender(surrenderingPlayer: Player) {
+        this.gameOver = true;
+        this.winnerNo = opponentPlayerNo(surrenderingPlayer.no);
+    }
 }

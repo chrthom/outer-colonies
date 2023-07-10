@@ -18,6 +18,7 @@ import CombatRangeIndicator from '../components/indicators/combat_range_indicato
 import CardImage from '../components/card/card_image';
 import { layout } from '../config/layout';
 import ExitButton from '../components/buttons/exit_button';
+import { environment } from '../config/environment';
 
 interface InitData {
     socket: Socket;
@@ -75,7 +76,7 @@ export default class Game extends Phaser.Scene {
 
     preload () {
         this.preloader = new Preloader(this);
-        this.load.baseURL = 'https://api.outercolonies.thomsen.in/assets/';
+        this.load.baseURL = `${environment.urls.api}/assets/`;
         [ 0, 1 ].concat(this.gameParams.preloadCardIds).forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
         [ 
             'equipment', 'hull', 'infrastructure', 'tactic', 'equipment_hull_infrastructure',
