@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.7
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Erstellungszeit: 25. Jun 2023 um 12:21
--- Server-Version: 10.3.32-MariaDB
--- PHP-Version: 7.4.30
+-- Erstellungszeit: 10. Jul 2023 um 15:59
+-- Server-Version: 10.3.37-MariaDB
+-- PHP-Version: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -28,13 +27,16 @@ SET time_zone = "+00:00";
 -- Tabellenstruktur für Tabelle `credentials`
 --
 
-DROP TABLE IF EXISTS `credentials`;
 CREATE TABLE `credentials` (
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `username` varchar(20) NOT NULL,
   `password` varchar(40) NOT NULL,
-  `email` varchar(60) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `email` varchar(60) NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `last_login` datetime DEFAULT NULL,
+  `session_token` varchar(50) DEFAULT NULL,
+  `session_valid_until` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -42,14 +44,13 @@ CREATE TABLE `credentials` (
 -- Tabellenstruktur für Tabelle `decks`
 --
 
-DROP TABLE IF EXISTS `decks`;
 CREATE TABLE `decks` (
   `card_instance_id` bigint(20) UNSIGNED NOT NULL,
   `card_id` smallint(7) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `in_use` tinyint(1) NOT NULL DEFAULT 0,
   `tradeable` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Indizes der exportierten Tabellen
@@ -62,7 +63,8 @@ ALTER TABLE `credentials`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `user_id` (`user_id`),
   ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `session_token` (`session_token`);
 
 --
 -- Indizes für die Tabelle `decks`
