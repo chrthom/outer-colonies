@@ -8,7 +8,7 @@ export default class VersonIndicator {
         this.text = scene.add.text(
             layout.version.x,
             layout.version.y,
-            'Outer Colonies v1.0 - Mimas'
+            'Outer Colonies v1.1 - Enceladus'
         )
             .setFontSize(layout.font.size)
             .setFontFamily(layout.font.textFamily)
