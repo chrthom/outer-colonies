@@ -34,6 +34,7 @@ export default class CardStack {
         if (removedCardIds.length) this.scene.retractCardsExists = true;
         this.filterCardsByIdList(removedCardIds).forEach(c => c.discard(this.data.ownedByPlayer, true));
         this.data.cards = data.cards;
+        this.data.criticalDamage = data.criticalDamage;
         this.data.damage = data.damage;
         this.data.defenseIcons = data.defenseIcons;
         this.createCards();
