@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'oc-root',
@@ -8,6 +9,10 @@ import { Component } from '@angular/core';
 export class AppComponent {
   bgNo: number;
   constructor() {
+    if (environment.https && window.location.protocol != "https:") {
+      window.location.protocol = "https:";
+      window.location.reload();
+    }
     this.bgNo = Math.floor(Math.random() * 7);
   }
 }
