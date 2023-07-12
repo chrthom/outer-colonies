@@ -18,7 +18,7 @@ import CombatRangeIndicator from '../components/indicators/combat_range_indicato
 import CardImage from '../components/card/card_image';
 import { layout } from '../config/layout';
 import ExitButton from '../components/buttons/exit_button';
-import { environment } from '../config/environment';
+import { environment } from '../../environments/environment';
 
 interface InitData {
     socket: Socket;

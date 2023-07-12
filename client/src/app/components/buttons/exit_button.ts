@@ -1,6 +1,6 @@
-import { environment } from "../../config/environment";
-import { layout } from "../../config/layout";
-import Game from "../../scenes/game";
+import { environment } from '../../../environments/environment';
+import { layout } from '../../config/layout';
+import Game from '../../scenes/game';
 
 export default class ExitButton {
     private scene!: Game;
