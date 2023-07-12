@@ -1,9 +1,10 @@
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../../server/src/components/config/enums";
-import { ClientPlannedBattle } from "../../../../server/src/components/shared_interfaces/client_planned_battle";
-import { ClientGameResult } from "../../../../server/src/components/shared_interfaces/client_state";
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from "../../../../../server/src/components/config/enums";
+import { ClientPlannedBattle } from "../../../../../server/src/components/shared_interfaces/client_planned_battle";
+import { ClientGameResult } from "../../../../../server/src/components/shared_interfaces/client_state";
 import { layout } from "../../config/layout";
 import Game from "../../scenes/game";
 import Prompt from "./prompt";
+import Phaser from 'phaser';
 
 interface ButtonImages {
     active_build: Phaser.GameObjects.Image;
@@ -111,9 +112,9 @@ export default class ContinueButton {
     }
     private showIntervene() {
         let text: string; 
-        if (this.scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
+        if (this.scene.state.battle?.type == BattleType.Raid) text = 'Verteidigung beginnen';
         else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
-        else text = 'Überspringen';
+        else text = 'Überspringen'
         this.show(text, 'inactive_select', () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds));
     }
     private showNextCombatPhase() {

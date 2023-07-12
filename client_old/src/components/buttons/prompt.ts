@@ -1,8 +1,8 @@
-import { BattleType, TurnPhase } from "../../../server/src/components/config/enums";
-import { ClientPlannedBattle } from "../../../server/src/components/shared_interfaces/client_planned_battle";
-import { ClientGameResult } from "../../../server/src/components/shared_interfaces/client_state";
-import { layout } from "../config/layout";
-import Game from "../scenes/game";
+import { BattleType, TurnPhase } from "../../../../server/src/components/config/enums";
+import { ClientPlannedBattle } from "../../../../server/src/components/shared_interfaces/client_planned_battle";
+import { ClientGameResult } from "../../../../server/src/components/shared_interfaces/client_state";
+import { layout } from "../../config/layout";
+import Game from "../../scenes/game";
 
 export default class Prompt {
     private scene: Game;
