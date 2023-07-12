@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import Phaser from 'phaser';
 import MatchmakingScene from './scenes/matchmaking';
+import GameScene from './scenes/game';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
   constructor() {
     this.config = {
       type: Phaser.AUTO,
-      scene: [ MatchmakingScene ],
+      scene: [ MatchmakingScene, GameScene ],
       scale: {
           mode: Phaser.Scale.FIT,
           parent: 'game',
