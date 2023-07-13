@@ -4,9 +4,13 @@
   "description": "Outer Colonies Website",
   "scripts": {
     "ng": "ng",
-    "start_local": "ng serve --configuration development",
-    "start_remote": "ng serve --configuration staging",
-    "build_test": "ng build --configuration staging",
+    "s": "npm run start",
+    "start": "ng serve --configuration development",
+    "ss": "npm run start_staging",
+    "start_staging": "ng serve --configuration staging",
+    "bs": "npm run build_staging",
+    "build_staging": "ng build --configuration staging",
+    "bp": "npm run build_prod",
     "build_prod": "ng build --configuration production",
     "test": "ng test"
   },
