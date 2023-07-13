@@ -1,16 +1,17 @@
 import mariadb from 'mariadb';
+import config from 'config';
 
 export default class DBConnection {
     private static con: DBConnection; 
     pool!: mariadb.Pool;
     private constructor() {
         this.pool = mariadb.createPool({
-            host: '192.168.0.2',
-            port: 3307,
-            database: 'outercolonies',
-            user:'outercolonies',
-            password: '}MrM<wiT,w?Eh&CS)27,',
-            connectionLimit: 20
+            host: config.get('database.host'),
+            port: config.get<number>('database.port'),
+            database: config.get('database.database'),
+            user: config.get('database.user'),
+            password: config.has('database.password') ? config.get('database.password') : <string> process.env.DB_PASSWORD,
+            connectionLimit: config.get<number>('database.connectionLimit'),
         });
     }
     async query<T>(query: string, noRetry?: boolean): Promise<T> {
