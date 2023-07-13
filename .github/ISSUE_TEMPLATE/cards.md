@@ -7,4 +7,12 @@ assignees: ''
 
 ---
 
+**Relevant card**
+ID (loser legt corner oft card) and card title
+Alternatively Screenshot oft card
 
+**Card issue**
+One oft these
+- Spelling (Something is spelled incorrectly vor grammar is wrong)
+- Unclear (Text is hard to und erstand)
+-
