@@ -1,3 +1,6 @@
 {
-    "stage": "production"
+    "stage": "production",
+    "url": {
+        "assets": "https://assets.outercolonies.thomsen.in"
+    }
 }

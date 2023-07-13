@@ -1,0 +1,6 @@
+{
+    "stage": "staging",
+    "url": {
+        "assets": "https://assets.staging.outercolonies.thomsen.in"
+    }
+}
