@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import Phaser from 'phaser';
 import MatchmakingScene from './scenes/matchmaking';
 import GameScene from './scenes/game';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class AppComponent implements OnInit {
   config: Phaser.Types.Core.GameConfig;
 
   constructor() {
+    console.log(`Outer Colonies client started on stage ${environment.name}`);
     this.config = {
       type: Phaser.AUTO,
       scene: [ MatchmakingScene, GameScene ],
