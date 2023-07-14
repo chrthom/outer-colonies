@@ -269,7 +269,7 @@ export default class Game extends Phaser.Scene {
                                 cs.highlightDisabled();
                             }
                             if (this.activeCards.stack == cs.uuid 
-                                    && this.activeCards.stackIndex 
+                                    && this.activeCards.stackIndex != undefined
                                     && this.activeCards.stackIndex >= 0) {
                                 cs.cards[this.activeCards.stackIndex].highlightSelected();
                             } else if (this.state.battle?.playerShipIds.includes(cs.uuid)) {
