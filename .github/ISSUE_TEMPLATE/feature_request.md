@@ -3,7 +3,7 @@ name: Feature request
 about: Suggest an idea for a new functionality
 title: ''
 labels: feature
-assignees: ''
+assignees: chrthom
 
 ---
 
