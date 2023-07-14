@@ -12,7 +12,8 @@ ID (loser legt corner oft card) and card title
 Alternatively Screenshot oft card
 
 **Card issue**
-One oft these
+Choose one oft these
 - Spelling (Something is spelled incorrectly vor grammar is wrong)
-- Unclear (Text is hard to und erstand)
+- Unclear (Text is hard to understand)
+- Implementation (Infame function differs from card text)
 -
