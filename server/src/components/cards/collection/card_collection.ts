@@ -18,6 +18,7 @@ import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util.cards';
+import { Card230, Card333, Card435 } from './infrastructure_start.cards';
 
 export default class CardCollection {
     static cards = {
@@ -86,6 +87,7 @@ export default class CardCollection {
         223: <Card> new Card223(),
         226: <Card> new Card226(),
         228: <Card> new Card228(),
+        230: <Card> new Card230(),
         232: <Card> new Card232(),
         234: <Card> new Card234(),
         237: <Card> new Card237(),
@@ -108,6 +110,7 @@ export default class CardCollection {
         327: <Card> new Card327(),
         328: <Card> new Card328(),
         329: <Card> new Card329(),
+        333: <Card> new Card333(),
         337: <Card> new Card337(),
         338: <Card> new Card338(),
         339: <Card> new Card339(),
@@ -131,6 +134,7 @@ export default class CardCollection {
         424: <Card> new Card424(),
         427: <Card> new Card427(),
         434: <Card> new Card434(),
+        435: <Card> new Card435(),
         436: <Card> new Card436(),
         439: <Card> new Card439(),
         440: <Card> new Card440(),
