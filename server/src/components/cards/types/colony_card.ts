@@ -10,12 +10,13 @@ export default class ColonyCard extends Card {
     constructor() {
         super(0, 'Colony', CardType.Colony, 0);
     }
-    getValidTargets(_: Player): CardStack[] {
+    getValidTargets(): CardStack[] {
         return [];
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
-    onStartTurn(_: Player) {}
+    onUtilizaton() {}
+    onRetraction() {}
+    onStartTurn() {}
+    onEndTurn() {}
     profile(): CardProfile {
         return {
             energy: 0,

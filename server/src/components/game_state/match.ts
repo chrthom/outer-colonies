@@ -81,7 +81,9 @@ export default class Match {
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.battle = new Battle(BattleType.None);
         this.getActivePlayer().moveFlightReadyShipsToOrbit();
+        // ISSUE #3: End of turn effect (just execute them once)
         if (this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() && !this.gameResult.gameOver) {
+            this.getActivePlayer().cardStacks.forEach(cs => cs.onEndTurn());
             this.prepareStartPhase();
         }
     }

@@ -24,7 +24,8 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     onRetraction(player: Player) {
         removeFromActionPool(player, this);
     }
-    onStartTurn(_: Player) {}
+    onStartTurn() {}
+    onEndTurn() {}
     actionPool(): ActionPool {
         return new ActionPool(new CardAction(...this.actionPoolCardTypes));
     }

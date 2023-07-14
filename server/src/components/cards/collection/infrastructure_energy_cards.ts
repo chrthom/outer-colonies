@@ -3,9 +3,10 @@ import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
 abstract class InfrastructureEnergyCard extends InfrastructureCard {
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
-    onStartTurn(_: Player) {}
+    onUtilizaton() {}
+    onRetraction() {}
+    onStartTurn() {}
+    onEndTurn() {}
 }
 
 abstract class CardPowerPlant extends InfrastructureEnergyCard {

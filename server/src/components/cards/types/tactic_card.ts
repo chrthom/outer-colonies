@@ -10,8 +10,9 @@ export default abstract class TacticCard extends Card {
         this.playableOutsideBuildPhase = playableOutsideBuildPhase;
         this.staysInPlay = staysInPlay;
     }
-    onRetraction(_: Player) {}
-    onStartTurn(_: Player) {}
+    onRetraction() {}
+    onStartTurn() {}
+    onEndTurn() {}
     canBeRetracted(): boolean {
         return false;
     }

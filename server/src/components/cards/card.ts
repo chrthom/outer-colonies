@@ -47,6 +47,7 @@ export default abstract class Card {
     abstract onUtilizaton(player: Player, target: CardStack): void
     abstract onRetraction(player: Player): void
     abstract onStartTurn(player: Player): void
+    abstract onEndTurn(player: Player, source: CardStack): void
     abstract profile(): CardProfile
     actionPool(): ActionPool {
         return new ActionPool();

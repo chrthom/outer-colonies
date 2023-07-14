@@ -116,6 +116,10 @@ export default class CardStack {
         this.card.onStartTurn(this.getPlayer());
         this.attachedCards.forEach(cs => cs.onStartTurn());
     }
+    onEndTurn() {
+        this.card.onEndTurn(this.getPlayer(), this);
+        this.attachedCards.forEach(cs => cs.onEndTurn());
+    }
     performImmediateEffect(target: CardStack) {
         this.card.onUtilizaton(this.getPlayer(), target);
     }

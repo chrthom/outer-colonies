@@ -2,9 +2,10 @@ import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
 abstract class InfrastructureUtilCard extends InfrastructureCard {
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
-    onStartTurn(_: Player) {}
+    onUtilizaton() {}
+    onRetraction() {}
+    onStartTurn() {}
+    onEndTurn() {}
 }
 
 export class Card172 extends InfrastructureUtilCard {

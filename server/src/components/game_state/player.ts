@@ -25,20 +25,7 @@ export default class Player {
         this.deck = deck;
         this.cardStacks = [ new RootCardStack(new ColonyCard(), Zone.Colony, this) ];
         this.resetRemainingActions();
-        //this.setDummyCardStacks(); // Just for testing
     }
-    /*
-    private setDummyCardStacks() {
-        const ship1 = new RootCardStack(CardCollection.card160, Zone.Oribital, this);
-        ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card166, ship1));
-        ship1.attachedCards.push(new AttachmentCardStack(CardCollection.card170, ship1));
-        ship1.damage = 2;
-        const ship2 = new RootCardStack(CardCollection.card348, Zone.Oribital, this);
-        ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card130, ship2));
-        ship2.attachedCards.push(new AttachmentCardStack(CardCollection.card163, ship2));
-        this.cardStacks.push(ship1, ship2);
-    }
-    */
     resetRemainingActions() {
         this.actionPool = this.getOriginalActions();
     }

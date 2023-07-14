@@ -8,7 +8,7 @@ import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_ca
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
 import { Card126, Card151, Card179, Card180, Card223, Card310, Card420 } from './equipment_weapon_kinetic_cards';
-import { Card109, Card161, Card434, Card449 } from './equipment_util_cards';
+import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
@@ -19,17 +19,20 @@ import { Card110 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
+import { Card114, Card155 } from './infrastructure_end.cards';
 
 export default class CardCollection {
     static cards = {
         0: <Card> new ColonyCard(),
         101: <Card> new Card101(),
         103: <Card> new Card103(),
+        104: <Card> new Card104(),
         105: <Card> new Card105(),
         106: <Card> new Card106(),
         107: <Card> new Card107(),
         109: <Card> new Card109(),
         110: <Card> new Card110(),
+        114: <Card> new Card114(),
         116: <Card> new Card116(),
         117: <Card> new Card117(),
         118: <Card> new Card118(),
@@ -54,6 +57,7 @@ export default class CardCollection {
         152: <Card> new Card152(),
         153: <Card> new Card153(),
         154: <Card> new Card154(),
+        155: <Card> new Card155(),
         157: <Card> new Card157(),
         160: <Card> new Card160(),
         161: <Card> new Card161(),
@@ -106,6 +110,7 @@ export default class CardCollection {
         314: <Card> new Card314(),
         315: <Card> new Card315(),
         321: <Card> new Card321(),
+        325: <Card> new Card325(),
         326: <Card> new Card326(),
         327: <Card> new Card327(),
         328: <Card> new Card328(),
@@ -237,17 +242,17 @@ export default class CardCollection {
         Array(5).fill(this.cards[179]), // Pulskanone
         Array(4).fill(this.cards[163]), // Verbundpanzerung
         Array(2).fill(this.cards[170]), // Strahlenschilde
-        // Infrastructure (12)
+        // Infrastructure (13)
         Array(2).fill(this.cards[350]), // Kraftwerk
         Array(2).fill(this.cards[183]), // Industriekomplex
         Array(3).fill(this.cards[352]), // Atomreaktor
         Array(2).fill(this.cards[353]), // Solarpanele
         Array(2).fill(this.cards[172]), // Ressourcensilo
         Array(1).fill(this.cards[333]), // Marsianisches Konsulat
-        // Tactic (13)
+        Array(1).fill(this.cards[155]), // Müllverarbeitungsanlage
+        // Tactic (12)
         Array(6).fill(this.cards[337]), // Militärpioniere
-        Array(3).fill(this.cards[338]), // Nachschub
-        Array(2).fill(this.cards[321]), // Recycling
+        Array(4).fill(this.cards[338]), // Nachschub
         Array(2).fill(this.cards[174]), // Feldreperaturen
         // TEST CARDS
     ].flat();

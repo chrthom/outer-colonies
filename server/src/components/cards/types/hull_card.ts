@@ -26,9 +26,10 @@ export default abstract class HullCard extends Card {
             cs.type() == CardType.Colony 
                 && this.hullProfile.energy >= 0);
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
-    onStartTurn(_: Player) {}
+    onUtilizaton() {}
+    onRetraction() {}
+    onStartTurn() {}
+    onEndTurn() {}
     canBeRetracted(isRootCard: boolean): boolean {
         return isRootCard;
     }
