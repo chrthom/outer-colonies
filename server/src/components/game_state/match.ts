@@ -57,8 +57,7 @@ export default class Match {
         this.getActivePlayer().resetRemainingActions();
         this.getActivePlayer().callBackShipsFromNeutralZone();
         this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
-        // ISSUE #32: Check for effects on drawing a cards (like drawing an extra card) and execute start of turn effects of cards
-        // + Wait for response to continue
+        this.getActivePlayer().cardStacks.forEach(cs => cs.onStartTurn());
         this.prepareBuildPhase();
     }
     prepareBuildPhase() {

@@ -112,6 +112,10 @@ export default class CardStack {
         this.card.onDestruction(this.getPlayer());
         this.attachedCards.forEach(cs => cs.onDestruction());
     }
+    onStartTurn() {
+        this.card.onStartTurn(this.getPlayer());
+        this.attachedCards.forEach(cs => cs.onStartTurn());
+    }
     performImmediateEffect(target: CardStack) {
         this.card.onUtilizaton(this.getPlayer(), target);
     }
