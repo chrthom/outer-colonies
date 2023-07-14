@@ -1,6 +1,7 @@
 import { CardType } from "../../config/enums";
 import Player from "../../game_state/player";
 import ActionPool, { CardAction } from "../action_pool";
+import { InfrastructureProfile } from "../card_profile";
 import InfrastructureCard from "../types/infrastructure_card";
 
 function addToActionPool(player: Player, card: InfrastructureCard) {
@@ -11,7 +12,25 @@ function removeFromActionPool(player: Player, card: InfrastructureCard) {
     player.actionPool.remove(...card.actionPool().getPool());
 }
 
-export class Card135 extends InfrastructureCard {
+abstract class ActionInfrastructureCard extends InfrastructureCard {
+    private actionPoolCardTypes!: CardType[];
+    constructor(id: number, name: string, rarity: number, profile: InfrastructureProfile, actionPool: CardType[]) {
+        super(id, name, rarity, profile)
+        this.actionPoolCardTypes = actionPool;
+    }
+    onUtilizaton(player: Player) {
+        addToActionPool(player, this);
+    }
+    onRetraction(player: Player) {
+        removeFromActionPool(player, this);
+    }
+    onStartTurn(_: Player) {}
+    actionPool(): ActionPool {
+        return new ActionPool(new CardAction(...this.actionPoolCardTypes));
+    }
+}
+
+export class Card135 extends ActionInfrastructureCard {
     constructor() {
         super(
             135, 
@@ -28,21 +47,13 @@ export class Card135 extends InfrastructureCard {
                 delta: 0,
                 psi: -1,
                 handCardLimit: 0
-            }
+            },
+            [ CardType.Hull ]
         )
-    }
-    onUtilizaton(player: Player) {
-        addToActionPool(player, this);
-    }
-    onRetraction(player: Player) {
-        removeFromActionPool(player, this);
-    }
-    actionPool(): ActionPool {
-        return new ActionPool(new CardAction(CardType.Hull));
     }
 }
 
-export class Card154 extends InfrastructureCard {
+export class Card154 extends ActionInfrastructureCard {
     constructor() {
         super(
             154, 
@@ -59,21 +70,13 @@ export class Card154 extends InfrastructureCard {
                 delta: 0,
                 psi: -1,
                 handCardLimit: 0
-            }
+            }, 
+            [ CardType.Infrastructure ]
         )
-    }
-    onUtilizaton(player: Player) {
-        addToActionPool(player, this);
-    }
-    onRetraction(player: Player) {
-        removeFromActionPool(player, this);
-    }
-    actionPool(): ActionPool {
-        return new ActionPool(new CardAction(CardType.Infrastructure));
     }
 }
 
-export class Card164 extends InfrastructureCard {
+export class Card164 extends ActionInfrastructureCard {
     constructor() {
         super(
             164,
@@ -90,21 +93,13 @@ export class Card164 extends InfrastructureCard {
                 delta: 0,
                 psi: -1,
                 handCardLimit: 0
-            }
+            },
+            [ CardType.Equipment ]
         )
-    }
-    onUtilizaton(player: Player) {
-        addToActionPool(player, this);
-    }
-    onRetraction(player: Player) {
-        removeFromActionPool(player, this);
-    }
-    actionPool(): ActionPool {
-        return new ActionPool(new CardAction(CardType.Equipment));
     }
 }
 
-export class Card183 extends InfrastructureCard {
+export class Card183 extends ActionInfrastructureCard {
     constructor() {
         super(
             183, 
@@ -121,17 +116,9 @@ export class Card183 extends InfrastructureCard {
                 delta: 0,
                 psi: 0,
                 handCardLimit: 0
-            }
+            },
+            [ CardType.Equipment, CardType.Infrastructure, CardType.Hull ]
         )
         this.onlyAttachableToColony = true;
-    }
-    onUtilizaton(player: Player) {
-        addToActionPool(player, this);
-    }
-    onRetraction(player: Player) {
-        removeFromActionPool(player, this);
-    }
-    actionPool(): ActionPool {
-        return new ActionPool(new CardAction(CardType.Equipment, CardType.Infrastructure, CardType.Hull));
     }
 }

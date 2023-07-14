@@ -1,7 +1,13 @@
 import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
-export class Card172 extends InfrastructureCard {
+abstract class InfrastructureUtilCard extends InfrastructureCard {
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
+}
+
+export class Card172 extends InfrastructureUtilCard {
     constructor() {
         super(
             172,
@@ -21,6 +27,4 @@ export class Card172 extends InfrastructureCard {
             }
         )
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
 }

@@ -15,6 +15,7 @@ export default class ColonyCard extends Card {
     }
     onUtilizaton(_: Player) {}
     onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
     profile(): CardProfile {
         return {
             energy: 0,

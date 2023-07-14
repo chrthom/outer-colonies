@@ -28,6 +28,7 @@ export default abstract class HullCard extends Card {
     }
     onUtilizaton(_: Player) {}
     onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
     canBeRetracted(isRootCard: boolean): boolean {
         return isRootCard;
     }

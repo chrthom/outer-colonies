@@ -2,7 +2,13 @@ import { BattleType, TurnPhase } from "../../config/enums";
 import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
-abstract class CardPowerPlant extends InfrastructureCard {
+abstract class InfrastructureEnergyCard extends InfrastructureCard {
+    onUtilizaton(_: Player) {}
+    onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
+}
+
+abstract class CardPowerPlant extends InfrastructureEnergyCard {
     constructor(id: number) {
         super(
             id, 
@@ -23,11 +29,9 @@ abstract class CardPowerPlant extends InfrastructureCard {
         )
         this.onlyAttachableToColony = true;
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
 }
 
-abstract class NuclearReactorCard extends InfrastructureCard {
+abstract class NuclearReactorCard extends InfrastructureEnergyCard {
     constructor(id: number) {
         super(
             id, 
@@ -47,11 +51,9 @@ abstract class NuclearReactorCard extends InfrastructureCard {
             }
         );
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
 }
 
-abstract class SolarPanelCard extends InfrastructureCard {
+abstract class SolarPanelCard extends InfrastructureEnergyCard {
     constructor(id: number) {
         super(
             id, 
@@ -71,11 +73,9 @@ abstract class SolarPanelCard extends InfrastructureCard {
             }
         );
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
 }
 
-export class Card105 extends InfrastructureCard {
+export class Card105 extends InfrastructureEnergyCard {
     constructor() {
         super(
             105, 
@@ -95,8 +95,6 @@ export class Card105 extends InfrastructureCard {
             }
         );
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
     onDestruction(player: Player) {
         const battle = player.match.battle;
         if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
@@ -105,7 +103,7 @@ export class Card105 extends InfrastructureCard {
     }
 }
 
-export class Card145 extends InfrastructureCard {
+export class Card145 extends InfrastructureEnergyCard {
     constructor() {
         super(
             145, 
@@ -125,8 +123,6 @@ export class Card145 extends InfrastructureCard {
             }
         );
     }
-    onUtilizaton(_: Player) {}
-    onRetraction(_: Player) {}
 }
 
 export class Card185 extends CardPowerPlant {

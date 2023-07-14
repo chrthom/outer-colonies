@@ -11,6 +11,7 @@ export default abstract class TacticCard extends Card {
         this.staysInPlay = staysInPlay;
     }
     onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
     canBeRetracted(): boolean {
         return false;
     }

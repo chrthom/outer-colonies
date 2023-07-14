@@ -33,6 +33,7 @@ export default abstract class EquipmentCard extends Card {
     }
     onUtilizaton(_: Player) {}
     onRetraction(_: Player) {}
+    onStartTurn(_: Player) {}
     profile(): CardProfile {
         return CardProfile.fromEquipmentProfile(this.equipmentProfile);
     }
