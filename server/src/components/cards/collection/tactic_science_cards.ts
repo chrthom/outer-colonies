@@ -1,9 +1,15 @@
-import { CardType } from "../../config/enums";
+import { CardType, TacticDiscipline } from "../../config/enums";
 import Player from "../../game_state/player";
 import CardStack from "../card_stack";
 import TacticCard from "../types/tactic_card";
 
-export class Card110 extends TacticCard {
+abstract class EconomyTacticCard extends TacticCard {
+    get discipline(): TacticDiscipline {
+        return TacticDiscipline.Science;
+    }
+}
+
+export class Card110 extends EconomyTacticCard {
     private readonly damageToRepair = 3;
     constructor() {
         super(

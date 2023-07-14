@@ -1,10 +1,16 @@
-import { CardType } from "../../config/enums";
+import { CardType, TacticDiscipline } from "../../config/enums";
 import Player from "../../game_state/player";
 import ActionPool, { CardAction } from "../action_pool";
 import CardStack from "../card_stack";
 import TacticCard from "../types/tactic_card";
 
-export class Card174 extends TacticCard {
+abstract class MilitaryTacticCard extends TacticCard {
+    get discipline(): TacticDiscipline {
+        return TacticDiscipline.Military;
+    }
+}
+
+export class Card174 extends MilitaryTacticCard {
     private readonly damageToRepair = 8;
     constructor() {
         super(
@@ -23,7 +29,7 @@ export class Card174 extends TacticCard {
     }
 }
 
-export class Card337 extends TacticCard {
+export class Card337 extends MilitaryTacticCard {
     private oneTimeActionPool = new ActionPool(
         new CardAction(CardType.Equipment),
         new CardAction(CardType.Hull)
@@ -45,7 +51,7 @@ export class Card337 extends TacticCard {
     }
 }
 
-export class Card338 extends TacticCard {
+export class Card338 extends MilitaryTacticCard {
     private readonly cardsToDraw = 2;
     constructor() {
         super(

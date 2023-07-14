@@ -39,6 +39,13 @@ export enum MsgTypeOutbound {
     State = 'state'
 }
 
+export enum TacticDiscipline {
+    Economy = 'economy',
+    Intelligence = 'intelligence',
+    Military = 'military',
+    Science = 'science'
+}
+
 export enum TurnPhase {
     Init = 'init',
     Start = 'start',

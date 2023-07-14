@@ -1,4 +1,4 @@
-import { CardType } from "../../config/enums";
+import { CardType, TacticDiscipline } from "../../config/enums";
 import Player from "../../game_state/player";
 import Card from "../card";
 import CardProfile from "../card_profile";
@@ -17,6 +17,7 @@ export default abstract class TacticCard extends Card {
     profile(): CardProfile {
         return new CardProfile();
     }
+    abstract get discipline(): TacticDiscipline
     protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {
         return playersCardStacks.filter(cs => cs.card.type == CardType.Colony);
     }
