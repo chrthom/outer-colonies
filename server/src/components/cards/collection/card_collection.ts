@@ -171,12 +171,13 @@ export default class CardCollection {
         Array(2).fill(this.cards[447]), // Schildgondel
         Array(4).fill(this.cards[184]), // Rumpferweiterung
         // Infrastructure (13)
-        Array(3).fill(this.cards[185]), // Kraftwerk
-        Array(3).fill(this.cards[183]), // Industriekomplex
-        Array(2).fill(this.cards[187]), // Atomreaktor
+        Array(2).fill(this.cards[185]), // Kraftwerk
+        Array(2).fill(this.cards[183]), // Industriekomplex
+        Array(3).fill(this.cards[187]), // Atomreaktor
         Array(2).fill(this.cards[188]), // Solarpanele
         Array(2).fill(this.cards[172]), // Ressourcensilo
         Array(1).fill(this.cards[164]), // Rüstungsschmiede
+        Array(1).fill(this.cards[435]), // Gewerbegebiet
         // Tactic (12)
         Array(4).fill(this.cards[232]), // Warenlieferung
         Array(2).fill(this.cards[165]), // Konvoi
@@ -209,7 +210,8 @@ export default class CardCollection {
         Array(2).fill(this.cards[245]), // Solarpanele
         Array(2).fill(this.cards[172]), // Ressourcensilo
         Array(1).fill(this.cards[135]), // Werft
-        Array(3).fill(this.cards[164]), // Rüstungsschmiede
+        Array(2).fill(this.cards[164]), // Rüstungsschmiede
+        Array(1).fill(this.cards[230]), // Verwaltungsbüro
         // Tactic (10)
         Array(2).fill(this.cards[232]), // Warenlieferung
         Array(2).fill(this.cards[165]), // Konvoi
@@ -235,15 +237,16 @@ export default class CardCollection {
         Array(5).fill(this.cards[179]), // Pulskanone
         Array(4).fill(this.cards[163]), // Verbundpanzerung
         Array(2).fill(this.cards[170]), // Strahlenschilde
-        // Infrastructure (11)
+        // Infrastructure (12)
         Array(2).fill(this.cards[350]), // Kraftwerk
         Array(2).fill(this.cards[183]), // Industriekomplex
         Array(3).fill(this.cards[352]), // Atomreaktor
         Array(2).fill(this.cards[353]), // Solarpanele
         Array(2).fill(this.cards[172]), // Ressourcensilo
-        // Tactic (14)
+        Array(1).fill(this.cards[333]), // Marsianisches Konsulat
+        // Tactic (13)
         Array(6).fill(this.cards[337]), // Militärpioniere
-        Array(4).fill(this.cards[338]), // Nachschub
+        Array(3).fill(this.cards[338]), // Nachschub
         Array(2).fill(this.cards[321]), // Recycling
         Array(2).fill(this.cards[174]), // Feldreperaturen
         // TEST CARDS
