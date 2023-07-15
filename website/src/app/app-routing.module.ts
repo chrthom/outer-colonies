@@ -1,5 +1,5 @@
 import { NgModule, inject } from '@angular/core';
-import { CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -11,9 +11,12 @@ import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
 
 const authGuardFn: CanActivateFn = () => {
-  return inject(AuthService).check().pipe(tap(b => !b ? inject(Router).navigate([ '/login' ]) : {}))
+  const router = inject(Router);
+  return inject(AuthService)
+    .check()
+    .pipe(tap(b => !b ? router.navigate([ '/login' ]) : {}));
 };
-const httpsGuardFn: CanActivateFn = () => {
+const httpsGuardFn: CanActivateChildFn = () => {
   if (!environment.https || window.location.protocol == "https:") return true;
   else {
     window.location.protocol = "https:";
@@ -25,7 +28,6 @@ const httpsGuardFn: CanActivateFn = () => {
 const routes: Routes = [
   {
     path: '',
-    canActivate: [ httpsGuardFn ],
     canActivateChild: [ httpsGuardFn ],
     children: [
       {
