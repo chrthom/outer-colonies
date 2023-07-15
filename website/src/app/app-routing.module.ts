@@ -1,5 +1,5 @@
 import { NgModule, inject } from '@angular/core';
-import { CanActivateChildFn, CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
+import { CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -10,52 +10,55 @@ import { DataPrivacyComponent as DataPrivacyPage } from './pages/data-privacy/da
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
 
-const authGuardFn: CanActivateFn = () => {
-  const router = inject(Router);
-  return inject(AuthService)
-    .check()
-    .pipe(tap(b => !b ? router.navigate([ '/login' ]) : {}));
-};
-const httpsGuardFn: CanActivateChildFn = () => {
-  if (!environment.https || window.location.protocol == "https:") return true;
-  else {
+function forceHttp(): boolean {
+  if (!environment.https || window.location.protocol == "https:") {
+    return true;
+  } else {
     window.location.protocol = "https:";
-    window.location.reload();
+    return false;
+  }
+}
+const privateGuardFn: CanActivateFn = () => {
+  if (forceHttp()) {
+    const router = inject(Router);
+    return inject(AuthService)
+      .check()
+      .pipe(tap(b => !b ? router.navigate([ '/login' ]) : {}));
+  } else {
     return false;
   }
 };
+const publicGuardFn: CanActivateFn = () => forceHttp();
 
 const routes: Routes = [
   {
+    path: 'login',
+    canActivate: [ publicGuardFn ],
+    component: LoginPage
+  }, {
+    path: 'register',
+    canActivate: [ publicGuardFn ],
+    component: RegisterPage
+  }, {
+    path: 'deck',
+    canActivate: [ privateGuardFn ],
+    component: DeckPage
+  }, {
+    path: 'imprint',
+    canActivate: [ publicGuardFn ],
+    component: ImprintPage
+  }, {
+    path: 'privacy',
+    canActivate: [ publicGuardFn ],
+    component: DataPrivacyPage
+  }, {
     path: '',
-    canActivateChild: [ httpsGuardFn ],
-    children: [
-      {
-        path: 'login',
-        component: LoginPage
-      }, {
-        path: 'register',
-        component: RegisterPage
-      }, {
-        path: 'deck',
-        canActivate: [ authGuardFn ],
-        component: DeckPage
-      }, {
-        path: 'imprint',
-        component: ImprintPage
-      }, {
-        path: 'privacy',
-        component: DataPrivacyPage
-      }, {
-        path: '',
-        canActivate: [ authGuardFn ],
-        component: HomePage,
-        pathMatch: 'full'
-      }, {
-        path: '**',
-        redirectTo: ''
-      }
-    ]
+    canActivate: [ privateGuardFn ],
+    component: HomePage,
+    pathMatch: 'full'
+  }, {
+    path: '**',
+    redirectTo: ''
   }
 ];
 
