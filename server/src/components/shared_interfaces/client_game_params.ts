@@ -1,3 +1,3 @@
 export class ClientGameParams {
-    preloadCardIds: number[];
+  preloadCardIds: number[];
 }

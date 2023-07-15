@@ -3,197 +3,175 @@ import Player from "../../game_state/player";
 import InfrastructureCard from "../types/infrastructure_card";
 
 abstract class InfrastructureEnergyCard extends InfrastructureCard {
-    onUtilizaton() {}
-    onRetraction() {}
-    onStartTurn() {}
-    onEndTurn() {}
+  onUtilizaton() {}
+  onRetraction() {}
+  onStartTurn() {}
+  onEndTurn() {}
 }
 
 abstract class CardPowerPlant extends InfrastructureEnergyCard {
-    constructor(id: number) {
-        super(
-            id, 
-            'Kraftwerk',
-            0,
-            {
-                energy: 5,
-                hp: 0,
-                speed: 0,
-                theta: 0,
-                xi: 0,
-                phi: 0,
-                omega: 0,
-                delta: 0,
-                psi: 0,
-                handCardLimit: 0
-            }
-        )
-        this.onlyAttachableToColony = true;
-    }
+  constructor(id: number) {
+    super(id, "Kraftwerk", 0, {
+      energy: 5,
+      hp: 0,
+      speed: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: 0,
+      delta: 0,
+      psi: 0,
+      handCardLimit: 0,
+    });
+    this.onlyAttachableToColony = true;
+  }
 }
 
 abstract class NuclearReactorCard extends InfrastructureEnergyCard {
-    constructor(id: number) {
-        super(
-            id, 
-            'Atomreaktor',
-            0,
-            {
-                energy: 2,
-                hp: 0,
-                speed: 0,
-                theta: 0,
-                xi: 0,
-                phi: 0,
-                omega: -1,
-                delta: 0,
-                psi: 0,
-                handCardLimit: 0
-            }
-        );
-    }
+  constructor(id: number) {
+    super(id, "Atomreaktor", 0, {
+      energy: 2,
+      hp: 0,
+      speed: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: -1,
+      delta: 0,
+      psi: 0,
+      handCardLimit: 0,
+    });
+  }
 }
 
 abstract class SolarPanelCard extends InfrastructureEnergyCard {
-    constructor(id: number) {
-        super(
-            id, 
-            'Solarpanele',
-            0,
-            {
-                energy: 1,
-                hp: 0,
-                speed: 0,
-                theta: 0,
-                xi: 0,
-                phi: 0,
-                omega: 0,
-                delta: 0,
-                psi: 0,
-                handCardLimit: 0
-            }
-        );
-    }
+  constructor(id: number) {
+    super(id, "Solarpanele", 0, {
+      energy: 1,
+      hp: 0,
+      speed: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: 0,
+      delta: 0,
+      psi: 0,
+      handCardLimit: 0,
+    });
+  }
 }
 
 export class Card105 extends InfrastructureEnergyCard {
-    constructor() {
-        super(
-            105, 
-            'Antimateriereaktor',
-            5,
-            {
-                energy: 10,
-                hp: 0,
-                speed: 0,
-                theta: 0,
-                xi: 0,
-                phi: 0,
-                omega: -3,
-                delta: 0,
-                psi: 0,
-                handCardLimit: 0
-            }
-        );
+  constructor() {
+    super(105, "Antimateriereaktor", 5, {
+      energy: 10,
+      hp: 0,
+      speed: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: -3,
+      delta: 0,
+      psi: 0,
+      handCardLimit: 0,
+    });
+  }
+  onDestruction(player: Player) {
+    const battle = player.match.battle;
+    if (
+      player.match.turnPhase == TurnPhase.Combat &&
+      battle.type != BattleType.None
+    ) {
+      battle.ships.flat().forEach((cs) => cs.damage++);
     }
-    onDestruction(player: Player) {
-        const battle = player.match.battle;
-        if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
-            battle.ships.flat().forEach(cs => cs.damage++);
-        }
-    }
+  }
 }
 
 export class Card145 extends InfrastructureEnergyCard {
-    constructor() {
-        super(
-            145, 
-            'Fusionsreaktor',
-            2,
-            {
-                energy: 4,
-                hp: 0,
-                speed: 0,
-                theta: 0,
-                xi: 0,
-                phi: 0,
-                omega: -2,
-                delta: 0,
-                psi: 0,
-                handCardLimit: 0
-            }
-        );
-    }
+  constructor() {
+    super(145, "Fusionsreaktor", 2, {
+      energy: 4,
+      hp: 0,
+      speed: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: -2,
+      delta: 0,
+      psi: 0,
+      handCardLimit: 0,
+    });
+  }
 }
 
 export class Card185 extends CardPowerPlant {
-    constructor() {
-        super(185)
-    }
+  constructor() {
+    super(185);
+  }
 }
 
 export class Card187 extends NuclearReactorCard {
-    constructor() {
-        super(187);
-    }
+  constructor() {
+    super(187);
+  }
 }
 
 export class Card188 extends SolarPanelCard {
-    constructor() {
-        super(188);
-    }
+  constructor() {
+    super(188);
+  }
 }
 
 export class Card242 extends CardPowerPlant {
-    constructor() {
-        super(242)
-    }
+  constructor() {
+    super(242);
+  }
 }
 
 export class Card244 extends NuclearReactorCard {
-    constructor() {
-        super(244);
-    }
+  constructor() {
+    super(244);
+  }
 }
 
 export class Card245 extends SolarPanelCard {
-    constructor() {
-        super(245);
-    }
+  constructor() {
+    super(245);
+  }
 }
 
 export class Card350 extends CardPowerPlant {
-    constructor() {
-        super(350)
-    }
+  constructor() {
+    super(350);
+  }
 }
 
 export class Card352 extends NuclearReactorCard {
-    constructor() {
-        super(352);
-    }
+  constructor() {
+    super(352);
+  }
 }
 
 export class Card353 extends SolarPanelCard {
-    constructor() {
-        super(353);
-    }
+  constructor() {
+    super(353);
+  }
 }
 
 export class Card451 extends NuclearReactorCard {
-    constructor() {
-        super(451);
-    }
+  constructor() {
+    super(451);
+  }
 }
 
 export class Card452 extends SolarPanelCard {
-    constructor() {
-        super(452);
-    }
+  constructor() {
+    super(452);
+  }
 }
 
 export class Card453 extends CardPowerPlant {
-    constructor() {
-        super(453)
-    }
+  constructor() {
+    super(453);
+  }
 }

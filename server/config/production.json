@@ -1,13 +1,13 @@
 {
-    "stage": "production",
-    "url": {
-        "assets": "https://assets.outercolonies.de"
-    },
-    "database": {
-        "host": "192.168.0.2",
-        "port": 3307,
-        "database": "outercolonies",
-        "user": "outercolonies",
-        "connectionLimit": 25
-    }
+  "stage": "production",
+  "url": {
+    "assets": "https://assets.outercolonies.de"
+  },
+  "database": {
+    "host": "192.168.0.2",
+    "port": 3307,
+    "database": "outercolonies",
+    "user": "outercolonies",
+    "connectionLimit": 25
+  }
 }

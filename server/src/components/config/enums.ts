@@ -1,62 +1,62 @@
 export enum BattleType {
-    None = 'none',
-    Mission = 'mission',
-    Raid = 'raid'
+  None = "none",
+  Mission = "mission",
+  Raid = "raid",
 }
 
 export enum CardType {
-    Colony = 'colony',
-    Equipment = 'equipment',
-    Hull = 'hull',
-    Infrastructure = 'infrastructure',
-    Tactic = 'tactic',
-    Orb = 'orb'
+  Colony = "colony",
+  Equipment = "equipment",
+  Hull = "hull",
+  Infrastructure = "infrastructure",
+  Tactic = "tactic",
+  Orb = "orb",
 }
 
 export enum EventType {
-    Attach = 'attach',
-    Attack = 'attack',
-    Discard = 'discard',
-    Retract = 'retract',
-    Tactic = 'tactic',
+  Attach = "attach",
+  Attack = "attack",
+  Discard = "discard",
+  Retract = "retract",
+  Tactic = "tactic",
 }
 
 export enum MsgTypeInbound {
-    Attack = 'attack',
-    Connect = 'connect',
-    Disconnect = 'disconnect',
-    Discard = 'discard',
-    Handcard = 'handcard',
-    Login = 'login',
-    Ready = 'ready',
-    Retract = 'retract'
+  Attack = "attack",
+  Connect = "connect",
+  Disconnect = "disconnect",
+  Discard = "discard",
+  Handcard = "handcard",
+  Login = "login",
+  Ready = "ready",
+  Retract = "retract",
 }
 
 export enum MsgTypeOutbound {
-    CardRequest = 'card_request',
-    Connect = 'connect',
-    Matchmaking = 'matchmaking',
-    State = 'state'
+  CardRequest = "card_request",
+  Connect = "connect",
+  Matchmaking = "matchmaking",
+  State = "state",
 }
 
 export enum TacticDiscipline {
-    Economy = 'economy',
-    Intelligence = 'intelligence',
-    Military = 'military',
-    Science = 'science'
+  Economy = "economy",
+  Intelligence = "intelligence",
+  Military = "military",
+  Science = "science",
 }
 
 export enum TurnPhase {
-    Init = 'init',
-    Start = 'start',
-    Build = 'build',
-    Combat = 'combat',
-    End = 'end'
+  Init = "init",
+  Start = "start",
+  Build = "build",
+  Combat = "combat",
+  End = "end",
 }
 
 export enum Zone {
-    Hand = 'hand',
-    Colony = 'colony',
-    Oribital = 'orbital',
-    Neutral = 'neutral'
+  Hand = "hand",
+  Colony = "colony",
+  Oribital = "orbital",
+  Neutral = "neutral",
 }

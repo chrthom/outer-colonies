@@ -1,13 +1,13 @@
 {
-    "stage": "staging",
-    "url": {
-        "assets": "https://assets.staging.outercolonies.de"
-    },
-    "database": {
-        "host": "192.168.0.2",
-        "port": 3307,
-        "database": "outercolonies_staging",
-        "user": "outercolonies_staging",
-        "connectionLimit": 10
-    }
+  "stage": "staging",
+  "url": {
+    "assets": "https://assets.staging.outercolonies.de"
+  },
+  "database": {
+    "host": "192.168.0.2",
+    "port": 3307,
+    "database": "outercolonies_staging",
+    "user": "outercolonies_staging",
+    "connectionLimit": 10
+  }
 }
