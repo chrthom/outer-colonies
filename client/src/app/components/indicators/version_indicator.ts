@@ -8,7 +8,7 @@ export default class VersonIndicator {
             'Outer Colonies v1.1 - Enceladus'
         )
             .setFontSize(layout.font.size)
-            .setFontFamily(layout.font.textFamily)
+            .setFontFamily(layout.font.captionFamily)
             .setColor(layout.font.color)
             .setAlign('right')
             .setOrigin(1, 1);

@@ -2,7 +2,7 @@ import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
 import { MsgTypeInbound, MsgTypeOutbound } from '../../../../server/src/components/config/enums';
-import VersonIndicator from '../components/indicators/version_indicator';
+import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 
@@ -25,7 +25,7 @@ export default class Matchmaking extends Phaser.Scene {
     create() {
         this.sessionToken = window.location.search.substring(1);
         this.status = new LoadingStatus(this);
-        new VersonIndicator(this);
+        new VersionIndicator(this);
         this.socket = io(environment.urls.api);
         this.socket.on(MsgTypeOutbound.Connect, () => {
             this.status.setText('Authentifiziere Nutzer...')
