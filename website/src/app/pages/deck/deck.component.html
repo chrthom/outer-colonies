@@ -1,23 +1,33 @@
 <oc-navbar active="deck"></oc-navbar>
 <div id="deck-box">
-    <oc-content-box [title]="'Karten im aktiven Deck (' + activeCards.length + ')'">
-        <div class="scroll">
-            <div *ngFor="let card of activeCards">
-                <mat-card (click)="deactivateCard(card)">
-                    <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name">
-                </mat-card>                  
-            </div>
-        </div>
-    </oc-content-box>
+  <oc-content-box
+    [title]="'Karten im aktiven Deck (' + activeCards.length + ')'"
+  >
+    <div class="scroll">
+      <div *ngFor="let card of activeCards">
+        <mat-card (click)="deactivateCard(card)">
+          <img
+            mat-card-image
+            [src]="toCardUrl(card.cardId)"
+            [alt]="card.name"
+          />
+        </mat-card>
+      </div>
+    </div>
+  </oc-content-box>
 </div>
 <div id="reserve-box">
-    <oc-content-box [title]="'Reserve Karten (' + reserveCards.length + ')'">
-        <div class="scroll">
-            <div *ngFor="let card of reserveCards">
-                <mat-card (click)="activateCard(card)">
-                    <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name">
-                </mat-card>                  
-            </div>
-        </div>
-    </oc-content-box>
+  <oc-content-box [title]="'Reserve Karten (' + reserveCards.length + ')'">
+    <div class="scroll">
+      <div *ngFor="let card of reserveCards">
+        <mat-card (click)="activateCard(card)">
+          <img
+            mat-card-image
+            [src]="toCardUrl(card.cardId)"
+            [alt]="card.name"
+          />
+        </mat-card>
+      </div>
+    </div>
+  </oc-content-box>
 </div>

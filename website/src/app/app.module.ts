@@ -32,7 +32,7 @@ import { DataPrivacyComponent } from './pages/data-privacy/data-privacy.page';
     NavbarComponent,
     DeckPage,
     ImprintComponent,
-    DataPrivacyComponent
+    DataPrivacyComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,9 +47,9 @@ import { DataPrivacyComponent } from './pages/data-privacy/data-privacy.page';
     MatSlideToggleModule,
     MatIconModule,
     MatCardModule,
-    MatBadgeModule
+    MatBadgeModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

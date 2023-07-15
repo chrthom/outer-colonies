@@ -8,21 +8,20 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'oc-page-login',
   templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss']
+  styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
   loginFailed: boolean = false;
   loginForm: FormGroup = new FormGroup({
-    username: new FormControl('', [ 
-      Validators.required
-    ]),
-    password: new FormControl('', [ 
-      Validators.required
-    ]),
-    remember: new FormControl(false, [])
+    username: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
+    remember: new FormControl(false, []),
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
   get username(): any {
     return this.loginForm.get('username');
   }
@@ -30,13 +29,15 @@ export class LoginPage {
     return this.loginForm.get('password');
   }
   submit() {
-    this.authService.login(
-      this.loginForm.value.username,
-      this.loginForm.value.password,
-      this.loginForm.value.remember
-    ).subscribe(success => {
-      if (success) this.router.navigate([ '/' ]);
-      else this.loginFailed = true;
-    });
+    this.authService
+      .login(
+        this.loginForm.value.username,
+        this.loginForm.value.password,
+        this.loginForm.value.remember,
+      )
+      .subscribe((success) => {
+        if (success) this.router.navigate(['/']);
+        else this.loginFailed = true;
+      });
   }
 }

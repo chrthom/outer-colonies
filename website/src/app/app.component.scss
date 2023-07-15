@@ -1,79 +1,79 @@
-@use '../style/color.scss' as oc;
+@use "../style/color.scss" as oc;
 
 #background-stars {
-    position: fixed;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: auto;
-    height: 100%;
-    width: 100%;
+  position: fixed;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: auto;
+  height: 100%;
+  width: 100%;
 }
 
 .background-stars-0 {
-    background-image: url('https://assets.outercolonies.de/background/stars0.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars0.jpg");
 }
 
 .background-stars-1 {
-    background-image: url('https://assets.outercolonies.de/background/stars1.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars1.jpg");
 }
 
 .background-stars-2 {
-    background-image: url('https://assets.outercolonies.de/background/stars2.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars2.jpg");
 }
 
 .background-stars-3 {
-    background-image: url('https://assets.outercolonies.de/background/stars3.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars3.jpg");
 }
 
 .background-stars-4 {
-    background-image: url('https://assets.outercolonies.de/background/stars4.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars4.jpg");
 }
 
 .background-stars-5 {
-    background-image: url('https://assets.outercolonies.de/background/stars5.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars5.jpg");
 }
 
 .background-stars-6 {
-    background-image: url('https://assets.outercolonies.de/background/stars6.jpg');
+  background-image: url("https://assets.outercolonies.de/background/stars6.jpg");
 }
 
 #background-layer {
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.4);
-    height: 100%;
-    width: 100%;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.4);
+  height: 100%;
+  width: 100%;
 }
 
 #root-content {
-    position: absolute;
-    left: max(calc(50% - 700px), 5%);
-    margin: auto;
-    width: min(1400px, 90%);
-    min-height: calc(100% - 100px);
-    background-image: url('../assets/background_squares_transparent.png');
+  position: absolute;
+  left: max(calc(50% - 700px), 5%);
+  margin: auto;
+  width: min(1400px, 90%);
+  min-height: calc(100% - 100px);
+  background-image: url("../assets/background_squares_transparent.png");
 }
 
 #footer {
-    position: absolute;
-    left: 0;
-    bottom: -100px;
-    background-color: black;
-    width: 100%;
-    height: 100px;
+  position: absolute;
+  left: 0;
+  bottom: -100px;
+  background-color: black;
+  width: 100%;
+  height: 100px;
 }
 
 #version {
-    position: absolute;
-    right: 40px;
-    bottom: 10px;
+  position: absolute;
+  right: 40px;
+  bottom: 10px;
 }
 
 #footer-links {
-    position: absolute;
-    left: 40px;
-    top: 10px;
+  position: absolute;
+  left: 40px;
+  top: 10px;
 }
 
 ul li {
-    color: oc.$primary-color;
+  color: oc.$primary-color;
 }

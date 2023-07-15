@@ -1,31 +1,34 @@
 <div id="login-box">
-    <oc-content-box title="Login">
-        <form id="login-form"
-                [formGroup]="loginForm"
-                (ngSubmit)="loginForm.valid ? submit() : {}">
-            <mat-form-field>
-                <mat-label>Nutzername oder E-Mail Adresse</mat-label>
-                <input matInput
-                    formControlName="username">
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Passwort</mat-label>
-                <input matInput type="password"
-                    formControlName="password">
-            </mat-form-field>
-            <mat-slide-toggle color="primary"
-                            formControlName="remember">
-                <mat-label>Zugangsdaten merken</mat-label>
-            </mat-slide-toggle>
-            <button mat-raised-button 
-                    type="submit"
-                    [color]="loginForm.valid ? 'primary' : 'accent'">
-                Anmelden
-            </button>
-            <mat-error *ngIf="loginFailed">
-                Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
-            </mat-error>
-        </form>
-        <p id="register-link"><a routerLink="/register">Neuen Nutzer registrieren</a></p>
-    </oc-content-box>
+  <oc-content-box title="Login">
+    <form
+      id="login-form"
+      [formGroup]="loginForm"
+      (ngSubmit)="loginForm.valid ? submit() : {}"
+    >
+      <mat-form-field>
+        <mat-label>Nutzername oder E-Mail Adresse</mat-label>
+        <input matInput formControlName="username" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Passwort</mat-label>
+        <input matInput type="password" formControlName="password" />
+      </mat-form-field>
+      <mat-slide-toggle color="primary" formControlName="remember">
+        <mat-label>Zugangsdaten merken</mat-label>
+      </mat-slide-toggle>
+      <button
+        mat-raised-button
+        type="submit"
+        [color]="loginForm.valid ? 'primary' : 'accent'"
+      >
+        Anmelden
+      </button>
+      <mat-error *ngIf="loginFailed">
+        Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
+      </mat-error>
+    </form>
+    <p id="register-link">
+      <a routerLink="/register">Neuen Nutzer registrieren</a>
+    </p>
+  </oc-content-box>
 </div>

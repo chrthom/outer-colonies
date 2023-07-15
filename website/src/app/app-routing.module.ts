@@ -1,5 +1,11 @@
 import { NgModule, inject } from '@angular/core';
-import { CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
+import {
+  CanActivateFn,
+  PreloadAllModules,
+  Router,
+  RouterModule,
+  Routes,
+} from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -11,10 +17,10 @@ import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
 
 function forceHttp(): boolean {
-  if (!environment.https || window.location.protocol == "https:") {
+  if (!environment.https || window.location.protocol == 'https:') {
     return true;
   } else {
-    window.location.protocol = "https:";
+    window.location.protocol = 'https:';
     return false;
   }
 }
@@ -23,7 +29,7 @@ const privateGuardFn: CanActivateFn = () => {
     const router = inject(Router);
     return inject(AuthService)
       .check()
-      .pipe(tap(b => !b ? router.navigate([ '/login' ]) : {}));
+      .pipe(tap((b) => (!b ? router.navigate(['/login']) : {})));
   } else {
     return false;
   }
@@ -33,37 +39,45 @@ const publicGuardFn: CanActivateFn = () => forceHttp();
 const routes: Routes = [
   {
     path: 'login',
-    canActivate: [ publicGuardFn ],
-    component: LoginPage
-  }, {
+    canActivate: [publicGuardFn],
+    component: LoginPage,
+  },
+  {
     path: 'register',
-    canActivate: [ publicGuardFn ],
-    component: RegisterPage
-  }, {
+    canActivate: [publicGuardFn],
+    component: RegisterPage,
+  },
+  {
     path: 'deck',
-    canActivate: [ privateGuardFn ],
-    component: DeckPage
-  }, {
+    canActivate: [privateGuardFn],
+    component: DeckPage,
+  },
+  {
     path: 'imprint',
-    canActivate: [ publicGuardFn ],
-    component: ImprintPage
-  }, {
+    canActivate: [publicGuardFn],
+    component: ImprintPage,
+  },
+  {
     path: 'privacy',
-    canActivate: [ publicGuardFn ],
-    component: DataPrivacyPage
-  }, {
+    canActivate: [publicGuardFn],
+    component: DataPrivacyPage,
+  },
+  {
     path: '',
-    canActivate: [ privateGuardFn ],
+    canActivate: [privateGuardFn],
     component: HomePage,
-    pathMatch: 'full'
-  }, {
+    pathMatch: 'full',
+  },
+  {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
+  ],
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}

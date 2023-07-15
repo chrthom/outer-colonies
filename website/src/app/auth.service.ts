@@ -4,7 +4,7 @@ import AuthApiService from './api/auth-api.service';
 import { Observable, map, of, tap } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export default class AuthService {
   private readonly cookieExpiry = 100;
@@ -14,13 +14,20 @@ export default class AuthService {
   sessionToken?: string;
   error?: string;
 
-  constructor(private cookieService: CookieService, private authAPIService: AuthApiService) {}
+  constructor(
+    private cookieService: CookieService,
+    private authAPIService: AuthApiService,
+  ) {}
 
-  login(username: string, password: string, remember: boolean): Observable<boolean> {
+  login(
+    username: string,
+    password: string,
+    remember: boolean,
+  ): Observable<boolean> {
     this.username = username;
     this.password = password;
     const loginAttempt = this.check();
-    loginAttempt.subscribe(success => {
+    loginAttempt.subscribe((success) => {
       if (success && remember) {
         this.cookieService.set('u', username, this.cookieExpiry);
         this.cookieService.set('p', password, this.cookieExpiry);
@@ -38,16 +45,21 @@ export default class AuthService {
   }
 
   check(): Observable<boolean> {
-    return !this.checkCache() ? of(false) : this.authAPIService.login({
-      username: this.username ? this.username : '',
-      password: this.password ? this.password : ''
-    }).pipe(
-      tap(sessionToken => this.sessionToken = sessionToken),
-      map(sessionToken => sessionToken != undefined)
-    );
+    return !this.checkCache()
+      ? of(false)
+      : this.authAPIService
+          .login({
+            username: this.username ? this.username : '',
+            password: this.password ? this.password : '',
+          })
+          .pipe(
+            tap((sessionToken) => (this.sessionToken = sessionToken)),
+            map((sessionToken) => sessionToken != undefined),
+          );
   }
 
-  private checkCache(): boolean { // TODO: Double-check what this does
+  private checkCache(): boolean {
+    // TODO: Double-check what this does
     if (!this.username || !this.password) {
       this.username = this.cookieService.get('u');
       this.password = this.cookieService.get('p');
