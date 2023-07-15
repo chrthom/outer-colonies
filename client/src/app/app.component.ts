@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   phaserGame: Phaser.Game;
@@ -17,14 +17,14 @@ export class AppComponent implements OnInit {
     console.log(`Outer Colonies client started on stage ${environment.name}`);
     this.config = {
       type: Phaser.AUTO,
-      scene: [ MatchmakingScene, GameScene ],
+      scene: [MatchmakingScene, GameScene],
       scale: {
-          mode: Phaser.Scale.FIT,
-          parent: 'game',
-          autoCenter: Phaser.Scale.CENTER_BOTH,
-          width: 2400,
-          height: 1350
-      }
+        mode: Phaser.Scale.FIT,
+        parent: 'game',
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 2400,
+        height: 1350,
+      },
     };
   }
   ngOnInit() {

@@ -20,14 +20,8 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "esModuleInterop": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "ES2022",
-      "dom",
-      "scripthost"
-    ]
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["ES2022", "dom", "scripthost"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
