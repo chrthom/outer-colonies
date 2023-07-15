@@ -31,7 +31,13 @@
 6. Upload zip to the target env under `website`
 7. Unzip zip archive on target env
 
-### 1.4 Increment version
+### 1.4 Create release
+
+1. Create tag via `git tag -a v<x.x.x> -m "<tag description from milestone>"`
+2. Push tag via `git push origin v<x.x.x>`
+3. Create new [GitHub Release](https://github.com/chrthom/outer-colonies/releases/new), refering to the existing tag
+
+### 1.5 Increment version
 
 Update the version to the next development version in these places:
 
