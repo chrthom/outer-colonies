@@ -4,6 +4,7 @@
   "description": "Outer Colonies Server",
   "main": "dist/app.js",
   "scripts": {
+    "s": "npm run start",
     "start": "npx nodemon src/app.ts",
     "test": "npx jest"
   },
