@@ -22,14 +22,12 @@ export default class AuthService {
   login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;
     this.password = password;
-    const loginAttempt = this.check();
-    loginAttempt.pipe(tap((success) => {
+    return this.check().pipe(tap((success) => {
       if (success && remember) {
         this.cookieService.set('u', username, this.cookieExpiry);
         this.cookieService.set('p', password, this.cookieExpiry);
       }
     }));
-    return loginAttempt;
   }
 
   logout() {
