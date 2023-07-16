@@ -1,13 +1,13 @@
-import Player from "../../game_state/player";
-import CardStack from "../card_stack";
-import EquipmentCard from "../types/equipment_card";
+import Player from '../../game_state/player';
+import CardStack from '../card_stack';
+import EquipmentCard from '../types/equipment_card';
 
 export class Card104 extends EquipmentCard {
   readonly repairDamage = 10;
   constructor() {
     super(
       104,
-      "Reperaturnaniten",
+      'Reperaturnaniten',
       5,
       {
         energy: -1,
@@ -27,10 +27,7 @@ export class Card104 extends EquipmentCard {
     );
   }
   onEndTurn(player: Player, source: CardStack) {
-    source.getRootCardStack().damage -= Math.min(
-      source.getRootCardStack().damage,
-      this.repairDamage,
-    );
+    source.getRootCardStack().damage -= Math.min(source.getRootCardStack().damage, this.repairDamage);
   }
 }
 
@@ -38,7 +35,7 @@ export class Card109 extends EquipmentCard {
   constructor() {
     super(
       109,
-      "Plasmanachbrenner",
+      'Plasmanachbrenner',
       4,
       {
         energy: -3,
@@ -63,7 +60,7 @@ export class Card161 extends EquipmentCard {
   constructor() {
     super(
       161,
-      "Ionenschubdüsen",
+      'Ionenschubdüsen',
       1,
       {
         energy: -1,
@@ -89,7 +86,7 @@ export class Card325 extends EquipmentCard {
   constructor() {
     super(
       325,
-      "Selbstreparierender Torso",
+      'Selbstreparierender Torso',
       2,
       {
         energy: 0,
@@ -109,10 +106,7 @@ export class Card325 extends EquipmentCard {
     );
   }
   onEndTurn(player: Player, source: CardStack) {
-    source.getRootCardStack().damage -= Math.min(
-      source.getRootCardStack().damage,
-      this.repairDamage,
-    );
+    source.getRootCardStack().damage -= Math.min(source.getRootCardStack().damage, this.repairDamage);
   }
 }
 
@@ -120,7 +114,7 @@ export class Card434 extends EquipmentCard {
   constructor() {
     super(
       434,
-      "Leichtbauweise",
+      'Leichtbauweise',
       2,
       {
         energy: 0,
@@ -145,7 +139,7 @@ export class Card449 extends EquipmentCard {
   constructor() {
     super(
       449,
-      "Schwerer Rumpf",
+      'Schwerer Rumpf',
       1,
       {
         energy: 0,

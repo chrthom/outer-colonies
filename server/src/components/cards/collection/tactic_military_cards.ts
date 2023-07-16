@@ -1,8 +1,8 @@
-import { CardType, TacticDiscipline } from "../../config/enums";
-import Player from "../../game_state/player";
-import ActionPool, { CardAction } from "../action_pool";
-import CardStack from "../card_stack";
-import TacticCard from "../types/tactic_card";
+import { CardType, TacticDiscipline } from '../../config/enums';
+import Player from '../../game_state/player';
+import ActionPool, { CardAction } from '../action_pool';
+import CardStack from '../card_stack';
+import TacticCard from '../types/tactic_card';
 
 abstract class MilitaryTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
@@ -13,15 +13,13 @@ abstract class MilitaryTacticCard extends TacticCard {
 export class Card174 extends MilitaryTacticCard {
   private readonly damageToRepair = 8;
   constructor() {
-    super(174, "Feldreperaturen", 1, false, false);
+    super(174, 'Feldreperaturen', 1, false, false);
   }
   onUtilizaton(player: Player, target: CardStack) {
     target.damage -= Math.min(this.damageToRepair, target.damage);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter(
-      (cs) => cs.type() == CardType.Hull && cs.damage > 0,
-    );
+    return player.cardStacks.filter((cs) => cs.type() == CardType.Hull && cs.damage > 0);
   }
 }
 
@@ -31,7 +29,7 @@ export class Card337 extends MilitaryTacticCard {
     new CardAction(CardType.Hull),
   );
   constructor() {
-    super(337, "Militärpioniere", 1, false, false);
+    super(337, 'Militärpioniere', 1, false, false);
   }
   onUtilizaton(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
@@ -44,7 +42,7 @@ export class Card337 extends MilitaryTacticCard {
 export class Card338 extends MilitaryTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(338, "Nachschub", 1, false, false);
+    super(338, 'Nachschub', 1, false, false);
   }
   onUtilizaton(player: Player) {
     player.drawCards(this.cardsToDraw);

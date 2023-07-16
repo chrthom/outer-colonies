@@ -1,7 +1,4 @@
-import {
-  BattleType,
-  TurnPhase,
-} from '../../../../../server/src/components/config/enums';
+import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
 import { layout } from '../../config/layout';
@@ -55,8 +52,7 @@ export default class Prompt {
     let text: string = '';
     if (this.scene.plannedBattle.type == BattleType.None) {
       if (this.scene.state.hasToRetractCards) {
-        text +=
-          'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
+        text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
       }
       text +=
         'Spiele Karten von deiner Hand aus.\n' +
@@ -67,17 +63,11 @@ export default class Prompt {
       this.scene.plannedBattle.type == BattleType.Mission &&
       !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)
     ) {
-      const missingCards = ClientPlannedBattle.missingCards(
-        this.scene.plannedBattle,
-      );
-      text += `Wähle ${missingCards} weitere Missionskarte${
-        missingCards == 1 ? '' : 'n'
-      }`;
+      const missingCards = ClientPlannedBattle.missingCards(this.scene.plannedBattle);
+      text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
     } else {
       text += `Wähle Schiffe für ${
-        this.scene.plannedBattle.type == BattleType.Raid
-          ? 'den Überfall'
-          : 'die Mission'
+        this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
       }`;
     }
     this.show(text);
@@ -95,18 +85,11 @@ export default class Prompt {
     );
   }
   private showEndPhase() {
-    const cardsToDrop =
-      this.scene.state.hand.length - this.scene.state.handCardLimit;
-    this.show(
-      `Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`,
-    );
+    const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
+    this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showGameOver(gameResult: ClientGameResult) {
-    this.show(
-      `GAME OVER\nDu hast das Spiel ${
-        gameResult.won ? 'gewonnen' : 'verloren'
-      }!`,
-    );
+    this.show(`GAME OVER\nDu hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
     this.text.setFontSize(layout.prompt.fontSizeBig);
   }
   private show(text: string) {

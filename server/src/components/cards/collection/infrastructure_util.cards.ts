@@ -1,5 +1,5 @@
-import Player from "../../game_state/player";
-import InfrastructureCard from "../types/infrastructure_card";
+import Player from '../../game_state/player';
+import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class InfrastructureUtilCard extends InfrastructureCard {
   onUtilizaton() {}
@@ -10,7 +10,7 @@ abstract class InfrastructureUtilCard extends InfrastructureCard {
 
 export class Card172 extends InfrastructureUtilCard {
   constructor() {
-    super(172, "Ressourcensilo", 1, {
+    super(172, 'Ressourcensilo', 1, {
       energy: 0,
       hp: 0,
       speed: 0,

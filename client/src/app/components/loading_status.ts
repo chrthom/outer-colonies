@@ -31,22 +31,14 @@ export default class LoadingStatus {
       const { x, y } = Phaser.Math.RotateAround(
         {
           x: layout.loadingAnimation.x,
-          y:
-            layout.loadingAnimation.y -
-            (layout.loadingAnimation.radius - height * 0.5),
+          y: layout.loadingAnimation.y - (layout.loadingAnimation.radius - height * 0.5),
         },
         layout.loadingAnimation.x,
         layout.loadingAnimation.y,
         Phaser.Math.DEG_TO_RAD * angle,
       );
       const bar = this.scene.add
-        .rectangle(
-          x,
-          y,
-          layout.loadingAnimation.barWidth,
-          height,
-          layout.colors.primary,
-        )
+        .rectangle(x, y, layout.loadingAnimation.barWidth, height, layout.colors.primary)
         .setAngle(angle)
         .setAlpha(layout.colors.alpha);
       this.bars.push(bar);

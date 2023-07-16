@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card126 extends EquipmentCard {
   constructor() {
     super(
       126,
-      "Kinetische Artillerie",
+      'Kinetische Artillerie',
       3,
       {
         energy: 0,
@@ -36,7 +36,7 @@ export class Card151 extends EquipmentCard {
   constructor() {
     super(
       151,
-      "Kinetikwaffenbatterie",
+      'Kinetikwaffenbatterie',
       2,
       {
         energy: 0,
@@ -68,7 +68,7 @@ export class Card179 extends EquipmentCard {
   constructor() {
     super(
       179,
-      "Pulskanone",
+      'Pulskanone',
       1,
       {
         energy: 0,
@@ -100,7 +100,7 @@ export class Card180 extends EquipmentCard {
   constructor() {
     super(
       180,
-      "Railgun",
+      'Railgun',
       1,
       {
         energy: 0,
@@ -132,7 +132,7 @@ export class Card223 extends EquipmentCard {
   constructor() {
     super(
       223,
-      "Massebeschleuniger",
+      'Massebeschleuniger',
       2,
       {
         energy: -1,
@@ -164,7 +164,7 @@ export class Card310 extends EquipmentCard {
   constructor() {
     super(
       310,
-      "Gauss Kanone",
+      'Gauss Kanone',
       4,
       {
         energy: -3,
@@ -196,7 +196,7 @@ export class Card420 extends EquipmentCard {
   constructor() {
     super(
       420,
-      "Donnerkanone",
+      'Donnerkanone',
       2,
       {
         energy: -1,

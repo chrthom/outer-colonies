@@ -19,11 +19,7 @@ export default class AuthService {
     private authAPIService: AuthApiService,
   ) {}
 
-  login(
-    username: string,
-    password: string,
-    remember: boolean,
-  ): Observable<boolean> {
+  login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;
     this.password = password;
     const loginAttempt = this.check();

@@ -1,10 +1,6 @@
 <div id="login-box">
   <oc-content-box title="Login">
-    <form
-      id="login-form"
-      [formGroup]="loginForm"
-      (ngSubmit)="loginForm.valid ? submit() : {}"
-    >
+    <form id="login-form" [formGroup]="loginForm" (ngSubmit)="loginForm.valid ? submit() : {}">
       <mat-form-field>
         <mat-label>Nutzername oder E-Mail Adresse</mat-label>
         <input matInput formControlName="username" />
@@ -16,11 +12,7 @@
       <mat-slide-toggle color="primary" formControlName="remember">
         <mat-label>Zugangsdaten merken</mat-label>
       </mat-slide-toggle>
-      <button
-        mat-raised-button
-        type="submit"
-        [color]="loginForm.valid ? 'primary' : 'accent'"
-      >
+      <button mat-raised-button type="submit" [color]="loginForm.valid ? 'primary' : 'accent'">
         Anmelden
       </button>
       <mat-error *ngIf="loginFailed">

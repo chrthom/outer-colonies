@@ -1,4 +1,4 @@
-import ColonyCard from "../types/colony_card";
+import ColonyCard from '../types/colony_card';
 import {
   Card160,
   Card186,
@@ -10,7 +10,7 @@ import {
   Card436,
   Card439,
   Card450,
-} from "./hull_1_part_cards";
+} from './hull_1_part_cards';
 import {
   Card103,
   Card140,
@@ -22,7 +22,7 @@ import {
   Card349,
   Card406,
   Card447,
-} from "./equipment_defense_cards";
+} from './equipment_defense_cards';
 import {
   Card130,
   Card168,
@@ -34,13 +34,8 @@ import {
   Card424,
   Card440,
   Card441,
-} from "./equipment_weapon_point_defense_cards";
-import {
-  Card135,
-  Card154,
-  Card164,
-  Card183,
-} from "./infrastructure_action_cards";
+} from './equipment_weapon_point_defense_cards';
+import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
 import {
   Card105,
   Card145,
@@ -56,29 +51,10 @@ import {
   Card451,
   Card452,
   Card453,
-} from "./infrastructure_energy_cards";
-import {
-  Card141,
-  Card165,
-  Card232,
-  Card321,
-  Card427,
-} from "./tactic_economy_cards";
-import {
-  Card119,
-  Card152,
-  Card153,
-  Card228,
-  Card446,
-} from "./hull_staton_cards";
-import {
-  Card166,
-  Card182,
-  Card343,
-  Card344,
-  Card347,
-  Card421,
-} from "./equipment_weapon_laser_cards";
+} from './infrastructure_energy_cards';
+import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
+import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
+import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
 import {
   Card126,
   Card151,
@@ -87,32 +63,11 @@ import {
   Card223,
   Card310,
   Card420,
-} from "./equipment_weapon_kinetic_cards";
-import {
-  Card104,
-  Card109,
-  Card161,
-  Card325,
-  Card434,
-  Card449,
-} from "./equipment_util_cards";
-import {
-  Card118,
-  Card125,
-  Card157,
-  Card209,
-  Card303,
-  Card409,
-} from "./equipment_weapon_plasma_cards";
-import { Card106, Card107, Card207 } from "./equipment_weapon_particle_cards";
-import {
-  Card101,
-  Card127,
-  Card136,
-  Card216,
-  Card304,
-  Card412,
-} from "./equipment_weapon_torpedo_cards";
+} from './equipment_weapon_kinetic_cards';
+import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
+import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
+import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
+import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
   Card132,
@@ -128,7 +83,7 @@ import {
   Card418,
   Card444,
   Card445,
-} from "./hull_2_part_cards";
+} from './hull_2_part_cards';
 import {
   Card116,
   Card117,
@@ -143,13 +98,13 @@ import {
   Card313,
   Card314,
   Card315,
-} from "./hull_3_part_cards";
-import { Card174, Card337, Card338 } from "./tactic_military_cards";
-import { Card110 } from "./tactic_science_cards";
-import Card from "../card";
-import { Card172 } from "./infrastructure_util.cards";
-import { Card230, Card333, Card435 } from "./infrastructure_start.cards";
-import { Card114, Card155 } from "./infrastructure_end.cards";
+} from './hull_3_part_cards';
+import { Card174, Card337, Card338 } from './tactic_military_cards';
+import { Card110 } from './tactic_science_cards';
+import Card from '../card';
+import { Card172 } from './infrastructure_util.cards';
+import { Card230, Card333, Card435 } from './infrastructure_start.cards';
+import { Card114, Card155 } from './infrastructure_end.cards';
 
 export default class CardCollection {
   static cards = {
@@ -397,8 +352,6 @@ export default class CardCollection {
   ];
 
   static pickRandomDeck(): Card[] {
-    return this.starterDecks[
-      Math.floor(Math.random() * this.starterDecks.length)
-    ].slice();
+    return this.starterDecks[Math.floor(Math.random() * this.starterDecks.length)].slice();
   }
 }

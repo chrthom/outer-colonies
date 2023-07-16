@@ -1,8 +1,8 @@
-import { BattleType } from "../config/enums";
-import { rules } from "../config/rules";
-import Battle from "../game_state/battle";
-import Match from "../game_state/match";
-import { getCardStackByUUID } from "../utils/helpers";
+import { BattleType } from '../config/enums';
+import { rules } from '../config/rules';
+import Battle from '../game_state/battle';
+import Match from '../game_state/match';
+import { getCardStackByUUID } from '../utils/helpers';
 
 export class ClientPlannedBattle {
   type: BattleType;
@@ -13,18 +13,11 @@ export class ClientPlannedBattle {
     return ClientPlannedBattle.missingCards(plannedBattle) == 0;
   }
   static missingCards(plannedBattle: ClientPlannedBattle): number {
-    return (
-      rules.cardsPerMission -
-      plannedBattle.downsideCardsNum -
-      plannedBattle.upsideCardsNum
-    );
+    return rules.cardsPerMission - plannedBattle.downsideCardsNum - plannedBattle.upsideCardsNum;
   }
 }
 
-export default function toBattle(
-  match: Match,
-  plannedBattle: ClientPlannedBattle,
-): Battle {
+export default function toBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
   const ships = plannedBattle.shipIds
     .map((id) => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
     .filter((cs) => cs.isMissionReady());
@@ -32,12 +25,8 @@ export default function toBattle(
   let battle: Battle;
   switch (plannedBattle.type) {
     case BattleType.Mission:
-      const downsideCards = match
-        .getActivePlayer()
-        .pickCardsFromDeck(plannedBattle.downsideCardsNum);
-      const upsideCards = match
-        .getActivePlayer()
-        .pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
+      const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
+      const upsideCards = match.getActivePlayer().pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
       battle = new Battle(BattleType.Mission);
       battle.ships[match.actionPendingByPlayerNo] = ships;
       battle.downsidePriceCards = downsideCards;

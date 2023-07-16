@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card130 extends EquipmentCard {
   constructor() {
     super(
       130,
-      "Flakartillerie",
+      'Flakartillerie',
       2,
       {
         energy: 0,
@@ -36,7 +36,7 @@ export class Card168 extends EquipmentCard {
   constructor() {
     super(
       168,
-      "Automatikkanone",
+      'Automatikkanone',
       1,
       {
         energy: 0,
@@ -68,7 +68,7 @@ export class Card181 extends EquipmentCard {
   constructor() {
     super(
       181,
-      "Flugabwehrkanone",
+      'Flugabwehrkanone',
       1,
       {
         energy: 0,
@@ -100,7 +100,7 @@ export class Card234 extends EquipmentCard {
   constructor() {
     super(
       234,
-      "Punktabwehrlaser",
+      'Punktabwehrlaser',
       1,
       {
         energy: 0,
@@ -132,7 +132,7 @@ export class Card237 extends EquipmentCard {
   constructor() {
     super(
       237,
-      "Mini-Railgun",
+      'Mini-Railgun',
       1,
       {
         energy: 0,
@@ -164,7 +164,7 @@ export class Card339 extends EquipmentCard {
   constructor() {
     super(
       339,
-      "Gatling",
+      'Gatling',
       1,
       {
         energy: 0,
@@ -196,7 +196,7 @@ export class Card340 extends EquipmentCard {
   constructor() {
     super(
       340,
-      "Abfangraketenwerfer",
+      'Abfangraketenwerfer',
       1,
       {
         energy: 0,
@@ -228,7 +228,7 @@ export class Card424 extends EquipmentCard {
   constructor() {
     super(
       424,
-      "Sturmgeschütz",
+      'Sturmgeschütz',
       2,
       {
         energy: -1,
@@ -260,7 +260,7 @@ export class Card440 extends EquipmentCard {
   constructor() {
     super(
       440,
-      "Impulskanone",
+      'Impulskanone',
       1,
       {
         energy: 0,
@@ -292,7 +292,7 @@ export class Card441 extends EquipmentCard {
   constructor() {
     super(
       441,
-      "Flechettewerfer",
+      'Flechettewerfer',
       1,
       {
         energy: 0,

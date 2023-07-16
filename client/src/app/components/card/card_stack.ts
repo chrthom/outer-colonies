@@ -1,10 +1,6 @@
 import { layout } from '../../config/layout';
 import Game from '../../scenes/game';
-import {
-  BattleType,
-  MsgTypeInbound,
-  TurnPhase,
-} from '../../../../../server/src/components/config/enums';
+import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/components/config/enums';
 import {
   ClientAttack,
   ClientCard,
@@ -25,12 +21,7 @@ export default class CardStack {
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
   private scene!: Game;
-  constructor(
-    scene: Game,
-    data: ClientCardStack,
-    fromHand?: boolean,
-    origin?: CardImage,
-  ) {
+  constructor(scene: Game, data: ClientCardStack, fromHand?: boolean, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
@@ -46,13 +37,9 @@ export default class CardStack {
       this.cards.map((c) => c.cardId),
       data.cards.map((c) => c.id),
     );
-    this.filterCardsByIdList(data.cards.map((c) => c.id)).forEach((c) =>
-      c.destroy(),
-    );
+    this.filterCardsByIdList(data.cards.map((c) => c.id)).forEach((c) => c.destroy());
     if (removedCardIds.length) this.scene.retractCardsExists = true;
-    this.filterCardsByIdList(removedCardIds).forEach((c) =>
-      c.discard(this.data.ownedByPlayer, true),
-    );
+    this.filterCardsByIdList(removedCardIds).forEach((c) => c.discard(this.data.ownedByPlayer, true));
     this.data.cards = data.cards;
     this.data.criticalDamage = data.criticalDamage;
     this.data.damage = data.damage;
@@ -71,11 +58,7 @@ export default class CardStack {
           ? handCard.image.y
           : layout.deck.y
         : layout.discardPile.yOpponent;
-      const angle = this.data.ownedByPlayer
-        ? handCard
-          ? handCard.image.angle
-          : 0
-        : 180;
+      const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
@@ -127,22 +110,12 @@ export default class CardStack {
         angle: this.data.ownedByPlayer ? 0 : 180,
       });
     });
-    if (this.damageIndicator)
-      this.damageIndicator.tween(this.x(), this.zoneLayout().y);
-    if (this.defenseIndicator)
-      this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
+    if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
+    if (this.defenseIndicator) this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
   }
   private createCards(origin?: CardImage, fromHand?: boolean) {
     this.cards = this.data.cards.map(
-      (c) =>
-        new Card(
-          this.scene,
-          this.x(),
-          this.y(c.index),
-          !this.data.ownedByPlayer,
-          this.uuid,
-          c,
-        ),
+      (c) => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c),
     );
     this.cards.forEach((c) => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -175,17 +148,11 @@ export default class CardStack {
     }
     if (fromHand) {
       if (origin) {
-        this.cards[0]
-          .setX(origin.image.x)
-          .setY(origin.image.y)
-          .setAngle(origin.image.angle);
+        this.cards[0].setX(origin.image.x).setY(origin.image.y).setAngle(origin.image.angle);
         this.tween();
       }
       if (!this.data.ownedByPlayer) {
-        this.cards[0]
-          .setX(layout.discardPile.x)
-          .setY(layout.discardPile.yOpponent)
-          .setAngle(180);
+        this.cards[0].setX(layout.discardPile.x).setY(layout.discardPile.yOpponent).setAngle(180);
         this.tween();
       }
     }
@@ -195,19 +162,15 @@ export default class CardStack {
       this.zoneLayout().x +
       (this.data.zoneCardsNum == 1
         ? this.zoneLayout().maxWidth / 2
-        : (this.data.index * this.zoneLayout().maxWidth) /
-          (this.data.zoneCardsNum - 1))
+        : (this.data.index * this.zoneLayout().maxWidth) / (this.data.zoneCardsNum - 1))
     );
   }
   private y(index: number) {
-    const yDistance =
-      layout.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
+    const yDistance = layout.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
   private zoneLayout() {
-    return this.data.ownedByPlayer
-      ? layout.player[this.data.zone]
-      : layout.opponent[this.data.zone];
+    return this.data.ownedByPlayer ? layout.player[this.data.zone] : layout.opponent[this.data.zone];
   }
   private destroyIndicators() {
     if (this.damageIndicator) this.damageIndicator.destroy();
@@ -221,26 +184,16 @@ export default class CardStack {
         case TurnPhase.Build:
           if (state.playerIsActive) {
             if (this.scene.activeCards.hand) {
-              this.scene.socket.emit(
-                MsgTypeInbound.Handcard,
-                this.scene.activeCards.hand,
-                this.uuid,
-              );
+              this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
             } else if (this.isOpponentColony()) {
               this.scene.resetView(
-                this.scene.plannedBattle.type == BattleType.Raid
-                  ? BattleType.None
-                  : BattleType.Raid,
+                this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid,
               );
-            } else if (
-              this.scene.plannedBattle.type != BattleType.None &&
-              this.data.missionReady
-            ) {
+            } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
               if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
-                this.scene.plannedBattle.shipIds =
-                  this.scene.plannedBattle.shipIds.filter(
-                    (id) => id != this.uuid,
-                  );
+                this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(
+                  (id) => id != this.uuid,
+                );
               } else {
                 this.scene.plannedBattle.shipIds.push(this.uuid);
               }
@@ -248,8 +201,7 @@ export default class CardStack {
           } else {
             if (this.data.missionReady) {
               if (this.scene.interveneShipIds.includes(this.uuid)) {
-                this.scene.interveneShipIds =
-                  this.scene.interveneShipIds.filter((id) => id != this.uuid);
+                this.scene.interveneShipIds = this.scene.interveneShipIds.filter((id) => id != this.uuid);
               } else if (this.data.interventionReady) {
                 this.scene.interveneShipIds.push(this.uuid);
               }

@@ -27,15 +27,8 @@ export default class Background {
       oColony: layout.opponent.colony.corners,
       oOrbital: layout.opponent.orbital.corners,
     };
-    const addCorner = (
-      x: number,
-      y: number,
-      angle: number,
-      opponent: boolean,
-    ) =>
-      this.scene.add
-        .image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`)
-        .setAngle(angle);
+    const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
+      this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
     const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
       this.scene.add
         .text(c.xLeft, c.yBottom, caption)

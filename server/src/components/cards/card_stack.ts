@@ -1,10 +1,10 @@
-import Card from "./card";
-import CardProfile from "./card_profile";
-import { CardType, TurnPhase, Zone } from "../config/enums";
-import { v4 as uuidv4 } from "uuid";
-import ActionPool from "./action_pool";
-import Player from "../game_state/player";
-import { spliceCardStackByUUID } from "../utils/helpers";
+import Card from './card';
+import CardProfile from './card_profile';
+import { CardType, TurnPhase, Zone } from '../config/enums';
+import { v4 as uuidv4 } from 'uuid';
+import ActionPool from './action_pool';
+import Player from '../game_state/player';
+import { spliceCardStackByUUID } from '../utils/helpers';
 
 export default class CardStack {
   card!: Card;
@@ -32,15 +32,11 @@ export default class CardStack {
   attack(target: CardStack) {
     if (!this.attackAvailable) {
       console.log(
-        `WARN: ${this.getPlayer().name} tried to attack with a card ${
-          this.card.name
-        }, which cannot attack`,
+        `WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`,
       );
     } else if (!this.card.isInRange(this.getPlayer().match.battle.range)) {
       console.log(
-        `WARN: ${this.getPlayer().name} tried to attack with a card ${
-          this.card.name
-        } at wrong range`,
+        `WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name} at wrong range`,
       );
     } else {
       const attackResult = this.card.attack(this, target);
@@ -97,9 +93,7 @@ export default class CardStack {
     return this.attachedCards.flatMap((cs) => cs.getCardStacks()).concat(this);
   }
   getPlayer(): Player {
-    return this.parentCardStack
-      ? this.parentCardStack.getPlayer()
-      : this.parentPlayer;
+    return this.parentCardStack ? this.parentCardStack.getPlayer() : this.parentPlayer;
   }
   getRootCardStack(): CardStack {
     if (this.parentCardStack) return this.parentCardStack.getRootCardStack();
@@ -116,29 +110,17 @@ export default class CardStack {
     const rootCardStack = this.getRootCardStack();
     if (this.type() == CardType.Colony) {
       return false;
-    } else if (
-      rootCardStack.zone == Zone.Colony &&
-      rootCardStack.type() == CardType.Infrastructure
-    ) {
-      return (
-        this.card.profile().energy < 0 &&
-        this.getPlayer().getColonyCardStack().profile().energy < 0
-      );
+    } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type() == CardType.Infrastructure) {
+      return this.card.profile().energy < 0 && this.getPlayer().getColonyCardStack().profile().energy < 0;
     } else {
-      return (
-        this.card.profile().energy < 0 && rootCardStack.profile().energy < 0
-      );
+      return this.card.profile().energy < 0 && rootCardStack.profile().energy < 0;
     }
   }
   isFlightReady(): boolean {
     return this.card.isFlightReady(this.getCards());
   }
   isMissionReady(): boolean {
-    return (
-      this.zone == Zone.Oribital &&
-      this.type() == CardType.Hull &&
-      this.profile().speed > 0
-    );
+    return this.zone == Zone.Oribital && this.type() == CardType.Hull && this.profile().speed > 0;
   }
   isPlayable(): boolean {
     return this.zone == Zone.Hand && this.card.isPlayable(this.getPlayer());
@@ -168,20 +150,12 @@ export default class CardStack {
         .reduce((a, b) => a + b, 0);
       const colonyCardsProfile = this.getPlayer()
         .cardStacks.filter((cs) => cs.zone == Zone.Colony)
-        .filter((cs) =>
-          [CardType.Orb, CardType.Infrastructure].includes(cs.type()),
-        )
+        .filter((cs) => [CardType.Orb, CardType.Infrastructure].includes(cs.type()))
         .map((cs) => cs.profile())
-        .reduce(
-          (a, b) => CardProfile.combineCardProfiles(a, b),
-          new CardProfile(),
-        );
+        .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
       colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
       colonyCardsProfile.hp = 0; // Else Building HP would increase the colony's HP
-      return CardProfile.combineCardProfiles(
-        colonyCardsProfile,
-        this.card.profile(),
-      );
+      return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile());
     } else {
       return this.getCards()
         .map((c) => c.profile())
@@ -189,9 +163,7 @@ export default class CardStack {
     }
   }
   profileMatches(c: CardProfile): boolean {
-    return CardProfile.isValid(
-      CardProfile.combineCardProfiles(this.profile(), c),
-    );
+    return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile(), c));
   }
   retract() {
     if (this.parentCardStack) {
@@ -200,12 +172,8 @@ export default class CardStack {
       spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
     }
     this.getCards().forEach((c) => c.onRetraction(this.getPlayer()));
-    this.getPlayer().takeCards(
-      this.getCards().filter((c) => c.canBeRetracted(this.isRootCard)),
-    );
-    this.getPlayer().discardCards(
-      ...this.getCards().filter((c) => !c.canBeRetracted(this.isRootCard)),
-    );
+    this.getPlayer().takeCards(this.getCards().filter((c) => c.canBeRetracted(this.isRootCard)));
+    this.getPlayer().discardCards(...this.getCards().filter((c) => !c.canBeRetracted(this.isRootCard)));
   }
   type(): CardType {
     return this.card.type;

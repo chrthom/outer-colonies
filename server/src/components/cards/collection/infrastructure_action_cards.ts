@@ -1,8 +1,8 @@
-import { CardType } from "../../config/enums";
-import Player from "../../game_state/player";
-import ActionPool, { CardAction } from "../action_pool";
-import { InfrastructureProfile } from "../card_profile";
-import InfrastructureCard from "../types/infrastructure_card";
+import { CardType } from '../../config/enums';
+import Player from '../../game_state/player';
+import ActionPool, { CardAction } from '../action_pool';
+import { InfrastructureProfile } from '../card_profile';
+import InfrastructureCard from '../types/infrastructure_card';
 
 function addToActionPool(player: Player, card: InfrastructureCard) {
   player.actionPool.push(...card.actionPool().getPool());
@@ -41,7 +41,7 @@ export class Card135 extends ActionInfrastructureCard {
   constructor() {
     super(
       135,
-      "Schiffswerft",
+      'Schiffswerft',
       2,
       {
         energy: -2,
@@ -64,7 +64,7 @@ export class Card154 extends ActionInfrastructureCard {
   constructor() {
     super(
       154,
-      "Bergbauaußenposten",
+      'Bergbauaußenposten',
       2,
       {
         energy: -1,
@@ -87,7 +87,7 @@ export class Card164 extends ActionInfrastructureCard {
   constructor() {
     super(
       164,
-      "Rüstungsschmiede",
+      'Rüstungsschmiede',
       2,
       {
         energy: -2,
@@ -110,7 +110,7 @@ export class Card183 extends ActionInfrastructureCard {
   constructor() {
     super(
       183,
-      "Industriekomplex",
+      'Industriekomplex',
       1,
       {
         energy: -5,

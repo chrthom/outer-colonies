@@ -1,4 +1,4 @@
-import { CardType } from "../config/enums";
+import { CardType } from '../config/enums';
 
 export interface AuthRegisterRequest {
   username: string;

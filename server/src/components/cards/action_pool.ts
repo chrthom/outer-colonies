@@ -1,4 +1,4 @@
-import { CardType } from "../config/enums";
+import { CardType } from '../config/enums';
 
 export class CardAction {
   possibleCardTypes!: CardType[];
@@ -13,7 +13,7 @@ export class CardAction {
     return this.possibleCardTypes.length;
   }
   toString(): string {
-    return this.possibleCardTypes.sort().join("_");
+    return this.possibleCardTypes.sort().join('_');
   }
 }
 
@@ -26,8 +26,7 @@ export default class ActionPool {
   activate(cardType: CardType) {
     const availablePools = this.getActionsFor(cardType);
     if (availablePools.length > 0) {
-      availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted =
-        true;
+      availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
       this.removeDepleted();
     }
   }
@@ -50,9 +49,7 @@ export default class ActionPool {
     cardActions
       .map((a) => a.toString())
       .forEach((s) => {
-        console.log(
-          `Remove ${s} | Found ${this.pool.filter((p) => p.toString() == s)}`,
-        ); /////
+        console.log(`Remove ${s} | Found ${this.pool.filter((p) => p.toString() == s)}`); /////
         this.pool.filter((p) => p.toString() == s)[0].depleted = true;
         this.removeDepleted();
       });
@@ -60,7 +57,7 @@ export default class ActionPool {
   toString(): string {
     return this.getPool()
       .map((ca) => ca.toString())
-      .join("__");
+      .join('__');
   }
   private removeDepleted() {
     const depleted = this.pool.filter((a) => a.depleted);

@@ -1,21 +1,15 @@
-import { CardType } from "../../config/enums";
-import EquipmentCard from "../types/equipment_card";
-import CardCollection from "./card_collection";
+import { CardType } from '../../config/enums';
+import EquipmentCard from '../types/equipment_card';
+import CardCollection from './card_collection';
 
-const equipmentCards = CardCollection.allCards.filter(
-  (c) => c.type == CardType.Equipment,
-);
+const equipmentCards = CardCollection.allCards.filter((c) => c.type == CardType.Equipment);
 
-const InfrastructureCards = CardCollection.allCards.filter(
-  (c) => c.type == CardType.Infrastructure,
-);
+const InfrastructureCards = CardCollection.allCards.filter((c) => c.type == CardType.Infrastructure);
 
-const weaponCards = equipmentCards
-  .map((c) => <EquipmentCard>c)
-  .filter((c) => c.canAttack());
+const weaponCards = equipmentCards.map((c) => <EquipmentCard>c).filter((c) => c.canAttack());
 
 equipmentCards.concat(InfrastructureCards).forEach((c) => {
-  ["theta", "xi", "phi", "omega", "delta", "psi"].forEach((v) => {
+  ['theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach((v) => {
     test(`${c.name} profile ${v} socket value should be 0 or less`, () => {
       expect(c.profile()[v]).toBeLessThanOrEqual(0);
     });
@@ -23,7 +17,7 @@ equipmentCards.concat(InfrastructureCards).forEach((c) => {
 });
 
 weaponCards.forEach((c) => {
-  ["armour", "shield", "pointDefense"].forEach((v) => {
+  ['armour', 'shield', 'pointDefense'].forEach((v) => {
     test(`${c.name} attack profile ${v} value should be 0 or less`, () => {
       expect(c.attackProfile[v]).toBeLessThanOrEqual(0);
     });

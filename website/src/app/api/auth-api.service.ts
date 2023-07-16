@@ -17,9 +17,9 @@ export default class AuthApiService extends OCApi {
     super(http);
   }
   checkUsernameExists(username: string): Observable<boolean> {
-    return this.get<AuthExistsResponse>(
-      `auth/exists?username=${username}`,
-    ).pipe(map((res) => (res.body ? res.body.exists : false)));
+    return this.get<AuthExistsResponse>(`auth/exists?username=${username}`).pipe(
+      map((res) => (res.body ? res.body.exists : false)),
+    );
   }
   checkEmailExists(email: string): Observable<boolean> {
     return this.get<AuthExistsResponse>(`auth/exists?email=${email}`).pipe(
@@ -27,20 +27,16 @@ export default class AuthApiService extends OCApi {
     );
   }
   register(body: AuthRegisterRequest): Observable<boolean> {
-    return this.post('auth/register', undefined, body,)
-      .pipe(map((res) => res.status >= 200 && res.status < 300),);
+    return this.post('auth/register', undefined, body).pipe(
+      map((res) => res.status >= 200 && res.status < 300),
+    );
   }
   login(body: AuthLoginRequest): Observable<string | undefined> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(
       map((res) => {
         const sessionToken =
-          res.status >= 200 && res.status < 300 && res.body != null
-            ? res.body.sessionToken
-            : undefined;
-        if (!sessionToken)
-          console.log(
-            `Login API call failed with HTTP ${res.status}: ${res.statusText}`,
-          );
+          res.status >= 200 && res.status < 300 && res.body != null ? res.body.sessionToken : undefined;
+        if (!sessionToken) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
         return sessionToken;
       }),
     );

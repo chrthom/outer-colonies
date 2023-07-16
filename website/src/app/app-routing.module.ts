@@ -1,11 +1,5 @@
 import { NgModule, inject } from '@angular/core';
-import {
-  CanActivateFn,
-  PreloadAllModules,
-  Router,
-  RouterModule,
-  Routes,
-} from '@angular/router';
+import { CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -75,9 +69,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
-  ],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

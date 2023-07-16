@@ -1,8 +1,8 @@
-import { CardType, TacticDiscipline } from "../../config/enums";
-import Player from "../../game_state/player";
-import ActionPool, { CardAction } from "../action_pool";
-import CardStack from "../card_stack";
-import TacticCard from "../types/tactic_card";
+import { CardType, TacticDiscipline } from '../../config/enums';
+import Player from '../../game_state/player';
+import ActionPool, { CardAction } from '../action_pool';
+import CardStack from '../card_stack';
+import TacticCard from '../types/tactic_card';
 
 abstract class EconomyTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
@@ -17,7 +17,7 @@ export class Card141 extends EconomyTacticCard {
     new CardAction(CardType.Infrastructure),
   );
   constructor() {
-    super(141, "Externe Arbeitskräfte", 2, false, false);
+    super(141, 'Externe Arbeitskräfte', 2, false, false);
   }
   onUtilizaton(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
@@ -30,7 +30,7 @@ export class Card141 extends EconomyTacticCard {
 export class Card165 extends EconomyTacticCard {
   private readonly cardsToDrawPerPsiSocket = 2;
   constructor() {
-    super(165, "Konvoi", 1, false, false);
+    super(165, 'Konvoi', 1, false, false);
   }
   onUtilizaton(player: Player) {
     const freePsiSockets = this.calcFreePsiSockets(player);
@@ -39,9 +39,7 @@ export class Card165 extends EconomyTacticCard {
     }
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.calcFreePsiSockets(player) > 0
-      ? this.onlyColonyTarget(player.cardStacks)
-      : [];
+    return this.calcFreePsiSockets(player) > 0 ? this.onlyColonyTarget(player.cardStacks) : [];
   }
   private calcFreePsiSockets(player: Player): number {
     return player.cardStacks
@@ -55,7 +53,7 @@ export class Card165 extends EconomyTacticCard {
 export class Card232 extends EconomyTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(232, "Warenlieferung", 1, false, false);
+    super(232, 'Warenlieferung', 1, false, false);
   }
   onUtilizaton(player: Player) {
     player.drawCards(this.cardsToDraw);
@@ -68,12 +66,10 @@ export class Card232 extends EconomyTacticCard {
 export class Card321 extends EconomyTacticCard {
   private readonly cardsToRestore = 6;
   constructor() {
-    super(321, "Recycling", 2, false, false);
+    super(321, 'Recycling', 2, false, false);
   }
   onUtilizaton(player: Player) {
-    player.deck.push(
-      ...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore),
-    );
+    player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -83,7 +79,7 @@ export class Card321 extends EconomyTacticCard {
 export class Card427 extends EconomyTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(427, "Immigranten von der Erde", 2, false, false);
+    super(427, 'Immigranten von der Erde', 2, false, false);
   }
   onUtilizaton(player: Player) {
     let foundCards = 0;

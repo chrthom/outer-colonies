@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card101 extends EquipmentCard {
   constructor() {
     super(
       101,
-      "Quantentorpedos",
+      'Quantentorpedos',
       5,
       {
         energy: -1,
@@ -36,7 +36,7 @@ export class Card127 extends EquipmentCard {
   constructor() {
     super(
       127,
-      "Protontorpedos",
+      'Protontorpedos',
       3,
       {
         energy: 0,
@@ -68,7 +68,7 @@ export class Card136 extends EquipmentCard {
   constructor() {
     super(
       136,
-      "Plasmatorpedos",
+      'Plasmatorpedos',
       2,
       {
         energy: 0,
@@ -100,7 +100,7 @@ export class Card216 extends EquipmentCard {
   constructor() {
     super(
       216,
-      "Schwarmraketensystem",
+      'Schwarmraketensystem',
       3,
       {
         energy: 0,
@@ -132,7 +132,7 @@ export class Card304 extends EquipmentCard {
   constructor() {
     super(
       304,
-      "Antimaterietorpedos",
+      'Antimaterietorpedos',
       5,
       {
         energy: -2,
@@ -164,7 +164,7 @@ export class Card412 extends EquipmentCard {
   constructor() {
     super(
       412,
-      "Langstreckentorpedos",
+      'Langstreckentorpedos',
       3,
       {
         energy: 0,

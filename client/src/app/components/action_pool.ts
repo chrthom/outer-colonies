@@ -20,12 +20,7 @@ export default class ActionPool {
           `icon_${action}`,
         )
         .setOrigin(0.5, 0.5)
-        .setTint(
-          layout.colors.primary,
-          layout.colors.neutral,
-          layout.colors.primary,
-          layout.colors.primary,
-        )
+        .setTint(layout.colors.primary, layout.colors.neutral, layout.colors.primary, layout.colors.primary)
         .setAlpha(layout.colors.alpha),
     );
   }

@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card106 extends EquipmentCard {
   constructor() {
     super(
       106,
-      "Tachyonlanze",
+      'Tachyonlanze',
       5,
       {
         energy: -4,
@@ -36,7 +36,7 @@ export class Card107 extends EquipmentCard {
   constructor() {
     super(
       107,
-      "Partiekllanze",
+      'Partiekllanze',
       4,
       {
         energy: -2,
@@ -68,7 +68,7 @@ export class Card207 extends EquipmentCard {
   constructor() {
     super(
       207,
-      "Materiedesintegrator",
+      'Materiedesintegrator',
       4,
       {
         energy: 0,

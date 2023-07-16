@@ -36,7 +36,6 @@ export default class Card extends CardImage {
   }
   tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     super.tween(tweenConfig);
-    if (this.retractCardButton)
-      this.retractCardButton.tween(tweenConfig['x'], tweenConfig['y']);
+    if (this.retractCardButton) this.retractCardButton.tween(tweenConfig['x'], tweenConfig['y']);
   }
 }

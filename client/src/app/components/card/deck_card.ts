@@ -1,10 +1,7 @@
 import CardImage from './card_image';
 import { layout } from '../../config/layout';
 import Game from '../../scenes/game';
-import {
-  BattleType,
-  TurnPhase,
-} from '../../../../../server/src/components/config/enums';
+import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 
@@ -19,8 +16,7 @@ export default class DeckCard extends CardImage {
     const cardsForMission = this.scene.plannedBattle.downsideCardsNum;
     this.indicator = new ValueIndicator(
       this.scene,
-      this.scene.state.deckSize +
-        (cardsForMission ? `/-${cardsForMission}` : ''),
+      this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
       this.scene.state.deckSize - cardsForMission < 10,
       layout.deck.x,
       layout.deck.y,

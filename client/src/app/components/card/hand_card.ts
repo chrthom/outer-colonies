@@ -2,11 +2,7 @@ import CardImage from './card_image';
 import { layout } from '../../config/layout';
 import Game from '../../scenes/game';
 import { ClientHandCard } from '../../../../../server/src/components/shared_interfaces/client_state';
-import {
-  BattleType,
-  MsgTypeInbound,
-  TurnPhase,
-} from '../../../../../server/src/components/config/enums';
+import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { animationConfig } from '../../config/animation';
 
 export default class HandCard extends CardImage {
@@ -37,27 +33,19 @@ export default class HandCard extends CardImage {
     return this.scene.state.hand.length - data.index - 1;
   }
   private x() {
-    return (
-      layout.player.hand.x + this.invIndex(this.data) * layout.player.hand.xStep
-    );
+    return layout.player.hand.x + this.invIndex(this.data) * layout.player.hand.xStep;
   }
   private y() {
-    return (
-      layout.player.hand.y + this.invIndex(this.data) * layout.player.hand.yStep
-    );
+    return layout.player.hand.y + this.invIndex(this.data) * layout.player.hand.yStep;
   }
   private angle() {
-    return (
-      layout.player.hand.startAngle +
-      this.invIndex(this.data) * layout.player.hand.angleStep
-    );
+    return layout.player.hand.startAngle + this.invIndex(this.data) * layout.player.hand.angleStep;
   }
   private onClickAction() {
     if (this.scene.state.playerPendingAction) {
       if (
         this.data.playable &&
-        (this.scene.state.turnPhase != TurnPhase.Build ||
-          this.scene.plannedBattle.type == BattleType.None)
+        (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)
       ) {
         const reset = this.scene.activeCards.hand == this.uuid;
         this.scene.activeCards.stack = undefined;

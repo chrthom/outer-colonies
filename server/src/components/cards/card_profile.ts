@@ -1,6 +1,4 @@
-export default class CardProfile
-  implements HullProfile, EquipmentProfile, InfrastructureProfile
-{
+export default class CardProfile implements HullProfile, EquipmentProfile, InfrastructureProfile {
   pointDefense: number = 0;
   shield: number = 0;
   armour: number = 0;
@@ -28,9 +26,7 @@ export default class CardProfile
   static fromHullProfile(hullProfile: HullProfile): CardProfile {
     return this.fromBaseProfile(hullProfile);
   }
-  static fromInfrastructureProfile(
-    infrastructureProfile: InfrastructureProfile,
-  ): CardProfile {
+  static fromInfrastructureProfile(infrastructureProfile: InfrastructureProfile): CardProfile {
     return this.fromBaseProfile(infrastructureProfile);
   }
   static combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {

@@ -1,7 +1,4 @@
-import {
-  BattleType,
-  TurnPhase,
-} from '../../../../../server/src/components/config/enums';
+import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { layout } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -22,9 +19,7 @@ export default class DiscardPile extends CardImage {
       this.setVisible(false);
     } else {
       this.setCardId(this.getTopCard());
-      this.image
-        .off('pointerdown')
-        .on('pointerdown', () => this.onClickAction());
+      this.image.off('pointerdown').on('pointerdown', () => this.onClickAction());
       this.setVisible(true);
       this.enableMaximizeOnMouseover();
       const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
@@ -56,9 +51,7 @@ export default class DiscardPile extends CardImage {
     ) {
       if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
         this.scene.resetView(BattleType.None);
-      } else if (
-        this.scene.plannedBattle.upsideCardsNum < this.cardIds.length
-      ) {
+      } else if (this.scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
         if (this.scene.plannedBattle.type != BattleType.Mission) {
           this.scene.resetView(BattleType.Mission);
         }

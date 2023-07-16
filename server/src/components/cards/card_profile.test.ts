@@ -1,4 +1,4 @@
-import CardProfile, { BaseProfile } from "./card_profile";
+import CardProfile, { BaseProfile } from './card_profile';
 
 test(`Cast from BaseProfile to CardProfile`, () => {
   const baseProfile: BaseProfile = {
@@ -27,7 +27,5 @@ test(`Cast from BaseProfile to CardProfile`, () => {
     psi: 1,
     handCardLimit: 0,
   };
-  expect(CardProfile.fromBaseProfile(baseProfile)).toStrictEqual(
-    expectedProfile,
-  );
+  expect(CardProfile.fromBaseProfile(baseProfile)).toStrictEqual(expectedProfile);
 });

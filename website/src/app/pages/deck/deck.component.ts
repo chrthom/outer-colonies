@@ -24,12 +24,8 @@ export class DeckPage implements OnInit {
   reload() {
     this.deckAPService.listDeck().subscribe((res) => {
       if (res) {
-        this.activeCards = res.cards
-          .filter((c) => c.inUse)
-          .sort(this.cardSortFn);
-        this.reserveCards = res.cards
-          .filter((c) => !c.inUse)
-          .sort(this.cardSortFn);
+        this.activeCards = res.cards.filter((c) => c.inUse).sort(this.cardSortFn);
+        this.reserveCards = res.cards.filter((c) => !c.inUse).sort(this.cardSortFn);
       }
     });
   }
@@ -39,9 +35,7 @@ export class DeckPage implements OnInit {
   }
   deactivateCard(card: DeckCard) {
     if (this.activeCards.length > this.minCards)
-      this.deckAPService
-        .deactivateCard(card.id)
-        .subscribe((_) => this.reload());
+      this.deckAPService.deactivateCard(card.id).subscribe((_) => this.reload());
   }
   toCardUrl(cardId: number): string {
     return `${this.cardsUrl}/${cardId}.png`;

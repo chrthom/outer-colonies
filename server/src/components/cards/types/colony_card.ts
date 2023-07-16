@@ -1,14 +1,14 @@
-import { CardType } from "../../config/enums";
-import { rules } from "../../config/rules";
-import Player from "../../game_state/player";
-import ActionPool, { CardAction } from "../action_pool";
-import Card from "../card";
-import CardProfile from "../card_profile";
-import CardStack from "../card_stack";
+import { CardType } from '../../config/enums';
+import { rules } from '../../config/rules';
+import Player from '../../game_state/player';
+import ActionPool, { CardAction } from '../action_pool';
+import Card from '../card';
+import CardProfile from '../card_profile';
+import CardStack from '../card_stack';
 
 export default class ColonyCard extends Card {
   constructor() {
-    super(0, "Colony", CardType.Colony, 0);
+    super(0, 'Colony', CardType.Colony, 0);
   }
   getValidTargets(): CardStack[] {
     return [];

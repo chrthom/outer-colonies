@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card118 extends EquipmentCard {
   constructor() {
     super(
       118,
-      "Ionendisruptor",
+      'Ionendisruptor',
       3,
       {
         energy: 0,
@@ -36,7 +36,7 @@ export class Card125 extends EquipmentCard {
   constructor() {
     super(
       125,
-      "Plasmakanone",
+      'Plasmakanone',
       3,
       {
         energy: -1,
@@ -68,7 +68,7 @@ export class Card157 extends EquipmentCard {
   constructor() {
     super(
       157,
-      "Plasmawerfer",
+      'Plasmawerfer',
       2,
       {
         energy: 0,
@@ -100,7 +100,7 @@ export class Card209 extends EquipmentCard {
   constructor() {
     super(
       209,
-      "Phasendisruptor",
+      'Phasendisruptor',
       4,
       {
         energy: 0,
@@ -132,7 +132,7 @@ export class Card303 extends EquipmentCard {
   constructor() {
     super(
       303,
-      "Archenemitter",
+      'Archenemitter',
       5,
       {
         energy: -2,
@@ -164,7 +164,7 @@ export class Card409 extends EquipmentCard {
   constructor() {
     super(
       409,
-      "Plasmabeschleuniger",
+      'Plasmabeschleuniger',
       4,
       {
         energy: -2,

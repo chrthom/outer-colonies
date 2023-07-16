@@ -18,10 +18,7 @@ export class DeckApiService extends OCApi {
   listDeck(): Observable<DeckListResponse | undefined> {
     return this.get<DeckListResponse>('deck', this.token).pipe(
       map((res) => {
-        const result =
-          res.status >= 200 && res.status < 300 && res.body != null
-            ? res.body
-            : undefined;
+        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
         return result;
       }),
     );
@@ -30,9 +27,7 @@ export class DeckApiService extends OCApi {
     return this.post(`deck/${cardInstanceId}`, this.token).pipe(map((_) => {}));
   }
   deactivateCard(cardInstanceId: number): Observable<void> {
-    return this.delete(`deck/${cardInstanceId}`, this.token).pipe(
-      map((_) => {}),
-    );
+    return this.delete(`deck/${cardInstanceId}`, this.token).pipe(map((_) => {}));
   }
   private get token(): string {
     return this.authService.sessionToken ? this.authService.sessionToken : '';

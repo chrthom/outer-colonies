@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card103 extends EquipmentCard {
   constructor() {
     super(
       103,
-      "Adamantiumpanzer",
+      'Adamantiumpanzer',
       5,
       {
         energy: 0,
@@ -29,7 +29,7 @@ export class Card140 extends EquipmentCard {
   constructor() {
     super(
       140,
-      "Deflektorschilde",
+      'Deflektorschilde',
       2,
       {
         energy: -2,
@@ -54,7 +54,7 @@ export class Card163 extends EquipmentCard {
   constructor() {
     super(
       163,
-      "Verbundpanzerung",
+      'Verbundpanzerung',
       1,
       {
         energy: 0,
@@ -79,7 +79,7 @@ export class Card170 extends EquipmentCard {
   constructor() {
     super(
       170,
-      "Strahlenschilde",
+      'Strahlenschilde',
       1,
       {
         energy: 0,
@@ -104,7 +104,7 @@ export class Card171 extends EquipmentCard {
   constructor() {
     super(
       171,
-      "Titanplattenplanzer",
+      'Titanplattenplanzer',
       1,
       {
         energy: 0,
@@ -129,7 +129,7 @@ export class Card184 extends EquipmentCard {
   constructor() {
     super(
       184,
-      "Rumpferweiterung",
+      'Rumpferweiterung',
       1,
       {
         energy: 0,
@@ -154,7 +154,7 @@ export class Card240 extends EquipmentCard {
   constructor() {
     super(
       240,
-      "Ceramo-Stahl",
+      'Ceramo-Stahl',
       1,
       {
         energy: 0,
@@ -179,7 +179,7 @@ export class Card349 extends EquipmentCard {
   constructor() {
     super(
       349,
-      "Dura-Stahl",
+      'Dura-Stahl',
       1,
       {
         energy: 0,
@@ -204,7 +204,7 @@ export class Card406 extends EquipmentCard {
   constructor() {
     super(
       406,
-      "Kohlenstoffsilikatpanzer",
+      'Kohlenstoffsilikatpanzer',
       4,
       {
         energy: 0,
@@ -229,7 +229,7 @@ export class Card447 extends EquipmentCard {
   constructor() {
     super(
       447,
-      "Schildgondel",
+      'Schildgondel',
       1,
       {
         energy: 0,

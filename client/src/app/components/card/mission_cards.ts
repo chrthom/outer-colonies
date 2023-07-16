@@ -22,9 +22,7 @@ export default class MissionCards {
           layout.cards.scale.min,
         );
       });
-      this.minCards
-        .filter((c) => c.cardId != 1)
-        .forEach((c) => c.enableMaximizeOnMouseover());
+      this.minCards.filter((c) => c.cardId != 1).forEach((c) => c.enableMaximizeOnMouseover());
     }
   }
 }

@@ -12,19 +12,13 @@ export default class Preloader {
       .graphics()
       .fillStyle(layout.colors.primary, layout.colors.fadedAlpha)
       .fillRect(
-        layout.preloader.x -
-          layout.preloader.width / 2 -
-          layout.preloader.boxPadding,
+        layout.preloader.x - layout.preloader.width / 2 - layout.preloader.boxPadding,
         layout.preloader.y - layout.preloader.boxPadding,
         layout.preloader.width + 2 * layout.preloader.boxPadding,
         layout.preloader.height + 2 * layout.preloader.boxPadding,
       );
     this.text = scene.add
-      .text(
-        layout.preloader.x,
-        layout.preloader.y + layout.preloader.textOffsetY,
-        'Lade Spieldaten...',
-      )
+      .text(layout.preloader.x, layout.preloader.y + layout.preloader.textOffsetY, 'Lade Spieldaten...')
       .setFontSize(layout.font.size)
       .setFontFamily(layout.font.textFamily)
       .setColor(layout.font.color)

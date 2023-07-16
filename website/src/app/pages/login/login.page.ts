@@ -30,11 +30,7 @@ export class LoginPage {
   }
   submit() {
     this.authService
-      .login(
-        this.loginForm.value.username,
-        this.loginForm.value.password,
-        this.loginForm.value.remember,
-      )
+      .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
       .subscribe((success) => {
         if (success) this.router.navigate(['/']);
         else this.loginFailed = true;

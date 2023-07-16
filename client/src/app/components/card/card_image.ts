@@ -8,14 +8,7 @@ export default class CardImage {
   protected scene!: Game;
   private imageHighlight!: Phaser.GameObjects.Image;
   private imageMask!: Phaser.GameObjects.Image;
-  constructor(
-    scene: Game,
-    x: number,
-    y: number,
-    cardId: number,
-    opponentCard?: boolean,
-    scale?: number,
-  ) {
+  constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
     this.scene = scene;
     this.cardId = cardId;
     const setImageProps = (image: Phaser.GameObjects.Image) =>
@@ -23,18 +16,11 @@ export default class CardImage {
         .setOrigin(0.5, 1)
         .setAngle(opponentCard ? 180 : 0)
         .setScale(scale ? scale : layout.cards.scale.normal);
-    this.imageHighlight = setImageProps(
-      scene.add.image(x, y, 'card_glow').setVisible(false),
-    );
+    this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
     this.image = setImageProps(
-      scene.add
-        .image(x, y, `card_${cardId}`)
-        .setCrop(41, 41, 740, 1040)
-        .setInteractive(),
+      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive(),
     );
-    this.imageMask = setImageProps(
-      scene.add.image(x, y, 'card_mask').setVisible(false),
-    );
+    this.imageMask = setImageProps(scene.add.image(x, y, 'card_mask').setVisible(false));
     this.image.setMask(this.imageMask.createBitmapMask());
   }
   destroy() {
@@ -49,16 +35,11 @@ export default class CardImage {
       targets: undefined,
       duration: animationConfig.duration.move,
       x: toDeck ? layout.deck.x : layout.discardPile.x,
-      y: ownedByPlayer
-        ? toDeck
-          ? layout.deck.y
-          : layout.discardPile.y
-        : layout.discardPile.yOpponent,
+      y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.yOpponent,
       angle: ownedByPlayer ? 0 : 180,
       scale: layout.cards.scale.normal,
       onComplete: () => {
-        if (ownedByPlayer && !toDeck)
-          this.scene.obj.discardPile.update(discardPileIds);
+        if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
       },
     });

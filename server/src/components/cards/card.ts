@@ -1,8 +1,8 @@
-import CardStack from "./card_stack";
-import CardProfile from "./card_profile";
-import { CardType, TurnPhase } from "../config/enums";
-import ActionPool from "./action_pool";
-import Player from "../game_state/player";
+import CardStack from './card_stack';
+import CardProfile from './card_profile';
+import { CardType, TurnPhase } from '../config/enums';
+import ActionPool from './action_pool';
+import Player from '../game_state/player';
 
 export default abstract class Card {
   readonly id!: number;
@@ -39,8 +39,7 @@ export default abstract class Card {
     return (
       player.actionPool.hasActionFor(this.type) &&
       (this.playableOutsideBuildPhase ||
-        (player.no == player.match.activePlayerNo &&
-          player.match.turnPhase == TurnPhase.Build)) &&
+        (player.no == player.match.activePlayerNo && player.match.turnPhase == TurnPhase.Build)) &&
       this.getValidTargets(player).length > 0
     );
   }

@@ -10,20 +10,14 @@ body {
 @font-face {
   font-family: "latin-modern-sans";
   src:
-    url("https://api.outercolonies.de/assets/fonts/latin-modern-sans.woff2")
-      format("woff2"),
-    url("https://api.outercolonies.de/assets/fonts/latin-modern-sans.woff")
-      format("woff"),
-    url("https://api.outercolonies.de/assets/latin-modern-sans.ttf")
-      format("truetype");
+    url("https://api.outercolonies.de/assets/fonts/latin-modern-sans.woff2") format("woff2"),
+    url("https://api.outercolonies.de/assets/fonts/latin-modern-sans.woff") format("woff"),
+    url("https://api.outercolonies.de/assets/latin-modern-sans.ttf") format("truetype");
 }
 @font-face {
   font-family: "latin-modern-mono-caps";
   src:
-    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.woff2")
-      format("woff2"),
-    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.woff")
-      format("woff"),
-    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.ttf")
-      format("truetype");
+    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.woff2") format("woff2"),
+    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.woff") format("woff"),
+    url("https://api.outercolonies.de/assets/fonts/latin-modern-mono-caps.ttf") format("truetype");
 }

@@ -45,31 +45,25 @@ export default class ContinueButton {
       lost: this.createButtonImage('lost'),
     };
     this.text = scene.add
-      .text(
-        layout.continueButton.x + layout.continueButton.xTextOffset,
-        layout.continueButton.y,
-        [''],
-      )
+      .text(layout.continueButton.x + layout.continueButton.xTextOffset, layout.continueButton.y, [''])
       .setFontSize(layout.continueButton.fontSize)
       .setFontFamily(layout.font.captionFamily)
       .setColor(layout.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages))
-      .concat([this.text])
-      .forEach((o) =>
-        o
-          .on('pointerdown', () => {
-            self.onClickAction();
-          })
-          .on('pointerover', () => {
-            self.text.setColor(layout.font.colorHover);
-          })
-          .on('pointerout', () => {
-            self.text.setColor(layout.font.color);
-          }),
-      );
+    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach((o) =>
+      o
+        .on('pointerdown', () => {
+          self.onClickAction();
+        })
+        .on('pointerover', () => {
+          self.text.setColor(layout.font.colorHover);
+        })
+        .on('pointerout', () => {
+          self.text.setColor(layout.font.color);
+        }),
+    );
     this.waitState();
   }
   update() {
@@ -115,37 +109,22 @@ export default class ContinueButton {
       (this.scene.plannedBattle.type == BattleType.Mission &&
         !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle))
         ? 'Zug beenden'
-        : `${
-            this.scene.plannedBattle.type == BattleType.Mission
-              ? 'Mission'
-              : 'Überfall'
-          } durchführen`;
+        : `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
     this.show(text, 'active_build', () =>
-      this.scene.socket.emit(
-        MsgTypeInbound.Ready,
-        TurnPhase.Build,
-        this.scene.plannedBattle,
-      ),
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle),
     );
   }
   private showIntervene() {
     let text: string;
-    if (this.scene.state.battle?.type == BattleType.Raid)
-      text = 'Verteidigung beginnen';
+    if (this.scene.state.battle?.type == BattleType.Raid) text = 'Verteidigung beginnen';
     else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
     else text = 'Überspringen';
     this.show(text, 'inactive_select', () =>
-      this.scene.socket.emit(
-        MsgTypeInbound.Ready,
-        TurnPhase.Build,
-        this.scene.interveneShipIds,
-      ),
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds),
     );
   }
   private showNextCombatPhase() {
-    const button = `${
-      this.scene.state.playerIsActive ? '' : 'in'
-    }active_combat`;
+    const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
     this.show('Kampfphase beenden', button, () =>
       this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat),
     );
@@ -169,9 +148,7 @@ export default class ContinueButton {
     this.buttonImages[name].setVisible(true);
   }
   private waitState() {
-    const button = `${
-      this.scene.state && this.scene.state.playerIsActive ? '' : 'in'
-    }active_wait`;
+    const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
     this.show('', button, () => {});
   }
 }

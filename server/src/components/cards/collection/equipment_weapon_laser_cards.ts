@@ -1,10 +1,10 @@
-import EquipmentCard from "../types/equipment_card";
+import EquipmentCard from '../types/equipment_card';
 
 export class Card166 extends EquipmentCard {
   constructor() {
     super(
       166,
-      "Laserkanone",
+      'Laserkanone',
       1,
       {
         energy: 0,
@@ -36,7 +36,7 @@ export class Card182 extends EquipmentCard {
   constructor() {
     super(
       182,
-      "Dual-Lasergeschütz",
+      'Dual-Lasergeschütz',
       1,
       {
         energy: -1,
@@ -68,7 +68,7 @@ export class Card343 extends EquipmentCard {
   constructor() {
     super(
       343,
-      "Laserphalanx",
+      'Laserphalanx',
       1,
       {
         energy: -1,
@@ -100,7 +100,7 @@ export class Card344 extends EquipmentCard {
   constructor() {
     super(
       344,
-      "Fokuslaser",
+      'Fokuslaser',
       1,
       {
         energy: 0,
@@ -132,7 +132,7 @@ export class Card347 extends EquipmentCard {
   constructor() {
     super(
       347,
-      "Impulslaser",
+      'Impulslaser',
       1,
       {
         energy: 0,
@@ -164,7 +164,7 @@ export class Card421 extends EquipmentCard {
   constructor() {
     super(
       421,
-      "Salvenlaser",
+      'Salvenlaser',
       2,
       {
         energy: -1,

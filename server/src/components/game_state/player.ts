@@ -1,10 +1,10 @@
-import Card from "../cards/card";
-import CardStack, { RootCardStack } from "../cards/card_stack";
-import { CardType, Zone } from "../config/enums";
-import { shuffle, spliceCardStackByUUID } from "../utils/helpers";
-import ColonyCard from "../cards/types/colony_card";
-import ActionPool from "../cards/action_pool";
-import Match from "./match";
+import Card from '../cards/card';
+import CardStack, { RootCardStack } from '../cards/card_stack';
+import { CardType, Zone } from '../config/enums';
+import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
+import ColonyCard from '../cards/types/colony_card';
+import ActionPool from '../cards/action_pool';
+import Match from './match';
 
 export default class Player {
   id!: string;
@@ -17,13 +17,7 @@ export default class Player {
   hand: CardStack[] = [];
   cardStacks!: CardStack[];
   actionPool!: ActionPool;
-  constructor(
-    id: string,
-    name: string,
-    match: Match,
-    playerNo: number,
-    deck: Card[],
-  ) {
+  constructor(id: string, name: string, match: Match, playerNo: number, deck: Card[]) {
     this.id = id;
     this.name = name;
     this.match = match;
@@ -36,9 +30,7 @@ export default class Player {
     this.actionPool = this.getOriginalActions();
   }
   callBackShipsFromNeutralZone() {
-    this.cardStacks
-      .filter((cs) => cs.zone == Zone.Neutral)
-      .forEach((cs) => (cs.zone = Zone.Oribital));
+    this.cardStacks.filter((cs) => cs.zone == Zone.Neutral).forEach((cs) => (cs.zone = Zone.Oribital));
   }
   moveFlightReadyShipsToOrbit() {
     this.cardStacks
@@ -55,17 +47,11 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids.forEach((uuid) =>
-      this.discardPile.push(
-        ...spliceCardStackByUUID(this.hand, uuid).getCards(),
-      ),
-    );
+    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).getCards()));
   }
   discardCardStacks(...uuids: string[]) {
     uuids.forEach((uuid) =>
-      this.discardPile.push(
-        ...spliceCardStackByUUID(this.cardStacks, uuid).getCards(),
-      ),
+      this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards()),
     );
   }
   getColonyCardStack(): CardStack {
@@ -81,14 +67,11 @@ export default class Player {
     this.hand.push(...cards.map((c) => new RootCardStack(c, Zone.Hand, this)));
   }
   pickCardsFromDeck(num: number): Card[] {
-    if (this.deck.length < num)
-      this.match.gameResult.setWinnerByDeckDepletion(this);
+    if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);
     return this.deck.splice(0, Math.min(num, this.deck.length));
   }
   pickCardsFromTopOfDiscardPile(num: number): Card[] {
-    return num == 0
-      ? []
-      : this.discardPile.splice(-Math.min(num, this.discardPile.length));
+    return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
   playHandCard(handCard: CardStack, target: CardStack) {
     this.actionPool.activate(handCard.type());
@@ -104,13 +87,9 @@ export default class Player {
     }
   }
   handCardLimit(): number {
-    return this.getColonyCardStack()
-      ? this.getColonyCardStack().profile().handCardLimit
-      : 0;
+    return this.getColonyCardStack() ? this.getColonyCardStack().profile().handCardLimit : 0;
   }
   getOriginalActions(): ActionPool {
-    return this.cardStacks
-      .map((cs) => cs.actionPool())
-      .reduce((a, b) => a.combine(b), new ActionPool());
+    return this.cardStacks.map((cs) => cs.actionPool()).reduce((a, b) => a.combine(b), new ActionPool());
   }
 }

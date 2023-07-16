@@ -1,34 +1,32 @@
-import { Express } from "express";
-import fetch from "node-fetch";
-import Auth from "./utils/auth";
+import { Express } from 'express';
+import fetch from 'node-fetch';
+import Auth from './utils/auth';
 import {
   AuthExistsResponse,
   AuthLoginRequest,
   AuthLoginResponse,
   AuthRegisterRequest,
   DeckListResponse,
-} from "./shared_interfaces/rest_api";
-import DBDecksDAO, { DBDeck } from "./persistence/db_decks";
-import DBCredentialsDAO from "./persistence/db_credentials";
-import CardCollection from "./cards/collection/card_collection";
-import Card from "./cards/card";
-import config from "config";
+} from './shared_interfaces/rest_api';
+import DBDecksDAO, { DBDeck } from './persistence/db_decks';
+import DBCredentialsDAO from './persistence/db_credentials';
+import CardCollection from './cards/collection/card_collection';
+import Card from './cards/card';
+import config from 'config';
 
 export default function restAPI(app: Express) {
-  app.get("/assets/*", (req, res) => {
-    const file = req.path.replace("/assets/", "");
-    fetch(`${config.get("url.assets")}/${file}`).then((actual) =>
-      actual.body.pipe(res),
-    );
+  app.get('/assets/*', (req, res) => {
+    const file = req.path.replace('/assets/', '');
+    fetch(`${config.get('url.assets')}/${file}`).then((actual) => actual.body.pipe(res));
   });
 
-  app.post("/api/auth/register", (req, res) => {
+  app.post('/api/auth/register', (req, res) => {
     Auth.register(<AuthRegisterRequest>req.body).then((success) =>
       success ? res.sendStatus(201) : res.sendStatus(500),
     );
   });
 
-  app.post("/api/auth/login", (req, res) => {
+  app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then((sessionToken) => {
       const payload: AuthLoginResponse = {
         success: sessionToken != null,
@@ -38,23 +36,19 @@ export default function restAPI(app: Express) {
     });
   });
 
-  app.get("/api/auth/exists", (req, res) => {
+  app.get('/api/auth/exists', (req, res) => {
     const sendExistsResponse = (exists: boolean) => {
       const payload: AuthExistsResponse = {
         exists: exists,
       };
       res.send(payload);
     };
-    if (req.query.username)
-      Auth.checkUsernameExists(String(req.query.username)).then(
-        sendExistsResponse,
-      );
-    else if (req.query.email)
-      Auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
+    if (req.query.username) Auth.checkUsernameExists(String(req.query.username)).then(sendExistsResponse);
+    else if (req.query.email) Auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
     else res.sendStatus(400);
   });
 
-  app.get("/api/deck", (req, res) => {
+  app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {
       const cardData: Card = CardCollection.cards[c.cardId];
       return {
@@ -72,7 +66,7 @@ export default function restAPI(app: Express) {
       };
       res.send(payload);
     };
-    const sessionToken = req.header("session-token");
+    const sessionToken = req.header('session-token');
     if (sessionToken) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
@@ -86,15 +80,11 @@ export default function restAPI(app: Express) {
     }
   });
 
-  app.post("/api/deck/:cardInstanceId(\\d+)", (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), true).then((_) =>
-      res.sendStatus(204),
-    );
+  app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
+    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), true).then((_) => res.sendStatus(204));
   });
 
-  app.delete("/api/deck/:cardInstanceId(\\d+)", (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), false).then((_) =>
-      res.sendStatus(204),
-    );
+  app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
+    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), false).then((_) => res.sendStatus(204));
   });
 }

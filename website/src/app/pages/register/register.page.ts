@@ -25,11 +25,7 @@ export class RegisterPage {
       [Validators.required, Validators.minLength(3), Validators.maxLength(20)],
       [this.usernameExistsValidator],
     ),
-    password: new FormControl('', [
-      Validators.required,
-      Validators.minLength(8),
-      Validators.maxLength(40),
-    ]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)]),
     email: new FormControl(
       '',
       [Validators.required, Validators.email, Validators.maxLength(60)],
@@ -67,9 +63,7 @@ export class RegisterPage {
   private get usernameExistsValidator(): AsyncValidatorFn {
     return (
       control: AbstractControl,
-    ):
-      | Promise<ValidationErrors | null>
-      | Observable<ValidationErrors | null> => {
+    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
       return this.authAPIService.checkUsernameExists(control.value).pipe(
         map((exists) => {
           return exists ? { exists: true } : null;
@@ -80,9 +74,7 @@ export class RegisterPage {
   private get emailExistsValidator(): AsyncValidatorFn {
     return (
       control: AbstractControl,
-    ):
-      | Promise<ValidationErrors | null>
-      | Observable<ValidationErrors | null> => {
+    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
       return this.authAPIService.checkEmailExists(control.value).pipe(
         map((exists) => {
           return exists ? { exists: true } : null;

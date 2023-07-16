@@ -1,6 +1,6 @@
-import { BattleType, TurnPhase } from "../../config/enums";
-import Player from "../../game_state/player";
-import InfrastructureCard from "../types/infrastructure_card";
+import { BattleType, TurnPhase } from '../../config/enums';
+import Player from '../../game_state/player';
+import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class InfrastructureEnergyCard extends InfrastructureCard {
   onUtilizaton() {}
@@ -11,7 +11,7 @@ abstract class InfrastructureEnergyCard extends InfrastructureCard {
 
 abstract class CardPowerPlant extends InfrastructureEnergyCard {
   constructor(id: number) {
-    super(id, "Kraftwerk", 0, {
+    super(id, 'Kraftwerk', 0, {
       energy: 5,
       hp: 0,
       speed: 0,
@@ -29,7 +29,7 @@ abstract class CardPowerPlant extends InfrastructureEnergyCard {
 
 abstract class NuclearReactorCard extends InfrastructureEnergyCard {
   constructor(id: number) {
-    super(id, "Atomreaktor", 0, {
+    super(id, 'Atomreaktor', 0, {
       energy: 2,
       hp: 0,
       speed: 0,
@@ -46,7 +46,7 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
 
 abstract class SolarPanelCard extends InfrastructureEnergyCard {
   constructor(id: number) {
-    super(id, "Solarpanele", 0, {
+    super(id, 'Solarpanele', 0, {
       energy: 1,
       hp: 0,
       speed: 0,
@@ -63,7 +63,7 @@ abstract class SolarPanelCard extends InfrastructureEnergyCard {
 
 export class Card105 extends InfrastructureEnergyCard {
   constructor() {
-    super(105, "Antimateriereaktor", 5, {
+    super(105, 'Antimateriereaktor', 5, {
       energy: 10,
       hp: 0,
       speed: 0,
@@ -78,10 +78,7 @@ export class Card105 extends InfrastructureEnergyCard {
   }
   onDestruction(player: Player) {
     const battle = player.match.battle;
-    if (
-      player.match.turnPhase == TurnPhase.Combat &&
-      battle.type != BattleType.None
-    ) {
+    if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
       battle.ships.flat().forEach((cs) => cs.damage++);
     }
   }
@@ -89,7 +86,7 @@ export class Card105 extends InfrastructureEnergyCard {
 
 export class Card145 extends InfrastructureEnergyCard {
   constructor() {
-    super(145, "Fusionsreaktor", 2, {
+    super(145, 'Fusionsreaktor', 2, {
       energy: 4,
       hp: 0,
       speed: 0,

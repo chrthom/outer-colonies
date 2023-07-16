@@ -1,11 +1,11 @@
-import Player from "./player";
-import { rules } from "../config/rules";
-import { BattleType, TurnPhase } from "../config/enums";
-import Battle from "./battle";
-import { ClientPlannedBattle } from "../shared_interfaces/client_planned_battle";
+import Player from './player';
+import { rules } from '../config/rules';
+import { BattleType, TurnPhase } from '../config/enums';
+import Battle from './battle';
+import { ClientPlannedBattle } from '../shared_interfaces/client_planned_battle';
 55;
-import CardStack from "../cards/card_stack";
-import { opponentPlayerNo } from "../utils/helpers";
+import CardStack from '../cards/card_stack';
+import { opponentPlayerNo } from '../utils/helpers';
 
 export default class Match {
   readonly room!: string;
@@ -46,10 +46,8 @@ export default class Match {
     f(1);
   }
   setStartPlayer() {
-    if (this.players[0].deck.length > this.players[1].deck.length)
-      this.activePlayerNo = 0;
-    else if (this.players[0].deck.length < this.players[1].deck.length)
-      this.activePlayerNo = 1;
+    if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
+    else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
     else this.activePlayerNo = Math.round(Math.random());
   }
   prepareStartPhase() {
@@ -73,10 +71,7 @@ export default class Match {
   }
   prepareCombatPhase(interveningShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
-    this.battle.assignInterveningShips(
-      this.getInactivePlayer(),
-      interveningShipIds,
-    );
+    this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
     this.players.forEach((player) => {
       player.cardStacks.forEach((cs) => cs.combatPhaseReset(true));
     });
@@ -89,8 +84,7 @@ export default class Match {
     this.getActivePlayer().moveFlightReadyShipsToOrbit();
     // ISSUE #3: End of turn effect (just execute them once)
     if (
-      this.getActivePlayer().hand.length <=
-        this.getActivePlayer().handCardLimit() &&
+      this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() &&
       !this.gameResult.gameOver
     ) {
       this.getActivePlayer().cardStacks.forEach((cs) => cs.onEndTurn());

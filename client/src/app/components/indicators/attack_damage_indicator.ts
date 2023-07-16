@@ -36,9 +36,7 @@ export default class AttackDamageIndicator {
       particleEmitters.forEach((pe) => pe.destroy());
     }, animationConfig.duration.attack);
   }
-  private createParticleEmitter(
-    color: string,
-  ): Phaser.GameObjects.Particles.ParticleEmitter {
+  private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
     return this.scene.add.particles(
       this.cardImage.x,
       this.cardImage.y + animationConfig.attack.flare.yOffset,

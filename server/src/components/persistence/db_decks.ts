@@ -1,4 +1,4 @@
-import DBConnection from "./db_connector";
+import DBConnection from './db_connector';
 
 export interface DBDeck {
   cardInstanceId: number;
@@ -12,9 +12,7 @@ export default class DBDecksDAO {
   }
   static async setInUse(cardInstanceId: number, inUse: boolean) {
     await DBConnection.instance.query(
-      `UPDATE decks SET in_use = ${
-        inUse ? 1 : 0
-      } WHERE card_instance_id = ${cardInstanceId}`,
+      `UPDATE decks SET in_use = ${inUse ? 1 : 0} WHERE card_instance_id = ${cardInstanceId}`,
     );
   }
   private static async getBy(whereClause: string): Promise<DBDeck[]> {
