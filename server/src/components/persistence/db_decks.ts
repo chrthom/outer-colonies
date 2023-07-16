@@ -27,4 +27,9 @@ export default class DBDecksDAO {
       };
     });
   }
+  static async create(cardId: number, userId: number, inUse?: boolean) {
+    DBConnection.instance.query(
+      `INSERT INTO decks (card_id, user_id, in_use) VALUES (${cardId}, ${userId}, ${inUse ? 1 : 0})`,
+    )
+  }
 }

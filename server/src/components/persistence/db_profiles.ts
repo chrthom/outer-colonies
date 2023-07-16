@@ -21,4 +21,14 @@ export default class DBProfilesDAO {
       };
     });
   }
+  static async create(userId: number) {
+    return DBConnection.instance.query(
+      `INSERT INTO profiles (user_id) VALUES (${userId})`,
+    );
+  }
+  static async increaseSol(userId: number, sol: number) {
+    return DBConnection.instance.query(
+      `UPDATE profiles SET sol = sol + ${sol} WHERE user_id = ${userId}`,
+    );
+  }
 }

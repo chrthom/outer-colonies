@@ -26,7 +26,7 @@ export default function restAPI(app: Express) {
 
   app.post('/api/auth/register', (req, res) => {
     Auth.register(<AuthRegisterRequest>req.body).then((success) =>
-      success ? res.sendStatus(201) : res.sendStatus(500),
+      success ? res.status(201).send({}) : res.sendStatus(500),
     );
   });
 

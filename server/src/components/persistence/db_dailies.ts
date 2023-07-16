@@ -35,4 +35,9 @@ export default class DBDailiesDAO {
       };
     });
   }
+  static async create(userId: number) {
+    return DBConnection.instance.query(
+      `INSERT INTO dailies (user_id) VALUES (${userId})`,
+    );
+  }
 }
