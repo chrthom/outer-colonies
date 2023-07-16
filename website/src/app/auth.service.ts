@@ -23,12 +23,12 @@ export default class AuthService {
     this.username = username;
     this.password = password;
     const loginAttempt = this.check();
-    loginAttempt.subscribe((success) => {
+    loginAttempt.pipe(tap((success) => {
       if (success && remember) {
         this.cookieService.set('u', username, this.cookieExpiry);
         this.cookieService.set('p', password, this.cookieExpiry);
       }
-    });
+    }));
     return loginAttempt;
   }
 
