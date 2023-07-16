@@ -5,9 +5,7 @@ import {
   AuthRegisterRequest,
   AuthExistsResponse,
   AuthLoginRequest,
-  AuthRegisterResponse,
   AuthLoginResponse,
-  DeckListResponse,
 } from '../../../../server/src/components/shared_interfaces/rest_api';
 import OCApi from './api';
 
@@ -29,24 +27,8 @@ export default class AuthApiService extends OCApi {
     );
   }
   register(body: AuthRegisterRequest): Observable<boolean> {
-    return this.post<AuthRegisterResponse>(
-      'auth/register',
-      undefined,
-      body,
-    ).pipe(
-      map((res) => {
-        const success =
-          res.status >= 200 &&
-          res.status < 300 &&
-          res.body != null &&
-          res.body.success;
-        if (!success)
-          console.log(
-            `Register API call failed with HTTP ${res.status}: ${res.statusText}`,
-          );
-        return success;
-      }),
-    );
+    return this.post('auth/register', undefined, body,)
+      .pipe(map((res) => res.status >= 200 && res.status < 300),);
   }
   login(body: AuthLoginRequest): Observable<string | undefined> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(

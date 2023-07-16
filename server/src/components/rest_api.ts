@@ -6,7 +6,6 @@ import {
   AuthLoginRequest,
   AuthLoginResponse,
   AuthRegisterRequest,
-  AuthRegisterResponse,
   DeckListResponse,
 } from "./shared_interfaces/rest_api";
 import DBDecksDAO, { DBDeck } from "./persistence/db_decks";
@@ -24,12 +23,9 @@ export default function restAPI(app: Express) {
   });
 
   app.post("/api/auth/register", (req, res) => {
-    Auth.register(<AuthRegisterRequest>req.body).then((success) => {
-      const payload: AuthRegisterResponse = {
-        success: success,
-      };
-      res.send(payload);
-    });
+    Auth.register(<AuthRegisterRequest>req.body).then((success) =>
+      success ? res.sendStatus(201) : res.sendStatus(500),
+    );
   });
 
   app.post("/api/auth/login", (req, res) => {

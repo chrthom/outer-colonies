@@ -7,11 +7,6 @@ export interface AuthRegisterRequest {
   startDeck: number;
 }
 
-export interface AuthRegisterResponse {
-  // ISSUE #91: Remove and just send HTTP status
-  success: boolean;
-}
-
 export interface AuthLoginRequest {
   username: string;
   password: string;
@@ -23,7 +18,6 @@ export interface AuthLoginResponse {
 }
 
 export interface AuthExistsResponse {
-  // ISSUE #91: Remove and just send HTTP status
   exists: boolean;
 }
 
