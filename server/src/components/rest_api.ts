@@ -7,12 +7,14 @@ import {
   AuthLoginResponse,
   AuthRegisterRequest,
   DeckListResponse,
+  ProfileGetResponse,
 } from './shared_interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO from './persistence/db_credentials';
 import CardCollection from './cards/collection/card_collection';
 import Card from './cards/card';
 import config from 'config';
+import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 
 export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
@@ -86,5 +88,24 @@ export default function restAPI(app: Express) {
 
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
     DBDecksDAO.setInUse(Number(req.params.cardInstanceId), false).then((_) => res.sendStatus(204));
+  });
+
+  app.get('/api/profile', (req, res) => {
+    const sendProfileResponse = (profile: DBProfile) => {
+      const payload: ProfileGetResponse = profile;
+      res.send(payload);
+    };
+    const sessionToken = req.header('session-token');
+    if (sessionToken) {
+      DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
+        if (u) {
+          DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse);
+        } else {
+          res.sendStatus(403);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
   });
 }
