@@ -6,8 +6,12 @@ class OCRules {
   readonly maxHandCards = 7;
   readonly maxRange = 4;
 
-  readonly solEarnings = {
-    login: 75
+  readonly dailyEarnings = {
+    login: 35,
+    victory: 45,
+    game: 70,
+    energy: 90,
+    ships: 125
   };
 }
 

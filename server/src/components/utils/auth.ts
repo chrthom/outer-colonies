@@ -27,11 +27,7 @@ export default class Auth {
     let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
     if (!credential) credential = await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
     if (credential) {
-      await DBCredentialsDAO.getBy(
-        `user_id = ${credential.userId} AND (last_login < current_timestamp() - INTERVAL 1 DAY OR last_login IS NULL)`
-      ).then(lastLoginMoreThan1DayAgo => {
-        if (lastLoginMoreThan1DayAgo) DBProfilesDAO.increaseSol(credential.userId, rules.solEarnings.login);
-      }); // TODO: Replace with Daily
+      DBDailiesDAO.achieveLogin(credential.userId); ////
       return DBCredentialsDAO.login(credential.userId);
     } else {
       return null;
