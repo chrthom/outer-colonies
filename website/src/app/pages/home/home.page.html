@@ -24,7 +24,14 @@
   </div>
   <div id="daily-box" class="inner-box">
     <oc-content-box title="Tägliche Aufgaben">
-      
+      <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedDaily">
+        <mat-tab *ngFor="let daily of dailies" label="&oplus;">
+          <h3>{{ daily.title }}</h3>
+          <p>{{ daily.description }}</p>
+          <h4 *ngIf="daily.achieved" class="daily-done">Erledigt</h4>
+          <span *ngIf="!daily.achieved">Belohnung: <h4 class="daily-open">{{ daily.sol }} Sol</h4></span>
+        </mat-tab>
+      </mat-tab-group>      
     </oc-content-box>
   </div>
 </div>

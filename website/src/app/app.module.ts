@@ -15,6 +15,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTabsModule } from '@angular/material/tabs';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
@@ -47,6 +48,7 @@ import { TradePage } from './pages/trade/trade.page';
     MatSlideToggleModule,
     MatCardModule,
     MatBadgeModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent],
