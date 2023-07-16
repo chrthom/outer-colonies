@@ -6,6 +6,7 @@ import {
   AuthLoginRequest,
   AuthLoginResponse,
   AuthRegisterRequest,
+  DailyGetResponse,
   DeckListResponse,
   ProfileGetResponse,
 } from './shared_interfaces/rest_api';
@@ -15,6 +16,7 @@ import CardCollection from './cards/collection/card_collection';
 import Card from './cards/card';
 import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
+import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 
 export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
@@ -100,6 +102,25 @@ export default function restAPI(app: Express) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
           DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse);
+        } else {
+          res.sendStatus(403);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+  });
+
+  app.get('/api/daily', (req, res) => {
+    const sendDailyResponse = (daily: DBDaily) => {
+      const payload: DailyGetResponse = daily;
+      res.send(payload);
+    };
+    const sessionToken = req.header('session-token');
+    if (sessionToken) {
+      DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
+        if (u) {
+          DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse);
         } else {
           res.sendStatus(403);
         }

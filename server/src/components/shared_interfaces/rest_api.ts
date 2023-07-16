@@ -35,6 +35,13 @@ export interface DeckListResponse {
 }
 
 export interface ProfileGetResponse {
-  userId: number;
   sol: number;
+}
+
+export interface DailyGetResponse {
+  login: boolean;
+  victory: boolean;
+  game: boolean;
+  energy: boolean;
+  ships: boolean;
 }
