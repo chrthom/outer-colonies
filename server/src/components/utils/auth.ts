@@ -3,6 +3,7 @@ import { AuthLoginRequest, AuthRegisterRequest } from '../shared_interfaces/rest
 import DBConnection from '../persistence/db_connector';
 import { v4 as uuidv4 } from 'uuid';
 import DBCredentialsDAO from '../persistence/db_credentials';
+import { rules } from '../config/rules';
 
 export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
@@ -33,6 +34,15 @@ export default class Auth {
     let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
     if (!credential) credential = await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
     if (credential) {
+      await DBCredentialsDAO.getBy(
+        `user_id = ${credential.userId} AND (last_login < current_timestamp() - INTERVAL 1 DAY OR last_login IS NULL)`
+      ).then(lastLoginMoreThan1DayAgo => {
+        if (lastLoginMoreThan1DayAgo) {
+          DBConnection.instance.query(
+            `UPDATE profiles SET sol = sol + ${rules.solEarnings.login} WHERE user_id = ${credential.userId}`,
+          );
+        }
+      });
       const sessionToken = uuidv4();
       await DBConnection.instance.query(
         'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, ' +

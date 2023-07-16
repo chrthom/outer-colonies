@@ -18,7 +18,7 @@ export default class DBCredentialsDAO {
   static async getBySessionToken(sessionToken: string): Promise<DBCredential | null> {
     return this.getBy(`session_token = '${sessionToken}' AND session_valid_until > current_timestamp()`);
   }
-  private static async getBy(whereClause: string): Promise<DBCredential | null> {
+  static async getBy(whereClause: string): Promise<DBCredential | null> {
     const queryResult: any[] = await DBConnection.instance.query(
       `SELECT user_id, username, session_token FROM credentials WHERE ${whereClause}`,
     );
