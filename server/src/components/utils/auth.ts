@@ -18,8 +18,11 @@ export default class Auth {
         `('${registrationData.username}', '${registrationData.password}', '${registrationData.email}')`,
     );
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
-    await DBConnection.instance.query(
+    DBConnection.instance.query(
       `INSERT INTO profiles (user_id) VALUES ('${credential.userId}')`,
+    );
+    DBConnection.instance.query(
+      `INSERT INTO dailies (user_id) VALUES ('${credential.userId}')`,
     );
     CardCollection.starterDecks[registrationData.startDeck]
       .map((c) => c.id)
