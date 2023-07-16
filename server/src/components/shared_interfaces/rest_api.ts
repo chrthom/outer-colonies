@@ -1,5 +1,4 @@
 import { CardType } from '../config/enums';
-import { DBProfile } from '../persistence/db_profiles';
 
 export interface AuthRegisterRequest {
   username: string;
@@ -35,4 +34,7 @@ export interface DeckListResponse {
   cards: DeckCard[];
 }
 
-export interface ProfileGetResponse extends DBProfile {}
+export interface ProfileGetResponse {
+  userId: number;
+  sol: number;
+}

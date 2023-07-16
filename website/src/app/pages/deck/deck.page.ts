@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import AuthService from 'src/app/auth.service';
 import { DeckCard } from '../../../../../server/src/components/shared_interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'oc-page-deck',
-  templateUrl: './deck.component.html',
-  styleUrls: ['./deck.component.scss'],
+  templateUrl: './deck.page.html',
+  styleUrls: ['./deck.page.scss'],
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;
@@ -15,14 +14,13 @@ export class DeckPage implements OnInit {
   activeCards: DeckCard[] = [];
   reserveCards: DeckCard[] = [];
   constructor(
-    private deckAPService: DeckApiService,
-    private authService: AuthService,
+    private deckApiService: DeckApiService
   ) {}
   ngOnInit() {
     this.reload();
   }
   reload() {
-    this.deckAPService.listDeck().subscribe((res) => {
+    this.deckApiService.listDeck().subscribe((res) => {
       if (res) {
         this.activeCards = res.cards.filter((c) => c.inUse).sort(this.cardSortFn);
         this.reserveCards = res.cards.filter((c) => !c.inUse).sort(this.cardSortFn);
@@ -31,11 +29,11 @@ export class DeckPage implements OnInit {
   }
   activateCard(card: DeckCard) {
     if (this.activeCards.length < this.maxCards)
-      this.deckAPService.activateCard(card.id).subscribe((_) => this.reload());
+      this.deckApiService.activateCard(card.id).subscribe((_) => this.reload());
   }
   deactivateCard(card: DeckCard) {
     if (this.activeCards.length > this.minCards)
-      this.deckAPService.deactivateCard(card.id).subscribe((_) => this.reload());
+      this.deckApiService.deactivateCard(card.id).subscribe((_) => this.reload());
   }
   toCardUrl(cardId: number): string {
     return `${this.cardsUrl}/${cardId}.png`;

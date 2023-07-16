@@ -5,4 +5,4 @@ import { Component } from '@angular/core';
   templateUrl: './data-privacy.page.html',
   styleUrls: ['./data-privacy.page.scss'],
 })
-export class DataPrivacyComponent {}
+export class DataPrivacyPage {}

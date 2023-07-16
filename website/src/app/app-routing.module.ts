@@ -4,11 +4,12 @@ import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
 import { tap } from 'rxjs';
-import { DeckPage } from './pages/deck/deck.component';
-import { ImprintComponent as ImprintPage } from './pages/imprint/imprint.page';
-import { DataPrivacyComponent as DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { DeckPage } from './pages/deck/deck.page';
+import { ImprintPage } from './pages/imprint/imprint.page';
+import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
+import { TradePage } from './pages/trade/trade.page';
 
 function forceHttp(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -45,6 +46,11 @@ const routes: Routes = [
     path: 'deck',
     canActivate: [privateGuardFn],
     component: DeckPage,
+  },
+  {
+    path: 'trade',
+    canActivate: [privateGuardFn],
+    component: TradePage,
   },
   {
     path: 'imprint',

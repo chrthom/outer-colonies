@@ -16,9 +16,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { DeckPage } from './pages/deck/deck.component';
-import { ImprintComponent } from './pages/imprint/imprint.page';
-import { DataPrivacyComponent } from './pages/data-privacy/data-privacy.page';
+import { DeckPage } from './pages/deck/deck.page';
+import { ImprintPage } from './pages/imprint/imprint.page';
+import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { TradePage } from './pages/trade/trade.page';
 
 @NgModule({
   declarations: [
@@ -29,8 +30,9 @@ import { DataPrivacyComponent } from './pages/data-privacy/data-privacy.page';
     RegisterPage,
     NavbarComponent,
     DeckPage,
-    ImprintComponent,
-    DataPrivacyComponent,
+    ImprintPage,
+    DataPrivacyPage,
+    TradePage,
   ],
   imports: [
     BrowserModule,
