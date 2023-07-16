@@ -5,15 +5,17 @@
   margin-top: 40px;
   margin-bottom: 20px;
 }
-#game-box {
+.inner-box {
   position: relative;
-  width: 400px;
   margin: 10px;
   float: left;
 }
+#game-box {
+  width: 400px;
+}
 #note-box {
-  position: relative;
   width: 500px;
-  margin: 10px;
-  float: left;
+}
+#daily-box {
+  width: 450px;
 }
