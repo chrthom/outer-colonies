@@ -13,6 +13,12 @@ class OCRules {
     energy: 90,
     ships: 125
   };
+  readonly gameEarnings = {
+    victory: 50,
+    cardsInGame: 3,
+    discardPile: 1,
+    dealtColonyDamage: 1
+  };
 }
 
 export const rules = new OCRules();

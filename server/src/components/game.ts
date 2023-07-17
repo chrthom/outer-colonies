@@ -8,7 +8,7 @@ import { ClientPlannedBattle } from './shared_interfaces/client_planned_battle';
 import Player from './game_state/player';
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket {
-  return io.sockets.sockets.get(match.players[playerNo].id);
+  return io.sockets.sockets.get(match.players[playerNo].socketId);
 }
 
 function getPlayer(socket: Socket): Player {

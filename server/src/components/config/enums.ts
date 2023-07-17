@@ -21,6 +21,12 @@ export enum EventType {
   Tactic = 'tactic',
 }
 
+export enum GameResultType {
+  Depletion = 'depletion',
+  Destruction = 'destruction',
+  Surrender = 'surrender'
+}
+
 export enum MsgTypeInbound {
   Attack = 'attack',
   Connect = 'connect',

@@ -7,7 +7,7 @@ import ActionPool from '../cards/action_pool';
 import Match from './match';
 
 export default class Player {
-  id!: string;
+  socketId!: string;
   name!: string;
   match!: Match;
   no!: number;
@@ -17,8 +17,8 @@ export default class Player {
   hand: CardStack[] = [];
   cardStacks!: CardStack[];
   actionPool!: ActionPool;
-  constructor(id: string, name: string, match: Match, playerNo: number, deck: Card[]) {
-    this.id = id;
+  constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
+    this.socketId = socketd;
     this.name = name;
     this.match = match;
     this.no = playerNo;
