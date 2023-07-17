@@ -10,7 +10,6 @@ import ValueIndicator from '../indicators/value_indicator';
 import DefenseIndicator from '../indicators/defense_indicator';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
-import { arrayDiff } from '../../../../../server/src/components/utils/helpers';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 
@@ -33,7 +32,7 @@ export default class CardStack {
   }
   update(data: ClientCardStack) {
     this.destroyIndicators();
-    const [removedCardIds, newCardIds] = arrayDiff(
+    const [removedCardIds, newCardIds] = this.arrayDiff(
       this.cards.map((c) => c.cardId),
       data.cards.map((c) => c.id),
     );
@@ -235,5 +234,18 @@ export default class CardStack {
       }
       this.scene.updateView();
     }
+  }
+  private arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
+    let a1 = array1.slice();
+    let a2 = array2.slice();
+    a1.slice().forEach((v1) => {
+      const i1 = a1.indexOf(v1);
+      const i2 = a2.indexOf(v1);
+      if (i1 >= 0 && i2 >= 0) {
+        a1.splice(i1, 1);
+        a2.splice(i2, 1);
+      }
+    });
+    return [a1, a2];
   }
 }

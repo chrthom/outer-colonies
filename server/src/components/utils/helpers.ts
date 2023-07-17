@@ -1,4 +1,5 @@
 import CardStack from '../cards/card_stack';
+
 export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
   let a1 = array1.slice();
   let a2 = array2.slice();

@@ -1,5 +1,5 @@
 import Match from './game_state/match';
-import toClientState from './shared_interfaces/client_state';
+import toClientState from './converters/client_state_converter';
 import { rules } from './config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from './config/enums';
 import { getCardStackByUUID } from './utils/helpers';
