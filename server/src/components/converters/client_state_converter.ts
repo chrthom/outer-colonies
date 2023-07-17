@@ -88,6 +88,8 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   const gameResult: ClientGameResult = match.gameResult.gameOver
     ? {
         won: match.gameResult.winnerNo == player.no,
+        type: match.gameResult.type,
+        sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol
       }
     : null;
   return {

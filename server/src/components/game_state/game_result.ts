@@ -12,6 +12,8 @@ export default class GameResult {
     gameOver: boolean = false;
     winnerNo?: number;
     type?: GameResultType;
+    winnerSol?: number;
+    loserSol?: number;
     constructor(match: Match) {
       this.match = match;
     }
@@ -31,8 +33,8 @@ export default class GameResult {
       this.gameOver = true;
       this.winnerNo = opponentPlayerNo(loser.no);
       const winner = this.match.players[this.winnerNo];
-      this.applyEarnings(winner, loser, true);
-      this.applyEarnings(loser, winner, false);
+      this.winnerSol = this.applyEarnings(winner, loser, true);
+      this.loserSol = this.applyEarnings(loser, winner, false);
     }
     private applyEarnings(player: Player, opponent: Player, won: boolean): number {
       let sol = 0;

@@ -1,4 +1,4 @@
-import { EventType, BattleType, TurnPhase, Zone } from '../config/enums';
+import { EventType, BattleType, TurnPhase, Zone, GameResultType } from '../config/enums';
 
 export interface ClientOpponent {
   name: string;
@@ -71,6 +71,8 @@ export interface ClientEvent {
 
 export interface ClientGameResult {
   won: boolean;
+  type: GameResultType;
+  sol: number;
 }
 
 export interface ClientState {
