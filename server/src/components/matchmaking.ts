@@ -22,14 +22,15 @@ function numberOfPlayersInMatchMaking(io: Server): number {
 function joinGame(socket: Socket, match: Match, playerNo: number): void {
   socket.leave(matchmakingRoom);
   socket.join(match.room);
-  socket.data.match = match;
-  socket.data.playerNo = playerNo;
+  const socketData: SocketData = <SocketData>socket.data;
+  socketData.match = match;
+  socketData.playerNo = playerNo;
   match.players[playerNo] = new Player(
     socket.id,
-    socket.data.name,
+    socketData.user.username,
     match,
     playerNo,
-    socket.data.activeDeck.slice(),
+    socketData.activeDeck.slice(),
   );
 }
 

@@ -1,4 +1,4 @@
-import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
+import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
 import { layout } from '../../config/layout';
@@ -89,7 +89,16 @@ export default class Prompt {
     this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showGameOver(gameResult: ClientGameResult) {
-    this.show(`GAME OVER\nDu hast das Spiel ${gameResult.won ? 'gewonnen' : 'verloren'}!`);
+    let gameOverText: string;
+    if (gameResult.won) {
+      if (gameResult.type == GameResultType.Depletion) gameOverText = 'Gegnerisches Deck aufgebraucht';
+      else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Gegnerische Kolonie zerstört';
+      else if (gameResult.type == GameResultType.Surrender) gameOverText = 'Gegner hat kapituliert';
+    } else {
+      if (gameResult.type == GameResultType.Depletion) gameOverText = 'Eigenes Deck aufgebraucht';
+      else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Eigene Kolonie zerstört';
+    }
+    this.show(`${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`);
     this.text.setFontSize(layout.prompt.fontSizeBig);
   }
   private show(text: string) {

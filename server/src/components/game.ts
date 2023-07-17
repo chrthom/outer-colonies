@@ -17,7 +17,9 @@ function getPlayer(socket: Socket): Player {
 
 function emitState(io: Server, match: Match) {
   match.forAllPlayers((playerNo: number) => {
-    getSocket(io, match, playerNo).emit(MsgTypeOutbound.State, toClientState(match, playerNo));
+    const socket = getSocket(io, match, playerNo)
+    if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
+    else console.log('WARN: Could not find socket to emit state');
   });
   match.battle.resetRecentEvents();
 }
