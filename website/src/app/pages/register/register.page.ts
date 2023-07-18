@@ -10,7 +10,7 @@ import {
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
 import ApiService from 'src/app/api/auth-api.service';
-import OCErrorStateMatcher from '../error-state-matcher';
+import OCErrorStateMatcher from '../../components/error-state-matcher';
 
 @Component({
   selector: 'oc-page-register',
