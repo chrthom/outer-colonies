@@ -1,13 +1,51 @@
 .item {
+  position: relative;
+  width: 160px;
+  height: 185px;
+  margin: 5px;
+  float: left;
+  #item {
     position: relative;
+    height: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #title {
+    position: absolute;
+    top: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #corners {
+    position: absolute;
     width: 160px;
     height: 160px;
-    margin: 5px;
-    float: left;
+    top: 0;
+    left: 0;
     img {
-      position: relative;
-      height: 160px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: absolute;
+      width: 60px;
+      height: 60px;
+    }
+    #top_left {
+      top: 0;
+      left: 0;
+      transform: translateX(-30%) translateY(-30%);
+    }
+    #top_right {
+      top: 0;
+      right: 0;
+      transform: rotate(90deg) translateX(-30%) translateY(-30%);
+    }
+    #bottom_left {
+      bottom: 0;
+      left: 0;
+      transform: rotate(270deg) translateX(-30%) translateY(-30%);
+    }
+    #bottom_right {
+      bottom: 0;
+      right: 0;;
+      transform: rotate(180deg) translateX(-30%) translateY(-30%);
     }
   }
+}

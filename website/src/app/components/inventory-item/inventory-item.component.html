@@ -1,3 +1,10 @@
 <div class="item">
-  <img [src]="img">
+  <div id="corners">
+    <img src="../../../assets/zone_corner_blue.png" id="top_left">
+    <img src="../../../assets/zone_corner_blue.png" id="top_right">
+    <img src="../../../assets/zone_corner_blue.png" id="bottom_left">
+    <img src="../../../assets/zone_corner_blue.png" id="bottom_right">
+  </div>
+  <img id="item" [src]="img">
+  <h4 id="title">{{ text }}</h4>
 </div>
