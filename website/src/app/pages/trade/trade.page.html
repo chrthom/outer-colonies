@@ -21,7 +21,7 @@
             <img [src]="assetURL + '/items/booster' + booster.no + '.png'">
           </mat-card-content>
           <mat-card-actions>
-            <button mat-raised-button [color]="sol >= booster.price ? 'primary' : 'secondary'">Kaufen</button>
+            <button mat-raised-button (click)="buyBooster(booster.no)" [color]="sol >= booster.price ? 'primary' : 'secondary'">Kaufen</button>
           </mat-card-actions>
         </mat-card>
       </div>

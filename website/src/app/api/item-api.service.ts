@@ -20,4 +20,7 @@ export class ItemApiService extends OCApiWithAuth {
       }),
     );
   }
+  buyBooster(boosterNo: number): Observable<any> {
+    return this.post(`buy/booster/${boosterNo}`, this.token);
+  }
 }

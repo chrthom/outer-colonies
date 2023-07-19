@@ -30,9 +30,12 @@ export default class DBItemsDAO {
       };
     });
   }
-  static async create(userId: number, type: ItemType, content: string, message?: string) {
+  static async createBooster(userId: number, boosterNo: number) {
+    return this.create(userId, ItemType.Booster, String(boosterNo));
+  }
+  private static async create(userId: number, type: ItemType, content: string, message?: string) {
     DBConnection.instance.query(
-      `INSERT INTO decks (user_id, type, content${message ? ', message' : ''}) VALUES `
+      `INSERT INTO items (user_id, type, content${message ? ', message' : ''}) VALUES `
         + `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`
     );
   }

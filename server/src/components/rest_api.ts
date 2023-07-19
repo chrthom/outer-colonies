@@ -20,6 +20,7 @@ import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
 import { ItemBoxContentType, ItemType } from './config/enums';
+import { rules } from './config/rules';
 
 export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
@@ -163,6 +164,28 @@ export default function restAPI(app: Express) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
           DBItemsDAO.getByUserId(u.userId).then(sendItemResponse);
+        } else {
+          res.sendStatus(403);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+  });
+
+  app.post('/api/buy/booster/:boosterNo([1-4])', (req, res) => {
+    const boosterNo = Number(req.params.boosterNo);
+    const sessionToken = req.header('session-token');
+    if (sessionToken) {
+      DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
+        if (u) {
+          DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
+            if (sufficientSol) {
+              DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(201).send({}));
+            } else {
+              res.sendStatus(400);
+            }
+          });
         } else {
           res.sendStatus(403);
         }

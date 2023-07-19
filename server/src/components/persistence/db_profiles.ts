@@ -31,4 +31,13 @@ export default class DBProfilesDAO {
       `UPDATE profiles SET sol = sol + ${sol} WHERE user_id = ${userId}`,
     );
   }
+  static async decreaseSol(userId: number, sol: number): Promise<boolean> {
+    const user = await this.getByUserId(userId);
+    if (user.sol >= sol) {
+      await this.increaseSol(userId, -sol);
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
