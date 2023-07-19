@@ -3,8 +3,8 @@
   <div id="inventory-box" class="inner-box">
     <oc-content-box title="Inventar">
       <div class="scroll">
-        <oc-inventory-item *ngIf="sol > 0" [img]="assetURL + '/items/booster1.png'" [text]="sol + ' Sol'"></oc-inventory-item>
-        <oc-inventory-item *ngFor="let box of boxes" [img]="assetURL + '/items/booster1.png'" text="Geschenk"></oc-inventory-item>
+        <oc-inventory-item *ngIf="sol > 0" [img]="assetURL + '/items/sol.png'" [text]="sol + ' Sol'"></oc-inventory-item>
+        <oc-inventory-item *ngFor="let box of boxes" [img]="assetURL + '/items/box.png'" text="Geschenk"></oc-inventory-item>
         <oc-inventory-item *ngFor="let booster of boosters" [img]="assetURL + '/items/booster' + booster.no + '.png'" text="Booster"></oc-inventory-item>
       </div>
     </oc-content-box>
