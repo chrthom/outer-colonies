@@ -4,49 +4,56 @@
   height: 185px;
   margin: 5px;
   float: left;
-  #item {
+  .image {
     position: relative;
     max-height: 160px;
     max-width: 160px;
     left: 50%;
     transform: translateX(-50%);
   }
-  #title {
+  .title {
     position: absolute;
     top: 160px;
     left: 50%;
     transform: translateX(-50%);
   }
-  #corners {
+  .corners {
     position: absolute;
     width: 160px;
     height: 160px;
     top: 0;
     left: 0;
-    img {
+    div {
       position: absolute;
       width: 60px;
       height: 60px;
+      background-image: url("../../../assets/zone_corner_blue.png");
     }
-    #top_left {
+    div:hover {
+      background-image: url("../../../assets/zone_corner_red.png");
+    }
+    .top_left {
       top: 0;
       left: 0;
       transform: translateX(-30%) translateY(-30%);
     }
-    #top_right {
+    .top_right {
       top: 0;
       right: 0;
       transform: rotate(90deg) translateX(-30%) translateY(-30%);
     }
-    #bottom_left {
+    .bottom_left {
       bottom: 0;
       left: 0;
       transform: rotate(270deg) translateX(-30%) translateY(-30%);
     }
-    #bottom_right {
+    .bottom_right {
       bottom: 0;
       right: 0;;
       transform: rotate(180deg) translateX(-30%) translateY(-30%);
     }
   }
+}
+.item:hover > .corners > div {
+  background-image: url("../../../assets/zone_corner_red.png");
 }
