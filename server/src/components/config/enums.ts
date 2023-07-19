@@ -56,6 +56,12 @@ export enum MsgTypeOutbound {
   State = 'state',
 }
 
+export enum Rarity {
+  Common = 'common',
+  Uncommon = 'uncommon',
+  Rare = 'rare'
+}
+
 export enum TacticDiscipline {
   Economy = 'economy',
   Intelligence = 'intelligence',

@@ -105,6 +105,7 @@ import Card from '../card';
 import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
 import { Card114, Card155 } from './infrastructure_end.cards';
+import { Rarity } from '../../config/enums';
 
 export default class CardCollection {
   static cards = {
@@ -351,7 +352,22 @@ export default class CardCollection {
     this.starterDeckExpedition,
   ];
 
-  static pickRandomDeck(): Card[] {
-    return this.starterDecks[Math.floor(Math.random() * this.starterDecks.length)].slice();
+  private static pickRandomCard(edition: number, rarity: Rarity) {
+    const relevantCards = this.allCards
+      .filter(c => Math.floor(c.id / 100) == edition)
+      .filter(c => 
+        rarity == Rarity.Common && c.rarity <= 1
+        || rarity == Rarity.Uncommon && c.rarity == 2
+        || rarity == Rarity.Rare && c.rarity >= 3
+      );
+    return relevantCards[Math.floor(Math.random() * relevantCards.length)];
+  }
+
+  static generateBooster(edition: number): Card[] {
+    let cards: Card[] = [];
+    for (let i = 0; i < 6; i++) cards.push(this.pickRandomCard(edition, Rarity.Common));
+    for (let i = 0; i < 3; i++) cards.push(this.pickRandomCard(edition, Rarity.Uncommon));
+    cards.push(this.pickRandomCard(edition, Rarity.Rare));
+    return cards;
   }
 }
