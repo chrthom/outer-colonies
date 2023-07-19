@@ -8,6 +8,7 @@ import {
   AuthRegisterRequest,
   DailyGetResponse,
   DeckListResponse,
+  ItemListResponse,
   ProfileGetResponse,
 } from './shared_interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
@@ -17,6 +18,8 @@ import Card from './cards/card';
 import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
+import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
+import { ItemBoxContentType, ItemType } from './config/enums';
 
 export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
@@ -121,6 +124,37 @@ export default function restAPI(app: Express) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
           DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse);
+        } else {
+          res.sendStatus(403);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+  });
+
+  app.get('/api/item', (req, res) => {
+    const toBox = (i: DBItem) => {
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      return {
+        message: i.message,
+        sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
+        cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
+        decks: content.filter(c => c.type == ItemBoxContentType.Deck).map(c => c.value)
+      };
+    };
+    const sendItemResponse = (items: DBItem[]) => {
+      const payload: ItemListResponse = {
+        boxes: items.filter(i => i.type == ItemType.Box).map(toBox),
+        decks: items.filter(i => i.type == ItemType.Deck).map(i => Number(i.content))
+      };
+      res.send(payload);
+    };
+    const sessionToken = req.header('session-token');
+    if (sessionToken) {
+      DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
+        if (u) {
+          DBItemsDAO.getByUserId(u.userId).then(sendItemResponse);
         } else {
           res.sendStatus(403);
         }

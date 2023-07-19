@@ -45,3 +45,15 @@ export interface DailyGetResponse {
   energy: boolean;
   ships: boolean;
 }
+
+export interface ItemListResponse {
+  boxes: ItemGetResponseBox[],
+  decks: number[]
+}
+
+export interface ItemGetResponseBox {
+  message: string,
+  sol: number[],
+  cards: number[],
+  decks: number[]
+}

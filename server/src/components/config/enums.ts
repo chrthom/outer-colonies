@@ -21,6 +21,17 @@ export enum EventType {
   Tactic = 'tactic',
 }
 
+export enum ItemType {
+  Box = 'box',
+  Deck = 'deck'
+}
+
+export enum ItemBoxContentType {
+  Card = 'card',
+  Deck = 'deck',
+  Sol = 'sol'
+}
+
 export enum GameResultType {
   Depletion = 'depletion',
   Destruction = 'destruction',
