@@ -2,6 +2,7 @@ import { ItemType } from '../config/enums';
 import DBConnection from './db_connector';
 
 export interface DBItem {
+  itemId: number,
   type: ItemType;
   message?: string,
   content: string
@@ -18,11 +19,12 @@ export default class DBItemsDAO {
   }
   private static async getBy(whereClause: string): Promise<DBItem[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT type, message, content FROM items WHERE ${whereClause}`,
+      `SELECT item_id, type, message, content FROM items WHERE ${whereClause}`,
     );
     return queryResult.map((r) => {
       return {
-        type: r.type == 'deck' ? ItemType.Deck : ItemType.Box,
+        itemId: Number(r.item_id),
+        type: r.type == 'booster' ? ItemType.Booster : ItemType.Box,
         message: r.message,
         content: r.content,
       };

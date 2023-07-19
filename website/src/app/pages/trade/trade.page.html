@@ -3,7 +3,13 @@
   <div id="inventory-box" class="inner-box">
     <oc-content-box title="Inventar">
       <div class="scroll">
-        {{ sol }} Sol
+        <div *ngIf="sol > 0" class="item">
+          {{ sol }} Sol
+        </div>
+        <div *ngFor="let box of boxes" class="item">
+          Box
+        </div>
+        <oc-inventory-item *ngFor="let booster of boosters" [img]="assetURL + '/items/booster' + booster.no + '.png'"></oc-inventory-item>
       </div>
     </oc-content-box>
   </div>

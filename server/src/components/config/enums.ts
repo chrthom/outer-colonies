@@ -23,12 +23,12 @@ export enum EventType {
 
 export enum ItemType {
   Box = 'box',
-  Deck = 'deck'
+  Booster = 'booster'
 }
 
 export enum ItemBoxContentType {
   Card = 'card',
-  Deck = 'deck',
+  Booster = 'booster',
   Sol = 'sol'
 }
 

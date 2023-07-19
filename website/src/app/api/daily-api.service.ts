@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import OCApi from './api';
+import OCApiWithAuth from './api-with-auth';
 import AuthService from '../auth.service';
 import { Observable, map } from 'rxjs';
 import { DailyGetResponse } from '../../../../server/src/components/shared_interfaces/rest_api';
@@ -8,14 +8,11 @@ import { DailyGetResponse } from '../../../../server/src/components/shared_inter
 @Injectable({
   providedIn: 'root'
 })
-export class DailyApiService extends OCApi {
-  constructor(private authService: AuthService, http: HttpClient) {
-    super(http);
+export class DailyApiService extends OCApiWithAuth {
+  constructor(authService: AuthService, http: HttpClient) {
+    super(authService, http);
   }
   get dailies(): Observable<DailyGetResponse | null> {
     return this.get<DailyGetResponse>('daily', this.token).pipe(map((res) => res.body));
-  }
-  private get token(): string {
-    return this.authService.sessionToken ? this.authService.sessionToken : '';
   }
 }

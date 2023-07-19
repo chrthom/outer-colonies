@@ -137,16 +137,24 @@ export default function restAPI(app: Express) {
     const toBox = (i: DBItem) => {
       const content = <DBItemBoxContent[]> JSON.parse(i.content);
       return {
+        itemId: i.itemId,
         message: i.message,
         sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
         cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
-        decks: content.filter(c => c.type == ItemBoxContentType.Deck).map(c => c.value)
+        boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
+      };
+    };
+    const toBooster = (i: DBItem) => {
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      return {
+        itemId: i.itemId,
+        no: Number(i.content)
       };
     };
     const sendItemResponse = (items: DBItem[]) => {
       const payload: ItemListResponse = {
         boxes: items.filter(i => i.type == ItemType.Box).map(toBox),
-        decks: items.filter(i => i.type == ItemType.Deck).map(i => Number(i.content))
+        boosters: items.filter(i => i.type == ItemType.Booster).map(toBooster)
       };
       res.send(payload);
     };

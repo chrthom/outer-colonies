@@ -21,6 +21,7 @@ import { DeckPage } from './pages/deck/deck.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { TradePage } from './pages/trade/trade.page';
+import { InventoryItemComponent } from './components/inventory-item/inventory-item.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { TradePage } from './pages/trade/trade.page';
     ImprintPage,
     DataPrivacyPage,
     TradePage,
+    InventoryItemComponent,
   ],
   imports: [
     BrowserModule,

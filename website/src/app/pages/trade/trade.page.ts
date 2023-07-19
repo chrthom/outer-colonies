@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
+import { ItemListResponseBooster, ItemListResponseBox } from '../../../../../server/src/components/shared_interfaces/rest_api';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-trade',
@@ -8,7 +11,10 @@ import { ProfileApiService } from 'src/app/api/profile-api.service';
 })
 export class TradePage implements OnInit {
   sol: number = 0;
-  constructor(private profileApiService: ProfileApiService) {}
+  boxes: ItemListResponseBox[] = [];
+  boosters: ItemListResponseBooster[] = [];
+  readonly assetURL = environment.url.assets;
+  constructor(private profileApiService: ProfileApiService, private itemApiService: ItemApiService) {}
   ngOnInit() {
     this.reload();
   }
@@ -16,6 +22,12 @@ export class TradePage implements OnInit {
     this.profileApiService.profile.subscribe(p => {
       if (p) {
         this.sol = p.sol;
+      }
+    });
+    this.itemApiService.items.subscribe(i => {
+      if (i) {
+        this.boosters = i.boosters;
+        this.boxes = i.boxes;
       }
     });
   }

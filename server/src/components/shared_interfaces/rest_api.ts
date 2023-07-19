@@ -47,13 +47,21 @@ export interface DailyGetResponse {
 }
 
 export interface ItemListResponse {
-  boxes: ItemGetResponseBox[],
-  decks: number[]
+  boxes: ItemListResponseBox[],
+  boosters: ItemListResponseBooster[]
 }
 
-export interface ItemGetResponseBox {
+interface ItemListResponseElement {
+  itemId: number
+}
+
+export interface ItemListResponseBox extends ItemListResponseElement {
   message: string,
   sol: number[],
   cards: number[],
-  decks: number[]
+  boosters: number[]
+}
+
+export interface ItemListResponseBooster extends ItemListResponseElement {
+  no: number;
 }
