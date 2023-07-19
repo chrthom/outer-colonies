@@ -14,6 +14,13 @@ export class TradePage implements OnInit {
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
   readonly assetURL = environment.url.assets;
+  readonly availableBoosters = [
+    {
+      no: 1,
+      title: 'Outer Colonies',
+      price: 920
+    }
+  ]
   constructor(private profileApiService: ProfileApiService, private itemApiService: ItemApiService) {}
   ngOnInit() {
     this.reload();

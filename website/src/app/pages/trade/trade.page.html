@@ -12,7 +12,18 @@
   <div id="buy-box" class="inner-box">
     <oc-content-box title="Booster kaufen">
       <div class="scroll">
-        TBD
+        <mat-card class="card" *ngFor="let booster of availableBoosters">
+          <mat-card-header>
+            <mat-card-title>{{ booster.title }}</mat-card-title>
+            <mat-card-subtitle><h5>{{ booster.price }} Sol</h5></mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <img [src]="assetURL + '/items/booster' + booster.no + '.png'">
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button [color]="sol >= booster.price ? 'primary' : 'secondary'">Kaufen</button>
+          </mat-card-actions>
+        </mat-card>
       </div>
     </oc-content-box>
   </div>
