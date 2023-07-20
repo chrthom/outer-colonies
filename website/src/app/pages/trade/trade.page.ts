@@ -7,6 +7,7 @@ import {
 } from '../../../../../server/src/components/shared_interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { rules } from '../../../../../server/src/components/config/rules';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-trade',
@@ -28,6 +29,7 @@ export class TradePage implements OnInit {
   constructor(
     private profileApiService: ProfileApiService,
     private itemApiService: ItemApiService,
+    private snackBar: MatSnackBar,
   ) {}
   ngOnInit() {
     this.reload();
@@ -47,7 +49,17 @@ export class TradePage implements OnInit {
   }
   buyBooster(boosterNo: number) {
     if (this.sol >= rules.boosterCosts[boosterNo]) {
-      this.itemApiService.buyBooster(boosterNo).subscribe((_) => this.reload());
+      this.itemApiService.buyBooster(boosterNo).subscribe((_) => {
+        this.reload();
+        const booster = this.availableBoosters.find((b) => b.no == boosterNo);
+        this.snackBar.open(
+          `Du hast ein Booster Pack "${booster?.title}" für ${booster?.price} Sol erworben.`,
+          'OK',
+          {
+            duration: 5000,
+          },
+        );
+      });
     }
   }
   open(itemId: number) {
