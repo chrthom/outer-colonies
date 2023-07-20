@@ -23,6 +23,7 @@ import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { TradePage } from './pages/trade/trade.page';
 import { InventoryItemComponent } from './components/inventory-item/inventory-item.component';
+import { OpenItemComponent } from './components/open-item/open-item.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { InventoryItemComponent } from './components/inventory-item/inventory-it
     DataPrivacyPage,
     TradePage,
     InventoryItemComponent,
+    OpenItemComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,16 @@
+<div id="overlay">
+    <div class="outer-box" [class]="outerBoxClasses">
+        <div *ngFor="let sol of content?.sol" class="item">
+            <img [src]="assetURL + '/items/sol.png'">
+            <h2>{{ sol }} Sol</h2>
+        </div>
+        <div *ngFor="let card of content?.cards" class="item">
+            <img [src]="assetURL + '/cards/' + card + '.png'">
+        </div>
+        <div *ngFor="let booster of content?.boosters" class="item">
+            <img [src]="assetURL + '/items/booster' + booster + '.png'">
+        </div>
+    </div>
+    <h5 id="box-message">{{ content?.message }}</h5>
+    <button mat-fab id="close-button" color="accent" (click)="closeBox()"><h1>x</h1></button>
+</div>

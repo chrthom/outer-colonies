@@ -48,3 +48,4 @@
     </oc-content-box>
   </div>
 </div>
+<oc-open-item *ngIf="openedBoxContent" [content]="openedBoxContent" (close)="boxClosed()"></oc-open-item>

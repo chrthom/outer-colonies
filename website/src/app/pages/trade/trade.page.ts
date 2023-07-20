@@ -4,6 +4,7 @@ import { ProfileApiService } from 'src/app/api/profile-api.service';
 import {
   ItemListResponseBooster,
   ItemListResponseBox,
+  OpenItemResponse,
 } from '../../../../../server/src/components/shared_interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { rules } from '../../../../../server/src/components/config/rules';
@@ -18,6 +19,7 @@ export class TradePage implements OnInit {
   sol: number = 0;
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
+  openedBoxContent?: OpenItemResponse;
   readonly assetURL = environment.url.assets;
   readonly availableBoosters = [
     {
@@ -63,6 +65,13 @@ export class TradePage implements OnInit {
     }
   }
   open(itemId: number) {
-    this.itemApiService.open(itemId).subscribe((_) => this.reload());
+    this.itemApiService.open(itemId).subscribe((content) => {
+      this.reload()
+      this.openedBoxContent = content;
+    });
+  }
+  boxClosed() {
+    this.openedBoxContent = undefined;
+    this.reload();
   }
 }
