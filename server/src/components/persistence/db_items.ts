@@ -2,15 +2,15 @@ import { ItemType } from '../config/enums';
 import DBConnection from './db_connector';
 
 export interface DBItem {
-  itemId: number,
+  itemId: number;
   type: ItemType;
-  message?: string,
-  content: string
+  message?: string;
+  content: string;
 }
 
 export interface DBItemBoxContent {
-  type: string,
-  value: number
+  type: string;
+  value: number;
 }
 
 export default class DBItemsDAO {
@@ -38,8 +38,8 @@ export default class DBItemsDAO {
   }
   private static async create(userId: number, type: ItemType, content: string, message?: string) {
     DBConnection.instance.query(
-      `INSERT INTO items (user_id, type, content${message ? ', message' : ''}) VALUES `
-        + `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`
+      `INSERT INTO items (user_id, type, content${message ? ', message' : ''}) VALUES ` +
+        `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`,
     );
   }
 }

@@ -354,11 +354,12 @@ export default class CardCollection {
 
   private static pickRandomCard(edition: number, rarity: Rarity) {
     const relevantCards = this.allCards
-      .filter(c => Math.floor(c.id / 100) == edition)
-      .filter(c => 
-        rarity == Rarity.Common && c.rarity <= 1
-        || rarity == Rarity.Uncommon && c.rarity == 2
-        || rarity == Rarity.Rare && c.rarity >= 3
+      .filter((c) => Math.floor(c.id / 100) == edition)
+      .filter(
+        (c) =>
+          (rarity == Rarity.Common && c.rarity <= 1) ||
+          (rarity == Rarity.Uncommon && c.rarity == 2) ||
+          (rarity == Rarity.Rare && c.rarity >= 3),
       );
     return relevantCards[Math.floor(Math.random() * relevantCards.length)];
   }

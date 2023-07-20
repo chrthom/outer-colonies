@@ -14,7 +14,11 @@ export default class Auth {
     return (await DBCredentialsDAO.getByEmail(email)) != null;
   }
   static async register(registrationData: AuthRegisterRequest): Promise<boolean> {
-    await DBCredentialsDAO.create(registrationData.username, registrationData.password, registrationData.email);
+    await DBCredentialsDAO.create(
+      registrationData.username,
+      registrationData.password,
+      registrationData.email,
+    );
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
     DBProfilesDAO.create(credential.userId);
     DBDailiesDAO.create(credential.userId);

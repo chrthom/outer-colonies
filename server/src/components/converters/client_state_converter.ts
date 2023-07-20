@@ -2,7 +2,15 @@ import Match from '../game_state/match';
 import { CardType, Zone } from '../config/enums';
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/helpers';
-import { ClientBattle, ClientCardStack, ClientDefenseIcon, ClientGameResult, ClientHandCard, ClientOpponent, ClientState } from '../shared_interfaces/client_state';
+import {
+  ClientBattle,
+  ClientCardStack,
+  ClientDefenseIcon,
+  ClientGameResult,
+  ClientHandCard,
+  ClientOpponent,
+  ClientState,
+} from '../shared_interfaces/client_state';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];
@@ -89,7 +97,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     ? {
         won: match.gameResult.winnerNo == player.no,
         type: match.gameResult.type,
-        sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol
+        sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol,
       }
     : null;
   return {
@@ -108,4 +116,3 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     hasToRetractCards: cardStacks.flatMap((cs) => cs.cards).some((c) => c.insufficientEnergy),
   };
 }
-  

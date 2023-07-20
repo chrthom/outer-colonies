@@ -147,26 +147,26 @@ export default function restAPI(app: Express) {
   // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
-      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
         message: i.message,
-        sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
-        cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
-        boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
+        sol: content.filter((c) => c.type == ItemBoxContentType.Sol).map((c) => c.value),
+        cards: content.filter((c) => c.type == ItemBoxContentType.Card).map((c) => c.value),
+        boosters: content.filter((c) => c.type == ItemBoxContentType.Booster).map((c) => c.value),
       };
     };
     const toBooster = (i: DBItem) => {
-      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
-        no: Number(i.content)
+        no: Number(i.content),
       };
     };
     const sendItemResponse = (items: DBItem[]) => {
       const payload: ItemListResponse = {
-        boxes: items.filter(i => i.type == ItemType.Box).map(toBox),
-        boosters: items.filter(i => i.type == ItemType.Booster).map(toBooster)
+        boxes: items.filter((i) => i.type == ItemType.Box).map(toBox),
+        boosters: items.filter((i) => i.type == ItemType.Booster).map(toBooster),
       };
       res.send(payload);
     };
@@ -192,24 +192,24 @@ export default function restAPI(app: Express) {
     if (sessionToken) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
-          DBItemsDAO.getByUserId(u.userId).then(items => {
-            const item = items.find(i => i.itemId == itemId)
+          DBItemsDAO.getByUserId(u.userId).then((items) => {
+            const item = items.find((i) => i.itemId == itemId);
             if (item) {
               DBItemsDAO.delete(itemId);
               if (item.type == ItemType.Booster) {
-                const cards = CardCollection.generateBooster(Number(item.content)).map(c => c.id);
-                cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
+                const cards = CardCollection.generateBooster(Number(item.content)).map((c) => c.id);
+                cards.forEach((cId) => DBDecksDAO.create(cId, u.userId, false, true));
                 const response: OpenItemResponse = {
                   itemId: item.itemId,
                   message: item.message,
                   sol: [],
                   cards: cards,
-                  boosters: []
+                  boosters: [],
                 };
                 res.send(response);
               } else if (item.type == ItemType.Box) {
-                const content = <DBItemBoxContent[]> JSON.parse(item.content);
-                content.forEach(e => {
+                const content = <DBItemBoxContent[]>JSON.parse(item.content);
+                content.forEach((e) => {
                   switch (e.type) {
                     case ItemBoxContentType.Booster:
                       DBItemsDAO.createBooster(u.userId, e.value);
@@ -224,9 +224,9 @@ export default function restAPI(app: Express) {
                 const response: OpenItemResponse = {
                   itemId: item.itemId,
                   message: item.message,
-                  sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
-                  cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
-                  boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
+                  sol: content.filter((c) => c.type == ItemBoxContentType.Sol).map((c) => c.value),
+                  cards: content.filter((c) => c.type == ItemBoxContentType.Card).map((c) => c.value),
+                  boosters: content.filter((c) => c.type == ItemBoxContentType.Booster).map((c) => c.value),
                 };
                 res.send(response);
               }
@@ -250,9 +250,9 @@ export default function restAPI(app: Express) {
     if (sessionToken) {
       DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => {
         if (u) {
-          DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
+          DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then((sufficientSol) => {
             if (sufficientSol) {
-              DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(201).send({}));
+              DBItemsDAO.createBooster(u.userId, boosterNo).then((_) => res.status(201).send({}));
             } else {
               res.sendStatus(400);
             }

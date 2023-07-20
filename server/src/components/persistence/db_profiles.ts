@@ -17,19 +17,15 @@ export default class DBProfilesDAO {
     return queryResult.map((r) => {
       return {
         userId: Number(r.user_id),
-        sol: Number(r.sol)
+        sol: Number(r.sol),
       };
     });
   }
   static async create(userId: number) {
-    return DBConnection.instance.query(
-      `INSERT INTO profiles (user_id) VALUES (${userId})`,
-    );
+    return DBConnection.instance.query(`INSERT INTO profiles (user_id) VALUES (${userId})`);
   }
   static async increaseSol(userId: number, sol: number) {
-    return DBConnection.instance.query(
-      `UPDATE profiles SET sol = sol + ${sol} WHERE user_id = ${userId}`,
-    );
+    return DBConnection.instance.query(`UPDATE profiles SET sol = sol + ${sol} WHERE user_id = ${userId}`);
   }
   static async decreaseSol(userId: number, sol: number): Promise<boolean> {
     const user = await this.getByUserId(userId);

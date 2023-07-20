@@ -23,19 +23,19 @@ export enum EventType {
 
 export enum ItemType {
   Box = 'box',
-  Booster = 'booster'
+  Booster = 'booster',
 }
 
 export enum ItemBoxContentType {
   Card = 'card',
   Booster = 'booster',
-  Sol = 'sol'
+  Sol = 'sol',
 }
 
 export enum GameResultType {
   Depletion = 'depletion',
   Destruction = 'destruction',
-  Surrender = 'surrender'
+  Surrender = 'surrender',
 }
 
 export enum MsgTypeInbound {
@@ -59,7 +59,7 @@ export enum MsgTypeOutbound {
 export enum Rarity {
   Common = 'common',
   Uncommon = 'uncommon',
-  Rare = 'rare'
+  Rare = 'rare',
 }
 
 export enum TacticDiscipline {
