@@ -360,7 +360,17 @@ export default class CardCollection {
           (rarity == Rarity.Common && c.rarity <= 1) ||
           (rarity == Rarity.Uncommon && c.rarity == 2) ||
           (rarity == Rarity.Rare && c.rarity >= 3),
-      );
+      )
+      .flatMap((c) => {
+        switch (c.rarity) {
+          case 0: return Array(5).fill(c);
+          case 1: return Array(4).fill(c);
+          case 2: return [ c ];
+          case 3: return Array(4).fill(c);
+          case 4: return Array(2).fill(c);
+          case 5: return [ c ];
+        }
+      });
     return relevantCards[Math.floor(Math.random() * relevantCards.length)];
   }
 
