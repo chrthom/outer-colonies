@@ -30,6 +30,9 @@ export default class DBItemsDAO {
       };
     });
   }
+  static async delete(itemId: number) {
+    return DBConnection.instance.query(`DELETE FROM items WHERE item_id = ${itemId}`);
+  }
   static async createBooster(userId: number, boosterNo: number) {
     return this.create(userId, ItemType.Booster, String(boosterNo));
   }

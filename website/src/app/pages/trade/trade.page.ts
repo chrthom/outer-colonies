@@ -44,4 +44,7 @@ export class TradePage implements OnInit {
       this.itemApiService.buyBooster(boosterNo).subscribe(_ => this.reload());
     }
   }
+  open(itemId: number) {
+    this.itemApiService.open(itemId).subscribe(_ => this.reload());
+  }
 }

@@ -39,7 +39,7 @@ export class HomePage implements OnInit {
       sol: rules.dailyEarnings.ships
     }
   ];
-  selectedDaily = 0;
+  selectedDaily = 1;
   constructor(public authService: AuthService, private dailyApiService: DailyApiService) {}
   ngOnInit() {
     this.reload();
