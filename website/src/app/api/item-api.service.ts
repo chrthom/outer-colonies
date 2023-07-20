@@ -1,12 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ItemListResponse, OpenItemResponse } from '../../../../server/src/components/shared_interfaces/rest_api';
+import {
+  ItemListResponse,
+  OpenItemResponse,
+} from '../../../../server/src/components/shared_interfaces/rest_api';
 import AuthService from '../auth.service';
 import OCApiWithAuth from './api-with-auth';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ItemApiService extends OCApiWithAuth {
   constructor(authService: AuthService, http: HttpClient) {

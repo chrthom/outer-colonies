@@ -6,7 +6,7 @@ import { ProfileGetResponse } from '../../../../server/src/components/shared_int
 import OCApiWithAuth from './api-with-auth';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfileApiService extends OCApiWithAuth {
   constructor(authService: AuthService, http: HttpClient) {

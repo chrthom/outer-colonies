@@ -9,10 +9,7 @@ import OCApiWithAuth from './api-with-auth';
   providedIn: 'root',
 })
 export class DeckApiService extends OCApiWithAuth {
-  constructor(
-    authService: AuthService,
-    http: HttpClient,
-  ) {
+  constructor(authService: AuthService, http: HttpClient) {
     super(authService, http);
   }
   listDeck(): Observable<DeckListResponse | undefined> {

@@ -50,7 +50,7 @@ import { InventoryItemComponent } from './components/inventory-item/inventory-it
     MatSlideToggleModule,
     MatCardModule,
     MatBadgeModule,
-    MatTabsModule
+    MatTabsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

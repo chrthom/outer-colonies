@@ -13,34 +13,41 @@ import { rules } from '../../../../../server/src/components/config/rules';
 export class HomePage implements OnInit {
   dailies: Daily[] = [
     {
-      matcher: r => r.login,
+      matcher: (r) => r.login,
       title: 'Tägliche Inspektion',
       description: 'Melde dich im Online Portal an.',
-      sol: rules.dailyEarnings.login
-    }, {
-      matcher: r => r.victory,
+      sol: rules.dailyEarnings.login,
+    },
+    {
+      matcher: (r) => r.victory,
       title: 'Der Duft des Sieges',
       description: 'Erringe einen Sieg.',
-      sol: rules.dailyEarnings.victory
-    }, {
-      matcher: r => r.game,
+      sol: rules.dailyEarnings.victory,
+    },
+    {
+      matcher: (r) => r.game,
       title: 'Bis zum bitteren Ende',
       description: 'Beende en Spiel, ohne dass ein Spieler kapituliert.',
-      sol: rules.dailyEarnings.game
-    }, {
-      matcher: r => r.energy,
+      sol: rules.dailyEarnings.game,
+    },
+    {
+      matcher: (r) => r.energy,
       title: 'Bereit zur Expansion',
       description: 'Beende ein Spiel mit mindestens 6 überschüssigen Energiepunkten.',
-      sol: rules.dailyEarnings.energy
-    }, {
-      matcher: r => r.ships,
+      sol: rules.dailyEarnings.energy,
+    },
+    {
+      matcher: (r) => r.ships,
       title: 'Armada',
       description: 'Beende ein Spiel mit mindestens 5 eigenen Schiffen.',
-      sol: rules.dailyEarnings.ships
-    }
+      sol: rules.dailyEarnings.ships,
+    },
   ];
   selectedDaily = 1;
-  constructor(public authService: AuthService, private dailyApiService: DailyApiService) {}
+  constructor(
+    public authService: AuthService,
+    private dailyApiService: DailyApiService,
+  ) {}
   ngOnInit() {
     this.reload();
     setInterval(this.showNextDaily(this.dailies.length), 3000);
@@ -48,7 +55,7 @@ export class HomePage implements OnInit {
   reload() {
     this.dailyApiService.dailies.subscribe((res) => {
       if (res) {
-        this.dailies = this.dailies.map(daily => {
+        this.dailies = this.dailies.map((daily) => {
           daily.achieved = daily.matcher(res);
           return daily;
         });
@@ -61,7 +68,7 @@ export class HomePage implements OnInit {
   private showNextDaily(length: number) {
     return () => {
       if (++this.selectedDaily >= length) this.selectedDaily = 0;
-    }
+    };
   }
 }
 

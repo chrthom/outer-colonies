@@ -3,9 +3,23 @@
   <div id="inventory-box" class="inner-box">
     <oc-content-box title="Inventar">
       <div class="scroll">
-        <oc-inventory-item *ngIf="sol > 0" [img]="assetURL + '/items/sol.png'" [text]="sol + ' Sol'"></oc-inventory-item>
-        <oc-inventory-item *ngFor="let box of boxes" (click)="open(box.itemId)" [img]="assetURL + '/items/box.png'" text="Geschenk"></oc-inventory-item>
-        <oc-inventory-item *ngFor="let booster of boosters" (click)="open(booster.itemId)" [img]="assetURL + '/items/booster' + booster.no + '.png'" text="Booster"></oc-inventory-item>
+        <oc-inventory-item
+          *ngIf="sol > 0"
+          [img]="assetURL + '/items/sol.png'"
+          [text]="sol + ' Sol'"
+        ></oc-inventory-item>
+        <oc-inventory-item
+          *ngFor="let box of boxes"
+          (click)="open(box.itemId)"
+          [img]="assetURL + '/items/box.png'"
+          text="Geschenk"
+        ></oc-inventory-item>
+        <oc-inventory-item
+          *ngFor="let booster of boosters"
+          (click)="open(booster.itemId)"
+          [img]="assetURL + '/items/booster' + booster.no + '.png'"
+          text="Booster"
+        ></oc-inventory-item>
       </div>
     </oc-content-box>
   </div>
@@ -18,10 +32,16 @@
             <mat-card-subtitle><h5>{{ booster.price }} Sol</h5></mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <img [src]="assetURL + '/items/booster' + booster.no + '.png'">
+            <img [src]="assetURL + '/items/booster' + booster.no + '.png'" />
           </mat-card-content>
           <mat-card-actions>
-            <button mat-raised-button (click)="buyBooster(booster.no)" [color]="sol >= booster.price ? 'primary' : 'secondary'">Kaufen</button>
+            <button
+              mat-raised-button
+              (click)="buyBooster(booster.no)"
+              [color]="sol >= booster.price ? 'primary' : 'secondary'"
+            >
+              Kaufen
+            </button>
           </mat-card-actions>
         </mat-card>
       </div>

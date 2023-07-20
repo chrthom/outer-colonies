@@ -13,9 +13,7 @@ export class DeckPage implements OnInit {
   readonly maxCards = 100;
   activeCards: DeckCard[] = [];
   reserveCards: DeckCard[] = [];
-  constructor(
-    private deckApiService: DeckApiService
-  ) {}
+  constructor(private deckApiService: DeckApiService) {}
   ngOnInit() {
     this.reload();
   }

@@ -6,7 +6,7 @@ import { Observable, map } from 'rxjs';
 import { DailyGetResponse } from '../../../../server/src/components/shared_interfaces/rest_api';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DailyApiService extends OCApiWithAuth {
   constructor(authService: AuthService, http: HttpClient) {
