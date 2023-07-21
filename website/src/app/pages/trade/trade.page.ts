@@ -37,6 +37,11 @@ export class TradePage implements OnInit {
       title: 'Marsianische Hegemonie',
       price: rules.boosterCosts[3],
     },
+    {
+      no: 4,
+      title: 'Kuipergürtel',
+      price: rules.boosterCosts[4],
+    },
   ];
   constructor(
     private profileApiService: ProfileApiService,
