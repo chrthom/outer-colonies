@@ -24,8 +24,13 @@ export class TradePage implements OnInit {
   readonly availableBoosters = [
     {
       no: 1,
-      title: 'Die äußeren Kolonien',
+      title: 'Outer Colonies',
       price: rules.boosterCosts[1],
+    },
+    {
+      no: 4,
+      title: 'Kuipergürtel',
+      price: rules.boosterCosts[4],
     },
     {
       no: 2,
@@ -36,11 +41,6 @@ export class TradePage implements OnInit {
       no: 3,
       title: 'Marsianische Hegemonie',
       price: rules.boosterCosts[3],
-    },
-    {
-      no: 4,
-      title: 'Kuipergürtel',
-      price: rules.boosterCosts[4],
     },
   ];
   constructor(
