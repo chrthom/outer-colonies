@@ -3,7 +3,7 @@ import { layout } from '../../config/layout';
 export default class VersonIndicator {
   constructor(scene: Phaser.Scene) {
     scene.add
-      .text(layout.version.x, layout.version.y, 'Outer Colonies v1.2 - Dione')
+      .text(layout.version.x, layout.version.y, 'Outer Colonies v1.3 - Tethys')
       .setFontSize(layout.font.size)
       .setFontFamily(layout.font.captionFamily)
       .setColor(layout.font.color)
