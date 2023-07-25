@@ -76,7 +76,7 @@ export default class Prompt {
     const battleText =
       this.scene.state.battle?.type == BattleType.Raid
         ? 'Verteidigung deiner Kolonie'
-        : 'Intervention der gegenerischen Mission';
+        : 'Intervention der gegenerischen\nMission';
     this.show(`Wähle Schiffe zur ${battleText}`);
   }
   private showCombatPhase() {

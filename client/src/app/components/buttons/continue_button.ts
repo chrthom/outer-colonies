@@ -1,3 +1,4 @@
+import { animationConfig } from 'src/app/config/animation';
 import {
   BattleType,
   MsgTypeInbound,
@@ -68,14 +69,24 @@ export default class ContinueButton {
   }
   update() {
     this.prompt.update();
+    const self = this;
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
     } else if (this.scene.state.playerPendingAction) {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
-          if (!this.scene.state.playerIsActive) this.showIntervene();
-          else if (this.scene.state.hasToRetractCards) this.waitState();
-          else this.showNextPhase();
+          if (!this.scene.state.playerIsActive) {
+            if (!this.canIntervene) {
+              setTimeout(() => {
+                self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
+              }, animationConfig.duration.move);
+            }
+            this.showIntervene();
+          } else if (this.scene.state.hasToRetractCards) {
+            this.waitState();
+          } else {
+            this.showNextPhase();
+          }
           break;
         case TurnPhase.Combat:
           this.showNextCombatPhase();
@@ -122,6 +133,9 @@ export default class ContinueButton {
     this.show(text, 'inactive_select', () =>
       this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds),
     );
+  }
+  private get canIntervene() {
+    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
   }
   private showNextCombatPhase() {
     const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
