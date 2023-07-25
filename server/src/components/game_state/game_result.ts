@@ -38,10 +38,14 @@ export default class GameResult {
   }
   private applyEarnings(player: Player, opponent: Player, won: boolean): number {
     let sol = 0;
-    if (won) sol += rules.gameEarnings.victory;
     sol += player.discardPile.length * rules.gameEarnings.discardPile;
     sol += opponent.getColonyCardStack().damage * rules.gameEarnings.dealtColonyDamage;
-    sol += player.cardStacks.flatMap((c) => c.getCards).length * rules.gameEarnings.cardsInGame;
+    const ingameCards = player.cardStacks.flatMap((c) => c.getCards).length - 1;
+    sol += ingameCards * rules.gameEarnings.cardsInGame;
+    if (won && ingameCards + player.discardPile.length >= rules.minCardsForVictoryBonus) {
+      sol += rules.gameEarnings.victory;
+    }
+    sol = Math.max(0, sol);
     DBCredentialsDAO.getByUsername(player.name).then((c) => {
       DBProfilesDAO.increaseSol(c.userId, sol);
       if (won) DBDailiesDAO.achieveVictory(c.userId);

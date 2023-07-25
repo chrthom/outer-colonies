@@ -19,6 +19,7 @@ class OCRules {
     discardPile: 1,
     dealtColonyDamage: 1,
   };
+  readonly minCardsForVictoryBonus = 6;
   readonly boosterCosts = [Infinity, 920, 1045, 1045, 1045];
 }
 
