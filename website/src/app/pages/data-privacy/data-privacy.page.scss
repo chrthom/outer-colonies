@@ -6,9 +6,20 @@
   margin-bottom: 20px;
 }
 
+h2,
 h3,
-h4,
 h5 {
   display: block;
-  margin-top: 10px;
+}
+
+h2 {
+  padding-top: 25px;
+}
+
+h3 {
+  padding-top: 15px;
+}
+
+h5 {
+  padding-top: 5px;
 }
