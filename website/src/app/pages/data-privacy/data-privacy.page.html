@@ -1,4 +1,4 @@
-<oc-navbar></oc-navbar>
+<oc-navbar *ngIf="authService.isLoggedIn"></oc-navbar>
 <div id="text-box">
   <oc-content-box title="Datenschutzerkl&auml;rung">
     <h3>1. Datenschutz auf einen Blick</h3>
