@@ -90,6 +90,11 @@ export default class ContinueButton {
           break;
         case TurnPhase.Combat:
           this.showNextCombatPhase();
+          if (!this.canAttack) {
+            setTimeout(() => {
+              self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
+            }, animationConfig.duration.attack);
+          }
           break;
         case TurnPhase.End:
           this.showEndPhase();
@@ -134,9 +139,6 @@ export default class ContinueButton {
       this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds),
     );
   }
-  private get canIntervene() {
-    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
-  }
   private showNextCombatPhase() {
     const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
     this.show('Kampfphase beenden', button, () =>
@@ -164,5 +166,11 @@ export default class ContinueButton {
   private waitState() {
     const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
     this.show('', button, () => {});
+  }
+  private get canIntervene() {
+    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
+  }
+  private get canAttack() {
+    return this.scene.state.cardStacks.some(cs => cs.cards.some(c => c.battleReady));
   }
 }
