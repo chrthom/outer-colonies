@@ -63,6 +63,20 @@
                 }
               ]
             },
+            "integration": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.integration.ts"
+                }
+              ]
+            },
             "development": {
               "buildOptimizer": false,
               "optimization": false,
@@ -88,6 +102,9 @@
             },
             "staging": {
               "browserTarget": "outercolonies-website:build:staging"
+            },
+            "integration": {
+              "browserTarget": "outercolonies-website:build:integration"
             },
             "development": {
               "browserTarget": "outercolonies-website:build:development"
