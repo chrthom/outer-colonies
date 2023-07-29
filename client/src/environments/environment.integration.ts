@@ -1,5 +1,5 @@
 export const environment = {
-  stage: 'staging',
+  stage: 'integration',
   urls: {
     website: 'https://staging.outercolonies.de',
     api: 'https://api.staging.outercolonies.de',

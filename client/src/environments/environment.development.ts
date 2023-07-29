@@ -1,5 +1,5 @@
 export const environment = {
-  name: 'development',
+  stage: 'development',
   urls: {
     website: 'http://localhost:4200',
     api: 'http://localhost:3000',

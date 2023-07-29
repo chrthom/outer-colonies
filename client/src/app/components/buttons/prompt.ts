@@ -68,7 +68,7 @@ export default class Prompt {
     } else {
       text += `Wähle Schiffe für ${
         this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
-      }`;
+      }!`;
     }
     this.show(text);
   }
@@ -77,11 +77,11 @@ export default class Prompt {
       this.scene.state.battle?.type == BattleType.Raid
         ? 'Verteidigung deiner Kolonie'
         : 'Intervention der gegenerischen\nMission';
-    this.show(`Wähle Schiffe zur ${battleText}`);
+    this.show(`Wähle Schiffe zur ${battleText}!`);
   }
   private showCombatPhase() {
     this.show(
-      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen Waffensystemen durch`,
+      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen Waffensystemen durch!`,
     );
   }
   private showEndPhase() {

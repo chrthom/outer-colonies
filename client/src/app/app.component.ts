@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   config: Phaser.Types.Core.GameConfig;
 
   constructor() {
-    console.log(`Outer Colonies client started on stage ${environment.name}`);
+    console.log(`Outer Colonies client started on stage ${environment.stage}`);
     this.config = {
       type: Phaser.AUTO,
       scene: [MatchmakingScene, GameScene],
