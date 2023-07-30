@@ -56,7 +56,7 @@ export default class AuthService {
 
   get isLoggedIn(): boolean {
     return this.username != undefined;
-  } 
+  }
 
   private checkCache(): boolean {
     // TODO: Double-check what this does

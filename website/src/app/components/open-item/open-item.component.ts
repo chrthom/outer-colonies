@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'oc-open-item',
   templateUrl: './open-item.component.html',
-  styleUrls: ['./open-item.component.scss']
+  styleUrls: ['./open-item.component.scss'],
 })
 export class OpenItemComponent {
   @Input() content?: OpenItemResponse = undefined;
@@ -15,15 +15,16 @@ export class OpenItemComponent {
     this.content = {
       itemId: 0,
       message: 'Test 12313 13 1 312 31 312 312 3',
-      sol: [ 1034 ],
-      cards: [ 102, 215 ],
-      boosters: [ 1, 1, 1 ]
-    }
+      sol: [1034],
+      cards: [102, 215],
+      boosters: [1, 1, 1],
+    };
   }
   get outerBoxClasses(): string {
     if (this.content) {
-      const numberOfElements = this.content.sol.length + this.content.boosters.length + this.content.cards.length;
-      switch(numberOfElements) {
+      const numberOfElements =
+        this.content.sol.length + this.content.boosters.length + this.content.cards.length;
+      switch (numberOfElements) {
         case 1:
         case 2:
         case 3:

@@ -81,7 +81,7 @@ export class TradePage implements OnInit {
   }
   open(itemId: number) {
     this.itemApiService.open(itemId).subscribe((content) => {
-      this.reload()
+      this.reload();
       this.openedBoxContent = content;
     });
   }
