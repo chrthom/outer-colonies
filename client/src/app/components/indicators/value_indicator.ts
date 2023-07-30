@@ -28,7 +28,8 @@ export default class ValueIndicator {
           critical ? layout.colors.secondary : layout.colors.primary,
           layout.colors.alpha,
         )
-        .setOrigin(0.5, 0.5);
+        .setOrigin(0.5, 0.5)
+        .setDepth(layout.depth.indicators);
     } else {
       this.shape = scene.add
         .star(
@@ -40,7 +41,8 @@ export default class ValueIndicator {
           critical ? layout.colors.secondary : layout.colors.primary,
           layout.colors.alpha,
         )
-        .setOrigin(0.5, 0.5);
+        .setOrigin(0.5, 0.5)
+        .setDepth(layout.depth.indicators);
     }
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
@@ -48,7 +50,8 @@ export default class ValueIndicator {
       .setFontFamily(layout.font.captionFamily)
       .setColor('#eeeecc')
       .setAlign('center')
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5, 0.5)
+      .setDepth(layout.depth.indicators);
   }
   destroy() {
     this.shape.destroy();
