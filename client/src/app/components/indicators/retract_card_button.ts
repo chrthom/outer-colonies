@@ -23,6 +23,7 @@ export default class RetractCardButton {
       )
       .setOrigin(0.5, 0.5)
       .setAlpha(layout.colors.alpha)
+      .setDepth(layout.depth.indicators)
       .setInteractive()
       .on('pointerover', () => this.setTintHover())
       .on('pointerout', () => (crititcal ? this.setTintCritical() : this.setTintNormal()))

@@ -48,7 +48,7 @@ export default class ValueIndicator {
       .text(this.x(cardX), this.y(cardY), value)
       .setFontSize(layout.cards.damageIndicator.fontSize)
       .setFontFamily(layout.font.captionFamily)
-      .setColor('#eeeecc')
+      .setColor(layout.font.colorHover)
       .setAlign('center')
       .setOrigin(0.5, 0.5)
       .setDepth(layout.depth.indicators);
@@ -66,7 +66,12 @@ export default class ValueIndicator {
     });
   }
   private x(cardX: number) {
-    return cardX + layout.cards.damageIndicator.xOffset;
+    return (
+      cardX +
+      (this.ownedByPlayer
+        ? layout.cards.damageIndicator.xOffsetPlayer
+        : layout.cards.damageIndicator.xOffsetOpponent)
+    );
   }
   private y(cardY: number) {
     return (
