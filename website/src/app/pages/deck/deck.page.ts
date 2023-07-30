@@ -61,9 +61,9 @@ export class DeckPage implements OnInit {
     });
   }
   get activeCardsNum(): number {
-    return this.activeCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b);
+    return this.activeCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b, 0);
   }
   get reserveCardsNum(): number {
-    return this.reserveCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b);
+    return this.reserveCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b, 0);
   }
 }
