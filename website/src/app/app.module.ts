@@ -24,6 +24,7 @@ import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { TradePage } from './pages/trade/trade.page';
 import { InventoryItemComponent } from './components/inventory-item/inventory-item.component';
 import { OpenItemComponent } from './components/open-item/open-item.component';
+import { RulesPage } from './pages/rules/rules.page';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { OpenItemComponent } from './components/open-item/open-item.component';
     TradePage,
     InventoryItemComponent,
     OpenItemComponent,
+    RulesPage,
   ],
   imports: [
     BrowserModule,
