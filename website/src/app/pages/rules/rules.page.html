@@ -1,15 +1,45 @@
 <oc-navbar active="rules"></oc-navbar>
 <div id="rules-box">
-    <oc-content-box title="Lerne die Outer Colonies Spielregeln">
-        <table>
-            <tr>
-                <td id="table-of-content">
-                    TBD
-                </td>
-                <td id="rules-content">
-                    TBD
-                </td>
-            </tr>
-        </table>
-    </oc-content-box>
+  <oc-content-box title="Spielregeln">
+    <table>
+      <tr>
+        <td id="table-of-content">
+          <mat-selection-list #activeChapter [multiple]="false" color="primary">
+            <mat-list-option value="intro" selected="true"><h3>Intro</h3></mat-list-option>
+            <mat-list-option value="setup"><h3>Spielaufbau</h3></mat-list-option>
+          </mat-selection-list>
+        </td>
+        <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
+          <div *ngSwitchCase="'intro'">
+            <img [src]="imgUrl('intro')" class="right size-20" />
+            <p>
+              Willkommen zu <i>Outer Colonies</i> , dem Trading Card Game, welches dich in den unwirtlichen
+              Rand unseres Sonnensystems entführt. Sei einer der abenteuerlustigen Anführer, die fernab der
+              überbevölkerten und von Kriegen zerrütteten Erde und den marsianischen Oligarchien auf den
+              äußeren Monden und Asteroiden um die Vorherrschaft auf Lebensraum und Ressourcen kämpfen.
+            </p>
+            <p>
+              Mit deinen <i>Outer Colonies</i> Karten stellst du dir ein Deck aus <b>60 bis 100</b> Karten
+              zusammen mit dem du gegen einen oder mehrere andere Spieler antreten kannst. Auf den folgenden
+              Seite lernst du, wie eine Partie <i>Outer Colonies</i> abläuft und wie du deine Karten einsetzt.
+            </p>
+          </div>
+          <div *ngSwitchCase="'setup'">
+            <img [src]="imgUrl('setup')" class="right size-40" />
+            <p>Vor dem Spielbeginn mischen beide Spieler ihr Deck und ziehen <b>7 Karten</b>.</p>
+            <p>
+              Die Kolonie jedes Spielers hat <b>50 Rumpfpunkte</b>. Jeder Spieler notiert sich die Anzahl
+              seiner verbleibenden Rumpfpunkte für alle sichtbar während des Spieles. Ein Spieler dessen
+              Rumpfpunkte zum Rundenende auf 0 sinken scheidet aus dem Spiel aus. Der Spieler der als letztes
+              im Spiel verbleibt gewinnt.
+            </p>
+            <p>
+              Während des Spiels legst du Karten vor dir aus, die in einer der drei Spielzonen (siehe
+              Abbildung) liegen.
+            </p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </oc-content-box>
 </div>

@@ -8,6 +8,34 @@
     width: 100%;
     #table-of-content {
       width: 250px;
+      h3 {
+        color: white !important;
+      }
+    }
+    #rules-content {
+      p {
+        margin-top: 40px;
+      }
+      img {
+        margin-bottom: 10px;
+      }
+      .left {
+        float: left;
+        margin-right: 20px;
+      }
+      .right {
+        float: right;
+        margin-left: 20px;
+      }
+      .size-20 {
+        max-width: 20%;
+      }
+      .size-30 {
+        max-width: 30%;
+      }
+      .size-40 {
+        max-width: 40%;
+      }
     }
   }
 }

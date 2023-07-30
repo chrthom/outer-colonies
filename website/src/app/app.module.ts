@@ -16,6 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.page';
@@ -53,6 +54,7 @@ import { RulesPage } from './pages/rules/rules.page';
     MatButtonModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatListModule,
     MatCardModule,
     MatBadgeModule,
     MatTabsModule,
