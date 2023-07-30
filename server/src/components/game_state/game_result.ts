@@ -42,7 +42,11 @@ export default class GameResult {
     sol += opponent.getColonyCardStack().damage * rules.gameEarnings.dealtColonyDamage;
     const ingameCards = player.cardStacks.flatMap((c) => c.getCards).length - 1;
     sol += ingameCards * rules.gameEarnings.cardsInGame;
-    if (won && ingameCards + player.discardPile.length >= rules.minCardsForVictoryBonus) {
+    if (
+      won &&
+      (this.type != GameResultType.Surrender ||
+        ingameCards + player.discardPile.length >= rules.minCardsForVictoryBonus)
+    ) {
       sol += rules.gameEarnings.victory;
     }
     sol = Math.max(0, sol);

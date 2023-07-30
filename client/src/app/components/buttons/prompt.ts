@@ -98,7 +98,9 @@ export default class Prompt {
       if (gameResult.type == GameResultType.Depletion) gameOverText = 'Eigenes Deck aufgebraucht';
       else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Eigene Kolonie zerstört';
     }
-    this.show(`${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`);
+    this.show(
+      `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`,
+    );
     this.text.setFontSize(layout.prompt.fontSizeBig);
   }
   private show(text: string) {
