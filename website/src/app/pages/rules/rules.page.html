@@ -10,8 +10,8 @@
             <mat-list-option value="setup"><h4>Spielaufbau</h4></mat-list-option>
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
             <h5>Karten</h5>
-            <mat-list-option value="cards" selected="true"><h4>Aufbau einer Karte</h4></mat-list-option>
-            <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
+            <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
+            <mat-list-option value="hull-cards" selected="true"><h4>Rumpfkarten</h4></mat-list-option>
             <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
             <mat-list-option value="nfrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
@@ -48,93 +48,123 @@
           </div>
           <div *ngSwitchCase="'symbols'">
             <p>
-              In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
+              In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel
+              in Form von Symbolen dargestellt.
             </p>
             <table>
               <tr>
                 <th colspan="2">Sockel</th>
-                <th colspan="2">Schiffs- und<br>Ausr&uuml;stungsattribute</th>
+                <th colspan="2">Schiffs- und<br />Ausr&uuml;stungsattribute</th>
                 <th colspan="2">Kartentypen</th>
               </tr>
               <tr>
                 <td><h5>&Delta;</h5></td>
                 <td>Delta (Triebwerk)</td>
-                <td><img [src]="iconUrl('point_defense_1')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('point_defense_1')" class="oc-icon" /></td>
                 <td>Punktabwehr</td>
-                <td><img [src]="iconUrl('tactic')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('tactic')" class="oc-icon" /></td>
                 <td>Taktik</td>
               </tr>
               <tr>
                 <td><h5>&Theta;</h5></td>
                 <td>Theta (Leichte Waffen)</td>
-                <td><img [src]="iconUrl('shield_1')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('shield_1')" class="oc-icon" /></td>
                 <td>Schild</td>
-                <td><img [src]="iconUrl('hull')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('hull')" class="oc-icon" /></td>
                 <td>Rumpf</td>
               </tr>
               <tr>
                 <td><h5>&Xi;</h5></td>
                 <td>Xi (Schwere Waffen)</td>
-                <td><img [src]="iconUrl('armour_1')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('armour_1')" class="oc-icon" /></td>
                 <td>Panzerung</td>
-                <td><img [src]="iconUrl('equipment')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('equipment')" class="oc-icon" /></td>
                 <td>Ausr&uuml;stung</td>
               </tr>
               <tr>
                 <td><h5>&Phi;</h5></td>
                 <td>Phi (Torpedos)</td>
-                <td><img [src]="iconUrl('hitpoints')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('hitpoints')" class="oc-icon" /></td>
                 <td>H&uuml;llenintegrit&auml;t</td>
-                <td><img [src]="iconUrl('infrastructure')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('infrastructure')" class="oc-icon" /></td>
                 <td>Infrastruktur</td>
               </tr>
               <tr>
                 <td><h5>&Psi;</h5></td>
                 <td>Psi (Frachtraum)</td>
-                <td><img [src]="iconUrl('speed')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('speed')" class="oc-icon" /></td>
                 <td>Geschwindigkeit</td>
                 <td colspan="2" rowspan="3"></td>
               </tr>
               <tr>
                 <td><h5>&Omega;</h5></td>
                 <td>Omega (Defensivsysteme)</td>
-                <td><img [src]="iconUrl('damage')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('damage')" class="oc-icon" /></td>
                 <td>Schaden</td>
               </tr>
               <tr>
                 <td colspan="2"></td>
-                <td><img [src]="iconUrl('energy')" class="oc-icon"></td>
+                <td><img [src]="iconUrl('energy')" class="oc-icon" /></td>
                 <td>Energie</td>
               </tr>
             </table>
           </div>
           <div *ngSwitchCase="'cards'">
             <p>
-              Jede Runde darf der aktive Spieler <b>je</b> Kartentyp <b>jeweils</b> eine Karte aus seiner Hand ausspielen. Einige bereits im Spiel befindliche Karten erlauben es dir weitere Karten auszuspielen.
+              Jede Runde darf der aktive Spieler <b>je</b> Kartentyp <b>jeweils</b> eine Karte aus seiner Hand
+              ausspielen. Einige bereits im Spiel befindliche Karten erlauben es dir weitere Karten
+              auszuspielen.
             </p>
             <img [src]="imgUrl('cards_1')" class="right size-30" />
             <p>
-              Es gibt <b>4 Typen von Karten</b>. Über das Symbol in der oberen linken Ecke kannst du sie am einfachsten unterscheiden.
+              Es gibt <b>4 Typen von Karten</b>. Über das Symbol in der oberen linken Ecke kannst du sie am
+              einfachsten unterscheiden.
             </p>
-            <br><br><br><br><br>
+            <br /><br /><br /><br /><br />
             <p>
-              Der Regeltext beschreibt besondere Bedingungen und Regeln dieser Karte. Einige Karten haben keine besonderen Fähigkeiten und enthalten hier keinen Text.
+              Der Regeltext beschreibt besondere Bedingungen und Regeln dieser Karte. Einige Karten haben
+              keine besonderen Fähigkeiten und enthalten hier keinen Text.
             </p>
             <p>
-              <img [src]="iconUrl('tactic')" class="oc-icon">-Karten gehören stets einer Disziplin an. Die Disziplin einer <img [src]="iconUrl('tactic')" class="oc-icon">-Karte wird im Regeltext einiger Karten referenziert.
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> gehören stets einer Disziplin an. Die
+              Disziplin einer <img [src]="iconUrl('tactic')" class="oc-icon" /> wird im Regeltext einiger
+              Karten referenziert.
             </p>
             <img [src]="imgUrl('cards_2')" class="left size-30" />
             <p>
-              <img [src]="iconUrl('equipment')" class="oc-icon">-Karten, die Offensivwaffen sind, haben eine Reichweite von 1 bis 4. Je höher die Reichweite ist desto früher und häufiger kann die Waffe im Gefecht eingesetzt werden.
+              <img [src]="iconUrl('equipment')" class="oc-icon" />, die Offensivwaffen sind, haben eine
+              Reichweite von 1 bis 4. Je höher die Reichweite ist desto früher und häufiger kann die Waffe im
+              Gefecht eingesetzt werden.
             </p>
             <p>
-              Die meisten Karten haben <b>Eigenschaftspunkte</b> hier zusammengefasst: Basiswerte (blau), positive Verbesserungen (blau mit „+“), Anforderungen (rote Sockel und <img [src]="iconUrl('energy')" class="oc-icon">) sowie Abzüge für Angriffe (gelbe <img [src]="iconUrl('point_defense_1')" class="oc-icon">, <img [src]="iconUrl('shield_1')" class="oc-icon"> und <img [src]="iconUrl('armour_1')" class="oc-icon">).
+              Die meisten Karten haben <b>Eigenschaftspunkte</b> hier zusammengefasst: Basiswerte (blau),
+              positive Verbesserungen (blau mit „+“), Anforderungen (rote Sockel und
+              <img [src]="iconUrl('energy')" class="oc-icon" />) sowie Abzüge für Angriffe (gelbe
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" />,
+              <img [src]="iconUrl('shield_1')" class="oc-icon" /> und
+              <img [src]="iconUrl('armour_1')" class="oc-icon" />).
+            </p>
+            <p>Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.</p>
+            <p>
+              Der kursive Text in der Textbox gibt dir Einblicke in die Welt von <i>Outer Colonies</i>. Auf
+              das Spiel hat dieser Text keinen Effekt.
+            </p>
+          </div>
+          <div *ngSwitchCase="'hull-cards'">
+            <img [src]="imgUrl('hull_cards')" class="right size-40" />
+            <p>
+              Aus <img [src]="iconUrl('hull')" class="oc-icon" /> setzt du die Schiffe deiner Flotte zusammen.
+              Einige Schiffe bestehen nur aus einer einzigen <img [src]="iconUrl('hull')" class="oc-icon" />,
+              andere sind erst durch Kombination mehrerer Karten vollständig wenn. Wenn du eine
+              <img [src]="iconUrl('hull')" class="oc-icon" /> ausspielst, kannst du diese entweder in deiner
+              Koloniezone platzieren, um zu zeigen, dass du hier ein neues Schiff konstruierst, oder du kannst
+              sie an bereits ausgespielte <img [src]="iconUrl('hull')" class="oc-icon" /> eines
+              unvollständigen Schiffs mit passendem Namen anlegen, um den Bau dieses Schiffs fortzusetzen.
             </p>
             <p>
-              Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.
-            </p>
-            <p>
-              Der kursive Text in der Textbox gibt dir Einblicke in die Welt von <i>Outer Colonies</i>. Auf das Spiel hat dieser Text keinen Effekt.
+              Welche <img [src]="iconUrl('hull')" class="oc-icon" /> benötigt werden, damit das Schiff
+              vollständig ist, wird auf der Karte selbst angezeigt. Vollständige Schiffe werden an Rundenende
+              von der Koloniezone in die orbitale Zone verschoben.
             </p>
           </div>
         </td>
