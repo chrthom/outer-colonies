@@ -202,6 +202,24 @@
               Die Kolonie stellt immer <b>alle geforderten Sockel</b> zur Verfügung, jedoch müssen die geforderte <img [src]="iconUrl('energy')" class="oc-icon" /> auch von der Kolonie zur Verfügung gestellt werden, damit du die Karte in die Koloniezone legen darfst.
             </p>
           </div>
+          <div *ngSwitchCase="'tactic-cards'">
+            <img [src]="imgUrl('tactic_cards')" class="left size-40" />
+            <p>
+              Während die vorherigen Karten den Aufbau deiner Kolonie und Flotte repräsentieren, können <img [src]="iconUrl('tactic')" class="oc-icon" /> den Spielverlauf beeinflussen. Jede <img [src]="iconUrl('tactic')" class="oc-icon" /> beschreibt ihren Effekt und eventuelle Bedingungen, die zum ausspielen erfüllt sein müssen. <img [src]="iconUrl('tactic')" class="oc-icon" /> gehören einer Disziplin an, welche am unteren Rand der Textbox auf den Karten vermerkt ist. Der Regeltext einiger Karten bezieht sich nur auf <img [src]="iconUrl('tactic')" class="oc-icon" /> einer bestimmten Disziplin.
+            </p>
+            <p>
+              Es gibt 4 Disziplinen für <img [src]="iconUrl('tactic')" class="oc-icon" />:
+            </p>
+            <ul>
+              <li>Information</li>
+              <li>Milit&auml;r</li>
+              <li>Wirtschaft</li>
+              <li>Wissenschaft</li>
+            </ul>
+            <p>
+              Die meisten <img [src]="iconUrl('tactic')" class="oc-icon" /> werden nachdem sie gespielt wurden direkt auf den Ablagestapel gelegt. Einige <img [src]="iconUrl('tactic')" class="oc-icon" /> werden an andere Karten angelegt und geben diesen Karten zusätzliche Eigenschaften. Wieder andere <img [src]="iconUrl('tactic')" class="oc-icon" /> enthalten im Regeltext „jederzeit spielbar“. Diese Karten darfst du auch in Gefechten und auch im Zug deiner Gegenspieler spielen. Bedenke, dass du pro Zug in der Regel nur eine <img [src]="iconUrl('tactic')" class="oc-icon" /> spielen darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver Spieler warst deine <img [src]="iconUrl('tactic')" class="oc-icon" /> bereits gespielt, kannst du keine weitere mehr ausspielen, wenn einer deiner Gegner der aktive Spieler ist.
+            </p>
+          </div>
         </td>
       </tr>
     </table>
