@@ -19,7 +19,8 @@
             <mat-list-option value="turn-overview"><h4>Spielzugübersicht</h4></mat-list-option>
             <mat-list-option value="missions"><h4>Missionen und Überfälle</h4></mat-list-option>
             <h5>Gefechte durchf&uuml;hren</h5>
-            <mat-list-option value="battle-overview" selected="true"><h4>Gefechtsphasen</h4></mat-list-option>
+            <mat-list-option value="battle-overview"><h4>Gefechtsphasen</h4></mat-list-option>
+            <mat-list-option value="attacks" selected="true"><h4>Angriffe durchf&uuml;hren</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
@@ -358,7 +359,7 @@
             </p>
           </div>
           <div *ngSwitchCase="'battle-overview'">
-            <img [src]="imgUrl('battle_overview')" class="right size-40" />
+            <img [src]="imgUrl('battle_overview')" class="right size-30" />
             <p>
               Es werden nacheinander bis zu <b>4 Gefechtsphasen</b> durchgeführt. Die Gefechtsphasen
               repräsentieren das Gefecht auf einer bestimmten Distanz. Es wird mit Reichweite 4 begonnen, die
@@ -388,6 +389,33 @@
               Sind auf einer <img [src]="iconUrl('infrastructure')" class="oc-icon" /> keine Angaben zu den
               <img [src]="iconUrl('hitpoints')" class="oc-icon" /> gemacht, wird die Karte behandelt als hätte
               sie 1 <img [src]="iconUrl('hitpoints')" class="oc-icon" />.
+            </p>
+          </div>
+          <div *ngSwitchCase="'attacks'">
+            <h2>Angriffe ansagen</h2>
+            <p>
+              Ein Teil der taktischen Tiefe in <i>Outer Colonies</i> besteht in der Planung der Angriffe, um die größtmögliche Wirkung zu erzielen. Es kann nur jeweils ein Angriff mit jeder aktiven Offensivwaffe pro Gefechtsphase durchgeführt werden, sofern dessen Reichweite die Reichweitenanforderung der Gefechtsphase erfüllt. In der zweiten Gefechtsphase (Reichweite 3) können also nur Waffen mit Reichweite 3 oder 4 einen Angriff ausführen. Für einen Angriff wird erst die Waffe gewählt, welche eingesetzt werden soll, sowie das Ziel auf das es eingesetzt werden soll.
+            </p>
+            <p>
+              Valide Ziele sind alle gegnerischen Schiffe, die am Gefecht teilnehmen. Sofern es die letzte Gefechtsphase (Reichweite 1) in einem Überfall ist, sind ebenfalls die Kolonie des Verteidigers sowie beliebige Karten in dessen Koloniezone valide Ziele.
+            </p>
+            <img [src]="imgUrl('attack')" class="left size-30" />
+            <h2>Schaden ermitteln</h2>
+            <p>
+              Bei jedem Waffensystem ist unter den Eigenschaftspunkten meist ganz links angegeben, wie viel <img [src]="iconUrl('damage')" class="oc-icon" /> es verursacht. Dieser Wert kann jedoch durch defensive Systeme des anvisierten Schiffs reduziert werden.
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" />, <img [src]="iconUrl('shield_1')" class="oc-icon" /> und <img [src]="iconUrl('armour_1')" class="oc-icon" /> werden (in dieser Reihenfolge) angewandt, um den <img [src]="iconUrl('damage')" class="oc-icon" /> zu reduzieren. Defensive Systeme müssen bei einem Angriff eingesetzt werden, der Spieler kann sich nicht entscheiden diese für spätere Angriffe aufzusparen. Prüfe nacheinander, ob die eingesetzte Waffe Abzüge (in gelb) für <img [src]="iconUrl('point_defense_1')" class="oc-icon" />, <img [src]="iconUrl('shield_1')" class="oc-icon" /> oder <img [src]="iconUrl('armour_1')" class="oc-icon" /> eingetragen hat. Der angegriffene Spieler muss die <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> von allen Gefecht teilnehmenden Schiffe verwenden, sowie alle <img [src]="iconUrl('shield_1')" class="oc-icon" /> und <img [src]="iconUrl('armour_1')" class="oc-icon" /> des angegriffenen Schiffs.
+            </p>
+            <p>
+              Es werden als erstes die Karten mit <img [src]="iconUrl('point_defense_1')" class="oc-icon" />, <img [src]="iconUrl('shield_1')" class="oc-icon" /> oder <img [src]="iconUrl('armour_1')" class="oc-icon" /> eingesetzt die die meisten dieser Defensivpunkte bieten. <img [src]="iconUrl('equipment')" class="oc-icon" /> mit defensiven Systemen haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der Textbox illustriert. <img [src]="iconUrl('equipment')" class="oc-icon" /> mit offensiven und defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie in der selben Gefechtsphase bereits angegriffen haben.
+            </p>
+            <p>
+              Reduziere nun den <img [src]="iconUrl('damage')" class="oc-icon" /> je Defensivpunkt um den in den Eigenschaftspunkten der Waffe angegebenen Abzug. Sollte danach der <img [src]="iconUrl('damage')" class="oc-icon" /> noch bei 0 oder höher liegen, deaktiviere die Karte mit dem entsprechenden Defensivsystem und fahre fort, bis entweder keine Defensivsysteme mehr eingesetzt werden können oder der <img [src]="iconUrl('damage')" class="oc-icon" /> bei 0 oder darunter liegt. Deaktivierte Karten kannst du dadurch anzeigen, dass du sie um 45&deg; zur Seite neigst. Ist für ein Defensivsystem bei einer Waffe als Abzug „X“ angegeben, kann die Waffe das Defensivsystem nicht durchdringen.
+            </p>
+            <p>
+              Sollte der <img [src]="iconUrl('damage')" class="oc-icon" /> nach allen Abzügen höher als 0 sein lege entsprechend viele <img [src]="iconUrl('damage')" class="oc-icon" />-Marker auf die Zielkarte.
+            </p>
+            <p>
+              Ist die Kolonie eines Gegners oder eine Karte in der Koloniezone das Ziel, handelst du dies genauso ab als wäre ein Schiff oder eine <img [src]="iconUrl('infrastructure')" class="oc-icon" /> das Ziel. Lege <img [src]="iconUrl('damage')" class="oc-icon" />-Marker auf die Kolonie bzw. die Karte in der Koloniezone.
             </p>
           </div>
         </td>
