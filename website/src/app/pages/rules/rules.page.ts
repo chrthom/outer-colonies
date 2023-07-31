@@ -9,6 +9,12 @@ import { environment } from 'src/environments/environment';
 export class RulesPage {
   activeChapter: string = 'intro';
   imgUrl(imgName: string): string {
-    return `${environment.url.assets}/rules/${imgName}.png`;
+    return `${this.assetUrl}/rules/${imgName}.png`;
+  }
+  iconUrl(iconName: string): string {
+    return `${this.assetUrl}/icons/${iconName}.png`;
+  }
+  get assetUrl(): string {
+    return environment.url.assets;
   }
 }
