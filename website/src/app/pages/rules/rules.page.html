@@ -8,9 +8,9 @@
             <h5>Allgemeines</h5>
             <mat-list-option value="intro"><h4>Intro</h4></mat-list-option>
             <mat-list-option value="setup"><h4>Spielaufbau</h4></mat-list-option>
-            <mat-list-option value="symbols" selected="true"><h4>Symbole</h4></mat-list-option>
+            <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
             <h5>Karten</h5>
-            <mat-list-option value="play-cards"><h4>Karten ausspielen</h4></mat-list-option>
+            <mat-list-option value="cards" selected="true"><h4>Aufbau einer Karte</h4></mat-list-option>
             <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
             <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
             <mat-list-option value="nfrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
@@ -107,6 +107,35 @@
                 <td>Energie</td>
               </tr>
             </table>
+          </div>
+          <div *ngSwitchCase="'cards'">
+            <p>
+              Jede Runde darf der aktive Spieler <b>je</b> Kartentyp <b>jeweils</b> eine Karte aus seiner Hand ausspielen. Einige bereits im Spiel befindliche Karten erlauben es dir weitere Karten auszuspielen.
+            </p>
+            <img [src]="imgUrl('cards_1')" class="right size-30" />
+            <p>
+              Es gibt <b>4 Typen von Karten</b>. Über das Symbol in der oberen linken Ecke kannst du sie am einfachsten unterscheiden.
+            </p>
+            <br><br><br><br><br>
+            <p>
+              Der Regeltext beschreibt besondere Bedingungen und Regeln dieser Karte. Einige Karten haben keine besonderen Fähigkeiten und enthalten hier keinen Text.
+            </p>
+            <p>
+              <img [src]="iconUrl('tactic')" class="oc-icon">-Karten gehören stets einer Disziplin an. Die Disziplin einer <img [src]="iconUrl('tactic')" class="oc-icon">-Karte wird im Regeltext einiger Karten referenziert.
+            </p>
+            <img [src]="imgUrl('cards_2')" class="left size-30" />
+            <p>
+              <img [src]="iconUrl('equipment')" class="oc-icon">-Karten, die Offensivwaffen sind, haben eine Reichweite von 1 bis 4. Je höher die Reichweite ist desto früher und häufiger kann die Waffe im Gefecht eingesetzt werden.
+            </p>
+            <p>
+              Die meisten Karten haben <b>Eigenschaftspunkte</b> hier zusammengefasst: Basiswerte (blau), positive Verbesserungen (blau mit „+“), Anforderungen (rote Sockel und <img [src]="iconUrl('energy')" class="oc-icon">) sowie Abzüge für Angriffe (gelbe <img [src]="iconUrl('point_defense_1')" class="oc-icon">, <img [src]="iconUrl('shield_1')" class="oc-icon"> und <img [src]="iconUrl('armour_1')" class="oc-icon">).
+            </p>
+            <p>
+              Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.
+            </p>
+            <p>
+              Der kursive Text in der Textbox gibt dir Einblicke in die Welt von <i>Outer Colonies</i>. Auf das Spiel hat dieser Text keinen Effekt.
+            </p>
           </div>
         </td>
       </tr>
