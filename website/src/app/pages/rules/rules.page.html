@@ -17,7 +17,9 @@
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
             <h5>Spielzug</h5>
             <mat-list-option value="turn-overview"><h4>Spielzugübersicht</h4></mat-list-option>
-            <mat-list-option value="missions" selected="true"><h4>Missionen und Überfälle</h4></mat-list-option>
+            <mat-list-option value="missions"><h4>Missionen und Überfälle</h4></mat-list-option>
+            <h5>Gefechte durchf&uuml;hren</h5>
+            <mat-list-option value="battle-overview" selected="true"><h4>Gefechtsphasen</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
@@ -199,20 +201,31 @@
           <div *ngSwitchCase="'infrastructure-cards'">
             <img [src]="imgUrl('infrastructure_cards')" class="right size-40" />
             <p>
-              Anders als <img [src]="iconUrl('equipment')" class="oc-icon" />, können <img [src]="iconUrl('infrastructure')" class="oc-icon" /> sowohl an Schiffe (außer die Karte besagt etwas anderes) als auch an die Kolonie selbst angelegt werden. Legst du <img [src]="iconUrl('infrastructure')" class="oc-icon" /> an ein Schiff an, gelten die selben Regeln wie für <img [src]="iconUrl('equipment')" class="oc-icon" />. Willst du die Karte an die Kolonie anlegen, platzierst du sie in deiner Koloniezone.
+              Anders als <img [src]="iconUrl('equipment')" class="oc-icon" />, können
+              <img [src]="iconUrl('infrastructure')" class="oc-icon" /> sowohl an Schiffe (außer die Karte
+              besagt etwas anderes) als auch an die Kolonie selbst angelegt werden. Legst du
+              <img [src]="iconUrl('infrastructure')" class="oc-icon" /> an ein Schiff an, gelten die selben
+              Regeln wie für <img [src]="iconUrl('equipment')" class="oc-icon" />. Willst du die Karte an die
+              Kolonie anlegen, platzierst du sie in deiner Koloniezone.
             </p>
             <p>
-              Die Kolonie stellt immer <b>alle geforderten Sockel</b> zur Verfügung, jedoch müssen die geforderte <img [src]="iconUrl('energy')" class="oc-icon" /> auch von der Kolonie zur Verfügung gestellt werden, damit du die Karte in die Koloniezone legen darfst.
+              Die Kolonie stellt immer <b>alle geforderten Sockel</b> zur Verfügung, jedoch müssen die
+              geforderte <img [src]="iconUrl('energy')" class="oc-icon" /> auch von der Kolonie zur Verfügung
+              gestellt werden, damit du die Karte in die Koloniezone legen darfst.
             </p>
           </div>
           <div *ngSwitchCase="'tactic-cards'">
             <img [src]="imgUrl('tactic_cards')" class="left size-40" />
             <p>
-              Während die vorherigen Karten den Aufbau deiner Kolonie und Flotte repräsentieren, können <img [src]="iconUrl('tactic')" class="oc-icon" /> den Spielverlauf beeinflussen. Jede <img [src]="iconUrl('tactic')" class="oc-icon" /> beschreibt ihren Effekt und eventuelle Bedingungen, die zum ausspielen erfüllt sein müssen. <img [src]="iconUrl('tactic')" class="oc-icon" /> gehören einer Disziplin an, welche am unteren Rand der Textbox auf den Karten vermerkt ist. Der Regeltext einiger Karten bezieht sich nur auf <img [src]="iconUrl('tactic')" class="oc-icon" /> einer bestimmten Disziplin.
+              Während die vorherigen Karten den Aufbau deiner Kolonie und Flotte repräsentieren, können
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> den Spielverlauf beeinflussen. Jede
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> beschreibt ihren Effekt und eventuelle
+              Bedingungen, die zum ausspielen erfüllt sein müssen.
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> gehören einer Disziplin an, welche am unteren
+              Rand der Textbox auf den Karten vermerkt ist. Der Regeltext einiger Karten bezieht sich nur auf
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> einer bestimmten Disziplin.
             </p>
-            <p>
-              Es gibt 4 Disziplinen für <img [src]="iconUrl('tactic')" class="oc-icon" />:
-            </p>
+            <p>Es gibt 4 Disziplinen für <img [src]="iconUrl('tactic')" class="oc-icon" />:</p>
             <ul>
               <li>Information</li>
               <li>Milit&auml;r</li>
@@ -220,7 +233,16 @@
               <li>Wissenschaft</li>
             </ul>
             <p>
-              Die meisten <img [src]="iconUrl('tactic')" class="oc-icon" /> werden nachdem sie gespielt wurden direkt auf den Ablagestapel gelegt. Einige <img [src]="iconUrl('tactic')" class="oc-icon" /> werden an andere Karten angelegt und geben diesen Karten zusätzliche Eigenschaften. Wieder andere <img [src]="iconUrl('tactic')" class="oc-icon" /> enthalten im Regeltext „jederzeit spielbar“. Diese Karten darfst du auch in Gefechten und auch im Zug deiner Gegenspieler spielen. Bedenke, dass du pro Zug in der Regel nur eine <img [src]="iconUrl('tactic')" class="oc-icon" /> spielen darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver Spieler warst deine <img [src]="iconUrl('tactic')" class="oc-icon" /> bereits gespielt, kannst du keine weitere mehr ausspielen, wenn einer deiner Gegner der aktive Spieler ist.
+              Die meisten <img [src]="iconUrl('tactic')" class="oc-icon" /> werden nachdem sie gespielt wurden
+              direkt auf den Ablagestapel gelegt. Einige
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> werden an andere Karten angelegt und geben
+              diesen Karten zusätzliche Eigenschaften. Wieder andere
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> enthalten im Regeltext „jederzeit spielbar“.
+              Diese Karten darfst du auch in Gefechten und auch im Zug deiner Gegenspieler spielen. Bedenke,
+              dass du pro Zug in der Regel nur eine <img [src]="iconUrl('tactic')" class="oc-icon" /> spielen
+              darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver
+              Spieler warst deine <img [src]="iconUrl('tactic')" class="oc-icon" /> bereits gespielt, kannst
+              du keine weitere mehr ausspielen, wenn einer deiner Gegner der aktive Spieler ist.
             </p>
           </div>
           <div *ngSwitchCase="'turn-overview'">
@@ -228,54 +250,144 @@
             <h2>1. Rundenbeginn</h2>
             <ul>
               <li>Verschiebe alle deine Schiffe von der neutralen Zone in deine orbitale Zone.</li>
-              <li>Ziehe zwei Karten. Hast du weniger als zwei Karten in deinem Deck, scheidest du sofort aus dem Spiel aus.</li>
-              <li>Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.</li>
+              <li>
+                Ziehe zwei Karten. Hast du weniger als zwei Karten in deinem Deck, scheidest du sofort aus dem
+                Spiel aus.
+              </li>
+              <li>
+                Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.
+              </li>
             </ul>
             <h2>2. Aufbauphase</h2>
             <ul>
-              <li>Du darfst beliebig viele ausgespielte Karten zurück auf die Hand nehmen. Nimmst du <img [src]="iconUrl('hull')" class="oc-icon" /> auf die Hand, musst du alle <img [src]="iconUrl('hull')" class="oc-icon" /> desselben Schiffs sowie alle daran angelegten Karten auf die Hand nehmen. Schadensmarken, die auf diesem Schiff lagen werden entfernt.</li>
-              <li>Nehme zudem alle Karten zurück auf die Hand, dessen Anforderungen nicht mehr erfüllt sind.</li>
-              <li>Du darfst bis zu <b>einer</b> Karte <b>jedes</b> Kartentyps ausspielen. Erlauben dir ausgespielte Karten, weitere Karten auszuspielen, darfst du dies jetzt ebenfalls tun.</li>
-              <li>Entferne Karten aller Spieler, die durch Karteneffekte mehr oder gleich viele <img [src]="iconUrl('damage')" class="oc-icon" />-Marker wie <img [src]="iconUrl('hitpoints')" class="oc-icon" /> haben und reaktiviere ggfls. in dieser Phase deaktivierte Karten.</li>
-              <li>Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission durchführen möchtest.</li>
+              <li>
+                Du darfst beliebig viele ausgespielte Karten zurück auf die Hand nehmen. Nimmst du
+                <img [src]="iconUrl('hull')" class="oc-icon" /> auf die Hand, musst du alle
+                <img [src]="iconUrl('hull')" class="oc-icon" /> desselben Schiffs sowie alle daran angelegten
+                Karten auf die Hand nehmen. Schadensmarken, die auf diesem Schiff lagen werden entfernt.
+              </li>
+              <li>
+                Nehme zudem alle Karten zurück auf die Hand, dessen Anforderungen nicht mehr erfüllt sind.
+              </li>
+              <li>
+                Du darfst bis zu <b>einer</b> Karte <b>jedes</b> Kartentyps ausspielen. Erlauben dir
+                ausgespielte Karten, weitere Karten auszuspielen, darfst du dies jetzt ebenfalls tun.
+              </li>
+              <li>
+                Entferne Karten aller Spieler, die durch Karteneffekte mehr oder gleich viele
+                <img [src]="iconUrl('damage')" class="oc-icon" />-Marker wie
+                <img [src]="iconUrl('hitpoints')" class="oc-icon" /> haben und reaktiviere ggfls. in dieser
+                Phase deaktivierte Karten.
+              </li>
+              <li>
+                Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission
+                durchführen möchtest.
+              </li>
               <li>Deine Gegner sagen an, ob sie gegen die Mission oder den Überfall intervenieren wollen.</li>
             </ul>
             <h2>3. Gefechtsphase</h2>
             <p>
-              Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift oder ein anderer Spieler in eine deiner Mission interveniert. Es nehmen alle zugewiesenen Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
+              Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift
+              oder ein anderer Spieler in eine deiner Mission interveniert. Es nehmen alle zugewiesenen
+              Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone
+              teil.
             </p>
             <h2>4. Rundenende</h2>
             <ul>
-              <li>Für jede Mission bei der nicht interveniert wurde, sowie für jede Mission in der du nach dem Gefecht noch mindestens ein Schiff besitzst, nimmst du die verdeckte Missionskarte auf die Hand bzw. legst die offene Missionkarte unter dein Deck. Die anderen Missionskarten werden auf den Ablagestapel gelegt.</li>
+              <li>
+                Für jede Mission bei der nicht interveniert wurde, sowie für jede Mission in der du nach dem
+                Gefecht noch mindestens ein Schiff besitzst, nimmst du die verdeckte Missionskarte auf die
+                Hand bzw. legst die offene Missionkarte unter dein Deck. Die anderen Missionskarten werden auf
+                den Ablagestapel gelegt.
+              </li>
               <li>Verschiebe alle vollständigen Schiffe aus deiner Koloniezone in deine orbitale Zone.</li>
-              <li>Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenende ausgeführt werden sollen.</li>
-              <li>Solltest du <b>mehr als 7 Karten</b> auf der Hand haben, lege so lange Handkarten auf den Ablagestapel bis du noch genau 7 hast.</li>
+              <li>
+                Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenende ausgeführt werden sollen.
+              </li>
+              <li>
+                Solltest du <b>mehr als 7 Karten</b> auf der Hand haben, lege so lange Handkarten auf den
+                Ablagestapel bis du noch genau 7 hast.
+              </li>
               <li>Der im Uhrzeigersinn nächste Spieler wird zum aktiven Spieler.</li>
             </ul>
           </div>
           <div *ngSwitchCase="'missions'">
             <img [src]="imgUrl('missions')" class="left size-40" />
             <p>
-              Am Ende der Aufbauphase hast du die Möglichkeit entweder einen Überfall auf eine feindliche Kolonie oder eine Mission anzusagen. Durch Missionen erhälst du zusätzliche Karten. Durch Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegeners angreifen, was letztendlich für den Spielsieg notwendig ist. Die Planung der Missionen und Überfälle läuft in mehreren Schritten ab.
+              Am Ende der Aufbauphase hast du die Möglichkeit entweder einen Überfall auf eine feindliche
+              Kolonie oder eine Mission anzusagen. Durch Missionen erhälst du zusätzliche Karten. Durch
+              Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegeners
+              angreifen, was letztendlich für den Spielsieg notwendig ist. Die Planung der Missionen und
+              Überfälle läuft in mehreren Schritten ab.
             </p>
             <h2>Ansage</h2>
             <p>
-              Sage an, ob du diese Runde einen Überfäll auf eine feindliche Kolonie oder eine Mssion durchführen möchtest.
+              Sage an, ob du diese Runde einen Überfäll auf eine feindliche Kolonie oder eine Mssion
+              durchführen möchtest.
             </p>
             <h2>Missionskarten</h2>
             <p>
-              Wenn du eine Mission durchführst, ziehe die Missionskarten. Überspringe diesen Schritt im Falle eines Überfalls. Ziehe für eine Mission zwei Missionskarten und lege sie neben die neutrale Zone. Missionskarten kannst du entweder von deinem Deck ziehen, dies sind verdeckte Missionskarten, oder du kannst die obersten Karten von deinem Ablagestapel, dies sind offene Missionskarten. Du kannst dich auch entscheiden eine offene und eine verdeckte Missionskarte auszuwählen.
+              Wenn du eine Mission durchführst, ziehe die Missionskarten. Überspringe diesen Schritt im Falle
+              eines Überfalls. Ziehe für eine Mission zwei Missionskarten und lege sie neben die neutrale
+              Zone. Missionskarten kannst du entweder von deinem Deck ziehen, dies sind verdeckte
+              Missionskarten, oder du kannst die obersten Karten von deinem Ablagestapel, dies sind offene
+              Missionskarten. Du kannst dich auch entscheiden eine offene und eine verdeckte Missionskarte
+              auszuwählen.
             </p>
             <h2>Flotte zusammenstellen</h2>
             <p>
-              Weise Schiffe aus deiner orbitalen Zone zu, die an dem Überfall oder der Mission teilnehmen sollen. Nur Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> können Überfälle oder Missionen durchführen. Versetze die Schiffe in die neutrale Zone.
+              Weise Schiffe aus deiner orbitalen Zone zu, die an dem Überfall oder der Mission teilnehmen
+              sollen. Nur Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> können Überfälle
+              oder Missionen durchführen. Versetze die Schiffe in die neutrale Zone.
             </p>
             <h2>Verteidigung / Intervention</h2>
             <p>
-              Im Falle einer Mission können andere Spieler intervenieren, um den Erfolg der Mission zu verhindern. Jeder andere Spieler sagt im Uhrzeigersinn an, ob er Schiffe entsenden möchte, um in der geplanten Mission zu intervenieren. Es können für Interventionen nur Schiffe entsandt werden, welche sich in der orbitalen Zone befinden und dessen <img [src]="iconUrl('speed')" class="oc-icon" /> mindestens so hoch ist wie der niedrigste <img [src]="iconUrl('speed')" class="oc-icon" /> in der Flotte, die die Mission durchführt. Der intervenierende Spieler verschiebt diese Schiffe ebenfalls in die neutrale Zone.
+              Im Falle einer Mission können andere Spieler intervenieren, um den Erfolg der Mission zu
+              verhindern. Jeder andere Spieler sagt im Uhrzeigersinn an, ob er Schiffe entsenden möchte, um in
+              der geplanten Mission zu intervenieren. Es können für Interventionen nur Schiffe entsandt
+              werden, welche sich in der orbitalen Zone befinden und dessen
+              <img [src]="iconUrl('speed')" class="oc-icon" /> mindestens so hoch ist wie der niedrigste
+              <img [src]="iconUrl('speed')" class="oc-icon" /> in der Flotte, die die Mission durchführt. Der
+              intervenierende Spieler verschiebt diese Schiffe ebenfalls in die neutrale Zone.
             </p>
             <p>
-              Im Falle eines Überfalls muss er angegriffene Spieler kämpfen. Er wählt Schiffe aus seiner orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> nehmen nicht an der Verteidiung teil und werden in die neutrale Zone verschoben.
+              Im Falle eines Überfalls muss er angegriffene Spieler kämpfen. Er wählt Schiffe aus seiner
+              orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+
+              <img [src]="iconUrl('speed')" class="oc-icon" /> nehmen nicht an der Verteidiung teil und werden
+              in die neutrale Zone verschoben.
+            </p>
+          </div>
+          <div *ngSwitchCase="'battle-overview'">
+            <img [src]="imgUrl('battle_overview')" class="right size-40" />
+            <p>
+              Es werden nacheinander bis zu <b>4 Gefechtsphasen</b> durchgeführt. Die Gefechtsphasen
+              repräsentieren das Gefecht auf einer bestimmten Distanz. Es wird mit Reichweite 4 begonnen, die
+              nächste Gefechtsphase mit Reichweite 3, dann 2 und zuletzt 1.
+            </p>
+            <p>Folgende Schritte werden in jeder der bis zu 4 Gefechtsphasen durchgeführt:</p>
+            <ol>
+              <li>Der aktive Spieler führt seine Angriffe in beliebiger Reihenfolge durch.</li>
+              <li>
+                Der verteidigende / intervenierende Spieler führt seine Angriffe in beliebiger Reihenfolge
+                durch.
+              </li>
+              <li>
+                Alle am Gefecht teilnehmenden Karten werden wieder aktiviert (außer deaktivierte Karten, die
+                <img [src]="iconUrl('armour_1')" class="oc-icon" /> bieten oder dessen Regeltext besagt, dass
+                sie nur einmal pro Gefecht eingesetzt werden können).
+              </li>
+              <li>
+                Schiffe und an die Kolonie angelegte
+                <img [src]="iconUrl('infrastructure')" class="oc-icon" /> auf denen mindestens genausoviele
+                <img [src]="iconUrl('damage')" class="oc-icon" />-Marker liegen wie sie
+                <img [src]="iconUrl('hitpoints')" class="oc-icon" /> haben werden zerstört. Alle Karten des
+                Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel seines Besitzers gelegt.
+              </li>
+            </ol>
+            <p>
+              Sind auf einer <img [src]="iconUrl('infrastructure')" class="oc-icon" /> keine Angaben zu den
+              <img [src]="iconUrl('hitpoints')" class="oc-icon" /> gemacht, wird die Karte behandelt als hätte
+              sie 1 <img [src]="iconUrl('hitpoints')" class="oc-icon" />.
             </p>
           </div>
         </td>
