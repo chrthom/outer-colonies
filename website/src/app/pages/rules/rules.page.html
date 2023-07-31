@@ -11,10 +11,12 @@
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
             <h5>Karten</h5>
             <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
-            <mat-list-option value="hull-cards" selected="true"><h4>Rumpfkarten</h4></mat-list-option>
+            <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
             <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
             <mat-list-option value="infrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
+            <h5>Spielzug</h5>
+            <mat-list-option value="turn-overview" selected="true"><h4>Spielzugübersicht</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
@@ -219,6 +221,36 @@
             <p>
               Die meisten <img [src]="iconUrl('tactic')" class="oc-icon" /> werden nachdem sie gespielt wurden direkt auf den Ablagestapel gelegt. Einige <img [src]="iconUrl('tactic')" class="oc-icon" /> werden an andere Karten angelegt und geben diesen Karten zusätzliche Eigenschaften. Wieder andere <img [src]="iconUrl('tactic')" class="oc-icon" /> enthalten im Regeltext „jederzeit spielbar“. Diese Karten darfst du auch in Gefechten und auch im Zug deiner Gegenspieler spielen. Bedenke, dass du pro Zug in der Regel nur eine <img [src]="iconUrl('tactic')" class="oc-icon" /> spielen darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver Spieler warst deine <img [src]="iconUrl('tactic')" class="oc-icon" /> bereits gespielt, kannst du keine weitere mehr ausspielen, wenn einer deiner Gegner der aktive Spieler ist.
             </p>
+          </div>
+          <div *ngSwitchCase="'turn-overview'">
+            <img [src]="imgUrl('turn_overview')" class="right size-40" />
+            <h2>1. Rundenbeginn</h2>
+            <ul>
+              <li>Verschiebe alle deine Schiffe von der neutralen Zone in deine orbitale Zone.</li>
+              <li>Ziehe zwei Karten. Hast du weniger als zwei Karten in deinem Deck, scheidest du sofort aus dem Spiel aus.</li>
+              <li>Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.</li>
+            </ul>
+            <h2>2. Aufbauphase</h2>
+            <ul>
+              <li>Du darfst beliebig viele ausgespielte Karten zurück auf die Hand nehmen. Nimmst du <img [src]="iconUrl('hull')" class="oc-icon" /> auf die Hand, musst du alle <img [src]="iconUrl('hull')" class="oc-icon" /> desselben Schiffs sowie alle daran angelegten Karten auf die Hand nehmen. Schadensmarken, die auf diesem Schiff lagen werden entfernt.</li>
+              <li>Nehme zudem alle Karten zurück auf die Hand, dessen Anforderungen nicht mehr erfüllt sind.</li>
+              <li>Du darfst bis zu <b>einer</b> Karte <b>jedes</b> Kartentyps ausspielen. Erlauben dir ausgespielte Karten, weitere Karten auszuspielen, darfst du dies jetzt ebenfalls tun.</li>
+              <li>Entferne Karten aller Spieler, die durch Karteneffekte mehr oder gleich viele <img [src]="iconUrl('damage')" class="oc-icon" />-Marker wie <img [src]="iconUrl('hitpoints')" class="oc-icon" /> haben und reaktiviere ggfls. in dieser Phase deaktivierte Karten.</li>
+              <li>Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission durchführen möchtest.</li>
+              <li>Deine Gegner sagen an, ob sie gegen die Mission oder den Überfall intervenieren wollen.</li>
+            </ul>
+            <h2>3. Gefechtsphase</h2>
+            <p>
+              Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift oder ein anderer Spieler in eine deiner Mission interveniert. Es nehmen alle zugewiesenen Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
+            </p>
+            <h2>4. Rundenende</h2>
+            <ul>
+              <li>Für jede Mission bei der nicht interveniert wurde, sowie für jede Mission in der du nach dem Gefecht noch mindestens ein Schiff besitzst, nimmst du die verdeckte Missionskarte auf die Hand bzw. legst die offene Missionkarte unter dein Deck. Die anderen Missionskarten werden auf den Ablagestapel gelegt.</li>
+              <li>Verschiebe alle vollständigen Schiffe aus deiner Koloniezone in deine orbitale Zone.</li>
+              <li>Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenende ausgeführt werden sollen.</li>
+              <li>Solltest du <b>mehr als 7 Karten</b> auf der Hand haben, lege so lange Handkarten auf den Ablagestapel bis du noch genau 7 hast.</li>
+              <li>Der im Uhrzeigersinn nächste Spieler wird zum aktiven Spieler.</li>
+            </ul>
           </div>
         </td>
       </tr>
