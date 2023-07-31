@@ -167,6 +167,32 @@
               von der Koloniezone in die orbitale Zone verschoben.
             </p>
           </div>
+          <div *ngSwitchCase="'equipment-cards'">
+            <img [src]="imgUrl('equipment_cards')" class="left size-40" />
+            <p>
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> sind Komponenten, die du an
+              <img [src]="iconUrl('hull')" class="oc-icon" /> anlegst. Dies können Waffen- oder
+              Defensivsysteme sein, die im Gefechten zum Einsatz kommen, oder aber Schiffsverbesserungen, die
+              die Basiswerte des Schiffes erhöhen oder die Regeln für dieses Schiff anpassen.
+            </p>
+            <p>
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> haben Anforderungen (in roten Boxen unter
+              dem Titel) in Form von benötigten Sockeln und <img [src]="iconUrl('energy')" class="oc-icon" />.
+              Bereits an Schiffe angelegte <img [src]="iconUrl('equipment')" class="oc-icon" /> belegen diese
+              Sockel und verbrauchen bereitgestellte <img [src]="iconUrl('energy')" class="oc-icon" />. Ein
+              Sockel z.B. kann also nicht mehrfach für verschiedene
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> verwendet werden. Es müssen alle
+              Anforderungen einer <img [src]="iconUrl('equipment')" class="oc-icon" /> von einem Schiff
+              erfüllt sein, damit diese angelegt werden darf.
+            </p>
+            <p>
+              Beachte, dass <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> /
+              <img [src]="iconUrl('shield_1')" class="oc-icon" /> /
+              <img [src]="iconUrl('armour_1')" class="oc-icon" /> in gelben Boxen keine Anforderungen sind,
+              sondern Abzüge auf den Schaden der Waffe beim Angriff. Zum Zwecke des Ausspielens kannst du
+              diese Angaben ignorieren.
+            </p>
+          </div>
         </td>
       </tr>
     </table>
