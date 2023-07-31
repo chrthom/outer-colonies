@@ -16,7 +16,8 @@
             <mat-list-option value="infrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
             <h5>Spielzug</h5>
-            <mat-list-option value="turn-overview" selected="true"><h4>Spielzugübersicht</h4></mat-list-option>
+            <mat-list-option value="turn-overview"><h4>Spielzugübersicht</h4></mat-list-option>
+            <mat-list-option value="missions" selected="true"><h4>Missionen und Überfälle</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
@@ -251,6 +252,31 @@
               <li>Solltest du <b>mehr als 7 Karten</b> auf der Hand haben, lege so lange Handkarten auf den Ablagestapel bis du noch genau 7 hast.</li>
               <li>Der im Uhrzeigersinn nächste Spieler wird zum aktiven Spieler.</li>
             </ul>
+          </div>
+          <div *ngSwitchCase="'missions'">
+            <img [src]="imgUrl('missions')" class="left size-40" />
+            <p>
+              Am Ende der Aufbauphase hast du die Möglichkeit entweder einen Überfall auf eine feindliche Kolonie oder eine Mission anzusagen. Durch Missionen erhälst du zusätzliche Karten. Durch Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegeners angreifen, was letztendlich für den Spielsieg notwendig ist. Die Planung der Missionen und Überfälle läuft in mehreren Schritten ab.
+            </p>
+            <h2>Ansage</h2>
+            <p>
+              Sage an, ob du diese Runde einen Überfäll auf eine feindliche Kolonie oder eine Mssion durchführen möchtest.
+            </p>
+            <h2>Missionskarten</h2>
+            <p>
+              Wenn du eine Mission durchführst, ziehe die Missionskarten. Überspringe diesen Schritt im Falle eines Überfalls. Ziehe für eine Mission zwei Missionskarten und lege sie neben die neutrale Zone. Missionskarten kannst du entweder von deinem Deck ziehen, dies sind verdeckte Missionskarten, oder du kannst die obersten Karten von deinem Ablagestapel, dies sind offene Missionskarten. Du kannst dich auch entscheiden eine offene und eine verdeckte Missionskarte auszuwählen.
+            </p>
+            <h2>Flotte zusammenstellen</h2>
+            <p>
+              Weise Schiffe aus deiner orbitalen Zone zu, die an dem Überfall oder der Mission teilnehmen sollen. Nur Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> können Überfälle oder Missionen durchführen. Versetze die Schiffe in die neutrale Zone.
+            </p>
+            <h2>Verteidigung / Intervention</h2>
+            <p>
+              Im Falle einer Mission können andere Spieler intervenieren, um den Erfolg der Mission zu verhindern. Jeder andere Spieler sagt im Uhrzeigersinn an, ob er Schiffe entsenden möchte, um in der geplanten Mission zu intervenieren. Es können für Interventionen nur Schiffe entsandt werden, welche sich in der orbitalen Zone befinden und dessen <img [src]="iconUrl('speed')" class="oc-icon" /> mindestens so hoch ist wie der niedrigste <img [src]="iconUrl('speed')" class="oc-icon" /> in der Flotte, die die Mission durchführt. Der intervenierende Spieler verschiebt diese Schiffe ebenfalls in die neutrale Zone.
+            </p>
+            <p>
+              Im Falle eines Überfalls muss er angegriffene Spieler kämpfen. Er wählt Schiffe aus seiner orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> nehmen nicht an der Verteidiung teil und werden in die neutrale Zone verschoben.
+            </p>
           </div>
         </td>
       </tr>
