@@ -1,12 +1,20 @@
 <oc-navbar active="rules"></oc-navbar>
 <div id="rules-box">
   <oc-content-box title="Spielregeln">
-    <table>
+    <table id="main-table">
       <tr>
         <td id="table-of-content">
           <mat-selection-list #activeChapter [multiple]="false" color="primary">
-            <mat-list-option value="intro" selected="true"><h3>Intro</h3></mat-list-option>
-            <mat-list-option value="setup"><h3>Spielaufbau</h3></mat-list-option>
+            <h5>Allgemeines</h5>
+            <mat-list-option value="intro"><h4>Intro</h4></mat-list-option>
+            <mat-list-option value="setup"><h4>Spielaufbau</h4></mat-list-option>
+            <mat-list-option value="symbols" selected="true"><h4>Symbole</h4></mat-list-option>
+            <h5>Karten</h5>
+            <mat-list-option value="play-cards"><h4>Karten ausspielen</h4></mat-list-option>
+            <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
+            <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
+            <mat-list-option value="nfrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
+            <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content" [ngSwitch]="activeChapter.selectedOptions.selected[0].value">
@@ -25,7 +33,7 @@
             </p>
           </div>
           <div *ngSwitchCase="'setup'">
-            <img [src]="imgUrl('setup')" class="right size-40" />
+            <img [src]="imgUrl('setup')" class="left size-40" />
             <p>Vor dem Spielbeginn mischen beide Spieler ihr Deck und ziehen <b>7 Karten</b>.</p>
             <p>
               Die Kolonie jedes Spielers hat <b>50 Rumpfpunkte</b>. Jeder Spieler notiert sich die Anzahl
@@ -37,6 +45,68 @@
               Während des Spiels legst du Karten vor dir aus, die in einer der drei Spielzonen (siehe
               Abbildung) liegen.
             </p>
+          </div>
+          <div *ngSwitchCase="'symbols'">
+            <p>
+              In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
+            </p>
+            <table>
+              <tr>
+                <th colspan="2">Sockel</th>
+                <th colspan="2">Schiffs- und Ausr&uuml;stungsattrbute</th>
+                <th colspan="2">Kartentypen</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Delta (Triebwerk)</td>
+                <td></td>
+                <td>Punktabwehr</td>
+                <td></td>
+                <td>Taktik</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Theta (Leichte Waffen)</td>
+                <td></td>
+                <td>Schild</td>
+                <td></td>
+                <td>Rumpf</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Xi (Schwere Waffen)</td>
+                <td></td>
+                <td>Panzerung</td>
+                <td></td>
+                <td>Ausr&uuml;stung</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Phi (Torpedos)</td>
+                <td></td>
+                <td>H&uuml;llenintegrit&auml;t</td>
+                <td></td>
+                <td>Infrastruktur</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Psi (Frachtraum)</td>
+                <td></td>
+                <td>Geschwindigkeit</td>
+                <td colspan="2" rowspan="3"></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Omega (Defensivsysteme)</td>
+                <td></td>
+                <td>Schaden</td>
+              </tr>
+              <tr>
+                <td colspan="2"></td>
+                <td></td>
+                <td>Energie</td>
+              </tr>
+            </table>
           </div>
         </td>
       </tr>

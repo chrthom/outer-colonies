@@ -4,20 +4,37 @@
   margin: auto;
   margin-top: 40px;
   margin-bottom: 20px;
-  table {
+  #main-table {
     width: 100%;
     #table-of-content {
       width: 250px;
-      h3 {
+      h4 {
         color: white !important;
       }
     }
     #rules-content {
       p {
-        margin-top: 40px;
+        margin-bottom: 40px;
       }
-      img {
-        margin-bottom: 10px;
+      table {
+        border-collapse: collapse;
+      }
+      td, th {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
+      tr:nth-child(even){
+        background-color: rgba(17, 153, 153, 0.2);
+      }
+      tr:hover {
+        background-color: rgba(153, 17, 17, 0.4);
+      }
+      th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #119999;
+        color: white;
       }
       .left {
         float: left;
