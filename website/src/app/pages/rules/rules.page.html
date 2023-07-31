@@ -13,7 +13,7 @@
             <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
             <mat-list-option value="hull-cards" selected="true"><h4>Rumpfkarten</h4></mat-list-option>
             <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
-            <mat-list-option value="nfrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
+            <mat-list-option value="infrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
           </mat-selection-list>
         </td>
@@ -191,6 +191,15 @@
               <img [src]="iconUrl('armour_1')" class="oc-icon" /> in gelben Boxen keine Anforderungen sind,
               sondern Abzüge auf den Schaden der Waffe beim Angriff. Zum Zwecke des Ausspielens kannst du
               diese Angaben ignorieren.
+            </p>
+          </div>
+          <div *ngSwitchCase="'infrastructure-cards'">
+            <img [src]="imgUrl('infrastructure_cards')" class="right size-40" />
+            <p>
+              Anders als <img [src]="iconUrl('equipment')" class="oc-icon" />, können <img [src]="iconUrl('infrastructure')" class="oc-icon" /> sowohl an Schiffe (außer die Karte besagt etwas anderes) als auch an die Kolonie selbst angelegt werden. Legst du <img [src]="iconUrl('infrastructure')" class="oc-icon" /> an ein Schiff an, gelten die selben Regeln wie für <img [src]="iconUrl('equipment')" class="oc-icon" />. Willst du die Karte an die Kolonie anlegen, platzierst du sie in deiner Koloniezone.
+            </p>
+            <p>
+              Die Kolonie stellt immer <b>alle geforderten Sockel</b> zur Verfügung, jedoch müssen die geforderte <img [src]="iconUrl('energy')" class="oc-icon" /> auch von der Kolonie zur Verfügung gestellt werden, damit du die Karte in die Koloniezone legen darfst.
             </p>
           </div>
         </td>
