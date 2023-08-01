@@ -41,12 +41,15 @@ export default abstract class EquipmentCard extends Card {
   attack(weapon: CardStack, target: CardStack): AttackResult {
     const attackingShip = weapon.getRootCardStack();
     const match = attackingShip.getPlayer().match;
-    let damage = this.attackProfile.damage;
+    let damage = this.baseDamageOnTarget(target);
     if (attackingShip.profile().speed + match.battle.range <= target.profile().speed)
       damage = Math.round(damage / 2);
     let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
     target.damage += attackResult.damage;
     return attackResult;
+  }
+  protected baseDamageOnTarget(target: CardStack) {
+    return this.attackProfile.damage;
   }
   private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
     const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
