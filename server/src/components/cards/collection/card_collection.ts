@@ -54,7 +54,7 @@ import {
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
-import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
+import { Card166, Card182, Card224, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
 import {
   Card126,
   Card151,
@@ -175,6 +175,7 @@ export default class CardCollection {
     220: <Card>new Card220(),
     221: <Card>new Card221(),
     223: <Card>new Card223(),
+    224: <Card>new Card224(),
     226: <Card>new Card226(),
     228: <Card>new Card228(),
     230: <Card>new Card230(),
