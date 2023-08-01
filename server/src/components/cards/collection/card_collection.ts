@@ -85,6 +85,7 @@ import {
   Card304,
   Card318,
   Card412,
+  Card422,
 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -247,6 +248,7 @@ export default class CardCollection {
     418: <Card>new Card418(),
     420: <Card>new Card420(),
     421: <Card>new Card421(),
+    422: <Card>new Card422(),
     424: <Card>new Card424(),
     427: <Card>new Card427(),
     434: <Card>new Card434(),

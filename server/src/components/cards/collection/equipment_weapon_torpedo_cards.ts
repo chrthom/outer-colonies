@@ -287,3 +287,35 @@ export class Card412 extends EquipmentCard {
     );
   }
 }
+
+export class Card422 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      422,
+      'Feuersturmtorpedos',
+      3,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      false,
+      {
+        range: 2,
+        damage: 8,
+        pointDefense: -4,
+        shield: 0,
+        armour: -4,
+      },
+    );
+  }
+}
