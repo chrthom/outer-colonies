@@ -1,6 +1,5 @@
-import { CardType } from '../../config/enums';
 import CardStack from '../card_stack';
-import EquipmentCard from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card166 extends EquipmentCard {
   constructor() {
@@ -66,7 +65,7 @@ export class Card182 extends EquipmentCard {
   }
 }
 
-export class Card224 extends EquipmentCard {
+export class Card224 extends EquipmentCardColonyKiller {
   constructor() {
     super(
       224,
@@ -98,9 +97,6 @@ export class Card224 extends EquipmentCard {
   }
   protected attackDamageBeforeReductions(target: CardStack) {
     return target.profile().speed < 3 ? this.attackProfile.damage : 0;
-  }
-  protected attackDamageAfterReductions(target: CardStack, damage: number) {
-    return target.type() == CardType.Colony ? damage * 2 : damage;
   }
 }
 

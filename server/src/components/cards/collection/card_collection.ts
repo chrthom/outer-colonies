@@ -66,7 +66,7 @@ import {
 } from './equipment_weapon_kinetic_cards';
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
-import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
+import { Card106, Card107, Card207, Card405 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -217,6 +217,7 @@ export default class CardCollection {
     351: <Card>new Card351(),
     352: <Card>new Card352(),
     353: <Card>new Card353(),
+    405: <Card>new Card405(),
     406: <Card>new Card406(),
     409: <Card>new Card409(),
     412: <Card>new Card412(),

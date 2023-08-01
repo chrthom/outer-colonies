@@ -1,4 +1,4 @@
-import EquipmentCard from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card106 extends EquipmentCard {
   constructor() {
@@ -91,6 +91,38 @@ export class Card207 extends EquipmentCard {
         pointDefense: 0,
         shield: -99,
         armour: -2,
+      },
+    );
+  }
+}
+
+export class Card405 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      405,
+      'Thermallanze',
+      4,
+      {
+        energy: -2,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: -2,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      true,
+      {
+        range: 3,
+        damage: 6,
+        pointDefense: 0,
+        shield: -5,
+        armour: -1,
       },
     );
   }
