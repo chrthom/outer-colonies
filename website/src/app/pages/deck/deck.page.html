@@ -1,9 +1,16 @@
 <oc-navbar active="deck"></oc-navbar>
 <div id="deck-box">
-  <oc-content-box [title]="'Karten im aktiven Deck (' + activeCards.length + ')'">
+  <oc-content-box [title]="'Karten im aktiven Deck (' + activeCardsNum + ')'">
     <div class="scroll">
       <div *ngFor="let card of activeCards">
-        <mat-card (click)="deactivateCard(card)">
+        <mat-card
+          (click)="deactivateCard(card)"
+          [matBadge]="card.numOfCards + 'x'"
+          matBadgeSize="large"
+          matBadgePosition="before"
+          [matBadgeHidden]="card.numOfCards == 1"
+          matBadgeColor="primary"
+        >
           <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
       </div>
@@ -11,10 +18,17 @@
   </oc-content-box>
 </div>
 <div id="reserve-box">
-  <oc-content-box [title]="'Reserve Karten (' + reserveCards.length + ')'">
+  <oc-content-box [title]="'Reserve Karten (' + reserveCardsNum + ')'">
     <div class="scroll">
       <div *ngFor="let card of reserveCards">
-        <mat-card (click)="activateCard(card)">
+        <mat-card
+          (click)="activateCard(card)"
+          [matBadge]="card.numOfCards + 'x'"
+          matBadgeSize="large"
+          matBadgePosition="before"
+          [matBadgeHidden]="card.numOfCards == 1"
+          matBadgeColor="accent"
+        >
           <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
       </div>
