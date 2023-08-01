@@ -75,7 +75,7 @@ import {
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
-import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
+import { Card101, Card127, Card136, Card150, Card167, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
   Card132,
@@ -147,6 +147,7 @@ export default class CardCollection {
     140: <Card>new Card140(),
     141: <Card>new Card141(),
     145: <Card>new Card145(),
+    150: <Card>new Card150(),
     151: <Card>new Card151(),
     152: <Card>new Card152(),
     153: <Card>new Card153(),
@@ -159,6 +160,7 @@ export default class CardCollection {
     164: <Card>new Card164(),
     165: <Card>new Card165(),
     166: <Card>new Card166(),
+    167: <Card>new Card167(),
     168: <Card>new Card168(),
     170: <Card>new Card170(),
     171: <Card>new Card171(),
