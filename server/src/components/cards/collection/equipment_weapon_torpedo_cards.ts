@@ -224,6 +224,38 @@ export class Card304 extends EquipmentCard {
   }
 }
 
+export class Card318 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      318,
+      'Nova-Torpedos',
+      3,
+      {
+        energy: -1,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      false,
+      {
+        range: 2,
+        damage: 14,
+        pointDefense: -7,
+        shield: -4,
+        armour: -3,
+      },
+    );
+  }
+}
+
 export class Card412 extends EquipmentCard {
   constructor() {
     super(
