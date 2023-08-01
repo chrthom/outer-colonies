@@ -125,7 +125,7 @@ import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
 import { Card114, Card155 } from './infrastructure_end.cards';
 import { Rarity } from '../../config/enums';
-import { Card401 } from './equipment_weapon_super_cards';
+import { Card302, Card401 } from './equipment_weapon_super_cards';
 
 export default class CardCollection {
   static cards = {
@@ -209,6 +209,7 @@ export default class CardCollection {
     243: <Card>new Card243(),
     244: <Card>new Card244(),
     245: <Card>new Card245(),
+    302: <Card>new Card302(),
     303: <Card>new Card303(),
     304: <Card>new Card304(),
     306: <Card>new Card306(),

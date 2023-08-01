@@ -32,5 +32,3 @@ CardCollection.allCards.forEach((c) => {
     expect(c2).toBe(c);
   });
 });
-
-

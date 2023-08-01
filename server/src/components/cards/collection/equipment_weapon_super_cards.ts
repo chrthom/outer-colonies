@@ -2,6 +2,38 @@ import { Zone } from '../../config/enums';
 import CardStack from '../card_stack';
 import EquipmentCard from '../types/equipment_card';
 
+export class Card302 extends EquipmentCard {
+  constructor() {
+    super(
+      302,
+      'Götterdämmerung',
+      5,
+      {
+        energy: -6,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: -3,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      true,
+      {
+        range: 1,
+        damage: 50,
+        pointDefense: 0,
+        shield: -6,
+        armour: -3,
+      },
+    );
+  }
+}
+
 export class Card401 extends EquipmentCard {
   private readonly damageReductionPerSpeedPoint = 6;
   constructor() {
