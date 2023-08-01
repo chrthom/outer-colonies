@@ -54,7 +54,15 @@ import {
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
-import { Card166, Card182, Card224, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
+import {
+  Card166,
+  Card182,
+  Card224,
+  Card343,
+  Card344,
+  Card347,
+  Card421,
+} from './equipment_weapon_laser_cards';
 import {
   Card126,
   Card151,
@@ -66,7 +74,7 @@ import {
 } from './equipment_weapon_kinetic_cards';
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
-import { Card106, Card107, Card207, Card405 } from './equipment_weapon_particle_cards';
+import { Card106, Card107, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
 import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -229,6 +237,7 @@ export default class CardCollection {
     434: <Card>new Card434(),
     435: <Card>new Card435(),
     436: <Card>new Card436(),
+    438: <Card>new Card438(),
     439: <Card>new Card439(),
     440: <Card>new Card440(),
     441: <Card>new Card441(),

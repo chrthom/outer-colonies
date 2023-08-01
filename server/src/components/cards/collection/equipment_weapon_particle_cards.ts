@@ -1,3 +1,5 @@
+import { Zone } from '../../config/enums';
+import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card106 extends EquipmentCard {
@@ -36,7 +38,7 @@ export class Card107 extends EquipmentCard {
   constructor() {
     super(
       107,
-      'Partiekllanze',
+      'Partikellanze',
       4,
       {
         energy: -2,
@@ -125,5 +127,40 @@ export class Card405 extends EquipmentCardColonyKiller {
         armour: -1,
       },
     );
+  }
+}
+
+export class Card438 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      438,
+      'Feldannihilator',
+      1,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: -1,
+        xi: 0,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      true,
+      {
+        range: 2,
+        damage: 2,
+        pointDefense: 0,
+        shield: -1,
+        armour: -99,
+      },
+    );
+  }
+  protected attackDamageBeforeReductions(target: CardStack) {
+    return target.zone == Zone.Colony ? 0 : this.attackProfile.damage;
   }
 }
