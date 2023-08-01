@@ -305,7 +305,6 @@ export default class CardCollection {
     Array(2).fill(this.cards[427]), // Immigranten von der Erde
     Array(2).fill(this.cards[321]), // Recycling
     Array(2).fill(this.cards[174]), // Feldreperaturen
-    // TEST CARDS
   ].flat();
 
   static starterDeckTraders: Card[] = [
@@ -340,7 +339,6 @@ export default class CardCollection {
     Array(2).fill(this.cards[321]), // Recycling
     Array(2).fill(this.cards[174]), // Feldreperaturen
     Array(2).fill(this.cards[141]), // Externe Arbeitskräfte
-    // TEST CARDS
   ].flat();
 
   static starterDeckExpedition: Card[] = [
@@ -353,7 +351,7 @@ export default class CardCollection {
     Array(2).fill(this.cards[446]), // Außenposten
     // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
     Array(2).fill(this.cards[340]), // Abfangraketenwerfer
-    Array(3).fill(this.cards[136]), // Plasmatorpedos
+    Array(3).fill(this.cards[167]), // Atombombentorpedos
     Array(2).fill(this.cards[182]), // Dual-Lasergeschütz
     Array(5).fill(this.cards[440]), // Impulskanone
     Array(4).fill(this.cards[168]), // Automatikkanone
@@ -372,7 +370,6 @@ export default class CardCollection {
     Array(6).fill(this.cards[337]), // Militärpioniere
     Array(4).fill(this.cards[338]), // Nachschub
     Array(2).fill(this.cards[174]), // Feldreperaturen
-    // TEST CARDS
   ].flat();
 
   static starterDecks: Card[][] = [
