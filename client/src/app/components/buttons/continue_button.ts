@@ -168,9 +168,9 @@ export default class ContinueButton {
     this.show('', button, () => {});
   }
   private get canIntervene() {
-    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
+    return this.scene.state.cardStacks.some((cs) => cs.interventionReady);
   }
   private get canAttack() {
-    return this.scene.state.cardStacks.some(cs => cs.cards.some(c => c.battleReady));
+    return this.scene.state.cardStacks.some((cs) => cs.cards.some((c) => c.battleReady));
   }
 }

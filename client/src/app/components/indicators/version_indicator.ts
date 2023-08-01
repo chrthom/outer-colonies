@@ -7,7 +7,7 @@ export default class VersonIndicator {
       .text(
         layout.version.x,
         layout.version.y,
-        `Tethys (1.3)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Tethys (1.3)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`,
       )
       .setFontSize(layout.font.size)
       .setFontFamily(layout.font.captionFamily)

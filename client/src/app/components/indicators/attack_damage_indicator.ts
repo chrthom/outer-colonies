@@ -37,27 +37,24 @@ export default class AttackDamageIndicator {
     }, animationConfig.duration.attack);
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
-    const yOffset = this.cardImage.angle == 0 
-      ? animationConfig.attack.flare.yOffset 
-      : animationConfig.attack.flare.yOffsetOpponent;
-    return this.scene.add.particles(
-      this.cardImage.x,
-      this.cardImage.y + yOffset,
-      `flare_${color}`,
-      {
-        lifespan: animationConfig.attack.flare.lifetime,
-        speed: { min: 150, max: 300 },
-        scale: { start: 0.8, end: 0 },
-        gravityY: 15,
-        blendMode: 'ADD',
-        emitting: false,
-      },
-    );
+    const yOffset =
+      this.cardImage.angle == 0
+        ? animationConfig.attack.flare.yOffset
+        : animationConfig.attack.flare.yOffsetOpponent;
+    return this.scene.add.particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
+      lifespan: animationConfig.attack.flare.lifetime,
+      speed: { min: 150, max: 300 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 15,
+      blendMode: 'ADD',
+      emitting: false,
+    });
   }
   private createIndicator(value: number, color: string) {
-    const yOffset = this.cardImage.angle == 0 
-      ? animationConfig.attack.indicator.yOffset 
-      : animationConfig.attack.indicator.yOffsetOpponent;
+    const yOffset =
+      this.cardImage.angle == 0
+        ? animationConfig.attack.indicator.yOffset
+        : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
       .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
       .setFontSize(layout.attack.fontSize)
