@@ -10,6 +10,7 @@ import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
 import { TradePage } from './pages/trade/trade.page';
+import { RulesPage } from './pages/rules/rules.page';
 
 function forceHttp(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -51,6 +52,11 @@ const routes: Routes = [
     path: 'trade',
     canActivate: [privateGuardFn],
     component: TradePage,
+  },
+  {
+    path: 'rules',
+    canActivate: [privateGuardFn],
+    component: RulesPage,
   },
   {
     path: 'imprint',

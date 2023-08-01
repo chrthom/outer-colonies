@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import AuthService from 'src/app/auth.service';
 
 @Component({
-  selector: 'app-imprint',
+  selector: 'oc-page-imprint',
   templateUrl: './imprint.page.html',
   styleUrls: ['./imprint.page.scss'],
 })

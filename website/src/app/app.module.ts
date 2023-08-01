@@ -16,6 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.page';
@@ -24,6 +25,7 @@ import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { TradePage } from './pages/trade/trade.page';
 import { InventoryItemComponent } from './components/inventory-item/inventory-item.component';
 import { OpenItemComponent } from './components/open-item/open-item.component';
+import { RulesPage } from './pages/rules/rules.page';
 
 @NgModule({
   declarations: [
@@ -39,6 +41,7 @@ import { OpenItemComponent } from './components/open-item/open-item.component';
     TradePage,
     InventoryItemComponent,
     OpenItemComponent,
+    RulesPage,
   ],
   imports: [
     BrowserModule,
@@ -51,6 +54,7 @@ import { OpenItemComponent } from './components/open-item/open-item.component';
     MatButtonModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatListModule,
     MatCardModule,
     MatBadgeModule,
     MatTabsModule,

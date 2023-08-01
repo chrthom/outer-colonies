@@ -11,7 +11,7 @@ import { rules } from '../../../../../server/src/components/config/rules';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-trade',
+  selector: 'oc-page-trade',
   templateUrl: './trade.page.html',
   styleUrls: ['./trade.page.scss'],
 })
