@@ -75,7 +75,17 @@ import {
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
-import { Card101, Card127, Card136, Card150, Card167, Card216, Card304, Card318, Card412 } from './equipment_weapon_torpedo_cards';
+import {
+  Card101,
+  Card127,
+  Card136,
+  Card150,
+  Card167,
+  Card216,
+  Card304,
+  Card318,
+  Card412,
+} from './equipment_weapon_torpedo_cards';
 import {
   Card131,
   Card132,
@@ -114,6 +124,7 @@ import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
 import { Card114, Card155 } from './infrastructure_end.cards';
 import { Rarity } from '../../config/enums';
+import { Card401 } from './equipment_weapon_super_cards';
 
 export default class CardCollection {
   static cards = {
@@ -228,6 +239,7 @@ export default class CardCollection {
     351: <Card>new Card351(),
     352: <Card>new Card352(),
     353: <Card>new Card353(),
+    401: <Card>new Card401(),
     405: <Card>new Card405(),
     406: <Card>new Card406(),
     409: <Card>new Card409(),
