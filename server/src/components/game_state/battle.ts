@@ -44,19 +44,19 @@ export default class Battle {
       this.ships[player.no].map((cs) => (cs.zone = Zone.Neutral));
     } else if (this.type == BattleType.Raid) {
       player.cardStacks
-        .filter((cs) => cs.isMissionReady() && !interveningShipIds.includes(cs.uuid))
+        .filter((cs) => cs.isMissionReady && !interveningShipIds.includes(cs.uuid))
         .forEach((cs) => (cs.zone = Zone.Neutral));
       this.ships[player.no] = player.cardStacks.filter((cs) => cs.zone == Zone.Oribital);
     }
   }
   canInterveneMission(interveningPlayerNo: number, cardStack: CardStack): boolean {
     return (
-      cardStack.isMissionReady() &&
+      cardStack.isMissionReady &&
       (this.type == BattleType.Raid ||
         (this.type == BattleType.Mission &&
-          cardStack.profile().speed >=
+          cardStack.profile.speed >=
             this.ships[opponentPlayerNo(interveningPlayerNo)]
-              .map((cs) => cs.profile().speed)
+              .map((cs) => cs.profile.speed)
               .reduce((a, b) => Math.min(a, b))))
     );
   }
@@ -70,7 +70,7 @@ export default class Battle {
         const destroyedCardStacks = this.getDestroyedCardStacks(player.no);
         destroyedCardStacks.forEach((cs) => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
         destroyedCardStacks.forEach((cs) => spliceCardStackByUUID(player.cardStacks, cs.uuid));
-        player.discardPile.push(...destroyedCardStacks.flatMap((cs) => cs.getCards()));
+        player.discardPile.push(...destroyedCardStacks.flatMap((cs) => cs.cards));
         player.cardStacks.forEach((cs) => cs.combatPhaseReset(false));
       });
       if (this.range == 1 && this.type == BattleType.Raid) {
@@ -85,7 +85,7 @@ export default class Battle {
       match.prepareEndPhase();
     } else {
       const hasAttack = this.ships[match.actionPendingByPlayerNo]
-        .flatMap((cs) => cs.getCardStacks())
+        .flatMap((cs) => cs.cardStacks)
         .filter((cs) => cs.attackAvailable)
         .some((cs) => (<EquipmentCard>cs.card).attackProfile.range >= this.range);
       const hasTarget = this.ships[match.getWaitingPlayerNo()].length > 0;
@@ -105,6 +105,6 @@ export default class Battle {
     }
   }
   private getDestroyedCardStacks(playerNo: number): CardStack[] {
-    return this.ships[playerNo].filter((cs) => cs.damage > 0 && cs.damage >= cs.profile().hp);
+    return this.ships[playerNo].filter((cs) => cs.damage > 0 && cs.damage >= cs.profile.hp);
   }
 }

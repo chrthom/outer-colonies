@@ -10,7 +10,7 @@ export default class CardStack {
   card!: Card;
   zone: Zone;
   uuid!: string;
-  attachedCards: CardStack[] = [];
+  attachedCardStacks: CardStack[] = [];
   damage: number = 0;
   attackAvailable: boolean = false;
   defenseAvailable: boolean = false;
@@ -20,31 +20,25 @@ export default class CardStack {
     this.card = card;
     this.uuid = uuidv4();
   }
-  actionPool(): ActionPool {
-    return this.getCards()
-      .map((c) => c.actionPool())
-      .reduce((a, b) => a.combine(b));
+  get actionPool(): ActionPool {
+    return this.cards.map((c) => c.actionPool).reduce((a, b) => a.combine(b));
   }
   attach(cardStack: CardStack) {
     cardStack.parentCardStack = this;
-    this.attachedCards.push(cardStack);
+    this.attachedCardStacks.push(cardStack);
   }
   attack(target: CardStack) {
     if (!this.attackAvailable) {
       console.log(
-        `WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name}, which cannot attack`,
+        `WARN: ${this.player.name} tried to attack with a card ${this.card.name}, which cannot attack`,
       );
-    } else if (!this.card.isInRange(this.getPlayer().match.battle.range)) {
-      console.log(
-        `WARN: ${this.getPlayer().name} tried to attack with a card ${this.card.name} at wrong range`,
-      );
+    } else if (!this.card.isInRange(this.player.match.battle.range)) {
+      console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} at wrong range`);
     } else {
       const attackResult = this.card.attack(this, target);
-      this.getPlayer().match.battle.recentAttack = {
-        sourceUUID: this.getRootCardStack().uuid,
-        sourceIndex: this.getRootCardStack()
-          .getCardStacks()
-          .findIndex((cs) => cs.uuid == this.uuid),
+      this.player.match.battle.recentAttack = {
+        sourceUUID: this.rootCardStack.uuid,
+        sourceIndex: this.rootCardStack.cardStacks.findIndex((cs) => cs.uuid == this.uuid),
         targetUUID: target.uuid,
         pointDefense: attackResult.pointDefense,
         shield: attackResult.shield,
@@ -54,23 +48,18 @@ export default class CardStack {
       this.attackAvailable = false;
     }
   }
-  canAttack(player: Player) {
+  canAttack(player: Player): boolean {
     return (
       this.attackAvailable &&
       this.card.isInRange(player.match.battle.range) &&
-      this.getRootCardStack().isFlightReady()
+      this.rootCardStack.isFlightReady
     );
   }
   canBeAttachedTo(cardStack: CardStack): boolean {
-    return (
-      this.zone == Zone.Hand &&
-      this.getValidTargets()
-        .map((cs) => cs.uuid)
-        .includes(cardStack.uuid)
-    );
+    return this.zone == Zone.Hand && this.validTargets.map((cs) => cs.uuid).includes(cardStack.uuid);
   }
-  canBeRetracted(): boolean {
-    const player = this.getPlayer();
+  get canBeRetracted(): boolean {
+    const player = this.player;
     return (
       player.isActivePlayer() &&
       player.isPendingPlayer() &&
@@ -80,102 +69,99 @@ export default class CardStack {
     );
   }
   combatPhaseReset(initial: boolean) {
-    this.attachedCards.forEach((cs) => cs.combatPhaseReset(initial));
-    if (initial || this.card.doesRechargeBetweenCombatPhases) {
-      if (this.card.canAttack()) this.attackAvailable = true;
-      if (this.card.canDefend()) this.defenseAvailable = true;
+    this.attachedCardStacks.forEach((cs) => cs.combatPhaseReset(initial));
+    if (initial || this.card.isRechargeable) {
+      if (this.card.canAttack) this.attackAvailable = true;
+      if (this.card.canDefend) this.defenseAvailable = true;
     }
   }
-  getCards(): Card[] {
-    return this.getCardStacks().map((cs) => cs.card);
+  get cards(): Card[] {
+    return this.cardStacks.map((cs) => cs.card);
   }
-  getCardStacks(): CardStack[] {
-    return this.attachedCards.flatMap((cs) => cs.getCardStacks()).concat(this);
+  get cardStacks(): CardStack[] {
+    return this.attachedCardStacks.flatMap((cs) => cs.cardStacks).concat(this);
   }
-  getPlayer(): Player {
-    return this.parentCardStack ? this.parentCardStack.getPlayer() : this.parentPlayer;
+  get player(): Player {
+    return this.parentCardStack ? this.parentCardStack.player : this.parentPlayer;
   }
-  getRootCardStack(): CardStack {
-    if (this.parentCardStack) return this.parentCardStack.getRootCardStack();
+  get rootCardStack(): CardStack {
+    if (this.parentCardStack) return this.parentCardStack.rootCardStack;
     else return this;
   }
-  getValidTargets(): CardStack[] {
+  get validTargets(): CardStack[] {
     if (this.zone == Zone.Hand) {
-      return this.card.getValidTargets(this.getPlayer());
+      return this.card.getValidTargets(this.player);
     } else {
       return []; // TODO: Reuse this method to determine valid attack targets in battle
     }
   }
-  hasInsufficientEnergy(): boolean {
-    const rootCardStack = this.getRootCardStack();
-    if (this.type() == CardType.Colony) {
+  get hasInsufficientEnergy(): boolean {
+    const rootCardStack = this.rootCardStack;
+    if (this.type == CardType.Colony) {
       return false;
-    } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type() == CardType.Infrastructure) {
-      return this.card.profile().energy < 0 && this.getPlayer().getColonyCardStack().profile().energy < 0;
+    } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type == CardType.Infrastructure) {
+      return this.card.profile.energy < 0 && this.player.getColonyCardStack().profile.energy < 0;
     } else {
-      return this.card.profile().energy < 0 && rootCardStack.profile().energy < 0;
+      return this.card.profile.energy < 0 && rootCardStack.profile.energy < 0;
     }
   }
-  isFlightReady(): boolean {
-    return this.card.isFlightReady(this.getCards());
+  get isFlightReady(): boolean {
+    return this.card.isFlightReady(this.cards);
   }
-  isMissionReady(): boolean {
-    return this.zone == Zone.Oribital && this.type() == CardType.Hull && this.profile().speed > 0;
+  get isMissionReady(): boolean {
+    return this.zone == Zone.Oribital && this.type == CardType.Hull && this.profile.speed > 0;
   }
-  isPlayable(): boolean {
-    return this.zone == Zone.Hand && this.card.isPlayable(this.getPlayer());
+  get isPlayable(): boolean {
+    return this.zone == Zone.Hand && this.card.isPlayable(this.player);
   }
   onDestruction() {
-    this.card.onDestruction(this.getPlayer());
-    this.attachedCards.forEach((cs) => cs.onDestruction());
+    this.card.onDestruction(this.player);
+    this.attachedCardStacks.forEach((cs) => cs.onDestruction());
   }
   onStartTurn() {
-    this.card.onStartTurn(this.getPlayer());
-    this.attachedCards.forEach((cs) => cs.onStartTurn());
+    this.card.onStartTurn(this.player);
+    this.attachedCardStacks.forEach((cs) => cs.onStartTurn());
   }
   onEndTurn() {
-    this.card.onEndTurn(this.getPlayer(), this);
-    this.attachedCards.forEach((cs) => cs.onEndTurn());
+    this.card.onEndTurn(this.player, this);
+    this.attachedCardStacks.forEach((cs) => cs.onEndTurn());
   }
   performImmediateEffect(target: CardStack) {
-    this.card.onUtilizaton(this.getPlayer(), target);
+    this.card.onUtilizaton(this.player, target);
   }
-  profile(): CardProfile {
-    if (this.type() == CardType.Colony) {
-      const handCardLimitOutsideColonyZone = this.getPlayer()
-        .cardStacks // Silos in orbit also increase hand card limit
+  get profile(): CardProfile {
+    if (this.type == CardType.Colony) {
+      const handCardLimitOutsideColonyZone = this.player.cardStacks // Silos in orbit also increase hand card limit
         .filter((cs) => cs.zone != Zone.Colony)
-        .filter((cs) => cs.type() == CardType.Infrastructure)
-        .map((cs) => cs.profile().handCardLimit)
+        .filter((cs) => cs.type == CardType.Infrastructure)
+        .map((cs) => cs.profile.handCardLimit)
         .reduce((a, b) => a + b, 0);
-      const colonyCardsProfile = this.getPlayer()
-        .cardStacks.filter((cs) => cs.zone == Zone.Colony)
-        .filter((cs) => [CardType.Orb, CardType.Infrastructure].includes(cs.type()))
-        .map((cs) => cs.profile())
+      const colonyCardsProfile = this.player.cardStacks
+        .filter((cs) => cs.zone == Zone.Colony)
+        .filter((cs) => [CardType.Orb, CardType.Infrastructure].includes(cs.type))
+        .map((cs) => cs.profile)
         .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
       colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
       colonyCardsProfile.hp = 0; // Else Building HP would increase the colony's HP
-      return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile());
+      return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile);
     } else {
-      return this.getCards()
-        .map((c) => c.profile())
-        .reduce((a, b) => CardProfile.combineCardProfiles(a, b));
+      return this.cards.map((c) => c.profile).reduce((a, b) => CardProfile.combineCardProfiles(a, b));
     }
   }
   profileMatches(c: CardProfile): boolean {
-    return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile(), c));
+    return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile, c));
   }
   retract() {
     if (this.parentCardStack) {
-      spliceCardStackByUUID(this.parentCardStack.attachedCards, this.uuid);
+      spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
     } else {
-      spliceCardStackByUUID(this.getPlayer().cardStacks, this.uuid);
+      spliceCardStackByUUID(this.player.cardStacks, this.uuid);
     }
-    this.getCards().forEach((c) => c.onRetraction(this.getPlayer()));
-    this.getPlayer().takeCards(this.getCards().filter((c) => c.canBeRetracted(this.isRootCard)));
-    this.getPlayer().discardCards(...this.getCards().filter((c) => !c.canBeRetracted(this.isRootCard)));
+    this.cards.forEach((c) => c.onRetraction(this.player));
+    this.player.takeCards(this.cards.filter((c) => c.canBeRetracted(this.isRootCard)));
+    this.player.discardCards(...this.cards.filter((c) => !c.canBeRetracted(this.isRootCard)));
   }
-  type(): CardType {
+  get type(): CardType {
     return this.card.type;
   }
   private get isRootCard() {

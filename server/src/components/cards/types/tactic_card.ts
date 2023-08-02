@@ -1,20 +1,11 @@
 import { CardType, TacticDiscipline } from '../../config/enums';
-import Player from '../../game_state/player';
 import Card from '../card';
 import CardProfile from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class TacticCard extends Card {
-  constructor(
-    id: number,
-    name: string,
-    rarity: number,
-    playableOutsideBuildPhase: boolean,
-    staysInPlay: boolean,
-  ) {
+  constructor(id: number, name: string, rarity: number) {
     super(id, name, CardType.Tactic, rarity);
-    this.playableOutsideBuildPhase = playableOutsideBuildPhase;
-    this.staysInPlay = staysInPlay;
   }
   onRetraction() {}
   onStartTurn() {}
@@ -22,8 +13,11 @@ export default abstract class TacticCard extends Card {
   canBeRetracted(): boolean {
     return false;
   }
-  profile(): CardProfile {
+  get profile(): CardProfile {
     return new CardProfile();
+  }
+  get isPermanent(): boolean {
+    return false;
   }
   abstract get discipline(): TacticDiscipline;
   protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {

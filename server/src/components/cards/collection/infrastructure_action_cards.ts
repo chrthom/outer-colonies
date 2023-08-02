@@ -5,11 +5,11 @@ import { InfrastructureProfile } from '../card_profile';
 import InfrastructureCard from '../types/infrastructure_card';
 
 function addToActionPool(player: Player, card: InfrastructureCard) {
-  player.actionPool.push(...card.actionPool().getPool());
+  player.actionPool.push(...card.actionPool.pool);
 }
 
 function removeFromActionPool(player: Player, card: InfrastructureCard) {
-  player.actionPool.remove(...card.actionPool().getPool());
+  player.actionPool.remove(...card.actionPool.pool);
 }
 
 abstract class ActionInfrastructureCard extends InfrastructureCard {
@@ -32,7 +32,7 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
   }
   onStartTurn() {}
   onEndTurn() {}
-  actionPool(): ActionPool {
+  get actionPool(): ActionPool {
     return new ActionPool(new CardAction(...this.actionPoolCardTypes));
   }
 }

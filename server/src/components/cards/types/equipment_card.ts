@@ -14,18 +14,16 @@ export default abstract class EquipmentCard extends Card {
     name: string,
     rarity: number,
     profile: EquipmentProfile,
-    doesRechargeBetweenCombatPhases: boolean,
     attackProfile?: AttackProfile,
   ) {
     super(id, name, CardType.Equipment, rarity);
     this.equipmentProfile = profile;
     this.attackProfile = attackProfile;
-    this.doesRechargeBetweenCombatPhases = doesRechargeBetweenCombatPhases;
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter((cs) => cs.type() == CardType.Hull && cs.profileMatches(this.profile()));
+    return player.cardStacks.filter((cs) => cs.type == CardType.Hull && cs.profileMatches(this.profile));
   }
-  canAttack(): boolean {
+  get canAttack(): boolean {
     return Boolean(this.attackProfile);
   }
   isInRange(range: number): boolean {
@@ -35,14 +33,14 @@ export default abstract class EquipmentCard extends Card {
   onRetraction() {}
   onStartTurn() {}
   onEndTurn(player: Player, source: CardStack) {}
-  profile(): CardProfile {
+  get profile(): CardProfile {
     return CardProfile.fromEquipmentProfile(this.equipmentProfile);
   }
   attack(weapon: CardStack, target: CardStack): AttackResult {
-    const attackingShip = weapon.getRootCardStack();
-    const match = attackingShip.getPlayer().match;
+    const attackingShip = weapon.rootCardStack;
+    const match = attackingShip.player.match;
     let damage = this.attackProfile.damage;
-    if (attackingShip.profile().speed + match.battle.range <= target.profile().speed)
+    if (attackingShip.profile.speed + match.battle.range <= target.profile.speed)
       damage = Math.round(damage / 2);
     let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
     target.damage += attackResult.damage;
@@ -51,16 +49,16 @@ export default abstract class EquipmentCard extends Card {
   private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
     const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
     const bestPointDefense = defendingShips
-      .flatMap((cs) => cs.getCardStacks())
-      .filter((cs) => cs.defenseAvailable && cs.profile().pointDefense)
-      .sort((a, b) => a.profile().pointDefense - b.profile().pointDefense)
+      .flatMap((cs) => cs.cardStacks)
+      .filter((cs) => cs.defenseAvailable && cs.profile.pointDefense)
+      .sort((a, b) => a.profile.pointDefense - b.profile.pointDefense)
       .pop();
     if (attackResult.damage == 0) {
       return attackResult;
     } else if (this.attackProfile.pointDefense == 0 || !bestPointDefense) {
       return this.attackShield(target, attackResult);
     } else {
-      const damageReduction = this.attackProfile.pointDefense * -bestPointDefense.profile().pointDefense;
+      const damageReduction = this.attackProfile.pointDefense * -bestPointDefense.profile.pointDefense;
       if (attackResult.damage >= damageReduction) bestPointDefense.defenseAvailable = false;
       const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
       attackResult.pointDefense += adjustedDamageReduction;
@@ -69,17 +67,16 @@ export default abstract class EquipmentCard extends Card {
     }
   }
   private attackShield(target: CardStack, attackResult: AttackResult): AttackResult {
-    const bestShield = target
-      .getCardStacks()
-      .filter((cs) => cs.defenseAvailable && cs.profile().shield)
-      .sort((a: CardStack, b: CardStack) => a.profile().shield - b.profile().shield)
+    const bestShield = target.cardStacks
+      .filter((cs) => cs.defenseAvailable && cs.profile.shield)
+      .sort((a: CardStack, b: CardStack) => a.profile.shield - b.profile.shield)
       .pop();
     if (attackResult.damage == 0) {
       return attackResult;
     } else if (this.attackProfile.shield == 0 || !bestShield) {
       return this.attackArmour(target, attackResult);
     } else {
-      const damageReduction = this.attackProfile.shield * -bestShield.profile().shield;
+      const damageReduction = this.attackProfile.shield * -bestShield.profile.shield;
       if (attackResult.damage >= damageReduction) bestShield.defenseAvailable = false;
       const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
       attackResult.shield += adjustedDamageReduction;
@@ -88,20 +85,25 @@ export default abstract class EquipmentCard extends Card {
     }
   }
   private attackArmour(target: CardStack, attackResult: AttackResult): AttackResult {
-    const bestArmour = target
-      .getCardStacks()
-      .filter((cs) => cs.defenseAvailable && cs.profile().armour)
-      .sort((a: CardStack, b: CardStack) => a.profile().armour - b.profile().armour)
+    const bestArmour = target.cardStacks
+      .filter((cs) => cs.defenseAvailable && cs.profile.armour)
+      .sort((a: CardStack, b: CardStack) => a.profile.armour - b.profile.armour)
       .pop();
     if (attackResult.damage == 0 || this.attackProfile.armour == 0 || !bestArmour) {
       return attackResult;
     } else {
-      const damageReduction = this.attackProfile.armour * -bestArmour.profile().armour;
+      const damageReduction = this.attackProfile.armour * -bestArmour.profile.armour;
       if (attackResult.damage >= damageReduction) bestArmour.defenseAvailable = false;
       const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
       attackResult.armour += adjustedDamageReduction;
       attackResult.damage -= adjustedDamageReduction;
       return this.attackArmour(target, attackResult);
     }
+  }
+}
+
+export abstract class EquipmentCardRechargeable extends EquipmentCard {
+  get isRechargeable(): boolean {
+    return true;
   }
 }
