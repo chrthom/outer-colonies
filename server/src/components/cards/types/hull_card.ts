@@ -32,10 +32,10 @@ export default abstract class HullCard extends Card {
   onRetraction() {}
   onStartTurn() {}
   onEndTurn() {}
-  canBeRetracted(isRootCard: boolean): boolean {
+  override canBeRetracted(isRootCard: boolean): boolean {
     return isRootCard;
   }
-  isFlightReady(cards: Card[]): boolean {
+  override isFlightReady(cards: Card[]): boolean {
     return cards.filter((c) => c.type == CardType.Hull).length == this.multipart.partNo;
   }
   get profile(): CardProfile {

@@ -10,13 +10,13 @@ export default abstract class TacticCard extends Card {
   onRetraction() {}
   onStartTurn() {}
   onEndTurn() {}
-  canBeRetracted(): boolean {
+  override canBeRetracted(): boolean {
     return false;
   }
   get profile(): CardProfile {
     return new CardProfile();
   }
-  get isPermanent(): boolean {
+  override get isPermanent(): boolean {
     return false;
   }
   abstract get discipline(): TacticDiscipline;

@@ -12,7 +12,7 @@ export default class DBConnection {
       user: config.get('database.user'),
       password: config.has('database.password')
         ? config.get('database.password')
-        : <string>process.env.DB_PASSWORD,
+        : <string>process.env['DB_PASSWORD'],
       connectionLimit: config.get<number>('database.connectionLimit'),
     });
   }

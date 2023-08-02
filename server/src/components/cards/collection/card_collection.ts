@@ -375,6 +375,8 @@ export default class CardCollection {
             return Array(2).fill(c);
           case 5:
             return [c];
+          default:
+            return [];
         }
       });
     return relevantCards[Math.floor(Math.random() * relevantCards.length)];

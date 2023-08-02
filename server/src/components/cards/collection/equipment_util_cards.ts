@@ -20,7 +20,7 @@ export class Card104 extends EquipmentCard {
       psi: 0,
     });
   }
-  onEndTurn(player: Player, source: CardStack) {
+  override onEndTurn(player: Player, source: CardStack) {
     source.rootCardStack.damage -= Math.min(source.rootCardStack.damage, this.repairDamage);
   }
 }
@@ -81,7 +81,7 @@ export class Card325 extends EquipmentCard {
       psi: 0,
     });
   }
-  onEndTurn(player: Player, source: CardStack) {
+  override onEndTurn(player: Player, source: CardStack) {
     source.rootCardStack.damage -= Math.min(source.rootCardStack.damage, this.repairDamage);
   }
 }
