@@ -4,12 +4,12 @@ import CardCollection from './card_collection';
 
 const equipmentCards = CardCollection.allCards.filter((c) => c.type == CardType.Equipment);
 const infrastructureCards = CardCollection.allCards.filter((c) => c.type == CardType.Infrastructure);
-const weaponCards = equipmentCards.map((c) => <EquipmentCard>c).filter((c) => c.canAttack());
+const weaponCards = equipmentCards.map((c) => <EquipmentCard>c).filter((c) => c.canAttack);
 
 equipmentCards.concat(infrastructureCards).forEach((c) => {
   ['theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach((v) => {
     test(`"${c.name}" profile ${v} socket value should be 0 or less`, () => {
-      expect(c.profile()[v]).toBeLessThanOrEqual(0);
+      expect(c.profile[v]).toBeLessThanOrEqual(0);
     });
   });
 });

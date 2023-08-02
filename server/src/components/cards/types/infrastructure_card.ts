@@ -14,11 +14,11 @@ export default abstract class InfrastructureCard extends Card {
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks
       .filter(
-        (cs) => (!this.onlyAttachableToColony && cs.type() == CardType.Hull) || cs.type() == CardType.Colony,
+        (cs) => (!this.onlyAttachableToColony && cs.type == CardType.Hull) || cs.type == CardType.Colony,
       )
-      .filter((cs) => cs.profileMatches(this.profile()));
+      .filter((cs) => cs.profileMatches(this.profile));
   }
-  profile(): CardProfile {
+  get profile(): CardProfile {
     return CardProfile.fromInfrastructureProfile(this.infrastructureProfile);
   }
 }

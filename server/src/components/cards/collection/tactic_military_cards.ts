@@ -13,13 +13,13 @@ abstract class MilitaryTacticCard extends TacticCard {
 export class Card174 extends MilitaryTacticCard {
   private readonly damageToRepair = 8;
   constructor() {
-    super(174, 'Feldreperaturen', 1, false, false);
+    super(174, 'Feldreperaturen', 1);
   }
   onUtilizaton(player: Player, target: CardStack) {
     target.damage -= Math.min(this.damageToRepair, target.damage);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter((cs) => cs.type() == CardType.Hull && cs.damage > 0);
+    return player.cardStacks.filter((cs) => cs.type == CardType.Hull && cs.damage > 0);
   }
 }
 
@@ -29,10 +29,10 @@ export class Card337 extends MilitaryTacticCard {
     new CardAction(CardType.Hull),
   );
   constructor() {
-    super(337, 'Militärpioniere', 1, false, false);
+    super(337, 'Militärpioniere', 1);
   }
   onUtilizaton(player: Player) {
-    player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
+    player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -42,7 +42,7 @@ export class Card337 extends MilitaryTacticCard {
 export class Card338 extends MilitaryTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(338, 'Nachschub', 1, false, false);
+    super(338, 'Nachschub', 1);
   }
   onUtilizaton(player: Player) {
     player.drawCards(this.cardsToDraw);

@@ -20,13 +20,13 @@ export default abstract class HullCard extends Card {
   private filterAttachableHull(cardStacks: CardStack[]): CardStack[] {
     return cardStacks.filter(
       (cs) =>
-        cs.type() == CardType.Hull &&
+        cs.type == CardType.Hull &&
         (<HullCard>cs.card).multipart.neededPartIds.includes(this.id) &&
-        !cs.getCards().some((c) => c.name == this.name),
+        !cs.cards.some((c) => c.name == this.name),
     ); // Reconsider if matching by name is a bad idea
   }
   private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
-    return cardStacks.filter((cs) => cs.type() == CardType.Colony && this.hullProfile.energy >= 0);
+    return cardStacks.filter((cs) => cs.type == CardType.Colony && this.hullProfile.energy >= 0);
   }
   onUtilizaton() {}
   onRetraction() {}
@@ -38,7 +38,7 @@ export default abstract class HullCard extends Card {
   isFlightReady(cards: Card[]): boolean {
     return cards.filter((c) => c.type == CardType.Hull).length == this.multipart.partNo;
   }
-  profile(): CardProfile {
+  get profile(): CardProfile {
     return CardProfile.fromHullProfile(this.hullProfile);
   }
 }

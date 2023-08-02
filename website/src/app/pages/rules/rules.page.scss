@@ -1,0 +1,67 @@
+#rules-box {
+  position: relative;
+  width: calc(100% - 50px);
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  #main-table {
+    width: 100%;
+    #table-of-content {
+      width: 250px;
+      h4 {
+        color: white !important;
+      }
+    }
+    #rules-content {
+      padding-left: 40px;
+      h2 {
+        display: block;
+        margin-bottom: 15px;
+      }
+      p,
+      ul,
+      ol {
+        margin-bottom: 40px;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
+      tr:nth-child(even) {
+        background-color: rgba(17, 153, 153, 0.2);
+      }
+      tr:hover {
+        background-color: rgba(153, 17, 17, 0.4);
+      }
+      th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        vertical-align: middle;
+        background-color: #119999;
+        color: white;
+      }
+      .left {
+        float: left;
+        margin-right: 20px;
+      }
+      .right {
+        float: right;
+        margin-left: 20px;
+      }
+      .size-20 {
+        max-width: 20%;
+      }
+      .size-30 {
+        max-width: 30%;
+      }
+      .size-40 {
+        max-width: 40%;
+      }
+    }
+  }
+}

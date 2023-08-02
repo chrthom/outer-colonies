@@ -18,10 +18,10 @@ export class CardAction {
 }
 
 export default class ActionPool {
-  private pool!: CardAction[];
+  private cardActions!: CardAction[];
   constructor(...cardActions: CardAction[]) {
-    if (cardActions) this.pool = cardActions;
-    else this.pool = [];
+    if (cardActions) this.cardActions = cardActions;
+    else this.cardActions = [];
   }
   activate(cardType: CardType) {
     const availablePools = this.getActionsFor(cardType);
@@ -31,37 +31,35 @@ export default class ActionPool {
     }
   }
   combine(ap: ActionPool): ActionPool {
-    return new ActionPool(...this.pool.concat(ap.pool));
+    return new ActionPool(...this.cardActions.concat(ap.cardActions));
   }
   getActionsFor(cardType: CardType): CardAction[] {
-    return this.getPool().filter((ap) => ap.canBeUsedFor(cardType));
+    return this.pool.filter((ap) => ap.canBeUsedFor(cardType));
   }
-  getPool() {
-    return this.pool;
+  get pool() {
+    return this.cardActions.slice();
   }
   hasActionFor(cardType: CardType): boolean {
     return this.getActionsFor(cardType).length > 0;
   }
   push(...pool: CardAction[]) {
-    this.pool.push(...pool);
+    this.cardActions.push(...pool);
   }
   remove(...cardActions: CardAction[]) {
     cardActions
       .map((a) => a.toString())
       .forEach((s) => {
-        console.log(`Remove ${s} | Found ${this.pool.filter((p) => p.toString() == s)}`); /////
-        this.pool.filter((p) => p.toString() == s)[0].depleted = true;
+        console.log(`Remove ${s} | Found ${this.cardActions.filter((p) => p.toString() == s)}`); /////
+        this.cardActions.filter((p) => p.toString() == s)[0].depleted = true;
         this.removeDepleted();
       });
   }
   toString(): string {
-    return this.getPool()
-      .map((ca) => ca.toString())
-      .join('__');
+    return this.pool.map((ca) => ca.toString()).join('__');
   }
   private removeDepleted() {
-    const depleted = this.pool.filter((a) => a.depleted);
-    this.pool = this.pool.filter((a) => !a.depleted);
+    const depleted = this.cardActions.filter((a) => a.depleted);
+    this.cardActions = this.cardActions.filter((a) => !a.depleted);
     depleted.forEach((a) => (a.depleted = false));
   }
   static sortOrder(a: CardAction, b: CardAction): number {

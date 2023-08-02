@@ -34,7 +34,7 @@ export default class Player {
   }
   moveFlightReadyShipsToOrbit() {
     this.cardStacks
-      .filter((cs) => cs.zone == Zone.Colony && cs.isFlightReady())
+      .filter((cs) => cs.zone == Zone.Colony && cs.isFlightReady)
       .forEach((cs) => (cs.zone = Zone.Oribital));
   }
   shuffleDeck() {
@@ -47,12 +47,10 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).getCards()));
+    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).cards));
   }
   discardCardStacks(...uuids: string[]) {
-    uuids.forEach((uuid) =>
-      this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).getCards()),
-    );
+    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
   }
   getColonyCardStack(): CardStack {
     return this.cardStacks.filter((c) => c.card.type == CardType.Colony)[0];
@@ -74,12 +72,12 @@ export default class Player {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
   playHandCard(handCard: CardStack, target: CardStack) {
-    this.actionPool.activate(handCard.type());
+    this.actionPool.activate(handCard.type);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     handCard.performImmediateEffect(target);
-    if (!handCard.card.staysInPlay) {
+    if (!handCard.card.isPermanent) {
       this.discardCards(handCard.card);
-    } else if (target.type() == CardType.Colony) {
+    } else if (target.type == CardType.Colony) {
       handCard.zone = Zone.Colony;
       this.cardStacks.push(handCard);
     } else {
@@ -87,9 +85,9 @@ export default class Player {
     }
   }
   handCardLimit(): number {
-    return this.getColonyCardStack() ? this.getColonyCardStack().profile().handCardLimit : 0;
+    return this.getColonyCardStack() ? this.getColonyCardStack().profile.handCardLimit : 0;
   }
   getOriginalActions(): ActionPool {
-    return this.cardStacks.map((cs) => cs.actionPool()).reduce((a, b) => a.combine(b), new ActionPool());
+    return this.cardStacks.map((cs) => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
   }
 }

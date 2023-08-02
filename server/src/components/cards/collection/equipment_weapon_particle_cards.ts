@@ -1,8 +1,8 @@
 import { Zone } from '../../config/enums';
 import CardStack from '../card_stack';
-import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardColonyKiller, EquipmentCardRechargeable } from '../types/equipment_card';
 
-export class Card106 extends EquipmentCard {
+export class Card106 extends EquipmentCardRechargeable {
   constructor() {
     super(
       106,
@@ -22,7 +22,6 @@ export class Card106 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 4,
         damage: 8,
@@ -34,7 +33,7 @@ export class Card106 extends EquipmentCard {
   }
 }
 
-export class Card107 extends EquipmentCard {
+export class Card107 extends EquipmentCardRechargeable {
   constructor() {
     super(
       107,
@@ -54,7 +53,6 @@ export class Card107 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 3,
         damage: 7,
@@ -66,7 +64,7 @@ export class Card107 extends EquipmentCard {
   }
 }
 
-export class Card207 extends EquipmentCard {
+export class Card207 extends EquipmentCardRechargeable {
   constructor() {
     super(
       207,
@@ -86,7 +84,6 @@ export class Card207 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 3,
         damage: 4,

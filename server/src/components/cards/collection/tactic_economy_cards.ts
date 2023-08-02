@@ -17,10 +17,10 @@ export class Card141 extends EconomyTacticCard {
     new CardAction(CardType.Infrastructure),
   );
   constructor() {
-    super(141, 'Externe Arbeitskräfte', 2, false, false);
+    super(141, 'Externe Arbeitskräfte', 2);
   }
   onUtilizaton(player: Player) {
-    player.actionPool.push(...this.oneTimeActionPool.getPool().slice());
+    player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -30,7 +30,7 @@ export class Card141 extends EconomyTacticCard {
 export class Card165 extends EconomyTacticCard {
   private readonly cardsToDrawPerPsiSocket = 2;
   constructor() {
-    super(165, 'Konvoi', 1, false, false);
+    super(165, 'Konvoi', 1);
   }
   onUtilizaton(player: Player) {
     const freePsiSockets = this.calcFreePsiSockets(player);
@@ -43,7 +43,7 @@ export class Card165 extends EconomyTacticCard {
   }
   private calcFreePsiSockets(player: Player): number {
     return player.cardStacks
-      .map((cs) => cs.profile())
+      .map((cs) => cs.profile)
       .filter((p) => p.speed >= 2 && p.psi > 0)
       .map((p) => p.psi)
       .reduce((psi1, psi2) => psi1 + psi2, 0);
@@ -53,7 +53,7 @@ export class Card165 extends EconomyTacticCard {
 export class Card232 extends EconomyTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(232, 'Warenlieferung', 1, false, false);
+    super(232, 'Warenlieferung', 1);
   }
   onUtilizaton(player: Player) {
     player.drawCards(this.cardsToDraw);
@@ -66,7 +66,7 @@ export class Card232 extends EconomyTacticCard {
 export class Card321 extends EconomyTacticCard {
   private readonly cardsToRestore = 6;
   constructor() {
-    super(321, 'Recycling', 2, false, false);
+    super(321, 'Recycling', 2);
   }
   onUtilizaton(player: Player) {
     player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
@@ -79,7 +79,7 @@ export class Card321 extends EconomyTacticCard {
 export class Card427 extends EconomyTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(427, 'Immigranten von der Erde', 2, false, false);
+    super(427, 'Immigranten von der Erde', 2);
   }
   onUtilizaton(player: Player) {
     let foundCards = 0;
