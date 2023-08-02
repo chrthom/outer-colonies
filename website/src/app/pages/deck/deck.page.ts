@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DeckCard } from '../../../../../server/src/components/shared_interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
