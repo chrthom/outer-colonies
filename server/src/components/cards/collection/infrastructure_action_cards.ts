@@ -32,7 +32,7 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
   }
   onStartTurn() {}
   onEndTurn() {}
-  get actionPool(): ActionPool {
+  override get actionPool(): ActionPool {
     return new ActionPool(new CardAction(...this.actionPoolCardTypes));
   }
 }

@@ -23,10 +23,10 @@ export default abstract class EquipmentCard extends Card {
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter((cs) => cs.type == CardType.Hull && cs.profileMatches(this.profile));
   }
-  get canAttack(): boolean {
+  override get canAttack(): boolean {
     return Boolean(this.attackProfile);
   }
-  isInRange(range: number): boolean {
+  override isInRange(range: number): boolean {
     return this.attackProfile.range >= range;
   }
   onUtilizaton() {}
@@ -36,7 +36,7 @@ export default abstract class EquipmentCard extends Card {
   get profile(): CardProfile {
     return CardProfile.fromEquipmentProfile(this.equipmentProfile);
   }
-  attack(weapon: CardStack, target: CardStack): AttackResult {
+  override attack(weapon: CardStack, target: CardStack): AttackResult {
     const attackingShip = weapon.rootCardStack;
     const match = attackingShip.player.match;
     let damage = this.attackProfile.damage;
@@ -103,7 +103,7 @@ export default abstract class EquipmentCard extends Card {
 }
 
 export abstract class EquipmentCardRechargeable extends EquipmentCard {
-  get isRechargeable(): boolean {
+  override get isRechargeable(): boolean {
     return true;
   }
 }

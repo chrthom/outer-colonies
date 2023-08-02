@@ -76,7 +76,7 @@ export class Card105 extends InfrastructureEnergyCard {
       handCardLimit: 0,
     });
   }
-  onDestruction(player: Player) {
+  override onDestruction(player: Player) {
     const battle = player.match.battle;
     if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
       battle.ships.flat().forEach((cs) => cs.damage++);

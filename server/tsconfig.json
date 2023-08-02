@@ -15,6 +15,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
     "lib": ["ES2022"]
   }
 }

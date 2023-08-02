@@ -34,7 +34,7 @@ export default class ColonyCard extends Card {
       handCardLimit: rules.maxHandCards,
     };
   }
-  get actionPool(): ActionPool {
+  override get actionPool(): ActionPool {
     return new ActionPool(
       new CardAction(CardType.Equipment),
       new CardAction(CardType.Hull),
@@ -43,10 +43,10 @@ export default class ColonyCard extends Card {
       new CardAction(CardType.Tactic),
     );
   }
-  canBeRetracted(): boolean {
+  override canBeRetracted(): boolean {
     return false;
   }
-  onDestruction(player: Player) {
+  override onDestruction(player: Player) {
     player.match.gameResult.setWinnerByDestruction(player);
   }
 }
