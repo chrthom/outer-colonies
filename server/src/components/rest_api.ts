@@ -65,8 +65,8 @@ export default function restAPI(app: Express) {
       };
       res.send(payload);
     };
-    if (req.query.username) Auth.checkUsernameExists(String(req.query.username)).then(sendExistsResponse);
-    else if (req.query.email) Auth.checkEmailExists(String(req.query.email)).then(sendExistsResponse);
+    if (req.query['username']) Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
+    else if (req.query['email']) Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse);
     else res.sendStatus(400);
   });
 
@@ -96,12 +96,12 @@ export default function restAPI(app: Express) {
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), true).then((_) => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then((_) => res.sendStatus(204));
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params.cardInstanceId), false).then((_) => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then((_) => res.sendStatus(204));
   });
 
   // Get user profile
@@ -159,7 +159,7 @@ export default function restAPI(app: Express) {
 
   // Open an item
   app.post('/api/item/:itemId(\\d+)', (req, res) => {
-    const itemId = Number(req.params.itemId);
+    const itemId = Number(req.params['itemId']);
     performWithSessionTokenCheck(req, res, (u) => {
       DBItemsDAO.getByUserId(u.userId).then((items) => {
         const item = items.find((i) => i.itemId == itemId);
@@ -208,7 +208,7 @@ export default function restAPI(app: Express) {
 
   // Buy a booster pack
   app.post('/api/buy/booster/:boosterNo([1-4])', (req, res) => {
-    const boosterNo = Number(req.params.boosterNo);
+    const boosterNo = Number(req.params['boosterNo']);
     performWithSessionTokenCheck(req, res, (u) => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then((sufficientSol) => {
         if (sufficientSol) {

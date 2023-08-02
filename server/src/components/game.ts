@@ -6,13 +6,14 @@ import { getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import { ClientPlannedBattle } from './shared_interfaces/client_planned_battle';
 import Player from './game_state/player';
+import SocketData from './game_state/socket_data';
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket {
   return io.sockets.sockets.get(match.players[playerNo].socketId);
 }
 
 function getPlayer(socket: Socket): Player {
-  return socket.data.match.players[socket.data.playerNo];
+  return data(socket).match.players[data(socket).playerNo];
 }
 
 function emitState(io: Server, match: Match) {
@@ -36,15 +37,15 @@ function initMatch(io: Server, match: Match) {
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
-    const match = <Match>socket.data.match;
+    const match = data(socket).match;
     if (match && turnPhase == match.turnPhase) {
       if (turnPhase == TurnPhase.Init) {
-        match.players[socket.data.playerNo].ready = true;
-        if (match.players[socket.data.opponentPlayerNo()].ready) initMatch(io, match);
-      } else if (socket.data.playerNo == match.actionPendingByPlayerNo) {
+        match.players[data(socket).playerNo].ready = true;
+        if (match.players[data(socket).opponentPlayerNo()].ready) initMatch(io, match);
+      } else if (data(socket).playerNo == match.actionPendingByPlayerNo) {
         switch (turnPhase) {
           case TurnPhase.Build:
-            if (socket.data.playerNo == match.activePlayerNo) {
+            if (data(socket).playerNo == match.activePlayerNo) {
               match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
             } else {
               match.prepareCombatPhase(<string[]>data);
@@ -59,8 +60,8 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     }
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
-    if (socket.data.match) {
-      const match = <Match>socket.data.match;
+    const match = data(socket).match;
+    if (match) {
       if (!match.gameResult.gameOver) {
         const player = getPlayer(socket);
         console.log(`Player ${player.name} disconnected from active game`);
@@ -70,7 +71,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     }
   });
   socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-    const match = <Match>socket.data.match;
+    const match = data(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     const target = getCardStackByUUID(match.getInPlayCardStacks(), targetUUID);
@@ -92,7 +93,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
-    const match = <Match>socket.data.match;
+    const match = data(socket).match;
     const player = getPlayer(socket);
     const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
     const targetCardStack =
@@ -113,7 +114,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
-    const match = <Match>socket.data.match;
+    const match = data(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     if (!handCard) {
@@ -125,7 +126,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
-    const match = <Match>socket.data.match;
+    const match = data(socket).match;
     const player = getPlayer(socket);
     const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
     const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
@@ -147,7 +148,10 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     } else {
       srcWeapon.attack(target);
     }
-    // ISSUE #33: Check if further weapons or tactic cards can be used, else end round
     emitState(io, match);
   });
+}
+
+function data(socket: Socket): SocketData {
+  return <SocketData> socket.data;
 }
