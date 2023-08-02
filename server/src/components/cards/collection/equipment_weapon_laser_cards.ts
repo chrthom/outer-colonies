@@ -1,5 +1,5 @@
 import CardStack from '../card_stack';
-import EquipmentCard, { EquipmentCardColonyKiller, EquipmentCardRechargeable } from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card166 extends EquipmentCardRechargeable {
   constructor() {
@@ -63,7 +63,7 @@ export class Card182 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card224 extends EquipmentCardColonyKiller {
+export class Card224 extends EquipmentCardColonyKillerRechargeable {
   constructor() {
     super(
       224,
@@ -93,7 +93,7 @@ export class Card224 extends EquipmentCardColonyKiller {
     );
   }
   protected attackDamageBeforeReductions(target: CardStack) {
-    return target.profile().speed < 3 ? this.attackProfile.damage : 0;
+    return target.profile.speed < 3 ? this.attackProfile.damage : 0;
   }
 }
 

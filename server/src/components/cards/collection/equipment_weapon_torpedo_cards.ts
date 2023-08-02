@@ -113,7 +113,6 @@ export class Card150 extends EquipmentCardColonyKiller {
         delta: 0,
         psi: 0,
       },
-      false,
       {
         range: 2,
         damage: 12,
@@ -145,7 +144,6 @@ export class Card167 extends EquipmentCardColonyKiller {
         delta: 0,
         psi: 0,
       },
-      false,
       {
         range: 2,
         damage: 10,
@@ -239,7 +237,6 @@ export class Card318 extends EquipmentCardColonyKiller {
         delta: 0,
         psi: 0,
       },
-      false,
       {
         range: 2,
         damage: 14,
@@ -302,7 +299,6 @@ export class Card422 extends EquipmentCardColonyKiller {
         delta: 0,
         psi: 0,
       },
-      false,
       {
         range: 2,
         damage: 8,

@@ -111,7 +111,13 @@ export default abstract class EquipmentCard extends Card {
 
 export abstract class EquipmentCardColonyKiller extends EquipmentCard {
   protected attackDamageAfterReductions(target: CardStack, damage: number) {
-    return target.type() == CardType.Colony ? damage * 2 : damage;
+    return target.type == CardType.Colony ? damage * 2 : damage;
+  }
+}
+
+export abstract class EquipmentCardColonyKillerRechargeable extends EquipmentCardColonyKiller {
+  get isRechargeable(): boolean {
+    return true;
   }
 }
     

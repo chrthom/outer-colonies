@@ -1,8 +1,8 @@
 import { Zone } from '../../config/enums';
 import CardStack from '../card_stack';
-import EquipmentCard from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
 
-export class Card302 extends EquipmentCard {
+export class Card302 extends EquipmentCardRechargeable {
   constructor() {
     super(
       302,
@@ -22,7 +22,6 @@ export class Card302 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 50,
@@ -34,7 +33,7 @@ export class Card302 extends EquipmentCard {
   }
 }
 
-export class Card401 extends EquipmentCard {
+export class Card401 extends EquipmentCardRechargeable {
   private readonly damageReductionPerSpeedPoint = 6;
   constructor() {
     super(
@@ -55,7 +54,6 @@ export class Card401 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 2,
         damage: 30,
@@ -68,7 +66,7 @@ export class Card401 extends EquipmentCard {
   protected attackDamageBeforeReductions(target: CardStack) {
     const damage = Math.max(
       0,
-      this.attackProfile.damage - target.profile().speed * this.damageReductionPerSpeedPoint,
+      this.attackProfile.damage - target.profile.speed * this.damageReductionPerSpeedPoint,
     );
     return target.zone == Zone.Colony ? 0 : damage;
   }
