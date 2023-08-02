@@ -20,8 +20,8 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       uuid: c.uuid,
       cardId: c.card.id,
       index: index,
-      playable: c.isPlayable(),
-      validTargets: c.getValidTargets().map((cs) => cs.uuid),
+      playable: c.isPlayable,
+      validTargets: c.validTargets.map((cs) => cs.uuid),
     };
   });
   const cardStacks: ClientCardStack[] = [true, false].flatMap((ownedByPlayer) => {
@@ -33,27 +33,26 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           ownedByPlayer &&
           match.getInactivePlayerNo() == playerNo &&
           match.battle.canInterveneMission(playerNo, cs);
-        const defenseIcons: ClientDefenseIcon[] = cs
-          .getCardStacks()
-          .filter((c) => c.card.canDefend())
+        const defenseIcons: ClientDefenseIcon[] = cs.cardStacks
+          .filter((c) => c.card.canDefend)
           .map((c) => {
             let icon: string;
-            if (c.profile().armour > 0) icon = `armour_${c.profile().armour}`;
-            else if (c.profile().shield > 0) icon = `shield_${c.profile().shield}`;
-            else icon = `point_defense_${c.profile().pointDefense}`;
+            if (c.profile.armour > 0) icon = `armour_${c.profile.armour}`;
+            else if (c.profile.shield > 0) icon = `shield_${c.profile.shield}`;
+            else icon = `point_defense_${c.profile.pointDefense}`;
             return {
               icon: icon,
               depleted: !c.defenseAvailable,
             };
           })
           .sort();
-        const cards = cs.getCardStacks().map((cs, index) => {
+        const cards = cs.cardStacks.map((cs, index) => {
           return {
             id: cs.card.id,
             index: index,
             battleReady: cs.canAttack(player),
-            retractable: ownedByPlayer && cs.canBeRetracted(),
-            insufficientEnergy: cs.hasInsufficientEnergy(),
+            retractable: ownedByPlayer && cs.canBeRetracted,
+            insufficientEnergy: cs.hasInsufficientEnergy,
           };
         });
         return {
@@ -64,16 +63,15 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           zoneCardsNum: zoneCardStacks.length,
           ownedByPlayer: ownedByPlayer,
           damage: cs.damage,
-          criticalDamage: cs.damage >= cs.profile().hp,
-          missionReady: ownedByPlayer && cs.isMissionReady(),
+          criticalDamage: cs.damage >= cs.profile.hp,
+          missionReady: ownedByPlayer && cs.isMissionReady,
           interventionReady: interventionReady,
           defenseIcons: defenseIcons,
         };
       });
     });
   });
-  const actionPool = player.actionPool
-    .getPool()
+  const actionPool = player.actionPool.pool
     .filter((a) => a.possibleCardTypes[0] != CardType.Orb)
     .sort(ActionPool.sortOrder)
     .map((a) => a.toString());

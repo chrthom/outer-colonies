@@ -9,9 +9,6 @@ export default abstract class Card {
   readonly name!: string;
   readonly type!: CardType;
   readonly rarity!: number;
-  playableOutsideBuildPhase: boolean = false;
-  doesRechargeBetweenCombatPhases: boolean = false;
-  staysInPlay: boolean = true;
   constructor(id: number, name: string, type: CardType, rarity: number) {
     this.id = id;
     this.name = name;
@@ -22,12 +19,18 @@ export default abstract class Card {
   attack(attackingShip: CardStack, target: CardStack): AttackResult {
     return new AttackResult(0);
   }
-  canAttack(): boolean {
+  get canAttack(): boolean {
     return false;
   }
-  canDefend(): boolean {
-    const p = this.profile();
+  get canDefend(): boolean {
+    const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some((n) => n > 0);
+  }
+  get isPermanent(): boolean {
+    return true;
+  }
+  get isRechargeable(): boolean {
+    return false;
   }
   canBeRetracted(isRootCard: boolean): boolean {
     return true;
@@ -38,8 +41,8 @@ export default abstract class Card {
   isPlayable(player: Player): boolean {
     return (
       player.actionPool.hasActionFor(this.type) &&
-      (this.playableOutsideBuildPhase ||
-        (player.no == player.match.activePlayerNo && player.match.turnPhase == TurnPhase.Build)) &&
+      player.no == player.match.activePlayerNo &&
+      player.match.turnPhase == TurnPhase.Build &&
       this.getValidTargets(player).length > 0
     );
   }
@@ -51,8 +54,8 @@ export default abstract class Card {
   abstract onRetraction(player: Player): void;
   abstract onStartTurn(player: Player): void;
   abstract onEndTurn(player: Player, source: CardStack): void;
-  abstract profile(): CardProfile;
-  actionPool(): ActionPool {
+  abstract get profile(): CardProfile;
+  get actionPool(): ActionPool {
     return new ActionPool();
   }
 }

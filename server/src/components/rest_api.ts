@@ -26,7 +26,7 @@ import { rules } from './config/rules';
 function performWithSessionTokenCheck(req: Request, res: Response, f: (u: DBCredential) => void) {
   const sessionToken = req.header('session-token');
   if (sessionToken) {
-    DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => u ? f(u) : res.sendStatus(403));
+    DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => (u ? f(u) : res.sendStatus(403)));
   } else {
     res.sendStatus(400);
   }

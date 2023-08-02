@@ -17,7 +17,7 @@ export default class ColonyCard extends Card {
   onRetraction() {}
   onStartTurn() {}
   onEndTurn() {}
-  profile(): CardProfile {
+  get profile(): CardProfile {
     return {
       energy: 0,
       hp: rules.colonyHP,
@@ -34,7 +34,7 @@ export default class ColonyCard extends Card {
       handCardLimit: rules.maxHandCards,
     };
   }
-  actionPool(): ActionPool {
+  get actionPool(): ActionPool {
     return new ActionPool(
       new CardAction(CardType.Equipment),
       new CardAction(CardType.Hull),

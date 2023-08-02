@@ -1,6 +1,6 @@
-import EquipmentCard from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
 
-export class Card118 extends EquipmentCard {
+export class Card118 extends EquipmentCardRechargeable {
   constructor() {
     super(
       118,
@@ -20,7 +20,6 @@ export class Card118 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 5,
@@ -32,7 +31,7 @@ export class Card118 extends EquipmentCard {
   }
 }
 
-export class Card125 extends EquipmentCard {
+export class Card125 extends EquipmentCardRechargeable {
   constructor() {
     super(
       125,
@@ -52,7 +51,6 @@ export class Card125 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 14,
@@ -64,7 +62,7 @@ export class Card125 extends EquipmentCard {
   }
 }
 
-export class Card157 extends EquipmentCard {
+export class Card157 extends EquipmentCardRechargeable {
   constructor() {
     super(
       157,
@@ -84,7 +82,6 @@ export class Card157 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 8,
@@ -96,7 +93,7 @@ export class Card157 extends EquipmentCard {
   }
 }
 
-export class Card209 extends EquipmentCard {
+export class Card209 extends EquipmentCardRechargeable {
   constructor() {
     super(
       209,
@@ -116,7 +113,6 @@ export class Card209 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 7,
@@ -128,7 +124,7 @@ export class Card209 extends EquipmentCard {
   }
 }
 
-export class Card303 extends EquipmentCard {
+export class Card303 extends EquipmentCardRechargeable {
   constructor() {
     super(
       303,
@@ -148,7 +144,6 @@ export class Card303 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 2,
         damage: 9,
@@ -160,7 +155,7 @@ export class Card303 extends EquipmentCard {
   }
 }
 
-export class Card409 extends EquipmentCard {
+export class Card409 extends EquipmentCardRechargeable {
   constructor() {
     super(
       409,
@@ -180,7 +175,6 @@ export class Card409 extends EquipmentCard {
         delta: 0,
         psi: 0,
       },
-      true,
       {
         range: 1,
         damage: 27,

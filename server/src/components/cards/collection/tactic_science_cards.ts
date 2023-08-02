@@ -12,13 +12,13 @@ abstract class EconomyTacticCard extends TacticCard {
 export class Card110 extends EconomyTacticCard {
   private readonly damageToRepair = 3;
   constructor() {
-    super(110, 'Nanobot Wolke', 4, false, false);
+    super(110, 'Nanobot Wolke', 4);
   }
   onUtilizaton(player: Player) {
     player.cardStacks
-      .filter((cs) => cs.type() == CardType.Hull)
+      .filter((cs) => cs.type == CardType.Hull)
       .forEach((cs) => {
-        const numOfHullCards = cs.getCards().filter((c) => c.type == CardType.Hull).length;
+        const numOfHullCards = cs.cards.filter((c) => c.type == CardType.Hull).length;
         cs.damage -= Math.min(this.damageToRepair * numOfHullCards, cs.damage);
       });
   }

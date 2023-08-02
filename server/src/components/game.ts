@@ -80,7 +80,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       console.log(
         `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`,
       );
-    } else if (!handCard.isPlayable()) {
+    } else if (!handCard.isPlayable) {
       console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
     } else if (!handCard.canBeAttachedTo(target)) {
       console.log(
@@ -96,8 +96,8 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const player = getPlayer(socket);
     const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
     const targetCardStack =
-      rootCardStack && rootCardStack.getCardStacks().length > cardIndex
-        ? rootCardStack.getCardStacks()[cardIndex]
+      rootCardStack && rootCardStack.cardStacks.length > cardIndex
+        ? rootCardStack.cardStacks[cardIndex]
         : null;
     if (!rootCardStack) {
       console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
@@ -105,7 +105,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       console.log(
         `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`,
       );
-    } else if (!targetCardStack.canBeRetracted()) {
+    } else if (!targetCardStack.canBeRetracted) {
       console.log(`WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`);
     } else {
       targetCardStack.retract();
@@ -130,7 +130,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
     const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
     const srcShip = playerShips.find((cs) => cs.uuid == srcId);
-    const srcWeapon = srcShip ? srcShip.getCardStacks()[srcIndex] : null;
+    const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
     const target = opponentShips.find((cs) => cs.uuid == targetId);
     if (!srcShip) {
       console.log(`WARN: ${player.name} tried to attack from non-existing ship ${srcId}`);
