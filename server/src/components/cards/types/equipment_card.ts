@@ -39,12 +39,19 @@ export default abstract class EquipmentCard extends Card {
   override attack(weapon: CardStack, target: CardStack): AttackResult {
     const attackingShip = weapon.rootCardStack;
     const match = attackingShip.player.match;
-    let damage = this.attackProfile.damage;
+    let damage = this.attackDamageBeforeReductions(target);
     if (attackingShip.profile.speed + match.battle.range <= target.profile.speed)
       damage = Math.round(damage / 2);
     let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
+    attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
     return attackResult;
+  }
+  protected attackDamageBeforeReductions(target: CardStack) {
+    return this.attackProfile.damage;
+  }
+  protected attackDamageAfterReductions(target: CardStack, damage: number) {
+    return damage;
   }
   private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
     const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
@@ -102,6 +109,18 @@ export default abstract class EquipmentCard extends Card {
   }
 }
 
+export abstract class EquipmentCardColonyKiller extends EquipmentCard {
+  protected attackDamageAfterReductions(target: CardStack, damage: number) {
+    return target.type == CardType.Colony ? damage * 2 : damage;
+  }
+}
+
+export abstract class EquipmentCardColonyKillerRechargeable extends EquipmentCardColonyKiller {
+  get isRechargeable(): boolean {
+    return true;
+  }
+}
+    
 export abstract class EquipmentCardRechargeable extends EquipmentCard {
   override get isRechargeable(): boolean {
     return true;

@@ -1,4 +1,5 @@
-import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
+import CardStack from '../card_stack';
+import EquipmentCard, { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card166 extends EquipmentCardRechargeable {
   constructor() {
@@ -59,6 +60,40 @@ export class Card182 extends EquipmentCardRechargeable {
         armour: -1,
       },
     );
+  }
+}
+
+export class Card224 extends EquipmentCardColonyKillerRechargeable {
+  constructor() {
+    super(
+      224,
+      'Bergbaulaser',
+      2,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: -1,
+        xi: 0,
+        phi: 0,
+        omega: -1,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 1,
+        damage: 7,
+        pointDefense: 0,
+        shield: -6,
+        armour: -1,
+      },
+    );
+  }
+  protected attackDamageBeforeReductions(target: CardStack) {
+    return target.profile.speed < 3 ? this.attackProfile.damage : 0;
   }
 }
 

@@ -1,4 +1,4 @@
-import EquipmentCard from '../types/equipment_card';
+import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card101 extends EquipmentCard {
   constructor() {
@@ -93,6 +93,68 @@ export class Card136 extends EquipmentCard {
   }
 }
 
+export class Card150 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      150,
+      'Fusionsbombentorpedos',
+      2,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: -1,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 2,
+        damage: 12,
+        pointDefense: -6,
+        shield: -3,
+        armour: -4,
+      },
+    );
+  }
+}
+
+export class Card167 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      167,
+      'Atombombentorpedos',
+      1,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 2,
+        damage: 10,
+        pointDefense: -5,
+        shield: -3,
+        armour: -4,
+      },
+    );
+  }
+}
+
 export class Card216 extends EquipmentCard {
   constructor() {
     super(
@@ -155,6 +217,37 @@ export class Card304 extends EquipmentCard {
   }
 }
 
+export class Card318 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      318,
+      'Nova-Torpedos',
+      3,
+      {
+        energy: -1,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 2,
+        damage: 14,
+        pointDefense: -7,
+        shield: -4,
+        armour: -3,
+      },
+    );
+  }
+}
+
 export class Card412 extends EquipmentCard {
   constructor() {
     super(
@@ -181,6 +274,37 @@ export class Card412 extends EquipmentCard {
         pointDefense: -4,
         shield: 0,
         armour: -1,
+      },
+    );
+  }
+}
+
+export class Card422 extends EquipmentCardColonyKiller {
+  constructor() {
+    super(
+      422,
+      'Feuersturmtorpedos',
+      3,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: -1,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 2,
+        damage: 8,
+        pointDefense: -4,
+        shield: 0,
+        armour: -4,
       },
     );
   }

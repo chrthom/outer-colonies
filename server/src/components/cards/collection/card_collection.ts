@@ -54,7 +54,15 @@ import {
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
-import { Card166, Card182, Card343, Card344, Card347, Card421 } from './equipment_weapon_laser_cards';
+import {
+  Card166,
+  Card182,
+  Card224,
+  Card343,
+  Card344,
+  Card347,
+  Card421,
+} from './equipment_weapon_laser_cards';
 import {
   Card126,
   Card151,
@@ -66,8 +74,19 @@ import {
 } from './equipment_weapon_kinetic_cards';
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
-import { Card106, Card107, Card207 } from './equipment_weapon_particle_cards';
-import { Card101, Card127, Card136, Card216, Card304, Card412 } from './equipment_weapon_torpedo_cards';
+import { Card106, Card107, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
+import {
+  Card101,
+  Card127,
+  Card136,
+  Card150,
+  Card167,
+  Card216,
+  Card304,
+  Card318,
+  Card412,
+  Card422,
+} from './equipment_weapon_torpedo_cards';
 import {
   Card131,
   Card132,
@@ -106,6 +125,7 @@ import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
 import { Card114, Card155 } from './infrastructure_end.cards';
 import { Rarity } from '../../config/enums';
+import { Card302, Card401 } from './equipment_weapon_super_cards';
 
 export default class CardCollection {
   static cards = {
@@ -139,6 +159,7 @@ export default class CardCollection {
     140: <Card>new Card140(),
     141: <Card>new Card141(),
     145: <Card>new Card145(),
+    150: <Card>new Card150(),
     151: <Card>new Card151(),
     152: <Card>new Card152(),
     153: <Card>new Card153(),
@@ -151,6 +172,7 @@ export default class CardCollection {
     164: <Card>new Card164(),
     165: <Card>new Card165(),
     166: <Card>new Card166(),
+    167: <Card>new Card167(),
     168: <Card>new Card168(),
     170: <Card>new Card170(),
     171: <Card>new Card171(),
@@ -175,6 +197,7 @@ export default class CardCollection {
     220: <Card>new Card220(),
     221: <Card>new Card221(),
     223: <Card>new Card223(),
+    224: <Card>new Card224(),
     226: <Card>new Card226(),
     228: <Card>new Card228(),
     230: <Card>new Card230(),
@@ -186,6 +209,7 @@ export default class CardCollection {
     243: <Card>new Card243(),
     244: <Card>new Card244(),
     245: <Card>new Card245(),
+    302: <Card>new Card302(),
     303: <Card>new Card303(),
     304: <Card>new Card304(),
     306: <Card>new Card306(),
@@ -195,6 +219,7 @@ export default class CardCollection {
     313: <Card>new Card313(),
     314: <Card>new Card314(),
     315: <Card>new Card315(),
+    318: <Card>new Card318(),
     321: <Card>new Card321(),
     325: <Card>new Card325(),
     326: <Card>new Card326(),
@@ -216,17 +241,21 @@ export default class CardCollection {
     351: <Card>new Card351(),
     352: <Card>new Card352(),
     353: <Card>new Card353(),
+    401: <Card>new Card401(),
+    405: <Card>new Card405(),
     406: <Card>new Card406(),
     409: <Card>new Card409(),
     412: <Card>new Card412(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),
     421: <Card>new Card421(),
+    422: <Card>new Card422(),
     424: <Card>new Card424(),
     427: <Card>new Card427(),
     434: <Card>new Card434(),
     435: <Card>new Card435(),
     436: <Card>new Card436(),
+    438: <Card>new Card438(),
     439: <Card>new Card439(),
     440: <Card>new Card440(),
     441: <Card>new Card441(),
@@ -276,7 +305,6 @@ export default class CardCollection {
     Array(2).fill(this.cards[427]), // Immigranten von der Erde
     Array(2).fill(this.cards[321]), // Recycling
     Array(2).fill(this.cards[174]), // Feldreperaturen
-    // TEST CARDS
   ].flat();
 
   static starterDeckTraders: Card[] = [
@@ -311,7 +339,6 @@ export default class CardCollection {
     Array(2).fill(this.cards[321]), // Recycling
     Array(2).fill(this.cards[174]), // Feldreperaturen
     Array(2).fill(this.cards[141]), // Externe Arbeitskräfte
-    // TEST CARDS
   ].flat();
 
   static starterDeckExpedition: Card[] = [
@@ -324,7 +351,7 @@ export default class CardCollection {
     Array(2).fill(this.cards[446]), // Außenposten
     // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
     Array(2).fill(this.cards[340]), // Abfangraketenwerfer
-    Array(3).fill(this.cards[136]), // Plasmatorpedos
+    Array(3).fill(this.cards[167]), // Atombombentorpedos
     Array(2).fill(this.cards[182]), // Dual-Lasergeschütz
     Array(5).fill(this.cards[440]), // Impulskanone
     Array(4).fill(this.cards[168]), // Automatikkanone
@@ -343,7 +370,6 @@ export default class CardCollection {
     Array(6).fill(this.cards[337]), // Militärpioniere
     Array(4).fill(this.cards[338]), // Nachschub
     Array(2).fill(this.cards[174]), // Feldreperaturen
-    // TEST CARDS
   ].flat();
 
   static starterDecks: Card[][] = [

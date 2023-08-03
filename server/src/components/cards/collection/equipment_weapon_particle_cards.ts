@@ -1,4 +1,6 @@
-import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
+import { Zone } from '../../config/enums';
+import CardStack from '../card_stack';
+import EquipmentCard, { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card106 extends EquipmentCardRechargeable {
   constructor() {
@@ -35,7 +37,7 @@ export class Card107 extends EquipmentCardRechargeable {
   constructor() {
     super(
       107,
-      'Partiekllanze',
+      'Partikellanze',
       4,
       {
         energy: -2,
@@ -90,5 +92,70 @@ export class Card207 extends EquipmentCardRechargeable {
         armour: -2,
       },
     );
+  }
+}
+
+export class Card405 extends EquipmentCardColonyKillerRechargeable {
+  constructor() {
+    super(
+      405,
+      'Thermallanze',
+      4,
+      {
+        energy: -2,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: -2,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 3,
+        damage: 6,
+        pointDefense: 0,
+        shield: -5,
+        armour: -1,
+      },
+    );
+  }
+}
+
+export class Card438 extends EquipmentCardColonyKillerRechargeable {
+  constructor() {
+    super(
+      438,
+      'Feldannihilator',
+      1,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: -1,
+        xi: 0,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0,
+      },
+      {
+        range: 2,
+        damage: 2,
+        pointDefense: 0,
+        shield: -1,
+        armour: -99,
+      },
+    );
+  }
+  protected attackDamageBeforeReductions(target: CardStack) {
+    return target.zone == Zone.Colony ? 0 : this.attackProfile.damage;
   }
 }
