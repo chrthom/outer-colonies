@@ -2,13 +2,13 @@ import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
 import {
   ClientHandCard,
-  ClientState,
+  ClientState
 } from '../../../../server/src/components/shared_interfaces/client_state';
 import {
   BattleType,
   MsgTypeInbound,
   MsgTypeOutbound,
-  TurnPhase,
+  TurnPhase
 } from '../../../../server/src/components/config/enums';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
@@ -72,7 +72,7 @@ export default class Game extends Phaser.Scene {
 
   constructor() {
     super({
-      key: 'Game',
+      key: 'Game'
     });
   }
 
@@ -87,7 +87,7 @@ export default class Game extends Phaser.Scene {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
-      .forEach((id) => this.load.image(`card_${id}`, `cards/${id}.png`));
+      .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
     [
       'equipment',
       'hull',
@@ -102,16 +102,16 @@ export default class Game extends Phaser.Scene {
       'point_defense_1',
       'point_defense_2',
       'retract_card',
-      'exit',
-    ].forEach((name) => this.load.image(`icon_${name}`, `icons/${name}.png`));
+      'exit'
+    ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
     this.load.image('card_mask', 'utils/card_mask.png');
     this.load.image('card_glow', 'utils/card_glow.png');
-    ['red', 'yellow', 'blue', 'white'].forEach((color) =>
-      this.load.image(`flare_${color}`, `utils/flare_${color}.png`),
+    ['red', 'yellow', 'blue', 'white'].forEach(color =>
+      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
     this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
     this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
-    [1, 2, 3, 4].forEach((r) => this.load.image(`range_${r}`, `utils/range${r}.png`));
+    [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
       'active_build',
       'active_combat',
@@ -121,8 +121,8 @@ export default class Game extends Phaser.Scene {
       'inactive_combat',
       'inactive_select',
       'inactive_wait',
-      'lost',
-    ].forEach((name) => this.load.image(`button_${name}`, `utils/button_${name}.png`));
+      'lost'
+    ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
     this.load.image('prompt_box', 'utils/prompt_box.png');
   }
 
@@ -153,7 +153,7 @@ export default class Game extends Phaser.Scene {
     const attackPerformed = this.animateAttack();
     setTimeout(
       () => {
-        const newHandCards = self.state.hand.filter((c) => !self.hand.some((h) => h.uuid == c.uuid));
+        const newHandCards = self.state.hand.filter(c => !self.hand.some(h => h.uuid == c.uuid));
         self.retractCardsExists = false; // If true, then the hand animations are delayed
         self.updateCardStacks(newHandCards);
         setTimeout(
@@ -162,10 +162,10 @@ export default class Game extends Phaser.Scene {
             self.showOpponentTacticCardAction(oldState);
             self.resetView();
           },
-          self.retractCardsExists ? animationConfig.duration.move : 0,
+          self.retractCardsExists ? animationConfig.duration.move : 0
         );
       },
-      attackPerformed ? animationConfig.duration.attack : 0,
+      attackPerformed ? animationConfig.duration.attack : 0
     );
   }
 
@@ -178,7 +178,7 @@ export default class Game extends Phaser.Scene {
       type: battleType ? battleType : BattleType.None,
       downsideCardsNum: 0,
       upsideCardsNum: 0,
-      shipIds: [],
+      shipIds: []
     };
     this.updateView();
   }
@@ -198,8 +198,8 @@ export default class Game extends Phaser.Scene {
   private animateAttack(): boolean {
     const attack = this.state.battle ? this.state.battle.recentAttack : null;
     if (attack) {
-      this.cardStacks.find((cs) => cs.uuid == attack.sourceUUID)?.animateAttack();
-      this.cardStacks.find((cs) => cs.uuid == attack.targetUUID)?.animateDamage(attack);
+      this.cardStacks.find(cs => cs.uuid == attack.sourceUUID)?.animateAttack();
+      this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
       return true;
     } else {
       return false;
@@ -208,35 +208,33 @@ export default class Game extends Phaser.Scene {
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
     const self = this;
-    self.cardStacks.forEach((cs) => {
-      const newData = self.state.cardStacks.find((csd) => csd.uuid == cs.uuid);
+    self.cardStacks.forEach(cs => {
+      const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
       if (newData) cs.update(newData); // Move card stacks
-      else if (newHandCards.some((h) => cs.data.cards.some((c) => c.id == h.cardId))) {
+      else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
         self.retractCardsExists = true;
       } else cs.discard(); // Discard card stack
     });
     self.state.cardStacks
-      .filter((cs) => !self.cardStacks.some((csd) => csd.uuid == cs.uuid))
-      .map((cs) => {
-        const originHandCard = self.hand.find((h) => h.uuid == cs.uuid);
+      .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
+      .map(cs => {
+        const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
         if (originHandCard) originHandCard.destroy();
         return new CardStack(self, cs, true, originHandCard);
       })
-      .forEach((cs) => self.cardStacks.push(cs));
-    self.cardStacks = self.cardStacks.filter((cs) =>
-      self.state.cardStacks.find((csd) => csd.uuid == cs.uuid),
-    );
+      .forEach(cs => self.cardStacks.push(cs));
+    self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
     const self = this;
-    self.hand.map((h) => {
-      const newData = self.state.hand.find((hcd) => hcd.uuid == h.uuid);
+    self.hand.map(h => {
+      const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
       const isTacticCard = !self.state.cardStacks
-        .flatMap((cs) => cs.cards)
-        .map((c) => c.id)
+        .flatMap(cs => cs.cards)
+        .map(c => c.id)
         .includes(h.cardId);
       if (newData) h.update(newData); // Move hand card to new position
       else if (oldState.turnPhase == TurnPhase.Build && isTacticCard)
@@ -245,9 +243,9 @@ export default class Game extends Phaser.Scene {
       else h.discard(true); // Discard hand card
     });
     newHandCards // Draw new hand cards
-      .map((c) => new HandCard(self, c))
-      .forEach((h) => self.hand.push(h));
-    self.hand = self.hand.filter((h) => self.state.hand.find((hcd) => hcd.uuid == h.uuid));
+      .map(c => new HandCard(self, c))
+      .forEach(h => self.hand.push(h));
+    self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
   }
 
   private showOpponentTacticCardAction(oldState: ClientState) {
@@ -268,8 +266,8 @@ export default class Game extends Phaser.Scene {
       if (
         cardId &&
         !self.state.cardStacks
-          .flatMap((cs) => cs.cards)
-          .map((c) => c.id)
+          .flatMap(cs => cs.cards)
+          .map(c => c.id)
           .includes(cardId)
       ) {
         new CardImage(
@@ -277,7 +275,7 @@ export default class Game extends Phaser.Scene {
           layout.discardPile.x,
           layout.discardPile.yOpponent,
           cardId,
-          true,
+          true
         ).showAndDiscardTacticCard(false);
       }
     }
@@ -286,24 +284,24 @@ export default class Game extends Phaser.Scene {
   private updateHighlighting() {
     this.obj.deck?.highlightReset();
     this.obj.discardPile?.highlightReset();
-    this.hand.forEach((c) => c.highlightReset());
-    this.cardStacks.forEach((c) => c.highlightReset());
+    this.hand.forEach(c => c.highlightReset());
+    this.cardStacks.forEach(c => c.highlightReset());
     if (this.state.playerPendingAction) {
       if (this.plannedBattle.type == BattleType.Mission) {
         this.obj.deck?.highlightSelected();
         if (this.obj.discardPile && this.obj.discardPile.cardIds.length > 0)
           this.obj.discardPile.highlightSelected();
       }
-      this.hand.forEach((c) => {
+      this.hand.forEach(c => {
         if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
         else if (this.activeCards.hand == c.uuid) c.highlightSelected();
         else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
         else c.highlightSelectable();
       });
-      this.cardStacks.forEach((cs) => {
+      this.cardStacks.forEach(cs => {
         if (this.activeCards.hand) {
           // Choose target for hand card
-          const activeCard = this.hand.find((c) => c.uuid == this.activeCards.hand);
+          const activeCard = this.hand.find(c => c.uuid == this.activeCards.hand);
           if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
         } else {
           switch (this.state.turnPhase) {
@@ -339,7 +337,7 @@ export default class Game extends Phaser.Scene {
               ) {
                 cs.cards[this.activeCards.stackIndex].highlightSelected();
               } else if (this.state.battle?.playerShipIds.includes(cs.uuid)) {
-                cs.cards.filter((c) => c.data.battleReady).forEach((c) => c.highlightSelectable());
+                cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
               }
               if (this.activeCards.stack && this.state.battle?.opponentShipIds.includes(cs.uuid)) {
                 cs.highlightSelectable();

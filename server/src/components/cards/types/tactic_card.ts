@@ -21,6 +21,6 @@ export default abstract class TacticCard extends Card {
   }
   abstract get discipline(): TacticDiscipline;
   protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {
-    return playersCardStacks.filter((cs) => cs.card.type == CardType.Colony);
+    return playersCardStacks.filter(cs => cs.card.type == CardType.Colony);
   }
 }

@@ -18,15 +18,15 @@ export class Card118 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 5,
         pointDefense: 0,
         shield: 0,
-        armour: 0,
-      },
+        armour: 0
+      }
     );
   }
 }
@@ -49,15 +49,15 @@ export class Card125 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 14,
         pointDefense: 0,
         shield: -6,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }
@@ -80,15 +80,15 @@ export class Card157 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 8,
         pointDefense: 0,
         shield: -6,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }
@@ -111,15 +111,15 @@ export class Card209 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 7,
         pointDefense: 0,
         shield: 0,
-        armour: 0,
-      },
+        armour: 0
+      }
     );
   }
 }
@@ -142,15 +142,15 @@ export class Card303 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 2,
         damage: 9,
         pointDefense: 0,
         shield: 0,
-        armour: 0,
-      },
+        armour: 0
+      }
     );
   }
 }
@@ -173,15 +173,15 @@ export class Card409 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 27,
         pointDefense: 0,
         shield: -6,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }

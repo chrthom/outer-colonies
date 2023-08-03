@@ -21,7 +21,7 @@ export default class CardStack {
     this.uuid = uuidv4();
   }
   get actionPool(): ActionPool {
-    return this.cards.map((c) => c.actionPool).reduce((a, b) => a.combine(b));
+    return this.cards.map(c => c.actionPool).reduce((a, b) => a.combine(b));
   }
   attach(cardStack: CardStack) {
     cardStack.parentCardStack = this;
@@ -30,7 +30,7 @@ export default class CardStack {
   attack(target: CardStack) {
     if (!this.attackAvailable) {
       console.log(
-        `WARN: ${this.player.name} tried to attack with a card ${this.card.name}, which cannot attack`,
+        `WARN: ${this.player.name} tried to attack with a card ${this.card.name}, which cannot attack`
       );
     } else if (!this.card.isInRange(this.player.match.battle.range)) {
       console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} at wrong range`);
@@ -38,12 +38,12 @@ export default class CardStack {
       const attackResult = this.card.attack(this, target);
       this.player.match.battle.recentAttack = {
         sourceUUID: this.rootCardStack.uuid,
-        sourceIndex: this.rootCardStack.cardStacks.findIndex((cs) => cs.uuid == this.uuid),
+        sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),
         targetUUID: target.uuid,
         pointDefense: attackResult.pointDefense,
         shield: attackResult.shield,
         armour: attackResult.armour,
-        damage: attackResult.damage,
+        damage: attackResult.damage
       };
       this.attackAvailable = false;
     }
@@ -56,7 +56,7 @@ export default class CardStack {
     );
   }
   canBeAttachedTo(cardStack: CardStack): boolean {
-    return this.zone == Zone.Hand && this.validTargets.map((cs) => cs.uuid).includes(cardStack.uuid);
+    return this.zone == Zone.Hand && this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
   }
   get canBeRetracted(): boolean {
     const player = this.player;
@@ -69,17 +69,17 @@ export default class CardStack {
     );
   }
   combatPhaseReset(initial: boolean) {
-    this.attachedCardStacks.forEach((cs) => cs.combatPhaseReset(initial));
+    this.attachedCardStacks.forEach(cs => cs.combatPhaseReset(initial));
     if (initial || this.card.isRechargeable) {
       if (this.card.canAttack) this.attackAvailable = true;
       if (this.card.canDefend) this.defenseAvailable = true;
     }
   }
   get cards(): Card[] {
-    return this.cardStacks.map((cs) => cs.card);
+    return this.cardStacks.map(cs => cs.card);
   }
   get cardStacks(): CardStack[] {
-    return this.attachedCardStacks.flatMap((cs) => cs.cardStacks).concat(this);
+    return this.attachedCardStacks.flatMap(cs => cs.cardStacks).concat(this);
   }
   get player(): Player {
     return this.parentCardStack ? this.parentCardStack.player : this.parentPlayer;
@@ -116,15 +116,15 @@ export default class CardStack {
   }
   onDestruction() {
     this.card.onDestruction(this.player);
-    this.attachedCardStacks.forEach((cs) => cs.onDestruction());
+    this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
   onStartTurn() {
     this.card.onStartTurn(this.player);
-    this.attachedCardStacks.forEach((cs) => cs.onStartTurn());
+    this.attachedCardStacks.forEach(cs => cs.onStartTurn());
   }
   onEndTurn() {
     this.card.onEndTurn(this.player, this);
-    this.attachedCardStacks.forEach((cs) => cs.onEndTurn());
+    this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   performImmediateEffect(target: CardStack) {
     this.card.onUtilizaton(this.player, target);
@@ -132,20 +132,20 @@ export default class CardStack {
   get profile(): CardProfile {
     if (this.type == CardType.Colony) {
       const handCardLimitOutsideColonyZone = this.player.cardStacks // Silos in orbit also increase hand card limit
-        .filter((cs) => cs.zone != Zone.Colony)
-        .filter((cs) => cs.type == CardType.Infrastructure)
-        .map((cs) => cs.profile.handCardLimit)
+        .filter(cs => cs.zone != Zone.Colony)
+        .filter(cs => cs.type == CardType.Infrastructure)
+        .map(cs => cs.profile.handCardLimit)
         .reduce((a, b) => a + b, 0);
       const colonyCardsProfile = this.player.cardStacks
-        .filter((cs) => cs.zone == Zone.Colony)
-        .filter((cs) => [CardType.Orb, CardType.Infrastructure].includes(cs.type))
-        .map((cs) => cs.profile)
+        .filter(cs => cs.zone == Zone.Colony)
+        .filter(cs => [CardType.Orb, CardType.Infrastructure].includes(cs.type))
+        .map(cs => cs.profile)
         .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
       colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
       colonyCardsProfile.hp = 0; // Else Building HP would increase the colony's HP
       return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile);
     } else {
-      return this.cards.map((c) => c.profile).reduce((a, b) => CardProfile.combineCardProfiles(a, b));
+      return this.cards.map(c => c.profile).reduce((a, b) => CardProfile.combineCardProfiles(a, b));
     }
   }
   profileMatches(c: CardProfile): boolean {
@@ -157,9 +157,9 @@ export default class CardStack {
     } else {
       spliceCardStackByUUID(this.player.cardStacks, this.uuid);
     }
-    this.cards.forEach((c) => c.onRetraction(this.player));
-    this.player.takeCards(this.cards.filter((c) => c.canBeRetracted(this.isRootCard)));
-    this.player.discardCards(...this.cards.filter((c) => !c.canBeRetracted(this.isRootCard)));
+    this.cards.forEach(c => c.onRetraction(this.player));
+    this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
+    this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
   }
   get type(): CardType {
     return this.card.type;

@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'oc-open-item',
   templateUrl: './open-item.component.html',
-  styleUrls: ['./open-item.component.scss'],
+  styleUrls: ['./open-item.component.scss']
 })
 export class OpenItemComponent {
   @Input() content?: OpenItemResponse = undefined;
@@ -17,7 +17,7 @@ export class OpenItemComponent {
       message: 'Test 12313 13 1 312 31 312 312 3',
       sol: [1034],
       cards: [102, 215],
-      boosters: [1, 1, 1],
+      boosters: [1, 1, 1]
     };
   }
   get outerBoxClasses(): string {

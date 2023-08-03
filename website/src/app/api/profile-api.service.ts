@@ -6,13 +6,13 @@ import { ProfileGetResponse } from '../../../../server/src/components/shared_int
 import OCApiWithAuth from './api-with-auth';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ProfileApiService extends OCApiWithAuth {
   constructor(authService: AuthService, http: HttpClient) {
     super(authService, http);
   }
   get profile(): Observable<ProfileGetResponse | null> {
-    return this.get<ProfileGetResponse>('profile', this.token).pipe(map((res) => res.body));
+    return this.get<ProfileGetResponse>('profile', this.token).pipe(map(res => res.body));
   }
 }

@@ -30,12 +30,12 @@ export default class Player {
     this.actionPool = this.getOriginalActions();
   }
   callBackShipsFromNeutralZone() {
-    this.cardStacks.filter((cs) => cs.zone == Zone.Neutral).forEach((cs) => (cs.zone = Zone.Oribital));
+    this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => (cs.zone = Zone.Oribital));
   }
   moveFlightReadyShipsToOrbit() {
     this.cardStacks
-      .filter((cs) => cs.zone == Zone.Colony && cs.isFlightReady)
-      .forEach((cs) => (cs.zone = Zone.Oribital));
+      .filter(cs => cs.zone == Zone.Colony && cs.isFlightReady)
+      .forEach(cs => (cs.zone = Zone.Oribital));
   }
   shuffleDeck() {
     this.deck = shuffle(this.deck);
@@ -47,13 +47,13 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).cards));
+    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).cards));
   }
   discardCardStacks(...uuids: string[]) {
-    uuids.forEach((uuid) => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
+    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
   }
   getColonyCardStack(): CardStack {
-    return this.cardStacks.filter((c) => c.card.type == CardType.Colony)[0];
+    return this.cardStacks.filter(c => c.card.type == CardType.Colony)[0];
   }
   isActivePlayer(): boolean {
     return this.no == this.match.activePlayerNo;
@@ -62,7 +62,7 @@ export default class Player {
     return this.no == this.match.actionPendingByPlayerNo;
   }
   takeCards(cards: Card[], originUUID?: string) {
-    this.hand.push(...cards.map((c) => new RootCardStack(c, Zone.Hand, this)));
+    this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
   }
   pickCardsFromDeck(num: number): Card[] {
     if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);
@@ -88,6 +88,6 @@ export default class Player {
     return this.getColonyCardStack() ? this.getColonyCardStack().profile.handCardLimit : 0;
   }
   getOriginalActions(): ActionPool {
-    return this.cardStacks.map((cs) => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
+    return this.cardStacks.map(cs => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
   }
 }

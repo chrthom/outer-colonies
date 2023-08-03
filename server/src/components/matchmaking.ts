@@ -30,7 +30,7 @@ function joinGame(socket: Socket, match: Match, playerNo: number): void {
     socketData.user.username,
     match,
     playerNo,
-    socketData.activeDeck.slice(),
+    socketData.activeDeck.slice()
   );
 }
 
@@ -39,7 +39,7 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
   joinGame(socket1, match, 0);
   joinGame(socket2, match, 1);
   const gameParams: ClientGameParams = {
-    preloadCardIds: [...new Set(match.players.flatMap((p) => p.deck).map((c) => c.id))],
+    preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
   io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', gameParams);
 }
@@ -47,7 +47,7 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
   socket.on(MsgTypeInbound.Login, (sessionToken: string) => {
     if (sessionToken) {
-      DBCredentialsDAO.getBySessionToken(sessionToken).then((user) => {
+      DBCredentialsDAO.getBySessionToken(sessionToken).then(user => {
         if (user) {
           console.log(`Player logged in: ${user.username}`);
           socket.data = new SocketData(user);

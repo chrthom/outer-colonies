@@ -6,7 +6,7 @@ import AuthService from '../auth.service';
 import OCApiWithAuth from './api-with-auth';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class DeckApiService extends OCApiWithAuth {
   constructor(authService: AuthService, http: HttpClient) {
@@ -14,16 +14,16 @@ export class DeckApiService extends OCApiWithAuth {
   }
   listDeck(): Observable<DeckListResponse | undefined> {
     return this.get<DeckListResponse>('deck', this.token).pipe(
-      map((res) => {
+      map(res => {
         const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
         return result;
-      }),
+      })
     );
   }
   activateCard(cardInstanceId: number): Observable<void> {
-    return this.post(`deck/${cardInstanceId}`, this.token).pipe(map((_) => {}));
+    return this.post(`deck/${cardInstanceId}`, this.token).pipe(map(_ => {}));
   }
   deactivateCard(cardInstanceId: number): Observable<void> {
-    return this.delete(`deck/${cardInstanceId}`, this.token).pipe(map((_) => {}));
+    return this.delete(`deck/${cardInstanceId}`, this.token).pipe(map(_ => {}));
   }
 }

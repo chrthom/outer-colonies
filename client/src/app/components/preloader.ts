@@ -15,7 +15,7 @@ export default class Preloader {
         layout.preloader.x - layout.preloader.width / 2 - layout.preloader.boxPadding,
         layout.preloader.y - layout.preloader.boxPadding,
         layout.preloader.width + 2 * layout.preloader.boxPadding,
-        layout.preloader.height + 2 * layout.preloader.boxPadding,
+        layout.preloader.height + 2 * layout.preloader.boxPadding
       );
     this.text = scene.add
       .text(layout.preloader.x, layout.preloader.y + layout.preloader.textOffsetY, 'Lade Spieldaten...')
@@ -32,7 +32,7 @@ export default class Preloader {
           layout.preloader.x - layout.preloader.width / 2,
           layout.preloader.y,
           layout.preloader.width * value,
-          layout.preloader.height,
+          layout.preloader.height
         );
     });
     scene.load.on('complete', () => {

@@ -1,6 +1,9 @@
 import { Zone } from '../../config/enums';
 import CardStack from '../card_stack';
-import EquipmentCard, { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
+import EquipmentCard, {
+  EquipmentCardColonyKillerRechargeable,
+  EquipmentCardRechargeable
+} from '../types/equipment_card';
 
 export class Card106 extends EquipmentCardRechargeable {
   constructor() {
@@ -20,15 +23,15 @@ export class Card106 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 4,
         damage: 8,
         pointDefense: 0,
         shield: -5,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }
@@ -51,15 +54,15 @@ export class Card107 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 7,
         pointDefense: 0,
         shield: -5,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }
@@ -82,15 +85,15 @@ export class Card207 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 4,
         pointDefense: 0,
         shield: -99,
-        armour: -2,
-      },
+        armour: -2
+      }
     );
   }
 }
@@ -113,15 +116,15 @@ export class Card405 extends EquipmentCardColonyKillerRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 6,
         pointDefense: 0,
         shield: -5,
-        armour: -1,
-      },
+        armour: -1
+      }
     );
   }
 }
@@ -144,18 +147,18 @@ export class Card438 extends EquipmentCardColonyKillerRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 2,
         damage: 2,
         pointDefense: 0,
         shield: -1,
-        armour: -99,
-      },
+        armour: -99
+      }
     );
   }
-  protected attackDamageBeforeReductions(target: CardStack) {
+  protected override attackDamageBeforeReductions(target: CardStack) {
     return target.zone == Zone.Colony ? 0 : this.attackProfile.damage;
   }
 }

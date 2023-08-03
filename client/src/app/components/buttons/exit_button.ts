@@ -13,7 +13,7 @@ export default class ExitButton {
       .text(
         layout.exitButton.x + layout.exitButton.xTextOffset,
         layout.exitButton.y + layout.exitButton.yTextOffset,
-        ['Aufgeben'],
+        ['Aufgeben']
       )
       .setFontSize(layout.exitButton.fontSize)
       .setFontFamily(layout.font.captionFamily)
@@ -25,7 +25,7 @@ export default class ExitButton {
       .image(layout.exitButton.x, layout.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach((o) =>
+    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(o =>
       o
         .on('pointerdown', () => {
           self.onClickAction();
@@ -35,7 +35,7 @@ export default class ExitButton {
         })
         .on('pointerout', () => {
           self.text.setColor(layout.font.color);
-        }),
+        })
     );
   }
   update() {

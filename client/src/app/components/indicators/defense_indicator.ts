@@ -12,7 +12,7 @@ export default class DefenseIndicator {
     defenseIcons: ClientDefenseIcon[],
     cardX: number,
     cardY: number,
-    ownedByPlayer: boolean,
+    ownedByPlayer: boolean
   ) {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
@@ -26,7 +26,7 @@ export default class DefenseIndicator {
     });
   }
   destroy() {
-    this.images.forEach((i) => i.destroy());
+    this.images.forEach(i => i.destroy());
   }
   tween(cardX: number, cardY: number) {
     this.images.forEach((image, index) => {
@@ -34,7 +34,7 @@ export default class DefenseIndicator {
         targets: [image],
         duration: animationConfig.duration.move,
         x: this.x(cardX),
-        y: this.y(cardY, index),
+        y: this.y(cardY, index)
       });
     });
   }

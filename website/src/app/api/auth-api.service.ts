@@ -5,12 +5,12 @@ import {
   AuthRegisterRequest,
   AuthExistsResponse,
   AuthLoginRequest,
-  AuthLoginResponse,
+  AuthLoginResponse
 } from '../../../../server/src/components/shared_interfaces/rest_api';
 import OCApi from './api';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export default class AuthApiService extends OCApi {
   constructor(http: HttpClient) {
@@ -18,27 +18,27 @@ export default class AuthApiService extends OCApi {
   }
   checkUsernameExists(username: string): Observable<boolean> {
     return this.get<AuthExistsResponse>(`auth/exists?username=${username}`).pipe(
-      map((res) => (res.body ? res.body.exists : false)),
+      map(res => (res.body ? res.body.exists : false))
     );
   }
   checkEmailExists(email: string): Observable<boolean> {
     return this.get<AuthExistsResponse>(`auth/exists?email=${email}`).pipe(
-      map((res) => (res.body ? res.body.exists : false)),
+      map(res => (res.body ? res.body.exists : false))
     );
   }
   register(body: AuthRegisterRequest): Observable<boolean> {
     return this.post('auth/register', undefined, body).pipe(
-      map((res) => res.status >= 200 && res.status < 300),
+      map(res => res.status >= 200 && res.status < 300)
     );
   }
   login(body: AuthLoginRequest): Observable<string | undefined> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(
-      map((res) => {
+      map(res => {
         const sessionToken =
           res.status >= 200 && res.status < 300 && res.body != null ? res.body.sessionToken : undefined;
         if (!sessionToken) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
         return sessionToken;
-      }),
+      })
     );
   }
 }

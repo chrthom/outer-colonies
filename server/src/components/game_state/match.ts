@@ -30,7 +30,7 @@ export default class Match {
     return opponentPlayerNo(this.activePlayerNo);
   }
   getInPlayCardStacks(): CardStack[] {
-    return this.players.flatMap((p) => p.cardStacks);
+    return this.players.flatMap(p => p.cardStacks);
   }
   getPendingActionPlayer(): Player {
     return this.players[this.actionPendingByPlayerNo];
@@ -58,7 +58,7 @@ export default class Match {
     this.getActivePlayer().resetRemainingActions();
     this.getActivePlayer().callBackShipsFromNeutralZone();
     this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
-    this.getActivePlayer().cardStacks.forEach((cs) => cs.onStartTurn());
+    this.getActivePlayer().cardStacks.forEach(cs => cs.onStartTurn());
     this.prepareBuildPhase();
   }
   prepareBuildPhase() {
@@ -72,8 +72,8 @@ export default class Match {
   prepareCombatPhase(interveningShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
     this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
-    this.players.forEach((player) => {
-      player.cardStacks.forEach((cs) => cs.combatPhaseReset(true));
+    this.players.forEach(player => {
+      player.cardStacks.forEach(cs => cs.combatPhaseReset(true));
     });
     this.processBattleRound();
   }
@@ -86,7 +86,7 @@ export default class Match {
       this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() &&
       !this.gameResult.gameOver
     ) {
-      this.getActivePlayer().cardStacks.forEach((cs) => cs.onEndTurn());
+      this.getActivePlayer().cardStacks.forEach(cs => cs.onEndTurn());
       this.prepareStartPhase();
     }
   }

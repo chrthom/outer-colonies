@@ -17,7 +17,7 @@ export class Card104 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
   override onEndTurn(player: Player, source: CardStack) {
@@ -39,7 +39,7 @@ export class Card109 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -58,7 +58,7 @@ export class Card161 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -78,7 +78,7 @@ export class Card325 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
   override onEndTurn(player: Player, source: CardStack) {
@@ -100,7 +100,7 @@ export class Card434 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -119,7 +119,7 @@ export class Card449 extends EquipmentCard {
       phi: 0,
       omega: 0,
       delta: -1,
-      psi: 0,
+      psi: 0
     });
   }
 }

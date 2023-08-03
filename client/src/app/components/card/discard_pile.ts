@@ -30,7 +30,7 @@ export default class DiscardPile extends CardImage {
         layout.discardPile.x,
         layout.discardPile.y,
         true,
-        true,
+        true
       );
     }
   }

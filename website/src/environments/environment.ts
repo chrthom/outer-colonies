@@ -4,6 +4,6 @@ export const environment = {
   url: {
     game: 'https://game.outercolonies.de',
     api: 'https://api.outercolonies.de',
-    assets: 'https://assets.outercolonies.de',
-  },
+    assets: 'https://assets.outercolonies.de'
+  }
 };

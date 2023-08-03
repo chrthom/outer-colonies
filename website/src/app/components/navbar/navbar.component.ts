@@ -5,13 +5,13 @@ import AuthService from 'src/app/auth.service';
 @Component({
   selector: 'oc-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
   @Input() active: string = '';
   constructor(
     private router: Router,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
   logout() {
     this.authService.logout();

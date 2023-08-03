@@ -10,7 +10,7 @@ test(`Cast from BaseProfile to CardProfile`, () => {
     phi: 1,
     omega: 1,
     delta: 1,
-    psi: 1,
+    psi: 1
   };
   const expectedProfile: CardProfile = {
     armour: 0,
@@ -25,7 +25,7 @@ test(`Cast from BaseProfile to CardProfile`, () => {
     omega: 1,
     delta: 1,
     psi: 1,
-    handCardLimit: 0,
+    handCardLimit: 0
   };
   expect(CardProfile.fromBaseProfile(baseProfile)).toStrictEqual(expectedProfile);
 });

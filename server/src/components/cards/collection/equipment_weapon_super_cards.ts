@@ -20,15 +20,15 @@ export class Card302 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 50,
         pointDefense: 0,
         shield: -6,
-        armour: -3,
-      },
+        armour: -3
+      }
     );
   }
 }
@@ -52,21 +52,21 @@ export class Card401 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 2,
         damage: 30,
         pointDefense: 0,
         shield: -8,
-        armour: -3,
-      },
+        armour: -3
+      }
     );
   }
-  protected attackDamageBeforeReductions(target: CardStack) {
+  protected override attackDamageBeforeReductions(target: CardStack) {
     const damage = Math.max(
       0,
-      this.attackProfile.damage - target.profile.speed * this.damageReductionPerSpeedPoint,
+      this.attackProfile.damage - target.profile.speed * this.damageReductionPerSpeedPoint
     );
     return target.zone == Zone.Colony ? 0 : damage;
   }

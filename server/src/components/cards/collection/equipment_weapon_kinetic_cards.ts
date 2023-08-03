@@ -18,15 +18,15 @@ export class Card126 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 2,
         damage: 8,
         pointDefense: 0,
         shield: 0,
-        armour: -4,
-      },
+        armour: -4
+      }
     );
   }
 }
@@ -49,15 +49,15 @@ export class Card151 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 2,
         damage: 5,
         pointDefense: 0,
         shield: 0,
-        armour: -4,
-      },
+        armour: -4
+      }
     );
   }
 }
@@ -80,15 +80,15 @@ export class Card179 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 2,
         pointDefense: 0,
         shield: 0,
-        armour: -2,
-      },
+        armour: -2
+      }
     );
   }
 }
@@ -111,15 +111,15 @@ export class Card180 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 3,
         pointDefense: 0,
         shield: 0,
-        armour: -2,
-      },
+        armour: -2
+      }
     );
   }
 }
@@ -142,15 +142,15 @@ export class Card223 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 3,
         damage: 4,
         pointDefense: 0,
         shield: 0,
-        armour: -2,
-      },
+        armour: -2
+      }
     );
   }
 }
@@ -173,15 +173,15 @@ export class Card310 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 4,
         damage: 4,
         pointDefense: 0,
         shield: 0,
-        armour: -2,
-      },
+        armour: -2
+      }
     );
   }
 }
@@ -204,15 +204,15 @@ export class Card420 extends EquipmentCardRechargeable {
         phi: 0,
         omega: 0,
         delta: 0,
-        psi: 0,
+        psi: 0
       },
       {
         range: 1,
         damage: 11,
         pointDefense: 0,
         shield: 0,
-        armour: -5,
-      },
+        armour: -5
+      }
     );
   }
 }

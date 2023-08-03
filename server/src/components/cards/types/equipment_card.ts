@@ -14,14 +14,14 @@ export default abstract class EquipmentCard extends Card {
     name: string,
     rarity: number,
     profile: EquipmentProfile,
-    attackProfile?: AttackProfile,
+    attackProfile?: AttackProfile
   ) {
     super(id, name, CardType.Equipment, rarity);
     this.equipmentProfile = profile;
     this.attackProfile = attackProfile;
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter((cs) => cs.type == CardType.Hull && cs.profileMatches(this.profile));
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profileMatches(this.profile));
   }
   override get canAttack(): boolean {
     return Boolean(this.attackProfile);
@@ -56,8 +56,8 @@ export default abstract class EquipmentCard extends Card {
   private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
     const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
     const bestPointDefense = defendingShips
-      .flatMap((cs) => cs.cardStacks)
-      .filter((cs) => cs.defenseAvailable && cs.profile.pointDefense)
+      .flatMap(cs => cs.cardStacks)
+      .filter(cs => cs.defenseAvailable && cs.profile.pointDefense)
       .sort((a, b) => a.profile.pointDefense - b.profile.pointDefense)
       .pop();
     if (attackResult.damage == 0) {
@@ -75,7 +75,7 @@ export default abstract class EquipmentCard extends Card {
   }
   private attackShield(target: CardStack, attackResult: AttackResult): AttackResult {
     const bestShield = target.cardStacks
-      .filter((cs) => cs.defenseAvailable && cs.profile.shield)
+      .filter(cs => cs.defenseAvailable && cs.profile.shield)
       .sort((a: CardStack, b: CardStack) => a.profile.shield - b.profile.shield)
       .pop();
     if (attackResult.damage == 0) {
@@ -93,7 +93,7 @@ export default abstract class EquipmentCard extends Card {
   }
   private attackArmour(target: CardStack, attackResult: AttackResult): AttackResult {
     const bestArmour = target.cardStacks
-      .filter((cs) => cs.defenseAvailable && cs.profile.armour)
+      .filter(cs => cs.defenseAvailable && cs.profile.armour)
       .sort((a: CardStack, b: CardStack) => a.profile.armour - b.profile.armour)
       .pop();
     if (attackResult.damage == 0 || this.attackProfile.armour == 0 || !bestArmour) {
@@ -110,17 +110,17 @@ export default abstract class EquipmentCard extends Card {
 }
 
 export abstract class EquipmentCardColonyKiller extends EquipmentCard {
-  protected attackDamageAfterReductions(target: CardStack, damage: number) {
+  protected override attackDamageAfterReductions(target: CardStack, damage: number) {
     return target.type == CardType.Colony ? damage * 2 : damage;
   }
 }
 
 export abstract class EquipmentCardColonyKillerRechargeable extends EquipmentCardColonyKiller {
-  get isRechargeable(): boolean {
+  override get isRechargeable(): boolean {
     return true;
   }
 }
-    
+
 export abstract class EquipmentCardRechargeable extends EquipmentCard {
   override get isRechargeable(): boolean {
     return true;

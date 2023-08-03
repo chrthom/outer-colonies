@@ -14,7 +14,7 @@ export class Card103 extends EquipmentCard {
       phi: 0,
       omega: -2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -33,7 +33,7 @@ export class Card140 extends EquipmentCardRechargeable {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -52,7 +52,7 @@ export class Card163 extends EquipmentCard {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -71,7 +71,7 @@ export class Card170 extends EquipmentCardRechargeable {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -90,7 +90,7 @@ export class Card171 extends EquipmentCard {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -109,7 +109,7 @@ export class Card184 extends EquipmentCard {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -128,7 +128,7 @@ export class Card240 extends EquipmentCard {
       phi: 0,
       omega: -1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -147,7 +147,7 @@ export class Card349 extends EquipmentCard {
       phi: 0,
       omega: -2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -166,7 +166,7 @@ export class Card406 extends EquipmentCard {
       phi: 0,
       omega: -2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -185,7 +185,7 @@ export class Card447 extends EquipmentCardRechargeable {
       phi: 0,
       omega: -2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }

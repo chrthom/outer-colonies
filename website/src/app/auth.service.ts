@@ -4,7 +4,7 @@ import AuthApiService from './api/auth-api.service';
 import { Observable, map, of, tap } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export default class AuthService {
   private readonly cookieExpiry = 100;
@@ -16,19 +16,19 @@ export default class AuthService {
 
   constructor(
     private cookieService: CookieService,
-    private authAPIService: AuthApiService,
+    private authAPIService: AuthApiService
   ) {}
 
   login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;
     this.password = password;
     return this.check().pipe(
-      tap((success) => {
+      tap(success => {
         if (success && remember) {
           this.cookieService.set('u', username, this.cookieExpiry);
           this.cookieService.set('p', password, this.cookieExpiry);
         }
-      }),
+      })
     );
   }
 
@@ -46,11 +46,11 @@ export default class AuthService {
       : this.authAPIService
           .login({
             username: this.username ? this.username : '',
-            password: this.password ? this.password : '',
+            password: this.password ? this.password : ''
           })
           .pipe(
-            tap((sessionToken) => (this.sessionToken = sessionToken)),
-            map((sessionToken) => sessionToken != undefined),
+            tap(sessionToken => (this.sessionToken = sessionToken)),
+            map(sessionToken => sessionToken != undefined)
           );
   }
 

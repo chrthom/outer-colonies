@@ -9,7 +9,7 @@ import {
   Card351,
   Card436,
   Card439,
-  Card450,
+  Card450
 } from './hull_1_part_cards';
 import {
   Card103,
@@ -21,7 +21,7 @@ import {
   Card240,
   Card349,
   Card406,
-  Card447,
+  Card447
 } from './equipment_defense_cards';
 import {
   Card130,
@@ -33,7 +33,7 @@ import {
   Card340,
   Card424,
   Card440,
-  Card441,
+  Card441
 } from './equipment_weapon_point_defense_cards';
 import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
 import {
@@ -50,7 +50,7 @@ import {
   Card353,
   Card451,
   Card452,
-  Card453,
+  Card453
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
@@ -61,7 +61,7 @@ import {
   Card343,
   Card344,
   Card347,
-  Card421,
+  Card421
 } from './equipment_weapon_laser_cards';
 import {
   Card126,
@@ -70,7 +70,7 @@ import {
   Card180,
   Card223,
   Card310,
-  Card420,
+  Card420
 } from './equipment_weapon_kinetic_cards';
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
@@ -85,7 +85,7 @@ import {
   Card304,
   Card318,
   Card412,
-  Card422,
+  Card422
 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -101,7 +101,7 @@ import {
   Card329,
   Card418,
   Card444,
-  Card445,
+  Card445
 } from './hull_2_part_cards';
 import {
   Card116,
@@ -116,7 +116,7 @@ import {
   Card309,
   Card313,
   Card314,
-  Card315,
+  Card315
 } from './hull_3_part_cards';
 import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110 } from './tactic_science_cards';
@@ -267,7 +267,7 @@ export default class CardCollection {
     450: <Card>new Card450(),
     451: <Card>new Card451(),
     452: <Card>new Card452(),
-    453: <Card>new Card453(),
+    453: <Card>new Card453()
   };
 
   static allCards = Object.values(this.cards);
@@ -304,7 +304,7 @@ export default class CardCollection {
     Array(2).fill(this.cards[165]), // Konvoi
     Array(2).fill(this.cards[427]), // Immigranten von der Erde
     Array(2).fill(this.cards[321]), // Recycling
-    Array(2).fill(this.cards[174]), // Feldreperaturen
+    Array(2).fill(this.cards[174]) // Feldreperaturen
   ].flat();
 
   static starterDeckTraders: Card[] = [
@@ -338,7 +338,7 @@ export default class CardCollection {
     Array(2).fill(this.cards[165]), // Konvoi
     Array(2).fill(this.cards[321]), // Recycling
     Array(2).fill(this.cards[174]), // Feldreperaturen
-    Array(2).fill(this.cards[141]), // Externe Arbeitskräfte
+    Array(2).fill(this.cards[141]) // Externe Arbeitskräfte
   ].flat();
 
   static starterDeckExpedition: Card[] = [
@@ -369,25 +369,25 @@ export default class CardCollection {
     // Tactic (12)
     Array(6).fill(this.cards[337]), // Militärpioniere
     Array(4).fill(this.cards[338]), // Nachschub
-    Array(2).fill(this.cards[174]), // Feldreperaturen
+    Array(2).fill(this.cards[174]) // Feldreperaturen
   ].flat();
 
   static starterDecks: Card[][] = [
     this.starterDeckSettlers,
     this.starterDeckTraders,
-    this.starterDeckExpedition,
+    this.starterDeckExpedition
   ];
 
   private static pickRandomCard(edition: number, rarity: Rarity) {
     const relevantCards = this.allCards
-      .filter((c) => Math.floor(c.id / 100) == edition)
+      .filter(c => Math.floor(c.id / 100) == edition)
       .filter(
-        (c) =>
+        c =>
           (rarity == Rarity.Common && c.rarity <= 1) ||
           (rarity == Rarity.Uncommon && c.rarity == 2) ||
-          (rarity == Rarity.Rare && c.rarity >= 3),
+          (rarity == Rarity.Rare && c.rarity >= 3)
       )
-      .flatMap((c) => {
+      .flatMap(c => {
         switch (c.rarity) {
           case 0:
             return Array(5).fill(c);

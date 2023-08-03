@@ -19,7 +19,7 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     name: string,
     rarity: number,
     profile: InfrastructureProfile,
-    actionPool: CardType[],
+    actionPool: CardType[]
   ) {
     super(id, name, rarity, profile);
     this.actionPoolCardTypes = actionPool;
@@ -53,9 +53,9 @@ export class Card135 extends ActionInfrastructureCard {
         omega: 0,
         delta: 0,
         psi: -1,
-        handCardLimit: 0,
+        handCardLimit: 0
       },
-      [CardType.Hull],
+      [CardType.Hull]
     );
   }
 }
@@ -76,9 +76,9 @@ export class Card154 extends ActionInfrastructureCard {
         omega: 0,
         delta: 0,
         psi: -1,
-        handCardLimit: 0,
+        handCardLimit: 0
       },
-      [CardType.Infrastructure],
+      [CardType.Infrastructure]
     );
   }
 }
@@ -99,9 +99,9 @@ export class Card164 extends ActionInfrastructureCard {
         omega: 0,
         delta: 0,
         psi: -1,
-        handCardLimit: 0,
+        handCardLimit: 0
       },
-      [CardType.Equipment],
+      [CardType.Equipment]
     );
   }
 }
@@ -122,9 +122,9 @@ export class Card183 extends ActionInfrastructureCard {
         omega: 0,
         delta: 0,
         psi: 0,
-        handCardLimit: 0,
+        handCardLimit: 0
       },
-      [CardType.Equipment, CardType.Infrastructure, CardType.Hull],
+      [CardType.Equipment, CardType.Infrastructure, CardType.Hull]
     );
     this.onlyAttachableToColony = true;
   }

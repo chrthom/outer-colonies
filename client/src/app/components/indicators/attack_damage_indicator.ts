@@ -12,19 +12,19 @@ export default class AttackDamageIndicator {
     this.cardImage = cardStack.cards[0].image;
     const self = this;
     ['pointDefense', 'shield', 'armour', 'damage']
-      .map((key) => [attack[key], layout.attack.color[key]])
+      .map(key => [attack[key], layout.attack.color[key]])
       .filter(([value, _]) => value > 0)
       .forEach(([value, color], index) =>
         setTimeout(
           () => self.tween(this.createIndicator(value, color)),
-          animationConfig.attack.indicator.spawnInterval * index,
-        ),
+          animationConfig.attack.indicator.spawnInterval * index
+        )
       );
     const particleEmitters = [
       ['red', Math.round((attack.shield + attack.armour + attack.damage) / 2)],
       ['blue', attack.shield * 2],
       ['white', attack.armour * 2],
-      ['yellow', attack.damage * 2],
+      ['yellow', attack.damage * 2]
     ]
       .filter(([_, n]) => Number(n) > 0)
       .map(([color, n]) => {
@@ -33,7 +33,7 @@ export default class AttackDamageIndicator {
         return emitter;
       });
     setTimeout(() => {
-      particleEmitters.forEach((pe) => pe.destroy());
+      particleEmitters.forEach(pe => pe.destroy());
     }, animationConfig.duration.attack);
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
@@ -47,7 +47,7 @@ export default class AttackDamageIndicator {
       scale: { start: 0.8, end: 0 },
       gravityY: 15,
       blendMode: 'ADD',
-      emitting: false,
+      emitting: false
     });
   }
   private createIndicator(value: number, color: string) {
@@ -69,7 +69,7 @@ export default class AttackDamageIndicator {
       duration: animationConfig.duration.attack,
       y: target.y + animationConfig.attack.indicator.yTween,
       alpha: 0,
-      onComplete: () => target.destroy(),
+      onComplete: () => target.destroy()
     });
   }
 }

@@ -17,14 +17,14 @@ export default class Auth {
     await DBCredentialsDAO.create(
       registrationData.username,
       registrationData.password,
-      registrationData.email,
+      registrationData.email
     );
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
     DBProfilesDAO.create(credential.userId);
     DBDailiesDAO.create(credential.userId);
     CardCollection.starterDecks[registrationData.startDeck]
-      .map((c) => c.id)
-      .forEach((id) => DBDecksDAO.create(id, credential.userId, true));
+      .map(c => c.id)
+      .forEach(id => DBDecksDAO.create(id, credential.userId, true));
     return true;
   }
   static async login(loginData: AuthLoginRequest): Promise<string | null> {

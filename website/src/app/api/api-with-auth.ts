@@ -5,7 +5,7 @@ import OCApi from './api';
 export default class OCApiWithAuth extends OCApi {
   constructor(
     private authService: AuthService,
-    http: HttpClient,
+    http: HttpClient
   ) {
     super(http);
   }

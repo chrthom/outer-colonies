@@ -24,16 +24,16 @@ export default class DBDailiesDAO {
         'CASE WHEN game IS NULL OR game < CURRENT_DATE() THEN 0 ELSE 1 END AS game, ' +
         'CASE WHEN energy IS NULL OR energy < CURRENT_DATE() THEN 0 ELSE 1 END AS energy, ' +
         'CASE WHEN ships IS NULL OR ships < CURRENT_DATE() THEN 0 ELSE 1 END AS ships ' +
-        `FROM dailies WHERE ${whereClause}`,
+        `FROM dailies WHERE ${whereClause}`
     );
-    return queryResult.map((r) => {
+    return queryResult.map(r => {
       return {
         userId: Number(r.user_id),
         login: Boolean(r.login),
         victory: Boolean(r.victory),
         game: Boolean(r.game),
         energy: Boolean(r.energy),
-        ships: Boolean(r.ships),
+        ships: Boolean(r.ships)
       };
     });
   }
@@ -56,7 +56,7 @@ export default class DBDailiesDAO {
     return this.achieve(userId, 'ships', rules.dailyEarnings.ships);
   }
   private static async achieve(userId: number, daily: string, sol: number) {
-    return this.getBy(`user_id = ${userId} AND (${daily} < current_date() OR ${daily} IS NULL)`).then((b) => {
+    return this.getBy(`user_id = ${userId} AND (${daily} < current_date() OR ${daily} IS NULL)`).then(b => {
       if (b.length) {
         DBConnection.instance.query(`UPDATE dailies SET ${daily} = current_date() WHERE user_id = ${userId}`);
         DBProfilesDAO.increaseSol(userId, sol);

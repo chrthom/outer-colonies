@@ -4,7 +4,7 @@ import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src
 import {
   ClientAttack,
   ClientCard,
-  ClientCardStack,
+  ClientCardStack
 } from '../../../../../server/src/components/shared_interfaces/client_state';
 import ValueIndicator from '../indicators/value_indicator';
 import DefenseIndicator from '../indicators/defense_indicator';
@@ -28,25 +28,25 @@ export default class CardStack {
   }
   discard(toDeck?: boolean) {
     this.destroyIndicators();
-    this.cards.forEach((c) => c.discard(this.data.ownedByPlayer, toDeck));
+    this.cards.forEach(c => c.discard(this.data.ownedByPlayer, toDeck));
   }
   update(data: ClientCardStack) {
     this.destroyIndicators();
     const [removedCardIds, newCardIds] = this.arrayDiff(
-      this.cards.map((c) => c.cardId),
-      data.cards.map((c) => c.id),
+      this.cards.map(c => c.cardId),
+      data.cards.map(c => c.id)
     );
-    this.filterCardsByIdList(data.cards.map((c) => c.id)).forEach((c) => c.destroy());
+    this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
     if (removedCardIds.length) this.scene.retractCardsExists = true;
-    this.filterCardsByIdList(removedCardIds).forEach((c) => c.discard(this.data.ownedByPlayer, true));
+    this.filterCardsByIdList(removedCardIds).forEach(c => c.discard(this.data.ownedByPlayer, true));
     this.data.cards = data.cards;
     this.data.criticalDamage = data.criticalDamage;
     this.data.damage = data.damage;
     this.data.defenseIcons = data.defenseIcons;
     this.createCards();
     this.data = data;
-    this.filterCardsByIdList(newCardIds).forEach((c) => {
-      const handCard = this.scene.hand.find((h) => h.cardId == c.cardId);
+    this.filterCardsByIdList(newCardIds).forEach(c => {
+      const handCard = this.scene.hand.find(h => h.cardId == c.cardId);
       const x = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.x
@@ -70,18 +70,18 @@ export default class CardStack {
     new AttackDamageIndicator(this.scene, this, attack);
   }
   highlightDisabled() {
-    this.cards.forEach((c) => {
+    this.cards.forEach(c => {
       c.highlightDisabled();
     });
   }
   highlightSelectable() {
-    this.cards.forEach((c) => c.highlightSelectable());
+    this.cards.forEach(c => c.highlightSelectable());
   }
   highlightSelected() {
-    this.cards.forEach((c) => c.highlightSelected());
+    this.cards.forEach(c => c.highlightSelected());
   }
   highlightReset() {
-    this.cards.forEach((c) => {
+    this.cards.forEach(c => {
       c.highlightReset();
     });
   }
@@ -90,7 +90,7 @@ export default class CardStack {
   }
   private filterCardsByIdList(list: number[]) {
     let l = list.slice();
-    return this.cards.filter((c) => {
+    return this.cards.filter(c => {
       if (l.includes(c.cardId)) {
         l.splice(l.indexOf(c.cardId), 1);
         return true;
@@ -106,7 +106,7 @@ export default class CardStack {
         duration: animationConfig.duration.move,
         x: this.x(),
         y: this.y(index),
-        angle: this.data.ownedByPlayer ? 0 : 180,
+        angle: this.data.ownedByPlayer ? 0 : 180
       });
     });
     if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
@@ -114,9 +114,9 @@ export default class CardStack {
   }
   private createCards(origin?: CardImage, fromHand?: boolean) {
     this.cards = this.data.cards.map(
-      (c) => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c),
+      c => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
     );
-    this.cards.forEach((c) => {
+    this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
       c.enableMaximizeOnMouseover();
     });
@@ -128,7 +128,7 @@ export default class CardStack {
         this.x(),
         this.zoneLayout().y,
         this.data.ownedByPlayer,
-        false,
+        false
       );
     }
     if (
@@ -142,7 +142,7 @@ export default class CardStack {
         this.data.defenseIcons,
         this.x(),
         this.zoneLayout().y,
-        this.data.ownedByPlayer,
+        this.data.ownedByPlayer
       );
     }
     if (fromHand) {
@@ -174,7 +174,7 @@ export default class CardStack {
   private destroyIndicators() {
     if (this.damageIndicator) this.damageIndicator.destroy();
     if (this.defenseIndicator) this.defenseIndicator.destroy();
-    this.cards.forEach((c) => c.destroyButton());
+    this.cards.forEach(c => c.destroyButton());
   }
   private onClickAction(cardData: ClientCard) {
     const state = this.scene.state;
@@ -186,12 +186,12 @@ export default class CardStack {
               this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
             } else if (this.isOpponentColony()) {
               this.scene.resetView(
-                this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid,
+                this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
               );
             } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
               if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
                 this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(
-                  (id) => id != this.uuid,
+                  id => id != this.uuid
                 );
               } else {
                 this.scene.plannedBattle.shipIds.push(this.uuid);
@@ -200,7 +200,7 @@ export default class CardStack {
           } else {
             if (this.data.missionReady) {
               if (this.scene.interveneShipIds.includes(this.uuid)) {
-                this.scene.interveneShipIds = this.scene.interveneShipIds.filter((id) => id != this.uuid);
+                this.scene.interveneShipIds = this.scene.interveneShipIds.filter(id => id != this.uuid);
               } else if (this.data.interventionReady) {
                 this.scene.interveneShipIds.push(this.uuid);
               }
@@ -227,7 +227,7 @@ export default class CardStack {
               MsgTypeInbound.Attack,
               this.scene.activeCards.stack,
               this.scene.activeCards.stackIndex,
-              this.uuid,
+              this.uuid
             );
           }
           break;
@@ -238,7 +238,7 @@ export default class CardStack {
   private arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
     let a1 = array1.slice();
     let a2 = array2.slice();
-    a1.slice().forEach((v1) => {
+    a1.slice().forEach(v1 => {
       const i1 = a1.indexOf(v1);
       const i2 = a2.indexOf(v1);
       if (i1 >= 0 && i2 >= 0) {

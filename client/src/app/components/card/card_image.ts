@@ -18,7 +18,7 @@ export default class CardImage {
         .setScale(scale ? scale : layout.cards.scale.normal);
     this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
     this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive(),
+      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
     );
     this.imageMask = setImageProps(scene.add.image(x, y, 'card_mask').setVisible(false));
     this.image.setMask(this.imageMask.createBitmapMask());
@@ -41,7 +41,7 @@ export default class CardImage {
       onComplete: () => {
         if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
-      },
+      }
     });
   }
   showAndDiscardTacticCard(ownedByPlayer: boolean) {
@@ -57,7 +57,7 @@ export default class CardImage {
       completeDelay: animationConfig.duration.waitBeforeDiscard,
       onComplete: () => {
         this.discard(ownedByPlayer);
-      },
+      }
     });
   }
   highlightDisabled() {
@@ -96,19 +96,19 @@ export default class CardImage {
     if (!visible) this.imageHighlight.setVisible(visible);
   }
   setX(x: number): this {
-    this.forAllImages((i) => i.setX(x));
+    this.forAllImages(i => i.setX(x));
     return this;
   }
   setY(y: number): this {
-    this.forAllImages((i) => i.setY(y));
+    this.forAllImages(i => i.setY(y));
     return this;
   }
   setAngle(angle: number): this {
-    this.forAllImages((i) => i.setAngle(angle));
+    this.forAllImages(i => i.setAngle(angle));
     return this;
   }
   setDepth(depth: number): this {
-    this.forAllImages((i) => i.setDepth(depth));
+    this.forAllImages(i => i.setDepth(depth));
     return this;
   }
   enableMaximizeOnMouseover() {

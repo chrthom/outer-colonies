@@ -27,7 +27,7 @@ function emitState(io: Server, match: Match) {
 
 function initMatch(io: Server, match: Match) {
   match.setStartPlayer();
-  match.players.forEach((player) => {
+  match.players.forEach(player => {
     player.shuffleDeck();
     player.drawCards(rules.initialCardsToDraw);
   });
@@ -79,13 +79,13 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
     } else if (!target) {
       console.log(
-        `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`,
+        `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
       );
     } else if (!handCard.isPlayable) {
       console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
     } else if (!handCard.canBeAttachedTo(target)) {
       console.log(
-        `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`,
+        `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
       );
     } else {
       player.playHandCard(handCard, target);
@@ -104,7 +104,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
     } else if (!targetCardStack) {
       console.log(
-        `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`,
+        `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`
       );
     } else if (!targetCardStack.canBeRetracted) {
       console.log(`WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`);
@@ -130,20 +130,20 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const player = getPlayer(socket);
     const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
     const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
-    const srcShip = playerShips.find((cs) => cs.uuid == srcId);
+    const srcShip = playerShips.find(cs => cs.uuid == srcId);
     const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
-    const target = opponentShips.find((cs) => cs.uuid == targetId);
+    const target = opponentShips.find(cs => cs.uuid == targetId);
     if (!srcShip) {
       console.log(`WARN: ${player.name} tried to attack from non-existing ship ${srcId}`);
     } else if (!srcWeapon) {
       console.log(
-        `WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcShip.card.name}`,
+        `WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcShip.card.name}`
       );
     } else if (!target) {
       console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
     } else if (!srcWeapon.attackAvailable) {
       console.log(
-        `WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`,
+        `WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`
       );
     } else {
       srcWeapon.attack(target);
@@ -153,5 +153,5 @@ export function gameSocketListeners(io: Server, socket: Socket) {
 }
 
 function data(socket: Socket): SocketData {
-  return <SocketData> socket.data;
+  return <SocketData>socket.data;
 }

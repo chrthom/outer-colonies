@@ -16,11 +16,11 @@ const io = new Server(httpServer, {
   cors: {
     origin: '*',
     methods: ['PUT', 'GET', 'POST', 'DELETE', 'OPTIONS'],
-    credentials: false,
-  },
+    credentials: false
+  }
 });
 
-io.on(MsgTypeInbound.Connect, (socket) => {
+io.on(MsgTypeInbound.Connect, socket => {
   console.log(`Client connected: ${socket.id}`);
   socket.on(MsgTypeInbound.Disconnect, () => {
     console.log(`Client disconnected: ${socket.id}`);
@@ -39,7 +39,7 @@ httpServer.listen(config.get<number>('server.port'), () => {
   console.log(`Server started on stage ${config.get('stage')}`);
 });
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', err => {
   if (err.name == 'SqlError' && err.message.includes('socket has unexpectedly been closed'))
     console.log(`WARN: Caught exception: ${err}`);
 });

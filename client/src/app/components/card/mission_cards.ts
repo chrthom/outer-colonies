@@ -11,7 +11,7 @@ export default class MissionCards {
   update() {
     if (this.scene.state && this.scene.state.battle) {
       const battle = this.scene.state.battle;
-      if (this.minCards) this.minCards.forEach((c) => c.destroy());
+      if (this.minCards) this.minCards.forEach(c => c.destroy());
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
@@ -19,10 +19,10 @@ export default class MissionCards {
           layout.missionCards.y + index * layout.missionCards.yDistance,
           id,
           false,
-          layout.cards.scale.min,
+          layout.cards.scale.min
         );
       });
-      this.minCards.filter((c) => c.cardId != 1).forEach((c) => c.enableMaximizeOnMouseover());
+      this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());
     }
   }
 }
