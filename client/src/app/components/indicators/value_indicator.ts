@@ -28,7 +28,8 @@ export default class ValueIndicator {
           critical ? layout.colors.secondary : layout.colors.primary,
           layout.colors.alpha,
         )
-        .setOrigin(0.5, 0.5);
+        .setOrigin(0.5, 0.5)
+        .setDepth(layout.depth.indicators);
     } else {
       this.shape = scene.add
         .star(
@@ -40,15 +41,17 @@ export default class ValueIndicator {
           critical ? layout.colors.secondary : layout.colors.primary,
           layout.colors.alpha,
         )
-        .setOrigin(0.5, 0.5);
+        .setOrigin(0.5, 0.5)
+        .setDepth(layout.depth.indicators);
     }
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
       .setFontSize(layout.cards.damageIndicator.fontSize)
       .setFontFamily(layout.font.captionFamily)
-      .setColor('#eeeecc')
+      .setColor(layout.font.colorHover)
       .setAlign('center')
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5, 0.5)
+      .setDepth(layout.depth.indicators);
   }
   destroy() {
     this.shape.destroy();
@@ -63,7 +66,12 @@ export default class ValueIndicator {
     });
   }
   private x(cardX: number) {
-    return cardX + layout.cards.damageIndicator.xOffset;
+    return (
+      cardX +
+      (this.ownedByPlayer
+        ? layout.cards.damageIndicator.xOffsetPlayer
+        : layout.cards.damageIndicator.xOffsetOpponent)
+    );
   }
   private y(cardY: number) {
     return (

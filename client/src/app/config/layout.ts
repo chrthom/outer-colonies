@@ -19,8 +19,9 @@ class Layout {
   };
 
   readonly depth = {
-    discardCard: 5,
-    maxedTacticCard: 10,
+    indicators: 20,
+    discardCard: 50,
+    maxedTacticCard: 100,
   };
 
   readonly actionPool = {
@@ -44,9 +45,10 @@ class Layout {
       max: 1,
     },
     damageIndicator: {
-      xOffset: 90,
-      yOffsetPlayer: -240,
-      yOffsetOpponent: -15,
+      xOffsetPlayer: 75,
+      yOffsetPlayer: -265,
+      xOffsetOpponent: -75,
+      yOffsetOpponent: 265,
       fontSize: 20,
     },
     defenseIndicator: {
@@ -56,8 +58,8 @@ class Layout {
       yDistance: 50,
     },
     retractCardButton: {
-      xOffset: -80,
-      yOffset: -245,
+      xOffset: -75,
+      yOffset: -248,
     },
   };
   readonly maxedTacticCard = {
