@@ -10,7 +10,7 @@ import {
   DeckListResponse,
   ItemListResponse,
   OpenItemResponse,
-  ProfileGetResponse,
+  ProfileGetResponse
 } from './shared_interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO, { DBCredential } from './persistence/db_credentials';
@@ -26,7 +26,7 @@ import { rules } from './config/rules';
 function performWithSessionTokenCheck(req: Request, res: Response, f: (u: DBCredential) => void) {
   const sessionToken = req.header('session-token');
   if (sessionToken) {
-    DBCredentialsDAO.getBySessionToken(sessionToken).then((u) => (u ? f(u) : res.sendStatus(403)));
+    DBCredentialsDAO.getBySessionToken(sessionToken).then(u => (u ? f(u) : res.sendStatus(403)));
   } else {
     res.sendStatus(400);
   }
@@ -36,22 +36,22 @@ export default function restAPI(app: Express) {
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
-    fetch(`${config.get('url.assets')}/${file}`).then((actual) => actual.body.pipe(res));
+    fetch(`${config.get('url.assets')}/${file}`).then(actual => actual.body.pipe(res));
   });
 
   // Register new user
   app.post('/api/auth/register', (req, res) => {
-    Auth.register(<AuthRegisterRequest>req.body).then((success) =>
-      success ? res.status(201).send({}) : res.sendStatus(500),
+    Auth.register(<AuthRegisterRequest>req.body).then(success =>
+      success ? res.status(201).send({}) : res.sendStatus(500)
     );
   });
 
   // Login
   app.post('/api/auth/login', (req, res) => {
-    Auth.login(<AuthLoginRequest>req.body).then((sessionToken) => {
+    Auth.login(<AuthLoginRequest>req.body).then(sessionToken => {
       const payload: AuthLoginResponse = {
         success: sessionToken != null,
-        sessionToken: sessionToken,
+        sessionToken: sessionToken
       };
       res.send(payload);
     });
@@ -61,11 +61,12 @@ export default function restAPI(app: Express) {
   app.get('/api/auth/exists', (req, res) => {
     const sendExistsResponse = (exists: boolean) => {
       const payload: AuthExistsResponse = {
-        exists: exists,
+        exists: exists
       };
       res.send(payload);
     };
-    if (req.query['username']) Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
+    if (req.query['username'])
+      Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
     else if (req.query['email']) Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse);
     else res.sendStatus(400);
   });
@@ -80,28 +81,28 @@ export default function restAPI(app: Express) {
         name: cardData.name,
         rarity: cardData.rarity,
         type: cardData.type,
-        inUse: c.inUse,
+        inUse: c.inUse
       };
     };
     const sendDeckResponse = (cards: DBDeck[]) => {
       const payload: DeckListResponse = {
-        cards: cards.map(toDeckCard),
+        cards: cards.map(toDeckCard)
       };
       res.send(payload);
     };
-    performWithSessionTokenCheck(req, res, (u) => {
+    performWithSessionTokenCheck(req, res, u => {
       DBDecksDAO.getByUserId(u.userId).then(sendDeckResponse);
     });
   });
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then((_) => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(_ => res.sendStatus(204));
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then((_) => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(_ => res.sendStatus(204));
   });
 
   // Get user profile
@@ -110,7 +111,7 @@ export default function restAPI(app: Express) {
       const payload: ProfileGetResponse = profile;
       res.send(payload);
     };
-    performWithSessionTokenCheck(req, res, (u) => {
+    performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse);
     });
   });
@@ -121,7 +122,7 @@ export default function restAPI(app: Express) {
       const payload: DailyGetResponse = daily;
       res.send(payload);
     };
-    performWithSessionTokenCheck(req, res, (u) => {
+    performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse);
     });
   });
@@ -133,26 +134,26 @@ export default function restAPI(app: Express) {
       return {
         itemId: i.itemId,
         message: i.message,
-        sol: content.filter((c) => c.type == ItemBoxContentType.Sol).map((c) => c.value),
-        cards: content.filter((c) => c.type == ItemBoxContentType.Card).map((c) => c.value),
-        boosters: content.filter((c) => c.type == ItemBoxContentType.Booster).map((c) => c.value),
+        sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
+        cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
+        boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
       };
     };
     const toBooster = (i: DBItem) => {
       const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
-        no: Number(i.content),
+        no: Number(i.content)
       };
     };
     const sendItemResponse = (items: DBItem[]) => {
       const payload: ItemListResponse = {
-        boxes: items.filter((i) => i.type == ItemType.Box).map(toBox),
-        boosters: items.filter((i) => i.type == ItemType.Booster).map(toBooster),
+        boxes: items.filter(i => i.type == ItemType.Box).map(toBox),
+        boosters: items.filter(i => i.type == ItemType.Booster).map(toBooster)
       };
       res.send(payload);
     };
-    performWithSessionTokenCheck(req, res, (u) => {
+    performWithSessionTokenCheck(req, res, u => {
       DBItemsDAO.getByUserId(u.userId).then(sendItemResponse);
     });
   });
@@ -160,25 +161,25 @@ export default function restAPI(app: Express) {
   // Open an item
   app.post('/api/item/:itemId(\\d+)', (req, res) => {
     const itemId = Number(req.params['itemId']);
-    performWithSessionTokenCheck(req, res, (u) => {
-      DBItemsDAO.getByUserId(u.userId).then((items) => {
-        const item = items.find((i) => i.itemId == itemId);
+    performWithSessionTokenCheck(req, res, u => {
+      DBItemsDAO.getByUserId(u.userId).then(items => {
+        const item = items.find(i => i.itemId == itemId);
         if (item) {
           DBItemsDAO.delete(itemId);
           if (item.type == ItemType.Booster) {
-            const cards = CardCollection.generateBooster(Number(item.content)).map((c) => c.id);
-            cards.forEach((cId) => DBDecksDAO.create(cId, u.userId, false, true));
+            const cards = CardCollection.generateBooster(Number(item.content)).map(c => c.id);
+            cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
             const response: OpenItemResponse = {
               itemId: item.itemId,
               message: item.message,
               sol: [],
               cards: cards,
-              boosters: [],
+              boosters: []
             };
             res.send(response);
           } else if (item.type == ItemType.Box) {
             const content = <DBItemBoxContent[]>JSON.parse(item.content);
-            content.forEach((e) => {
+            content.forEach(e => {
               switch (e.type) {
                 case ItemBoxContentType.Booster:
                   DBItemsDAO.createBooster(u.userId, e.value);
@@ -193,9 +194,9 @@ export default function restAPI(app: Express) {
             const response: OpenItemResponse = {
               itemId: item.itemId,
               message: item.message,
-              sol: content.filter((c) => c.type == ItemBoxContentType.Sol).map((c) => c.value),
-              cards: content.filter((c) => c.type == ItemBoxContentType.Card).map((c) => c.value),
-              boosters: content.filter((c) => c.type == ItemBoxContentType.Booster).map((c) => c.value),
+              sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
+              cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
+              boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
             };
             res.send(response);
           }
@@ -209,10 +210,10 @@ export default function restAPI(app: Express) {
   // Buy a booster pack
   app.post('/api/buy/booster/:boosterNo([1-4])', (req, res) => {
     const boosterNo = Number(req.params['boosterNo']);
-    performWithSessionTokenCheck(req, res, (u) => {
-      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then((sufficientSol) => {
+    performWithSessionTokenCheck(req, res, u => {
+      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then((_) => res.status(201).send({}));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(201).send({}));
         } else {
           res.sendStatus(400);
         }

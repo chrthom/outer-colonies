@@ -13,7 +13,7 @@ export default class Matchmaking extends Phaser.Scene {
 
   constructor() {
     super({
-      key: 'Matchmaking',
+      key: 'Matchmaking'
     });
   }
 
@@ -41,7 +41,7 @@ export default class Matchmaking extends Phaser.Scene {
           this.socket.off(MsgTypeOutbound.Matchmaking);
           this.scene.start('Game', {
             socket: this.socket,
-            gameParams: params,
+            gameParams: params
           });
           break;
       }

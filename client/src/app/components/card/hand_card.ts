@@ -22,7 +22,7 @@ export default class HandCard extends CardImage {
       duration: animationConfig.duration.draw,
       x: this.x(),
       y: this.y(),
-      angle: this.angle(),
+      angle: this.angle()
     });
   }
   highlightPlayability() {

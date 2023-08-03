@@ -34,7 +34,7 @@ export default class ActionPool {
     return new ActionPool(...this.cardActions.concat(ap.cardActions));
   }
   getActionsFor(cardType: CardType): CardAction[] {
-    return this.pool.filter((ap) => ap.canBeUsedFor(cardType));
+    return this.pool.filter(ap => ap.canBeUsedFor(cardType));
   }
   get pool() {
     return this.cardActions.slice();
@@ -47,20 +47,20 @@ export default class ActionPool {
   }
   remove(...cardActions: CardAction[]) {
     cardActions
-      .map((a) => a.toString())
-      .forEach((s) => {
-        console.log(`Remove ${s} | Found ${this.cardActions.filter((p) => p.toString() == s)}`); /////
-        this.cardActions.filter((p) => p.toString() == s)[0].depleted = true;
+      .map(a => a.toString())
+      .forEach(s => {
+        console.log(`Remove ${s} | Found ${this.cardActions.filter(p => p.toString() == s)}`); /////
+        this.cardActions.filter(p => p.toString() == s)[0].depleted = true;
         this.removeDepleted();
       });
   }
   toString(): string {
-    return this.pool.map((ca) => ca.toString()).join('__');
+    return this.pool.map(ca => ca.toString()).join('__');
   }
   private removeDepleted() {
-    const depleted = this.cardActions.filter((a) => a.depleted);
-    this.cardActions = this.cardActions.filter((a) => !a.depleted);
-    depleted.forEach((a) => (a.depleted = false));
+    const depleted = this.cardActions.filter(a => a.depleted);
+    this.cardActions = this.cardActions.filter(a => !a.depleted);
+    depleted.forEach(a => (a.depleted = false));
   }
   static sortOrder(a: CardAction, b: CardAction): number {
     if (a.priority() == b.priority()) {

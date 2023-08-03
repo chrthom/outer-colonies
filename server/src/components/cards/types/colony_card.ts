@@ -31,7 +31,7 @@ export default class ColonyCard extends Card {
       omega: 99,
       delta: 99,
       psi: 99,
-      handCardLimit: rules.maxHandCards,
+      handCardLimit: rules.maxHandCards
     };
   }
   override get actionPool(): ActionPool {
@@ -40,7 +40,7 @@ export default class ColonyCard extends Card {
       new CardAction(CardType.Hull),
       new CardAction(CardType.Infrastructure),
       new CardAction(CardType.Orb),
-      new CardAction(CardType.Tactic),
+      new CardAction(CardType.Tactic)
     );
   }
   override canBeRetracted(): boolean {

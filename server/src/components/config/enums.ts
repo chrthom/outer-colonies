@@ -1,7 +1,7 @@
 export enum BattleType {
   None = 'none',
   Mission = 'mission',
-  Raid = 'raid',
+  Raid = 'raid'
 }
 
 export enum CardType {
@@ -10,7 +10,7 @@ export enum CardType {
   Hull = 'hull',
   Infrastructure = 'infrastructure',
   Tactic = 'tactic',
-  Orb = 'orb',
+  Orb = 'orb'
 }
 
 export enum EventType {
@@ -18,24 +18,24 @@ export enum EventType {
   Attack = 'attack',
   Discard = 'discard',
   Retract = 'retract',
-  Tactic = 'tactic',
+  Tactic = 'tactic'
 }
 
 export enum ItemType {
   Box = 'box',
-  Booster = 'booster',
+  Booster = 'booster'
 }
 
 export enum ItemBoxContentType {
   Card = 'card',
   Booster = 'booster',
-  Sol = 'sol',
+  Sol = 'sol'
 }
 
 export enum GameResultType {
   Depletion = 'depletion',
   Destruction = 'destruction',
-  Surrender = 'surrender',
+  Surrender = 'surrender'
 }
 
 export enum MsgTypeInbound {
@@ -46,27 +46,27 @@ export enum MsgTypeInbound {
   Handcard = 'handcard',
   Login = 'login',
   Ready = 'ready',
-  Retract = 'retract',
+  Retract = 'retract'
 }
 
 export enum MsgTypeOutbound {
   CardRequest = 'card_request',
   Connect = 'connect',
   Matchmaking = 'matchmaking',
-  State = 'state',
+  State = 'state'
 }
 
 export enum Rarity {
   Common = 'common',
   Uncommon = 'uncommon',
-  Rare = 'rare',
+  Rare = 'rare'
 }
 
 export enum TacticDiscipline {
   Economy = 'economy',
   Intelligence = 'intelligence',
   Military = 'military',
-  Science = 'science',
+  Science = 'science'
 }
 
 export enum TurnPhase {
@@ -74,12 +74,12 @@ export enum TurnPhase {
   Start = 'start',
   Build = 'build',
   Combat = 'combat',
-  End = 'end',
+  End = 'end'
 }
 
 export enum Zone {
   Hand = 'hand',
   Colony = 'colony',
   Oribital = 'orbital',
-  Neutral = 'neutral',
+  Neutral = 'neutral'
 }

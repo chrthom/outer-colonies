@@ -12,14 +12,14 @@ export default class RetractCardButton {
     cardY: number,
     cardStackUUID: string,
     cardIndex: number,
-    crititcal: boolean,
+    crititcal: boolean
   ) {
     this.scene = scene;
     this.image = scene.add
       .image(
         cardX + layout.cards.retractCardButton.xOffset,
         cardY + layout.cards.retractCardButton.yOffset,
-        `icon_retract_card`,
+        `icon_retract_card`
       )
       .setOrigin(0.5, 0.5)
       .setAlpha(layout.colors.alpha)
@@ -38,7 +38,7 @@ export default class RetractCardButton {
       layout.colors.primary,
       layout.colors.neutral,
       layout.colors.primary,
-      layout.colors.primary,
+      layout.colors.primary
     );
   }
   setTintCritical() {
@@ -46,7 +46,7 @@ export default class RetractCardButton {
       layout.colors.secondary,
       layout.colors.neutral,
       layout.colors.secondary,
-      layout.colors.secondary,
+      layout.colors.secondary
     );
   }
   setTintHover() {
@@ -57,7 +57,7 @@ export default class RetractCardButton {
       targets: this.image,
       duration: animationConfig.duration.move,
       x: cardX + layout.cards.retractCardButton.xOffset,
-      y: cardY + layout.cards.retractCardButton.yOffset,
+      y: cardY + layout.cards.retractCardButton.yOffset
     });
   }
 }

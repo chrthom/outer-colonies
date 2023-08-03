@@ -12,25 +12,25 @@ export default class DBDecksDAO {
   }
   static async setInUse(cardInstanceId: number, inUse: boolean) {
     await DBConnection.instance.query(
-      `UPDATE decks SET in_use = ${inUse ? 1 : 0} WHERE card_instance_id = ${cardInstanceId}`,
+      `UPDATE decks SET in_use = ${inUse ? 1 : 0} WHERE card_instance_id = ${cardInstanceId}`
     );
   }
   private static async getBy(whereClause: string): Promise<DBDeck[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`,
+      `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`
     );
-    return queryResult.map((r) => {
+    return queryResult.map(r => {
       return {
         cardInstanceId: Number(r.card_instance_id),
         cardId: Number(r.card_id),
-        inUse: Boolean(r.in_use),
+        inUse: Boolean(r.in_use)
       };
     });
   }
   static async create(cardId: number, userId: number, inUse?: boolean, tradeable?: boolean) {
     DBConnection.instance.query(
       'INSERT INTO decks (card_id, user_id, in_use, tradeable) VALUES ' +
-        `(${cardId}, ${userId}, ${inUse ? 1 : 0}, ${tradeable ? 1 : 0})`,
+        `(${cardId}, ${userId}, ${inUse ? 1 : 0}, ${tradeable ? 1 : 0})`
     );
   }
 }

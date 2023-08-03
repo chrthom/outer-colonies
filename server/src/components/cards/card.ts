@@ -24,7 +24,7 @@ export default abstract class Card {
   }
   get canDefend(): boolean {
     const p = this.profile;
-    return [p.armour, p.shield, p.pointDefense].some((n) => n > 0);
+    return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
   }
   get isPermanent(): boolean {
     return true;

@@ -14,7 +14,7 @@ export default class ValueIndicator {
     cardX: number,
     cardY: number,
     ownedByPlayer: boolean,
-    hasEllipseShape: boolean,
+    hasEllipseShape: boolean
   ) {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
@@ -26,7 +26,7 @@ export default class ValueIndicator {
           64,
           32,
           critical ? layout.colors.secondary : layout.colors.primary,
-          layout.colors.alpha,
+          layout.colors.alpha
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layout.depth.indicators);
@@ -39,7 +39,7 @@ export default class ValueIndicator {
           16,
           22,
           critical ? layout.colors.secondary : layout.colors.primary,
-          layout.colors.alpha,
+          layout.colors.alpha
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layout.depth.indicators);
@@ -62,7 +62,7 @@ export default class ValueIndicator {
       targets: [this.text, this.shape],
       duration: animationConfig.duration.move,
       x: this.x(cardX),
-      y: this.y(cardY),
+      y: this.y(cardY)
     });
   }
   private x(cardX: number) {

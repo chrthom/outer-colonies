@@ -12,7 +12,7 @@ export class Card119 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -28,7 +28,7 @@ export class Card152 extends HullCard {
       phi: 1,
       omega: 2,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -44,7 +44,7 @@ export class Card153 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -60,7 +60,7 @@ export class Card228 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 2,
+      psi: 2
     });
   }
 }
@@ -76,7 +76,7 @@ export class Card446 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }

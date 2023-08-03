@@ -14,7 +14,7 @@ export class Card141 extends EconomyTacticCard {
   private oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
     new CardAction(CardType.Hull),
-    new CardAction(CardType.Infrastructure),
+    new CardAction(CardType.Infrastructure)
   );
   constructor() {
     super(141, 'Externe Arbeitskräfte', 2);
@@ -43,9 +43,9 @@ export class Card165 extends EconomyTacticCard {
   }
   private calcFreePsiSockets(player: Player): number {
     return player.cardStacks
-      .map((cs) => cs.profile)
-      .filter((p) => p.speed >= 2 && p.psi > 0)
-      .map((p) => p.psi)
+      .map(cs => cs.profile)
+      .filter(p => p.speed >= 2 && p.psi > 0)
+      .map(p => p.psi)
       .reduce((psi1, psi2) => psi1 + psi2, 0);
   }
 }

@@ -11,13 +11,13 @@ class OCRules {
     victory: 45,
     game: 70,
     energy: 90,
-    ships: 125,
+    ships: 125
   };
   readonly gameEarnings = {
     victory: 50,
     cardsInGame: 3,
     discardPile: 1,
-    dealtColonyDamage: 1,
+    dealtColonyDamage: 1
   };
   readonly minCardsForVictoryBonus = 6;
   readonly boosterCosts = [Infinity, 920, 1045, 1045, 1045];

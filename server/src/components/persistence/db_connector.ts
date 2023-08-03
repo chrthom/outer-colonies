@@ -13,7 +13,7 @@ export default class DBConnection {
       password: config.has('database.password')
         ? config.get('database.password')
         : <string>process.env['DB_PASSWORD'],
-      connectionLimit: config.get<number>('database.connectionLimit'),
+      connectionLimit: config.get<number>('database.connectionLimit')
     });
   }
   async query<T>(query: string, noRetry?: boolean): Promise<T> {

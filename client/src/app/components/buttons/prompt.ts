@@ -81,7 +81,7 @@ export default class Prompt {
   }
   private showCombatPhase() {
     this.show(
-      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen Waffensystemen durch!`,
+      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen Waffensystemen durch!`
     );
   }
   private showEndPhase() {
@@ -99,7 +99,7 @@ export default class Prompt {
       else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Eigene Kolonie zerstört';
     }
     this.show(
-      `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`,
+      `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
     );
     this.text.setFontSize(layout.prompt.fontSizeBig);
   }

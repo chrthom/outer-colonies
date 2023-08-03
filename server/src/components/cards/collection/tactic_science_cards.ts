@@ -16,9 +16,9 @@ export class Card110 extends EconomyTacticCard {
   }
   onUtilizaton(player: Player) {
     player.cardStacks
-      .filter((cs) => cs.type == CardType.Hull)
-      .forEach((cs) => {
-        const numOfHullCards = cs.cards.filter((c) => c.type == CardType.Hull).length;
+      .filter(cs => cs.type == CardType.Hull)
+      .forEach(cs => {
+        const numOfHullCards = cs.cards.filter(c => c.type == CardType.Hull).length;
         cs.damage -= Math.min(this.damageToRepair * numOfHullCards, cs.damage);
       });
   }

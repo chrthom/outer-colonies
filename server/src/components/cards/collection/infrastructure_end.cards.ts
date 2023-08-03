@@ -20,7 +20,7 @@ export class Card114 extends InfrastructureEndOfTurnCard {
       omega: 0,
       delta: 0,
       psi: -2,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
   onEndTurn(player: Player) {
@@ -40,7 +40,7 @@ export class Card155 extends InfrastructureEndOfTurnCard {
       omega: 0,
       delta: 0,
       psi: -1,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
   onEndTurn(player: Player) {

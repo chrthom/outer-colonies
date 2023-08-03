@@ -21,7 +21,7 @@ abstract class CardPowerPlant extends InfrastructureEnergyCard {
       omega: 0,
       delta: 0,
       psi: 0,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
     this.onlyAttachableToColony = true;
   }
@@ -39,7 +39,7 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
       omega: -1,
       delta: 0,
       psi: 0,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
 }
@@ -56,7 +56,7 @@ abstract class SolarPanelCard extends InfrastructureEnergyCard {
       omega: 0,
       delta: 0,
       psi: 0,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
 }
@@ -73,13 +73,13 @@ export class Card105 extends InfrastructureEnergyCard {
       omega: -3,
       delta: 0,
       psi: 0,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
   override onDestruction(player: Player) {
     const battle = player.match.battle;
     if (player.match.turnPhase == TurnPhase.Combat && battle.type != BattleType.None) {
-      battle.ships.flat().forEach((cs) => cs.damage++);
+      battle.ships.flat().forEach(cs => cs.damage++);
     }
   }
 }
@@ -96,7 +96,7 @@ export class Card145 extends InfrastructureEnergyCard {
       omega: -2,
       delta: 0,
       psi: 0,
-      handCardLimit: 0,
+      handCardLimit: 0
     });
   }
 }

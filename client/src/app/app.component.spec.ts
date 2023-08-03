@@ -4,8 +4,8 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
-    }),
+      declarations: [AppComponent]
+    })
   );
 
   it('should create the app', () => {
@@ -25,7 +25,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.content span')?.textContent).toContain(
-      'outercolonies-client app is running!',
+      'outercolonies-client app is running!'
     );
   });
 });

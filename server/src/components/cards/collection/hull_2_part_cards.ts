@@ -3,7 +3,7 @@ import HullCard, { HullMultipart } from '../types/hull_card';
 function toMultipart(...neededPartIds: number[]): HullMultipart {
   return {
     partNo: 2,
-    neededPartIds: neededPartIds,
+    neededPartIds: neededPartIds
   };
 }
 
@@ -22,7 +22,7 @@ export class Card131 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -38,7 +38,7 @@ export class Card132 extends HullCard {
       phi: 2,
       omega: 0,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -54,7 +54,7 @@ export class Card177 extends HullCard {
       phi: 0,
       omega: 0,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -70,7 +70,7 @@ export class Card178 extends HullCard {
       phi: 1,
       omega: 1,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -86,7 +86,7 @@ export class Card213 extends HullCard {
       phi: 0,
       omega: 0,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -102,7 +102,7 @@ export class Card221 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -118,7 +118,7 @@ export class Card226 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -134,7 +134,7 @@ export class Card326 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 0,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -150,7 +150,7 @@ export class Card327 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 1,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -166,7 +166,7 @@ export class Card328 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -182,7 +182,7 @@ export class Card329 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -198,7 +198,7 @@ export class Card418 extends HullCard {
       phi: 0,
       omega: 3,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -214,7 +214,7 @@ export class Card444 extends HullCard {
       phi: 1,
       omega: 0,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -230,7 +230,7 @@ export class Card445 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }

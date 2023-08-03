@@ -12,7 +12,7 @@ export default class Card extends CardImage {
     y: number,
     opponentCard: boolean,
     cardStackUUID: string,
-    data: ClientCard,
+    data: ClientCard
   ) {
     super(scene, x, y, data.id, opponentCard);
     this.data = data;
@@ -23,7 +23,7 @@ export default class Card extends CardImage {
         y,
         cardStackUUID,
         data.index,
-        data.insufficientEnergy,
+        data.insufficientEnergy
       );
     }
   }

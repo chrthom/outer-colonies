@@ -3,7 +3,7 @@ import {
   BattleType,
   MsgTypeInbound,
   MsgTypeOutbound,
-  TurnPhase,
+  TurnPhase
 } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
@@ -43,7 +43,7 @@ export default class ContinueButton {
       inactive_select: this.createButtonImage('inactive_select'),
       inactive_wait: this.createButtonImage('inactive_wait'),
       won: this.createButtonImage('won'),
-      lost: this.createButtonImage('lost'),
+      lost: this.createButtonImage('lost')
     };
     this.text = scene.add
       .text(layout.continueButton.x + layout.continueButton.xTextOffset, layout.continueButton.y, [''])
@@ -53,7 +53,7 @@ export default class ContinueButton {
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach((o) =>
+    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(o =>
       o
         .on('pointerdown', () => {
           self.onClickAction();
@@ -63,7 +63,7 @@ export default class ContinueButton {
         })
         .on('pointerout', () => {
           self.text.setColor(layout.font.color);
-        }),
+        })
     );
     this.waitState();
   }
@@ -127,7 +127,7 @@ export default class ContinueButton {
         ? 'Zug beenden'
         : `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
     this.show(text, 'active_build', () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle),
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle)
     );
   }
   private showIntervene() {
@@ -136,13 +136,13 @@ export default class ContinueButton {
     else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
     else text = 'Überspringen';
     this.show(text, 'inactive_select', () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds),
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds)
     );
   }
   private showNextCombatPhase() {
     const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
     this.show('Kampfphase beenden', button, () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat),
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat)
     );
   }
   private showEndPhase() {
@@ -160,7 +160,7 @@ export default class ContinueButton {
     this.text.setText(text);
   }
   private showButton(name: string) {
-    Object.values(this.buttonImages).forEach((i) => i.setVisible(false));
+    Object.values(this.buttonImages).forEach(i => i.setVisible(false));
     this.buttonImages[name].setVisible(true);
   }
   private waitState() {
@@ -168,9 +168,9 @@ export default class ContinueButton {
     this.show('', button, () => {});
   }
   private get canIntervene() {
-    return this.scene.state.cardStacks.some((cs) => cs.interventionReady);
+    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
   }
   private get canAttack() {
-    return this.scene.state.cardStacks.some((cs) => cs.cards.some((c) => c.battleReady));
+    return this.scene.state.cardStacks.some(cs => cs.cards.some(c => c.battleReady));
   }
 }

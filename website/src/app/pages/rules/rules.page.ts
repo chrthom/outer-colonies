@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'oc-page-rules',
   templateUrl: './rules.page.html',
-  styleUrls: ['./rules.page.scss'],
+  styleUrls: ['./rules.page.scss']
 })
 export class RulesPage {
   activeChapter: string = 'intro';

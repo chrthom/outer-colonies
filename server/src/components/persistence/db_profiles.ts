@@ -12,12 +12,12 @@ export default class DBProfilesDAO {
   }
   private static async getBy(whereClause: string): Promise<DBProfile[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT user_id, sol FROM profiles WHERE ${whereClause}`,
+      `SELECT user_id, sol FROM profiles WHERE ${whereClause}`
     );
-    return queryResult.map((r) => {
+    return queryResult.map(r => {
       return {
         userId: Number(r.user_id),
-        sol: Number(r.sol),
+        sol: Number(r.sol)
       };
     });
   }

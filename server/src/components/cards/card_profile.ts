@@ -43,11 +43,11 @@ export default class CardProfile implements HullProfile, EquipmentProfile, Infra
       pointDefense: c1.pointDefense + c2.pointDefense,
       shield: c1.shield + c2.shield,
       armour: c1.armour + c2.armour,
-      handCardLimit: c1.handCardLimit + c2.handCardLimit,
+      handCardLimit: c1.handCardLimit + c2.handCardLimit
     };
   }
   static isValid(c: CardProfile): boolean {
-    return Object.values(c).filter((v) => v < 0).length == 0;
+    return Object.values(c).filter(v => v < 0).length == 0;
   }
 }
 

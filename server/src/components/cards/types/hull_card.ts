@@ -14,19 +14,19 @@ export default abstract class HullCard extends Card {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.filterAttachableHull(player.cardStacks).concat(
-      this.filterAttachableColony(player.cardStacks),
+      this.filterAttachableColony(player.cardStacks)
     );
   }
   private filterAttachableHull(cardStacks: CardStack[]): CardStack[] {
     return cardStacks.filter(
-      (cs) =>
+      cs =>
         cs.type == CardType.Hull &&
         (<HullCard>cs.card).multipart.neededPartIds.includes(this.id) &&
-        !cs.cards.some((c) => c.name == this.name),
+        !cs.cards.some(c => c.name == this.name)
     ); // Reconsider if matching by name is a bad idea
   }
   private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
-    return cardStacks.filter((cs) => cs.type == CardType.Colony && this.hullProfile.energy >= 0);
+    return cardStacks.filter(cs => cs.type == CardType.Colony && this.hullProfile.energy >= 0);
   }
   onUtilizaton() {}
   onRetraction() {}
@@ -36,7 +36,7 @@ export default abstract class HullCard extends Card {
     return isRootCard;
   }
   override isFlightReady(cards: Card[]): boolean {
-    return cards.filter((c) => c.type == CardType.Hull).length == this.multipart.partNo;
+    return cards.filter(c => c.type == CardType.Hull).length == this.multipart.partNo;
   }
   get profile(): CardProfile {
     return CardProfile.fromHullProfile(this.hullProfile);
@@ -48,6 +48,6 @@ export class HullMultipart {
   neededPartIds!: number[];
   static noMultipart: HullMultipart = {
     partNo: 1,
-    neededPartIds: [],
+    neededPartIds: []
   };
 }

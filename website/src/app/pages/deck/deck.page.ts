@@ -11,7 +11,7 @@ interface DeckCardStack extends DeckCard {
 @Component({
   selector: 'oc-page-deck',
   templateUrl: './deck.page.html',
-  styleUrls: ['./deck.page.scss'],
+  styleUrls: ['./deck.page.scss']
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;
@@ -23,21 +23,21 @@ export class DeckPage implements OnInit {
     this.update();
   }
   update() {
-    this.deckApiService.listDeck().subscribe((res) => {
+    this.deckApiService.listDeck().subscribe(res => {
       if (res) {
-        this.activeCards = this.groupDeckCards(res.cards.filter((dc) => dc.inUse)).sort(this.cardSortFn);
-        this.reserveCards = this.groupDeckCards(res.cards.filter((dc) => !dc.inUse)).sort(this.cardSortFn);
+        this.activeCards = this.groupDeckCards(res.cards.filter(dc => dc.inUse)).sort(this.cardSortFn);
+        this.reserveCards = this.groupDeckCards(res.cards.filter(dc => !dc.inUse)).sort(this.cardSortFn);
       }
     });
   }
   activateCard(card: DeckCard) {
     if (this.activeCardsNum < this.maxCards) {
-      this.deckApiService.activateCard(card.id).subscribe((_) => this.update());
+      this.deckApiService.activateCard(card.id).subscribe(_ => this.update());
     }
   }
   deactivateCard(card: DeckCard) {
     if (this.activeCardsNum > this.minCards) {
-      this.deckApiService.deactivateCard(card.id).subscribe((_) => this.update());
+      this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
     }
   }
   toCardUrl(cardId: number): string {
@@ -54,16 +54,16 @@ export class DeckPage implements OnInit {
     else return 0;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
-    return Object.values(_.groupBy(deckCards, (dc) => dc.cardId)).map((dc) => {
+    return Object.values(_.groupBy(deckCards, dc => dc.cardId)).map(dc => {
       const stack = <DeckCardStack>dc[0];
       stack.numOfCards = dc.length;
       return stack;
     });
   }
   get activeCardsNum(): number {
-    return this.activeCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b, 0);
+    return this.activeCards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
   }
   get reserveCardsNum(): number {
-    return this.reserveCards.map((dc) => dc.numOfCards).reduce((a, b) => a + b, 0);
+    return this.reserveCards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
   }
 }

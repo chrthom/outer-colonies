@@ -19,14 +19,14 @@ export default class DBItemsDAO {
   }
   private static async getBy(whereClause: string): Promise<DBItem[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT item_id, type, message, content FROM items WHERE ${whereClause}`,
+      `SELECT item_id, type, message, content FROM items WHERE ${whereClause}`
     );
-    return queryResult.map((r) => {
+    return queryResult.map(r => {
       return {
         itemId: Number(r.item_id),
         type: r.type == 'booster' ? ItemType.Booster : ItemType.Box,
         message: r.message,
-        content: r.content,
+        content: r.content
       };
     });
   }
@@ -39,7 +39,7 @@ export default class DBItemsDAO {
   private static async create(userId: number, type: ItemType, content: string, message?: string) {
     DBConnection.instance.query(
       `INSERT INTO items (user_id, type, content${message ? ', message' : ''}) VALUES ` +
-        `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`,
+        `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`
     );
   }
 }

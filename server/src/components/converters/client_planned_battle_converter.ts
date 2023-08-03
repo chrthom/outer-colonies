@@ -6,8 +6,8 @@ import { getCardStackByUUID } from '../utils/helpers';
 
 export default function toBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
   const ships = plannedBattle.shipIds
-    .map((id) => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
-    .filter((cs) => cs.isMissionReady);
+    .map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
+    .filter(cs => cs.isMissionReady);
   if (plannedBattle.shipIds.length == 0) return new Battle(BattleType.None);
   let battle: Battle;
   switch (plannedBattle.type) {

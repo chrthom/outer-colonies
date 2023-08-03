@@ -4,6 +4,6 @@ export const environment = {
   url: {
     game: 'http://localhost:4201',
     api: 'https://api.staging.outercolonies.de',
-    assets: 'https://assets.staging.outercolonies.de',
-  },
+    assets: 'https://assets.staging.outercolonies.de'
+  }
 };

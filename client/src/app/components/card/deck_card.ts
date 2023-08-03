@@ -21,7 +21,7 @@ export default class DeckCard extends CardImage {
       layout.deck.x,
       layout.deck.y,
       true,
-      true,
+      true
     );
   }
   private onClickAction() {

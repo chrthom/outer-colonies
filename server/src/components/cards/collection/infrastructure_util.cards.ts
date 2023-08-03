@@ -20,7 +20,7 @@ export class Card172 extends InfrastructureUtilCard {
       omega: 0,
       delta: 0,
       psi: -1,
-      handCardLimit: 2,
+      handCardLimit: 2
     });
   }
 }

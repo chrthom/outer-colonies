@@ -41,7 +41,7 @@ import { RulesPage } from './pages/rules/rules.page';
     TradePage,
     InventoryItemComponent,
     OpenItemComponent,
-    RulesPage,
+    RulesPage
   ],
   imports: [
     BrowserModule,
@@ -58,9 +58,9 @@ import { RulesPage } from './pages/rules/rules.page';
     MatCardModule,
     MatBadgeModule,
     MatTabsModule,
-    MatSnackBarModule,
+    MatSnackBarModule
   ],
   providers: [],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}

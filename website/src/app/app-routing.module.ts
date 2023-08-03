@@ -25,7 +25,7 @@ const privateGuardFn: CanActivateFn = () => {
     const router = inject(Router);
     return inject(AuthService)
       .check()
-      .pipe(tap((b) => (!b ? router.navigate(['/login']) : {})));
+      .pipe(tap(b => (!b ? router.navigate(['/login']) : {})));
   } else {
     return false;
   }
@@ -36,52 +36,52 @@ const routes: Routes = [
   {
     path: 'login',
     canActivate: [publicGuardFn],
-    component: LoginPage,
+    component: LoginPage
   },
   {
     path: 'register',
     canActivate: [publicGuardFn],
-    component: RegisterPage,
+    component: RegisterPage
   },
   {
     path: 'deck',
     canActivate: [privateGuardFn],
-    component: DeckPage,
+    component: DeckPage
   },
   {
     path: 'trade',
     canActivate: [privateGuardFn],
-    component: TradePage,
+    component: TradePage
   },
   {
     path: 'rules',
     canActivate: [privateGuardFn],
-    component: RulesPage,
+    component: RulesPage
   },
   {
     path: 'imprint',
     canActivate: [publicGuardFn],
-    component: ImprintPage,
+    component: ImprintPage
   },
   {
     path: 'privacy',
     canActivate: [publicGuardFn],
-    component: DataPrivacyPage,
+    component: DataPrivacyPage
   },
   {
     path: '',
     canActivate: [privateGuardFn],
     component: HomePage,
-    pathMatch: 'full',
+    pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: '',
-  },
+    redirectTo: ''
+  }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

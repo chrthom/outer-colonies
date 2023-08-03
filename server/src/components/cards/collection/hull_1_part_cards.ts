@@ -12,7 +12,7 @@ abstract class CardCorvette extends HullCard {
       phi: 0,
       omega: 1,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -28,7 +28,7 @@ export class Card160 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 1,
-      psi: 1,
+      psi: 1
     });
   }
 }
@@ -50,7 +50,7 @@ export class Card220 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -72,7 +72,7 @@ export class Card342 extends HullCard {
       phi: 1,
       omega: 1,
       delta: 1,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -88,7 +88,7 @@ export class Card348 extends HullCard {
       phi: 0,
       omega: 1,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -110,7 +110,7 @@ export class Card436 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 0,
-      psi: 0,
+      psi: 0
     });
   }
 }
@@ -126,7 +126,7 @@ export class Card439 extends HullCard {
       phi: 0,
       omega: 2,
       delta: 1,
-      psi: 1,
+      psi: 1
     });
   }
 }

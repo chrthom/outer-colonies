@@ -40,7 +40,7 @@ export default class GameResult {
     let sol = 0;
     sol += player.discardPile.length * rules.gameEarnings.discardPile;
     sol += opponent.getColonyCardStack().damage * rules.gameEarnings.dealtColonyDamage;
-    const ingameCards = player.cardStacks.flatMap((c) => c.cards).length - 1;
+    const ingameCards = player.cardStacks.flatMap(c => c.cards).length - 1;
     sol += ingameCards * rules.gameEarnings.cardsInGame;
     if (
       won &&
@@ -50,12 +50,12 @@ export default class GameResult {
       sol += rules.gameEarnings.victory;
     }
     sol = Math.max(0, sol);
-    DBCredentialsDAO.getByUsername(player.name).then((c) => {
+    DBCredentialsDAO.getByUsername(player.name).then(c => {
       DBProfilesDAO.increaseSol(c.userId, sol);
       if (won) DBDailiesDAO.achieveVictory(c.userId);
       if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
       if (player.getColonyCardStack().profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
-      if (player.cardStacks.filter((c) => c.isFlightReady).length >= 5) DBDailiesDAO.achieveShips(c.userId);
+      if (player.cardStacks.filter(c => c.isFlightReady).length >= 5) DBDailiesDAO.achieveShips(c.userId);
     });
     return sol;
   }

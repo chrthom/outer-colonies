@@ -12,8 +12,8 @@ export default class SocketData {
   match: Match;
   constructor(user: DBCredential) {
     this.user = user;
-    DBDecksDAO.getByUserId(user.userId).then((cards) => {
-      this.activeDeck = cards.filter((c) => c.inUse).map((c) => CardCollection.cards[c.cardId]);
+    DBDecksDAO.getByUserId(user.userId).then(cards => {
+      this.activeDeck = cards.filter(c => c.inUse).map(c => CardCollection.cards[c.cardId]);
     });
   }
   opponentPlayerNo(): number {

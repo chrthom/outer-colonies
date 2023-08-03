@@ -6,11 +6,11 @@ export default class CombatRangeIndicator {
   private images!: Phaser.GameObjects.Image[];
   constructor(scene: Game) {
     this.scene = scene;
-    this.images = [1, 2, 3, 4].map((i) =>
+    this.images = [1, 2, 3, 4].map(i =>
       this.scene.add
         .image(layout.combatRange.x, layout.combatRange.y, `range_${i}`)
         .setOrigin(0.5, 0.5)
-        .setVisible(false),
+        .setVisible(false)
     );
   }
   update() {
@@ -22,6 +22,6 @@ export default class CombatRangeIndicator {
     this.images[range - 1].setVisible(true);
   }
   hide() {
-    this.images.forEach((i) => i.setVisible(false));
+    this.images.forEach(i => i.setVisible(false));
   }
 }

@@ -19,14 +19,14 @@ export class Card174 extends MilitaryTacticCard {
     target.damage -= Math.min(this.damageToRepair, target.damage);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter((cs) => cs.type == CardType.Hull && cs.damage > 0);
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
   }
 }
 
 export class Card337 extends MilitaryTacticCard {
   private oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
-    new CardAction(CardType.Hull),
+    new CardAction(CardType.Hull)
   );
   constructor() {
     super(337, 'Militärpioniere', 1);
