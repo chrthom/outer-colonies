@@ -21,6 +21,7 @@ import {
   Card240,
   Card349,
   Card406,
+  Card426,
   Card447
 } from './equipment_defense_cards';
 import {
@@ -251,6 +252,7 @@ export default class CardCollection {
     421: <Card>new Card421(),
     422: <Card>new Card422(),
     424: <Card>new Card424(),
+    426: <Card>new Card426(),
     427: <Card>new Card427(),
     434: <Card>new Card434(),
     435: <Card>new Card435(),

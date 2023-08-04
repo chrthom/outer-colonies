@@ -1,3 +1,5 @@
+import Player from '../../game_state/player';
+import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card103 extends EquipmentCard {
@@ -149,6 +151,28 @@ export class Card349 extends EquipmentCard {
       delta: 0,
       psi: 0
     });
+  }
+}
+
+export class Card426 extends EquipmentCard {
+  constructor() {
+    super(426, 'Schildbooster', 2, {
+      energy: -1,
+      hp: 0,
+      speed: 0,
+      pointDefense: 0,
+      shield: 2,
+      armour: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: -1,
+      delta: 0,
+      psi: 0
+    });
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.profile.shield > 0);
   }
 }
 
