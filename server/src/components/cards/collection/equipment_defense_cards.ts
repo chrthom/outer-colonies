@@ -135,6 +135,25 @@ export class Card240 extends EquipmentCard {
   }
 }
 
+export class Card341 extends EquipmentCard {
+  constructor() {
+    super(341, 'Ködersystem', 1, {
+      energy: 0,
+      hp: 0,
+      speed: 0,
+      pointDefense: 2,
+      shield: 0,
+      armour: 0,
+      theta: 0,
+      xi: 0,
+      phi: 0,
+      omega: -1,
+      delta: 0,
+      psi: 0
+    });
+  }
+}
+
 export class Card349 extends EquipmentCard {
   constructor() {
     super(349, 'Dura-Stahl', 1, {
