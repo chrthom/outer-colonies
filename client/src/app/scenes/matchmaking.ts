@@ -5,6 +5,7 @@ import { MsgTypeInbound, MsgTypeOutbound } from '../../../../server/src/componen
 import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
+import ExitButton from '../components/buttons/exit_button';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken: string;
@@ -20,12 +21,14 @@ export default class Matchmaking extends Phaser.Scene {
   preload() {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
+    this.load.image('icon_exit', 'icons/exit.png');
   }
 
   create() {
     this.sessionToken = window.location.search.substring(1);
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
+    new ExitButton(this);
     this.socket = io(environment.urls.api);
     this.socket.on(MsgTypeOutbound.Connect, () => {
       this.status.setText('Authentifiziere Nutzer...');
