@@ -1,22 +1,9 @@
 @use "@angular/material" as mat;
 @use "./style/color.scss" as oc;
+@use "./style/material-theme.scss" as mat-theme;
 @import "./style/fonts.scss";
 @include mat.core();
-
-$outercolonies-website-primary: mat.define-palette(oc.$primary-palette, 500, 100, 800);
-$outercolonies-website-accent: mat.define-palette(oc.$secondary-palette, 500, 100, 700);
-$outercolonies-website-warn: mat.define-palette(oc.$secondary-palette, A400, A100, A700);
-$outercolonies-website-theme: mat.define-dark-theme(
-  (
-    color: (
-      primary: $outercolonies-website-primary,
-      accent: $outercolonies-website-accent,
-      warn: $outercolonies-website-warn
-    )
-  )
-);
-
-@include mat.all-component-themes($outercolonies-website-theme);
+@include mat.all-component-themes(mat-theme.$outercolonies-website-theme);
 
 * {
   margin: 0;
