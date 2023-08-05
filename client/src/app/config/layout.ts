@@ -92,6 +92,7 @@ class Layout {
     y: 450,
     xTextOffset: -30,
     yTextOffset: -4,
+    yConfirmOffset: 35,
     fontSize: 30
   };
   readonly loadingAnimation = {
