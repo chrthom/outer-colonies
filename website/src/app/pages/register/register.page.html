@@ -54,7 +54,7 @@
         </mat-select>
         <mat-error *ngIf="startDeck.hasError('required')"> Bitte w&auml;hle ein Start Deck </mat-error>
       </mat-form-field>
-      <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'accent'">
+      <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
         Neuen Nutzer registrieren
       </button>
       <mat-error *ngIf="registrationSuccessful == false">

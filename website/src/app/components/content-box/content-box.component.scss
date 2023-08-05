@@ -41,7 +41,7 @@
 
 .content-box-center {
   width: calc(100% - 85px);
-  background-color: rgba(17, 153, 153, 0.08);
+  background-color: color-mix(in srgb, var(--color-primary), transparent 93%);;
 }
 
 .content-box-right {
