@@ -1,9 +1,16 @@
 @use "@angular/material" as mat;
-@use "./style/color.scss" as oc;
-@use "./style/material-theme.scss" as mat-theme;
+@use "./style/material-theme.scss" as oc;
 @import "./style/fonts.scss";
 @include mat.core();
-@include mat.all-component-themes(mat-theme.$outercolonies-website-theme);
+@include mat.all-component-themes(oc.$theme);
+
+:root {
+  --color-primary: #{oc.$color-primary};
+  --color-accent: #{oc.$color-accent};
+  --color-warn: #{oc.$color-warning};
+  --color-light: white;
+  --color-dark: black;
+}
 
 * {
   margin: 0;
@@ -14,20 +21,19 @@
   font-family: "Latin Modern Sans";
 }
 a,
-a:visited,
-mat-label {
-  color: oc.$primary-color;
+a:visited {
+  color: var(--color-primary);
 }
 html,
 body {
   height: 100%;
 }
 body {
-  color: white;
+  color: var(--color-light);
 }
 mat-card-title,
 mat-card-subtitle {
-  color: white !important;
+  color: var(--color-light) !important;
   font-family: "Latin Modern Mono Caps" !important;
 }
 h1,
@@ -50,7 +56,6 @@ h5 {
 ul {
   list-style-type: square;
 }
-
 .oc-icon {
   vertical-align: middle;
   width: 24px;

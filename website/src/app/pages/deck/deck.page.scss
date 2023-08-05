@@ -13,7 +13,7 @@
 }
 
 mat-card {
-  background: rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, var(--color-dark), transparent 70%);;
   width: 300px;
   float: left;
   margin-left: 15px;
