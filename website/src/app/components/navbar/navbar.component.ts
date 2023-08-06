@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import AuthService from 'src/app/auth.service';
 
@@ -8,11 +8,13 @@ import AuthService from 'src/app/auth.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  @Input() active: string = '';
   constructor(
-    private router: Router,
+    public router: Router,
     private authService: AuthService
   ) {}
+  get active(): string {
+    return this.router.url.replace('/', '');
+  }
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);

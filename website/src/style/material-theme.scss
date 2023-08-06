@@ -13,6 +13,3 @@ $theme: mat.define-dark-theme(
     )
   )
 );
-$color-primary: mat.get-color-from-palette($theme-primary, 500);
-$color-accent: mat.get-color-from-palette($theme-accent, 500);
-$color-warning: mat.get-color-from-palette($theme-accent, A400);
