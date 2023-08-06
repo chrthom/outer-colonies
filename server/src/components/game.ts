@@ -13,7 +13,7 @@ function getSocket(io: Server, match: Match, playerNo: number): Socket {
 }
 
 function getPlayer(socket: Socket): Player {
-  return data(socket).match.players[data(socket).playerNo];
+  return socketData(socket).match.players[socketData(socket).playerNo];
 }
 
 function emitState(io: Server, match: Match) {
@@ -37,15 +37,15 @@ function initMatch(io: Server, match: Match) {
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     if (match && turnPhase == match.turnPhase) {
       if (turnPhase == TurnPhase.Init) {
-        match.players[data(socket).playerNo].ready = true;
-        if (match.players[data(socket).opponentPlayerNo()].ready) initMatch(io, match);
-      } else if (data(socket).playerNo == match.actionPendingByPlayerNo) {
+        match.players[socketData(socket).playerNo].ready = true;
+        if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
+      } else if (socketData(socket).playerNo == match.actionPendingByPlayerNo) {
         switch (turnPhase) {
           case TurnPhase.Build:
-            if (data(socket).playerNo == match.activePlayerNo) {
+            if (socketData(socket).playerNo == match.activePlayerNo) {
               match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
             } else {
               match.prepareCombatPhase(<string[]>data);
@@ -60,7 +60,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     }
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     if (match) {
       if (!match.gameResult.gameOver) {
         const player = getPlayer(socket);
@@ -71,7 +71,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     }
   });
   socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     const target = getCardStackByUUID(match.getInPlayCardStacks(), targetUUID);
@@ -93,7 +93,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     const player = getPlayer(socket);
     const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
     const targetCardStack =
@@ -114,7 +114,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     if (!handCard) {
@@ -126,7 +126,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
-    const match = data(socket).match;
+    const match = socketData(socket).match;
     const player = getPlayer(socket);
     const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
     const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
@@ -152,6 +152,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   });
 }
 
-function data(socket: Socket): SocketData {
-  return <SocketData>socket.data;
+function socketData(socket: Socket): SocketData {
+  return <SocketData> socket.data;
 }
