@@ -30,12 +30,20 @@
   h1 {
     color: var(--color-primary-light);
   }
+  img {
+    filter: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
+  }
 }
 .active, .navbar-element:hover {
   background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent), transparent 50%) 40%, rgba(0, 0, 0, 0));
 }
-.active h1, .navbar-element:hover h1 {
-  color: var(--color-accent-light);
+.active, .navbar-element:hover {
+  h1 {
+    color: var(--color-accent-light);
+  }
+  img {
+    filter: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
+  }
 }
 #navbar-logo {
   position: absolute;
