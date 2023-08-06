@@ -20,7 +20,11 @@
 }
 .navbar-element {
   cursor: pointer;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary), transparent 70%) 30%, rgba(0, 0, 0, 0));
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-primary), transparent 70%) 30%,
+    rgba(0, 0, 0, 0)
+  );
   h1 {
     color: var(--color-primary-light);
   }
@@ -48,10 +52,16 @@ h2.navbar-right {
   left: calc(100% - 100px);
   transform: translateX(-100%);
 }
-.active, .navbar-element:hover {
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent), transparent 50%) 40%, rgba(0, 0, 0, 0));
+.active,
+.navbar-element:hover {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-accent), transparent 50%) 40%,
+    rgba(0, 0, 0, 0)
+  );
 }
-.active, .navbar-element:hover {
+.active,
+.navbar-element:hover {
   h1 {
     color: var(--color-accent-light);
   }
@@ -60,10 +70,15 @@ h2.navbar-right {
   }
 }
 #navbar-logo {
+  cursor: pointer;
   position: absolute;
   left: 0;
   transform: translateY(-50%);
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-dark), transparent 25%) 75%, rgba(0, 0, 0, 0));
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-dark), transparent 25%) 75%,
+    rgba(0, 0, 0, 0)
+  );
   width: fit-content;
   padding: 10px 20px;
   z-index: 51;

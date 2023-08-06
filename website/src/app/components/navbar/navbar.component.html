@@ -1,19 +1,39 @@
 <div id="navbar-space"></div>
 <div id="navbar-main">
   <div id="navbar-logo" routerLink="/">
-    <img src="../../../assets/logo.png">
+    <img src="../../../assets/logo.png" />
   </div>
-  <div class="navbar-element navbar-center" matTooltip="Spielsuche & Aktuelles" [class.active]="active == ''" routerLink="/">
-    <img src="../../../assets/icons/home.png">
+  <div
+    class="navbar-element navbar-center"
+    matTooltip="Spielsuche & Aktuelles"
+    [class.active]="active == ''"
+    routerLink="/"
+  >
+    <img src="../../../assets/icons/home.png" />
   </div>
-  <div class="navbar-element navbar-center" matTooltip="Spielregeln" [class.active]="active == 'rules'" routerLink="/rules">
-    <img src="../../../assets/icons/rules.png">
+  <div
+    class="navbar-element navbar-center"
+    matTooltip="Spielregeln"
+    [class.active]="active == 'rules'"
+    routerLink="/rules"
+  >
+    <img src="../../../assets/icons/rules.png" />
   </div>
-  <div class="navbar-element navbar-center" matTooltip="Deck-Manager" [class.active]="active == 'deck'" routerLink="/deck">
-    <img src="../../../assets/icons/deck.png">
+  <div
+    class="navbar-element navbar-center"
+    matTooltip="Deck-Manager"
+    [class.active]="active == 'deck'"
+    routerLink="/deck"
+  >
+    <img src="../../../assets/icons/deck.png" />
   </div>
-  <div class="navbar-element navbar-center" matTooltip="Inventar und Markt" [class.active]="active == 'trade'" routerLink="/trade">
-    <img src="../../../assets/icons/trade.png">
+  <div
+    class="navbar-element navbar-center"
+    matTooltip="Inventar und Markt"
+    [class.active]="active == 'trade'"
+    routerLink="/trade"
+  >
+    <img src="../../../assets/icons/trade.png" />
   </div>
   <!--
   <div class="navbar-element" matTooltip="Verwalte dein Profil" [class.active]="active == 'profile'" routerLink="/profile">
@@ -22,6 +42,6 @@
   -->
   <h2 class="user-name navbar-right">{{ username }}</h2>
   <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()">
-    <img src="../../../assets/icons/logout.png">
+    <img src="../../../assets/icons/logout.png" />
   </div>
 </div>
