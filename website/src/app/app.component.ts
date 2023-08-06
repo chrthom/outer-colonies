@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { environment } from 'src/environments/environment';
+import AuthService from './auth.service';
 
 @Component({
   selector: 'oc-root',
@@ -8,7 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class AppComponent {
   bgNo: number;
-  constructor() {
+  constructor(public authService: AuthService) {
     this.bgNo = Math.floor(Math.random() * 7);
   }
   get env() {

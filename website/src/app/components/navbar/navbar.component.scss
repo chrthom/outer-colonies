@@ -1,17 +1,23 @@
-#navbar-main {
+#navbar-space {
   position: relative;
+  height: 25px;
+  width: 100%;
+}
+
+#navbar-main {
+  position: sticky;
+  top: 0;
+  left: 0;
+  background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
+  border-top: 3px ridge var(--color-primary-dark);
+  border-bottom: 3px ridge var(--color-primary-dark);
   height: 62px;
-  margin-top: 20px;
-  margin-bottom: 50px;
+  width: 100%;
+  margin-bottom: 30px;
   -webkit-box-align: center;
   -webkit-box-pack: center;
   display: -webkit-box;
-}
-
-mat-icon {
-  margin-top: 20px;
-  margin-right: 10px;
-  vertical-align: text-bottom;
+  z-index: 50;
 }
 
 .navbar-element {
@@ -21,43 +27,15 @@ mat-icon {
   left: 0;
   width: fit-content;
   margin: 0 10px 0 10px;
-  padding: 0 36px 0 36px;
+  padding: 10px 36px 10px 36px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary), transparent 70%) 30%, rgba(0, 0, 0, 0));
+  h1 {
+    color: var(--color-primary-light);
+  }
 }
-
-.navbar-left {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 62px;
-  background-image: url("../../../assets/navbar_box_left.png");
+.active, .navbar-element:hover {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent), transparent 50%) 40%, rgba(0, 0, 0, 0));
 }
-
-.navbar-left.active {
-  background-image: url("../../../assets/navbar_box_left_active.png") !important;
-}
-
-.navbar-right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 36px;
-  height: 62px;
-  background-image: url("../../../assets/navbar_box_right.png");
-}
-
-.navbar-right.active {
-  background-image: url("../../../assets/navbar_box_right_active.png") !important;
-}
-
-.navbar-center {
-  position: relative;
-  height: 62px;
-  line-height: 62px;
-  text-align: center;
-  background-image: url("../../../assets/navbar_box_center.png");
-}
-
-.navbar-center.active {
-  background-image: url("../../../assets/navbar_box_center_active.png") !important;
+.active h1, .navbar-element:hover h1 {
+  color: var(--color-accent-light);
 }

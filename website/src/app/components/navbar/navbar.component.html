@@ -1,37 +1,18 @@
+<div id="navbar-space"></div>
 <div id="navbar-main">
-  <div class="navbar-element" routerLink="/">
-    <div class="navbar-left" [class.active]="active == 'home'"></div>
-    <div class="navbar-center" [class.active]="active == 'home'">
-      <h1>Spielen</h1>
-    </div>
-    <div class="navbar-right" [class.active]="active == 'home'"></div>
+  <div class="navbar-element" [class.active]="active == ''" routerLink="/">
+    <h1>Spielen</h1>
   </div>
-  <div class="navbar-element" routerLink="/rules">
-    <div class="navbar-left" [class.active]="active == 'rules'"></div>
-    <div class="navbar-center" [class.active]="active == 'rules'">
-      <h1>Lernen</h1>
-    </div>
-    <div class="navbar-right" [class.active]="active == 'rules'"></div>
+  <div class="navbar-element" [class.active]="active == 'rules'" routerLink="/rules">
+    <h1>Lernen</h1>
   </div>
-  <div class="navbar-element" routerLink="/deck">
-    <div class="navbar-left" [class.active]="active == 'deck'"></div>
-    <div class="navbar-center" [class.active]="active == 'deck'">
-      <h1>Planen</h1>
-    </div>
-    <div class="navbar-right" [class.active]="active == 'deck'"></div>
+  <div class="navbar-element" [class.active]="active == 'deck'" routerLink="/deck">
+    <h1>Planen</h1>
   </div>
-  <div class="navbar-element" routerLink="/trade">
-    <div class="navbar-left" [class.active]="active == 'trade'"></div>
-    <div class="navbar-center" [class.active]="active == 'trade'">
-      <h1>Handeln</h1>
-    </div>
-    <div class="navbar-right" [class.active]="active == 'trade'"></div>
+  <div class="navbar-element" [class.active]="active == 'trade'" routerLink="/trade">
+    <h1>Handeln</h1>
   </div>
   <div class="navbar-element" (click)="logout()">
-    <div class="navbar-left"></div>
-    <div class="navbar-center">
-      <h1>X</h1>
-    </div>
-    <div class="navbar-right"></div>
+    <h1>X</h1>
   </div>
 </div>
