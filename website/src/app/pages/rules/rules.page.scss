@@ -8,9 +8,6 @@
     width: 100%;
     #table-of-content {
       width: 250px;
-      h4 {
-        color: white !important;
-      }
     }
     #rules-content {
       padding-left: 40px;
@@ -28,22 +25,22 @@
       }
       td,
       th {
-        border: 1px solid #ccc;
+        border: 1px ridge color-mix(in srgb, var(--color-light), transparent 50%);
         padding: 8px;
       }
       tr:nth-child(even) {
-        background-color: rgba(17, 153, 153, 0.2);
+        background-color: color-mix(in srgb, var(--color-primary), transparent 80%);
       }
       tr:hover {
-        background-color: rgba(153, 17, 17, 0.4);
+        background-color: color-mix(in srgb, var(--color-accent), transparent 60%);
       }
       th {
         padding-top: 12px;
         padding-bottom: 12px;
         text-align: left;
         vertical-align: middle;
-        background-color: #119999;
-        color: white;
+        background-color: var(--color-primary);
+        color: var(--color-light);
       }
       .left {
         float: left;

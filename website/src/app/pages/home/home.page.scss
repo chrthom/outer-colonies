@@ -1,5 +1,3 @@
-@use "../../../style/color.scss" as oc;
-
 #outer-box {
   position: relative;
   width: min(100%, 940px);
@@ -26,8 +24,8 @@
   }
 }
 .daily-done {
-  color: oc.$secondary-color;
+  color: var(--color-accent);
 }
 .daily-open {
-  color: oc.$primary-color;
+  color: var(--color-primary);
 }

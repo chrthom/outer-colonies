@@ -19,8 +19,10 @@ import {
   Card171,
   Card184,
   Card240,
+  Card341,
   Card349,
   Card406,
+  Card426,
   Card447
 } from './equipment_defense_cards';
 import {
@@ -231,6 +233,7 @@ export default class CardCollection {
     338: <Card>new Card338(),
     339: <Card>new Card339(),
     340: <Card>new Card340(),
+    341: <Card>new Card341(),
     342: <Card>new Card342(),
     343: <Card>new Card343(),
     344: <Card>new Card344(),
@@ -251,6 +254,7 @@ export default class CardCollection {
     421: <Card>new Card421(),
     422: <Card>new Card422(),
     424: <Card>new Card424(),
+    426: <Card>new Card426(),
     427: <Card>new Card427(),
     434: <Card>new Card434(),
     435: <Card>new Card435(),
