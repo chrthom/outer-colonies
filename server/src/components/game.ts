@@ -153,5 +153,5 @@ export function gameSocketListeners(io: Server, socket: Socket) {
 }
 
 function socketData(socket: Socket): SocketData {
-  return <SocketData> socket.data;
+  return <SocketData>socket.data;
 }

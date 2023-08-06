@@ -12,9 +12,7 @@
       <mat-slide-toggle color="primary" formControlName="remember">
         <mat-label>Zugangsdaten merken</mat-label>
       </mat-slide-toggle>
-      <button mat-raised-button type="submit" [color]="loginForm.valid ? 'primary' : 'warn'">
-        Anmelden
-      </button>
+      <button mat-raised-button type="submit" [color]="loginForm.valid ? 'primary' : 'warn'">Anmelden</button>
       <mat-error *ngIf="loginFailed">
         Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
       </mat-error>

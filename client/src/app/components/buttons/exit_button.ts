@@ -40,16 +40,17 @@ export default class ExitButton {
       .image(layout.exitButton.x, layout.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(o => o
-      .on('pointerdown', () => {
-        self.onClickAction();
-      })
-      .on('pointerover', () => {
-        self.text.setColor(layout.font.colorWarn);
-      })
-      .on('pointerout', () => {
-        self.text.setColor(layout.font.color);
-      })
+    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(o =>
+      o
+        .on('pointerdown', () => {
+          self.onClickAction();
+        })
+        .on('pointerover', () => {
+          self.text.setColor(layout.font.colorWarn);
+        })
+        .on('pointerout', () => {
+          self.text.setColor(layout.font.color);
+        })
     );
     this.confirmText
       .on('pointerdown', () => {
@@ -70,7 +71,7 @@ export default class ExitButton {
     else this.text.setText('Spiel beenden');
   }
   private onClickAction(confirmed?: boolean) {
-    if (this.isMatchmaking || confirmed || this.scene instanceof Game && this.scene.state.gameResult) {
+    if (this.isMatchmaking || confirmed || (this.scene instanceof Game && this.scene.state.gameResult)) {
       window.location.href = environment.urls.website;
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
