@@ -31,8 +31,14 @@
     color: var(--color-primary-light);
   }
   img {
+    width: 35px;
     filter: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
   }
+}
+.navbar-right {
+  position: absolute;
+  top: 0;
+  left: calc(100% - 130px);
 }
 .active, .navbar-element:hover {
   background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent), transparent 50%) 40%, rgba(0, 0, 0, 0));
@@ -47,7 +53,7 @@
 }
 #navbar-logo {
   position: absolute;
-  left: 50px;
+  left: 0;
   transform: translateY(-50%);
   background: radial-gradient(closest-side, color-mix(in srgb, var(--color-dark), transparent 25%) 75%, rgba(0, 0, 0, 0));
   width: fit-content;
