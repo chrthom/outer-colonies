@@ -12,7 +12,9 @@ export default class HandCard extends CardImage {
     super(scene, layout.deck.x, layout.deck.y, data.cardId);
     this.uuid = data.uuid;
     this.update(data);
-    this.image.on('pointerdown', () => this.onClickAction());
+    this.image
+      .on('pointerdown', () => this.onClickAction())
+      .setDepth(layout.depth.handCard);
     this.enableMaximizeOnMouseover();
   }
   update(data: ClientHandCard) {

@@ -21,6 +21,7 @@ class Layout {
   readonly depth = {
     indicators: 20,
     discardCard: 50,
+    handCard: 70,
     maxedTacticCard: 100
   };
 
