@@ -19,22 +19,12 @@ export class ItemApiService extends OCApi {
     super(http);
   }
   get items(): Observable<ItemListResponse | undefined> {
-    return this.get<ItemListResponse>('item', this.authService.token).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body ? res.body : undefined;
-        return result;
-      })
-    );
+    return this.get<ItemListResponse>('item', this.authService.token);
   }
   buyBooster(boosterNo: number): Observable<any> {
     return this.post(`buy/booster/${boosterNo}`, this.authService.token);
   }
   open(itemId: number): Observable<OpenItemResponse | undefined> {
-    return this.post<OpenItemResponse>(`item/${itemId}`, this.authService.token).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body ? res.body : undefined;
-        return result;
-      })
-    );
+    return this.post<OpenItemResponse>(`item/${itemId}`, this.authService.token);
   }
 }

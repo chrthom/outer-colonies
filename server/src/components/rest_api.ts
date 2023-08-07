@@ -41,9 +41,14 @@ export default function restAPI(app: Express) {
 
   // Register new user
   app.post('/api/auth/register', (req, res) => {
-    Auth.register(<AuthRegisterRequest>req.body).then(success =>
-      success ? res.status(201).send({}) : res.sendStatus(500)
-    );
+    Auth.register(<AuthRegisterRequest>req.body).then(credential => {
+      const payload: AuthLoginResponse = {
+        success: true,
+        sessionToken: credential.sessionToken,
+        username: credential.username
+      };
+      res.status(201).send(payload);
+    });
   });
 
   // Login
@@ -151,7 +156,7 @@ export default function restAPI(app: Express) {
   // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
-      const content = <DBItemBoxContent[]>JSON.parse(i.content);
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
       return {
         itemId: i.itemId,
         message: i.message,
@@ -161,7 +166,7 @@ export default function restAPI(app: Express) {
       };
     };
     const toBooster = (i: DBItem) => {
-      const content = <DBItemBoxContent[]>JSON.parse(i.content);
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
       return {
         itemId: i.itemId,
         no: Number(i.content)
@@ -234,7 +239,7 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(201).send({}));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(204));
         } else {
           res.sendStatus(400);
         }

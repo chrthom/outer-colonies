@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import {
   AuthRegisterRequest,
   AuthExistsResponse,
@@ -18,45 +18,26 @@ export default class AuthApiService extends OCApi {
   }
   checkUsernameExists(username: string): Observable<boolean> {
     return this.get<AuthExistsResponse>(`auth/exists?username=${username}`).pipe(
-      map(res => (res.body ? res.body.exists : false))
+      map(res => (res ? res.exists : false))
     );
   }
   checkEmailExists(email: string): Observable<boolean> {
     return this.get<AuthExistsResponse>(`auth/exists?email=${email}`).pipe(
-      map(res => (res.body ? res.body.exists : false))
+      map(res => (res ? res.exists : false))
     );
   }
   checkSessionToken(sessionToken: string): Observable<AuthLoginResponse | undefined> {
-    return this.get<AuthLoginResponse>('auth/login', sessionToken).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
-        if (!result)
-          console.log(`Login API call with session token failed with HTTP ${res.status}: ${res.statusText}`);
-        return result;
-      })
-    );
+    return this.get<AuthLoginResponse>('auth/login', sessionToken);
   }
   register(body: AuthRegisterRequest): Observable<boolean> {
     return this.post('auth/register', undefined, body).pipe(
-      map(res => res.status >= 200 && res.status < 300)
+      map(r => r != undefined)
     );
   }
   login(body: AuthLoginRequest): Observable<AuthLoginResponse | undefined> {
-    return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
-        if (!result) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
-        return result;
-      })
-    );
+    return this.post<AuthLoginResponse>('auth/login', undefined, body);
   }
   logout(sessionToken: string): Observable<void> {
-    return this.delete<void>('auth/login', sessionToken).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
-        if (!result) console.log(`Logout API call failed with HTTP ${res.status}: ${res.statusText}`);
-        return result;
-      })
-    );
+    return this.delete<void>('auth/login', sessionToken)
   }
 }

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
-import { Observable, map, mergeAll, mergeMap, of, tap } from 'rxjs';
+import { Observable, catchError, map, mergeAll, mergeMap, of, tap } from 'rxjs';
 import { AuthLoginResponse } from '../../../server/src/components/shared_interfaces/rest_api';
 import { flatMap } from 'lodash-es';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -56,12 +57,17 @@ export default class AuthService {
       return of(false);
     }
     return res.pipe(
-      mergeMap(r => {
-        let retry = false;
-        if (!r && this.sessionToken) retry = true;
+      map(r => {
         this.sessionToken = r?.sessionToken;
         this.username = r?.username;
-        return retry ? this.check() : of(r != null);
+        return true;
+      }),
+      catchError(res => {
+        console.log(`API call to ${res.url} failed with HTTP ${res.status}: ${res.statusText}`);
+        const retry = this.sessionToken != undefined;
+        this.sessionToken = undefined;
+        this.username = undefined;
+        return retry ? this.check() : of(false);
       })
     );
   }
@@ -73,7 +79,7 @@ export default class AuthService {
   get displayname(): string {
     return this.username ? this.username : '';
   }
-
+  
   get token(): string {
     return this.sessionToken ? this.sessionToken : '';
   }
