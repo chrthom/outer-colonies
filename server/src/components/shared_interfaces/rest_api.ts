@@ -15,6 +15,7 @@ export interface AuthLoginRequest {
 export interface AuthLoginResponse {
   success: boolean;
   sessionToken: string;
+  username: string;
 }
 
 export interface AuthExistsResponse {

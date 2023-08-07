@@ -26,18 +26,27 @@ export default class AuthApiService extends OCApi {
       map(res => (res.body ? res.body.exists : false))
     );
   }
+  checkSessionToken(sessionToken: string): Observable<AuthLoginResponse | undefined> {
+    return this.get<AuthLoginResponse>('auth/login', sessionToken).pipe(
+      map(res => {
+        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
+        if (!result)
+          console.log(`Login API call with session token failed with HTTP ${res.status}: ${res.statusText}`);
+        return result;
+      })
+    );
+  }
   register(body: AuthRegisterRequest): Observable<boolean> {
     return this.post('auth/register', undefined, body).pipe(
       map(res => res.status >= 200 && res.status < 300)
     );
   }
-  login(body: AuthLoginRequest): Observable<string | undefined> {
+  login(body: AuthLoginRequest): Observable<AuthLoginResponse | undefined> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body).pipe(
       map(res => {
-        const sessionToken =
-          res.status >= 200 && res.status < 300 && res.body != null ? res.body.sessionToken : undefined;
-        if (!sessionToken) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
-        return sessionToken;
+        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
+        if (!result) console.log(`Login API call failed with HTTP ${res.status}: ${res.statusText}`);
+        return result;
       })
     );
   }
