@@ -237,7 +237,7 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(204));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.sendStatus(204));
         } else {
           res.sendStatus(400);
         }
