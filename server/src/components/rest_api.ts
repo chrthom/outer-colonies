@@ -43,7 +43,6 @@ export default function restAPI(app: Express) {
   app.post('/api/auth/register', (req, res) => {
     Auth.register(<AuthRegisterRequest>req.body).then(credential => {
       const payload: AuthLoginResponse = {
-        success: true,
         sessionToken: credential.sessionToken,
         username: credential.username
       };
@@ -54,10 +53,10 @@ export default function restAPI(app: Express) {
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
+      if (!usernameAndToken) res.sendStatus(401);
       const payload: AuthLoginResponse = {
-        success: usernameAndToken != null,
-        sessionToken: usernameAndToken ? usernameAndToken[1] : undefined,
-        username: usernameAndToken ? usernameAndToken[0] : undefined
+        sessionToken: usernameAndToken[1],
+        username: usernameAndToken[0]
       };
       res.send(payload);
     });
@@ -67,7 +66,6 @@ export default function restAPI(app: Express) {
   app.get('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       const payload: AuthLoginResponse = {
-        success: true,
         sessionToken: u.sessionToken,
         username: u.username
       };
