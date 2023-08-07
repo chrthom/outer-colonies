@@ -16,17 +16,12 @@ export class DeckApiService extends OCApi {
     super(http);
   }
   listDeck(): Observable<DeckListResponse | undefined> {
-    return this.get<DeckListResponse>('deck', this.authService.token).pipe(
-      map(res => {
-        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
-        return result;
-      })
-    );
+    return this.get<DeckListResponse>('deck', this.authService.token);
   }
   activateCard(cardInstanceId: number): Observable<void> {
-    return this.post(`deck/${cardInstanceId}`, this.authService.token).pipe(map(_ => {}));
+    return this.post(`deck/${cardInstanceId}`, this.authService.token);
   }
   deactivateCard(cardInstanceId: number): Observable<void> {
-    return this.delete(`deck/${cardInstanceId}`, this.authService.token).pipe(map(_ => {}));
+    return this.delete(`deck/${cardInstanceId}`, this.authService.token);
   }
 }

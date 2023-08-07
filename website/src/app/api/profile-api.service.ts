@@ -16,6 +16,6 @@ export class ProfileApiService extends OCApi {
     super(http);
   }
   get profile(): Observable<ProfileGetResponse | null> {
-    return this.get<ProfileGetResponse>('profile', this.authService.token).pipe(map(res => res.body));
+    return this.get<ProfileGetResponse>('profile', this.authService.token);
   }
 }

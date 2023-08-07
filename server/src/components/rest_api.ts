@@ -41,18 +41,22 @@ export default function restAPI(app: Express) {
 
   // Register new user
   app.post('/api/auth/register', (req, res) => {
-    Auth.register(<AuthRegisterRequest>req.body).then(success =>
-      success ? res.status(201).send({}) : res.sendStatus(500)
-    );
+    Auth.register(<AuthRegisterRequest>req.body).then(credential => {
+      const payload: AuthLoginResponse = {
+        sessionToken: credential.sessionToken,
+        username: credential.username
+      };
+      res.status(201).send(payload);
+    });
   });
 
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
+      if (!usernameAndToken) res.sendStatus(401);
       const payload: AuthLoginResponse = {
-        success: usernameAndToken != null,
-        sessionToken: usernameAndToken ? usernameAndToken[1] : undefined,
-        username: usernameAndToken ? usernameAndToken[0] : undefined
+        sessionToken: usernameAndToken[1],
+        username: usernameAndToken[0]
       };
       res.send(payload);
     });
@@ -62,7 +66,6 @@ export default function restAPI(app: Express) {
   app.get('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       const payload: AuthLoginResponse = {
-        success: true,
         sessionToken: u.sessionToken,
         username: u.username
       };
@@ -151,7 +154,7 @@ export default function restAPI(app: Express) {
   // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
-      const content = <DBItemBoxContent[]>JSON.parse(i.content);
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
       return {
         itemId: i.itemId,
         message: i.message,
@@ -161,7 +164,7 @@ export default function restAPI(app: Express) {
       };
     };
     const toBooster = (i: DBItem) => {
-      const content = <DBItemBoxContent[]>JSON.parse(i.content);
+      const content = <DBItemBoxContent[]> JSON.parse(i.content);
       return {
         itemId: i.itemId,
         no: Number(i.content)
@@ -234,7 +237,7 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.status(201).send({}));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.sendStatus(204));
         } else {
           res.sendStatus(400);
         }

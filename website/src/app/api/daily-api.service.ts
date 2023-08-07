@@ -16,6 +16,6 @@ export class DailyApiService extends OCApi {
     super(http);
   }
   get dailies(): Observable<DailyGetResponse | null> {
-    return this.get<DailyGetResponse>('daily', this.authService.token).pipe(map(res => res.body));
+    return this.get<DailyGetResponse>('daily', this.authService.token);
   }
 }
