@@ -16,7 +16,7 @@ export class NavbarComponent {
     return this.router.url.replace('/', '');
   }
   get username(): string | undefined {
-    return this.authService.username;
+    return this.authService.displayname;
   }
   logout() {
     this.authService.logout();

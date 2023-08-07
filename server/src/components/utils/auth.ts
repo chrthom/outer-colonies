@@ -1,7 +1,6 @@
 import CardCollection from '../cards/collection/card_collection';
 import { AuthLoginRequest, AuthRegisterRequest } from '../shared_interfaces/rest_api';
 import DBCredentialsDAO from '../persistence/db_credentials';
-import { rules } from '../config/rules';
 import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBDecksDAO from '../persistence/db_decks';
@@ -27,12 +26,13 @@ export default class Auth {
       .forEach(id => DBDecksDAO.create(id, credential.userId, true));
     return true;
   }
-  static async login(loginData: AuthLoginRequest): Promise<string | null> {
+  static async login(loginData: AuthLoginRequest): Promise<[string, string] | null> {
     let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
     if (!credential) credential = await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
     if (credential) {
-      DBDailiesDAO.achieveLogin(credential.userId); ////
-      return DBCredentialsDAO.login(credential.userId);
+      DBDailiesDAO.achieveLogin(credential.userId);
+      const sessionToken = await DBCredentialsDAO.login(credential.userId);
+      return [credential.username, sessionToken];
     } else {
       return null;
     }

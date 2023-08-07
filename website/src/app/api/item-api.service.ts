@@ -6,17 +6,20 @@ import {
   OpenItemResponse
 } from '../../../../server/src/components/shared_interfaces/rest_api';
 import AuthService from '../auth.service';
-import OCApiWithAuth from './api-with-auth';
+import OCApi from './api';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ItemApiService extends OCApiWithAuth {
-  constructor(authService: AuthService, http: HttpClient) {
-    super(authService, http);
+export class ItemApiService extends OCApi {
+  constructor(
+    private authService: AuthService,
+    http: HttpClient
+  ) {
+    super(http);
   }
   get items(): Observable<ItemListResponse | undefined> {
-    return this.get<ItemListResponse>('item', this.token).pipe(
+    return this.get<ItemListResponse>('item', this.authService.token).pipe(
       map(res => {
         const result = res.status >= 200 && res.status < 300 && res.body ? res.body : undefined;
         return result;
@@ -24,10 +27,10 @@ export class ItemApiService extends OCApiWithAuth {
     );
   }
   buyBooster(boosterNo: number): Observable<any> {
-    return this.post(`buy/booster/${boosterNo}`, this.token);
+    return this.post(`buy/booster/${boosterNo}`, this.authService.token);
   }
   open(itemId: number): Observable<OpenItemResponse | undefined> {
-    return this.post<OpenItemResponse>(`item/${itemId}`, this.token).pipe(
+    return this.post<OpenItemResponse>(`item/${itemId}`, this.authService.token).pipe(
       map(res => {
         const result = res.status >= 200 && res.status < 300 && res.body ? res.body : undefined;
         return result;

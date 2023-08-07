@@ -48,10 +48,23 @@ export default function restAPI(app: Express) {
 
   // Login
   app.post('/api/auth/login', (req, res) => {
-    Auth.login(<AuthLoginRequest>req.body).then(sessionToken => {
+    Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
       const payload: AuthLoginResponse = {
-        success: sessionToken != null,
-        sessionToken: sessionToken
+        success: usernameAndToken != null,
+        sessionToken: usernameAndToken ? usernameAndToken[1] : undefined,
+        username: usernameAndToken ? usernameAndToken[0] : undefined
+      };
+      res.send(payload);
+    });
+  });
+
+  // Get user by session token
+  app.get('/api/auth/login', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      const payload: AuthLoginResponse = {
+        success: true,
+        sessionToken: u.sessionToken,
+        username: u.username
       };
       res.send(payload);
     });

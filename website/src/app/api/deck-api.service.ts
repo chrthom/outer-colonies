@@ -3,17 +3,20 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { DeckListResponse } from '../../../../server/src/components/shared_interfaces/rest_api';
 import AuthService from '../auth.service';
-import OCApiWithAuth from './api-with-auth';
+import OCApi from './api';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DeckApiService extends OCApiWithAuth {
-  constructor(authService: AuthService, http: HttpClient) {
-    super(authService, http);
+export class DeckApiService extends OCApi {
+  constructor(
+    private authService: AuthService,
+    http: HttpClient
+  ) {
+    super(http);
   }
   listDeck(): Observable<DeckListResponse | undefined> {
-    return this.get<DeckListResponse>('deck', this.token).pipe(
+    return this.get<DeckListResponse>('deck', this.authService.token).pipe(
       map(res => {
         const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
         return result;
@@ -21,9 +24,9 @@ export class DeckApiService extends OCApiWithAuth {
     );
   }
   activateCard(cardInstanceId: number): Observable<void> {
-    return this.post(`deck/${cardInstanceId}`, this.token).pipe(map(_ => {}));
+    return this.post(`deck/${cardInstanceId}`, this.authService.token).pipe(map(_ => {}));
   }
   deactivateCard(cardInstanceId: number): Observable<void> {
-    return this.delete(`deck/${cardInstanceId}`, this.token).pipe(map(_ => {}));
+    return this.delete(`deck/${cardInstanceId}`, this.authService.token).pipe(map(_ => {}));
   }
 }
