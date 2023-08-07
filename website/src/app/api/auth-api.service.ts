@@ -50,4 +50,13 @@ export default class AuthApiService extends OCApi {
       })
     );
   }
+  logout(sessionToken: string): Observable<void> {
+    return this.delete<void>('auth/login', sessionToken).pipe(
+      map(res => {
+        const result = res.status >= 200 && res.status < 300 && res.body != null ? res.body : undefined;
+        if (!result) console.log(`Logout API call failed with HTTP ${res.status}: ${res.statusText}`);
+        return result;
+      })
+    );
+  }
 }

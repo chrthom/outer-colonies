@@ -70,6 +70,14 @@ export default function restAPI(app: Express) {
     });
   });
 
+  // Logout
+  app.delete('/api/auth/login', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      Auth.logout(u.sessionToken);
+      res.sendStatus(204);
+    });
+  });
+
   // Check if username or email exists
   app.get('/api/auth/exists', (req, res) => {
     const sendExistsResponse = (exists: boolean) => {
