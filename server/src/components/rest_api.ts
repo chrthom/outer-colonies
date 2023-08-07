@@ -41,12 +41,25 @@ export default function restAPI(app: Express) {
 
   // Register new user
   app.post('/api/auth/register', (req, res) => {
-    Auth.register(<AuthRegisterRequest>req.body).then(credential => {
-      const payload: AuthLoginResponse = {
-        sessionToken: credential.sessionToken,
-        username: credential.username
-      };
-      res.status(201).send(payload);
+    const registerRequest = <AuthRegisterRequest> req.body;
+    Auth.checkUsernameExists(registerRequest.username).then(usernameExists => {
+      if (usernameExists) {
+        res.sendStatus(409);
+      } else {
+        Auth.checkEmailExists(registerRequest.email).then(emailExists => {
+          if (emailExists) {
+            res.sendStatus(409);
+          } else {
+            Auth.register(registerRequest).then(credential => {
+              const payload: AuthLoginResponse = {
+                sessionToken: credential.sessionToken,
+                username: credential.username
+              };
+              res.status(201).send(payload);
+            });
+          }
+        });
+      }
     });
   });
 
