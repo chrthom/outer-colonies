@@ -37,4 +37,8 @@ export default class Auth {
       return null;
     }
   }
+  static async logout(sessionToken: string): Promise<boolean> {
+    await DBCredentialsDAO.invalidateSessionToken(sessionToken);
+    return true;
+  }
 }

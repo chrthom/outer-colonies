@@ -31,6 +31,7 @@ export default class AuthService {
   }
 
   logout() {
+    if (this.sessionToken) this.authAPIService.logout(this.sessionToken).subscribe(_ => {});
     this.username = undefined;
     this.sessionToken = undefined;
     this.cookieService.delete('u');

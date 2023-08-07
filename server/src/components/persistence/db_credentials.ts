@@ -44,4 +44,9 @@ export default class DBCredentialsDAO {
     );
     return sessionToken;
   }
+  static async invalidateSessionToken(sessionToken: string): Promise<void> {
+    return DBConnection.instance.query(
+      `UPDATE credentials SET session_token = NULL, session_valid_until = NULL WHERE session_token = '${sessionToken}'`
+    );
+  }
 }
