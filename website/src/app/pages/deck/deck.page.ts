@@ -86,7 +86,10 @@ class DeckBox {
     return `${this._title} (${this.cardsNum} Karten)`;
   }
   get cards() {
-    return this.$cards.getValue();
+    return this.$cards.getValue().filter(c => {
+      const filter = this.page.filterFormControl.value;
+      return !filter || c.type == filter;
+    });
   }
   get cardsNum(): number {
     return this.cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
