@@ -1,5 +1,4 @@
-#deck-box,
-#reserve-box {
+.deck-box {
   position: relative;
   width: calc(100% - 50px);
   margin: auto;
@@ -18,4 +17,7 @@ mat-card {
   float: left;
   margin-left: 15px;
   margin-top: 15px;
+  img {
+    cursor: pointer;
+  }
 }

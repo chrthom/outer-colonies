@@ -3,9 +3,35 @@ import { DeckCard } from '../../../../../server/src/components/shared_interfaces
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
+import { BehaviorSubject } from 'rxjs';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
+}
+
+class DeckBox {
+  private $cards!: BehaviorSubject<DeckCardStack[]>;
+  private _title!: string;
+  private _onClick!: (card: DeckCard,  page: DeckPage) => void;
+  private page!: DeckPage;
+  constructor($cards: BehaviorSubject<DeckCardStack[]>, title: string, onClick: (card: DeckCard, page: DeckPage) => void, page: DeckPage) {
+    this.$cards = $cards;
+    this._title = title;
+    this._onClick = onClick;
+    this.page = page;
+  }
+  get title() {
+    return `${this._title} (${this.cardsNum} Karten)`;
+  }
+  get cards() {
+    return this.$cards.getValue();
+  }
+  get cardsNum(): number {
+    return this.cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
+  }
+  onClick(card: DeckCard) {
+    this._onClick(card, this.page);
+  }
 }
 
 @Component({
@@ -16,34 +42,39 @@ interface DeckCardStack extends DeckCard {
 export class DeckPage implements OnInit {
   readonly minCards = 60;
   readonly maxCards = 100;
-  activeCards: DeckCardStack[] = [];
-  reserveCards: DeckCardStack[] = [];
+  private $activeCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
+  private $reserveCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
+  boxes!: DeckBox[];
   constructor(private deckApiService: DeckApiService) {}
   ngOnInit() {
+    this.boxes = [
+      new DeckBox(this.$activeCards, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
+      new DeckBox(this.$reserveCards, 'Reserve', (card, page) => page.activateCard(card), this)
+    ];
     this.update();
   }
   update() {
     this.deckApiService.listDeck().subscribe(res => {
       if (res) {
-        this.activeCards = this.groupDeckCards(res.cards.filter(dc => dc.inUse)).sort(this.cardSortFn);
-        this.reserveCards = this.groupDeckCards(res.cards.filter(dc => !dc.inUse)).sort(this.cardSortFn);
+        this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)).sort(this.cardSortFn));
+        this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)).sort(this.cardSortFn));
       }
     });
   }
   activateCard(card: DeckCard) {
-    if (this.activeCardsNum < this.maxCards) {
+    if (this.boxes[0].cardsNum < this.maxCards) {
       this.deckApiService.activateCard(card.id).subscribe(_ => this.update());
     }
   }
   deactivateCard(card: DeckCard) {
-    if (this.activeCardsNum > this.minCards) {
+    if (this.boxes[0].cardsNum > this.minCards) {
       this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
     }
   }
   toCardUrl(cardId: number): string {
     return `${this.cardsUrl}/${cardId}.png`;
   }
-  get cardsUrl(): string {
+  private get cardsUrl(): string {
     return `${environment.url.assets}/cards`;
   }
   private cardSortFn(a: DeckCard, b: DeckCard): number {
@@ -59,11 +90,5 @@ export class DeckPage implements OnInit {
       stack.numOfCards = dc.length;
       return stack;
     });
-  }
-  get activeCardsNum(): number {
-    return this.activeCards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
-  }
-  get reserveCardsNum(): number {
-    return this.reserveCards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
   }
 }

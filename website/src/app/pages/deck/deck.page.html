@@ -1,32 +1,14 @@
-<div id="deck-box">
-  <oc-content-box [title]="'Karten im aktiven Deck (' + activeCardsNum + ')'">
+<div class="deck-box" *ngFor="let box of boxes">
+  <oc-content-box [title]="box.title">
     <div class="scroll">
-      <div *ngFor="let card of activeCards">
+      <div *ngFor="let card of box.cards">
         <mat-card
-          (click)="deactivateCard(card)"
+          (click)="box.onClick(card)"
           [matBadge]="card.numOfCards + 'x'"
           matBadgeSize="large"
           matBadgePosition="before"
           [matBadgeHidden]="card.numOfCards == 1"
           matBadgeColor="primary"
-        >
-          <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name" />
-        </mat-card>
-      </div>
-    </div>
-  </oc-content-box>
-</div>
-<div id="reserve-box">
-  <oc-content-box [title]="'Reserve Karten (' + reserveCardsNum + ')'">
-    <div class="scroll">
-      <div *ngFor="let card of reserveCards">
-        <mat-card
-          (click)="activateCard(card)"
-          [matBadge]="card.numOfCards + 'x'"
-          matBadgeSize="large"
-          matBadgePosition="before"
-          [matBadgeHidden]="card.numOfCards == 1"
-          matBadgeColor="accent"
         >
           <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
