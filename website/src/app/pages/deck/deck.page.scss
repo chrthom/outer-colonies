@@ -6,17 +6,26 @@
   margin-bottom: 20px;
   table {
     width: 100%;
+    th, td {
+      padding: 2px 8px 1px 8px;
+    }
     th {
       text-align: left;
     }
     td {
-      margin-top: 3px;
+      white-space: nowrap;
       * {
         vertical-align: middle;
       }
     }
+    .absorbing {
+      width: 100%;
+    }
+    .min-width {
+      min-width: 80px;
+    }
     img {
-      max-height: 50px;
+      max-height: 40px;
     }
   }
 }
@@ -24,6 +33,18 @@
 .scroll {
   height: 420px;
   overflow-y: auto;
+}
+
+.rarity {
+  float: left;
+  margin-right: 3px;
+  width: 12px;
+  height: 20px;
+  background-color: var(--color-primary);
+  transform: skew(-20deg);
+}
+.rarity.active {
+  background-color: var(--color-accent);
 }
 
 mat-card {

@@ -32,18 +32,18 @@
       </div>
       <table *ngIf="viewFormControl.value == 'list'">
         <tr>
-          <th>Aktion</th>
-          <th>Karte</th>
+          <th>{{ box.isActiveDeck ? 'Entfernen' : 'Hinzufügen' }}</th>
+          <th>Karten</th>
           <th>ID</th>
-          <th>Name</th>
+          <th class="absorbing">Name</th>
           <th>Typ</th>
-          <th>Seltenheit</th>
+          <th class="min-width">Seltenheit</th>
           <th>Edition</th>
         </tr>
         <tr *ngFor="let card of box.cardsFiltered">
           <td>
-            <button mat-mini-fab (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
-              <h3>{{ box.isActiveDeck ? '-' : '+' }}</h3>
+            <button mat-raised-button (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
+              <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
             </button>
           </td>
           <td>
@@ -53,7 +53,9 @@
           <td>{{ card.cardId }}</td>
           <td>{{ card.name }}</td>
           <td>{{ typeToText(card.type) }}</td>
-          <td>{{ card.rarity }}</td>
+          <td>
+            <div class="rarity" [class.active]="i <= card.rarity" *ngFor="let i of [ 1, 2, 3, 4, 5 ]"></div>
+          </td>
           <td>{{ cardIdToEditionName(card.cardId) }}</td>
         </tr>
       </table>
