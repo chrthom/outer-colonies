@@ -56,8 +56,11 @@ export class DeckPage implements OnInit {
   get canDeactivateDeckCard() {
     return cardsNum(this.boxes[0].cards) > this.minCards;
   }
-  cardIdToCardUrl(cardId: number): string {
-    return `${this.cardsUrl}/${cardId}.png`;
+  cardIdToUrl(cardId: number): string {
+    return `${environment.url.assets}/cards/${cardId}.png`;
+  }
+  cardIdToEditionUrl(cardId: number): string {
+    return `${environment.url.assets}/icons/edition${Math.floor(cardId / 100)}.png`;
   }
   cardIdToEditionName(cardId: number): string {
     switch (Math.floor(cardId / 100)) {
@@ -65,21 +68,11 @@ export class DeckPage implements OnInit {
       case 2: return 'Jovians Freihändler';
       case 3: return 'Marsianische Hegemonie';
       case 4: return 'Kuiper-Gürtel';
-      default: '';
-    }
-    return `${this.cardsUrl}/${cardId}.png`;
-  }
-  typeToText(cardType: CardType): string {
-    switch (cardType) {
-      case CardType.Equipment: return 'Ausrüstung';
-      case CardType.Hull: return 'Rumpf';
-      case CardType.Infrastructure: return 'Infrastruktur';
-      case CardType.Tactic: return 'Taktik';
       default: return '';
     }
   }
-  private get cardsUrl(): string {
-    return `${environment.url.assets}/cards`;
+  cardTypeToUrl(cardType: CardType): string {
+    return `${environment.url.assets}/icons/${cardType}.png`;
   }
   private cardSortFn(a: DeckCard, b: DeckCard): number {
     if (a.type > b.type) return -1;

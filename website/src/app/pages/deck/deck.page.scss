@@ -8,24 +8,47 @@
     width: 100%;
     th, td {
       padding: 2px 8px 1px 8px;
+      white-space: nowrap;
     }
     th {
       text-align: left;
     }
     td {
-      white-space: nowrap;
       * {
         vertical-align: middle;
       }
     }
-    .absorbing {
+    td.card-col {
+      img {
+        max-height: 40px;
+      }
+    }
+    td.name-col {
       width: 100%;
     }
-    .min-width {
-      min-width: 80px;
+    td.type-col {
+      img {
+        max-height: 32px;
+      }
     }
-    img {
-      max-height: 40px;
+    td.rarity-col {
+      min-width: 80px;
+      .rarity {
+        float: left;
+        margin-right: 3px;
+        width: 12px;
+        height: 20px;
+        background-color: var(--color-primary);
+        transform: skew(-20deg) translateY(4px);
+      }
+      .rarity.active {
+        background-color: var(--color-accent);
+      }
+    }
+    td.editon-col {
+      img {
+        max-height: 32px;
+      }
     }
   }
 }
@@ -33,18 +56,6 @@
 .scroll {
   height: 420px;
   overflow-y: auto;
-}
-
-.rarity {
-  float: left;
-  margin-right: 3px;
-  width: 12px;
-  height: 20px;
-  background-color: var(--color-primary);
-  transform: skew(-20deg);
-}
-.rarity.active {
-  background-color: var(--color-accent);
 }
 
 mat-card {

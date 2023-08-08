@@ -1,6 +1,6 @@
 <div class="deck-box">
   <mat-form-field appearance="outline">
-    <mat-label>Filter Karten</mat-label>
+    <mat-label>Filtern nach Kartentyp</mat-label>
     <mat-select [formControl]="filterFormControl">
       <mat-option value="">Alle</mat-option>
       <mat-option value="hull">Rumpf</mat-option>
@@ -27,7 +27,7 @@
           [matBadgeHidden]="card.numOfCards == 1"
           matBadgeColor="primary"
         >
-          <img mat-card-image [src]="cardIdToCardUrl(card.cardId)" [alt]="card.name" />
+          <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
       </div>
       <table *ngIf="viewFormControl.value == 'list'">
@@ -35,28 +35,33 @@
           <th>{{ box.isActiveDeck ? 'Entfernen' : 'Hinzufügen' }}</th>
           <th>Karten</th>
           <th>ID</th>
-          <th class="absorbing">Name</th>
+          <th>Name</th>
           <th>Typ</th>
-          <th class="min-width">Seltenheit</th>
+          <th>Sub-Typ</th>
+          <th>Seltenheit</th>
           <th>Edition</th>
         </tr>
         <tr *ngFor="let card of box.cardsFiltered">
-          <td>
+          <td class="action-col">
             <button mat-raised-button (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
               <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
             </button>
           </td>
-          <td>
+          <td class="card-col">
             <h3>{{ card.numOfCards }}x </h3>
-            <img [src]="cardIdToCardUrl(card.cardId)" [alt]="card.name" />
+            <img [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
           </td>
-          <td>{{ card.cardId }}</td>
-          <td>{{ card.name }}</td>
-          <td>{{ typeToText(card.type) }}</td>
-          <td>
+          <td class="id-col">{{ card.cardId }}</td>
+          <td class="name-col">{{ card.name }}</td>
+          <td class="type-col"><img [src]="cardTypeToUrl(card.type)"></td>
+          <td class="subtype-col">&nbsp;</td>
+          <td class="rarity-col">
             <div class="rarity" [class.active]="i <= card.rarity" *ngFor="let i of [ 1, 2, 3, 4, 5 ]"></div>
           </td>
-          <td>{{ cardIdToEditionName(card.cardId) }}</td>
+          <td class="edition-col">
+            <img [src]="cardIdToEditionUrl(card.cardId)">
+            {{ cardIdToEditionName(card.cardId) }}
+          </td>
         </tr>
       </table>
     </div>
