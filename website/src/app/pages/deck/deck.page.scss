@@ -21,3 +21,12 @@ mat-card {
     cursor: pointer;
   }
 }
+
+mat-form-field {
+  margin-right: 20px;
+}
+
+mat-button-toggle img {
+  width: 40px;
+  transform: translateY(-3px);
+}

@@ -1,3 +1,18 @@
+<div class="deck-box">
+  <mat-form-field appearance="outline">
+    <mat-label>Filter Karten</mat-label>
+    <mat-select [formControl]="filterFormControl">
+      <mat-option value="">Alle</mat-option>
+      <mat-option value="hull">Rumpf</mat-option>
+      <mat-option value="equipment">Ausr&uuml;stung</mat-option>
+      <mat-option value="infrastructure">Infrastruktur</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-button-toggle-group [formControl]="viewFormControl">
+    <mat-button-toggle value="card"><img src="../../../assets/icons/card-view.png"></mat-button-toggle>
+    <mat-button-toggle value="list"><img src="../../../assets/icons/list-view.png"></mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
 <div class="deck-box" *ngFor="let box of boxes">
   <oc-content-box [title]="box.title">
     <div class="scroll">

@@ -4,34 +4,10 @@ import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
-}
-
-class DeckBox {
-  private $cards!: BehaviorSubject<DeckCardStack[]>;
-  private _title!: string;
-  private _onClick!: (card: DeckCard,  page: DeckPage) => void;
-  private page!: DeckPage;
-  constructor($cards: BehaviorSubject<DeckCardStack[]>, title: string, onClick: (card: DeckCard, page: DeckPage) => void, page: DeckPage) {
-    this.$cards = $cards;
-    this._title = title;
-    this._onClick = onClick;
-    this.page = page;
-  }
-  get title() {
-    return `${this._title} (${this.cardsNum} Karten)`;
-  }
-  get cards() {
-    return this.$cards.getValue();
-  }
-  get cardsNum(): number {
-    return this.cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
-  }
-  onClick(card: DeckCard) {
-    this._onClick(card, this.page);
-  }
 }
 
 @Component({
@@ -42,6 +18,8 @@ class DeckBox {
 export class DeckPage implements OnInit {
   readonly minCards = 60;
   readonly maxCards = 100;
+  filterFormControl = new FormControl('');
+  viewFormControl = new FormControl('list');
   private $activeCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   private $reserveCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   boxes!: DeckBox[];
@@ -90,5 +68,30 @@ export class DeckPage implements OnInit {
       stack.numOfCards = dc.length;
       return stack;
     });
+  }
+}
+
+class DeckBox {
+  private $cards!: BehaviorSubject<DeckCardStack[]>;
+  private _title!: string;
+  private _onClick!: (card: DeckCard,  page: DeckPage) => void;
+  private page!: DeckPage;
+  constructor($cards: BehaviorSubject<DeckCardStack[]>, title: string, onClick: (card: DeckCard, page: DeckPage) => void, page: DeckPage) {
+    this.$cards = $cards;
+    this._title = title;
+    this._onClick = onClick;
+    this.page = page;
+  }
+  get title() {
+    return `${this._title} (${this.cardsNum} Karten)`;
+  }
+  get cards() {
+    return this.$cards.getValue();
+  }
+  get cardsNum(): number {
+    return this.cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
+  }
+  onClick(card: DeckCard) {
+    this._onClick(card, this.page);
   }
 }
