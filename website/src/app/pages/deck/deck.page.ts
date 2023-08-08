@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
-import { CardType } from '../../../../../server/src/components/config/enums';
+import { CardType, TacticDiscipline } from '../../../../../server/src/components/config/enums';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
@@ -60,7 +60,7 @@ export class DeckPage implements OnInit {
     return `${environment.url.assets}/cards/${cardId}.png`;
   }
   cardIdToEditionUrl(cardId: number): string {
-    return `${environment.url.assets}/icons/edition${Math.floor(cardId / 100)}.png`;
+    return this.toIconUrl(`edition${Math.floor(cardId / 100)}`);
   }
   cardIdToEditionName(cardId: number): string {
     switch (Math.floor(cardId / 100)) {
@@ -72,7 +72,22 @@ export class DeckPage implements OnInit {
     }
   }
   cardTypeToUrl(cardType: CardType): string {
-    return `${environment.url.assets}/icons/${cardType}.png`;
+    return this.toIconUrl(cardType);
+  }
+  rangeToUrl(range: number): string {
+    return `${environment.url.assets}/utils/range${range}.png`;
+  }
+  toIconUrl(name: string): string {
+    return `${environment.url.assets}/icons/${name}.png`;
+  }
+  disciplineToText(discipline?: TacticDiscipline): string {
+    switch (discipline) {
+      case TacticDiscipline.Economy: return 'Wirtschaft';
+      case TacticDiscipline.Intelligence: return 'Information';
+      case TacticDiscipline.Military: return 'Militär';
+      case TacticDiscipline.Science: return 'Wissenschaft';
+      default: return '';
+    }
   }
   private cardSortFn(a: DeckCard, b: DeckCard): number {
     if (a.type > b.type) return -1;

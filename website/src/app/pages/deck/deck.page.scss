@@ -7,29 +7,28 @@
   table {
     width: 100%;
     th, td {
-      padding: 2px 8px 1px 8px;
+      padding: 0 8px;
       white-space: nowrap;
-    }
-    th {
-      text-align: left;
-    }
-    td {
       * {
         vertical-align: middle;
       }
     }
-    td.card-col {
+    th {
+      text-align: left;
+    }
+    td.card-col, td.type-col, td.editon-col, td.attack-col, td.defense-col, td.card-col {
       img {
-        max-height: 40px;
+        max-height: 32px;
+      }
+      img.big {
+        max-height: 44px;
+      }
+      img.large {
+        max-height: 50px;
       }
     }
     td.name-col {
       width: 100%;
-    }
-    td.type-col {
-      img {
-        max-height: 32px;
-      }
     }
     td.rarity-col {
       min-width: 80px;
@@ -43,11 +42,6 @@
       }
       .rarity.active {
         background-color: var(--color-accent);
-      }
-    }
-    td.editon-col {
-      img {
-        max-height: 32px;
       }
     }
   }

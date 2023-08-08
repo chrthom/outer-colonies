@@ -1,4 +1,4 @@
-import { CardType } from '../config/enums';
+import { CardType, TacticDiscipline } from '../config/enums';
 
 export interface AuthRegisterRequest {
   username: string;
@@ -23,11 +23,17 @@ export interface AuthExistsResponse {
 
 export interface DeckCard {
   id: number;
+  inUse: boolean;
   cardId: number;
   name: string;
   rarity: number;
   type: CardType;
-  inUse: boolean;
+  canAttack: boolean;
+  discipline?: TacticDiscipline;
+  hp?: number;
+  damage?: number;
+  range?: number;
+  defense?: string;
 }
 
 export interface DeckListResponse {
