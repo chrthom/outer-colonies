@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
+import { CardType } from '../../../../../server/src/components/config/enums';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
@@ -40,17 +41,42 @@ export class DeckPage implements OnInit {
     });
   }
   activateCard(card: DeckCard) {
-    if (this.boxes[0].cardsNum < this.maxCards) {
+    if (this.canActivateDeckCard) {
       this.deckApiService.activateCard(card.id).subscribe(_ => this.update());
     }
   }
   deactivateCard(card: DeckCard) {
-    if (this.boxes[0].cardsNum > this.minCards) {
+    if (this.canDeactivateDeckCard) {
       this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
     }
   }
-  toCardUrl(cardId: number): string {
+  get canActivateDeckCard() {
+    return cardsNum(this.boxes[0].cards) < this.maxCards;
+  }
+  get canDeactivateDeckCard() {
+    return cardsNum(this.boxes[0].cards) > this.minCards;
+  }
+  cardIdToCardUrl(cardId: number): string {
     return `${this.cardsUrl}/${cardId}.png`;
+  }
+  cardIdToEditionName(cardId: number): string {
+    switch (Math.floor(cardId / 100)) {
+      case 1: return 'Outer Colonies';
+      case 2: return 'Jovians Freihändler';
+      case 3: return 'Marsianische Hegemonie';
+      case 4: return 'Kuiper-Gürtel';
+      default: '';
+    }
+    return `${this.cardsUrl}/${cardId}.png`;
+  }
+  typeToText(cardType: CardType): string {
+    switch (cardType) {
+      case CardType.Equipment: return 'Ausrüstung';
+      case CardType.Hull: return 'Rumpf';
+      case CardType.Infrastructure: return 'Infrastruktur';
+      case CardType.Tactic: return 'Taktik';
+      default: return '';
+    }
   }
   private get cardsUrl(): string {
     return `${environment.url.assets}/cards`;
@@ -82,19 +108,26 @@ class DeckBox {
     this._onClick = onClick;
     this.page = page;
   }
-  get title() {
-    return `${this._title} (${this.cardsNum} Karten)`;
+  get title(): string {
+    return `${this._title} (${cardsNum(this.cardsFiltered)} / ${cardsNum(this.cards)} Karten)`;
   }
-  get cards() {
-    return this.$cards.getValue().filter(c => {
+  get cards(): DeckCardStack[] {
+    return this.$cards.getValue();
+  }
+  get cardsFiltered() {
+    return this.cards.filter(c => {
       const filter = this.page.filterFormControl.value;
       return !filter || c.type == filter;
     });
   }
-  get cardsNum(): number {
-    return this.cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
+  get isActiveDeck(): boolean {
+    return this._title == 'Aktives Deck';
   }
   onClick(card: DeckCard) {
     this._onClick(card, this.page);
   }
+}
+
+function cardsNum(cards: DeckCardStack[]): number {
+  return cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
 }

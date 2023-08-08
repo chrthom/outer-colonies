@@ -17,8 +17,9 @@
 <div class="deck-box" *ngFor="let box of boxes">
   <oc-content-box [title]="box.title">
     <div class="scroll">
-      <div *ngFor="let card of box.cards">
+      <div *ngIf="viewFormControl.value == 'card'">
         <mat-card
+          *ngFor="let card of box.cardsFiltered"
           (click)="box.onClick(card)"
           [matBadge]="card.numOfCards + 'x'"
           matBadgeSize="large"
@@ -26,9 +27,36 @@
           [matBadgeHidden]="card.numOfCards == 1"
           matBadgeColor="primary"
         >
-          <img mat-card-image [src]="toCardUrl(card.cardId)" [alt]="card.name" />
+          <img mat-card-image [src]="cardIdToCardUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
       </div>
+      <table *ngIf="viewFormControl.value == 'list'">
+        <tr>
+          <th>Aktion</th>
+          <th>Karte</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Typ</th>
+          <th>Seltenheit</th>
+          <th>Edition</th>
+        </tr>
+        <tr *ngFor="let card of box.cardsFiltered">
+          <td>
+            <button mat-mini-fab (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
+              <h3>{{ box.isActiveDeck ? '-' : '+' }}</h3>
+            </button>
+          </td>
+          <td>
+            <h3>{{ card.numOfCards }}x </h3>
+            <img [src]="cardIdToCardUrl(card.cardId)" [alt]="card.name" />
+          </td>
+          <td>{{ card.cardId }}</td>
+          <td>{{ card.name }}</td>
+          <td>{{ typeToText(card.type) }}</td>
+          <td>{{ card.rarity }}</td>
+          <td>{{ cardIdToEditionName(card.cardId) }}</td>
+        </tr>
+      </table>
     </div>
   </oc-content-box>
 </div>
