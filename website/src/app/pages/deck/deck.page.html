@@ -10,8 +10,8 @@
     </mat-select>
   </mat-form-field>
   <mat-button-toggle-group [formControl]="viewFormControl">
-    <mat-button-toggle value="card"><img src="../../../assets/icons/card-view.png"></mat-button-toggle>
-    <mat-button-toggle value="list"><img src="../../../assets/icons/list-view.png"></mat-button-toggle>
+    <mat-button-toggle value="list"><img src="../../../assets/icons/list-view.png" /></mat-button-toggle>
+    <mat-button-toggle value="card"><img src="../../../assets/icons/card-view.png" /></mat-button-toggle>
   </mat-button-toggle-group>
 </div>
 <div class="deck-box" *ngFor="let box of boxes">
@@ -45,33 +45,37 @@
         </tr>
         <tr *ngFor="let card of box.cardsFiltered">
           <td class="card-col">
-            <h3>{{ card.numOfCards }}x </h3>
+            <h3>{{ card.numOfCards }}x</h3>
             <img class="large" [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
           </td>
           <td class="id-col">{{ card.cardId }}</td>
           <td class="name-col">{{ card.name }}</td>
-          <td class="type-col"><img [src]="cardTypeToUrl(card.type)"></td>
+          <td class="type-col"><img [src]="cardTypeToUrl(card.type)" /></td>
           <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
           <td class="attack-col">
-            <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)">
+            <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)" />
             <h3 *ngIf="card.damage">{{ card.damage }}</h3>
-            <img *ngIf="card.damage" [src]="toIconUrl('damage')">
+            <img *ngIf="card.damage" [src]="toIconUrl('damage')" />
           </td>
           <td class="defense-col">
-            <img *ngIf="card.defense" [src]="toIconUrl(card.defense)">
+            <img *ngIf="card.defense" [src]="toIconUrl(card.defense)" />
             <h3 *ngIf="card.hp && card.defense">+</h3>
             <h3 *ngIf="card.hp">{{ card.hp }}</h3>
-            <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')">
+            <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')" />
           </td>
           <td class="rarity-col">
             <div class="rarity" [class.active]="i <= card.rarity" *ngFor="let i of [ 1, 2, 3, 4, 5 ]"></div>
           </td>
           <td class="edition-col">
-            <img [src]="cardIdToEditionUrl(card.cardId)">
+            <img [src]="cardIdToEditionUrl(card.cardId)" />
             {{ cardIdToEditionName(card.cardId) }}
           </td>
           <td class="action-col">
-            <button mat-raised-button (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
+            <button
+              mat-raised-button
+              (click)="box.onClick(card)"
+              [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'"
+            >
               <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
             </button>
           </td>

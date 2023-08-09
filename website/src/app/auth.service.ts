@@ -79,7 +79,7 @@ export default class AuthService {
   get displayname(): string {
     return this.username ? this.username : '';
   }
-  
+
   get token(): string {
     return this.sessionToken ? this.sessionToken : '';
   }
