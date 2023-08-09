@@ -2,6 +2,7 @@ import { ClientCard } from '../../../../../server/src/components/shared_interfac
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import RetractCardButton from '../indicators/retract_card_button';
+import { animationConfig } from 'src/app/config/animation';
 
 export default class Card extends CardImage {
   data: ClientCard;
@@ -33,6 +34,10 @@ export default class Card extends CardImage {
   }
   destroyButton() {
     if (this.retractCardButton) this.retractCardButton.destroy();
+  }
+  animateAttack() {
+    this.highlightSelected();
+    setTimeout(() => this.highlightReset(), animationConfig.duration.attack);
   }
   tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     super.tween(tweenConfig);
