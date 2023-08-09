@@ -4,8 +4,9 @@ import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/components/config/enums';
+import { Sort } from '@angular/material/sort';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
@@ -35,8 +36,8 @@ export class DeckPage implements OnInit {
   update() {
     this.deckApiService.listDeck().subscribe(res => {
       if (res) {
-        this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)).sort(this.cardSortFn));
-        this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)).sort(this.cardSortFn));
+        this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
+        this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
       }
     });
   }
@@ -89,13 +90,6 @@ export class DeckPage implements OnInit {
       default: return '';
     }
   }
-  private cardSortFn(a: DeckCard, b: DeckCard): number {
-    if (a.type > b.type) return -1;
-    else if (a.type < b.type) return 1;
-    else if (a.name < b.name) return -1;
-    else if (a.name > b.name) return 1;
-    else return 0;
-  }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
     return Object.values(_.groupBy(deckCards, dc => dc.cardId)).map(dc => {
       const stack = <DeckCardStack>dc[0];
@@ -110,6 +104,7 @@ class DeckBox {
   private _title!: string;
   private _onClick!: (card: DeckCard,  page: DeckPage) => void;
   private page!: DeckPage;
+  private sort?: Sort;
   constructor($cards: BehaviorSubject<DeckCardStack[]>, title: string, onClick: (card: DeckCard, page: DeckPage) => void, page: DeckPage) {
     this.$cards = $cards;
     this._title = title;
@@ -120,7 +115,7 @@ class DeckBox {
     return `${this._title} (${cardsNum(this.cardsFiltered)} / ${cardsNum(this.cards)} Karten)`;
   }
   get cards(): DeckCardStack[] {
-    return this.$cards.getValue();
+    return this.sortCards(this.$cards.getValue());
   }
   get cardsFiltered() {
     return this.cards.filter(c => {
@@ -134,6 +129,44 @@ class DeckBox {
   onClick(card: DeckCard) {
     this._onClick(card, this.page);
   }
+  setSort(sort: Sort) {
+    this.sort = sort;
+  }
+  private sortCards(cardStacks: DeckCardStack[]): DeckCardStack[] {
+    if (!this.sort || !this.sort.active || this.sort.direction == '') {
+      return cardStacks;
+    } else {
+      const isAsc = this.sort.direction == 'asc';
+      return cardStacks.sort((a, b) => {
+        switch (this.sort?.active) {
+          case 'id':
+            return compare(a.cardId, b.cardId, isAsc);
+          case 'name':
+            return compare(a.name, b.name, isAsc);
+          case 'type':
+            return compare(a.type, b.type, isAsc);
+          case 'discipline':
+            return compare(a.discipline, b.discipline, isAsc);
+          case 'attack':
+            return compare(!a.damage || !a.range ? undefined : a.damage * a.range, !b.damage || !b.range ? undefined : b.damage * b.range, isAsc);
+          case 'defense':
+            return compare(a.defense ? a.defense : a.hp, b.defense ? b.defense : b.hp, isAsc);
+          case 'rarity':
+            return compare(a.rarity, b.rarity, isAsc);
+          case 'edition':
+            return compare(Math.floor(a.cardId / 100), Math.floor(b.cardId / 100), isAsc);
+          default:
+            return 0;
+        }
+      });
+    }
+  }
+}
+
+function compare(a: number | string | undefined, b: number | string | undefined, isAsc: boolean) {
+  if (a == undefined) return 1;
+  else if (b == undefined) return -1;
+  else return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }
 
 function cardsNum(cards: DeckCardStack[]): number {

@@ -128,7 +128,7 @@ export default function restAPI(app: Express) {
         type: cardData.type,
         canAttack: cardData.canAttack,
         discipline: cardData.type == CardType.Tactic ? (<TacticCard> cardData).discipline : undefined,
-        hp: cardData.profile.hp,
+        hp: cardData.profile.hp > 0 ? cardData.profile.hp : undefined,
         damage: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.damage : undefined,
         range: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.range : undefined,
         defense: defenseIcon

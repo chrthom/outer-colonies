@@ -30,25 +30,20 @@
           <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
       </div>
-      <table *ngIf="viewFormControl.value == 'list'">
+      <table *ngIf="viewFormControl.value == 'list'" matSort (matSortChange)="box.setSort($event)">
         <tr>
+          <th mat-sort-header="numOfCards">Karten</th>
+          <th mat-sort-header="id">ID</th>
+          <th mat-sort-header="name">Name</th>
+          <th mat-sort-header="type">Typ</th>
+          <th mat-sort-header="discipline">Disziplin</th>
+          <th mat-sort-header="attack">Angriff</th>
+          <th mat-sort-header="defense">Verteidigung</th>
+          <th mat-sort-header="rarity">Seltenheit</th>
+          <th mat-sort-header="edition">Edition</th>
           <th>{{ box.isActiveDeck ? 'Entfernen' : 'Hinzufügen' }}</th>
-          <th>Karten</th>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Typ</th>
-          <th>Disziplin</th>
-          <th>Angriff</th>
-          <th>Verteidigung</th>
-          <th>Seltenheit</th>
-          <th>Edition</th>
         </tr>
         <tr *ngFor="let card of box.cardsFiltered">
-          <td class="action-col">
-            <button mat-raised-button (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
-              <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
-            </button>
-          </td>
           <td class="card-col">
             <h3>{{ card.numOfCards }}x </h3>
             <img class="large" [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
@@ -63,10 +58,10 @@
             <img *ngIf="card.damage" [src]="toIconUrl('damage')">
           </td>
           <td class="defense-col">
+            <img *ngIf="card.defense" [src]="toIconUrl(card.defense)">
+            <h3 *ngIf="card.hp && card.defense">+</h3>
             <h3 *ngIf="card.hp">{{ card.hp }}</h3>
             <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')">
-            <h3 *ngIf="card.hp && card.defense">+</h3>
-            <img *ngIf="card.defense" [src]="toIconUrl(card.defense)">
           </td>
           <td class="rarity-col">
             <div class="rarity" [class.active]="i <= card.rarity" *ngFor="let i of [ 1, 2, 3, 4, 5 ]"></div>
@@ -74,6 +69,11 @@
           <td class="edition-col">
             <img [src]="cardIdToEditionUrl(card.cardId)">
             {{ cardIdToEditionName(card.cardId) }}
+          </td>
+          <td class="action-col">
+            <button mat-raised-button (click)="box.onClick(card)" [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'">
+              <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
+            </button>
           </td>
         </tr>
       </table>
