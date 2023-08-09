@@ -52,5 +52,5 @@ export default class Matchmaking extends Phaser.Scene {
     new Background(this);
   }
 
-  update() {}
+  override update() {}
 }
