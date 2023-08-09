@@ -7,7 +7,7 @@ export default class VersonIndicator {
       .text(
         layout.version.x,
         layout.version.y,
-        `Rhea (1.4)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Titan (1.5.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layout.font.size)
       .setFontFamily(layout.font.captionFamily)
