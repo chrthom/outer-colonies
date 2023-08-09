@@ -1,10 +1,63 @@
-#deck-box,
-#reserve-box {
+.deck-box {
   position: relative;
   width: calc(100% - 50px);
   margin: auto;
   margin-top: 40px;
   margin-bottom: 20px;
+  table {
+    width: 100%;
+    th, td {
+      padding: 0 8px;
+      white-space: nowrap;
+      * {
+        vertical-align: middle;
+      }
+    }
+    th {
+      text-align: left;
+      position: sticky;
+      top: 0;
+      background-color: var(--color-primary);
+      z-index: 10;
+    }
+    th:hover {
+      background-color: var(--color-accent);
+    }
+    tr:nth-child(even) {
+      background-color: color-mix(in srgb, var(--color-primary), transparent 80%);
+    }
+    tr:hover {
+      background-color: color-mix(in srgb, var(--color-accent), transparent 60%);
+    }
+    td.card-col, td.type-col, td.editon-col, td.attack-col, td.defense-col, td.card-col {
+      img {
+        max-height: 32px;
+      }
+      img.big {
+        max-height: 44px;
+      }
+      img.large {
+        max-height: 50px;
+      }
+    }
+    td.name-col {
+      width: 100%;
+    }
+    td.rarity-col {
+      min-width: 80px;
+      .rarity {
+        float: left;
+        margin-right: 3px;
+        width: 12px;
+        height: 20px;
+        background-color: var(--color-primary);
+        transform: skew(-20deg) translateY(4px);
+      }
+      .rarity.active {
+        background-color: var(--color-accent);
+      }
+    }
+  }
 }
 
 .scroll {
@@ -18,4 +71,16 @@ mat-card {
   float: left;
   margin-left: 15px;
   margin-top: 15px;
+  img {
+    cursor: pointer;
+  }
+}
+
+mat-form-field {
+  margin-right: 20px;
+}
+
+mat-button-toggle img {
+  width: 40px;
+  transform: translateY(-3px);
 }

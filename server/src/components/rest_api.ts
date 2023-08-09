@@ -7,6 +7,7 @@ import {
   AuthLoginResponse,
   AuthRegisterRequest,
   DailyGetResponse,
+  DeckCard,
   DeckListResponse,
   ItemListResponse,
   OpenItemResponse,
@@ -20,8 +21,10 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
-import { ItemBoxContentType, ItemType } from './config/enums';
+import { CardType, ItemBoxContentType, ItemType } from './config/enums';
 import { rules } from './config/rules';
+import TacticCard from './cards/types/tactic_card';
+import EquipmentCard from './cards/types/equipment_card';
 
 function performWithSessionTokenCheck(req: Request, res: Response, f: (u: DBCredential) => void) {
   const sessionToken = req.header('session-token');
@@ -112,14 +115,25 @@ export default function restAPI(app: Express) {
   app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {
       const cardData: Card = CardCollection.cards[c.cardId];
-      return {
+      let defenseIcon: string | undefined;
+      if (cardData.profile.armour > 0) defenseIcon = `armour_${cardData.profile.armour}`;
+      else if (cardData.profile.shield > 0) defenseIcon = `shield_${cardData.profile.shield}`;
+      else if (cardData.profile.pointDefense > 0) defenseIcon = `point_defense_${cardData.profile.pointDefense}`
+      const payload: DeckCard = {
         id: c.cardInstanceId,
+        inUse: c.inUse,
         cardId: c.cardId,
         name: cardData.name,
         rarity: cardData.rarity,
         type: cardData.type,
-        inUse: c.inUse
+        canAttack: cardData.canAttack,
+        discipline: cardData.type == CardType.Tactic ? (<TacticCard> cardData).discipline : undefined,
+        hp: cardData.profile.hp > 0 ? cardData.profile.hp : undefined,
+        damage: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.damage : undefined,
+        range: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.range : undefined,
+        defense: defenseIcon
       };
+      return payload;
     };
     const sendDeckResponse = (cards: DBDeck[]) => {
       const payload: DeckListResponse = {
