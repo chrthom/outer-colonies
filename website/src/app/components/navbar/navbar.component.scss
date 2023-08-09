@@ -71,14 +71,15 @@ h2.navbar-right {
 #navbar-logo {
   cursor: pointer;
   position: absolute;
+  top: 0;
   left: 0;
-  transform: translateY(-50%);
+  transform: translateY(-30%);
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--color-dark), transparent 25%) 75%,
+    color-mix(in srgb, var(--color-dark), transparent 20%) 75%,
     rgba(0, 0, 0, 0)
   );
   width: fit-content;
-  padding: 10px 20px;
+  padding: 15px 25px;
   z-index: 51;
 }

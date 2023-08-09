@@ -17,6 +17,7 @@
 .scroll {
   height: max(calc(100vh - 400px), 300px);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .item {
   position: relative;
@@ -34,7 +35,7 @@
 .card {
   position: relative;
   background-color: color-mix(in srgb, var(--color-dark), transparent 70%);
-  width: 170px;
+  width: 164px;
   float: left;
   margin: 5px;
   img {

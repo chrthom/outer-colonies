@@ -69,11 +69,12 @@
 .scroll {
   height: 420px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 mat-card {
   background: color-mix(in srgb, var(--color-dark), transparent 70%);
-  width: 300px;
+  width: 295px;
   float: left;
   margin-left: 15px;
   margin-top: 15px;
