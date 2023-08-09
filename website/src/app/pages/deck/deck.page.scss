@@ -69,6 +69,7 @@
 .scroll {
   height: 420px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 mat-card {
