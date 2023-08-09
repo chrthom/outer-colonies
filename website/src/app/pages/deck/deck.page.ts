@@ -139,6 +139,8 @@ class DeckBox {
       const isAsc = this.sort.direction == 'asc';
       return cardStacks.sort((a, b) => {
         switch (this.sort?.active) {
+          case 'amount':
+            return compare(a.numOfCards, b.numOfCards, isAsc);
           case 'id':
             return compare(a.cardId, b.cardId, isAsc);
           case 'name':

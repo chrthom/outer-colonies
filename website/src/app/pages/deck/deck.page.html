@@ -32,7 +32,7 @@
       </div>
       <table *ngIf="viewFormControl.value == 'list'" matSort (matSortChange)="box.setSort($event)">
         <tr>
-          <th mat-sort-header="numOfCards">Karten</th>
+          <th mat-sort-header="amount">Karten</th>
           <th mat-sort-header="id">ID</th>
           <th mat-sort-header="name">Name</th>
           <th mat-sort-header="type">Typ</th>
