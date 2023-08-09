@@ -142,7 +142,7 @@ export default class Game extends Phaser.Scene {
     this.obj.missionCards = new MissionCards(this);
   }
 
-  update() {}
+  override update() {}
 
   updateState(state: ClientState) {
     const self = this;

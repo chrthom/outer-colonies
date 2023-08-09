@@ -28,7 +28,7 @@ export default class Card extends CardImage {
       );
     }
   }
-  destroy() {
+  override destroy() {
     super.destroy();
     this.destroyButton();
   }
@@ -39,7 +39,7 @@ export default class Card extends CardImage {
     this.highlightSelected();
     setTimeout(() => this.highlightReset(), animationConfig.duration.attack);
   }
-  tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
+  override tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     super.tween(tweenConfig);
     if (this.retractCardButton) this.retractCardButton.tween(tweenConfig['x'], tweenConfig['y']);
   }

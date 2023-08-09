@@ -34,7 +34,7 @@ export default class DiscardPile extends CardImage {
       );
     }
   }
-  destroy() {
+  override destroy() {
     super.destroy();
     if (this.indicator) this.indicator.destroy();
   }
