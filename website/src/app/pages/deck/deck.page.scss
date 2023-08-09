@@ -6,7 +6,8 @@
   margin-bottom: 20px;
   table {
     width: 100%;
-    th, td {
+    th,
+    td {
       padding: 0 8px;
       white-space: nowrap;
       * {
@@ -29,7 +30,12 @@
     tr:hover {
       background-color: color-mix(in srgb, var(--color-accent), transparent 60%);
     }
-    td.card-col, td.type-col, td.editon-col, td.attack-col, td.defense-col, td.card-col {
+    td.card-col,
+    td.type-col,
+    td.editon-col,
+    td.attack-col,
+    td.defense-col,
+    td.card-col {
       img {
         max-height: 32px;
       }

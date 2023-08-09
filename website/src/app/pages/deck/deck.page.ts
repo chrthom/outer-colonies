@@ -65,11 +65,16 @@ export class DeckPage implements OnInit {
   }
   cardIdToEditionName(cardId: number): string {
     switch (Math.floor(cardId / 100)) {
-      case 1: return 'Outer Colonies';
-      case 2: return 'Jovians Freihändler';
-      case 3: return 'Marsianische Hegemonie';
-      case 4: return 'Kuiper-Gürtel';
-      default: return '';
+      case 1:
+        return 'Outer Colonies';
+      case 2:
+        return 'Jovians Freihändler';
+      case 3:
+        return 'Marsianische Hegemonie';
+      case 4:
+        return 'Kuiper-Gürtel';
+      default:
+        return '';
     }
   }
   cardTypeToUrl(cardType: CardType): string {
@@ -83,11 +88,16 @@ export class DeckPage implements OnInit {
   }
   disciplineToText(discipline?: TacticDiscipline): string {
     switch (discipline) {
-      case TacticDiscipline.Economy: return 'Wirtschaft';
-      case TacticDiscipline.Intelligence: return 'Information';
-      case TacticDiscipline.Military: return 'Militär';
-      case TacticDiscipline.Science: return 'Wissenschaft';
-      default: return '';
+      case TacticDiscipline.Economy:
+        return 'Wirtschaft';
+      case TacticDiscipline.Intelligence:
+        return 'Information';
+      case TacticDiscipline.Military:
+        return 'Militär';
+      case TacticDiscipline.Science:
+        return 'Wissenschaft';
+      default:
+        return '';
     }
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
@@ -102,10 +112,15 @@ export class DeckPage implements OnInit {
 class DeckBox {
   private $cards!: BehaviorSubject<DeckCardStack[]>;
   private _title!: string;
-  private _onClick!: (card: DeckCard,  page: DeckPage) => void;
+  private _onClick!: (card: DeckCard, page: DeckPage) => void;
   private page!: DeckPage;
   private sort?: Sort;
-  constructor($cards: BehaviorSubject<DeckCardStack[]>, title: string, onClick: (card: DeckCard, page: DeckPage) => void, page: DeckPage) {
+  constructor(
+    $cards: BehaviorSubject<DeckCardStack[]>,
+    title: string,
+    onClick: (card: DeckCard, page: DeckPage) => void,
+    page: DeckPage
+  ) {
     this.$cards = $cards;
     this._title = title;
     this._onClick = onClick;
@@ -150,7 +165,11 @@ class DeckBox {
           case 'discipline':
             return compare(a.discipline, b.discipline, isAsc);
           case 'attack':
-            return compare(!a.damage || !a.range ? undefined : a.damage * a.range, !b.damage || !b.range ? undefined : b.damage * b.range, isAsc);
+            return compare(
+              !a.damage || !a.range ? undefined : a.damage * a.range,
+              !b.damage || !b.range ? undefined : b.damage * b.range,
+              isAsc
+            );
           case 'defense':
             return compare(a.defense ? a.defense : a.hp, b.defense ? b.defense : b.hp, isAsc);
           case 'rarity':

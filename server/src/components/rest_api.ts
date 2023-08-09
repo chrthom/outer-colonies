@@ -44,7 +44,7 @@ export default function restAPI(app: Express) {
 
   // Register new user
   app.post('/api/auth/register', (req, res) => {
-    const registerRequest = <AuthRegisterRequest> req.body;
+    const registerRequest = <AuthRegisterRequest>req.body;
     Auth.checkUsernameExists(registerRequest.username).then(usernameExists => {
       if (usernameExists) {
         res.sendStatus(409);
@@ -118,7 +118,8 @@ export default function restAPI(app: Express) {
       let defenseIcon: string | undefined;
       if (cardData.profile.armour > 0) defenseIcon = `armour_${cardData.profile.armour}`;
       else if (cardData.profile.shield > 0) defenseIcon = `shield_${cardData.profile.shield}`;
-      else if (cardData.profile.pointDefense > 0) defenseIcon = `point_defense_${cardData.profile.pointDefense}`
+      else if (cardData.profile.pointDefense > 0)
+        defenseIcon = `point_defense_${cardData.profile.pointDefense}`;
       const payload: DeckCard = {
         id: c.cardInstanceId,
         inUse: c.inUse,
@@ -127,10 +128,12 @@ export default function restAPI(app: Express) {
         rarity: cardData.rarity,
         type: cardData.type,
         canAttack: cardData.canAttack,
-        discipline: cardData.type == CardType.Tactic ? (<TacticCard> cardData).discipline : undefined,
+        discipline: cardData.type == CardType.Tactic ? (<TacticCard>cardData).discipline : undefined,
         hp: cardData.profile.hp > 0 ? cardData.profile.hp : undefined,
-        damage: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.damage : undefined,
-        range: cardData.type == CardType.Equipment ? (<EquipmentCard> cardData).attackProfile?.range : undefined,
+        damage:
+          cardData.type == CardType.Equipment ? (<EquipmentCard>cardData).attackProfile?.damage : undefined,
+        range:
+          cardData.type == CardType.Equipment ? (<EquipmentCard>cardData).attackProfile?.range : undefined,
         defense: defenseIcon
       };
       return payload;
@@ -181,7 +184,7 @@ export default function restAPI(app: Express) {
   // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
-      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
         message: i.message,
@@ -191,7 +194,7 @@ export default function restAPI(app: Express) {
       };
     };
     const toBooster = (i: DBItem) => {
-      const content = <DBItemBoxContent[]> JSON.parse(i.content);
+      const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
         no: Number(i.content)
