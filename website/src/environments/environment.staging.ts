@@ -1,5 +1,5 @@
 export const environment = {
-  stage: 'test',
+  stage: 'staging',
   https: true,
   url: {
     game: 'https://game.staging.outercolonies.de',
