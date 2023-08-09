@@ -62,9 +62,8 @@ export default class CardStack {
     });
     this.tween();
   }
-  animateAttack() {
-    this.highlightSelected();
-    setTimeout(() => this.highlightReset(), animationConfig.duration.attack);
+  animateAttack(cardIndex: number) {
+    this.cards[cardIndex].animateAttack();
   }
   animateDamage(attack: ClientAttack) {
     new AttackDamageIndicator(this.scene, this, attack);

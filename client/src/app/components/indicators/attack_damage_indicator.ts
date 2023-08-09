@@ -34,7 +34,7 @@ export default class AttackDamageIndicator {
       });
     setTimeout(() => {
       particleEmitters.forEach(pe => pe.destroy());
-    }, animationConfig.duration.attack);
+    }, animationConfig.duration.attack * 2);
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
     const yOffset =

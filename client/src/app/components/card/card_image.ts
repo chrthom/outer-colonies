@@ -6,7 +6,7 @@ export default class CardImage {
   image!: Phaser.GameObjects.Image;
   cardId!: number;
   protected scene!: Game;
-  private imageHighlight!: Phaser.GameObjects.Image;
+  protected imageHighlight!: Phaser.GameObjects.Image;
   private imageMask!: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
     this.scene = scene;

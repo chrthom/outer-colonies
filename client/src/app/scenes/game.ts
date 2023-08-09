@@ -198,7 +198,10 @@ export default class Game extends Phaser.Scene {
   private animateAttack(): boolean {
     const attack = this.state.battle ? this.state.battle.recentAttack : null;
     if (attack) {
-      this.cardStacks.find(cs => cs.uuid == attack.sourceUUID)?.animateAttack();
+      const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceUUID);
+      if (!attacker?.data.ownedByPlayer) {
+        attacker?.animateAttack(attack.sourceIndex);
+      }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
       return true;
     } else {
