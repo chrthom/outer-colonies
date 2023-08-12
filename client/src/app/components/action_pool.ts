@@ -1,4 +1,4 @@
-import { layout } from '../config/layout';
+import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 
 export default class ActionPool {
@@ -15,13 +15,18 @@ export default class ActionPool {
     this.images = this.scene.state.actionPool.map((action, index) =>
       this.scene.add
         .image(
-          layout.actionPool.x,
-          layout.actionPool.y + index * layout.actionPool.yDistance,
+          layoutConfig.actionPool.x,
+          layoutConfig.actionPool.y + index * layoutConfig.actionPool.yDistance,
           `icon_${action}`
         )
         .setOrigin(0.5, 0.5)
-        .setTint(layout.colors.primary, layout.colors.neutral, layout.colors.primary, layout.colors.primary)
-        .setAlpha(layout.colors.alpha)
+        .setTint(
+          layoutConfig.colors.primary,
+          layoutConfig.colors.neutral,
+          layoutConfig.colors.primary,
+          layoutConfig.colors.primary
+        )
+        .setAlpha(layoutConfig.colors.alpha)
     );
   }
 }

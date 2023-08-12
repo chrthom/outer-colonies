@@ -1,5 +1,5 @@
 import { animationConfig } from '../../config/animation';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class ValueIndicator {
@@ -25,11 +25,11 @@ export default class ValueIndicator {
           this.y(cardY),
           64,
           32,
-          critical ? layout.colors.secondary : layout.colors.primary,
-          layout.colors.alpha
+          critical ? layoutConfig.colors.secondary : layoutConfig.colors.primary,
+          layoutConfig.colors.alpha
         )
         .setOrigin(0.5, 0.5)
-        .setDepth(layout.depth.indicators);
+        .setDepth(layoutConfig.depth.indicators);
     } else {
       this.shape = scene.add
         .star(
@@ -38,20 +38,20 @@ export default class ValueIndicator {
           12,
           16,
           22,
-          critical ? layout.colors.secondary : layout.colors.primary,
-          layout.colors.alpha
+          critical ? layoutConfig.colors.secondary : layoutConfig.colors.primary,
+          layoutConfig.colors.alpha
         )
         .setOrigin(0.5, 0.5)
-        .setDepth(layout.depth.indicators);
+        .setDepth(layoutConfig.depth.indicators);
     }
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
-      .setFontSize(layout.cards.damageIndicator.fontSize)
-      .setFontFamily(layout.font.captionFamily)
-      .setColor(layout.font.colorHover)
+      .setFontSize(layoutConfig.cards.damageIndicator.fontSize)
+      .setFontFamily(layoutConfig.font.captionFamily)
+      .setColor(layoutConfig.font.colorHover)
       .setAlign('center')
       .setOrigin(0.5, 0.5)
-      .setDepth(layout.depth.indicators);
+      .setDepth(layoutConfig.depth.indicators);
   }
   destroy() {
     this.shape.destroy();
@@ -69,16 +69,16 @@ export default class ValueIndicator {
     return (
       cardX +
       (this.ownedByPlayer
-        ? layout.cards.damageIndicator.xOffsetPlayer
-        : layout.cards.damageIndicator.xOffsetOpponent)
+        ? layoutConfig.cards.damageIndicator.xOffsetPlayer
+        : layoutConfig.cards.damageIndicator.xOffsetOpponent)
     );
   }
   private y(cardY: number) {
     return (
       cardY +
       (this.ownedByPlayer
-        ? layout.cards.damageIndicator.yOffsetPlayer
-        : layout.cards.damageIndicator.yOffsetOpponent)
+        ? layoutConfig.cards.damageIndicator.yOffsetPlayer
+        : layoutConfig.cards.damageIndicator.yOffsetOpponent)
     );
   }
 }

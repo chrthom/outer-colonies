@@ -1,5 +1,5 @@
 import { animationConfig } from '../../config/animation';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class CardImage {
@@ -15,7 +15,7 @@ export default class CardImage {
       image
         .setOrigin(0.5, 1)
         .setAngle(opponentCard ? 180 : 0)
-        .setScale(scale ? scale : layout.cards.scale.normal);
+        .setScale(scale ? scale : layoutConfig.cards.scale.normal);
     this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
     this.image = setImageProps(
       scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
@@ -30,14 +30,18 @@ export default class CardImage {
   }
   discard(ownedByPlayer: boolean, toDeck?: boolean) {
     const discardPileIds = this.scene.state.discardPileIds.slice();
-    this.setDepth(layout.depth.discardCard);
+    this.setDepth(layoutConfig.depth.discardCard);
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
-      x: toDeck ? layout.deck.x : layout.discardPile.x,
-      y: ownedByPlayer ? (toDeck ? layout.deck.y : layout.discardPile.y) : layout.discardPile.yOpponent,
+      x: toDeck ? layoutConfig.deck.x : layoutConfig.discardPile.x,
+      y: ownedByPlayer
+        ? toDeck
+          ? layoutConfig.deck.y
+          : layoutConfig.discardPile.y
+        : layoutConfig.discardPile.yOpponent,
       angle: ownedByPlayer ? 0 : 180,
-      scale: layout.cards.scale.normal,
+      scale: layoutConfig.cards.scale.normal,
       onComplete: () => {
         if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
@@ -45,15 +49,15 @@ export default class CardImage {
     });
   }
   showAndDiscardTacticCard(ownedByPlayer: boolean) {
-    this.setDepth(layout.depth.maxedTacticCard);
+    this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layout.maxedTacticCard.x,
-      y: layout.maxedTacticCard.y,
+      x: layoutConfig.maxedTacticCard.x,
+      y: layoutConfig.maxedTacticCard.y,
       angle: 0,
-      scale: layout.maxedTacticCard.scale,
+      scale: layoutConfig.maxedTacticCard.scale,
       completeDelay: animationConfig.duration.waitBeforeDiscard,
       onComplete: () => {
         this.discard(ownedByPlayer);
@@ -62,19 +66,19 @@ export default class CardImage {
   }
   highlightDisabled() {
     this.highlightReset();
-    this.image.setTint(layout.colors.fadedTint);
+    this.image.setTint(layoutConfig.colors.fadedTint);
   }
   highlightSelectable() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layout.colors.neutral);
+    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.neutral);
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layout.colors.secondary);
+    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.secondary);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
-    this.image.setTint(layout.colors.neutral);
+    this.image.setTint(layoutConfig.colors.neutral);
   }
   setCardId(cardId: number) {
     this.cardId = cardId;

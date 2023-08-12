@@ -1,5 +1,5 @@
 import CardImage from './card_image';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { ClientHandCard } from '../../../../../server/src/components/shared_interfaces/client_state';
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/components/config/enums';
@@ -9,11 +9,11 @@ export default class HandCard extends CardImage {
   uuid!: string;
   data!: ClientHandCard;
   constructor(scene: Game, data: ClientHandCard) {
-    super(scene, layout.deck.x, layout.deck.y, data.cardId);
+    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, data.cardId);
     this.uuid = data.uuid;
     this.update(data);
     this.image.on('pointerdown', () => this.onClickAction());
-    this.setDepth(layout.depth.handCard);
+    this.setDepth(layoutConfig.depth.handCard);
     this.enableMaximizeOnMouseover();
   }
   update(data: ClientHandCard) {
@@ -34,13 +34,15 @@ export default class HandCard extends CardImage {
     return this.scene.state.hand.length - data.index - 1;
   }
   private x() {
-    return layout.player.hand.x + this.invIndex(this.data) * layout.player.hand.xStep;
+    return layoutConfig.player.hand.x + this.invIndex(this.data) * layoutConfig.player.hand.xStep;
   }
   private y() {
-    return layout.player.hand.y + this.invIndex(this.data) * layout.player.hand.yStep;
+    return layoutConfig.player.hand.y + this.invIndex(this.data) * layoutConfig.player.hand.yStep;
   }
   private angle() {
-    return layout.player.hand.startAngle + this.invIndex(this.data) * layout.player.hand.angleStep;
+    return (
+      layoutConfig.player.hand.startAngle + this.invIndex(this.data) * layoutConfig.player.hand.angleStep
+    );
   }
   private onClickAction() {
     if (this.scene.state.playerPendingAction) {

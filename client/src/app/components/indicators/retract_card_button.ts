@@ -1,6 +1,6 @@
 import { MsgTypeInbound } from '../../../../../server/src/components/config/enums';
 import { animationConfig } from '../../config/animation';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class RetractCardButton {
@@ -17,13 +17,13 @@ export default class RetractCardButton {
     this.scene = scene;
     this.image = scene.add
       .image(
-        cardX + layout.cards.retractCardButton.xOffset,
-        cardY + layout.cards.retractCardButton.yOffset,
+        cardX + layoutConfig.cards.retractCardButton.xOffset,
+        cardY + layoutConfig.cards.retractCardButton.yOffset,
         `icon_retract_card`
       )
       .setOrigin(0.5, 0.5)
-      .setAlpha(layout.colors.alpha)
-      .setDepth(layout.depth.indicators)
+      .setAlpha(layoutConfig.colors.alpha)
+      .setDepth(layoutConfig.depth.indicators)
       .setInteractive()
       .on('pointerover', () => this.setTintHover())
       .on('pointerout', () => (crititcal ? this.setTintCritical() : this.setTintNormal()))
@@ -35,29 +35,29 @@ export default class RetractCardButton {
   }
   setTintNormal() {
     this.image.setTint(
-      layout.colors.primary,
-      layout.colors.neutral,
-      layout.colors.primary,
-      layout.colors.primary
+      layoutConfig.colors.primary,
+      layoutConfig.colors.neutral,
+      layoutConfig.colors.primary,
+      layoutConfig.colors.primary
     );
   }
   setTintCritical() {
     this.image.setTint(
-      layout.colors.secondary,
-      layout.colors.neutral,
-      layout.colors.secondary,
-      layout.colors.secondary
+      layoutConfig.colors.secondary,
+      layoutConfig.colors.neutral,
+      layoutConfig.colors.secondary,
+      layoutConfig.colors.secondary
     );
   }
   setTintHover() {
-    this.image.setTint(layout.colors.neutral);
+    this.image.setTint(layoutConfig.colors.neutral);
   }
   tween(cardX: number, cardY: number) {
     this.scene.tweens.add({
       targets: this.image,
       duration: animationConfig.duration.move,
-      x: cardX + layout.cards.retractCardButton.xOffset,
-      y: cardY + layout.cards.retractCardButton.yOffset
+      x: cardX + layoutConfig.cards.retractCardButton.xOffset,
+      y: cardY + layoutConfig.cards.retractCardButton.yOffset
     });
   }
 }

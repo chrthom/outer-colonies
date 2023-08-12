@@ -7,7 +7,7 @@ import {
 } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
 import Phaser from 'phaser';
@@ -46,10 +46,14 @@ export default class ContinueButton {
       lost: this.createButtonImage('lost')
     };
     this.text = scene.add
-      .text(layout.continueButton.x + layout.continueButton.xTextOffset, layout.continueButton.y, [''])
-      .setFontSize(layout.continueButton.fontSize)
-      .setFontFamily(layout.font.captionFamily)
-      .setColor(layout.font.color)
+      .text(
+        layoutConfig.continueButton.x + layoutConfig.continueButton.xTextOffset,
+        layoutConfig.continueButton.y,
+        ['']
+      )
+      .setFontSize(layoutConfig.continueButton.fontSize)
+      .setFontFamily(layoutConfig.font.captionFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
@@ -59,10 +63,10 @@ export default class ContinueButton {
           self.onClickAction();
         })
         .on('pointerover', () => {
-          self.text.setColor(layout.font.colorHover);
+          self.text.setColor(layoutConfig.font.colorHover);
         })
         .on('pointerout', () => {
-          self.text.setColor(layout.font.color);
+          self.text.setColor(layoutConfig.font.color);
         })
     );
     this.waitState();
@@ -114,7 +118,7 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(layout.continueButton.x, layout.continueButton.y, `button_${name}`)
+      .image(layoutConfig.continueButton.x, layoutConfig.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

@@ -6,6 +6,7 @@ import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
+import { backgroundConfig } from '../config/background';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken: string;
@@ -22,6 +23,12 @@ export default class Matchmaking extends Phaser.Scene {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     this.load.image('icon_exit', 'icons/exit.png');
+    backgroundConfig.orbs
+      .map(o => o.name)
+      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`)); ////
+    backgroundConfig.rings.forEach(name =>
+      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
+    ); ////
   }
 
   create() {
@@ -49,7 +56,9 @@ export default class Matchmaking extends Phaser.Scene {
           break;
       }
     });
-    new Background(this);
+    const b = new Background(this);
+    b.moveToRing(8); ////
+    setTimeout(() => b.moveToRing(0), 20000);
   }
 
   override update() {}

@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import MatchmakingScene from './scenes/matchmaking';
 import GameScene from './scenes/game';
 import { environment } from 'src/environments/environment';
+import { layoutConfig } from './config/layout';
 
 @Component({
   selector: 'app-root',
@@ -22,8 +23,8 @@ export class AppComponent implements OnInit {
         mode: Phaser.Scale.FIT,
         parent: 'game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 2400,
-        height: 1350
+        width: layoutConfig.scene.width,
+        height: layoutConfig.scene.height
       }
     };
   }

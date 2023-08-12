@@ -1,6 +1,6 @@
 import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
@@ -9,7 +9,7 @@ export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
   indicator: ValueIndicator;
   constructor(scene: Game) {
-    super(scene, layout.discardPile.x, layout.discardPile.y, 1);
+    super(scene, layoutConfig.discardPile.x, layoutConfig.discardPile.y, 1);
     this.update([]);
   }
   update(cardIds?: number[]) {
@@ -27,8 +27,8 @@ export default class DiscardPile extends CardImage {
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        layout.discardPile.x,
-        layout.discardPile.y,
+        layoutConfig.discardPile.x,
+        layoutConfig.discardPile.y,
         true,
         true
       );

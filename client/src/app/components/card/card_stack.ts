@@ -1,4 +1,4 @@
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/components/config/enums';
 import {
@@ -50,13 +50,13 @@ export default class CardStack {
       const x = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.x
-          : layout.deck.x
-        : layout.discardPile.x;
+          : layoutConfig.deck.x
+        : layoutConfig.discardPile.x;
       const y = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.y
-          : layout.deck.y
-        : layout.discardPile.yOpponent;
+          : layoutConfig.deck.y
+        : layoutConfig.discardPile.yOpponent;
       const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
@@ -150,7 +150,7 @@ export default class CardStack {
         this.tween();
       }
       if (!this.data.ownedByPlayer) {
-        this.cards[0].setX(layout.discardPile.x).setY(layout.discardPile.yOpponent).setAngle(180);
+        this.cards[0].setX(layoutConfig.discardPile.x).setY(layoutConfig.discardPile.yOpponent).setAngle(180);
         this.tween();
       }
     }
@@ -164,11 +164,13 @@ export default class CardStack {
     );
   }
   private y(index: number) {
-    const yDistance = layout.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
+    const yDistance = layoutConfig.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
   private zoneLayout() {
-    return this.data.ownedByPlayer ? layout.player[this.data.zone] : layout.opponent[this.data.zone];
+    return this.data.ownedByPlayer
+      ? layoutConfig.player[this.data.zone]
+      : layoutConfig.opponent[this.data.zone];
   }
   private destroyIndicators() {
     if (this.damageIndicator) this.damageIndicator.destroy();
