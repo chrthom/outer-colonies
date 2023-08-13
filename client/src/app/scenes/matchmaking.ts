@@ -57,8 +57,9 @@ export default class Matchmaking extends Phaser.Scene {
       }
     });
     const b = new Background(this);
-    b.moveToRing(8); ////
-    setTimeout(() => b.moveToRing(0), 20000);
+    b.moveToOrb('titan', true); ////
+    setTimeout(() => b.moveToOrb('europa', false), 13000);
+    setTimeout(() => b.moveToOrb('ganymed', true), 20000);
   }
 
   override update() {}
