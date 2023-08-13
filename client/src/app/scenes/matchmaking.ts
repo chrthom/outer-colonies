@@ -29,6 +29,7 @@ export default class Matchmaking extends Phaser.Scene {
     backgroundConfig.rings.forEach(name =>
       this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
     ); ////
+    this.load.image(`background_sun`, `background/sun.png`); ////
   }
 
   create() {
@@ -60,6 +61,7 @@ export default class Matchmaking extends Phaser.Scene {
     b.moveToOrb('titan', true); ////
     setTimeout(() => b.moveToOrb('europa', false), 13000);
     setTimeout(() => b.moveToOrb('ganymed', true), 20000);
+    setTimeout(() => b.moveToRing(0), 28000);
   }
 
   override update() {}

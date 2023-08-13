@@ -14,6 +14,7 @@ export default class Background {
   private targetOrb?: BackgroundOrb;
   private playerOrb?: boolean;
   private starsImage!: Phaser.GameObjects.Image;
+  private sunImage!: Phaser.GameObjects.Image;
   private ringImage!: Phaser.GameObjects.Image;
   private orbImage?: Phaser.GameObjects.Image;
   private zoneMarkers!: Phaser.GameObjects.Group;
@@ -26,6 +27,15 @@ export default class Background {
       .setOrigin(0, 0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(layoutConfig.colors.fadedAlpha);
+    this.sunImage = scene.add
+      .image(
+        this.sunCoordinatesAndScale(this.currentRing)[0],
+        this.sunCoordinatesAndScale(this.currentRing)[1],
+        'background_sun'
+      )
+      .setOrigin(0.5, 0.5)
+      .setDepth(layoutConfig.depth.background + 1)
+      .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     this.ringImage = this.createRing(this.currentRing, false);
     this.zoneMarkers = scene.add.group();
   }
@@ -85,10 +95,11 @@ export default class Background {
 
   private tween(initial: boolean) {
     const movingInwards = this.targetRing < this.currentRing;
-    this.tweenStars();
     if (initial) {
       this.tweenOutCurrentObjects();
     } else {
+      this.tweenStars();
+      this.tweenSun();
       if (this.targetOrb && this.nextRing == this.targetRing) {
         this.createOrbAndTweenToPosition(movingInwards);
       }
@@ -129,6 +140,16 @@ export default class Background {
       targets: this.starsImage,
       duration: backgroundConfig.animation.duration,
       y: y
+    });
+  }
+
+  private tweenSun() {
+    this.scene.tweens.add({
+      targets: this.sunImage,
+      duration: backgroundConfig.animation.duration,
+      x: this.sunCoordinatesAndScale(this.nextRing)[0],
+      y: this.sunCoordinatesAndScale(this.nextRing)[1],
+      scale: this.sunCoordinatesAndScale(this.nextRing)[2]
     });
   }
 
@@ -250,5 +271,13 @@ export default class Background {
       x = (Math.random() - 0.25) * 2 * layoutConfig.scene.width;
     }
     return [x, y];
+  }
+
+  private sunCoordinatesAndScale(ring: number): [number, number, number] {
+    return [
+      (layoutConfig.scene.width * ring) / backgroundConfig.rings.length / 2,
+      (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
+      2 / (Math.pow(ring, 2) + 1)
+    ];
   }
 }
