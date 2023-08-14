@@ -9,6 +9,8 @@ interface CornerConfig {
 }
 
 export default class Background {
+  inCombat: boolean = false;
+  private scene!: Phaser.Scene;
   private currentRing: number = 2;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
@@ -18,7 +20,6 @@ export default class Background {
   private ringImage!: Phaser.GameObjects.Image;
   private orbImage?: Phaser.GameObjects.Image;
   private zoneMarkers!: Phaser.GameObjects.Group;
-  private scene!: Phaser.Scene;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -38,6 +39,7 @@ export default class Background {
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     this.ringImage = this.createRing(this.currentRing, false);
     this.zoneMarkers = scene.add.group();
+    setInterval(() => this.animateRandomObjects(), backgroundConfig.animation.randomEventInterval);
   }
 
   initInterface() {
@@ -138,7 +140,7 @@ export default class Background {
       ) * this.nextRing;
     this.scene.tweens.add({
       targets: this.starsImage,
-      duration: backgroundConfig.animation.duration,
+      duration: backgroundConfig.animation.durationTransition,
       y: y
     });
   }
@@ -146,7 +148,7 @@ export default class Background {
   private tweenSun() {
     this.scene.tweens.add({
       targets: this.sunImage,
-      duration: backgroundConfig.animation.duration,
+      duration: backgroundConfig.animation.durationTransition,
       x: this.sunCoordinatesAndScale(this.nextRing)[0],
       y: this.sunCoordinatesAndScale(this.nextRing)[1],
       scale: this.sunCoordinatesAndScale(this.nextRing)[2]
@@ -186,11 +188,22 @@ export default class Background {
     this.tweenOrbToPosition();
   }
 
+  private tweenOrbToPosition() {
+    this.scene.tweens.add({
+      targets: this.orbImage,
+      duration: backgroundConfig.animation.durationTransition,
+      ease: 'Quint',
+      x: backgroundConfig.animation.orbX,
+      y: this.playerOrb ? backgroundConfig.animation.orbYPlayer : backgroundConfig.animation.orbYOpponent,
+      scale: backgroundConfig.animation.orbScale
+    });
+  }
+
   private tweenOut(image: Phaser.GameObjects.Image, movingInwards: boolean) {
     const [x, y] = movingInwards ? this.outCoordinates : this.inCoordinates;
     this.scene.tweens.add({
       targets: image,
-      duration: backgroundConfig.animation.duration,
+      duration: backgroundConfig.animation.durationTransition,
       ease: movingInwards ? 'Quad.easeIn' : 'Quint',
       x: x,
       y: y,
@@ -202,7 +215,7 @@ export default class Background {
   private tweenRingToPosition() {
     this.scene.tweens.add({
       targets: this.ringImage,
-      duration: backgroundConfig.animation.duration,
+      duration: backgroundConfig.animation.durationTransition,
       ease: 'Quint',
       x: Math.random() * layoutConfig.scene.width,
       y: Math.random() * layoutConfig.scene.height,
@@ -215,17 +228,6 @@ export default class Background {
     });
   }
 
-  private tweenOrbToPosition() {
-    this.scene.tweens.add({
-      targets: this.orbImage,
-      duration: backgroundConfig.animation.duration,
-      ease: 'Quint',
-      x: backgroundConfig.animation.orbX,
-      y: this.playerOrb ? backgroundConfig.animation.orbYPlayer : backgroundConfig.animation.orbYOpponent,
-      scale: backgroundConfig.animation.orbScale
-    });
-  }
-
   private getTint(angle: number): [number, number, number, number] {
     const tintCorner = (corner: number) =>
       angle >= (corner - 0.5) * 90 && angle < (corner + 0.5) * 90
@@ -234,8 +236,34 @@ export default class Background {
     return <[number, number, number, number]>[0, 2, 3, 1].map(tintCorner);
   }
 
-  private get randomBoolean(): boolean {
-    return Math.random() < 0.5;
+  private animateRandomObjects() {
+    if (!this.targetRing) {
+      backgroundConfig.randomVessels
+        .filter(rv => this.randomBoolean(rv.probability))
+        .forEach(rv => {
+          const vessel = this.scene.add
+            .image(rv.startX, rv.startY, `background_vessel_${rv.vessel}`)
+            .setOrigin(0.5, 0.5)
+            .setDepth(layoutConfig.depth.background + backgroundConfig.depth.vessel)
+            .setScale(rv.startScale ? rv.startScale : 1)
+            .setAngle(rv.startAngle ? rv.startAngle : 0)
+            .setTint(...this.getTint(rv.startAngle ? rv.startAngle : 0));
+          this.scene.tweens.add({
+            targets: vessel,
+            duration: backgroundConfig.animation.durationNextRing,
+            ease: rv.ease ? rv.ease : 'Linear',
+            x: rv.endX,
+            y: rv.endY,
+            scale: rv.endScale ? rv.endScale : (rv.startScale ? rv.startScale : 1),
+            angle: rv.endAngle ? rv.endAngle : (rv.startAngle ? rv.startAngle : 0),
+            onComplete: () => vessel.destroy()
+          });
+        });
+    }
+  }
+
+  private randomBoolean(chance?: number): boolean {
+    return Math.random() < (chance ? chance : 0.5);
   }
 
   private get inCoordinates(): [number, number] {
@@ -255,17 +283,17 @@ export default class Background {
   }
 
   private get outCoordinates(): [number, number] {
-    const xIsOff = this.randomBoolean;
-    const offAxisFactor = this.randomBoolean ? 1 : -1;
+    const xIsOff = this.randomBoolean();
+    const offAxisFactor = this.randomBoolean() ? 1 : -1;
     let x: number;
     let y: number;
     if (xIsOff) {
-      x = this.randomBoolean
+      x = this.randomBoolean()
         ? layoutConfig.scene.width + backgroundConfig.animation.offDistance
         : -backgroundConfig.animation.offDistance;
       y = (Math.random() - 0.25) * 2 * layoutConfig.scene.height;
     } else {
-      y = this.randomBoolean
+      y = this.randomBoolean()
         ? layoutConfig.scene.width + backgroundConfig.animation.offDistance
         : -backgroundConfig.animation.offDistance;
       x = (Math.random() - 0.25) * 2 * layoutConfig.scene.width;
