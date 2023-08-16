@@ -239,6 +239,8 @@ export default class Background {
   private animateRandomObjects() {
     if (!this.targetRing) {
       backgroundConfig.randomVessels
+        .filter(rv => !rv.combatOnly || this.inCombat)
+        .filter(rv => !rv.orbitOnly || this.orbImage)
         .filter(rv => this.randomBoolean(rv.probability))
         .forEach(rv => {
           const vessel = this.scene.add

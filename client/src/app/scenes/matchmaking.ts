@@ -32,9 +32,13 @@ export default class Matchmaking extends Phaser.Scene {
     this.load.image(`background_sun`, `background/sun.png`); ////
     [
       'corvette1',
+      'corvette2',
+      'corvette3',
       'freighter1',
       'freighter2',
-      'freighter3'
+      'freighter3',
+      'station1',
+      'torpedos1'
     ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
   }
 

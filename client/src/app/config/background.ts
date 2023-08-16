@@ -53,7 +53,7 @@ class BackgroundConfig {
       endScale: 1
     },
     {
-      probability: 0.005,
+      probability: 0.01,
       vessel: 'freighter2',
       startX: layoutConfig.scene.width + 300,
       startY: layoutConfig.scene.height * 0.4,
@@ -63,6 +63,7 @@ class BackgroundConfig {
       endY: layoutConfig.scene.height + 650,
       endScale: 1.8,
       endAngle: 20,
+      orbitOnly: true,
       ease: 'Quad.easeIn'
     },
     {
@@ -101,6 +102,94 @@ class BackgroundConfig {
       endAngle: -100,
       combatOnly: true,
       ease: 'Quad'
+    },
+    {
+      probability: 0.02,
+      vessel: 'corvette2',
+      startX: -400,
+      startY: layoutConfig.scene.height * 0.2,
+      endX: layoutConfig.scene.width + 400,
+      endY: layoutConfig.scene.height * 0.4,
+      endScale: 0.9,
+      endAngle: -10,
+      combatOnly: true
+    },
+    {
+      probability: 0.02,
+      vessel: 'corvette2',
+      startX: layoutConfig.scene.width * 0.3,
+      startY: layoutConfig.scene.height + 120,
+      startScale: 0.2,
+      startAngle: -100,
+      endX: layoutConfig.scene.width * 0.4,
+      endY: -60,
+      endScale: 0.1,
+      endAngle: -90,
+      combatOnly: true,
+      ease: 'Quad'
+    },
+    {
+      probability: 0.02,
+      vessel: 'corvette3',
+      startX: 1000,
+      startY: layoutConfig.scene.height - 800,
+      startScale: 0.01,
+      startAngle: -20,
+      endX: -1050,
+      endY: layoutConfig.scene.height - 100,
+      endScale: 2,
+      endAngle: 20,
+      combatOnly: true,
+      ease: 'Quint.easeIn'
+    },
+    {
+      probability: 0.02,
+      vessel: 'corvette3',
+      startX: layoutConfig.scene.width * 0.3,
+      startY: -400,
+      startScale: 0.8,
+      startAngle: -170,
+      endX: layoutConfig.scene.width + 1000,
+      endY: layoutConfig.scene.height * 0.4,
+      endScale: 1.5,
+      endAngle: -140,
+      combatOnly: true,
+      ease: 'Cubic.easeIn'
+    },
+    {
+      probability: 0.01,
+      vessel: 'station1',
+      startX: layoutConfig.scene.width + 185,
+      startY: layoutConfig.scene.height * 0.7,
+      endX: -185,
+      endY: layoutConfig.scene.height * 0.75,
+      endAngle: 70,
+      orbitOnly: true
+    },
+    {
+      probability: 0.02,
+      vessel: 'torpedos1',
+      startX: layoutConfig.scene.width * 0.6,
+      startY: layoutConfig.scene.height * 0.5,
+      startScale: 0.01,
+      endX: layoutConfig.scene.width + 500,
+      endY: layoutConfig.scene.height + 1000,
+      endScale: 2,
+      combatOnly: true,
+      ease: 'Cubic.easeIn'
+    },
+    {
+      probability: 0.02,
+      vessel: 'torpedos1',
+      startX: layoutConfig.scene.width * 0.4,
+      startY: layoutConfig.scene.height * 0.4,
+      startScale: 0.01,
+      startAngle: 130,
+      endX: -1000,
+      endY: layoutConfig.scene.height * 0.5,
+      endScale: 2,
+      combatOnly: true,
+      ease: 'Cubic.easeIn'
     }
   ]
 
