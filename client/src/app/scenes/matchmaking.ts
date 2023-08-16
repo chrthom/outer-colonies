@@ -31,6 +31,7 @@ export default class Matchmaking extends Phaser.Scene {
     ); ////
     this.load.image(`background_sun`, `background/sun.png`); ////
     [
+      'asteroid1',
       'corvette1',
       'corvette2',
       'corvette3',

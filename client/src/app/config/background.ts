@@ -190,6 +190,26 @@ class BackgroundConfig {
       endScale: 2,
       combatOnly: true,
       ease: 'Cubic.easeIn'
+    },
+    {
+      probability: 0.005,
+      vessel: 'asteroid1',
+      startX: -450,
+      startY: layoutConfig.scene.height * 0.7,
+      startAngle: -40,
+      endX: layoutConfig.scene.width + 450,
+      endY: layoutConfig.scene.height * 0.9,
+      endAngle: -80
+    },
+    {
+      probability: 0.005,
+      vessel: 'asteroid1',
+      startX: -90,
+      startY: layoutConfig.scene.height * 0.4,
+      startScale: 0.2,
+      endX: layoutConfig.scene.width,
+      endY: -90,
+      endAngle: -50
     }
   ]
 
