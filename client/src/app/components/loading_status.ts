@@ -1,4 +1,4 @@
-import { layout } from '../config/layout';
+import { layoutConfig } from '../config/layout';
 
 export default class LoadingStatus {
   private scene!: Phaser.Scene;
@@ -8,13 +8,13 @@ export default class LoadingStatus {
     this.scene = scene;
     this.text = scene.add
       .text(
-        layout.loadingAnimation.x,
-        layout.loadingAnimation.y + layout.loadingAnimation.textOffsetY,
+        layoutConfig.loadingAnimation.x,
+        layoutConfig.loadingAnimation.y + layoutConfig.loadingAnimation.textOffsetY,
         'Verbinde mit Server...'
       )
-      .setFontSize(layout.font.size)
-      .setFontFamily(layout.font.textFamily)
-      .setColor(layout.font.color)
+      .setFontSize(layoutConfig.font.size)
+      .setFontFamily(layoutConfig.font.textFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     this.createLoadingAnimation();
@@ -24,23 +24,23 @@ export default class LoadingStatus {
     return this;
   }
   private createLoadingAnimation() {
-    const height = layout.loadingAnimation.radius * 0.5;
+    const height = layoutConfig.loadingAnimation.radius * 0.5;
     let angle = -90;
     this.bars = [];
     for (let i = 0; i < 12; ++i) {
       const { x, y } = Phaser.Math.RotateAround(
         {
-          x: layout.loadingAnimation.x,
-          y: layout.loadingAnimation.y - (layout.loadingAnimation.radius - height * 0.5)
+          x: layoutConfig.loadingAnimation.x,
+          y: layoutConfig.loadingAnimation.y - (layoutConfig.loadingAnimation.radius - height * 0.5)
         },
-        layout.loadingAnimation.x,
-        layout.loadingAnimation.y,
+        layoutConfig.loadingAnimation.x,
+        layoutConfig.loadingAnimation.y,
         Phaser.Math.DEG_TO_RAD * angle
       );
       const bar = this.scene.add
-        .rectangle(x, y, layout.loadingAnimation.barWidth, height, layout.colors.primary)
+        .rectangle(x, y, layoutConfig.loadingAnimation.barWidth, height, layoutConfig.colors.primary)
         .setAngle(angle)
-        .setAlpha(layout.colors.alpha);
+        .setAlpha(layoutConfig.colors.alpha);
       this.bars.push(bar);
       angle += 30;
     }
@@ -58,9 +58,9 @@ export default class LoadingStatus {
           const tween = this.scene.tweens.add({
             repeat: -1,
             targets: bar,
-            alpha: layout.colors.fadedAlpha,
+            alpha: layoutConfig.colors.fadedAlpha,
             duration: 400,
-            onStart: () => (bar.alpha = layout.colors.alpha)
+            onStart: () => (bar.alpha = layoutConfig.colors.alpha)
           });
           tweens.push(tween);
         }

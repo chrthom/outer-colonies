@@ -6,6 +6,7 @@ import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
+import { backgroundConfig } from '../config/background';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken: string;
@@ -22,6 +23,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     this.load.image('icon_exit', 'icons/exit.png');
+    this.load.image(`background_sun`, `background/sun.png`);
   }
 
   create() {

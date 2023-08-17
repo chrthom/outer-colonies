@@ -1,5 +1,5 @@
 import CardImage from './card_image';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class MissionCards {
@@ -15,11 +15,11 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layout.missionCards.x + index * layout.missionCards.xDistance,
-          layout.missionCards.y + index * layout.missionCards.yDistance,
+          layoutConfig.missionCards.x + index * layoutConfig.missionCards.xDistance,
+          layoutConfig.missionCards.y + index * layoutConfig.missionCards.yDistance,
           id,
           false,
-          layout.cards.scale.min
+          layoutConfig.cards.scale.min
         );
       });
       this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());

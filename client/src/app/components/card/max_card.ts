@@ -1,10 +1,17 @@
 import CardImage from './card_image';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
-    super(scene, layout.maxCard.x, layout.maxCard.y, layout.cards.scale.max, false, layout.maxCard.scale);
+    super(
+      scene,
+      layoutConfig.maxCard.x,
+      layoutConfig.maxCard.y,
+      layoutConfig.cards.scale.max,
+      false,
+      layoutConfig.maxCard.scale
+    );
     this.hide();
   }
   hide() {

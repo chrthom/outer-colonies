@@ -1,4 +1,4 @@
-import { layout } from '../config/layout';
+import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 
 export default class Preloader {
@@ -10,29 +10,33 @@ export default class Preloader {
     this.progressBar = scene.add.graphics();
     this.progressBox = scene.add
       .graphics()
-      .fillStyle(layout.colors.primary, layout.colors.fadedAlpha)
+      .fillStyle(layoutConfig.colors.primary, layoutConfig.colors.fadedAlpha)
       .fillRect(
-        layout.preloader.x - layout.preloader.width / 2 - layout.preloader.boxPadding,
-        layout.preloader.y - layout.preloader.boxPadding,
-        layout.preloader.width + 2 * layout.preloader.boxPadding,
-        layout.preloader.height + 2 * layout.preloader.boxPadding
+        layoutConfig.preloader.x - layoutConfig.preloader.width / 2 - layoutConfig.preloader.boxPadding,
+        layoutConfig.preloader.y - layoutConfig.preloader.boxPadding,
+        layoutConfig.preloader.width + 2 * layoutConfig.preloader.boxPadding,
+        layoutConfig.preloader.height + 2 * layoutConfig.preloader.boxPadding
       );
     this.text = scene.add
-      .text(layout.preloader.x, layout.preloader.y + layout.preloader.textOffsetY, 'Lade Spieldaten...')
-      .setFontSize(layout.font.size)
-      .setFontFamily(layout.font.textFamily)
-      .setColor(layout.font.color)
+      .text(
+        layoutConfig.preloader.x,
+        layoutConfig.preloader.y + layoutConfig.preloader.textOffsetY,
+        'Lade Spieldaten...'
+      )
+      .setFontSize(layoutConfig.font.size)
+      .setFontFamily(layoutConfig.font.textFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     scene.load.on('progress', (value: number) => {
       self.progressBar
         .clear()
-        .fillStyle(layout.colors.primary, layout.colors.alpha)
+        .fillStyle(layoutConfig.colors.primary, layoutConfig.colors.alpha)
         .fillRect(
-          layout.preloader.x - layout.preloader.width / 2,
-          layout.preloader.y,
-          layout.preloader.width * value,
-          layout.preloader.height
+          layoutConfig.preloader.x - layoutConfig.preloader.width / 2,
+          layoutConfig.preloader.y,
+          layoutConfig.preloader.width * value,
+          layoutConfig.preloader.height
         );
     });
     scene.load.on('complete', () => {

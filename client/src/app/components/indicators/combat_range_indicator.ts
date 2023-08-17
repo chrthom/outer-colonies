@@ -1,4 +1,4 @@
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class CombatRangeIndicator {
@@ -8,7 +8,7 @@ export default class CombatRangeIndicator {
     this.scene = scene;
     this.images = [1, 2, 3, 4].map(i =>
       this.scene.add
-        .image(layout.combatRange.x, layout.combatRange.y, `range_${i}`)
+        .image(layoutConfig.combatRange.x, layoutConfig.combatRange.y, `range_${i}`)
         .setOrigin(0.5, 0.5)
         .setVisible(false)
     );

@@ -1,6 +1,6 @@
 import { ClientAttack } from '../../../../../server/src/components/shared_interfaces/client_state';
 import { animationConfig } from '../../config/animation';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardStack from '../card/card_stack';
 
@@ -12,7 +12,7 @@ export default class AttackDamageIndicator {
     this.cardImage = cardStack.cards[0].image;
     const self = this;
     ['pointDefense', 'shield', 'armour', 'damage']
-      .map(key => [attack[key], layout.attack.color[key]])
+      .map(key => [attack[key], layoutConfig.attack.color[key]])
       .filter(([value, _]) => value > 0)
       .forEach(([value, color], index) =>
         setTimeout(
@@ -57,8 +57,8 @@ export default class AttackDamageIndicator {
         : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
       .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
-      .setFontSize(layout.attack.fontSize)
-      .setFontFamily(layout.font.captionFamily)
+      .setFontSize(layoutConfig.attack.fontSize)
+      .setFontFamily(layoutConfig.font.captionFamily)
       .setColor(color)
       .setAlign('center')
       .setOrigin(0.5, 1);

@@ -24,9 +24,10 @@ import { animationConfig } from '../config/animation';
 import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 import CardImage from '../components/card/card_image';
-import { layout } from '../config/layout';
+import { layoutConfig } from '../config/layout';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
+import { backgroundConfig } from '../config/background';
 
 interface InitData {
   socket: Socket;
@@ -49,12 +50,6 @@ class ActiveCards {
   hand?: string;
   stack?: string;
   stackIndex?: number;
-}
-
-interface Layers {
-  background: Phaser.GameObjects.Layer;
-  cards: Phaser.GameObjects.Layer;
-  interface: Phaser.GameObjects.Layer;
 }
 
 export default class Game extends Phaser.Scene {
@@ -124,6 +119,24 @@ export default class Game extends Phaser.Scene {
       'lost'
     ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
     this.load.image('prompt_box', 'utils/prompt_box.png');
+    backgroundConfig.orbs
+      .map(o => o.name)
+      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
+    backgroundConfig.rings.forEach(name =>
+      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
+    );
+    this.load.image(`background_sun`, `background/sun.png`);
+    [
+      'asteroid1',
+      'corvette1',
+      'corvette2',
+      'corvette3',
+      'freighter1',
+      'freighter2',
+      'freighter3',
+      'station1',
+      'torpedos1'
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
   }
 
   create() {
@@ -185,6 +198,7 @@ export default class Game extends Phaser.Scene {
 
   updateView() {
     this.obj.actionPool?.update();
+    this.obj.background?.update();
     this.obj.continueButton?.update();
     this.obj.combatRangeIndicator?.update();
     this.obj.deck?.update();
@@ -275,8 +289,8 @@ export default class Game extends Phaser.Scene {
       ) {
         new CardImage(
           self,
-          layout.discardPile.x,
-          layout.discardPile.yOpponent,
+          layoutConfig.discardPile.x,
+          layoutConfig.discardPile.yOpponent,
           cardId,
           true
         ).showAndDiscardTacticCard(false);

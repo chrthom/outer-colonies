@@ -1,5 +1,5 @@
 import CardImage from './card_image';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
@@ -8,7 +8,7 @@ import { ClientPlannedBattle } from '../../../../../server/src/components/shared
 export default class DeckCard extends CardImage {
   indicator: ValueIndicator;
   constructor(scene: Game) {
-    super(scene, layout.deck.x, layout.deck.y, 1);
+    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, 1);
     this.image.on('pointerdown', () => this.onClickAction());
   }
   update() {
@@ -18,8 +18,8 @@ export default class DeckCard extends CardImage {
       this.scene,
       this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
       this.scene.state.deckSize - cardsForMission < 10,
-      layout.deck.x,
-      layout.deck.y,
+      layoutConfig.deck.x,
+      layoutConfig.deck.y,
       true,
       true
     );

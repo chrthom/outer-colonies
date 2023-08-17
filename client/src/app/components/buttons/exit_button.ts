@@ -1,5 +1,5 @@
 import { environment } from '../../../environments/environment';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class ExitButton {
@@ -14,30 +14,32 @@ export default class ExitButton {
     const self = this;
     this.text = scene.add
       .text(
-        layout.exitButton.x + layout.exitButton.xTextOffset,
-        layout.exitButton.y + layout.exitButton.yTextOffset,
+        layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
+        layoutConfig.exitButton.y + layoutConfig.exitButton.yTextOffset,
         ['']
       )
-      .setFontSize(layout.exitButton.fontSize)
-      .setFontFamily(layout.font.captionFamily)
-      .setColor(layout.font.color)
+      .setFontSize(layoutConfig.exitButton.fontSize)
+      .setFontFamily(layoutConfig.font.captionFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
     this.confirmText = scene.add
       .text(
-        layout.exitButton.x + layout.exitButton.xTextOffset,
-        layout.exitButton.y + layout.exitButton.yTextOffset + layout.exitButton.yConfirmOffset,
+        layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
+        layoutConfig.exitButton.y +
+          layoutConfig.exitButton.yTextOffset +
+          layoutConfig.exitButton.yConfirmOffset,
         ['Kapitulation bestätigen']
       )
-      .setFontSize(layout.exitButton.fontSize)
-      .setFontFamily(layout.font.captionFamily)
-      .setColor(layout.font.color)
+      .setFontSize(layoutConfig.exitButton.fontSize)
+      .setFontFamily(layoutConfig.font.captionFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
     this.image = this.scene.add
-      .image(layout.exitButton.x, layout.exitButton.y, 'icon_exit')
+      .image(layoutConfig.exitButton.x, layoutConfig.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
       .setInteractive();
     (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(o =>
@@ -46,10 +48,10 @@ export default class ExitButton {
           self.onClickAction();
         })
         .on('pointerover', () => {
-          self.text.setColor(layout.font.colorWarn);
+          self.text.setColor(layoutConfig.font.colorWarn);
         })
         .on('pointerout', () => {
-          self.text.setColor(layout.font.color);
+          self.text.setColor(layoutConfig.font.color);
         })
     );
     this.confirmText
@@ -57,10 +59,10 @@ export default class ExitButton {
         self.onClickAction(true);
       })
       .on('pointerover', () => {
-        self.confirmText.setColor(layout.font.colorWarn);
+        self.confirmText.setColor(layoutConfig.font.colorWarn);
       })
       .on('pointerout', () => {
-        self.confirmText.setColor(layout.font.color);
+        self.confirmText.setColor(layoutConfig.font.color);
       });
     this.update();
   }

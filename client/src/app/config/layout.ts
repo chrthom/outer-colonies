@@ -1,4 +1,4 @@
-class Layout {
+class LayoutConfig {
   readonly colors = {
     alpha: 0.8,
     fadedAlpha: 0.3,
@@ -19,6 +19,7 @@ class Layout {
   };
 
   readonly depth = {
+    background: -1000,
     indicators: 20,
     discardCard: 50,
     handCard: 70,
@@ -206,10 +207,14 @@ class Layout {
     fontSize: 22,
     fontSizeBig: 30
   };
+  readonly scene = {
+    height: 1350,
+    width: 2400
+  };
   readonly version = {
     x: 2360,
     y: 1340
   };
 }
 
-export const layout = new Layout();
+export const layoutConfig = new LayoutConfig();

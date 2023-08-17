@@ -1,7 +1,7 @@
 import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/components/config/enums';
 import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
-import { layout } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class Prompt {
@@ -11,14 +11,14 @@ export default class Prompt {
   constructor(scene: Game) {
     this.scene = scene;
     this.image = this.scene.add
-      .image(layout.prompt.box.x, layout.prompt.box.y, 'prompt_box')
+      .image(layoutConfig.prompt.box.x, layoutConfig.prompt.box.y, 'prompt_box')
       .setOrigin(0, 0)
       .setScale(0.8);
     this.text = scene.add
-      .text(layout.prompt.x, layout.prompt.y, 'Lädt...')
-      .setFontSize(layout.prompt.fontSize)
-      .setFontFamily(layout.font.textFamily)
-      .setColor(layout.font.color)
+      .text(layoutConfig.prompt.x, layoutConfig.prompt.y, 'Lädt...')
+      .setFontSize(layoutConfig.prompt.fontSize)
+      .setFontFamily(layoutConfig.font.textFamily)
+      .setColor(layoutConfig.font.color)
       .setAlign('left')
       .setOrigin(0, 0);
   }
@@ -101,7 +101,7 @@ export default class Prompt {
     this.show(
       `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
     );
-    this.text.setFontSize(layout.prompt.fontSizeBig);
+    this.text.setFontSize(layoutConfig.prompt.fontSizeBig);
   }
   private show(text: string) {
     this.text.setText(text);
