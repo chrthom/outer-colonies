@@ -23,6 +23,7 @@ class LayoutConfig {
     indicators: 20,
     discardCard: 50,
     handCard: 70,
+    battleEffects: 85,
     maxedTacticCard: 100
   };
 
