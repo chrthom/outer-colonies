@@ -47,7 +47,7 @@ export default class AttackDamageIndicator {
       gravityY: 15,
       blendMode: 'ADD',
       emitting: false
-    });
+    }).setDepth(layoutConfig.depth.battleEffects);
   }
   private createIndicator(value: number, color: string) {
     const yOffset =
@@ -60,7 +60,8 @@ export default class AttackDamageIndicator {
       .setFontFamily(layoutConfig.font.captionFamily)
       .setColor(color)
       .setAlign('center')
-      .setOrigin(0.5, 1);
+      .setOrigin(0.5, 1)
+      .setDepth(layoutConfig.depth.battleEffects);
   }
   private tween(target: Phaser.GameObjects.Text) {
     this.scene.tweens.add({
