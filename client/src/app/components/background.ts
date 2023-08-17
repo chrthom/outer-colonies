@@ -1,3 +1,4 @@
+import { TurnPhase } from '../../../../server/src/components/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
@@ -10,9 +11,11 @@ interface CornerConfig {
 }
 
 export default class Background {
-  inCombat: boolean = false;
+  private readonly playerDefaultOrb = 'europa';
+  private readonly opponentDefaultOrb = 'titan';
+
   private scene!: Phaser.Scene | Game;
-  private currentRing: number = 2;
+  private currentRing: number = 0;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
   private playerOrb?: boolean;
@@ -24,6 +27,7 @@ export default class Background {
 
   constructor(scene: Phaser.Scene | Game) {
     this.scene = scene;
+    this.zoneMarkers = scene.add.group();
     this.starsImage = scene.add
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
       .setOrigin(0, 0)
@@ -38,14 +42,15 @@ export default class Background {
       .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
-    this.ringImage = this.createRing(this.currentRing, true);
-    this.zoneMarkers = scene.add.group();
-    setInterval(() => {
-      if (!this.targetRing) {
-        this.animateRandomObjects();
-        this.animateRandomCombatEffects();
-      }
-    }, backgroundConfig.animation.randomEventInterval);
+    if (this.isGame) {
+      this.ringImage = this.createRing(this.currentRing, false);
+      setInterval(() => {
+        if (!this.targetRing) {
+          this.animateRandomObjects();
+          this.animateRandomCombatEffects();
+        }
+      }, backgroundConfig.animation.randomEventInterval);
+    }
   }
 
   initInterface() {
@@ -90,15 +95,29 @@ export default class Background {
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }
 
-  moveToOrb(orb: string, playerOrb: boolean) {
+  update() {
+    if (this.isGame) {
+      const state = this.game.state;
+      if (this.inCombat) {
+        if (this.orbImage) {
+          this.moveToRing(this.randomIndex(backgroundConfig.rings));
+        }
+      } else if (!this.orbImage || state.playerIsActive != this.playerOrb) {
+        this.moveToOrb(state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb, state.playerIsActive);
+      }
+    }
+  }
+
+  private moveToOrb(orb: string, playerOrb: boolean) {
     this.targetOrb = backgroundConfig.orbs.find(o => o.name == orb);
     this.playerOrb = playerOrb;
     this.moveToRing(this.targetOrb.ring);
   }
 
-  moveToRing(ring: number) {
+  private moveToRing(ring: number) {
+    const alreadyInTransit = this.targetRing != undefined;
     this.targetRing = ring;
-    this.tween(true);
+    if (!alreadyInTransit) this.tween(true);
   }
 
   private tween(initial: boolean) {
@@ -319,7 +338,7 @@ export default class Background {
       0xffffff,
       conf.alpha
     ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
-    line.postFX.addGlow(conf.colors[Math.floor(Math.random() * conf.colors.length)]);
+    line.postFX.addGlow(this.randomElement(conf.colors));
     this.scene.tweens.add({
       targets: line,
       duration: conf.duration,
@@ -335,7 +354,7 @@ export default class Background {
     const emitter = this.scene.add.particles(
       layoutConfig.scene.width * Math.random(),
       layoutConfig.scene.height * Math.random(),
-      `flare_${conf.colors[Math.floor(Math.random() * conf.colors.length)]}`,
+      `flare_${this.randomElement(conf.colors)}`,
       {
         lifespan: lifetime,
         speed: { min: 0, max: conf.maxSpeed * scale },
@@ -401,5 +420,25 @@ export default class Background {
       (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
         (backgroundConfig.rings.length - 1)
     ) * ring;
+  }
+
+  private get isGame(): boolean {
+    return this.game.gameParams !== undefined;
+  }
+
+  private get game(): Game {
+    return this.scene as Game;
+  }
+
+  private get inCombat(): boolean {
+    return this.isGame && this.game.state.turnPhase == TurnPhase.Combat;
+  }
+
+  private randomElement<T>(array: T[]): T {
+    return array[this.randomIndex(array)];
+  }
+
+  private randomIndex(array: any[]): number {
+    return Math.floor(Math.random() * array.length);
   }
 }

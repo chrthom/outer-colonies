@@ -42,7 +42,7 @@ class BackgroundConfig {
     smallScale: 0.003,
     ringMaxScale: 1.3,
     orbScale: 1,
-    orbX: layoutConfig.scene.width / 2,
+    orbX: layoutConfig.scene.width / 2 + 125,
     orbYPlayer: layoutConfig.scene.height + 200,
     orbYOpponent: -200
   };

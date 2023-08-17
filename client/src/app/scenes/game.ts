@@ -52,12 +52,6 @@ class ActiveCards {
   stackIndex?: number;
 }
 
-interface Layers {
-  background: Phaser.GameObjects.Layer;
-  cards: Phaser.GameObjects.Layer;
-  interface: Phaser.GameObjects.Layer;
-}
-
 export default class Game extends Phaser.Scene {
   socket: Socket;
   gameParams: ClientGameParams;
@@ -131,6 +125,18 @@ export default class Game extends Phaser.Scene {
     backgroundConfig.rings.forEach(name =>
       this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
     );
+    this.load.image(`background_sun`, `background/sun.png`);
+    [
+      'asteroid1',
+      'corvette1',
+      'corvette2',
+      'corvette3',
+      'freighter1',
+      'freighter2',
+      'freighter3',
+      'station1',
+      'torpedos1'
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
   }
 
   create() {
@@ -192,6 +198,7 @@ export default class Game extends Phaser.Scene {
 
   updateView() {
     this.obj.actionPool?.update();
+    this.obj.background?.update();
     this.obj.continueButton?.update();
     this.obj.combatRangeIndicator?.update();
     this.obj.deck?.update();

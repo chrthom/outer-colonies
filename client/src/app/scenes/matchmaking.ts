@@ -23,27 +23,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
     this.load.image('icon_exit', 'icons/exit.png');
-    backgroundConfig.orbs
-      .map(o => o.name)
-      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`)); ////
-    backgroundConfig.rings.forEach(name =>
-      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
-    ); ////
-    this.load.image(`background_sun`, `background/sun.png`); ////
-    [
-      'asteroid1',
-      'corvette1',
-      'corvette2',
-      'corvette3',
-      'freighter1',
-      'freighter2',
-      'freighter3',
-      'station1',
-      'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`)); ////
-    ['red', 'yellow', 'blue', 'white'].forEach(color =>
-      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
-    ); ////
+    this.load.image(`background_sun`, `background/sun.png`);
   }
 
   create() {
@@ -71,8 +51,7 @@ export default class Matchmaking extends Phaser.Scene {
           break;
       }
     });
-    const b = new Background(this);
-    b.moveToRing(2);
+    new Background(this);
   }
 
   override update() {}
