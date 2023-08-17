@@ -99,6 +99,15 @@ class BackgroundConfig {
       alpha: 0.5,
       range: 2500,
       colors: [ 0xff0000, 0x00ff00, 0x00aaff ]
+    },
+    explosion: {
+      probability: 0.1,
+      duration: 4000,
+      maxScale: 2,
+      maxSpeed: 5,
+      minParticles: 15,
+      maxParticles: 20,
+      colors: [ 'white', 'blue' ]
     }
   };
 

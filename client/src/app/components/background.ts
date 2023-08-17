@@ -268,7 +268,7 @@ export default class Background {
   }
 
   private animateRandomCombatEffects() {
-    if (true /*this.inCombat*/) {
+    if (true/*this.inCombat*/) {
       for (let i = 0; i < backgroundConfig.randomCombatEffects.multiplier; i++) {
         if (this.randomBoolean(backgroundConfig.randomCombatEffects.autogun.probability)) {
           this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
@@ -278,6 +278,11 @@ export default class Background {
         if (this.randomBoolean(backgroundConfig.randomCombatEffects.laser.probability)) {
           this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
             this.createLaserFire()
+          );
+        }
+        if (this.randomBoolean(backgroundConfig.randomCombatEffects.explosion.probability)) {
+          this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
+            this.createExplosion()
           );
         }
       }
@@ -325,6 +330,27 @@ export default class Background {
       alpha: 0,
       onComplete: () => line.destroy()
     });
+  }
+
+  private createExplosion() {
+    const conf = backgroundConfig.randomCombatEffects.explosion;
+    const lifetime = (Math.random() + 0.5) * conf.duration;
+    const scale = Math.random() * conf.maxScale;
+    const emitter = this.scene.add.particles(
+      layoutConfig.scene.width * Math.random(),
+      layoutConfig.scene.height * Math.random(),
+      `flare_${conf.colors[Math.floor(Math.random() * conf.colors.length)]}`,
+      {
+        lifespan: lifetime,
+        speed: { min: 0, max: conf.maxSpeed * scale },
+        scale: { start: 0.01, end: scale },
+        alpha: { start: 1, end: 0 },
+        blendMode: 'ADD',
+        emitting: false
+      }
+    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    emitter.explode(Number(Math.random() * conf.maxParticles + conf.minParticles));
+    this.scene.time.delayedCall(lifetime, () => emitter.destroy());
   }
 
   private randomBoolean(chance?: number): boolean {
