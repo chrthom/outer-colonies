@@ -40,7 +40,10 @@ export default class Matchmaking extends Phaser.Scene {
       'freighter3',
       'station1',
       'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`)); ////
+    ['red', 'yellow', 'blue', 'white'].forEach(color =>
+      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
+    ); ////
   }
 
   create() {

@@ -24,6 +24,13 @@ export interface BackgroundRandomVessel {
 }
 
 class BackgroundConfig {
+  readonly depth = {
+    ring: 100,
+    orb: 200,
+    effects: 300,
+    vessel: 400
+  };
+
   readonly animation = {
     randomEventInterval: 1000,
     durationTransition: 3000,
@@ -38,6 +45,61 @@ class BackgroundConfig {
     orbX: layoutConfig.scene.width / 2,
     orbYPlayer: layoutConfig.scene.height + 200,
     orbYOpponent: -200
+  };
+
+  readonly orbs: BackgroundOrb[] = [
+    {
+      cardId: 146,
+      name: 'europa',
+      ring: 4,
+      distance: 1
+    },
+    {
+      cardId: 159,
+      name: 'ganymed',
+      ring: 4,
+      distance: 0.7
+    },
+    {
+      cardId: 112,
+      name: 'titan',
+      ring: 5,
+      distance: 1
+    },
+    {
+      cardId: 432,
+      name: 'oberon',
+      ring: 6,
+      distance: 0.2
+    },
+    {
+      cardId: 433,
+      name: 'triton',
+      ring: 7,
+      distance: 1
+    }
+  ];
+
+  readonly rings = ['venus', 'earth', 'mars', 'belt', 'jupiter', 'saturn', 'uranus', 'neptun', 'kuiper'];
+
+  readonly randomCombatEffects = {
+    multiplier: 5,
+    autogun: {
+      probability: 0.1,
+      speed: 20000,
+      spread: 5,
+      maxScale: 1,
+      lifetime: 800,
+      frequency: 100,
+      duration: this.animation.durationNextRing / 2
+    },
+    laser: {
+      probability: 0.1,
+      duration: 200,
+      alpha: 0.5,
+      range: 2500,
+      colors: [ 0xff0000, 0x00ff00, 0x00aaff ]
+    }
   };
 
   readonly randomVessels: BackgroundRandomVessel[] = [
@@ -211,48 +273,7 @@ class BackgroundConfig {
       endY: -90,
       endAngle: -50
     }
-  ]
-
-  readonly depth = {
-    ring: 100,
-    orb: 200,
-    vessel: 300
-  };
-
-  readonly orbs: BackgroundOrb[] = [
-    {
-      cardId: 146,
-      name: 'europa',
-      ring: 4,
-      distance: 1
-    },
-    {
-      cardId: 159,
-      name: 'ganymed',
-      ring: 4,
-      distance: 0.7
-    },
-    {
-      cardId: 112,
-      name: 'titan',
-      ring: 5,
-      distance: 1
-    },
-    {
-      cardId: 432,
-      name: 'oberon',
-      ring: 6,
-      distance: 0.2
-    },
-    {
-      cardId: 433,
-      name: 'triton',
-      ring: 7,
-      distance: 1
-    }
   ];
-
-  readonly rings = ['venus', 'earth', 'mars', 'belt', 'jupiter', 'saturn', 'uranus', 'neptun', 'kuiper'];
 }
 
 export const backgroundConfig = new BackgroundConfig();

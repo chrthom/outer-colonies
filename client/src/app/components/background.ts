@@ -39,7 +39,12 @@ export default class Background {
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     this.ringImage = this.createRing(this.currentRing, false);
     this.zoneMarkers = scene.add.group();
-    setInterval(() => this.animateRandomObjects(), backgroundConfig.animation.randomEventInterval);
+    setInterval(() => {
+      if (!this.targetRing) {
+        this.animateRandomObjects();
+        this.animateRandomCombatEffects();
+      }
+    }, backgroundConfig.animation.randomEventInterval);
   }
 
   initInterface() {
@@ -237,31 +242,89 @@ export default class Background {
   }
 
   private animateRandomObjects() {
-    if (!this.targetRing) {
-      backgroundConfig.randomVessels
-        .filter(rv => !rv.combatOnly || this.inCombat)
-        .filter(rv => !rv.orbitOnly || this.orbImage)
-        .filter(rv => this.randomBoolean(rv.probability))
-        .forEach(rv => {
-          const vessel = this.scene.add
-            .image(rv.startX, rv.startY, `background_vessel_${rv.vessel}`)
-            .setOrigin(0.5, 0.5)
-            .setDepth(layoutConfig.depth.background + backgroundConfig.depth.vessel)
-            .setScale(rv.startScale ? rv.startScale : 1)
-            .setAngle(rv.startAngle ? rv.startAngle : 0)
-            .setTint(...this.getTint(rv.startAngle ? rv.startAngle : 0));
-          this.scene.tweens.add({
-            targets: vessel,
-            duration: backgroundConfig.animation.durationNextRing,
-            ease: rv.ease ? rv.ease : 'Linear',
-            x: rv.endX,
-            y: rv.endY,
-            scale: rv.endScale ? rv.endScale : (rv.startScale ? rv.startScale : 1),
-            angle: rv.endAngle ? rv.endAngle : (rv.startAngle ? rv.startAngle : 0),
-            onComplete: () => vessel.destroy()
-          });
+    backgroundConfig.randomVessels
+      .filter(rv => !rv.combatOnly || this.inCombat)
+      .filter(rv => !rv.orbitOnly || this.orbImage)
+      .filter(rv => this.randomBoolean(rv.probability))
+      .forEach(rv => {
+        const vessel = this.scene.add
+          .image(rv.startX, rv.startY, `background_vessel_${rv.vessel}`)
+          .setOrigin(0.5, 0.5)
+          .setDepth(layoutConfig.depth.background + backgroundConfig.depth.vessel)
+          .setScale(rv.startScale ? rv.startScale : 1)
+          .setAngle(rv.startAngle ? rv.startAngle : 0)
+          .setTint(...this.getTint(rv.startAngle ? rv.startAngle : 0));
+        this.scene.tweens.add({
+          targets: vessel,
+          duration: backgroundConfig.animation.durationNextRing,
+          ease: rv.ease ? rv.ease : 'Linear',
+          x: rv.endX,
+          y: rv.endY,
+          scale: rv.endScale ? rv.endScale : rv.startScale ? rv.startScale : 1,
+          angle: rv.endAngle ? rv.endAngle : rv.startAngle ? rv.startAngle : 0,
+          onComplete: () => vessel.destroy()
         });
+      });
+  }
+
+  private animateRandomCombatEffects() {
+    if (true /*this.inCombat*/) {
+      for (let i = 0; i < backgroundConfig.randomCombatEffects.multiplier; i++) {
+        if (this.randomBoolean(backgroundConfig.randomCombatEffects.autogun.probability)) {
+          this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
+            this.createAutogunFire()
+          );
+        }
+        if (this.randomBoolean(backgroundConfig.randomCombatEffects.laser.probability)) {
+          this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
+            this.createLaserFire()
+          );
+        }
+      }
     }
+  }
+
+  private createAutogunFire() {
+    const conf = backgroundConfig.randomCombatEffects.autogun;
+    const endScale = Math.pow(Math.random() * conf.maxScale, 2);
+    const duration = (Math.random() + 0.5) * conf.duration;
+    const emitter = this.scene.add.particles(
+      layoutConfig.scene.width * Math.random(),
+      layoutConfig.scene.height * Math.random(),
+      'flare_yellow',
+      {
+        duration: duration,
+        lifespan: conf.lifetime,
+        gravityX: (Math.random() - 0.5) * conf.speed * endScale,
+        gravityY: (Math.random() - 0.5) * conf.speed * endScale,
+        frequency: conf.frequency,
+        speed: { min: 0, max: conf.spread },
+        scale: { start: Math.pow((Math.random() * conf.maxScale) / 2, 2), end: endScale },
+        blendMode: 'ADD',
+        emitting: true
+      }
+    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    this.scene.time.delayedCall(duration + conf.lifetime, () => emitter.destroy());
+  }
+
+  private createLaserFire() {
+    const conf = backgroundConfig.randomCombatEffects.laser;
+    const x = layoutConfig.scene.width * Math.random();
+    const y = layoutConfig.scene.height * Math.random();
+    const line = this.scene.add.line(
+      0, 0, x, y,
+      x + conf.range * (Math.random() - 0.5),
+      y + conf.range * (Math.random() - 0.5),
+      0xffffff,
+      conf.alpha
+    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    line.postFX.addGlow(conf.colors[Math.floor(Math.random() * conf.colors.length)]);
+    this.scene.tweens.add({
+      targets: line,
+      duration: conf.duration,
+      alpha: 0,
+      onComplete: () => line.destroy()
+    });
   }
 
   private randomBoolean(chance?: number): boolean {
