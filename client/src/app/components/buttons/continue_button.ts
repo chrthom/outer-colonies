@@ -81,9 +81,9 @@ export default class ContinueButton {
         case TurnPhase.Build:
           if (!this.scene.state.playerIsActive) {
             if (!this.canIntervene) {
-              setTimeout(() => {
+              this.scene.time.delayedCall(animationConfig.duration.move, () => {
                 self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
-              }, animationConfig.duration.move);
+              });
             }
             this.showIntervene();
           } else if (this.scene.state.hasToRetractCards) {
@@ -95,9 +95,9 @@ export default class ContinueButton {
         case TurnPhase.Combat:
           this.showNextCombatPhase();
           if (!this.canAttack) {
-            setTimeout(() => {
+            this.scene.time.delayedCall(animationConfig.duration.attack, () => {
               self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
-            }, animationConfig.duration.attack);
+            });
           }
           break;
         case TurnPhase.End:
