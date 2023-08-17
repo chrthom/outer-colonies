@@ -15,9 +15,8 @@ export default class AttackDamageIndicator {
       .map(key => [attack[key], layoutConfig.attack.color[key]])
       .filter(([value, _]) => value > 0)
       .forEach(([value, color], index) =>
-        setTimeout(
-          () => self.tween(this.createIndicator(value, color)),
-          animationConfig.attack.indicator.spawnInterval * index
+        this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
+          self.tween(this.createIndicator(value, color))
         )
       );
     const particleEmitters = [
@@ -32,9 +31,9 @@ export default class AttackDamageIndicator {
         emitter.explode(Number(n));
         return emitter;
       });
-    setTimeout(() => {
+    this.scene.time.delayedCall(animationConfig.duration.attack * 2, () => {
       particleEmitters.forEach(pe => pe.destroy());
-    }, animationConfig.duration.attack * 2);
+    });
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
     const yOffset =

@@ -103,7 +103,10 @@ export default class Background {
           this.moveToRing(this.randomIndex(backgroundConfig.rings));
         }
       } else if (!this.orbImage || state.playerIsActive != this.playerOrb) {
-        this.moveToOrb(state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb, state.playerIsActive);
+        this.moveToOrb(
+          state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb,
+          state.playerIsActive
+        );
       }
     }
   }
@@ -138,7 +141,7 @@ export default class Background {
       this.currentRing = this.nextRing;
     }
     if (initial || this.currentRing != this.targetRing) {
-      setTimeout(() => this.tween(false), backgroundConfig.animation.durationNextRing);
+      this.scene.time.delayedCall(backgroundConfig.animation.durationNextRing, () => this.tween(false));
     } else {
       this.targetRing = undefined;
       this.targetOrb = undefined;
@@ -308,22 +311,24 @@ export default class Background {
     const conf = backgroundConfig.randomCombatEffects.autogun;
     const endScale = Math.pow(Math.random() * conf.maxScale, 2);
     const duration = (Math.random() + 0.5) * conf.duration;
-    const emitter = this.scene.add.particles(
-      layoutConfig.scene.width * Math.random(),
-      layoutConfig.scene.height * Math.random(),
-      'flare_yellow',
-      {
-        duration: duration,
-        lifespan: conf.lifetime,
-        gravityX: (Math.random() - 0.5) * conf.speed * endScale,
-        gravityY: (Math.random() - 0.5) * conf.speed * endScale,
-        frequency: conf.frequency,
-        speed: { min: 0, max: conf.spread },
-        scale: { start: Math.pow((Math.random() * conf.maxScale) / 2, 2), end: endScale },
-        blendMode: 'ADD',
-        emitting: true
-      }
-    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    const emitter = this.scene.add
+      .particles(
+        layoutConfig.scene.width * Math.random(),
+        layoutConfig.scene.height * Math.random(),
+        'flare_yellow',
+        {
+          duration: duration,
+          lifespan: conf.lifetime,
+          gravityX: (Math.random() - 0.5) * conf.speed * endScale,
+          gravityY: (Math.random() - 0.5) * conf.speed * endScale,
+          frequency: conf.frequency,
+          speed: { min: 0, max: conf.spread },
+          scale: { start: Math.pow((Math.random() * conf.maxScale) / 2, 2), end: endScale },
+          blendMode: 'ADD',
+          emitting: true
+        }
+      )
+      .setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
     this.scene.time.delayedCall(duration + conf.lifetime, () => emitter.destroy());
   }
 
@@ -331,13 +336,18 @@ export default class Background {
     const conf = backgroundConfig.randomCombatEffects.laser;
     const x = layoutConfig.scene.width * Math.random();
     const y = layoutConfig.scene.height * Math.random();
-    const line = this.scene.add.line(
-      0, 0, x, y,
-      x + conf.range * (Math.random() - 0.5),
-      y + conf.range * (Math.random() - 0.5),
-      0xffffff,
-      conf.alpha
-    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    const line = this.scene.add
+      .line(
+        0,
+        0,
+        x,
+        y,
+        x + conf.range * (Math.random() - 0.5),
+        y + conf.range * (Math.random() - 0.5),
+        0xffffff,
+        conf.alpha
+      )
+      .setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
     line.postFX.addGlow(this.randomElement(conf.colors));
     this.scene.tweens.add({
       targets: line,
@@ -351,19 +361,21 @@ export default class Background {
     const conf = backgroundConfig.randomCombatEffects.explosion;
     const lifetime = (Math.random() + 0.5) * conf.duration;
     const scale = Math.random() * conf.maxScale;
-    const emitter = this.scene.add.particles(
-      layoutConfig.scene.width * Math.random(),
-      layoutConfig.scene.height * Math.random(),
-      `flare_${this.randomElement(conf.colors)}`,
-      {
-        lifespan: lifetime,
-        speed: { min: 0, max: conf.maxSpeed * scale },
-        scale: { start: 0.01, end: scale },
-        alpha: { start: 1, end: 0 },
-        blendMode: 'ADD',
-        emitting: false
-      }
-    ).setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
+    const emitter = this.scene.add
+      .particles(
+        layoutConfig.scene.width * Math.random(),
+        layoutConfig.scene.height * Math.random(),
+        `flare_${this.randomElement(conf.colors)}`,
+        {
+          lifespan: lifetime,
+          speed: { min: 0, max: conf.maxSpeed * scale },
+          scale: { start: 0.01, end: scale },
+          alpha: { start: 1, end: 0 },
+          blendMode: 'ADD',
+          emitting: false
+        }
+      )
+      .setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
     emitter.explode(Number(Math.random() * conf.maxParticles + conf.minParticles));
     this.scene.time.delayedCall(lifetime, () => emitter.destroy());
   }
@@ -416,10 +428,12 @@ export default class Background {
   }
 
   private starsYCorrdinates(ring: number): number {
-    return -Math.floor(
-      (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
-        (backgroundConfig.rings.length - 1)
-    ) * ring;
+    return (
+      -Math.floor(
+        (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
+          (backgroundConfig.rings.length - 1)
+      ) * ring
+    );
   }
 
   private get isGame(): boolean {

@@ -164,22 +164,16 @@ export default class Game extends Phaser.Scene {
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     const attackPerformed = this.animateAttack();
-    setTimeout(
-      () => {
-        const newHandCards = self.state.hand.filter(c => !self.hand.some(h => h.uuid == c.uuid));
-        self.retractCardsExists = false; // If true, then the hand animations are delayed
-        self.updateCardStacks(newHandCards);
-        setTimeout(
-          () => {
-            self.updateHandCards(newHandCards, oldState);
-            self.showOpponentTacticCardAction(oldState);
-            self.resetView();
-          },
-          self.retractCardsExists ? animationConfig.duration.move : 0
-        );
-      },
-      attackPerformed ? animationConfig.duration.attack : 0
-    );
+    this.time.delayedCall(attackPerformed ? animationConfig.duration.attack : 0, () => {
+      const newHandCards = self.state.hand.filter(c => !self.hand.some(h => h.uuid == c.uuid));
+      self.retractCardsExists = false; // If true, then the hand animations are delayed
+      self.updateCardStacks(newHandCards);
+      this.time.delayedCall(self.retractCardsExists ? animationConfig.duration.move : 0, () => {
+        self.updateHandCards(newHandCards, oldState);
+        self.showOpponentTacticCardAction(oldState);
+        self.resetView();
+      });
+    });
   }
 
   resetView(battleType?: BattleType) {

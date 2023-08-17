@@ -37,7 +37,7 @@ export default class Card extends CardImage {
   }
   animateAttack() {
     this.highlightSelected();
-    setTimeout(() => this.highlightReset(), animationConfig.duration.attack);
+    this.scene.time.delayedCall(animationConfig.duration.attack, () => this.highlightReset());
   }
   override tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     super.tween(tweenConfig);
