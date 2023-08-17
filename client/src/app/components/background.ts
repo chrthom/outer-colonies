@@ -1,5 +1,6 @@
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { layoutConfig } from '../config/layout';
+import Game from '../scenes/game';
 
 interface CornerConfig {
   xLeft: number;
@@ -10,7 +11,7 @@ interface CornerConfig {
 
 export default class Background {
   inCombat: boolean = false;
-  private scene!: Phaser.Scene;
+  private scene!: Phaser.Scene | Game;
   private currentRing: number = 2;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
@@ -21,10 +22,10 @@ export default class Background {
   private orbImage?: Phaser.GameObjects.Image;
   private zoneMarkers!: Phaser.GameObjects.Group;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene | Game) {
     this.scene = scene;
     this.starsImage = scene.add
-      .image(0, 0, 'background')
+      .image(0, this.starsYCorrdinates(this.currentRing), 'background')
       .setOrigin(0, 0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(layoutConfig.colors.fadedAlpha);
@@ -37,7 +38,7 @@ export default class Background {
       .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
-    this.ringImage = this.createRing(this.currentRing, false);
+    this.ringImage = this.createRing(this.currentRing, true);
     this.zoneMarkers = scene.add.group();
     setInterval(() => {
       if (!this.targetRing) {
@@ -138,15 +139,10 @@ export default class Background {
   }
 
   private tweenStars() {
-    const y =
-      -Math.floor(
-        (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
-          (backgroundConfig.rings.length - 1)
-      ) * this.nextRing;
     this.scene.tweens.add({
       targets: this.starsImage,
       duration: backgroundConfig.animation.durationTransition,
-      y: y
+      y: this.starsYCorrdinates(this.nextRing)
     });
   }
 
@@ -268,7 +264,7 @@ export default class Background {
   }
 
   private animateRandomCombatEffects() {
-    if (true/*this.inCombat*/) {
+    if (this.inCombat) {
       for (let i = 0; i < backgroundConfig.randomCombatEffects.multiplier; i++) {
         if (this.randomBoolean(backgroundConfig.randomCombatEffects.autogun.probability)) {
           this.scene.time.delayedCall(Math.random() * backgroundConfig.animation.randomEventInterval, () =>
@@ -398,5 +394,12 @@ export default class Background {
       (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
       2 / (Math.pow(ring, 2) + 1)
     ];
+  }
+
+  private starsYCorrdinates(ring: number): number {
+    return -Math.floor(
+      (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
+        (backgroundConfig.rings.length - 1)
+    ) * ring;
   }
 }
