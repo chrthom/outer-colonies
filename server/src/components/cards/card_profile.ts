@@ -21,7 +21,10 @@ export default class CardProfile implements HullProfile, EquipmentProfile, Infra
     return profile;
   }
   static fromEquipmentProfile(equipmentProfile: EquipmentProfile): CardProfile {
-    return <CardProfile>equipmentProfile;
+    return equipmentProfile as CardProfile;
+  }
+  static fromOrbProfile(orbProfile: OrbProfile): CardProfile {
+    return orbProfile as CardProfile;
   }
   static fromHullProfile(hullProfile: HullProfile): CardProfile {
     return this.fromBaseProfile(hullProfile);
@@ -74,6 +77,8 @@ export interface EquipmentProfile extends BaseProfile {
   shield: number;
   armour: number;
 }
+
+export interface OrbProfile extends EquipmentProfile {}
 
 export interface AttackProfile {
   range: number;
