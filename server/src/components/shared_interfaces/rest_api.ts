@@ -34,6 +34,17 @@ export interface DeckCard {
   damage?: number;
   range?: number;
   defense?: string;
+  profile: DeckCardProfile;
+}
+
+export interface DeckCardProfile {
+  energy: number;
+  theta: number;
+  xi: number;
+  phi: number;
+  omega: number;
+  delta: number;
+  psi: number;
 }
 
 export interface DeckListResponse {
