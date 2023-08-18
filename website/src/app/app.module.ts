@@ -20,6 +20,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DeckPage } from './pages/deck/deck.page';
@@ -29,6 +30,7 @@ import { TradePage } from './pages/trade/trade.page';
 import { InventoryItemComponent } from './components/inventory-item/inventory-item.component';
 import { OpenItemComponent } from './components/open-item/open-item.component';
 import { RulesPage } from './pages/rules/rules.page';
+import { ImageModalComponent } from './components/image-modal/image-modal.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +46,8 @@ import { RulesPage } from './pages/rules/rules.page';
     TradePage,
     InventoryItemComponent,
     OpenItemComponent,
-    RulesPage
+    RulesPage,
+    ImageModalComponent
   ],
   imports: [
     BrowserModule,
@@ -64,7 +67,8 @@ import { RulesPage } from './pages/rules/rules.page';
     MatSnackBarModule,
     MatTooltipModule,
     MatButtonToggleModule,
-    MatSortModule
+    MatSortModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
