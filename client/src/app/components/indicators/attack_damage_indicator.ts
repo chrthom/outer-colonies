@@ -10,14 +10,13 @@ export default class AttackDamageIndicator {
   constructor(scene: Game, cardStack: CardStack, attack: ClientAttack) {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;
-    const self = this;
     ['pointDefense', 'shield', 'armour', 'damage']
       .map(key => [attack[key], layoutConfig.attack.color[key]])
       .filter(([value, _]) => value > 0)
       .forEach(([value, color], index) =>
         this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
-          self.tween(this.createIndicator(value, color))
-        )
+          this.tween(this.createIndicator(value, color))
+        ), this
       );
     const particleEmitters = [
       ['red', Math.round((attack.shield + attack.armour + attack.damage) / 2)],

@@ -32,7 +32,6 @@ export default class ContinueButton {
   private onClickAction: () => void = () => {};
   constructor(scene: Game) {
     this.scene = scene;
-    const self = this;
     this.prompt = new Prompt(scene);
     this.buttonImages = {
       active_build: this.createButtonImage('active_build'),
@@ -60,20 +59,20 @@ export default class ContinueButton {
     (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(o =>
       o
         .on('pointerdown', () => {
-          self.onClickAction();
+          this.onClickAction();
         })
         .on('pointerover', () => {
-          self.text.setColor(layoutConfig.font.colorHover);
+          this.text.setColor(layoutConfig.font.colorHover);
         })
         .on('pointerout', () => {
-          self.text.setColor(layoutConfig.font.color);
-        })
+          this.text.setColor(layoutConfig.font.color);
+        }),
+      this
     );
     this.waitState();
   }
   update() {
     this.prompt.update();
-    const self = this;
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
     } else if (this.scene.state.playerPendingAction) {
@@ -82,7 +81,7 @@ export default class ContinueButton {
           if (!this.scene.state.playerIsActive) {
             if (!this.canIntervene) {
               this.scene.time.delayedCall(animationConfig.duration.move, () => {
-                self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
+                this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
               });
             }
             this.showIntervene();
@@ -96,7 +95,7 @@ export default class ContinueButton {
           this.showNextCombatPhase();
           if (!this.canAttack) {
             this.scene.time.delayedCall(animationConfig.duration.attack, () => {
-              self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
+              this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
             });
           }
           break;
