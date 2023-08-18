@@ -33,8 +33,8 @@ class BackgroundConfig {
 
   readonly animation = {
     randomEventInterval: 1000,
-    durationTransition: 3000,
-    durationNextRing: 2500,
+    durationTransition: 2500,
+    durationNextRing: 2000,
     starsHeight: 1600,
     offDistance: 2500,
     minRingScale: 0.1,
@@ -101,7 +101,7 @@ class BackgroundConfig {
       colors: [0xff0000, 0x00ff00, 0x00aaff]
     },
     explosion: {
-      probability: 0.1,
+      probability: 0.08,
       duration: 4000,
       maxScale: 2,
       maxSpeed: 5,
@@ -113,7 +113,7 @@ class BackgroundConfig {
 
   readonly randomVessels: BackgroundRandomVessel[] = [
     {
-      probability: 0.005,
+      probability: 0.004,
       vessel: 'freighter1',
       startX: layoutConfig.scene.width + 620,
       startY: layoutConfig.scene.height * 0.4,
@@ -124,7 +124,7 @@ class BackgroundConfig {
       endScale: 1
     },
     {
-      probability: 0.01,
+      probability: 0.006,
       vessel: 'freighter2',
       startX: layoutConfig.scene.width + 300,
       startY: layoutConfig.scene.height * 0.4,
@@ -138,7 +138,7 @@ class BackgroundConfig {
       ease: 'Quad.easeIn'
     },
     {
-      probability: 0.005,
+      probability: 0.004,
       vessel: 'freighter3',
       startX: -430,
       startY: -300,
@@ -149,7 +149,7 @@ class BackgroundConfig {
       ease: 'Quad.easeIn'
     },
     {
-      probability: 0.02,
+      probability: 0.015,
       vessel: 'corvette1',
       startX: 300,
       startY: layoutConfig.scene.height + 600,
@@ -175,7 +175,7 @@ class BackgroundConfig {
       ease: 'Quad'
     },
     {
-      probability: 0.02,
+      probability: 0.012,
       vessel: 'corvette2',
       startX: -400,
       startY: layoutConfig.scene.height * 0.2,
@@ -200,7 +200,7 @@ class BackgroundConfig {
       ease: 'Quad'
     },
     {
-      probability: 0.02,
+      probability: 0.014,
       vessel: 'corvette3',
       startX: 1000,
       startY: layoutConfig.scene.height - 800,
@@ -214,7 +214,7 @@ class BackgroundConfig {
       ease: 'Quint.easeIn'
     },
     {
-      probability: 0.02,
+      probability: 0.014,
       vessel: 'corvette3',
       startX: layoutConfig.scene.width * 0.3,
       startY: -400,
@@ -228,7 +228,7 @@ class BackgroundConfig {
       ease: 'Cubic.easeIn'
     },
     {
-      probability: 0.01,
+      probability: 0.005,
       vessel: 'station1',
       startX: layoutConfig.scene.width + 185,
       startY: layoutConfig.scene.height * 0.7,
@@ -263,7 +263,7 @@ class BackgroundConfig {
       ease: 'Cubic.easeIn'
     },
     {
-      probability: 0.005,
+      probability: 0.004,
       vessel: 'asteroid1',
       startX: -450,
       startY: layoutConfig.scene.height * 0.7,

@@ -1,4 +1,4 @@
-import { TurnPhase } from '../../../../server/src/components/config/enums';
+import { BattleType, TurnPhase } from '../../../../server/src/components/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
@@ -98,11 +98,22 @@ export default class Background {
   update() {
     if (this.isGame) {
       const state = this.game.state;
-      if (this.inCombat) {
-        if (this.orbImage) {
-          this.moveToRing(this.randomIndex(backgroundConfig.rings));
+      if (this.inCombatRaid) {
+        if (this.playerOrb != !state.playerIsActive) {
+          this.moveToOrb(
+            state.playerIsActive ? this.opponentDefaultOrb : this.playerDefaultOrb,
+            !state.playerIsActive
+          );
         }
-      } else if (!this.orbImage || state.playerIsActive != this.playerOrb) {
+      } else if (this.inCombat) {
+        if (this.playerOrb != undefined) {
+          if (this.randomBoolean()) {
+            this.moveToRing(this.randomIndex(backgroundConfig.rings));
+          } else {
+            this.moveToOrb(this.randomElement(backgroundConfig.orbs).name);
+          }
+        }
+      } else if (this.inStartOrBuildPhase && this.playerOrb != state.playerIsActive) {
         this.moveToOrb(
           state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb,
           state.playerIsActive
@@ -111,7 +122,7 @@ export default class Background {
     }
   }
 
-  private moveToOrb(orb: string, playerOrb: boolean) {
+  private moveToOrb(orb: string, playerOrb?: boolean) {
     this.targetOrb = backgroundConfig.orbs.find(o => o.name == orb);
     this.playerOrb = playerOrb;
     this.moveToRing(this.targetOrb.ring);
@@ -201,7 +212,13 @@ export default class Background {
   }
 
   private createOrbAndTweenToPosition(movingInwards: boolean) {
-    const [x, y] = movingInwards ? this.inCoordinates : this.outCoordinates;
+    let x: number, y: number;
+    if (movingInwards) [x, y] = this.inCoordinates;
+    else {
+      x = this.outCoordinates[0];
+      if (this.playerOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+      else y = -backgroundConfig.animation.offDistance;
+    }
     this.orbImage = this.scene.add
       .image(x, y, `background_orb_${this.targetOrb.name}`)
       .setOrigin(0.5, 0.5)
@@ -217,7 +234,11 @@ export default class Background {
       duration: backgroundConfig.animation.durationTransition,
       ease: 'Quint',
       x: backgroundConfig.animation.orbX,
-      y: this.playerOrb ? backgroundConfig.animation.orbYPlayer : backgroundConfig.animation.orbYOpponent,
+      y: this.playerOrb
+        ? backgroundConfig.animation.orbYPlayer
+        : this.playerOrb == undefined
+        ? layoutConfig.scene.height / 2
+        : backgroundConfig.animation.orbYOpponent,
       scale: backgroundConfig.animation.orbScale
     });
   }
@@ -384,6 +405,31 @@ export default class Background {
     return Math.random() < (chance ? chance : 0.5);
   }
 
+  private randomElement<T>(array: T[]): T {
+    return array[this.randomIndex(array)];
+  }
+
+  private randomIndex(array: any[]): number {
+    return Math.floor(Math.random() * array.length);
+  }
+
+  private sunCoordinatesAndScale(ring: number): [number, number, number] {
+    return [
+      (layoutConfig.scene.width * ring) / backgroundConfig.rings.length / 2,
+      (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
+      2 / (Math.pow(ring, 2) + 1)
+    ];
+  }
+
+  private starsYCorrdinates(ring: number): number {
+    return (
+      -Math.floor(
+        (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
+          (backgroundConfig.rings.length - 1)
+      ) * ring
+    );
+  }
+
   private get inCoordinates(): [number, number] {
     return [layoutConfig.scene.width / 2, layoutConfig.scene.height / 2];
   }
@@ -419,23 +465,6 @@ export default class Background {
     return [x, y];
   }
 
-  private sunCoordinatesAndScale(ring: number): [number, number, number] {
-    return [
-      (layoutConfig.scene.width * ring) / backgroundConfig.rings.length / 2,
-      (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
-      2 / (Math.pow(ring, 2) + 1)
-    ];
-  }
-
-  private starsYCorrdinates(ring: number): number {
-    return (
-      -Math.floor(
-        (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /
-          (backgroundConfig.rings.length - 1)
-      ) * ring
-    );
-  }
-
   private get isGame(): boolean {
     return this.game.gameParams !== undefined;
   }
@@ -448,11 +477,11 @@ export default class Background {
     return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Combat;
   }
 
-  private randomElement<T>(array: T[]): T {
-    return array[this.randomIndex(array)];
+  private get inCombatRaid(): boolean {
+    return this.inCombat && this.game.state.battle && this.game.state.battle.type == BattleType.Raid;
   }
 
-  private randomIndex(array: any[]): number {
-    return Math.floor(Math.random() * array.length);
+  private get inStartOrBuildPhase(): boolean {
+    return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Start || this.game.state.turnPhase == TurnPhase.Build;
   }
 }
