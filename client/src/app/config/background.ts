@@ -33,8 +33,8 @@ class BackgroundConfig {
 
   readonly animation = {
     randomEventInterval: 1000,
-    durationTransition: 2500,
-    durationNextRing: 2000,
+    durationObjectTransition: 2500,
+    durationNextRing: 1800,
     starsHeight: 1600,
     offDistance: 2500,
     minRingScale: 0.1,
