@@ -20,6 +20,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -68,7 +69,8 @@ import { ImageModalComponent } from './components/image-modal/image-modal.compon
     MatTooltipModule,
     MatButtonToggleModule,
     MatSortModule,
-    MatDialogModule
+    MatDialogModule,
+    MatExpansionModule
   ],
   providers: [],
   bootstrap: [AppComponent]
