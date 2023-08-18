@@ -174,7 +174,7 @@ export default class Background {
   private tweenStars() {
     this.scene.tweens.add({
       targets: this.starsImage,
-      duration: backgroundConfig.animation.durationTransition,
+      duration: backgroundConfig.animation.durationNextRing,
       y: this.starsYCorrdinates(this.nextRing)
     });
   }
@@ -182,10 +182,7 @@ export default class Background {
   private tweenSun() {
     this.scene.tweens.add({
       targets: this.sunImage,
-      duration:
-        this.nextRing == this.targetRing
-          ? backgroundConfig.animation.durationNextRing
-          : backgroundConfig.animation.durationTransition,
+      duration: backgroundConfig.animation.durationNextRing,
       x: this.sunCoordinatesAndScale(this.nextRing)[0],
       y: this.sunCoordinatesAndScale(this.nextRing)[1],
       scale: this.sunCoordinatesAndScale(this.nextRing)[2]
@@ -234,7 +231,7 @@ export default class Background {
   private tweenOrbToPosition() {
     this.scene.tweens.add({
       targets: this.orbImage,
-      duration: backgroundConfig.animation.durationTransition,
+      duration: backgroundConfig.animation.durationObjectTransition,
       ease: 'Quint',
       x: backgroundConfig.animation.orbX,
       y: this.playerOrb
@@ -259,7 +256,7 @@ export default class Background {
     }
     this.scene.tweens.add({
       targets: image,
-      duration: backgroundConfig.animation.durationTransition,
+      duration: backgroundConfig.animation.durationObjectTransition,
       ease: movingInwards ? 'Quad.easeIn' : 'Quint',
       x: x,
       y: y,
@@ -271,7 +268,7 @@ export default class Background {
   private tweenRingToPosition() {
     this.scene.tweens.add({
       targets: this.ringImage,
-      duration: backgroundConfig.animation.durationTransition,
+      duration: backgroundConfig.animation.durationObjectTransition,
       ease: 'Quint',
       x: Math.random() * layoutConfig.scene.width,
       y: Math.random() * layoutConfig.scene.height,
