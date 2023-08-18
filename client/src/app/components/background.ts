@@ -182,7 +182,10 @@ export default class Background {
   private tweenSun() {
     this.scene.tweens.add({
       targets: this.sunImage,
-      duration: backgroundConfig.animation.durationTransition,
+      duration:
+        this.nextRing == this.targetRing
+          ? backgroundConfig.animation.durationNextRing
+          : backgroundConfig.animation.durationTransition,
       x: this.sunCoordinatesAndScale(this.nextRing)[0],
       y: this.sunCoordinatesAndScale(this.nextRing)[1],
       scale: this.sunCoordinatesAndScale(this.nextRing)[2]
@@ -244,7 +247,16 @@ export default class Background {
   }
 
   private tweenOut(image: Phaser.GameObjects.Image, movingInwards: boolean) {
-    const [x, y] = movingInwards ? this.outCoordinates : this.inCoordinates;
+    let x: number, y: number;
+    if (movingInwards) {
+      x = image.x + (image.x - layoutConfig.scene.width / 2) * 4;
+      y =
+        image.y < layoutConfig.scene.height / 2
+          ? -backgroundConfig.animation.offDistance
+          : layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+    } else {
+      [x, y] = this.inCoordinates;
+    }
     this.scene.tweens.add({
       targets: image,
       duration: backgroundConfig.animation.durationTransition,
@@ -482,6 +494,9 @@ export default class Background {
   }
 
   private get inStartOrBuildPhase(): boolean {
-    return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Start || this.game.state.turnPhase == TurnPhase.Build;
+    return (
+      (this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Start) ||
+      this.game.state.turnPhase == TurnPhase.Build
+    );
   }
 }
