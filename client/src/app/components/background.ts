@@ -113,7 +113,7 @@ export default class Background {
             this.moveToOrb(this.randomElement(backgroundConfig.orbs).name);
           }
         }
-      } else if (this.playerOrb != state.playerIsActive) {
+      } else if (this.inStartOrBuildPhase && this.playerOrb != state.playerIsActive) {
         this.moveToOrb(
           state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb,
           state.playerIsActive
@@ -212,7 +212,13 @@ export default class Background {
   }
 
   private createOrbAndTweenToPosition(movingInwards: boolean) {
-    const [x, y] = movingInwards ? this.inCoordinates : this.outCoordinates;
+    let x: number, y: number;
+    if (movingInwards) [x, y] = this.inCoordinates;
+    else {
+      x = this.outCoordinates[0];
+      if (this.playerOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+      else y = -backgroundConfig.animation.offDistance;
+    }
     this.orbImage = this.scene.add
       .image(x, y, `background_orb_${this.targetOrb.name}`)
       .setOrigin(0.5, 0.5)
@@ -473,5 +479,9 @@ export default class Background {
 
   private get inCombatRaid(): boolean {
     return this.inCombat && this.game.state.battle && this.game.state.battle.type == BattleType.Raid;
+  }
+
+  private get inStartOrBuildPhase(): boolean {
+    return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Start || this.game.state.turnPhase == TurnPhase.Build;
   }
 }
