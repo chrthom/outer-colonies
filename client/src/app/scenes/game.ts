@@ -158,20 +158,19 @@ export default class Game extends Phaser.Scene {
   override update() {}
 
   updateState(state: ClientState) {
-    const self = this;
     const oldState = this.state ? this.state : state;
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     const attackPerformed = this.animateAttack();
     this.time.delayedCall(attackPerformed ? animationConfig.duration.attack : 0, () => {
-      const newHandCards = self.state.hand.filter(c => !self.hand.some(h => h.uuid == c.uuid));
-      self.retractCardsExists = false; // If true, then the hand animations are delayed
-      self.updateCardStacks(newHandCards);
-      this.time.delayedCall(self.retractCardsExists ? animationConfig.duration.move : 0, () => {
-        self.updateHandCards(newHandCards, oldState);
-        self.showOpponentTacticCardAction(oldState);
-        self.resetView();
+      const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
+      this.retractCardsExists = false; // If true, then the hand animations are delayed
+      this.updateCardStacks(newHandCards);
+      this.time.delayedCall(this.retractCardsExists ? animationConfig.duration.move : 0, () => {
+        this.updateHandCards(newHandCards, oldState);
+        this.showOpponentTacticCardAction(oldState);
+        this.resetView();
       });
     });
   }
@@ -218,32 +217,30 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
-    const self = this;
-    self.cardStacks.forEach(cs => {
-      const newData = self.state.cardStacks.find(csd => csd.uuid == cs.uuid);
+    this.cardStacks.forEach(cs => {
+      const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
       if (newData) cs.update(newData); // Move card stacks
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
-        self.retractCardsExists = true;
+        this.retractCardsExists = true;
       } else cs.discard(); // Discard card stack
-    });
-    self.state.cardStacks
-      .filter(cs => !self.cardStacks.some(csd => csd.uuid == cs.uuid))
+    }, this);
+    this.state.cardStacks
+      .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
-        const originHandCard = self.hand.find(h => h.uuid == cs.uuid);
+        const originHandCard = this.hand.find(h => h.uuid == cs.uuid);
         if (originHandCard) originHandCard.destroy();
-        return new CardStack(self, cs, true, originHandCard);
-      })
-      .forEach(cs => self.cardStacks.push(cs));
-    self.cardStacks = self.cardStacks.filter(cs => self.state.cardStacks.find(csd => csd.uuid == cs.uuid));
+        return new CardStack(this, cs, true, originHandCard);
+      }, this)
+      .forEach(cs => this.cardStacks.push(cs), this);
+    this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid), this);
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
-    const self = this;
-    self.hand.map(h => {
-      const newData = self.state.hand.find(hcd => hcd.uuid == h.uuid);
-      const isTacticCard = !self.state.cardStacks
+    this.hand.map(h => {
+      const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
+      const isTacticCard = !this.state.cardStacks
         .flatMap(cs => cs.cards)
         .map(c => c.id)
         .includes(h.cardId);
@@ -252,21 +249,20 @@ export default class Game extends Phaser.Scene {
         h.showAndDiscardTacticCard(true); // Play tactic card
       else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
       else h.discard(true); // Discard hand card
-    });
+    }, this);
     newHandCards // Draw new hand cards
-      .map(c => new HandCard(self, c))
-      .forEach(h => self.hand.push(h));
-    self.hand = self.hand.filter(h => self.state.hand.find(hcd => hcd.uuid == h.uuid));
+      .map(c => new HandCard(this, c), this)
+      .forEach(h => this.hand.push(h), this);
+    this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid), this);
   }
 
   private showOpponentTacticCardAction(oldState: ClientState) {
-    const self = this;
-    const opponent = self.state.opponent;
+    const opponent = this.state.opponent;
     const oldOpponent = oldState.opponent;
     if (
       opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize &&
       opponent.discardPileIds.length > oldOpponent.discardPileIds.length &&
-      self.state.turnPhase == TurnPhase.Build &&
+      this.state.turnPhase == TurnPhase.Build &&
       oldState.turnPhase == TurnPhase.Build
     ) {
       // Opponent playing tactic card
@@ -276,13 +272,13 @@ export default class Game extends Phaser.Scene {
           : null;
       if (
         cardId &&
-        !self.state.cardStacks
+        !this.state.cardStacks
           .flatMap(cs => cs.cards)
           .map(c => c.id)
           .includes(cardId)
       ) {
         new CardImage(
-          self,
+          this,
           layoutConfig.discardPile.x,
           layoutConfig.discardPile.yOpponent,
           cardId,
