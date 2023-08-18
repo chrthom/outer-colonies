@@ -7,6 +7,8 @@ import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/components/config/enums';
 import { Sort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
@@ -25,7 +27,7 @@ export class DeckPage implements OnInit {
   private $activeCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   private $reserveCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   boxes!: DeckBox[];
-  constructor(private deckApiService: DeckApiService) {}
+  constructor(private deckApiService: DeckApiService, private dialog: MatDialog) {}
   ngOnInit() {
     this.boxes = [
       new DeckBox(this.$activeCards, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
@@ -50,6 +52,13 @@ export class DeckPage implements OnInit {
     if (this.canDeactivateDeckCard) {
       this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
     }
+  }
+  openImgInModal(card: DeckCard) {
+    this.dialog.open(ImageModalComponent, {
+      data: this.cardIdToUrl(card.cardId),
+      height: '95vh',
+      maxHeight: '95vh'
+    });
   }
   get canActivateDeckCard() {
     return cardsNum(this.boxes[0].cards) < this.maxCards;

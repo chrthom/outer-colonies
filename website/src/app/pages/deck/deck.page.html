@@ -46,7 +46,7 @@
         <tr *ngFor="let card of box.cardsFiltered">
           <td class="card-col">
             <h3>{{ card.numOfCards }}x</h3>
-            <img class="large" [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
+            <img class="large" [src]="cardIdToUrl(card.cardId)" [alt]="card.name" (click)="openImgInModal(card)" />
           </td>
           <td class="id-col">{{ card.cardId }}</td>
           <td class="name-col">{{ card.name }}</td>
