@@ -445,7 +445,7 @@ export default class Background {
   }
 
   private get inCombat(): boolean {
-    return this.isGame && this.game.state.turnPhase == TurnPhase.Combat;
+    return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Combat;
   }
 
   private randomElement<T>(array: T[]): T {

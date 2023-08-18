@@ -6,7 +6,6 @@ export default class Preloader {
   progressBox!: Phaser.GameObjects.Graphics;
   text!: Phaser.GameObjects.Text;
   constructor(scene: Game) {
-    const self = this;
     this.progressBar = scene.add.graphics();
     this.progressBox = scene.add
       .graphics()
@@ -29,7 +28,7 @@ export default class Preloader {
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     scene.load.on('progress', (value: number) => {
-      self.progressBar
+      this.progressBar
         .clear()
         .fillStyle(layoutConfig.colors.primary, layoutConfig.colors.alpha)
         .fillRect(
