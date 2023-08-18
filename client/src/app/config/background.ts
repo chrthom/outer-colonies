@@ -101,7 +101,7 @@ class BackgroundConfig {
       colors: [0xff0000, 0x00ff00, 0x00aaff]
     },
     explosion: {
-      probability: 0.1,
+      probability: 0.08,
       duration: 4000,
       maxScale: 2,
       maxSpeed: 5,
@@ -124,7 +124,7 @@ class BackgroundConfig {
       endScale: 1
     },
     {
-      probability: 0.01,
+      probability: 0.008,
       vessel: 'freighter2',
       startX: layoutConfig.scene.width + 300,
       startY: layoutConfig.scene.height * 0.4,

@@ -56,17 +56,18 @@ export default class ContinueButton {
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(o =>
-      o
-        .on('pointerdown', () => {
-          this.onClickAction();
-        })
-        .on('pointerover', () => {
-          this.text.setColor(layoutConfig.font.colorHover);
-        })
-        .on('pointerout', () => {
-          this.text.setColor(layoutConfig.font.color);
-        }),
+    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
+      o =>
+        o
+          .on('pointerdown', () => {
+            this.onClickAction();
+          })
+          .on('pointerover', () => {
+            this.text.setColor(layoutConfig.font.colorHover);
+          })
+          .on('pointerout', () => {
+            this.text.setColor(layoutConfig.font.color);
+          }),
       this
     );
     this.waitState();

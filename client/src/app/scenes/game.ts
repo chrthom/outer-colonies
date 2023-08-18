@@ -234,7 +234,10 @@ export default class Game extends Phaser.Scene {
         return new CardStack(this, cs, true, originHandCard);
       }, this)
       .forEach(cs => this.cardStacks.push(cs), this);
-    this.cardStacks = this.cardStacks.filter(cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid), this);
+    this.cardStacks = this.cardStacks.filter(
+      cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid),
+      this
+    );
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
