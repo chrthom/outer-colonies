@@ -69,9 +69,9 @@ export default class Match {
     if (this.battle.type == BattleType.None) this.prepareEndPhase();
     else this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
   }
-  prepareCombatPhase(interveningShipIds: string[]) {
+  prepareCombatPhase(interceptingShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
-    this.battle.assignInterveningShips(this.getInactivePlayer(), interveningShipIds);
+    this.battle.assignInterceptingShips(this.getInactivePlayer(), interceptingShipIds);
     this.players.forEach(player => {
       player.cardStacks.forEach(cs => cs.combatPhaseReset(true));
     });

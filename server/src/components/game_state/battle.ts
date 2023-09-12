@@ -36,26 +36,26 @@ export default class Battle {
     }
     return battle;
   }
-  assignInterveningShips(player: Player, interveningShipIds: string[]) {
+  assignInterceptingShips(player: Player, interceptingShipIds: string[]) {
     if (this.type == BattleType.Mission) {
-      this.ships[player.no] = interveningShipIds
+      this.ships[player.no] = interceptingShipIds
         .map(id => getCardStackByUUID(player.cardStacks, id))
         .filter(cs => cs.isMissionReady);
       this.ships[player.no].map(cs => (cs.zone = Zone.Neutral));
     } else if (this.type == BattleType.Raid) {
       player.cardStacks
-        .filter(cs => cs.isMissionReady && !interveningShipIds.includes(cs.uuid))
+        .filter(cs => cs.isMissionReady && !interceptingShipIds.includes(cs.uuid))
         .forEach(cs => (cs.zone = Zone.Neutral));
       this.ships[player.no] = player.cardStacks.filter(cs => cs.zone == Zone.Oribital);
     }
   }
-  canInterveneMission(interveningPlayerNo: number, cardStack: CardStack): boolean {
+  canInterceptMission(interceptingPlayerNo: number, cardStack: CardStack): boolean {
     return (
       cardStack.isMissionReady &&
       (this.type == BattleType.Raid ||
         (this.type == BattleType.Mission &&
           cardStack.profile.speed >=
-            this.ships[opponentPlayerNo(interveningPlayerNo)]
+            this.ships[opponentPlayerNo(interceptingPlayerNo)]
               .map(cs => cs.profile.speed)
               .reduce((a, b) => Math.min(a, b))))
     );

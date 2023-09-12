@@ -113,6 +113,11 @@
             </table>
           </div>
           <div *ngSwitchCase="'glossar'">
+            <h4>Abfangen</h4>
+            <p>
+              Ein Spieler der nicht der aktive Spieler ist kann entscheiden Schiffe zu entsenden, um zu
+              verhindern, dass der aktive Spieler eine Mission durchführt und die Missionskarten ziehen darf.
+            </p>
             <h4>Ablagestapel</h4>
             <p>
               Der Stapel neben deinem Deck auf den Karten offen gelegt werden, wenn sie das Spiel verlassen.
@@ -170,7 +175,7 @@
               Eigenschaftspunkt von <img [src]="iconUrl('hull')" class="oc-icon" /> (bei aus mehren
               <img [src]="iconUrl('hull')" class="oc-icon" /> bestehenden Schiffen nur vom Heck, da dort das
               Triebwerk ist). Für einige <img [src]="iconUrl('equipment')" class="oc-icon" /> und
-              <img [src]="iconUrl('tactic')" class="oc-icon" />, sowie bei Intervention relevant, um zu
+              <img [src]="iconUrl('tactic')" class="oc-icon" />, sowie beim Abfangen relevant, um zu
               ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an und die
               <img [src]="iconUrl('speed')" class="oc-icon" /> plus die Reichweite der aktuellen Gefechtsphase
               sind kleiner oder gleich der <img [src]="iconUrl('speed')" class="oc-icon" /> des Ziel, so wir
@@ -193,11 +198,6 @@
               Ein Kartentyp, der sowohl an <img [src]="iconUrl('hull')" class="oc-icon" /> als auch an die
               Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt können alle
               Sockel-Anforderungen ignoriert werden.
-            </p>
-            <h4>Intervention / intervenieren</h4>
-            <p>
-              Ein Spieler der nicht der aktive Spieler ist kann entscheiden Schiffe zu entsenden, um zu
-              verhindern, dass der aktive Spieler eine Mission durchführt und die Missionskarten ziehen darf.
             </p>
             <h4>Jederzeit spielbar</h4>
             <p>
@@ -222,13 +222,13 @@
               Der aktive Spieler kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission
               muss er mindestens ein Schiff zuweisen. Für die Mission platziert er zwei die Missionskarten
               (offene Missionskarten vom Ablagestapel und/oder verdeckte Missonskarten vom Deck). Ist die
-              Mission erfolgreich (keine Intervention, oder mindestens ein überlebendes Schiff), so darf er
+              Mission erfolgreich (kein Abfangversuch, oder mindestens ein überlebendes Schiff), so darf er
               verdeckte Missionskarte auf die Hand nehmen und offene Missionskarten in sein Deck mischen.
             </p>
             <h4>Neutrale Zone</h4>
             <p>
               Der Bereich des Spielfeld zwischen den Karten der Spieler. Hier werden Missionskarten platziert
-              und Gefechte bei Interventionen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn des
+              und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn des
               Spielers in diese Zone und können bis dahin an keinen anderen Gefechten teilnehmen.
             </p>
             <h4>Orbitale Zone</h4>
@@ -480,19 +480,22 @@
                 Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission
                 durchführen möchtest.
               </li>
-              <li>Deine Gegner sagen an, ob sie gegen die Mission oder den Überfall intervenieren wollen.</li>
+              <li>
+                Gegenspieler können gegen Missionen Schiffe zum Abfangen schicken bzw. von Überfall 
+                betroffener Spieler benennt Schiffe zur Verteidigung
+              </li>
             </ul>
             <h2>3. Gefechtsphase</h2>
             <p>
               Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift
-              oder ein anderer Spieler in eine deiner Mission interveniert. Es nehmen alle zugewiesenen
+              oder ein anderer Spieler eine deiner Mission abfängt. Es nehmen alle zugewiesenen
               Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone
               teil.
             </p>
             <h2>4. Rundenende</h2>
             <ul>
               <li>
-                Für jede Mission bei der nicht interveniert wurde, sowie für jede Mission in der du nach dem
+                Für jede Mission bei der kein Abfangversuch unternommen wurde, sowie für jede Mission in der du nach dem
                 Gefecht noch mindestens ein Schiff besitzst, nimmst du die verdeckte Missionskarte auf die
                 Hand bzw. legst die offene Missionkarte unter dein Deck. Die anderen Missionskarten werden auf
                 den Ablagestapel gelegt.
@@ -537,15 +540,15 @@
               sollen. Nur Schiffe mit 1+ <img [src]="iconUrl('speed')" class="oc-icon" /> können Überfälle
               oder Missionen durchführen. Versetze die Schiffe in die neutrale Zone.
             </p>
-            <h2>Verteidigung / Intervention</h2>
+            <h2>Verteidigung / Abfangen</h2>
             <p>
-              Im Falle einer Mission können andere Spieler intervenieren, um den Erfolg der Mission zu
-              verhindern. Jeder andere Spieler sagt im Uhrzeigersinn an, ob er Schiffe entsenden möchte, um in
-              der geplanten Mission zu intervenieren. Es können für Interventionen nur Schiffe entsandt
+              Im Falle einer Mission können andere Spieler abfangen, um den Erfolg der Mission zu
+              verhindern. Jeder andere Spieler sagt im Uhrzeigersinn an, ob er Schiffe entsenden möchte, um die
+              geplante Mission abzufangen. Es können für das Abfangen nur Schiffe entsandt
               werden, welche sich in der orbitalen Zone befinden und dessen
               <img [src]="iconUrl('speed')" class="oc-icon" /> mindestens so hoch ist wie der niedrigste
               <img [src]="iconUrl('speed')" class="oc-icon" /> in der Flotte, die die Mission durchführt. Der
-              intervenierende Spieler verschiebt diese Schiffe ebenfalls in die neutrale Zone.
+              abfangende Spieler verschiebt diese Schiffe ebenfalls in die neutrale Zone.
             </p>
             <p>
               Im Falle eines Überfalls muss er angegriffene Spieler kämpfen. Er wählt Schiffe aus seiner
@@ -565,7 +568,7 @@
             <ol>
               <li>Der aktive Spieler führt seine Angriffe in beliebiger Reihenfolge durch.</li>
               <li>
-                Der verteidigende / intervenierende Spieler führt seine Angriffe in beliebiger Reihenfolge
+                Der verteidigende / abfangende Spieler führt seine Angriffe in beliebiger Reihenfolge
                 durch.
               </li>
               <li>

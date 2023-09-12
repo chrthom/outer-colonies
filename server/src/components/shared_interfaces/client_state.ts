@@ -44,7 +44,7 @@ export interface ClientCardStack {
   damage: number;
   criticalDamage: boolean;
   missionReady: boolean;
-  interventionReady: boolean;
+  interceptionReady: boolean;
   defenseIcons: ClientDefenseIcon[];
 }
 
