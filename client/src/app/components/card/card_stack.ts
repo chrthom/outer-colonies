@@ -200,10 +200,10 @@ export default class CardStack {
             }
           } else {
             if (this.data.missionReady) {
-              if (this.scene.interveneShipIds.includes(this.uuid)) {
-                this.scene.interveneShipIds = this.scene.interveneShipIds.filter(id => id != this.uuid);
-              } else if (this.data.interventionReady) {
-                this.scene.interveneShipIds.push(this.uuid);
+              if (this.scene.interceptShipIds.includes(this.uuid)) {
+                this.scene.interceptShipIds = this.scene.interceptShipIds.filter(id => id != this.uuid);
+              } else if (this.data.interceptionReady) {
+                this.scene.interceptShipIds.push(this.uuid);
               }
             }
           }

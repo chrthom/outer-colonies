@@ -29,10 +29,10 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
       const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
       return zoneCardStacks.map((cs, index) => {
-        const interventionReady =
+        const interceptionReady =
           ownedByPlayer &&
           match.getInactivePlayerNo() == playerNo &&
-          match.battle.canInterveneMission(playerNo, cs);
+          match.battle.canInterceptMission(playerNo, cs);
         const defenseIcons: ClientDefenseIcon[] = cs.cardStacks
           .filter(c => c.card.canDefend)
           .map(c => {
@@ -65,7 +65,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           damage: cs.damage,
           criticalDamage: cs.damage >= cs.profile.hp,
           missionReady: ownedByPlayer && cs.isMissionReady,
-          interventionReady: interventionReady,
+          interceptionReady: interceptionReady,
           defenseIcons: defenseIcons
         };
       });

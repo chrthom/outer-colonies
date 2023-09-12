@@ -59,7 +59,7 @@ export default class Game extends Phaser.Scene {
   state: ClientState;
   activeCards: ActiveCards = new ActiveCards();
   plannedBattle: ClientPlannedBattle;
-  interveneShipIds: Array<string> = [];
+  interceptShipIds: Array<string> = [];
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   obj: StaticObjects = new StaticObjects();
@@ -179,7 +179,7 @@ export default class Game extends Phaser.Scene {
     this.activeCards.hand = undefined;
     this.activeCards.stack = undefined;
     this.activeCards.stackIndex = undefined;
-    this.interveneShipIds = [];
+    this.interceptShipIds = [];
     this.plannedBattle = {
       type: battleType ? battleType : BattleType.None,
       downsideCardsNum: 0,
@@ -327,10 +327,10 @@ export default class Game extends Phaser.Scene {
                   cs.highlightSelectable();
                 }
               } else if (this.state.battle?.type != BattleType.None && !this.state.playerIsActive) {
-                // Assign ships to intervene
-                if (this.interveneShipIds.includes(cs.uuid)) {
+                // Assign ships to intercept
+                if (this.interceptShipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
-                } else if (cs.data.interventionReady) {
+                } else if (cs.data.interceptionReady) {
                   cs.highlightSelectable();
                 }
               }
