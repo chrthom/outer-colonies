@@ -1,5 +1,5 @@
 import { NgModule, inject } from '@angular/core';
-import { CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 import { TradePage } from './pages/trade/trade.page';
 import { RulesPage } from './pages/rules/rules.page';
 
-function forceHttp(): boolean {
+function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
     return true;
   } else {
@@ -20,17 +20,23 @@ function forceHttp(): boolean {
     return false;
   }
 }
-const privateGuardFn: CanActivateFn = () => {
-  if (forceHttp()) {
+const privateGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  if (checkHttps()) {
     const router = inject(Router);
-    return inject(AuthService)
-      .check()
-      .pipe(tap(b => (!b ? router.navigate(['/login']) : {})));
+    const initialPath = route.queryParams['p'];
+    if (initialPath) {
+      router.navigate(['/' + initialPath]);
+      return false;
+    } else {
+      return inject(AuthService)
+        .check()
+        .pipe(tap(b => (!b ? router.navigate(['/login']) : {})));
+    }
   } else {
     return false;
   }
 };
-const publicGuardFn: CanActivateFn = () => forceHttp();
+const publicGuardFn: CanActivateFn = () => checkHttps();
 
 const routes: Routes = [
   {
