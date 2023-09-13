@@ -11,7 +11,6 @@ export default class ExitButton {
   constructor(scene: Phaser.Scene | Game) {
     this.scene = scene;
     this.isMatchmaking = !(scene instanceof Game);
-    const self = this;
     this.text = scene.add
       .text(
         layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
@@ -42,28 +41,34 @@ export default class ExitButton {
       .image(layoutConfig.exitButton.x, layoutConfig.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(o =>
-      o
-        .on('pointerdown', () => {
-          self.onClickAction();
-        })
-        .on('pointerover', () => {
-          self.text.setColor(layoutConfig.font.colorWarn);
-        })
-        .on('pointerout', () => {
-          self.text.setColor(layoutConfig.font.color);
-        })
+    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(
+      o =>
+        o
+          .on('pointerdown', () => {
+            this.onClickAction();
+          })
+          .on('pointerover', () => {
+            this.text.setColor(layoutConfig.font.colorWarn);
+          })
+          .on('pointerout', () => {
+            this.text.setColor(layoutConfig.font.color);
+          }),
+      this
     );
     this.confirmText
       .on('pointerdown', () => {
-        self.onClickAction(true);
+        this.onClickAction(true);
       })
       .on('pointerover', () => {
-        self.confirmText.setColor(layoutConfig.font.colorWarn);
+        this.confirmText.setColor(layoutConfig.font.colorWarn);
       })
-      .on('pointerout', () => {
-        self.confirmText.setColor(layoutConfig.font.color);
-      });
+      .on(
+        'pointerout',
+        () => {
+          this.confirmText.setColor(layoutConfig.font.color);
+        },
+        this
+      );
     this.update();
   }
   update() {

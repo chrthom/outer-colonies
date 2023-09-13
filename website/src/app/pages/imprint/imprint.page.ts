@@ -7,5 +7,5 @@ import AuthService from 'src/app/auth.service';
   styleUrls: ['./imprint.page.scss']
 })
 export class ImprintPage {
-  constructor(public authService: AuthService) {}
+  constructor() {}
 }

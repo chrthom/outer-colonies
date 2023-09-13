@@ -120,6 +120,7 @@ export default function restAPI(app: Express) {
       else if (cardData.profile.shield > 0) defenseIcon = `shield_${cardData.profile.shield}`;
       else if (cardData.profile.pointDefense > 0)
         defenseIcon = `point_defense_${cardData.profile.pointDefense}`;
+      const profile = cardData.profile;
       const payload: DeckCard = {
         id: c.cardInstanceId,
         inUse: c.inUse,
@@ -134,7 +135,16 @@ export default function restAPI(app: Express) {
           cardData.type == CardType.Equipment ? (<EquipmentCard>cardData).attackProfile?.damage : undefined,
         range:
           cardData.type == CardType.Equipment ? (<EquipmentCard>cardData).attackProfile?.range : undefined,
-        defense: defenseIcon
+        defense: defenseIcon,
+        profile: {
+          energy: profile.energy,
+          theta: profile.theta,
+          xi: profile.xi,
+          phi: profile.phi,
+          omega: profile.omega,
+          delta: profile.delta,
+          psi: profile.psi
+        }
       };
       return payload;
     };

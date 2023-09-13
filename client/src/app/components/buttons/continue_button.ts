@@ -32,7 +32,6 @@ export default class ContinueButton {
   private onClickAction: () => void = () => {};
   constructor(scene: Game) {
     this.scene = scene;
-    const self = this;
     this.prompt = new Prompt(scene);
     this.buttonImages = {
       active_build: this.createButtonImage('active_build'),
@@ -57,35 +56,36 @@ export default class ContinueButton {
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
-    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(o =>
-      o
-        .on('pointerdown', () => {
-          self.onClickAction();
-        })
-        .on('pointerover', () => {
-          self.text.setColor(layoutConfig.font.colorHover);
-        })
-        .on('pointerout', () => {
-          self.text.setColor(layoutConfig.font.color);
-        })
+    (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
+      o =>
+        o
+          .on('pointerdown', () => {
+            this.onClickAction();
+          })
+          .on('pointerover', () => {
+            this.text.setColor(layoutConfig.font.colorHover);
+          })
+          .on('pointerout', () => {
+            this.text.setColor(layoutConfig.font.color);
+          }),
+      this
     );
     this.waitState();
   }
   update() {
     this.prompt.update();
-    const self = this;
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
     } else if (this.scene.state.playerPendingAction) {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
           if (!this.scene.state.playerIsActive) {
-            if (!this.canIntervene) {
+            if (!this.canIntercept) {
               this.scene.time.delayedCall(animationConfig.duration.move, () => {
-                self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
+                this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
               });
             }
-            this.showIntervene();
+            this.showIncept();
           } else if (this.scene.state.hasToRetractCards) {
             this.waitState();
           } else {
@@ -96,7 +96,7 @@ export default class ContinueButton {
           this.showNextCombatPhase();
           if (!this.canAttack) {
             this.scene.time.delayedCall(animationConfig.duration.attack, () => {
-              self.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
+              this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
             });
           }
           break;
@@ -134,13 +134,13 @@ export default class ContinueButton {
       this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle)
     );
   }
-  private showIntervene() {
+  private showIncept() {
     let text: string;
     if (this.scene.state.battle?.type == BattleType.Raid) text = 'Verteidigung beginnen';
-    else if (this.scene.interveneShipIds.length > 0) text = 'Intervenieren';
+    else if (this.scene.interceptShipIds.length > 0) text = 'Abfangen';
     else text = 'Überspringen';
     this.show(text, 'inactive_select', () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interveneShipIds)
+      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interceptShipIds)
     );
   }
   private showNextCombatPhase() {
@@ -171,8 +171,8 @@ export default class ContinueButton {
     const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
     this.show('', button, () => {});
   }
-  private get canIntervene() {
-    return this.scene.state.cardStacks.some(cs => cs.interventionReady);
+  private get canIntercept() {
+    return this.scene.state.cardStacks.some(cs => cs.interceptionReady);
   }
   private get canAttack() {
     return this.scene.state.cardStacks.some(cs => cs.cards.some(c => c.battleReady));

@@ -29,7 +29,7 @@ export default class Prompt {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
           if (this.scene.state.playerIsActive) this.showBuildPhase();
-          else this.showIntervenePhase();
+          else this.showInterceptPhase();
           break;
         case TurnPhase.Combat:
           this.showCombatPhase();
@@ -72,12 +72,12 @@ export default class Prompt {
     }
     this.show(text);
   }
-  private showIntervenePhase() {
+  private showInterceptPhase() {
     const battleText =
       this.scene.state.battle?.type == BattleType.Raid
-        ? 'Verteidigung deiner Kolonie'
-        : 'Intervention der gegenerischen\nMission';
-    this.show(`Wähle Schiffe zur ${battleText}!`);
+        ? 'zur Verteidigung deiner Kolonie'
+        : 'zum Abfangen der gegenerischen\nMission';
+    this.show(`Wähle Schiffe ${battleText}!`);
   }
   private showCombatPhase() {
     this.show(

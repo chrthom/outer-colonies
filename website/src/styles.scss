@@ -64,3 +64,15 @@ ul {
   vertical-align: middle;
   width: 24px;
 }
+.oc-icon.big {
+  width: 32px;
+}
+.primary-color {
+  color: var(--color-primary);
+}
+.accent-color {
+  color: var(--color-accent);
+}
+.clickable {
+  cursor: pointer;
+}

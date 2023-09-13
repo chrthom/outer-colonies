@@ -7,10 +7,8 @@ import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/components/config/enums';
 import { Sort } from '@angular/material/sort';
-
-interface DeckCardStack extends DeckCard {
-  numOfCards: number;
-}
+import { MatDialog } from '@angular/material/dialog';
+import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 
 @Component({
   selector: 'oc-page-deck',
@@ -20,12 +18,43 @@ interface DeckCardStack extends DeckCard {
 export class DeckPage implements OnInit {
   readonly minCards = 60;
   readonly maxCards = 100;
+  boxes!: DeckBox[];
   filterFormControl = new FormControl('');
   viewFormControl = new FormControl('list');
   private $activeCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   private $reserveCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
-  boxes!: DeckBox[];
-  constructor(private deckApiService: DeckApiService) {}
+  private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
+    {
+      title: '&Delta;',
+      get: (card: DeckCard) => card.profile.delta
+    },
+    {
+      title: '&Theta;',
+      get: (card: DeckCard) => card.profile.theta
+    },
+    {
+      title: '&Xi;',
+      get: (card: DeckCard) => card.profile.xi
+    },
+    {
+      title: '&Phi;',
+      get: (card: DeckCard) => card.profile.phi
+    },
+    {
+      title: '&Psi;',
+      get: (card: DeckCard) => card.profile.psi
+    },
+    {
+      title: '&Omega;',
+      get: (card: DeckCard) => card.profile.omega
+    },
+    {
+      energyIcon: true,
+      get: (card: DeckCard) => card.profile.energy
+    }
+  ];
+
+  constructor(private deckApiService: DeckApiService, private dialog: MatDialog) {}
   ngOnInit() {
     this.boxes = [
       new DeckBox(this.$activeCards, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
@@ -51,11 +80,12 @@ export class DeckPage implements OnInit {
       this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
     }
   }
-  get canActivateDeckCard() {
-    return cardsNum(this.boxes[0].cards) < this.maxCards;
-  }
-  get canDeactivateDeckCard() {
-    return cardsNum(this.boxes[0].cards) > this.minCards;
+  openImgInModal(card: DeckCard) {
+    this.dialog.open(ImageModalComponent, {
+      data: this.cardIdToUrl(card.cardId),
+      height: '95vh',
+      maxHeight: '95vh'
+    });
   }
   cardIdToUrl(cardId: number): string {
     return `${environment.url.assets}/cards/${cardId}.png`;
@@ -99,6 +129,23 @@ export class DeckPage implements OnInit {
       default:
         return '';
     }
+  }
+  get statistics(): DeckStatistics[] {
+    return this.statisticsTemplate.map(st => {
+      const profileValues = this.$activeCards.value.map(st.get);
+      return {
+        title: st.title,
+        energyIcon: st.energyIcon,
+        used: -profileValues.filter(v => v < 0).reduce((a, b) => a + b, 0),
+        provided: profileValues.filter(v => v > 0).reduce((a, b) => a + b, 0)
+      }
+    });
+  }
+  get canActivateDeckCard() {
+    return cardsNum(this.boxes[0].cards) < this.maxCards;
+  }
+  get canDeactivateDeckCard() {
+    return cardsNum(this.boxes[0].cards) > this.minCards;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
     return Object.values(_.groupBy(deckCards, dc => dc.cardId)).map(dc => {
@@ -192,4 +239,21 @@ function compare(a: number | string | undefined, b: number | string | undefined,
 
 function cardsNum(cards: DeckCardStack[]): number {
   return cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
+}
+
+interface DeckCardStack extends DeckCard {
+  numOfCards: number;
+}
+
+interface DeckStatisticsTemplate {
+  title?: string,
+  energyIcon?: boolean,
+  get: (card: DeckCard) => number
+}
+
+interface DeckStatistics {
+  title?: string,
+  energyIcon?: boolean,
+  used: number,
+  provided: number
 }

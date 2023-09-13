@@ -10,14 +10,15 @@ export default class AttackDamageIndicator {
   constructor(scene: Game, cardStack: CardStack, attack: ClientAttack) {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;
-    const self = this;
     ['pointDefense', 'shield', 'armour', 'damage']
       .map(key => [attack[key], layoutConfig.attack.color[key]])
       .filter(([value, _]) => value > 0)
-      .forEach(([value, color], index) =>
-        this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
-          self.tween(this.createIndicator(value, color))
-        )
+      .forEach(
+        ([value, color], index) =>
+          this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
+            this.tween(this.createIndicator(value, color))
+          ),
+        this
       );
     const particleEmitters = [
       ['red', Math.round((attack.shield + attack.armour + attack.damage) / 2)],
@@ -40,14 +41,16 @@ export default class AttackDamageIndicator {
       this.cardImage.angle == 0
         ? animationConfig.attack.flare.yOffset
         : animationConfig.attack.flare.yOffsetOpponent;
-    return this.scene.add.particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
-      lifespan: animationConfig.attack.flare.lifetime,
-      speed: { min: 150, max: 300 },
-      scale: { start: 0.8, end: 0 },
-      gravityY: 15,
-      blendMode: 'ADD',
-      emitting: false
-    }).setDepth(layoutConfig.depth.battleEffects);
+    return this.scene.add
+      .particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
+        lifespan: animationConfig.attack.flare.lifetime,
+        speed: { min: 150, max: 300 },
+        scale: { start: 0.8, end: 0 },
+        gravityY: 15,
+        blendMode: 'ADD',
+        emitting: false
+      })
+      .setDepth(layoutConfig.depth.battleEffects);
   }
   private createIndicator(value: number, color: string) {
     const yOffset =

@@ -1,5 +1,6 @@
 import { CardType, TacticDiscipline } from '../../config/enums';
 import Player from '../../game_state/player';
+import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
@@ -21,6 +22,24 @@ export class Card110 extends EconomyTacticCard {
         const numOfHullCards = cs.cards.filter(c => c.type == CardType.Hull).length;
         cs.damage -= Math.min(this.damageToRepair * numOfHullCards, cs.damage);
       });
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card316 extends EconomyTacticCard {
+  private oneTimeActionPool = new ActionPool(
+    new CardAction(TacticDiscipline.Military),
+    new CardAction(TacticDiscipline.Military),
+    new CardAction(TacticDiscipline.Military),
+    new CardAction(TacticDiscipline.Military)
+  );
+  constructor() {
+    super(316, 'Militärforschung', 3);
+  }
+  onUtilizaton(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);

@@ -9,13 +9,13 @@
   <div id="footer">
     <div id="footer-links">
       <ul>
-        <li><a routerLink="/imprint">Impressum</a></li>
-        <li><a routerLink="/privacy">Datenschutz</a></li>
+        <li><span class="clickable" (click)="openImprint()">Impressum</span></li>
+        <li><span class="clickable" (click)="openDataPrivacy()">Datenschutz</span></li>
       </ul>
     </div>
     <a id="version" href="https://github.com/chrthom/outer-colonies/releases" target="_blank">
       <h4 *ngIf="env.stage != 'production'">{{ env.stage }} environment<br /></h4>
-      <h3>Outer Colonies - Titan (v1.5.0)</h3>
+      <h3>Outer Colonies - Hyperion (v1.6.0)</h3>
     </a>
   </div>
 </div>

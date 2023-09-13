@@ -7,5 +7,5 @@ import AuthService from 'src/app/auth.service';
   styleUrls: ['./data-privacy.page.scss']
 })
 export class DataPrivacyPage {
-  constructor(public authService: AuthService) {}
+  constructor() {}
 }
