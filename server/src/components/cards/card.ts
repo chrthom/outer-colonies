@@ -40,7 +40,7 @@ export default abstract class Card {
   }
   isPlayable(player: Player): boolean {
     return (
-      player.actionPool.hasActionFor(this.type) &&
+      player.actionPool.hasActionFor(this) &&
       player.no == player.match.activePlayerNo &&
       player.match.turnPhase == TurnPhase.Build &&
       this.getValidTargets(player).length > 0

@@ -1,19 +1,27 @@
-import { CardType } from '../config/enums';
+import { CardType, TacticDiscipline } from '../config/enums';
+import Card from './card';
+import TacticCard from './types/tactic_card';
+
+type CardSubtype = CardType | TacticDiscipline;
 
 export class CardAction {
-  possibleCardTypes!: CardType[];
+  possibleCardTypes!: CardSubtype[];
   depleted: boolean = false;
-  constructor(...possibleCardTypes: CardType[]) {
+  constructor(...possibleCardTypes: CardSubtype[]) {
     this.possibleCardTypes = possibleCardTypes;
   }
-  canBeUsedFor(cardType: CardType): boolean {
-    return this.possibleCardTypes.includes(cardType);
+  canBeUsedFor(cardType: CardSubtype): boolean {
+    return this.possibleCardTypes.includes(cardType)
+      || this.isTacticDiscipline(cardType) && this.possibleCardTypes.includes(CardType.Tactic);
   }
   priority(): number {
-    return this.possibleCardTypes.length;
+    return this.isTacticDiscipline(this.possibleCardTypes[0]) ? 0 : this.possibleCardTypes.length;
   }
   toString(): string {
     return this.possibleCardTypes.sort().join('_');
+  }
+  private isTacticDiscipline(cardType: CardSubtype): boolean {
+    return Object.values(TacticDiscipline).map(td => <CardSubtype> td).includes(cardType);
   }
 }
 
@@ -23,24 +31,17 @@ export default class ActionPool {
     if (cardActions) this.cardActions = cardActions;
     else this.cardActions = [];
   }
-  activate(cardType: CardType) {
-    const availablePools = this.getActionsFor(cardType);
-    if (availablePools.length > 0) {
-      availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
-      this.removeDepleted();
-    }
+  get pool() {
+    return this.cardActions.slice();
+  }
+  activate(card: Card) {
+    this.activateCardType(this.cardSubtypeFromCard(card));
   }
   combine(ap: ActionPool): ActionPool {
     return new ActionPool(...this.cardActions.concat(ap.cardActions));
   }
-  getActionsFor(cardType: CardType): CardAction[] {
-    return this.pool.filter(ap => ap.canBeUsedFor(cardType));
-  }
-  get pool() {
-    return this.cardActions.slice();
-  }
-  hasActionFor(cardType: CardType): boolean {
-    return this.getActionsFor(cardType).length > 0;
+  hasActionFor(card: Card): boolean {
+    return this.hasActionForCardType(this.cardSubtypeFromCard(card));
   }
   push(...pool: CardAction[]) {
     this.cardActions.push(...pool);
@@ -56,6 +57,22 @@ export default class ActionPool {
   }
   toString(): string {
     return this.pool.map(ca => ca.toString()).join('__');
+  }
+  private cardSubtypeFromCard(card: Card): CardSubtype {
+    return card.type == CardType.Tactic ? (<TacticCard> card).discipline : card.type;
+  }
+  private activateCardType(cardType: CardSubtype) {
+    const availablePools = this.getActionsForCardType(cardType);
+    if (availablePools.length > 0) {
+      availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
+      this.removeDepleted();
+    }
+  }
+  private hasActionForCardType(cardType: CardSubtype): boolean {
+    return this.getActionsForCardType(cardType).length > 0;
+  }
+  private getActionsForCardType(cardType: CardSubtype): CardAction[] {
+    return this.pool.filter(ap => ap.canBeUsedFor(cardType));
   }
   private removeDepleted() {
     const depleted = this.cardActions.filter(a => a.depleted);

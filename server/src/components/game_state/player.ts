@@ -72,7 +72,7 @@ export default class Player {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
   playHandCard(handCard: CardStack, target: CardStack) {
-    this.actionPool.activate(handCard.type);
+    this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     handCard.performImmediateEffect(target);
     if (!handCard.card.isPermanent) {
