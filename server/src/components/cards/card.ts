@@ -58,6 +58,12 @@ export default abstract class Card {
   get actionPool(): ActionPool {
     return new ActionPool();
   }
+  protected addToActionPool(player: Player) {
+    player.actionPool.push(...this.actionPool.pool);
+  }
+  protected removeFromActionPool(player: Player) {
+    player.actionPool.remove(...this.actionPool.pool);
+  }
 }
 
 export class AttackResult {
