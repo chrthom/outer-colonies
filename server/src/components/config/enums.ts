@@ -1,3 +1,5 @@
+export type CardSubtype = CardType | TacticDiscipline;
+
 export enum BattleType {
   None = 'none',
   Mission = 'mission',

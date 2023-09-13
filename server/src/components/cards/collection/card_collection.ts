@@ -37,7 +37,7 @@ import {
   Card440,
   Card441
 } from './equipment_weapon_point_defense_cards';
-import { Card135, Card154, Card164, Card183 } from './infrastructure_action_cards';
+import { Card135, Card137, Card138, Card147, Card148, Card154, Card164, Card183, Card219, Card336 } from './infrastructure_action_cards';
 import {
   Card105,
   Card145,
@@ -121,7 +121,7 @@ import {
   Card315
 } from './hull_3_part_cards';
 import { Card174, Card337, Card338 } from './tactic_military_cards';
-import { Card110 } from './tactic_science_cards';
+import { Card110, Card316 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util.cards';
 import { Card230, Card333, Card435 } from './infrastructure_start.cards';
@@ -158,9 +158,13 @@ export default class CardCollection {
     134: <Card>new Card134(),
     135: <Card>new Card135(),
     136: <Card>new Card136(),
+    137: <Card>new Card137(),
+    138: <Card>new Card138(),
     140: <Card>new Card140(),
     141: <Card>new Card141(),
     145: <Card>new Card145(),
+    147: <Card>new Card147(),
+    148: <Card>new Card148(),
     150: <Card>new Card150(),
     151: <Card>new Card151(),
     152: <Card>new Card152(),
@@ -196,6 +200,7 @@ export default class CardCollection {
     209: <Card>new Card209(),
     213: <Card>new Card213(),
     216: <Card>new Card216(),
+    219: <Card>new Card219(),
     220: <Card>new Card220(),
     221: <Card>new Card221(),
     223: <Card>new Card223(),
@@ -221,6 +226,7 @@ export default class CardCollection {
     313: <Card>new Card313(),
     314: <Card>new Card314(),
     315: <Card>new Card315(),
+    316: <Card>new Card316(),
     318: <Card>new Card318(),
     321: <Card>new Card321(),
     325: <Card>new Card325(),
@@ -229,6 +235,7 @@ export default class CardCollection {
     328: <Card>new Card328(),
     329: <Card>new Card329(),
     333: <Card>new Card333(),
+    336: <Card>new Card336(),
     337: <Card>new Card337(),
     338: <Card>new Card338(),
     339: <Card>new Card339(),
