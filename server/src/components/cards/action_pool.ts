@@ -1,8 +1,6 @@
-import { CardType, TacticDiscipline } from '../config/enums';
+import { CardSubtype, CardType, TacticDiscipline } from '../config/enums';
 import Card from './card';
 import TacticCard from './types/tactic_card';
-
-type CardSubtype = CardType | TacticDiscipline;
 
 export class CardAction {
   possibleCardTypes!: CardSubtype[];
