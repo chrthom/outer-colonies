@@ -31,6 +31,7 @@ export default abstract class OrbCard extends Card {
   onLeaveGame(player: Player): void {
     this.removeFromActionPool(player);
   }
+  override onEndTurn(): void {}
   get profile(): CardProfile {
     return CardProfile.fromOrbProfile(this.orbProfile);
   }

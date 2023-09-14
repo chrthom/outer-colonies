@@ -28,7 +28,6 @@ export class Card146 extends OrbCard {
   override onStartTurn(player: Player): void {
     this.additionalCardWhenDrawing(TacticDiscipline.Intelligence, player);
   }
-  override onEndTurn(): void {}
 }
 
 export class Card159 extends OrbCard {
@@ -57,7 +56,6 @@ export class Card159 extends OrbCard {
   override onStartTurn(player: Player): void {
     this.additionalCardWhenDrawing(TacticDiscipline.Economy, player);
   }
-  override onEndTurn(): void {}
 }
 
 export class Card317 extends OrbCard {
@@ -86,5 +84,30 @@ export class Card317 extends OrbCard {
   override onStartTurn(player: Player): void {
     this.additionalCardWhenDrawing(CardType.Equipment, player);
   }
-  override onEndTurn(): void {}
+}
+
+export class Card432 extends OrbCard {
+  constructor() {
+    super(
+      432,
+      'Oberon',
+      2,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0
+      },
+      [ CardType.Equipment ]
+    );
+  }
+  override onStartTurn(player: Player): void {}
 }
