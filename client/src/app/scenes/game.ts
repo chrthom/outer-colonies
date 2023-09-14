@@ -93,6 +93,7 @@ export default class Game extends Phaser.Scene {
       'military',
       'science',
       'equipment_hull_infrastructure',
+      'equipment_hull_infrastructure_tactic',
       'armour_1',
       'armour_2',
       'armour_3',

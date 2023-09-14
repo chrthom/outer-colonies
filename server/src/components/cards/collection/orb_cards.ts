@@ -86,6 +86,32 @@ export class Card317 extends OrbCard {
   }
 }
 
+export class Card403 extends OrbCard {
+  constructor() {
+    super(
+      403,
+      'Pluto',
+      5,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0
+      },
+      [ CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic ]
+    );
+  }
+  override onStartTurn(player: Player): void {}
+}
+
 export class Card432 extends OrbCard {
   constructor() {
     super(
