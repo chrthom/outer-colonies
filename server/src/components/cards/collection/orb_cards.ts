@@ -1,5 +1,6 @@
-import { CardType, TacticDiscipline } from "../../config/enums";
+import { CardType, TacticDiscipline, Zone } from "../../config/enums";
 import Player from "../../game_state/player";
+import CardStack from "../card_stack";
 import OrbCard from "../types/orb_card";
 
 export class Card146 extends OrbCard {
@@ -109,7 +110,7 @@ export class Card403 extends OrbCard {
       [ CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic ]
     );
   }
-  override onStartTurn(player: Player): void {}
+  override onStartTurn(): void {}
 }
 
 export class Card432 extends OrbCard {
@@ -135,5 +136,34 @@ export class Card432 extends OrbCard {
       [ CardType.Equipment ]
     );
   }
-  override onStartTurn(player: Player): void {}
+  override onStartTurn(): void {}
+}
+
+export class Card433 extends OrbCard {
+  constructor() {
+    super(
+      433,
+      'Triton',
+      2,
+      {
+        energy: 0,
+        hp: 0,
+        speed: 0,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0,
+        theta: 0,
+        xi: 0,
+        phi: 0,
+        omega: 0,
+        delta: 0,
+        psi: 0
+      },
+      [ CardType.Hull ]
+    );
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.zone == Zone.Colony && cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
+  }
+  override onStartTurn(): void {}
 }
