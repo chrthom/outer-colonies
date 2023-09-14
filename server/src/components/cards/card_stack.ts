@@ -127,7 +127,7 @@ export default class CardStack {
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   performImmediateEffect(target: CardStack) {
-    this.card.onUtilizaton(this.player, target);
+    this.card.onEnterGame(this.player, target);
   }
   get profile(): CardProfile {
     if (this.type == CardType.Colony) {
@@ -142,7 +142,7 @@ export default class CardStack {
         .map(cs => cs.profile)
         .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
       colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
-      colonyCardsProfile.hp = 0; // Else Building HP would increase the colony's HP
+      colonyCardsProfile.hp = 0; // Else infrastructure cards' HP would increase the colony's HP
       return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile);
     } else {
       return this.cards.map(c => c.profile).reduce((a, b) => CardProfile.combineCardProfiles(a, b));
@@ -151,18 +151,25 @@ export default class CardStack {
   profileMatches(c: CardProfile): boolean {
     return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile, c));
   }
+  discard() {
+    this.removeCardStack();
+    this.player.discardCards(...this.cards);
+  }
   retract() {
-    if (this.parentCardStack) {
-      spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
-    } else {
-      spliceCardStackByUUID(this.player.cardStacks, this.uuid);
-    }
-    this.cards.forEach(c => c.onRetraction(this.player));
+    this.removeCardStack();
     this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
     this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
   }
   get type(): CardType {
     return this.card.type;
+  }
+  private removeCardStack() {
+    if (this.isRootCard) {
+      spliceCardStackByUUID(this.player.cardStacks, this.uuid);
+    } else {
+      spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
+    }
+    this.cards.forEach(c => c.onLeaveGame(this.player));
   }
   private get isRootCard() {
     return !this.parentCardStack;

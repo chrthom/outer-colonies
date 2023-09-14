@@ -16,10 +16,10 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     super(id, name, rarity, profile);
     this.actionPoolCardTypes = actionPool;
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     this.addToActionPool(player);
   }
-  onRetraction(player: Player) {
+  onLeaveGame(player: Player) {
     this.removeFromActionPool(player);
   }
   onStartTurn() {}

@@ -77,7 +77,7 @@ export default class Player {
     handCard.performImmediateEffect(target);
     if (!handCard.card.isPermanent) {
       this.discardCards(handCard.card);
-    } else if (target.type == CardType.Colony) {
+    } else if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
       handCard.zone = Zone.Colony;
       this.cardStacks.push(handCard);
     } else {

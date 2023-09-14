@@ -15,7 +15,7 @@ export class Card110 extends EconomyTacticCard {
   constructor() {
     super(110, 'Nanobot Wolke', 4);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.cardStacks
       .filter(cs => cs.type == CardType.Hull)
       .forEach(cs => {
@@ -38,7 +38,7 @@ export class Card316 extends EconomyTacticCard {
   constructor() {
     super(316, 'Militärforschung', 3);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {

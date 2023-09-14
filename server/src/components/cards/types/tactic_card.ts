@@ -7,7 +7,7 @@ export default abstract class TacticCard extends Card {
   constructor(id: number, name: string, rarity: number) {
     super(id, name, CardType.Tactic, rarity);
   }
-  onRetraction() {}
+  onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
   override canBeRetracted(): boolean {

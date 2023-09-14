@@ -29,8 +29,8 @@ export default abstract class EquipmentCard extends Card {
   override isInRange(range: number): boolean {
     return this.attackProfile.range >= range;
   }
-  onUtilizaton() {}
-  onRetraction() {}
+  onEnterGame() {}
+  onLeaveGame() {}
   onStartTurn() {}
   onEndTurn(player: Player, source: CardStack) {}
   get profile(): CardProfile {
