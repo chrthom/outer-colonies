@@ -163,7 +163,7 @@ export class Card433 extends OrbCard {
     );
   }
   override getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter(cs => cs.zone == Zone.Colony && cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
+    return player.cardStacks.some(cs => cs.zone == Zone.Colony && cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
   }
   override onStartTurn(): void {}
 }
