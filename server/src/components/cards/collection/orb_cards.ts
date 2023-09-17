@@ -110,6 +110,9 @@ export class Card403 extends OrbCard {
       [ CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic ]
     );
   }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.some(cs => cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
+  }
   override onStartTurn(): void {}
 }
 
