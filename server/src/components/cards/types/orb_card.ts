@@ -32,6 +32,9 @@ export default abstract class OrbCard extends Card {
     this.removeFromActionPool(player);
   }
   override onEndTurn(): void {}
+  override canBeRetracted(): boolean {
+    return false;
+  }
   get profile(): CardProfile {
     return CardProfile.fromOrbProfile(this.orbProfile);
   }
