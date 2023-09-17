@@ -5,8 +5,8 @@ import InfrastructureCard from '../types/infrastructure_card';
 import TacticCard from '../types/tactic_card';
 
 abstract class InfrastructureStartOfTurnCard extends InfrastructureCard {
-  onUtilizaton() {}
-  onRetraction() {}
+  onEnterGame() {}
+  onLeaveGame() {}
   onEndTurn() {}
   protected getDrawnCards(player: Player) {
     return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);

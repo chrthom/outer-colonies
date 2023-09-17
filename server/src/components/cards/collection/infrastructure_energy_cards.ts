@@ -1,10 +1,11 @@
-import { BattleType, TurnPhase } from '../../config/enums';
+import { BattleType, CardType, TurnPhase } from '../../config/enums';
 import Player from '../../game_state/player';
+import CardStack from '../card_stack';
 import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class InfrastructureEnergyCard extends InfrastructureCard {
-  onUtilizaton() {}
-  onRetraction() {}
+  onEnterGame() {}
+  onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
 }
@@ -58,6 +59,15 @@ abstract class SolarPanelCard extends InfrastructureEnergyCard {
       psi: 0,
       handCardLimit: 0
     });
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    let validTargets = super.getValidTargets(player);
+    if (player.getColonyCardStack().cards.some(c => c.id == 433)) {
+      validTargets = validTargets.filter(cs => cs.card.type != CardType.Colony);
+    } else if (player.getColonyCardStack().cards.some(c => c.id == 433)) {
+      validTargets = [];
+    }
+    return validTargets;
   }
 }
 

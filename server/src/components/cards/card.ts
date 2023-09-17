@@ -50,13 +50,19 @@ export default abstract class Card {
     return false;
   }
   onDestruction(player: Player) {}
-  abstract onUtilizaton(player: Player, target: CardStack): void;
-  abstract onRetraction(player: Player): void;
+  abstract onEnterGame(player: Player, target: CardStack): void;
+  abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player): void;
   abstract onEndTurn(player: Player, source: CardStack): void;
   abstract get profile(): CardProfile;
   get actionPool(): ActionPool {
     return new ActionPool();
+  }
+  protected addToActionPool(player: Player) {
+    player.actionPool.push(...this.actionPool.pool);
+  }
+  protected removeFromActionPool(player: Player) {
+    player.actionPool.remove(...this.actionPool.pool);
   }
 }
 

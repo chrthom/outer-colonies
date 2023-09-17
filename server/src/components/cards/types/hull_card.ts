@@ -28,8 +28,8 @@ export default abstract class HullCard extends Card {
   private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
     return cardStacks.filter(cs => cs.type == CardType.Colony && this.hullProfile.energy >= 0);
   }
-  onUtilizaton() {}
-  onRetraction() {}
+  onEnterGame() {}
+  onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
   override canBeRetracted(isRootCard: boolean): boolean {

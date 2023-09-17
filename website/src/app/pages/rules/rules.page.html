@@ -13,6 +13,7 @@
             <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
             <mat-list-option value="equipment-cards"><h4>Ausr&uuml;stungskarten</h4></mat-list-option>
             <mat-list-option value="infrastructure-cards"><h4>Infrastrukturkarten</h4></mat-list-option>
+            <mat-list-option value="orb-cards"><h4>Himmelsk&ouml;rperkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
             <h5>Spielzug</h5>
             <mat-list-option value="turn-overview"><h4>Spielzugübersicht</h4></mat-list-option>
@@ -181,6 +182,12 @@
               sind kleiner oder gleich der <img [src]="iconUrl('speed')" class="oc-icon" /> des Ziel, so wir
               der vom Angriff verursachte <img [src]="iconUrl('damage')" class="oc-icon" /> halbiert
               (aufgerundet).
+            </p>
+            <h4>Himmelsk&ouml;rperkarte <img [src]="iconUrl('orb')" class="oc-icon" /></h4>
+            <p>
+              Ein Kartentyp, der an die Kolonie angelegt wird, von der jeder Spieler nur eine im Spiel haben
+              kann, die nicht zurück auf die Hand genommen werden kann und nicht Ziel von Angriffen und Karten
+              sein kann.
             </p>
             <h4>Hüllenintegrität <img [src]="iconUrl('hitpoints')" class="oc-icon" /></h4>
             <p>
@@ -409,6 +416,32 @@
               Die Kolonie stellt immer <b>alle geforderten Sockel</b> zur Verfügung, jedoch müssen die
               geforderte <img [src]="iconUrl('energy')" class="oc-icon" /> auch von der Kolonie zur Verfügung
               gestellt werden, damit du die Karte in die Koloniezone legen darfst.
+            </p>
+          </div>
+          <div *ngSwitchCase="'orb-cards'">
+            <img [src]="imgUrl('orb_cards')" class="left size-40" />
+            <p>
+              Zu Beginn des Spiels ist nicht definiert in welchem Teil des Sonnensystems sich deine Kolonie
+              befindet. Sobald du eine <img [src]="iconUrl('orb')" class="oc-icon" /> spielst, legst du fest
+              auf welchem Stück Gestein sich deine Kolonie befindet.
+              <img [src]="iconUrl('orb')" class="oc-icon" /> bieten Boni und Mali, welche für die gesamte
+              Kolonie gelten. Spielst du eine <img [src]="iconUrl('orb')" class="oc-icon" /> aus, legst du sie 
+              an deine Koloniekarte an.
+            </p>
+            <p>
+              <img [src]="iconUrl('orb')" class="oc-icon" /> sind die einzigen Karten, welche nachdem du sie
+              gespielt hast nicht Ziel von Angriffen und Karten deiner Gegenspieler sein können.
+            </p>
+            <p>
+              M&ouml;chtest du eine <img [src]="iconUrl('orb')" class="oc-icon" /> spielen, musst du dies
+              <b>VOR</b> dem Ausspielen anderer Karten tun.
+              Zudem kannst du <img [src]="iconUrl('orb')" class="oc-icon" /> zu Beginn deiner Aufbauphase
+              <b>NICHT</b> wieder auf deine Hand zurücknehmen.
+            </p>
+            <p>
+              Du kannst zu jeder Zeit nur eine <img [src]="iconUrl('orb')" class="oc-icon" /> im Spiel haben.
+              Spielst du eine weitere <img [src]="iconUrl('orb')" class="oc-icon" />, so musst du eine zuvor
+              an deine Kolonie angelegte <img [src]="iconUrl('orb')" class="oc-icon" /> ablegen.
             </p>
           </div>
           <div *ngSwitchCase="'tactic-cards'">

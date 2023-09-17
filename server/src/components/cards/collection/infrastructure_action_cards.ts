@@ -4,14 +4,6 @@ import ActionPool, { CardAction } from '../action_pool';
 import { InfrastructureProfile } from '../card_profile';
 import InfrastructureCard from '../types/infrastructure_card';
 
-function addToActionPool(player: Player, card: InfrastructureCard) {
-  player.actionPool.push(...card.actionPool.pool);
-}
-
-function removeFromActionPool(player: Player, card: InfrastructureCard) {
-  player.actionPool.remove(...card.actionPool.pool);
-}
-
 abstract class ActionInfrastructureCard extends InfrastructureCard {
   private actionPoolCardTypes!: CardSubtype[][];
   constructor(
@@ -24,11 +16,11 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     super(id, name, rarity, profile);
     this.actionPoolCardTypes = actionPool;
   }
-  onUtilizaton(player: Player) {
-    addToActionPool(player, this);
+  onEnterGame(player: Player) {
+    this.addToActionPool(player);
   }
-  onRetraction(player: Player) {
-    removeFromActionPool(player, this);
+  onLeaveGame(player: Player) {
+    this.removeFromActionPool(player);
   }
   onStartTurn() {}
   onEndTurn() {}

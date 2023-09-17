@@ -13,8 +13,8 @@ export default class ColonyCard extends Card {
   getValidTargets(): CardStack[] {
     return [];
   }
-  onUtilizaton() {}
-  onRetraction() {}
+  onEnterGame() {}
+  onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
   get profile(): CardProfile {

@@ -19,7 +19,7 @@ export class Card141 extends EconomyTacticCard {
   constructor() {
     super(141, 'Externe Arbeitskräfte', 2);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {
@@ -32,7 +32,7 @@ export class Card165 extends EconomyTacticCard {
   constructor() {
     super(165, 'Konvoi', 1);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     const freePsiSockets = this.calcFreePsiSockets(player);
     if (freePsiSockets) {
       player.drawCards(freePsiSockets * this.cardsToDrawPerPsiSocket);
@@ -55,7 +55,7 @@ export class Card232 extends EconomyTacticCard {
   constructor() {
     super(232, 'Warenlieferung', 1);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.drawCards(this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
@@ -68,7 +68,7 @@ export class Card321 extends EconomyTacticCard {
   constructor() {
     super(321, 'Recycling', 2);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
   }
   getValidTargets(player: Player): CardStack[] {
@@ -81,7 +81,7 @@ export class Card427 extends EconomyTacticCard {
   constructor() {
     super(427, 'Immigranten von der Erde', 2);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     let foundCards = 0;
     for (let i = 0; i < player.deck.length; i++) {
       if (player.deck[i].type == CardType.Infrastructure) {

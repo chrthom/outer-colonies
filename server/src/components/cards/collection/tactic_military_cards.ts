@@ -15,7 +15,7 @@ export class Card174 extends MilitaryTacticCard {
   constructor() {
     super(174, 'Feldreperaturen', 1);
   }
-  onUtilizaton(player: Player, target: CardStack) {
+  onEnterGame(player: Player, target: CardStack) {
     target.damage -= Math.min(this.damageToRepair, target.damage);
   }
   getValidTargets(player: Player): CardStack[] {
@@ -31,7 +31,7 @@ export class Card337 extends MilitaryTacticCard {
   constructor() {
     super(337, 'Militärpioniere', 1);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
   }
   getValidTargets(player: Player): CardStack[] {
@@ -44,7 +44,7 @@ export class Card338 extends MilitaryTacticCard {
   constructor() {
     super(338, 'Nachschub', 1);
   }
-  onUtilizaton(player: Player) {
+  onEnterGame(player: Player) {
     player.drawCards(this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
