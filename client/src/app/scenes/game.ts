@@ -63,7 +63,7 @@ export default class Game extends Phaser.Scene {
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   obj: StaticObjects = new StaticObjects();
-  discardCardsExist: boolean = false;
+  retractCardsExist: boolean = false;
 
   constructor() {
     super({
@@ -170,9 +170,9 @@ export default class Game extends Phaser.Scene {
     const attackPerformed = this.animateAttack();
     this.time.delayedCall(attackPerformed ? animationConfig.duration.attack : 0, () => {
       const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
-      this.discardCardsExist = false; // If true, then the hand animations are delayed
+      this.retractCardsExist = false; // If true, then the hand animations are delayed
       this.updateCardStacks(newHandCards);
-      this.time.delayedCall(this.discardCardsExist ? animationConfig.duration.move : 0, () => {
+      this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
         this.updateHandCards(newHandCards, oldState);
         this.showOpponentTacticCardAction(oldState);
         this.resetView();
@@ -228,7 +228,7 @@ export default class Game extends Phaser.Scene {
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
-        this.discardCardsExist = true;
+        this.retractCardsExist = true;
       } else cs.discard(); // Discard card stack
     }, this);
     this.state.cardStacks
