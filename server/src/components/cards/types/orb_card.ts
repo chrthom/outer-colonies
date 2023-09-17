@@ -22,7 +22,10 @@ export default abstract class OrbCard extends Card {
     this.actionPoolCardTypes = actionPool;
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.getColonyCardStack().cardStacks.some(c => c.card.id == this.id) ? [] : player.cardStacks.filter(cs => cs.type == CardType.Colony);
+    return player.getColonyCardStack().cardStacks.some(c => c.card.id == this.id) 
+      || player.actionPool.toString() != player.getOriginalActions().toString()
+      ? []
+      : player.cardStacks.filter(cs => cs.type == CardType.Colony);
   }
   onEnterGame(player: Player): void {
     player.getColonyCardStack().cardStacks.filter(c => c.type == CardType.Orb).forEach(c => c.discard());
