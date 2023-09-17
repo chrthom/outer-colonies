@@ -61,11 +61,11 @@ export default class CardStack {
   get canBeRetracted(): boolean {
     const player = this.player;
     return (
-      player.isActivePlayer() &&
-      player.isPendingPlayer() &&
+      player.isActivePlayer &&
+      player.isPendingPlayer &&
       player.match.turnPhase == TurnPhase.Build &&
       this.card.canBeRetracted(this.isRootCard) &&
-      player.actionPool.toString() == player.getOriginalActions().toString()
+      player.actionPool.toString() == player.originalActions.toString()
     );
   }
   combatPhaseReset(initial: boolean) {
@@ -100,7 +100,7 @@ export default class CardStack {
     if (this.type == CardType.Colony) {
       return false;
     } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type == CardType.Infrastructure) {
-      return this.card.profile.energy < 0 && this.player.getColonyCardStack().profile.energy < 0;
+      return this.card.profile.energy < 0 && this.player.colonyCardStack.profile.energy < 0;
     } else {
       return this.card.profile.energy < 0 && rootCardStack.profile.energy < 0;
     }

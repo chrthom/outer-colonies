@@ -105,7 +105,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     actionPool: actionPool,
     opponent: opponentData,
     hand: hand,
-    handCardLimit: player.handCardLimit(),
+    handCardLimit: player.handCardLimit,
     deckSize: player.deck.length,
     discardPileIds: player.discardPile.map(c => c.id),
     cardStacks: cardStacks,

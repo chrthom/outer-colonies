@@ -83,7 +83,7 @@ export default class Match {
     this.battle = new Battle(BattleType.None);
     this.getActivePlayer().moveFlightReadyShipsToOrbit();
     if (
-      this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit() &&
+      this.getActivePlayer().hand.length <= this.getActivePlayer().handCardLimit &&
       !this.gameResult.gameOver
     ) {
       this.getActivePlayer().cardStacks.forEach(cs => cs.onEndTurn());
