@@ -11,14 +11,13 @@ interface CornerConfig {
 }
 
 export default class Background {
-  private readonly playerDefaultOrb = 'europa';
-  private readonly opponentDefaultOrb = 'titan';
-
   private scene!: Phaser.Scene | Game;
+  private playerOrb!: string;
+  private opponentOrb!: string;
   private currentRing: number = 0;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
-  private playerOrb?: boolean;
+  private isColonyOrb?: boolean;
   private starsImage!: Phaser.GameObjects.Image;
   private sunImage!: Phaser.GameObjects.Image;
   private ringImage!: Phaser.GameObjects.Image;
@@ -43,6 +42,8 @@ export default class Background {
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     if (this.isGame) {
+      this.playerOrb = this.randomElement(backgroundConfig.defaultBackgroundOrbNames);
+      this.opponentOrb = this.randomElement(backgroundConfig.defaultBackgroundOrbNames.filter(o => o != this.playerOrb));
       this.ringImage = this.createRing(this.currentRing, false);
       setInterval(() => {
         if (!this.targetRing) {
@@ -99,23 +100,23 @@ export default class Background {
     if (this.isGame) {
       const state = this.game.state;
       if (this.inCombatRaid) {
-        if (this.playerOrb != !state.playerIsActive) {
+        if (this.isColonyOrb != !state.playerIsActive) {
           this.moveToOrb(
-            state.playerIsActive ? this.opponentDefaultOrb : this.playerDefaultOrb,
+            state.playerIsActive ? this.opponentOrb : this.playerOrb,
             !state.playerIsActive
           );
         }
       } else if (this.inCombat) {
-        if (this.playerOrb != undefined) {
+        if (this.isColonyOrb != undefined) {
           if (this.randomBoolean()) {
             this.moveToRing(this.randomIndex(backgroundConfig.rings));
           } else {
             this.moveToOrb(this.randomElement(backgroundConfig.orbs).name);
           }
         }
-      } else if (this.inStartOrBuildPhase && this.playerOrb != state.playerIsActive) {
+      } else if (this.inStartOrBuildPhase && this.isColonyOrb != state.playerIsActive) {
         this.moveToOrb(
-          state.playerIsActive ? this.playerDefaultOrb : this.opponentDefaultOrb,
+          state.playerIsActive ? this.playerOrb : this.opponentOrb,
           state.playerIsActive
         );
       }
@@ -124,7 +125,7 @@ export default class Background {
 
   private moveToOrb(orb: string, playerOrb?: boolean) {
     this.targetOrb = backgroundConfig.orbs.find(o => o.name == orb);
-    this.playerOrb = playerOrb;
+    this.isColonyOrb = playerOrb;
     this.moveToRing(this.targetOrb.ring);
   }
 
@@ -216,7 +217,7 @@ export default class Background {
     if (movingInwards) [x, y] = this.inCoordinates;
     else {
       x = this.outCoordinates[0];
-      if (this.playerOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+      if (this.isColonyOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
       else y = -backgroundConfig.animation.offDistance;
     }
     this.orbImage = this.scene.add
@@ -224,7 +225,7 @@ export default class Background {
       .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
       .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
-      .setTint(...this.getTint(this.playerOrb ? 0 : 270));
+      .setTint(...this.getTint(this.isColonyOrb ? 0 : 270));
     this.tweenOrbToPosition();
   }
 
@@ -234,9 +235,9 @@ export default class Background {
       duration: backgroundConfig.animation.durationObjectTransition,
       ease: 'Quint',
       x: backgroundConfig.animation.orbX,
-      y: this.playerOrb
+      y: this.isColonyOrb
         ? backgroundConfig.animation.orbYPlayer
-        : this.playerOrb == undefined
+        : this.isColonyOrb == undefined
         ? layoutConfig.scene.height / 2
         : backgroundConfig.animation.orbYOpponent,
       scale: backgroundConfig.animation.orbScale
