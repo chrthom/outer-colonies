@@ -27,7 +27,7 @@ export default class Player {
     this.resetRemainingActions();
   }
   resetRemainingActions() {
-    this.actionPool = this.getOriginalActions();
+    this.actionPool = this.originalActions;
   }
   callBackShipsFromNeutralZone() {
     this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => (cs.zone = Zone.Oribital));
@@ -52,13 +52,13 @@ export default class Player {
   discardCardStacks(...uuids: string[]) {
     uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
   }
-  getColonyCardStack(): CardStack {
+  get colonyCardStack(): CardStack {
     return this.cardStacks.filter(c => c.card.type == CardType.Colony)[0];
   }
-  isActivePlayer(): boolean {
+  get isActivePlayer(): boolean {
     return this.no == this.match.activePlayerNo;
   }
-  isPendingPlayer(): boolean {
+  get isPendingPlayer(): boolean {
     return this.no == this.match.actionPendingByPlayerNo;
   }
   takeCards(cards: Card[], originUUID?: string) {
@@ -84,10 +84,10 @@ export default class Player {
       target.attach(handCard);
     }
   }
-  handCardLimit(): number {
-    return this.getColonyCardStack() ? this.getColonyCardStack().profile.handCardLimit : 0;
+  get handCardLimit(): number {
+    return this.colonyCardStack ? this.colonyCardStack.profile.handCardLimit : 0;
   }
-  getOriginalActions(): ActionPool {
+  get originalActions(): ActionPool {
     return this.cardStacks.map(cs => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
   }
 }
