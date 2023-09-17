@@ -82,13 +82,19 @@ class BackgroundConfig {
       cardId: 146,
       name: 'europa',
       ring: 4,
-      distance: 0.8
+      distance: 0.7
     },
     {
       cardId: 159,
       name: 'ganymed',
       ring: 4,
-      distance: 0.5
+      distance: 0.4
+    },
+    {
+      cardId: 317,
+      name: 'kallisto',
+      ring: 4,
+      distance: 0.2
     },
     {
       cardId: 112,
@@ -107,6 +113,12 @@ class BackgroundConfig {
       name: 'triton',
       ring: 7,
       distance: 1
+    },
+    {
+      cardId: 403,
+      name: 'pluto',
+      ring: 8,
+      distance: 0.3
     }
   ];
 
