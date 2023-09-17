@@ -6,7 +6,7 @@ import TacticCard from '../types/tactic_card';
 
 abstract class EconomyTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
-    return TacticDiscipline.Economy;
+    return TacticDiscipline.Trade;
   }
 }
 

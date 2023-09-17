@@ -118,14 +118,14 @@ export class DeckPage implements OnInit {
   }
   disciplineToText(discipline?: TacticDiscipline): string {
     switch (discipline) {
-      case TacticDiscipline.Economy:
-        return 'Wirtschaft';
       case TacticDiscipline.Intelligence:
         return 'Information';
       case TacticDiscipline.Military:
         return 'Militär';
       case TacticDiscipline.Science:
         return 'Wissenschaft';
+      case TacticDiscipline.Trade:
+        return 'Wirtschaft';
       default:
         return '';
     }
