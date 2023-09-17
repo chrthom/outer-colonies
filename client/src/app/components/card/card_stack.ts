@@ -37,8 +37,11 @@ export default class CardStack {
       data.cards.map(c => c.id)
     );
     this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
-    if (removedCardIds.length) this.scene.retractCardsExists = true;
-    this.filterCardsByIdList(removedCardIds).forEach(c => c.discard(this.data.ownedByPlayer, true));
+    if (removedCardIds.length) this.scene.discardCardsExist = true;
+    this.filterCardsByIdList(removedCardIds).forEach(c => 
+      c.discard(this.data.ownedByPlayer, this.scene.state.discardPileIds.slice(-1).pop() != c.cardId),
+      this
+    );
     this.data.cards = data.cards;
     this.data.criticalDamage = data.criticalDamage;
     this.data.damage = data.damage;
