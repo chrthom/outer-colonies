@@ -77,7 +77,7 @@ export class Card435 extends InfrastructureStartOfTurnCard {
     const relevantCardDrawn = this.getDrawnCards(player)
       .filter(c => c.type == CardType.Tactic)
       .map(c => <TacticCard>c)
-      .some(c => c.discipline == TacticDiscipline.Economy || c.discipline == TacticDiscipline.Science);
+      .some(c => c.discipline == TacticDiscipline.Trade || c.discipline == TacticDiscipline.Science);
     if (relevantCardDrawn) player.drawCards(1);
   }
 }

@@ -55,7 +55,7 @@ export class Card159 extends OrbCard {
     );
   }
   override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(TacticDiscipline.Economy, player);
+    this.additionalCardWhenDrawing(TacticDiscipline.Trade, player);
   }
 }
 

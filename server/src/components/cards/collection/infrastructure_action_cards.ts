@@ -93,7 +93,7 @@ export class Card138 extends ActionInfrastructureCard {
         psi: -1,
         handCardLimit: 0
       },
-      [TacticDiscipline.Economy]
+      [TacticDiscipline.Trade]
     );
   }
 }
@@ -232,7 +232,7 @@ export class Card219 extends ActionInfrastructureCard {
         psi: -2,
         handCardLimit: 0
       },
-      [TacticDiscipline.Economy],
+      [TacticDiscipline.Trade],
       [TacticDiscipline.Intelligence]
     );
   }

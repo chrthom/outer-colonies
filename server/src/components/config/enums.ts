@@ -65,10 +65,10 @@ export enum Rarity {
 }
 
 export enum TacticDiscipline {
-  Economy = 'economy',
   Intelligence = 'intelligence',
   Military = 'military',
-  Science = 'science'
+  Science = 'science',
+  Trade = 'trade'
 }
 
 export enum TurnPhase {
