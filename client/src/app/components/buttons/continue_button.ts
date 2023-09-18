@@ -172,9 +172,9 @@ export default class ContinueButton {
     this.show('', button, () => {});
   }
   private get canIntercept() {
-    return this.scene.state.cardStacks.some(cs => cs.interceptionReady);
+    return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.interceptionReady);
   }
   private get canAttack() {
-    return this.scene.state.cardStacks.some(cs => cs.cards.some(c => c.battleReady));
+    return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.cards.some(c => c.battleReady));
   }
 }
