@@ -9,7 +9,7 @@ if [ "$#" -ne 2 ]; then
     echo "Usage: version.sh VERSION RELEASE_NAME"
 fi
 
-echo Incrementing version to $2 (v$1)
+echo "Incrementing version to $2 (v$1)"
 
 for d in client server website; do
     sed -E -i "s/\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\",$/\"version\": \"$1\",/" $BASE_DIR/$d/package.json
