@@ -45,4 +45,4 @@ Update the version to the next development version in these places:
 2. In `website/src/app/app.component.html` in the <span> tag with `id="version"`
 3. In `server/package.json` under `version`
 4. In `client/package.json` under `version`
-5. In `client/src/app/components/indicators/verson_indicator.ts` in the `scene.add.text` method call
+5. In `client/src/app/components/indicators/version_indicator.ts` in the `scene.add.text` method call
