@@ -9,8 +9,11 @@ if [ "$#" -ne 2 ]; then
     echo "Usage: version.sh VERSION RELEASE_NAME"
 fi
 
-#for d in client server website; do
-#    sed -E -i "s/\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\",$/\"version\": \"$1\",/" $BASE_DIR/$d/package.json
-#done
+echo Incrementing version to $2 (v$1)
 
-sed -E -i "s/[A-Z][a-z]+ \([0-9]+\.[0-9]+\.[0-9]+\)/$2 ($1)/" $BASE_DIR/client/src/app/components/indicators/version_indicator.ts
+for d in client server website; do
+    sed -E -i "s/\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\",$/\"version\": \"$1\",/" $BASE_DIR/$d/package.json
+done
+
+sed -E -i "s/[A-Z][a-z]+ \(v[0-9]+\.[0-9]+\.[0-9]+\)/$2 (v$1)/" $BASE_DIR/client/src/app/components/indicators/version_indicator.ts
+sed -E -i "s/Outer Colonies - [A-Z][a-z]+ \(v[0-9]+\.[0-9]+\.[0-9]+\)/Outer Colonies - $2 (v$1)/" $BASE_DIR/website/src/app/app.component.html
