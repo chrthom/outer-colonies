@@ -1,14 +1,15 @@
+import Matchmaking from 'src/app/scenes/matchmaking';
 import { environment } from '../../../environments/environment';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class ExitButton {
   private isMatchmaking!: boolean;
-  private scene!: Phaser.Scene | Game;
+  private scene!: Matchmaking | Game;
   private image!: Phaser.GameObjects.Image;
   private text!: Phaser.GameObjects.Text;
   private confirmText!: Phaser.GameObjects.Text;
-  constructor(scene: Phaser.Scene | Game) {
+  constructor(scene: Matchmaking | Game) {
     this.scene = scene;
     this.isMatchmaking = !(scene instanceof Game);
     this.text = scene.add
@@ -79,6 +80,7 @@ export default class ExitButton {
   }
   private onClickAction(confirmed?: boolean) {
     if (this.isMatchmaking || confirmed || (this.scene instanceof Game && this.scene.state.gameResult)) {
+      this.scene.socket.disconnect();
       window.location.href = environment.urls.website;
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
