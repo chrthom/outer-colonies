@@ -66,8 +66,8 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         const player = getPlayer(socket);
         console.log(`Player ${player.name} disconnected from active game`);
         match.gameResult.setWinnerBySurrender(player);
-        emitState(io, match);
       }
+      emitState(io, match);
     }
   });
   socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {

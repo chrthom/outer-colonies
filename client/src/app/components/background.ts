@@ -2,6 +2,7 @@ import { BattleType, TurnPhase } from '../../../../server/src/components/config/
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
+import Matchmaking from '../scenes/matchmaking';
 
 interface CornerConfig {
   xLeft: number;
@@ -11,7 +12,7 @@ interface CornerConfig {
 }
 
 export default class Background {
-  private scene!: Phaser.Scene | Game;
+  private scene!: Matchmaking | Game;
   private playerOrb!: string;
   private opponentOrb!: string;
   private currentRing: number = 0;
@@ -24,7 +25,7 @@ export default class Background {
   private orbImage?: Phaser.GameObjects.Image;
   private zoneMarkers!: Phaser.GameObjects.Group;
 
-  constructor(scene: Phaser.Scene | Game) {
+  constructor(scene: Matchmaking | Game) {
     this.scene = scene;
     this.zoneMarkers = scene.add.group();
     this.starsImage = scene.add
