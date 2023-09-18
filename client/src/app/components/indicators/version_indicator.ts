@@ -7,7 +7,7 @@ export default class VersonIndicator {
       .text(
         layoutConfig.version.x,
         layoutConfig.version.y,
-        `Hyperion (1.6.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Iapetus (1.7.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.font.size)
       .setFontFamily(layoutConfig.font.captionFamily)
