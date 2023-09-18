@@ -44,7 +44,9 @@ export default class Background {
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     if (this.isGame) {
       this.playerOrb = this.randomElement(backgroundConfig.defaultBackgroundOrbNames);
-      this.opponentOrb = this.randomElement(backgroundConfig.defaultBackgroundOrbNames.filter(o => o != this.playerOrb));
+      this.opponentOrb = this.randomElement(
+        backgroundConfig.defaultBackgroundOrbNames.filter(o => o != this.playerOrb)
+      );
       this.ringImage = this.createRing(this.currentRing, false);
       setInterval(() => {
         if (!this.targetRing) {
@@ -103,10 +105,7 @@ export default class Background {
       const state = this.game.state;
       if (this.inCombatRaid) {
         if (this.isColonyOrb != !state.playerIsActive) {
-          this.moveToOrb(
-            state.playerIsActive ? this.opponentOrb : this.playerOrb,
-            !state.playerIsActive
-          );
+          this.moveToOrb(state.playerIsActive ? this.opponentOrb : this.playerOrb, !state.playerIsActive);
         }
       } else if (this.inCombat) {
         if (this.isColonyOrb != undefined) {
@@ -117,10 +116,7 @@ export default class Background {
           }
         }
       } else if (this.inStartOrBuildPhase && this.isColonyOrb != state.playerIsActive) {
-        this.moveToOrb(
-          state.playerIsActive ? this.playerOrb : this.opponentOrb,
-          state.playerIsActive
-        );
+        this.moveToOrb(state.playerIsActive ? this.playerOrb : this.opponentOrb, state.playerIsActive);
       }
     }
   }

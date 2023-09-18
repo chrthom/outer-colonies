@@ -37,7 +37,18 @@ import {
   Card440,
   Card441
 } from './equipment_weapon_point_defense_cards';
-import { Card135, Card137, Card138, Card147, Card148, Card154, Card164, Card183, Card219, Card336 } from './infrastructure_action_cards';
+import {
+  Card135,
+  Card137,
+  Card138,
+  Card147,
+  Card148,
+  Card154,
+  Card164,
+  Card183,
+  Card219,
+  Card336
+} from './infrastructure_action_cards';
 import {
   Card105,
   Card145,

@@ -9,8 +9,10 @@ export class CardAction {
     this.possibleCardTypes = possibleCardTypes;
   }
   canBeUsedFor(cardType: CardSubtype): boolean {
-    return this.possibleCardTypes.includes(cardType)
-      || this.isTacticDiscipline(cardType) && this.possibleCardTypes.includes(CardType.Tactic);
+    return (
+      this.possibleCardTypes.includes(cardType) ||
+      (this.isTacticDiscipline(cardType) && this.possibleCardTypes.includes(CardType.Tactic))
+    );
   }
   priority(): number {
     return this.isTacticDiscipline(this.possibleCardTypes[0]) ? 0 : this.possibleCardTypes.length;
@@ -19,7 +21,9 @@ export class CardAction {
     return this.possibleCardTypes.sort().join('_');
   }
   private isTacticDiscipline(cardType: CardSubtype): boolean {
-    return Object.values(TacticDiscipline).map(td => <CardSubtype> td).includes(cardType);
+    return Object.values(TacticDiscipline)
+      .map(td => <CardSubtype>td)
+      .includes(cardType);
   }
 }
 
@@ -57,7 +61,7 @@ export default class ActionPool {
     return this.pool.map(ca => ca.toString()).join('__');
   }
   private cardSubtypeFromCard(card: Card): CardSubtype {
-    return card.type == CardType.Tactic ? (<TacticCard> card).discipline : card.type;
+    return card.type == CardType.Tactic ? (<TacticCard>card).discipline : card.type;
   }
   private activateCardType(cardType: CardSubtype) {
     const availablePools = this.getActionsForCardType(cardType);

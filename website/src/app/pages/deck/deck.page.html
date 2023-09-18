@@ -31,11 +31,16 @@
           <tr *ngFor="let card of box.cardsFiltered">
             <td class="card-col">
               <h3>{{ card.numOfCards }}x&nbsp;</h3>
-              <img class="large clickable" [src]="cardIdToUrl(card.cardId)" [alt]="card.name" (click)="openImgInModal(card)" />
+              <img
+                class="large clickable"
+                [src]="cardIdToUrl(card.cardId)"
+                [alt]="card.name"
+                (click)="openImgInModal(card)"
+              />
             </td>
             <td class="id-col">{{ card.cardId }}</td>
             <td class="name-col">{{ card.name }}</td>
-            <td class="type-col"><img [src]="cardTypeToUrl(card.type)"></td>
+            <td class="type-col"><img [src]="cardTypeToUrl(card.type)" /></td>
             <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
             <td class="attack-col">
               <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)" />
@@ -82,8 +87,12 @@
       </mat-select>
     </mat-form-field>
     <mat-button-toggle-group [formControl]="viewFormControl">
-      <mat-button-toggle value="list" matTooltip="Listenansicht"><img src="../../../assets/icons/list-view.png" /></mat-button-toggle>
-      <mat-button-toggle value="card" matTooltip="Kartenansicht"><img src="../../../assets/icons/card-view.png" /></mat-button-toggle>
+      <mat-button-toggle value="list" matTooltip="Listenansicht"
+        ><img src="../../../assets/icons/list-view.png"
+      /></mat-button-toggle>
+      <mat-button-toggle value="card" matTooltip="Kartenansicht"
+        ><img src="../../../assets/icons/card-view.png"
+      /></mat-button-toggle>
     </mat-button-toggle-group>
     <mat-accordion>
       <mat-expansion-panel>
@@ -99,7 +108,7 @@
           <tr>
             <th *ngFor="let s of statistics">
               <h1 *ngIf="s.title" [innerHtml]="s.title"></h1>
-              <img *ngIf="s.energyIcon" [src]="toIconUrl('energy')" class="oc-icon big">
+              <img *ngIf="s.energyIcon" [src]="toIconUrl('energy')" class="oc-icon big" />
             </th>
           </tr>
           <tr>

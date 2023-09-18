@@ -10,20 +10,14 @@ import TacticCard from './tactic_card';
 export default abstract class OrbCard extends Card {
   readonly orbProfile!: OrbProfile;
   private actionPoolCardTypes!: CardSubtype[][];
-  constructor(
-    id: number,
-    name: string,
-    rarity: number,
-    profile: OrbProfile,
-    ...actionPool: CardSubtype[][]
-  ) {
+  constructor(id: number, name: string, rarity: number, profile: OrbProfile, ...actionPool: CardSubtype[][]) {
     super(id, name, CardType.Orb, rarity);
     this.orbProfile = profile;
     this.actionPoolCardTypes = actionPool;
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.colonyCardStack.cardStacks.some(c => c.card.id == this.id) 
-      || player.actionPool.toString() != player.originalActions.toString()
+    return player.colonyCardStack.cardStacks.some(c => c.card.id == this.id) ||
+      player.actionPool.toString() != player.originalActions.toString()
       ? []
       : player.cardStacks.filter(cs => cs.type == CardType.Colony);
   }
@@ -45,13 +39,19 @@ export default abstract class OrbCard extends Card {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
   }
   protected additionalCardWhenDrawing(cardType: CardSubtype, player: Player) {
-    const relevantCardDrawn = this.getDrawnCards(player).some(c =>
-      c.type == cardType || this.isTacticDiscipline(cardType) && c.type == CardType.Tactic && (c as TacticCard).discipline == cardType
+    const relevantCardDrawn = this.getDrawnCards(player).some(
+      c =>
+        c.type == cardType ||
+        (this.isTacticDiscipline(cardType) &&
+          c.type == CardType.Tactic &&
+          (c as TacticCard).discipline == cardType)
     );
     if (relevantCardDrawn) player.drawCards(1);
   }
   private isTacticDiscipline(cardType: CardSubtype): boolean {
-    return Object.values(TacticDiscipline).map(td => <CardSubtype> td).includes(cardType);
+    return Object.values(TacticDiscipline)
+      .map(td => <CardSubtype>td)
+      .includes(cardType);
   }
   private getDrawnCards(player: Player) {
     return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);

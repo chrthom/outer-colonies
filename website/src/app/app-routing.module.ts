@@ -1,5 +1,12 @@
 import { NgModule, inject } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  PreloadAllModules,
+  Router,
+  RouterModule,
+  Routes
+} from '@angular/router';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
