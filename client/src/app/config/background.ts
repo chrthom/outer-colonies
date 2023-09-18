@@ -1,7 +1,7 @@
 import { layoutConfig } from './layout';
 
 export interface BackgroundOrb {
-  cardId: number;
+  cardId?: number;
   name: string;
   ring: number;
   distance: number;
@@ -49,36 +49,82 @@ class BackgroundConfig {
 
   readonly orbs: BackgroundOrb[] = [
     {
+      name: 'vesta',
+      ring: 3,
+      distance: 1
+    },
+    {
+      name: 'enceladus',
+      ring: 5,
+      distance: 1
+    },
+    {
+      name: 'rhea',
+      ring: 5,
+      distance: 0.5
+    },
+    {
+      name: 'iapetus',
+      ring: 5,
+      distance: 0.05
+    },
+    {
+      name: 'ariel',
+      ring: 6,
+      distance: 1
+    },
+    {
+      name: 'titania',
+      ring: 6,
+      distance: 0.3
+    },
+    {
       cardId: 146,
       name: 'europa',
       ring: 4,
-      distance: 1
+      distance: 0.7
     },
     {
       cardId: 159,
       name: 'ganymed',
       ring: 4,
-      distance: 0.7
+      distance: 0.4
+    },
+    {
+      cardId: 317,
+      name: 'kallisto',
+      ring: 4,
+      distance: 0.2
     },
     {
       cardId: 112,
       name: 'titan',
       ring: 5,
-      distance: 1
+      distance: 0.4
     },
     {
       cardId: 432,
       name: 'oberon',
       ring: 6,
-      distance: 0.2
+      distance: 0.1
     },
     {
       cardId: 433,
       name: 'triton',
       ring: 7,
       distance: 1
+    },
+    {
+      cardId: 403,
+      name: 'pluto',
+      ring: 8,
+      distance: 0.3
     }
   ];
+
+  get defaultBackgroundOrbNames(): string[] {
+    return this.orbs.filter(o => !o.cardId).map(o => o.name);
+  }
 
   readonly rings = ['venus', 'earth', 'mars', 'belt', 'jupiter', 'saturn', 'uranus', 'neptun', 'kuiper'];
 
