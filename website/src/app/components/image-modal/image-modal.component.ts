@@ -7,7 +7,5 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   styleUrls: ['./image-modal.component.scss']
 })
 export class ImageModalComponent {
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: string,
-  ) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: string) {}
 }

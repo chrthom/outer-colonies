@@ -175,6 +175,8 @@ export default class ContinueButton {
     return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.interceptionReady);
   }
   private get canAttack() {
-    return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.cards.some(c => c.battleReady));
+    return this.scene.state.cardStacks
+      .filter(cs => cs.ownedByPlayer)
+      .some(cs => cs.cards.some(c => c.battleReady));
   }
 }

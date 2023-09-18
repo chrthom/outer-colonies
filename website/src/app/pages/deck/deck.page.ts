@@ -54,7 +54,10 @@ export class DeckPage implements OnInit {
     }
   ];
 
-  constructor(private deckApiService: DeckApiService, private dialog: MatDialog) {}
+  constructor(
+    private deckApiService: DeckApiService,
+    private dialog: MatDialog
+  ) {}
   ngOnInit() {
     this.boxes = [
       new DeckBox(this.$activeCards, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
@@ -138,7 +141,7 @@ export class DeckPage implements OnInit {
         energyIcon: st.energyIcon,
         used: -profileValues.filter(v => v < 0).reduce((a, b) => a + b, 0),
         provided: profileValues.filter(v => v > 0).reduce((a, b) => a + b, 0)
-      }
+      };
     });
   }
   get canActivateDeckCard() {
@@ -246,14 +249,14 @@ interface DeckCardStack extends DeckCard {
 }
 
 interface DeckStatisticsTemplate {
-  title?: string,
-  energyIcon?: boolean,
-  get: (card: DeckCard) => number
+  title?: string;
+  energyIcon?: boolean;
+  get: (card: DeckCard) => number;
 }
 
 interface DeckStatistics {
-  title?: string,
-  energyIcon?: boolean,
-  used: number,
-  provided: number
+  title?: string;
+  energyIcon?: boolean;
+  used: number;
+  provided: number;
 }

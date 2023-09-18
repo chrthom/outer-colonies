@@ -12,7 +12,10 @@ import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 })
 export class AppComponent {
   bgNo: number;
-  constructor(public authService: AuthService, private dialog: MatDialog) {
+  constructor(
+    public authService: AuthService,
+    private dialog: MatDialog
+  ) {
     this.bgNo = Math.floor(Math.random() * 7);
   }
   get env() {
