@@ -324,7 +324,7 @@ export default class Game extends Phaser.Scene {
               if (this.plannedBattle.type != BattleType.None) {
                 // Assign ships for battle
                 if (
-                  (cs.isOpponentColony() && this.plannedBattle.type == BattleType.Raid) ||
+                  (cs.isOpponentColony && this.plannedBattle.type == BattleType.Raid) ||
                   this.plannedBattle.shipIds.includes(cs.uuid)
                 ) {
                   cs.highlightSelected();

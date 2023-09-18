@@ -90,8 +90,8 @@ export default class CardStack {
       c.highlightReset();
     });
   }
-  isOpponentColony() {
-    return !this.data.ownedByPlayer && this.data.cards[0].id == 0;
+  get isOpponentColony(): boolean {
+    return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop().id == 0;
   }
   private filterCardsByIdList(list: number[]) {
     let l = list.slice();
@@ -191,7 +191,7 @@ export default class CardStack {
           if (state.playerIsActive) {
             if (this.scene.activeCards.hand) {
               this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
-            } else if (this.isOpponentColony()) {
+            } else if (this.isOpponentColony) {
               this.scene.resetView(
                 this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
               );
