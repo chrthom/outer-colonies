@@ -97,6 +97,7 @@ export default class Background {
   }
 
   update() {
+    this.checkPlayerOrbs();
     if (this.isGame) {
       const state = this.game.state;
       if (this.inCombatRaid) {
@@ -438,6 +439,17 @@ export default class Background {
           (backgroundConfig.rings.length - 1)
       ) * ring
     );
+  }
+
+  private checkPlayerOrbs() {
+    this.game.state.cardStacks
+      .filter(cs => cs.cards.slice(-1).pop().id == 0)
+      .filter(cs => backgroundConfig.orbs.some(o => o.cardId == cs.cards[0].id))
+      .forEach(cs => {
+        const orbName = backgroundConfig.orbs.find(o => o.cardId == cs.cards[0].id).name;
+        if (cs.ownedByPlayer) this.playerOrb = orbName;
+        else this.opponentOrb = orbName;
+      });
   }
 
   private get inCoordinates(): [number, number] {
