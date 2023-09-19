@@ -63,7 +63,7 @@ export default class Game extends Phaser.Scene {
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   obj: StaticObjects = new StaticObjects();
-  retractCardsExist: boolean = false;
+  retractCardsExist = false;
 
   constructor() {
     super({
@@ -159,8 +159,6 @@ export default class Game extends Phaser.Scene {
     this.obj.maxCard = new MaxCard(this);
     this.obj.missionCards = new MissionCards(this);
   }
-
-  override update() {}
 
   updateState(state: ClientState) {
     const oldState = this.state ? this.state : state;
@@ -319,6 +317,7 @@ export default class Game extends Phaser.Scene {
           const activeCard = this.hand.find(c => c.uuid == this.activeCards.hand);
           if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
         } else {
+          const allShips = this.state.battle?.playerShipIds.concat(this.state.battle.opponentShipIds);
           switch (this.state.turnPhase) {
             case TurnPhase.Build:
               if (this.plannedBattle.type != BattleType.None) {
@@ -341,7 +340,6 @@ export default class Game extends Phaser.Scene {
               }
               break;
             case TurnPhase.Combat:
-              const allShips = this.state.battle?.playerShipIds.concat(this.state.battle.opponentShipIds);
               if (!allShips?.includes(cs.uuid)) {
                 cs.highlightDisabled();
               }

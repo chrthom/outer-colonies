@@ -6,7 +6,6 @@ import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
-import { backgroundConfig } from '../config/background';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken: string;
@@ -53,6 +52,4 @@ export default class Matchmaking extends Phaser.Scene {
     });
     new Background(this);
   }
-
-  override update() {}
 }

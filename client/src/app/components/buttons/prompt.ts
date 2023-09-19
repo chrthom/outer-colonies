@@ -49,7 +49,7 @@ export default class Prompt {
     this.image.setVisible(visible);
   }
   private showBuildPhase() {
-    let text: string = '';
+    let text = '';
     if (this.scene.plannedBattle.type == BattleType.None) {
       if (this.scene.state.hasToRetractCards) {
         text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
