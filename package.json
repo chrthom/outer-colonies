@@ -6,7 +6,7 @@
     "format": "for p in server client website; do cd $p; npm run format; cd ..; done",
     "build:staging": "misc/release.sh",
     "build:prod": "misc/release.sh -p",
-    "version:increment": ""
+    "version": "read -p \"Version number (x.x.x)?: \" V; read -p \"Version name?: \" N; misc/version.sh $V $N"
   },
   "private": true,
   "author": "Christopher Thomsen"
