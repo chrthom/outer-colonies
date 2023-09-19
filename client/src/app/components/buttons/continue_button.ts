@@ -29,7 +29,9 @@ export default class ContinueButton {
   private buttonImages!: ButtonImages;
   private text: Phaser.GameObjects.Text;
   private prompt!: Prompt;
-  private onClickAction: () => void = () => {};
+  private onClickAction: () => void = () => {
+    /* Do nothing */
+  };
   constructor(scene: Game) {
     this.scene = scene;
     this.prompt = new Prompt(scene);
@@ -150,7 +152,7 @@ export default class ContinueButton {
     );
   }
   private showEndPhase() {
-    this.show('Karten ablegen', 'active_select', () => {});
+    this.show('Karten ablegen', 'active_select');
   }
   private showGameOver(gameResult: ClientGameResult) {
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
@@ -158,8 +160,12 @@ export default class ContinueButton {
       this.scene.scene.start('Matchmaking');
     });
   }
-  private show(text: string, button: string, onClickAction: () => void) {
-    this.onClickAction = onClickAction;
+  private show(text: string, button: string, onClickAction?: () => void) {
+    this.onClickAction = onClickAction
+      ? onClickAction
+      : () => {
+          /* Do nothing */
+        };
     this.showButton(button);
     this.text.setText(text);
   }
@@ -169,7 +175,7 @@ export default class ContinueButton {
   }
   private waitState() {
     const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
-    this.show('', button, () => {});
+    this.show('', button);
   }
   private get canIntercept() {
     return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.interceptionReady);

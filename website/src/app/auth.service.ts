@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
-import { Observable, catchError, map, mergeAll, mergeMap, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { AuthLoginResponse } from '../../../server/src/components/shared_interfaces/rest_api';
-import { flatMap } from 'lodash-es';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +30,10 @@ export default class AuthService {
   }
 
   logout() {
-    if (this.sessionToken) this.authAPIService.logout(this.sessionToken).subscribe(_ => {});
+    if (this.sessionToken)
+      this.authAPIService.logout(this.sessionToken).subscribe(() => {
+        /* Do nothing */
+      });
     this.username = undefined;
     this.sessionToken = undefined;
     this.cookieService.delete('u');

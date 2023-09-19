@@ -1,6 +1,6 @@
 import CardProfile, { BaseProfile } from './card_profile';
 
-test(`Cast from BaseProfile to CardProfile`, () => {
+test('Cast from BaseProfile to CardProfile', () => {
   const baseProfile: BaseProfile = {
     hp: 1,
     speed: 1,

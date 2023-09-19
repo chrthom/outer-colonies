@@ -161,12 +161,12 @@ export default function restAPI(app: Express) {
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(_ => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(() => res.sendStatus(204));
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(_ => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(() => res.sendStatus(204));
   });
 
   // Get user profile
@@ -204,7 +204,6 @@ export default function restAPI(app: Express) {
       };
     };
     const toBooster = (i: DBItem) => {
-      const content = <DBItemBoxContent[]>JSON.parse(i.content);
       return {
         itemId: i.itemId,
         no: Number(i.content)
@@ -277,7 +276,7 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(_ => res.sendStatus(204));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(() => res.sendStatus(204));
         } else {
           res.sendStatus(400);
         }

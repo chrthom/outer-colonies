@@ -19,7 +19,7 @@ export default class RetractCardButton {
       .image(
         cardX + layoutConfig.cards.retractCardButton.xOffset,
         cardY + layoutConfig.cards.retractCardButton.yOffset,
-        `icon_retract_card`
+        'icon_retract_card'
       )
       .setOrigin(0.5, 0.5)
       .setAlpha(layoutConfig.colors.alpha)

@@ -15,7 +15,7 @@ export default class Background {
   private scene!: Matchmaking | Game;
   private playerOrb!: string;
   private opponentOrb!: string;
-  private currentRing: number = 0;
+  private currentRing = 0;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
   private isColonyOrb?: boolean;
@@ -467,7 +467,6 @@ export default class Background {
 
   private get outCoordinates(): [number, number] {
     const xIsOff = this.randomBoolean();
-    const offAxisFactor = this.randomBoolean() ? 1 : -1;
     let x: number;
     let y: number;
     if (xIsOff) {

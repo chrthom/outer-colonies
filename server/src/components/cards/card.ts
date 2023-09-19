@@ -16,7 +16,7 @@ export default abstract class Card {
     this.rarity = rarity;
   }
   abstract getValidTargets(player: Player): CardStack[];
-  attack(attackingShip: CardStack, target: CardStack): AttackResult {
+  attack(attackingShip: CardStack, target: CardStack): AttackResult { // eslint-disable-line @typescript-eslint/no-unused-vars
     return new AttackResult(0);
   }
   get canAttack(): boolean {
@@ -32,10 +32,10 @@ export default abstract class Card {
   get isRechargeable(): boolean {
     return false;
   }
-  canBeRetracted(isRootCard: boolean): boolean {
+  canBeRetracted(isRootCard: boolean): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
     return true;
   }
-  isInRange(range: number): boolean {
+  isInRange(range: number): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
     return false;
   }
   isPlayable(player: Player): boolean {
@@ -46,10 +46,10 @@ export default abstract class Card {
       this.getValidTargets(player).length > 0
     );
   }
-  isFlightReady(cards: Card[]): boolean {
+  isFlightReady(cards: Card[]): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
     return false;
   }
-  onDestruction(player: Player) {}
+  onDestruction(player: Player) {} // eslint-disable-line @typescript-eslint/no-unused-vars
   abstract onEnterGame(player: Player, target: CardStack): void;
   abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player): void;

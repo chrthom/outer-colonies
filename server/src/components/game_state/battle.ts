@@ -30,7 +30,7 @@ export default class Battle {
     this.type = type;
   }
   static fromClientPlannedBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
-    let battle = toBattle(match, plannedBattle);
+    const battle = toBattle(match, plannedBattle);
     if (battle.type != BattleType.None) {
       battle.ships[match.actionPendingByPlayerNo].forEach(cs => (cs.zone = Zone.Neutral));
     }

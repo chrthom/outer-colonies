@@ -6,6 +6,6 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./inventory-item.component.scss']
 })
 export class InventoryItemComponent {
-  @Input() img: string = '';
-  @Input() text: string = '';
+  @Input() img = '';
+  @Input() text = '';
 }

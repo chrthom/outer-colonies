@@ -1,6 +1,6 @@
 import { Zone } from '../../config/enums';
 import CardStack from '../card_stack';
-import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
+import { EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card302 extends EquipmentCardRechargeable {
   constructor() {

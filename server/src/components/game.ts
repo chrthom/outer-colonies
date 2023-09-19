@@ -1,7 +1,7 @@
 import Match from './game_state/match';
 import toClientState from './converters/client_state_converter';
 import { rules } from './config/rules';
-import { MsgTypeInbound, MsgTypeOutbound, TurnPhase, Zone } from './config/enums';
+import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from './config/enums';
 import { getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import { ClientPlannedBattle } from './shared_interfaces/client_planned_battle';

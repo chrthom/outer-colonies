@@ -94,7 +94,7 @@ export default class CardStack {
     return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop().id == 0;
   }
   private filterCardsByIdList(list: number[]) {
-    let l = list.slice();
+    const l = list.slice();
     return this.cards.filter(c => {
       if (l.includes(c.cardId)) {
         l.splice(l.indexOf(c.cardId), 1);
@@ -243,8 +243,8 @@ export default class CardStack {
     }
   }
   private arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
-    let a1 = array1.slice();
-    let a2 = array2.slice();
+    const a1 = array1.slice();
+    const a2 = array2.slice();
     a1.slice().forEach(v1 => {
       const i1 = a1.indexOf(v1);
       const i2 = a2.indexOf(v1);

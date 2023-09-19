@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class OpenItemComponent {
   @Input() content?: OpenItemResponse = undefined;
-  @Output() close = new EventEmitter<string>();
+  @Output() done = new EventEmitter<string>();
   readonly assetURL = environment.url.assets;
   constructor() {
     this.content = {
@@ -42,6 +42,6 @@ export class OpenItemComponent {
     } else return '';
   }
   closeBox() {
-    this.close.emit('');
+    this.done.emit('');
   }
 }
