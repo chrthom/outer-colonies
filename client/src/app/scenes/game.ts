@@ -130,7 +130,7 @@ export default class Game extends Phaser.Scene {
     backgroundConfig.rings.forEach(name =>
       this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
     );
-    this.load.image(`background_sun`, `background/sun.png`);
+    this.load.image('background_sun', 'background/sun.png');
     [
       'asteroid1',
       'corvette1',

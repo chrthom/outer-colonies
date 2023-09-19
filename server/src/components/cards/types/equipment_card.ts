@@ -32,7 +32,7 @@ export default abstract class EquipmentCard extends Card {
   onEnterGame() {}
   onLeaveGame() {}
   onStartTurn() {}
-  onEndTurn(player: Player, source: CardStack) {}
+  onEndTurn() {}
   get profile(): CardProfile {
     return CardProfile.fromEquipmentProfile(this.equipmentProfile);
   }
@@ -42,12 +42,12 @@ export default abstract class EquipmentCard extends Card {
     let damage = this.attackDamageBeforeReductions(target);
     if (attackingShip.profile.speed + match.battle.range < target.profile.speed)
       damage = Math.round(damage / 2);
-    let attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
+    const attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
     return attackResult;
   }
-  protected attackDamageBeforeReductions(target: CardStack) {
+  protected attackDamageBeforeReductions(target: CardStack) { // eslint-disable-line @typescript-eslint/no-unused-vars
     return this.attackProfile.damage;
   }
   protected attackDamageAfterReductions(target: CardStack, damage: number) {

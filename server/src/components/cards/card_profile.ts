@@ -13,7 +13,7 @@ export default class CardProfile implements HullProfile, EquipmentProfile, Infra
   psi: number = 0;
   handCardLimit: number = 0;
   static fromBaseProfile(baseProfile: BaseProfile): CardProfile {
-    let profile = <CardProfile>baseProfile;
+    const profile = <CardProfile>baseProfile;
     if (!profile.pointDefense) profile.pointDefense = 0;
     if (!profile.shield) profile.shield = 0;
     if (!profile.armour) profile.armour = 0;

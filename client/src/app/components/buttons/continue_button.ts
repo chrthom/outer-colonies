@@ -29,7 +29,9 @@ export default class ContinueButton {
   private buttonImages!: ButtonImages;
   private text: Phaser.GameObjects.Text;
   private prompt!: Prompt;
-  private onClickAction: () => void = () => {/* Do nothing */};
+  private onClickAction: () => void = () => {
+    /* Do nothing */
+  };
   constructor(scene: Game) {
     this.scene = scene;
     this.prompt = new Prompt(scene);
@@ -159,7 +161,11 @@ export default class ContinueButton {
     });
   }
   private show(text: string, button: string, onClickAction?: () => void) {
-    this.onClickAction = onClickAction ? onClickAction : () => {/* Do nothing */};
+    this.onClickAction = onClickAction
+      ? onClickAction
+      : () => {
+          /* Do nothing */
+        };
     this.showButton(button);
     this.text.setText(text);
   }

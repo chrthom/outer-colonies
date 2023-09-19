@@ -1,8 +1,8 @@
 import CardStack from '../cards/card_stack';
 
 export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
-  let a1 = array1.slice();
-  let a2 = array2.slice();
+  const a1 = array1.slice();
+  const a2 = array2.slice();
   a1.slice().forEach(v1 => {
     const i1 = a1.indexOf(v1);
     const i2 = a2.indexOf(v1);

@@ -1,7 +1,7 @@
 import { ClientCard } from '../../../../../server/src/components/shared_interfaces/client_state';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
-import RetractCardButton from '../indicators/retract_card_button';
+import RetractCardButton from '../buttons/retract_card_button';
 import { animationConfig } from 'src/app/config/animation';
 
 export default class Card extends CardImage {

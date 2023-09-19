@@ -438,7 +438,7 @@ export default class CardCollection {
   }
 
   static generateBooster(edition: number): Card[] {
-    let cards: Card[] = [];
+    const cards: Card[] = [];
     for (let i = 0; i < 6; i++) cards.push(this.pickRandomCard(edition, Rarity.Common));
     for (let i = 0; i < 3; i++) cards.push(this.pickRandomCard(edition, Rarity.Uncommon));
     cards.push(this.pickRandomCard(edition, Rarity.Rare));
