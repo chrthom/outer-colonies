@@ -1,8 +1,5 @@
 import CardStack from '../card_stack';
-import {
-  EquipmentCardColonyKillerRechargeable,
-  EquipmentCardRechargeable
-} from '../types/equipment_card';
+import { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 
 export class Card166 extends EquipmentCardRechargeable {
   constructor() {
