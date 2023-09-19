@@ -32,7 +32,8 @@ export default abstract class EquipmentCard extends Card {
   onEnterGame() {}
   onLeaveGame() {}
   onStartTurn() {}
-  onEndTurn() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onEndTurn(player: Player, source: CardStack) {}
   get profile(): CardProfile {
     return CardProfile.fromEquipmentProfile(this.equipmentProfile);
   }
@@ -47,7 +48,8 @@ export default abstract class EquipmentCard extends Card {
     target.damage += attackResult.damage;
     return attackResult;
   }
-  protected attackDamageBeforeReductions(target: CardStack) { // eslint-disable-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected attackDamageBeforeReductions(target: CardStack) {
     return this.attackProfile.damage;
   }
   protected attackDamageAfterReductions(target: CardStack, damage: number) {
