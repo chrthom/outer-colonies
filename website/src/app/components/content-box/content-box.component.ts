@@ -6,5 +6,5 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./content-box.component.scss']
 })
 export class ContentBoxComponent {
-  @Input() title: string = '';
+  @Input() title = '';
 }

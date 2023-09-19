@@ -6,7 +6,7 @@
   <div
     class="navbar-element navbar-center"
     matTooltip="Spielsuche & Aktuelles"
-    [class.active]="active == ''"
+    [class.active]="active === ''"
     routerLink="/"
   >
     <img src="../../../assets/icons/home.png" />
@@ -14,7 +14,7 @@
   <div
     class="navbar-element navbar-center"
     matTooltip="Spielregeln"
-    [class.active]="active == 'rules'"
+    [class.active]="active === 'rules'"
     routerLink="/rules"
   >
     <img src="../../../assets/icons/rules.png" />
@@ -22,7 +22,7 @@
   <div
     class="navbar-element navbar-center"
     matTooltip="Deck-Manager"
-    [class.active]="active == 'deck'"
+    [class.active]="active === 'deck'"
     routerLink="/deck"
   >
     <img src="../../../assets/icons/deck.png" />
@@ -30,7 +30,7 @@
   <div
     class="navbar-element navbar-center"
     matTooltip="Inventar und Markt"
-    [class.active]="active == 'trade'"
+    [class.active]="active === 'trade'"
     routerLink="/trade"
   >
     <img src="../../../assets/icons/trade.png" />
@@ -41,7 +41,7 @@
   </div>
   -->
   <h2 class="user-name navbar-right">{{ username }}</h2>
-  <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()">
+  <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()" tabindex="invalid">
     <img src="../../../assets/icons/logout.png" />
   </div>
 </div>

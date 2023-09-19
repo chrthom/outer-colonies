@@ -57,7 +57,7 @@
       <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
         Neuen Nutzer registrieren
       </button>
-      <mat-error *ngIf="registrationSuccessful == false">
+      <mat-error *ngIf="registrationSuccessful === false">
         Ein unerwarteter Fehler ist bei der Registrierung aufgetreten. Bitte versuchen sie es sp&auml;ter
         erneut.
       </mat-error>

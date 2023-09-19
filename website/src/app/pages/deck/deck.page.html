@@ -2,20 +2,20 @@
   <div class="deck-box">
     <oc-content-box [title]="box.title">
       <div class="scroll">
-        <div *ngIf="viewFormControl.value == 'card'">
+        <div *ngIf="viewFormControl.value === 'card'">
           <mat-card
             *ngFor="let card of box.cardsFiltered"
             (click)="box.onClick(card)"
             [matBadge]="card.numOfCards + 'x'"
             matBadgeSize="large"
             matBadgePosition="before"
-            [matBadgeHidden]="card.numOfCards == 1"
+            [matBadgeHidden]="card.numOfCards === 1"
             matBadgeColor="primary"
           >
             <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
           </mat-card>
         </div>
-        <table *ngIf="viewFormControl.value == 'list'" matSort (matSortChange)="box.setSort($event)">
+        <table *ngIf="viewFormControl.value === 'list'" matSort (matSortChange)="box.setSort($event)">
           <tr>
             <th mat-sort-header="amount">Karten</th>
             <th mat-sort-header="id">ID</th>
@@ -36,6 +36,7 @@
                 [src]="cardIdToUrl(card.cardId)"
                 [alt]="card.name"
                 (click)="openImgInModal(card)"
+                tabindex="invalid"
               />
             </td>
             <td class="id-col">{{ card.cardId }}</td>

@@ -9,12 +9,12 @@
   <div id="footer">
     <div id="footer-links">
       <ul>
-        <li><span class="clickable" (click)="openImprint()">Impressum</span></li>
-        <li><span class="clickable" (click)="openDataPrivacy()">Datenschutz</span></li>
+        <li><span class="clickable" tabindex="invalid" (click)="openImprint()">Impressum</span></li>
+        <li><span class="clickable" tabindex="invalid" (click)="openDataPrivacy()">Datenschutz</span></li>
       </ul>
     </div>
     <a id="version" href="https://github.com/chrthom/outer-colonies/releases" target="_blank">
-      <h4 *ngIf="env.stage != 'production'">{{ env.stage }} environment<br /></h4>
+      <h4 *ngIf="env.stage !== 'production'">{{ env.stage }} environment<br /></h4>
       <h3>Outer Colonies - Iapetus (v1.7.0)</h3>
     </a>
   </div>

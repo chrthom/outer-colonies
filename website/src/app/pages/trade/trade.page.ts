@@ -16,7 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./trade.page.scss']
 })
 export class TradePage implements OnInit {
-  sol: number = 0;
+  sol = 0;
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
   openedBoxContent?: OpenItemResponse;
@@ -66,11 +66,8 @@ export class TradePage implements OnInit {
   }
   buyBooster(boosterNo: number) {
     if (this.sol >= rules.boosterCosts[boosterNo]) {
-      console.log('BUY BOOSTER'); ////
-      this.itemApiService.buyBooster(boosterNo).subscribe(_ => {
-        console.log('BOOSTER BOUGHT'); ////
+      this.itemApiService.buyBooster(boosterNo).subscribe(() => {
         this.reload();
-        console.log('RELOADED'); ////
         const booster = this.availableBoosters.find(b => b.no == boosterNo);
         this.snackBar.open(
           `Du hast ein Booster Pack "${booster?.title}" für ${booster?.price} Sol erworben.`,

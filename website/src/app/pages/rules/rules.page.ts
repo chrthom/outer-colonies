@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./rules.page.scss']
 })
 export class RulesPage {
-  activeChapter: string = 'intro';
+  activeChapter = 'intro';
   imgUrl(imgName: string): string {
     return `${this.assetUrl}/rules/${imgName}.png`;
   }

@@ -75,12 +75,12 @@ export class DeckPage implements OnInit {
   }
   activateCard(card: DeckCard) {
     if (this.canActivateDeckCard) {
-      this.deckApiService.activateCard(card.id).subscribe(_ => this.update());
+      this.deckApiService.activateCard(card.id).subscribe(() => this.update());
     }
   }
   deactivateCard(card: DeckCard) {
     if (this.canDeactivateDeckCard) {
-      this.deckApiService.deactivateCard(card.id).subscribe(_ => this.update());
+      this.deckApiService.deactivateCard(card.id).subscribe(() => this.update());
     }
   }
   openImgInModal(card: DeckCard) {
