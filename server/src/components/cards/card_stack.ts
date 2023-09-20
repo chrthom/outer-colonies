@@ -136,20 +136,30 @@ export default class CardStack {
         .filter(cs => cs.type == CardType.Infrastructure)
         .map(cs => cs.profile.handCardLimit)
         .reduce((a, b) => a + b, 0);
-      const colonyCardsProfile = this.player.cardStacks
+      const colonyZoneCardProfiles = this.player.cardStacks
         .filter(cs => cs.zone == Zone.Colony)
         .filter(cs => [CardType.Orb, CardType.Infrastructure].includes(cs.type))
         .map(cs => cs.profile)
         .reduce((a, b) => a.combine(b), new CardProfile());
-      colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
-      colonyCardsProfile.hp = 0; // Else infrastructure cards' HP would increase the colony's HP
-      return this.card.profile.combine(colonyCardsProfile);
+      colonyZoneCardProfiles.handCardLimit += handCardLimitOutsideColonyZone;
+      colonyZoneCardProfiles.hp = 0; // Else infrastructure cards' HP would increase the colony's HP
+      return this.card.profile.combine(colonyZoneCardProfiles);
     } else {
       return this.cards.map(c => c.profile).reduce((a, b) => a.combine(b));
     }
   }
   profileMatches(c: CardProfile): boolean {
     return this.profile.combine(c).isValid;
+  }
+  canDefend(target: CardStack): boolean {
+    return (
+      this.defenseAvailable &&
+      this.card.canDefend &&
+      (this.rootCardStack.uuid == target.uuid || // Defend self
+        (this.card.profile.pointDefense > 0 && this.rootCardStack.zone != Zone.Colony) || // Point defend of active ships in combat
+        (target.zone == Zone.Colony && this.card.isColonyDefense) || // Colony defense for colony zone targets
+        (target.type == CardType.Colony && this.zone == Zone.Colony)) // Defense of colony card in colony zone
+    );
   }
   discard() {
     this.removeCardStack();

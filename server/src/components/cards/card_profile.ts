@@ -38,9 +38,9 @@ export default class CardProfile implements CardProfileConfig {
       omega: this.omega + c.omega,
       delta: this.delta + c.delta,
       psi: this.psi + c.psi,
-      pointDefense: this.pointDefense + c.pointDefense,
-      shield: this.shield + c.shield,
-      armour: this.armour + c.armour,
+      pointDefense: Math.max(this.pointDefense, c.pointDefense),
+      shield: Math.max(this.shield, c.shield),
+      armour: Math.max(this.armour, c.armour),
       handCardLimit: this.handCardLimit + c.handCardLimit
     });
   }

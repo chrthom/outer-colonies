@@ -29,6 +29,9 @@ export default abstract class Card {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
   }
+  get isColonyDefense(): boolean {
+    return false;
+  }
   get isPermanent(): boolean {
     return true;
   }

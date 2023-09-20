@@ -1,9 +1,8 @@
 import Card, { AttackResult } from '../card';
-import { CardProfileConfig } from '../card_profile';
+import CardProfile, { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
-import Match from '../../game_state/match';
 import { AttackProfile } from '../card_profile';
-import { CardType } from '../../config/enums';
+import { CardType, DefenseType } from '../../config/enums';
 import Player from '../../game_state/player';
 
 export default abstract class EquipmentCard extends Card {
@@ -38,7 +37,11 @@ export default abstract class EquipmentCard extends Card {
     let damage = this.attackDamageBeforeReductions(target);
     if (attackingShip.profile.speed + match.battle.range < target.profile.speed)
       damage = Math.round(damage / 2);
-    const attackResult = this.attackPointDefense(match, target, new AttackResult(damage));
+    const attackResult = this.attackStep(
+      target,
+      match.battle.ships[match.getWaitingPlayerNo()],
+      new AttackResult(damage)
+    );
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
     return attackResult;
@@ -50,58 +53,54 @@ export default abstract class EquipmentCard extends Card {
   protected attackDamageAfterReductions(target: CardStack, damage: number) {
     return damage;
   }
-  private attackPointDefense(match: Match, target: CardStack, attackResult: AttackResult): AttackResult {
-    const defendingShips = match.battle.ships[match.getWaitingPlayerNo()];
-    const bestPointDefense = defendingShips
+  private attackStep(
+    target: CardStack,
+    defendingShips: CardStack[],
+    attackResult: AttackResult,
+    defenseType: DefenseType = DefenseType.PointDefense
+  ): AttackResult {
+    const fromProfile = (p: AttackProfile | CardProfile) => {
+      switch (defenseType) {
+        case DefenseType.Armour:
+          return p.armour;
+        case DefenseType.Shield:
+          return p.shield;
+        default:
+          return p.pointDefense;
+      }
+    };
+    const bestDefense = defendingShips
       .flatMap(cs => cs.cardStacks)
-      .filter(cs => cs.defenseAvailable && cs.profile.pointDefense)
-      .sort((a, b) => a.profile.pointDefense - b.profile.pointDefense)
+      .filter(cs => fromProfile(cs.card.profile) && cs.canDefend(target))
+      .sort((a, b) => fromProfile(a.card.profile) - fromProfile(b.card.profile))
       .pop();
     if (attackResult.damage == 0) {
       return attackResult;
-    } else if (this.attackProfile.pointDefense == 0 || !bestPointDefense) {
-      return this.attackShield(target, attackResult);
+    } else if (fromProfile(this.attackProfile) == 0 || !bestDefense) {
+      switch (defenseType) {
+        case DefenseType.Armour:
+          return attackResult;
+        case DefenseType.Shield:
+          return this.attackStep(target, defendingShips, attackResult, DefenseType.Armour);
+        default:
+          return this.attackStep(target, defendingShips, attackResult, DefenseType.Shield);
+      }
     } else {
-      const damageReduction = this.attackProfile.pointDefense * -bestPointDefense.profile.pointDefense;
-      if (attackResult.damage >= damageReduction) bestPointDefense.defenseAvailable = false;
+      const damageReduction = fromProfile(this.attackProfile) * -fromProfile(bestDefense.profile);
+      if (attackResult.damage >= damageReduction) bestDefense.defenseAvailable = false;
       const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
-      attackResult.pointDefense += adjustedDamageReduction;
+      switch (defenseType) {
+        case DefenseType.Armour:
+          attackResult.armour += adjustedDamageReduction;
+          break;
+        case DefenseType.Shield:
+          attackResult.shield += adjustedDamageReduction;
+          break;
+        default:
+          attackResult.pointDefense += adjustedDamageReduction;
+      }
       attackResult.damage -= adjustedDamageReduction;
-      return this.attackPointDefense(match, target, attackResult);
-    }
-  }
-  private attackShield(target: CardStack, attackResult: AttackResult): AttackResult {
-    const bestShield = target.cardStacks
-      .filter(cs => cs.defenseAvailable && cs.profile.shield)
-      .sort((a: CardStack, b: CardStack) => a.profile.shield - b.profile.shield)
-      .pop();
-    if (attackResult.damage == 0) {
-      return attackResult;
-    } else if (this.attackProfile.shield == 0 || !bestShield) {
-      return this.attackArmour(target, attackResult);
-    } else {
-      const damageReduction = this.attackProfile.shield * -bestShield.profile.shield;
-      if (attackResult.damage >= damageReduction) bestShield.defenseAvailable = false;
-      const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
-      attackResult.shield += adjustedDamageReduction;
-      attackResult.damage -= adjustedDamageReduction;
-      return this.attackShield(target, attackResult);
-    }
-  }
-  private attackArmour(target: CardStack, attackResult: AttackResult): AttackResult {
-    const bestArmour = target.cardStacks
-      .filter(cs => cs.defenseAvailable && cs.profile.armour)
-      .sort((a: CardStack, b: CardStack) => a.profile.armour - b.profile.armour)
-      .pop();
-    if (attackResult.damage == 0 || this.attackProfile.armour == 0 || !bestArmour) {
-      return attackResult;
-    } else {
-      const damageReduction = this.attackProfile.armour * -bestArmour.profile.armour;
-      if (attackResult.damage >= damageReduction) bestArmour.defenseAvailable = false;
-      const adjustedDamageReduction = Math.min(attackResult.damage, damageReduction);
-      attackResult.armour += adjustedDamageReduction;
-      attackResult.damage -= adjustedDamageReduction;
-      return this.attackArmour(target, attackResult);
+      return this.attackStep(target, defendingShips, attackResult, defenseType);
     }
   }
 }
