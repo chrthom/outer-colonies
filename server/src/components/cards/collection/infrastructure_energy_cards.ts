@@ -15,7 +15,9 @@ abstract class CardPowerPlant extends InfrastructureEnergyCard {
     super(id, 'Kraftwerk', 0, {
       energy: 5
     });
-    this.onlyAttachableToColony = true;
+  }
+  protected override get onlyAttachableToColony(): boolean {
+    return true;
   }
 }
 

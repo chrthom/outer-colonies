@@ -145,7 +145,9 @@ export class Card183 extends ActionInfrastructureCard {
       },
       [CardType.Equipment, CardType.Infrastructure, CardType.Hull]
     );
-    this.onlyAttachableToColony = true;
+  }
+  protected override get onlyAttachableToColony(): boolean {
+    return true;
   }
 }
 

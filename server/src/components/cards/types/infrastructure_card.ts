@@ -5,7 +5,6 @@ import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class InfrastructureCard extends Card {
-  onlyAttachableToColony: boolean = false;
   constructor(id: number, name: string, rarity: number, profile?: CardProfileConfig) {
     super(id, name, CardType.Infrastructure, rarity, profile);
   }
@@ -13,5 +12,8 @@ export default abstract class InfrastructureCard extends Card {
     return player.cardStacks
       .filter(cs => (!this.onlyAttachableToColony && cs.type == CardType.Hull) || cs.type == CardType.Colony)
       .filter(cs => cs.profileMatches(this.profile));
+  }
+  protected get onlyAttachableToColony(): boolean {
+    return false;
   }
 }
