@@ -10,17 +10,7 @@ export class Card302 extends EquipmentCardRechargeable {
       5,
       {
         energy: -6,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -3,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -3
       },
       {
         range: 1,
@@ -42,17 +32,7 @@ export class Card401 extends EquipmentCardRechargeable {
       5,
       {
         energy: -3,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 2,

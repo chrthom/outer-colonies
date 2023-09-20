@@ -1,5 +1,5 @@
 import CardStack from './card_stack';
-import CardProfile from './card_profile';
+import CardProfile, { CardProfileConfig } from './card_profile';
 import { CardType, TurnPhase } from '../config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -9,11 +9,13 @@ export default abstract class Card {
   readonly name!: string;
   readonly type!: CardType;
   readonly rarity!: number;
-  constructor(id: number, name: string, type: CardType, rarity: number) {
+  readonly profile!: CardProfile;
+  constructor(id: number, name: string, type: CardType, rarity: number, profile?: CardProfileConfig) {
     this.id = id;
     this.name = name;
     this.type = type;
     this.rarity = rarity;
+    this.profile = new CardProfile(profile);
   }
   abstract getValidTargets(player: Player): CardStack[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -59,7 +61,6 @@ export default abstract class Card {
   abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player): void;
   abstract onEndTurn(player: Player, source: CardStack): void;
-  abstract get profile(): CardProfile;
   get actionPool(): ActionPool {
     return new ActionPool();
   }

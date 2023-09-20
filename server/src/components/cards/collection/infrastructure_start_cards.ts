@@ -17,15 +17,7 @@ export class Card230 extends InfrastructureStartOfTurnCard {
   constructor() {
     super(230, 'Verwaltungsbüros', 2, {
       energy: -2,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: -2,
-      handCardLimit: 0
+      psi: -2
     });
   }
   onStartTurn(player: Player) {
@@ -38,15 +30,7 @@ export class Card333 extends InfrastructureStartOfTurnCard {
   constructor() {
     super(333, 'Marsianisches Konsulat', 2, {
       energy: -1,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: -1,
-      handCardLimit: 0
+      psi: -1
     });
   }
   onStartTurn(player: Player) {
@@ -62,15 +46,7 @@ export class Card435 extends InfrastructureStartOfTurnCard {
   constructor() {
     super(435, 'Gewerbegebiet', 2, {
       energy: -1,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: -1,
-      handCardLimit: 0
+      psi: -1
     });
   }
   onStartTurn(player: Player) {

@@ -134,9 +134,9 @@ import {
 import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110, Card316 } from './tactic_science_cards';
 import Card from '../card';
-import { Card172 } from './infrastructure_util.cards';
-import { Card230, Card333, Card435 } from './infrastructure_start.cards';
-import { Card114, Card155 } from './infrastructure_end.cards';
+import { Card172 } from './infrastructure_util_cards';
+import { Card230, Card333, Card435 } from './infrastructure_start_cards';
+import { Card114, Card155 } from './infrastructure_end_cards';
 import { Rarity } from '../../config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
 import { Card146, Card159, Card317, Card403, Card432, Card433 } from './orb_cards';

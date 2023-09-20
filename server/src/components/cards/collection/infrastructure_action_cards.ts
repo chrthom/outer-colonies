@@ -1,7 +1,7 @@
 import { CardSubtype, CardType, TacticDiscipline } from '../../config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
-import { InfrastructureProfile } from '../card_profile';
+import { CardProfileConfig } from '../card_profile';
 import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class ActionInfrastructureCard extends InfrastructureCard {
@@ -10,7 +10,7 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     id: number,
     name: string,
     rarity: number,
-    profile: InfrastructureProfile,
+    profile: CardProfileConfig,
     ...actionPool: CardSubtype[][]
   ) {
     super(id, name, rarity, profile);
@@ -37,15 +37,7 @@ export class Card135 extends ActionInfrastructureCard {
       2,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [CardType.Hull]
     );
@@ -60,15 +52,7 @@ export class Card137 extends ActionInfrastructureCard {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [TacticDiscipline.Intelligence]
     );
@@ -83,15 +67,7 @@ export class Card138 extends ActionInfrastructureCard {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [TacticDiscipline.Trade]
     );
@@ -106,15 +82,7 @@ export class Card147 extends ActionInfrastructureCard {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [TacticDiscipline.Military]
     );
@@ -129,15 +97,7 @@ export class Card148 extends ActionInfrastructureCard {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [TacticDiscipline.Science]
     );
@@ -152,15 +112,7 @@ export class Card154 extends ActionInfrastructureCard {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [CardType.Infrastructure]
     );
@@ -175,15 +127,7 @@ export class Card164 extends ActionInfrastructureCard {
       2,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -1,
-        handCardLimit: 0
+        psi: -1
       },
       [CardType.Equipment]
     );
@@ -197,16 +141,7 @@ export class Card183 extends ActionInfrastructureCard {
       'Industriekomplex',
       1,
       {
-        energy: -5,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0,
-        handCardLimit: 0
+        energy: -5
       },
       [CardType.Equipment, CardType.Infrastructure, CardType.Hull]
     );
@@ -222,15 +157,7 @@ export class Card219 extends ActionInfrastructureCard {
       2,
       {
         energy: -3,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -2,
-        handCardLimit: 0
+        psi: -2
       },
       [TacticDiscipline.Trade],
       [TacticDiscipline.Intelligence]
@@ -246,15 +173,7 @@ export class Card336 extends ActionInfrastructureCard {
       2,
       {
         energy: -3,
-        hp: 0,
-        speed: 0,
-        theta: 0,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: -2,
-        handCardLimit: 0
+        psi: -2
       },
       [TacticDiscipline.Military],
       [TacticDiscipline.Science]

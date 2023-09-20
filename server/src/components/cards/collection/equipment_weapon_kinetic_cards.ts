@@ -7,18 +7,7 @@ export class Card126 extends EquipmentCardRechargeable {
       'Kinetische Artillerie',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 2,
@@ -38,18 +27,7 @@ export class Card151 extends EquipmentCardRechargeable {
       'Kinetikwaffenbatterie',
       2,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 2,
@@ -69,18 +47,7 @@ export class Card179 extends EquipmentCardRechargeable {
       'Pulskanone',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 3,
@@ -100,18 +67,7 @@ export class Card180 extends EquipmentCardRechargeable {
       'Railgun',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 3,
@@ -132,17 +88,7 @@ export class Card223 extends EquipmentCardRechargeable {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 3,
@@ -163,17 +109,7 @@ export class Card310 extends EquipmentCardRechargeable {
       4,
       {
         energy: -3,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 4,
@@ -194,17 +130,7 @@ export class Card420 extends EquipmentCardRechargeable {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 1,

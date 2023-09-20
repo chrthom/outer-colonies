@@ -3,16 +3,20 @@ import { rules } from '../../config/rules';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import Card from '../card';
-import CardProfile, { OrbProfile } from '../card_profile';
+import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import TacticCard from './tactic_card';
 
 export default abstract class OrbCard extends Card {
-  readonly orbProfile!: OrbProfile;
   private actionPoolCardTypes!: CardSubtype[][];
-  constructor(id: number, name: string, rarity: number, profile: OrbProfile, ...actionPool: CardSubtype[][]) {
-    super(id, name, CardType.Orb, rarity);
-    this.orbProfile = profile;
+  constructor(
+    id: number,
+    name: string,
+    rarity: number,
+    profile: CardProfileConfig,
+    ...actionPool: CardSubtype[][]
+  ) {
+    super(id, name, CardType.Orb, rarity, profile);
     this.actionPoolCardTypes = actionPool;
   }
   getValidTargets(player: Player): CardStack[] {
@@ -31,9 +35,6 @@ export default abstract class OrbCard extends Card {
   override onEndTurn(): void {}
   override canBeRetracted(): boolean {
     return false;
-  }
-  get profile(): CardProfile {
-    return CardProfile.fromOrbProfile(this.orbProfile);
   }
   override get actionPool(): ActionPool {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));

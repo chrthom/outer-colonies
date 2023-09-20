@@ -1,5 +1,5 @@
 import Card, { AttackResult } from '../card';
-import CardProfile, { EquipmentProfile } from '../card_profile';
+import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import Match from '../../game_state/match';
 import { AttackProfile } from '../card_profile';
@@ -7,17 +7,15 @@ import { CardType } from '../../config/enums';
 import Player from '../../game_state/player';
 
 export default abstract class EquipmentCard extends Card {
-  readonly equipmentProfile!: EquipmentProfile;
   readonly attackProfile?: AttackProfile;
   constructor(
     id: number,
     name: string,
     rarity: number,
-    profile: EquipmentProfile,
+    profile?: CardProfileConfig,
     attackProfile?: AttackProfile
   ) {
-    super(id, name, CardType.Equipment, rarity);
-    this.equipmentProfile = profile;
+    super(id, name, CardType.Equipment, rarity, profile);
     this.attackProfile = attackProfile;
   }
   getValidTargets(player: Player): CardStack[] {
@@ -34,9 +32,6 @@ export default abstract class EquipmentCard extends Card {
   onStartTurn() {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEndTurn(player: Player, source: CardStack) {}
-  get profile(): CardProfile {
-    return CardProfile.fromEquipmentProfile(this.equipmentProfile);
-  }
   override attack(weapon: CardStack, target: CardStack): AttackResult {
     const attackingShip = weapon.rootCardStack;
     const match = attackingShip.player.match;

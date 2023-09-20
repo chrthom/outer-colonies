@@ -12,15 +12,7 @@ export class Card114 extends InfrastructureEndOfTurnCard {
   constructor() {
     super(114, 'Flottenlogistikzentrum', 4, {
       energy: -4,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: -2,
-      handCardLimit: 0
+      psi: -2
     });
   }
   onEndTurn(player: Player) {
@@ -32,15 +24,7 @@ export class Card155 extends InfrastructureEndOfTurnCard {
   constructor() {
     super(155, 'Müllverarbetungsanlage', 2, {
       energy: -1,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: -1,
-      handCardLimit: 0
+      psi: -1
     });
   }
   onEndTurn(player: Player) {

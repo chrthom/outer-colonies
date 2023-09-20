@@ -8,18 +8,7 @@ export class Card166 extends EquipmentCardRechargeable {
       'Laserkanone',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 2,
@@ -40,17 +29,7 @@ export class Card182 extends EquipmentCardRechargeable {
       1,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 2,
@@ -70,18 +49,8 @@ export class Card224 extends EquipmentCardColonyKillerRechargeable {
       'Bergbaulaser',
       2,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
         theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: -1,
-        delta: 0,
-        psi: 0
+        omega: -1
       },
       {
         range: 1,
@@ -105,17 +74,7 @@ export class Card343 extends EquipmentCardRechargeable {
       1,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 2,
@@ -135,18 +94,7 @@ export class Card344 extends EquipmentCardRechargeable {
       'Fokuslaser',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 3,
@@ -166,18 +114,7 @@ export class Card347 extends EquipmentCardRechargeable {
       'Impulslaser',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 2,
@@ -198,17 +135,7 @@ export class Card421 extends EquipmentCardRechargeable {
       2,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -2,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -2
       },
       {
         range: 2,

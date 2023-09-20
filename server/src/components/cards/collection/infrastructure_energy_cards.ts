@@ -13,16 +13,7 @@ abstract class InfrastructureEnergyCard extends InfrastructureCard {
 abstract class CardPowerPlant extends InfrastructureEnergyCard {
   constructor(id: number) {
     super(id, 'Kraftwerk', 0, {
-      energy: 5,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: 0,
-      handCardLimit: 0
+      energy: 5
     });
     this.onlyAttachableToColony = true;
   }
@@ -32,15 +23,7 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
   constructor(id: number) {
     super(id, 'Atomreaktor', 0, {
       energy: 2,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: -1,
-      delta: 0,
-      psi: 0,
-      handCardLimit: 0
+      omega: -1
     });
   }
 }
@@ -48,16 +31,7 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
 abstract class SolarPanelCard extends InfrastructureEnergyCard {
   constructor(id: number) {
     super(id, 'Solarpanele', 0, {
-      energy: 1,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: 0,
-      delta: 0,
-      psi: 0,
-      handCardLimit: 0
+      energy: 1
     });
   }
   override getValidTargets(player: Player): CardStack[] {
@@ -75,15 +49,7 @@ export class Card105 extends InfrastructureEnergyCard {
   constructor() {
     super(105, 'Antimateriereaktor', 5, {
       energy: 10,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: -3,
-      delta: 0,
-      psi: 0,
-      handCardLimit: 0
+      omega: -3
     });
   }
   override onDestruction(player: Player) {
@@ -98,15 +64,7 @@ export class Card145 extends InfrastructureEnergyCard {
   constructor() {
     super(145, 'Fusionsreaktor', 2, {
       energy: 4,
-      hp: 0,
-      speed: 0,
-      theta: 0,
-      xi: 0,
-      phi: 0,
-      omega: -2,
-      delta: 0,
-      psi: 0,
-      handCardLimit: 0
+      omega: -2
     });
   }
 }

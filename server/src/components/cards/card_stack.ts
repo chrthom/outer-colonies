@@ -140,16 +140,16 @@ export default class CardStack {
         .filter(cs => cs.zone == Zone.Colony)
         .filter(cs => [CardType.Orb, CardType.Infrastructure].includes(cs.type))
         .map(cs => cs.profile)
-        .reduce((a, b) => CardProfile.combineCardProfiles(a, b), new CardProfile());
+        .reduce((a, b) => a.combine(b), new CardProfile());
       colonyCardsProfile.handCardLimit += handCardLimitOutsideColonyZone;
       colonyCardsProfile.hp = 0; // Else infrastructure cards' HP would increase the colony's HP
-      return CardProfile.combineCardProfiles(colonyCardsProfile, this.card.profile);
+      return this.card.profile.combine(colonyCardsProfile);
     } else {
-      return this.cards.map(c => c.profile).reduce((a, b) => CardProfile.combineCardProfiles(a, b));
+      return this.cards.map(c => c.profile).reduce((a, b) => a.combine(b));
     }
   }
   profileMatches(c: CardProfile): boolean {
-    return CardProfile.isValid(CardProfile.combineCardProfiles(this.profile, c));
+    return this.profile.combine(c).isValid;
   }
   discard() {
     this.removeCardStack();

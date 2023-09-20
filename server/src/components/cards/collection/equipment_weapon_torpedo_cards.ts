@@ -8,17 +8,7 @@ export class Card101 extends EquipmentCard {
       5,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -38,18 +28,7 @@ export class Card127 extends EquipmentCard {
       'Protontorpedos',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -69,18 +48,7 @@ export class Card136 extends EquipmentCard {
       'Plasmatorpedos',
       2,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -100,18 +68,8 @@ export class Card150 extends EquipmentCardColonyKiller {
       'Fusionsbombentorpedos',
       2,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
         phi: -1,
-        omega: -1,
-        delta: 0,
-        psi: 0
+        omega: -1
       },
       {
         range: 2,
@@ -131,18 +89,7 @@ export class Card167 extends EquipmentCardColonyKiller {
       'Atombombentorpedos',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -162,18 +109,7 @@ export class Card216 extends EquipmentCard {
       'Schwarmraketensystem',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -194,17 +130,7 @@ export class Card304 extends EquipmentCard {
       5,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -225,17 +151,7 @@ export class Card318 extends EquipmentCardColonyKiller {
       3,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
@@ -255,18 +171,7 @@ export class Card412 extends EquipmentCard {
       'Langstreckentorpedos',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 3,
@@ -286,18 +191,7 @@ export class Card422 extends EquipmentCardColonyKiller {
       'Feuersturmtorpedos',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: 0,
-        phi: -1,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        phi: -1
       },
       {
         range: 2,
