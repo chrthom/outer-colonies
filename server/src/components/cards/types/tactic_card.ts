@@ -1,20 +1,17 @@
 import { CardType, TacticDiscipline } from '../../config/enums';
 import Card from '../card';
-import CardProfile from '../card_profile';
+import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class TacticCard extends Card {
-  constructor(id: number, name: string, rarity: number) {
-    super(id, name, CardType.Tactic, rarity);
+  constructor(id: number, name: string, rarity: number, profile?: CardProfileConfig) {
+    super(id, name, CardType.Tactic, rarity, profile);
   }
   onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
   override canBeRetracted(): boolean {
     return false;
-  }
-  get profile(): CardProfile {
-    return new CardProfile();
   }
   override get isPermanent(): boolean {
     return false;

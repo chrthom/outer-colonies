@@ -1,84 +1,69 @@
-export default class CardProfile implements HullProfile, EquipmentProfile, InfrastructureProfile {
-  pointDefense: number = 0;
-  shield: number = 0;
-  armour: number = 0;
-  hp: number = 0;
-  speed: number = 0;
-  energy: number = 0;
-  theta: number = 0;
-  xi: number = 0;
-  phi: number = 0;
-  omega: number = 0;
-  delta: number = 0;
-  psi: number = 0;
-  handCardLimit: number = 0;
-  static fromBaseProfile(baseProfile: BaseProfile): CardProfile {
-    const profile = <CardProfile>baseProfile;
-    if (!profile.pointDefense) profile.pointDefense = 0;
-    if (!profile.shield) profile.shield = 0;
-    if (!profile.armour) profile.armour = 0;
-    if (!profile.handCardLimit) profile.handCardLimit = 0;
-    return profile;
+export default class CardProfile implements CardProfileConfig {
+  pointDefense!: number;
+  shield!: number;
+  armour!: number;
+  hp!: number;
+  speed!: number;
+  energy!: number;
+  theta!: number;
+  xi!: number;
+  phi!: number;
+  omega!: number;
+  delta!: number;
+  psi!: number;
+  handCardLimit!: number;
+  constructor(profile: CardProfileConfig = {}) {
+    this.pointDefense = profile.pointDefense ?? 0;
+    this.shield = profile.shield ?? 0;
+    this.armour = profile.armour ?? 0;
+    this.hp = profile.hp ?? 0;
+    this.speed = profile.speed ?? 0;
+    this.energy = profile.energy ?? 0;
+    this.theta = profile.theta ?? 0;
+    this.xi = profile.xi ?? 0;
+    this.phi = profile.phi ?? 0;
+    this.omega = profile.omega ?? 0;
+    this.delta = profile.delta ?? 0;
+    this.psi = profile.psi ?? 0;
+    this.handCardLimit = profile.handCardLimit ?? 0;
   }
-  static fromEquipmentProfile(equipmentProfile: EquipmentProfile): CardProfile {
-    return equipmentProfile as CardProfile;
+  combine(c: CardProfile): CardProfile {
+    return new CardProfile({
+      hp: this.hp + c.hp,
+      speed: this.speed + c.speed,
+      energy: this.energy + c.energy,
+      theta: this.theta + c.theta,
+      xi: this.xi + c.xi,
+      phi: this.phi + c.phi,
+      omega: this.omega + c.omega,
+      delta: this.delta + c.delta,
+      psi: this.psi + c.psi,
+      pointDefense: Math.max(this.pointDefense, c.pointDefense),
+      shield: Math.max(this.shield, c.shield),
+      armour: Math.max(this.armour, c.armour),
+      handCardLimit: this.handCardLimit + c.handCardLimit
+    });
   }
-  static fromOrbProfile(orbProfile: OrbProfile): CardProfile {
-    return orbProfile as CardProfile;
-  }
-  static fromHullProfile(hullProfile: HullProfile): CardProfile {
-    return this.fromBaseProfile(hullProfile);
-  }
-  static fromInfrastructureProfile(infrastructureProfile: InfrastructureProfile): CardProfile {
-    return this.fromBaseProfile(infrastructureProfile);
-  }
-  static combineCardProfiles(c1: CardProfile, c2: CardProfile): CardProfile {
-    return {
-      hp: c1.hp + c2.hp,
-      speed: c1.speed + c2.speed,
-      energy: c1.energy + c2.energy,
-      theta: c1.theta + c2.theta,
-      xi: c1.xi + c2.xi,
-      phi: c1.phi + c2.phi,
-      omega: c1.omega + c2.omega,
-      delta: c1.delta + c2.delta,
-      psi: c1.psi + c2.psi,
-      pointDefense: c1.pointDefense + c2.pointDefense,
-      shield: c1.shield + c2.shield,
-      armour: c1.armour + c2.armour,
-      handCardLimit: c1.handCardLimit + c2.handCardLimit
-    };
-  }
-  static isValid(c: CardProfile): boolean {
-    return Object.values(c).filter(v => v < 0).length == 0;
+  get isValid(): boolean {
+    return Object.values(this).filter(v => v < 0).length == 0;
   }
 }
 
-export interface BaseProfile {
-  hp: number;
-  speed: number;
-  energy: number;
-  theta: number;
-  xi: number;
-  phi: number;
-  omega: number;
-  delta: number;
-  psi: number;
+export interface CardProfileConfig {
+  pointDefense?: number;
+  shield?: number;
+  armour?: number;
+  hp?: number;
+  speed?: number;
+  energy?: number;
+  theta?: number;
+  xi?: number;
+  phi?: number;
+  omega?: number;
+  delta?: number;
+  psi?: number;
+  handCardLimit?: number;
 }
-
-export interface HullProfile extends BaseProfile {}
-
-export interface InfrastructureProfile extends BaseProfile {
-  handCardLimit: number;
-}
-
-export interface EquipmentProfile extends BaseProfile {
-  pointDefense: number;
-  shield: number;
-  armour: number;
-}
-
-export interface OrbProfile extends EquipmentProfile {}
 
 export interface AttackProfile {
   range: number;

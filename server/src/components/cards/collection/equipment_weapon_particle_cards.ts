@@ -10,17 +10,7 @@ export class Card106 extends EquipmentCardRechargeable {
       5,
       {
         energy: -4,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 4,
@@ -41,17 +31,7 @@ export class Card107 extends EquipmentCardRechargeable {
       4,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 3,
@@ -71,18 +51,7 @@ export class Card207 extends EquipmentCardRechargeable {
       'Materiedesintegrator',
       4,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 3,
@@ -103,17 +72,7 @@ export class Card405 extends EquipmentCardColonyKillerRechargeable {
       4,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 3,
@@ -133,18 +92,7 @@ export class Card438 extends EquipmentCardColonyKillerRechargeable {
       'Feldannihilator',
       1,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 2,

@@ -7,18 +7,7 @@ export class Card118 extends EquipmentCardRechargeable {
       'Ionendisruptor',
       3,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 1,
@@ -39,17 +28,7 @@ export class Card125 extends EquipmentCardRechargeable {
       3,
       {
         energy: -1,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 1,
@@ -69,18 +48,7 @@ export class Card157 extends EquipmentCardRechargeable {
       'Plasmawerfer',
       2,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -1,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -1
       },
       {
         range: 1,
@@ -100,18 +68,7 @@ export class Card209 extends EquipmentCardRechargeable {
       'Phasendisruptor',
       4,
       {
-        energy: 0,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -1,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -1
       },
       {
         range: 1,
@@ -132,17 +89,7 @@ export class Card303 extends EquipmentCardRechargeable {
       5,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: -2,
-        xi: 0,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        theta: -2
       },
       {
         range: 2,
@@ -163,17 +110,7 @@ export class Card409 extends EquipmentCardRechargeable {
       4,
       {
         energy: -2,
-        hp: 0,
-        speed: 0,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        theta: 0,
-        xi: -2,
-        phi: 0,
-        omega: 0,
-        delta: 0,
-        psi: 0
+        xi: -2
       },
       {
         range: 1,

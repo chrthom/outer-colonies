@@ -134,12 +134,13 @@ import {
 import { Card174, Card337, Card338 } from './tactic_military_cards';
 import { Card110, Card316 } from './tactic_science_cards';
 import Card from '../card';
-import { Card172 } from './infrastructure_util.cards';
-import { Card230, Card333, Card435 } from './infrastructure_start.cards';
-import { Card114, Card155 } from './infrastructure_end.cards';
+import { Card172 } from './infrastructure_util_cards';
+import { Card230, Card333, Card435 } from './infrastructure_start_cards';
+import { Card114, Card155 } from './infrastructure_end_cards';
 import { Rarity } from '../../config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
 import { Card146, Card159, Card317, Card403, Card432, Card433 } from './orb_cards';
+import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 
 export default class CardCollection {
   static cards = {
@@ -184,6 +185,7 @@ export default class CardCollection {
     153: <Card>new Card153(),
     154: <Card>new Card154(),
     155: <Card>new Card155(),
+    156: <Card>new Card156(),
     157: <Card>new Card157(),
     159: <Card>new Card159(),
     160: <Card>new Card160(),
@@ -194,6 +196,7 @@ export default class CardCollection {
     166: <Card>new Card166(),
     167: <Card>new Card167(),
     168: <Card>new Card168(),
+    169: <Card>new Card169(),
     170: <Card>new Card170(),
     171: <Card>new Card171(),
     172: <Card>new Card172(),
@@ -225,6 +228,7 @@ export default class CardCollection {
     232: <Card>new Card232(),
     234: <Card>new Card234(),
     237: <Card>new Card237(),
+    238: <Card>new Card238(),
     240: <Card>new Card240(),
     242: <Card>new Card242(),
     243: <Card>new Card243(),
@@ -259,6 +263,7 @@ export default class CardCollection {
     342: <Card>new Card342(),
     343: <Card>new Card343(),
     344: <Card>new Card344(),
+    345: <Card>new Card345(),
     347: <Card>new Card347(),
     348: <Card>new Card348(),
     349: <Card>new Card349(),
@@ -292,6 +297,7 @@ export default class CardCollection {
     445: <Card>new Card445(),
     446: <Card>new Card446(),
     447: <Card>new Card447(),
+    448: <Card>new Card448(),
     449: <Card>new Card449(),
     450: <Card>new Card450(),
     451: <Card>new Card451(),

@@ -15,6 +15,12 @@ export enum CardType {
   Orb = 'orb'
 }
 
+export enum DefenseType {
+  Armour = 'armour',
+  PointDefense = 'point_defense',
+  Shield = 'shield'
+}
+
 export enum EventType {
   Attach = 'attach',
   Attack = 'attack',
