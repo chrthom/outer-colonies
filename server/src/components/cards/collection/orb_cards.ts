@@ -40,6 +40,20 @@ export class Card403 extends OrbCard {
   override onStartTurn(): void {}
 }
 
+export class Card410 extends OrbCard {
+  constructor() {
+    super(410, 'Miranda', 4, {
+      armour: 1
+    });
+  }
+  override onStartTurn(player: Player): void {
+    this.additionalCardWhenDrawing(TacticDiscipline.Military, player);
+  }
+  override get instantRecharge(): boolean {
+    return true;
+  }
+}
+
 export class Card432 extends OrbCard {
   constructor() {
     super(432, 'Oberon', 2, {}, [CardType.Equipment]);

@@ -81,6 +81,22 @@ export class Card240 extends EquipmentCard {
   }
 }
 
+export class Card312 extends EquipmentCard {
+  constructor() {
+    super(312, 'Refraktorfeld', 3, {
+      energy: -2,
+      shield: 1,
+      omega: -1
+    });
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.profile.shield == 0);
+  }
+  override get instantRecharge(): boolean {
+    return true;
+  }
+}
+
 export class Card341 extends EquipmentCard {
   constructor() {
     super(341, 'Ködersystem', 1, {
