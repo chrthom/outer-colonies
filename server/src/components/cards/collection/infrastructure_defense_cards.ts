@@ -60,4 +60,7 @@ export class Card448 extends InfrastructureDefenseCard {
       energy: -1
     });
   }
+  override get isColonyDefense(): boolean {
+    return false;
+  }
 }
