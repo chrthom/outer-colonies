@@ -180,13 +180,15 @@ class DeckBox {
     return `${this._title} (${cardsNum(this.cardsFiltered)} / ${cardsNum(this.cards)} Karten)`;
   }
   get cards(): DeckCardStack[] {
-    return this.sortCards(this.$cards.getValue());
+    return this.$cards.getValue();
   }
   get cardsFiltered() {
-    return this.cards.filter(c => {
-      const filter = this.page.filterFormControl.value;
-      return !filter || c.type == filter;
-    });
+    return this.sortCards(
+      this.cards.filter(c => {
+        const filter = this.page.filterFormControl.value;
+        return !filter || c.type == filter;
+      })
+    );
   }
   get isActiveDeck(): boolean {
     return this._title == 'Aktives Deck';

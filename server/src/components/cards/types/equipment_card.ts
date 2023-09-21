@@ -82,7 +82,7 @@ export default abstract class EquipmentCard extends Card {
           defendingShips
             .flatMap(cs => cs.cardStacks)
             .filter(cs => cs.card.instantRecharge)
-            .forEach(cs => cs.defenseAvailable = true);
+            .forEach(cs => (cs.defenseAvailable = true));
           return attackResult;
         case DefenseType.Shield:
           return this.attackStep(target, defendingShips, attackResult, DefenseType.Armour);
