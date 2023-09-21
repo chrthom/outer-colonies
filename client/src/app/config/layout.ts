@@ -48,20 +48,20 @@ class LayoutConfig {
       max: 1
     },
     damageIndicator: {
-      xOffsetPlayer: 75,
+      xOffsetPlayer: -75,
       yOffsetPlayer: -265,
       xOffsetOpponent: -75,
       yOffsetOpponent: 265,
       fontSize: 20
     },
     defenseIndicator: {
-      xOffset: 90,
+      xOffset: -85,
       yOffsetPlayer: -190,
-      yOffsetOpponent: 35,
+      yOffsetOpponent: 20,
       yDistance: 50
     },
     retractCardButton: {
-      xOffset: -75,
+      xOffset: 0,
       yOffset: -248
     }
   };
