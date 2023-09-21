@@ -22,7 +22,8 @@ export default class DefenseIndicator {
         .image(this.x(cardX), this.y(cardY, index), `icon_${icon.icon}`)
         .setOrigin(0.5, 0.5)
         .setTint(color, layoutConfig.colors.neutral, color, color)
-        .setAlpha(layoutConfig.colors.alpha);
+        .setAlpha(layoutConfig.colors.alpha)
+        .setDepth(layoutConfig.depth.indicators);
     });
   }
   destroy() {
