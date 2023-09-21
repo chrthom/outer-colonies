@@ -72,13 +72,17 @@ export default abstract class EquipmentCard extends Card {
     const bestDefense = defendingShips
       .flatMap(cs => cs.cardStacks)
       .filter(cs => fromProfile(cs.card.profile) && cs.canDefend(target))
-      .sort((a, b) => fromProfile(a.card.profile) - fromProfile(b.card.profile))
+      .sort((a, b) => a.deactivationPriority - b.deactivationPriority)
       .pop();
     if (attackResult.damage == 0) {
       return attackResult;
     } else if (fromProfile(this.attackProfile) == 0 || !bestDefense) {
       switch (defenseType) {
         case DefenseType.Armour:
+          defendingShips
+            .flatMap(cs => cs.cardStacks)
+            .filter(cs => cs.card.instantRecharge)
+            .forEach(cs => cs.defenseAvailable = true);
           return attackResult;
         case DefenseType.Shield:
           return this.attackStep(target, defendingShips, attackResult, DefenseType.Armour);
