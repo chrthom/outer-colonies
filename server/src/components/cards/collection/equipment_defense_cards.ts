@@ -11,6 +11,18 @@ export class Card103 extends EquipmentCard {
   }
 }
 
+export class Card115 extends EquipmentCard {
+  constructor() {
+    super(115, 'Ablative Magnetpanzerung', 4, {
+      armour: 1,
+      omega: -1
+    });
+  }
+  override get instantRecharge(): boolean {
+    return true;
+  }
+}
+
 export class Card140 extends EquipmentCardRechargeable {
   constructor() {
     super(140, 'Deflektorschilde', 2, {
@@ -66,6 +78,22 @@ export class Card240 extends EquipmentCard {
       armour: 1,
       omega: -1
     });
+  }
+}
+
+export class Card312 extends EquipmentCard {
+  constructor() {
+    super(312, 'Refraktorfeld', 3, {
+      energy: -2,
+      shield: 1,
+      omega: -1
+    });
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.profile.shield == 0);
+  }
+  override get instantRecharge(): boolean {
+    return true;
   }
 }
 

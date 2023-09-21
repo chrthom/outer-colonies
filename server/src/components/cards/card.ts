@@ -1,6 +1,6 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase } from '../config/enums';
+import { CardType, TurnPhase, Zone } from '../config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 
@@ -29,6 +29,13 @@ export default abstract class Card {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
   }
+  deactivationPriority(cardStack: CardStack): number {
+    let priority = this.instantRecharge ? 0 : 15;
+    priority += Math.max(this.profile.armour, this.profile.shield, this.profile.pointDefense) * 4;
+    priority += cardStack.zone == Zone.Colony ? 2 : 0;
+    priority += this.isColonyDefense ? 0 : 1;
+    return priority;
+  }
   get isColonyDefense(): boolean {
     return false;
   }
@@ -36,6 +43,9 @@ export default abstract class Card {
     return true;
   }
   get isRechargeable(): boolean {
+    return false;
+  }
+  get instantRecharge(): boolean {
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

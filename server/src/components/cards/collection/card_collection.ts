@@ -13,12 +13,14 @@ import {
 } from './hull_1_part_cards';
 import {
   Card103,
+  Card115,
   Card140,
   Card163,
   Card170,
   Card171,
   Card184,
   Card240,
+  Card312,
   Card341,
   Card349,
   Card406,
@@ -139,7 +141,7 @@ import { Card230, Card333, Card435 } from './infrastructure_start_cards';
 import { Card114, Card155 } from './infrastructure_end_cards';
 import { Rarity } from '../../config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
-import { Card146, Card159, Card317, Card403, Card432, Card433 } from './orb_cards';
+import { Card146, Card159, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 
 export default class CardCollection {
@@ -154,6 +156,7 @@ export default class CardCollection {
     109: <Card>new Card109(),
     110: <Card>new Card110(),
     114: <Card>new Card114(),
+    115: <Card>new Card115(),
     116: <Card>new Card116(),
     117: <Card>new Card117(),
     118: <Card>new Card118(),
@@ -241,6 +244,7 @@ export default class CardCollection {
     308: <Card>new Card308(),
     309: <Card>new Card309(),
     310: <Card>new Card310(),
+    312: <Card>new Card312(),
     313: <Card>new Card313(),
     314: <Card>new Card314(),
     315: <Card>new Card315(),
@@ -276,6 +280,7 @@ export default class CardCollection {
     405: <Card>new Card405(),
     406: <Card>new Card406(),
     409: <Card>new Card409(),
+    410: <Card>new Card410(),
     412: <Card>new Card412(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),

@@ -108,6 +108,9 @@ export default class CardStack {
   get isFlightReady(): boolean {
     return this.card.isFlightReady(this.cards);
   }
+  get deactivationPriority(): number {
+    return this.card.deactivationPriority(this);
+  }
   get isMissionReady(): boolean {
     return this.zone == Zone.Oribital && this.type == CardType.Hull && this.profile.speed > 0;
   }
