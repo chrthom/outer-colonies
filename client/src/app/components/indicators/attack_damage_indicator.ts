@@ -21,10 +21,10 @@ export default class AttackDamageIndicator {
         this
       );
     const particleEmitters = [
-      ['red', Math.round((attack.shield + attack.armour + attack.damage) / 3)],
-      ['blue', Math.round(attack.shield * 1.5)],
-      ['white', Math.round(attack.armour * 1.5)],
-      ['yellow', Math.round(attack.damage * 1.5)]
+      ['yellow', Math.round((attack.shield + attack.armour + attack.damage) / 3)],
+      ['blue', attack.shield * 2],
+      ['white', attack.armour * 2],
+      ['red', attack.damage * 2]
     ]
       .filter(([_, n]) => Number(n) > 0)
       .map(([color, n]) => {
