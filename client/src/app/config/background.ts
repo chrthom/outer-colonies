@@ -148,11 +148,11 @@ class BackgroundConfig {
     },
     explosion: {
       probability: 0.08,
-      duration: 4000,
+      duration: 3000,
       maxScale: 2,
       maxSpeed: 5,
-      minParticles: 15,
-      maxParticles: 20,
+      minParticles: 8,
+      maxParticles: 15,
       colors: ['white', 'blue']
     }
   };
