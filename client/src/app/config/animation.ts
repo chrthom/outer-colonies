@@ -13,7 +13,7 @@ class AnimationConfig {
       yOffsetOpponent: 50,
       yTween: -150,
       spawnInterval: 200,
-      duration: 1800
+      duration: 2300
     },
     flare: {
       yOffset: -160,
