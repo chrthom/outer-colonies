@@ -48,12 +48,14 @@ export default class Background {
         backgroundConfig.defaultBackgroundOrbNames.filter(o => o != this.playerOrb)
       );
       this.ringImage = this.createRing(this.currentRing, false);
-      setInterval(() => {
+      const randomAnimation = () => {
         if (!this.targetRing) {
           this.animateRandomObjects();
           this.animateRandomCombatEffects();
         }
-      }, backgroundConfig.animation.randomEventInterval);
+        this.scene.time.delayedCall(backgroundConfig.animation.randomEventInterval, randomAnimation);
+      };
+      randomAnimation();
     }
   }
 
