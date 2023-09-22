@@ -55,9 +55,9 @@ export function gameSocketListeners(io: Server, socket: Socket) {
             match.processBattleRound();
             break;
         }
-        emitState(io, match);
       }
     }
+    emitState(io, match);
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
     const match = socketData(socket).match;

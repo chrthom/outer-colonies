@@ -182,7 +182,7 @@ export default class ContinueButton {
   }
   private get canAttack() {
     return this.scene.state.cardStacks
-      .filter(cs => cs.ownedByPlayer)
+      .filter(cs => this.scene.state.battle.playerShipIds.includes(cs.uuid), this)
       .some(cs => cs.cards.some(c => c.battleReady));
   }
 }
