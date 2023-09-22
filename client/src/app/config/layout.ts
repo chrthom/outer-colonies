@@ -33,7 +33,7 @@ class LayoutConfig {
     yDistance: -55
   };
   readonly attack = {
-    fontSize: 30,
+    fontSize: 36,
     color: {
       pointDefense: '#999911',
       shield: '#119999',

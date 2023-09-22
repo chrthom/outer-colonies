@@ -21,10 +21,10 @@ export default class AttackDamageIndicator {
         this
       );
     const particleEmitters = [
-      ['red', Math.round((attack.shield + attack.armour + attack.damage) / 2)],
-      ['blue', attack.shield * 2],
-      ['white', attack.armour * 2],
-      ['yellow', attack.damage * 2]
+      ['red', Math.round((attack.shield + attack.armour + attack.damage) / 3)],
+      ['blue', attack.shield],
+      ['white', attack.armour],
+      ['yellow', attack.damage]
     ]
       .filter(([_, n]) => Number(n) > 0)
       .map(([color, n]) => {
@@ -44,7 +44,7 @@ export default class AttackDamageIndicator {
     return this.scene.add
       .particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
         lifespan: animationConfig.attack.flare.lifetime,
-        speed: { min: 150, max: 300 },
+        speed: { min: 200, max: 500 },
         scale: { start: 0.8, end: 0 },
         gravityY: 15,
         blendMode: 'ADD',
@@ -69,7 +69,7 @@ export default class AttackDamageIndicator {
   private tween(target: Phaser.GameObjects.Text) {
     this.scene.tweens.add({
       targets: target,
-      duration: animationConfig.duration.attack,
+      duration: animationConfig.attack.indicator.duration,
       y: target.y + animationConfig.attack.indicator.yTween,
       alpha: 0,
       onComplete: () => target.destroy()

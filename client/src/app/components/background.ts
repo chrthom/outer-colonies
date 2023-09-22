@@ -405,7 +405,7 @@ export default class Background {
         }
       )
       .setDepth(layoutConfig.depth.background + backgroundConfig.depth.effects);
-    emitter.explode(Number(Math.random() * conf.maxParticles + conf.minParticles));
+    emitter.explode(Number(Math.random() * (conf.maxParticles - conf.minParticles) + conf.minParticles));
     this.scene.time.delayedCall(lifetime, () => emitter.destroy());
   }
 
