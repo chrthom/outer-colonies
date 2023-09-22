@@ -139,9 +139,9 @@ export default class Background {
     const movingInwards = this.targetRing < this.currentRing;
     if (initial) {
       this.tweenOutCurrentObjects();
-    } else {
       this.tweenStars();
       this.tweenSun();
+    } else {
       if (this.targetOrb && this.nextRing == this.targetRing) {
         this.createOrbAndTweenToPosition(movingInwards);
       }
@@ -175,18 +175,24 @@ export default class Background {
   private tweenStars() {
     this.scene.tweens.add({
       targets: this.starsImage,
-      duration: backgroundConfig.animation.durationNextRing,
-      y: this.starsYCorrdinates(this.nextRing)
+      duration:
+        backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
+        backgroundConfig.animation.durationObjectTransition,
+      y: this.starsYCorrdinates(this.targetRing),
+      ease: 'Quad.inOut'
     });
   }
 
   private tweenSun() {
     this.scene.tweens.add({
       targets: this.sunImage,
-      duration: backgroundConfig.animation.durationNextRing,
-      x: this.sunCoordinatesAndScale(this.nextRing)[0],
-      y: this.sunCoordinatesAndScale(this.nextRing)[1],
-      scale: this.sunCoordinatesAndScale(this.nextRing)[2]
+      duration:
+        backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
+        backgroundConfig.animation.durationObjectTransition,
+      x: this.sunCoordinatesAndScale(this.targetRing)[0],
+      y: this.sunCoordinatesAndScale(this.targetRing)[1],
+      scale: this.sunCoordinatesAndScale(this.targetRing)[2],
+      ease: 'Quad.inOut'
     });
   }
 
