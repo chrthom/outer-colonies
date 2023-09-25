@@ -1,6 +1,6 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase, Zone } from '../config/enums';
+import { CardType, CardVolatility, TurnPhase, Zone } from '../config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 
@@ -39,8 +39,8 @@ export default abstract class Card {
   get isColonyDefense(): boolean {
     return false;
   }
-  get isPermanent(): boolean {
-    return true;
+  get volatility(): CardVolatility {
+    return CardVolatility.Attach;
   }
   get isRechargeable(): boolean {
     return false;
@@ -70,7 +70,7 @@ export default abstract class Card {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onDestruction(player: Player) {}
-  abstract onEnterGame(player: Player, target: CardStack): void;
+  abstract onEnterGame(player: Player, target: CardStack, cardStack: CardStack): void;
   abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player): void;
   abstract onEndTurn(player: Player, source: CardStack): void;

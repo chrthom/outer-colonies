@@ -15,6 +15,12 @@ export enum CardType {
   Orb = 'orb'
 }
 
+export enum CardVolatility {
+  Attach = 'attach',
+  Instant = 'instant',
+  SelfManaged = 'self_managed'
+}
+
 export enum DefenseType {
   Armour = 'armour',
   PointDefense = 'point_defense',

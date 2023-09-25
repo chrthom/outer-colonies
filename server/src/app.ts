@@ -40,6 +40,6 @@ httpServer.listen(config.get<number>('server.port'), () => {
 });
 
 process.on('uncaughtException', err => {
-  if (err.name == 'SqlError' && err.message.includes('socket has unexpectedly been closed'))
-    console.log(`WARN: Caught exception: ${err}`);
+  //if (err.name == 'SqlError' && err.message.includes('socket has unexpectedly been closed'))
+  console.log(`WARN: Caught exception: ${err}`);
 });
