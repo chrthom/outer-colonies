@@ -5,9 +5,9 @@ import {
   ItemListResponseBooster,
   ItemListResponseBox,
   OpenItemResponse
-} from '../../../../../server/src/components/shared_interfaces/rest_api';
+} from '../../../../../server/src/shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
-import { rules } from '../../../../../server/src/components/config/rules';
+import { rules } from '../../../../../server/src/shared/config/rules';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({

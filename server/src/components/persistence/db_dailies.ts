@@ -1,4 +1,4 @@
-import { rules } from '../config/rules';
+import { rules } from '../../shared/config/rules';
 import DBConnection from './db_connector';
 import DBProfilesDAO from './db_profiles';
 

@@ -1,4 +1,4 @@
-import { BattleType, TurnPhase } from '../../../../server/src/components/config/enums';
+import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';

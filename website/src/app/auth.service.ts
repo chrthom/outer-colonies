@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { AuthLoginResponse } from '../../../server/src/components/shared_interfaces/rest_api';
+import { AuthLoginResponse } from '../../../server/src/shared/interfaces/rest_api';
 
 @Injectable({
   providedIn: 'root'

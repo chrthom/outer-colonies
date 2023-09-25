@@ -1,4 +1,4 @@
-import { BattleType, CardType, TurnPhase } from '../../config/enums';
+import { BattleType, CardType, TurnPhase } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import InfrastructureCard from '../types/infrastructure_card';

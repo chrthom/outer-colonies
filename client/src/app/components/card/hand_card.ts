@@ -1,8 +1,8 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { ClientHandCard } from '../../../../../server/src/components/shared_interfaces/client_state';
-import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/components/config/enums';
+import { ClientHandCard } from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 
 export default class HandCard extends CardImage {

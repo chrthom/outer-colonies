@@ -5,7 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
 import { gameSocketListeners } from './components/game';
-import { MsgTypeInbound } from './components/config/enums';
+import { MsgTypeInbound } from './shared/config/enums';
 import restAPI from './components/rest_api';
 import process from 'node:process';
 

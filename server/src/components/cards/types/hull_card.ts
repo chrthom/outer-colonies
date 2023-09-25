@@ -1,7 +1,7 @@
 import Card from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
-import { CardType } from '../../config/enums';
+import { CardType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 
 export default abstract class HullCard extends Card {

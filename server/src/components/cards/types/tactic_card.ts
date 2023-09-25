@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, CardDurability } from '../../config/enums';
+import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import Card from '../card';
 import { CardProfileConfig } from '../card_profile';
@@ -9,7 +9,7 @@ export default abstract class TacticCard extends Card {
     super(id, name, CardType.Tactic, rarity, profile);
   }
   onLeaveGame() {}
-  onStartTurn(player: Player) {}
+  onStartTurn() {}
   onEndTurn() {}
   override canBeRetracted(): boolean {
     return false;

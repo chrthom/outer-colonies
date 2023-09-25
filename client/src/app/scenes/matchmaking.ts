@@ -1,7 +1,7 @@
 import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
-import { MsgTypeInbound, MsgTypeOutbound } from '../../../../server/src/components/config/enums';
+import { MsgTypeInbound, MsgTypeOutbound } from '../../../../server/src/shared/config/enums';
 import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';

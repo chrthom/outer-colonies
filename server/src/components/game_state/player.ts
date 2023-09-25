@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, CardDurability } from '../config/enums';
+import { CardType, Zone, CardDurability } from '../../shared/config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';

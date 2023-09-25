@@ -1,4 +1,4 @@
-import { ItemType } from '../config/enums';
+import { ItemType } from '../../shared/config/enums';
 import DBConnection from './db_connector';
 
 export interface DBItem {
