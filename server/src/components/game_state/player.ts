@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, CardVolatility, Zone } from '../config/enums';
+import { CardType, Zone, CardDurability } from '../config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -75,20 +75,15 @@ export default class Player {
     if (!freeAction) this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     handCard.performImmediateEffect(target);
-    switch (handCard.card.volatility) {
-      case CardVolatility.Attach:
-        if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
-          handCard.zone = Zone.Colony;
-          this.cardStacks.push(handCard);
-        } else {
-          target.attach(handCard);
-        }
-        break;
-      case CardVolatility.Instant:
+    if (!handCard.card.isAttachSelfManaging) {
+      if (handCard.card.durability == CardDurability.Instant) {
         this.discardCards(handCard.card);
-        break;
-      default:
-      // Self-managed: Do nothing
+      } else if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
+        handCard.zone = Zone.Colony;
+        this.cardStacks.push(handCard);
+      } else {
+        target.attach(handCard);
+      }
     }
   }
   get handCardLimit(): number {

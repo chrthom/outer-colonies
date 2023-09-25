@@ -1,4 +1,4 @@
-import { CardType, CardVolatility, TacticDiscipline } from '../../config/enums';
+import { CardType, TacticDiscipline, CardDurability } from '../../config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -34,8 +34,8 @@ export class Card144 extends ScienceTacticCard {
       energy: 1
     });
   }
-  override get volatility(): CardVolatility {
-    return CardVolatility.SelfManaged;
+  override get durability(): CardDurability {
+    return CardDurability.Permanent;
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {
     let handCard: CardStack;
@@ -49,6 +49,21 @@ export class Card144 extends ScienceTacticCard {
       .filter(cs => cs.card.name == 'Fusionsreaktor' || cs.card.name == 'Kraftwerk')
       .flatMap(cs => cs.card.getValidTargets(player));
     return [...new Map(validTargetsWithDuplicates.map(cs => [cs.uuid, cs])).values()];
+  }
+}
+
+export class Card162 extends ScienceTacticCard {
+  constructor() {
+    super(162, 'Schildüberladung', 1, {
+      shield: 2
+    });
+  }
+  override get durability(): CardDurability {
+    return CardDurability.Turn;
+  }
+  onEnterGame() {}
+  getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profile.shield > 0);
   }
 }
 

@@ -6,6 +6,12 @@ export enum BattleType {
   Raid = 'raid'
 }
 
+export enum CardDurability {
+  Instant = 'instant',
+  Permanent = 'permanent',
+  Turn = 'turn'
+}
+
 export enum CardType {
   Colony = 'colony',
   Equipment = 'equipment',
@@ -13,12 +19,6 @@ export enum CardType {
   Infrastructure = 'infrastructure',
   Tactic = 'tactic',
   Orb = 'orb'
-}
-
-export enum CardVolatility {
-  Attach = 'attach',
-  Instant = 'instant',
-  SelfManaged = 'self_managed'
 }
 
 export enum DefenseType {
