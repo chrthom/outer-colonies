@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone } from '../config/enums';
+import { CardType, Zone, CardDurability } from '../config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -71,17 +71,19 @@ export default class Player {
   pickCardsFromTopOfDiscardPile(num: number): Card[] {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
-  playHandCard(handCard: CardStack, target: CardStack) {
-    this.actionPool.activate(handCard.card);
+  playHandCard(handCard: CardStack, target: CardStack, freeAction?: boolean) {
+    if (!freeAction) this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     handCard.performImmediateEffect(target);
-    if (!handCard.card.isPermanent) {
-      this.discardCards(handCard.card);
-    } else if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
-      handCard.zone = Zone.Colony;
-      this.cardStacks.push(handCard);
-    } else {
-      target.attach(handCard);
+    if (!handCard.card.isAttachSelfManaging) {
+      if (handCard.card.durability == CardDurability.Instant) {
+        this.discardCards(handCard.card);
+      } else if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
+        handCard.zone = Zone.Colony;
+        this.cardStacks.push(handCard);
+      } else {
+        target.attach(handCard);
+      }
     }
   }
   get handCardLimit(): number {

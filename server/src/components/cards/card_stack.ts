@@ -130,7 +130,7 @@ export default class CardStack {
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   performImmediateEffect(target: CardStack) {
-    this.card.onEnterGame(this.player, target);
+    this.card.onEnterGame(this.player, target, this);
   }
   get profile(): CardProfile {
     if (this.type == CardType.Colony) {
