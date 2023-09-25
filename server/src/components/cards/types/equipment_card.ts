@@ -2,7 +2,7 @@ import Card, { AttackResult } from '../card';
 import CardProfile, { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { AttackProfile } from '../card_profile';
-import { CardType, DefenseType } from '../../config/enums';
+import { CardType, DefenseType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 
 export default abstract class EquipmentCard extends Card {

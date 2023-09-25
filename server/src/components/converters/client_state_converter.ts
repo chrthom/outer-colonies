@@ -1,5 +1,5 @@
 import Match from '../game_state/match';
-import { CardType, Zone } from '../config/enums';
+import { CardType, Zone } from '../../shared/config/enums';
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/helpers';
 import {
@@ -10,7 +10,7 @@ import {
   ClientHandCard,
   ClientOpponent,
   ClientState
-} from '../shared_interfaces/client_state';
+} from '../../shared/interfaces/client_state';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];

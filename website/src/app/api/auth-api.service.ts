@@ -6,7 +6,7 @@ import {
   AuthExistsResponse,
   AuthLoginRequest,
   AuthLoginResponse
-} from '../../../../server/src/components/shared_interfaces/rest_api';
+} from '../../../../server/src/shared/interfaces/rest_api';
 import OCApi from './api';
 
 @Injectable({

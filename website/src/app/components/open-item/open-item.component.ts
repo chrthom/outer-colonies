@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { OpenItemResponse } from '../../../../../server/src/components/shared_interfaces/rest_api';
+import { OpenItemResponse } from '../../../../../server/src/shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 
 @Component({

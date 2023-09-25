@@ -1,5 +1,5 @@
-import { CardType, TacticDiscipline } from '../../config/enums';
-import { rules } from '../../config/rules';
+import { CardType, TacticDiscipline } from '../../../shared/config/enums';
+import { rules } from '../../../shared/config/rules';
 import Player from '../../game_state/player';
 import InfrastructureCard from '../types/infrastructure_card';
 import TacticCard from '../types/tactic_card';

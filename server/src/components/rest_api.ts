@@ -12,7 +12,7 @@ import {
   ItemListResponse,
   OpenItemResponse,
   ProfileGetResponse
-} from './shared_interfaces/rest_api';
+} from '../shared/interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO, { DBCredential } from './persistence/db_credentials';
 import CardCollection from './cards/collection/card_collection';
@@ -21,8 +21,8 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
-import { CardType, ItemBoxContentType, ItemType } from './config/enums';
-import { rules } from './config/rules';
+import { CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
+import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import EquipmentCard from './cards/types/equipment_card';
 

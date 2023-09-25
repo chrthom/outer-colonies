@@ -1,6 +1,6 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase, Zone, CardDurability } from '../config/enums';
+import { CardType, TurnPhase, Zone, CardDurability } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 
@@ -42,7 +42,7 @@ export default abstract class Card {
   get durability(): CardDurability {
     return CardDurability.Permanent;
   }
-  get isAttachSelfManaging(): Boolean {
+  get isAttachSelfManaging(): boolean {
     return false;
   }
   get isRechargeable(): boolean {

@@ -1,4 +1,4 @@
-import { CardSubtype, CardType, TacticDiscipline } from '../config/enums';
+import { CardSubtype, CardType, TacticDiscipline } from '../../shared/config/enums';
 import Card from './card';
 import TacticCard from './types/tactic_card';
 

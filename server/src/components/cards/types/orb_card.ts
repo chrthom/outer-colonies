@@ -1,5 +1,5 @@
-import { CardSubtype, CardType, TacticDiscipline } from '../../config/enums';
-import { rules } from '../../config/rules';
+import { CardSubtype, CardType, TacticDiscipline } from '../../../shared/config/enums';
+import { rules } from '../../../shared/config/rules';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import Card from '../card';

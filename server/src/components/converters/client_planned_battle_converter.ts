@@ -1,7 +1,7 @@
-import { BattleType } from '../config/enums';
+import { BattleType } from '../../shared/config/enums';
 import Battle from '../game_state/battle';
 import Match from '../game_state/match';
-import { ClientPlannedBattle } from '../shared_interfaces/client_planned_battle';
+import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import { getCardStackByUUID } from '../utils/helpers';
 
 export default function toBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {

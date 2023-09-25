@@ -1,4 +1,4 @@
-import { CardType } from '../../config/enums';
+import { CardType } from '../../../shared/config/enums';
 import EquipmentCard from '../types/equipment_card';
 import CardCollection from './card_collection';
 

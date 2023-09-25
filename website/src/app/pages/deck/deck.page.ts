@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { DeckCard } from '../../../../../server/src/components/shared_interfaces/rest_api';
+import { DeckCard } from '../../../../../server/src/shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { CardType, TacticDiscipline } from '../../../../../server/src/components/config/enums';
+import { CardType, TacticDiscipline } from '../../../../../server/src/shared/config/enums';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';

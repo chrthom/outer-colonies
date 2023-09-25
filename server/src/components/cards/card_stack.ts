@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { CardType, TurnPhase, Zone } from '../config/enums';
+import { CardType, TurnPhase, Zone } from '../../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';

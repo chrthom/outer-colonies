@@ -1,5 +1,5 @@
-import { GameResultType } from '../config/enums';
-import { rules } from '../config/rules';
+import { GameResultType } from '../../shared/config/enums';
+import { rules } from '../../shared/config/rules';
 import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';

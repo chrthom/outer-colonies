@@ -1,4 +1,4 @@
-import { Zone } from '../../config/enums';
+import { Zone } from '../../../shared/config/enums';
 import CardStack from '../card_stack';
 import { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 

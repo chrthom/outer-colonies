@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, Zone } from '../../config/enums';
+import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import OrbCard from '../types/orb_card';

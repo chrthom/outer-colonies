@@ -1,4 +1,4 @@
-import { ClientCard } from '../../../../../server/src/components/shared_interfaces/client_state';
+import { ClientCard } from '../../../../../server/src/shared/interfaces/client_state';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import RetractCardButton from '../buttons/retract_card_button';

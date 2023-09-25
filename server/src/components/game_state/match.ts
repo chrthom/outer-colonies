@@ -1,8 +1,8 @@
 import Player from './player';
-import { rules } from '../config/rules';
-import { BattleType, CardDurability, TurnPhase } from '../config/enums';
+import { rules } from '../../shared/config/rules';
+import { BattleType, CardDurability, TurnPhase } from '../../shared/config/enums';
 import Battle from './battle';
-import { ClientPlannedBattle } from '../shared_interfaces/client_planned_battle';
+import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
 import GameResult from './game_result';
@@ -59,8 +59,8 @@ export default class Match {
     this.getActivePlayer().callBackShipsFromNeutralZone();
     this.getActivePlayer().drawCards(rules.cardsToDrawPerTurn);
     this.getActivePlayer().cardStacks.forEach(cs => cs.onStartTurn());
-    this.getActivePlayer().cardStacks
-      .flatMap(cs => cs.cardStacks)
+    this.getActivePlayer()
+      .cardStacks.flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
     this.prepareBuildPhase();

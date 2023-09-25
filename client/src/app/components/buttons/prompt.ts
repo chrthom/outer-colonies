@@ -1,6 +1,6 @@
-import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/components/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
-import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
+import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 

@@ -1,9 +1,9 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
-import { BattleType, Zone } from '../config/enums';
-import { rules } from '../config/rules';
-import { ClientPlannedBattle } from '../shared_interfaces/client_planned_battle';
+import { BattleType, Zone } from '../../shared/config/enums';
+import { rules } from '../../shared/config/rules';
+import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
 import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';

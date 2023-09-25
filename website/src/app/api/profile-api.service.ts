@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import AuthService from '../auth.service';
 import { Observable } from 'rxjs';
-import { ProfileGetResponse } from '../../../../server/src/components/shared_interfaces/rest_api';
+import { ProfileGetResponse } from '../../../../server/src/shared/interfaces/rest_api';
 import OCApi from './api';
 
 @Injectable({

@@ -1,4 +1,4 @@
-import { ClientDefenseIcon } from '../../../../../server/src/components/shared_interfaces/client_state';
+import { ClientDefenseIcon } from '../../../../../server/src/shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';

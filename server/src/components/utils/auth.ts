@@ -1,5 +1,5 @@
 import CardCollection from '../cards/collection/card_collection';
-import { AuthLoginRequest, AuthRegisterRequest } from '../shared_interfaces/rest_api';
+import { AuthLoginRequest, AuthRegisterRequest } from '../../shared/interfaces/rest_api';
 import DBCredentialsDAO, { DBCredential } from '../persistence/db_credentials';
 import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';

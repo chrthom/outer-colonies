@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
-import { DailyGetResponse } from '../../../../../server/src/components/shared_interfaces/rest_api';
-import { rules } from '../../../../../server/src/components/config/rules';
+import { DailyGetResponse } from '../../../../../server/src/shared/interfaces/rest_api';
+import { rules } from '../../../../../server/src/shared/config/rules';
 
 @Component({
   selector: 'oc-page-home',

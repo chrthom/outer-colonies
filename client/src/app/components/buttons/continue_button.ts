@@ -4,9 +4,9 @@ import {
   MsgTypeInbound,
   MsgTypeOutbound,
   TurnPhase
-} from '../../../../../server/src/components/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/components/shared_interfaces/client_planned_battle';
-import { ClientGameResult } from '../../../../../server/src/components/shared_interfaces/client_state';
+} from '../../../../../server/src/shared/config/enums';
+import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
