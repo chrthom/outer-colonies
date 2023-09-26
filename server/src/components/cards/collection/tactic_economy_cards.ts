@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -43,6 +43,7 @@ export class Card165 extends EconomyTacticCard {
   }
   private calcFreePsiSockets(player: Player): number {
     return player.cardStacks
+      .filter(cs => cs.zone == Zone.Oribital)
       .map(cs => cs.profile)
       .filter(p => p.speed >= 2 && p.psi > 0)
       .map(p => p.psi)
