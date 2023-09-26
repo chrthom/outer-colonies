@@ -28,7 +28,7 @@ export class Card141 extends EconomyTacticCard {
 }
 
 export class Card165 extends EconomyTacticCard {
-  private readonly cardsToDrawPerPsiSocket = 2;
+  private readonly cardsToDrawPerPsiSocket = 1;
   constructor() {
     super(165, 'Konvoi', 1);
   }
