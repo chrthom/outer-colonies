@@ -156,7 +156,7 @@ export class Card424 extends EquipmentCardRechargeable {
       {
         energy: -1,
         pointDefense: 1,
-        theta: -1
+        xi: -1
       },
       {
         range: 1,
