@@ -135,7 +135,7 @@ export class DeckPage implements OnInit {
   }
   get statistics(): DeckStatistics[] {
     return this.statisticsTemplate.map(st => {
-      const profileValues = this.$activeCards.value.map(st.get);
+      const profileValues = this.$activeCards.value.map(dcs => st.get(dcs) * dcs.numOfCards);
       return {
         title: st.title,
         energyIcon: st.energyIcon,
