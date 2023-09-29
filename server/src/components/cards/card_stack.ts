@@ -56,7 +56,7 @@ export default class CardStack {
     );
   }
   canBeAttachedTo(cardStack: CardStack): boolean {
-    return this.zone == Zone.Hand && this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
+    return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
   }
   get canBeRetracted(): boolean {
     const player = this.player;
@@ -89,11 +89,8 @@ export default class CardStack {
     else return this;
   }
   get validTargets(): CardStack[] {
-    if (this.zone == Zone.Hand) {
-      return this.card.getValidTargets(this.player);
-    } else {
-      return []; // TODO: Reuse this method to determine valid attack targets in battle
-    }
+    if (this.zone != Zone.Hand || this.player.hasInsufficientEnergyCard) return [];
+    return this.card.getValidTargets(this.player);
   }
   get hasInsufficientEnergy(): boolean {
     const rootCardStack = this.rootCardStack;

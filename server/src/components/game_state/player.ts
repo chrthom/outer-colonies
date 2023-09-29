@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, CardDurability } from '../../shared/config/enums';
+import { CardType, Zone, CardDurability, TurnPhase } from '../../shared/config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -91,5 +91,12 @@ export default class Player {
   }
   get originalActions(): ActionPool {
     return this.cardStacks.map(cs => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
+  }
+  get hasInsufficientEnergyCard(): boolean {
+    return (
+      this.isActivePlayer &&
+      this.match.turnPhase == TurnPhase.Build &&
+      this.cardStacks.some(cs => cs.hasInsufficientEnergy)
+    );
   }
 }
