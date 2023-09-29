@@ -89,8 +89,13 @@ export default class CardStack {
     else return this;
   }
   get validTargets(): CardStack[] {
-    if (this.zone != Zone.Hand || this.player.hasInsufficientEnergyCard) return [];
-    return this.card.getValidTargets(this.player);
+    return this.zone == Zone.Hand
+      && this.player.isActivePlayer
+      && this.player.match.turnPhase == TurnPhase.Build
+      && this.player.actionPool.hasActionFor(this.card)
+      && !this.player.hasInsufficientEnergyCard
+      ? this.card.getValidTargets(this.player)
+      : [];
   }
   get hasInsufficientEnergy(): boolean {
     const rootCardStack = this.rootCardStack;
@@ -112,7 +117,7 @@ export default class CardStack {
     return this.zone == Zone.Oribital && this.type == CardType.Hull && this.profile.speed > 0;
   }
   get isPlayable(): boolean {
-    return this.zone == Zone.Hand && this.card.isPlayable(this.player);
+    return this.validTargets.length > 0;
   }
   onDestruction() {
     this.card.onDestruction(this.player);
