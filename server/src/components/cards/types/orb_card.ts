@@ -36,6 +36,9 @@ export default abstract class OrbCard extends Card {
   override canBeRetracted(): boolean {
     return false;
   }
+  override get isColonyDefense(): boolean {
+    return true;
+  }
   override get actionPool(): ActionPool {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
   }
