@@ -49,12 +49,11 @@ export default class Prompt {
     this.image.setVisible(visible);
   }
   private showBuildPhase() {
-    let text = '';
-    if (this.scene.plannedBattle.type == BattleType.None) {
-      if (this.scene.state.hasToRetractCards) {
-        text += 'Einige deiner Karten haben nicht genügend Energie.\n Nehme sie auf die Hand zurück!\n';
-      }
-      text +=
+    let text: string;
+    if (this.scene.state.hasToRetractCards) {
+      text = 'Einige deiner Karten haben nicht genügend Energie.\nNimm sie auf die Hand zurück!\n';
+    } else if (this.scene.plannedBattle.type == BattleType.None) {
+      text =
         'Spiele Karten von deiner Hand aus.\n' +
         'Plane dann eine Mission oder Überfall.\n' +
         'Klicke die gegnerische Kolonie für einen Überfall\n' +
@@ -64,9 +63,9 @@ export default class Prompt {
       !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)
     ) {
       const missingCards = ClientPlannedBattle.missingCards(this.scene.plannedBattle);
-      text += `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}`;
+      text = `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}!`;
     } else {
-      text += `Wähle Schiffe für ${
+      text = `Wähle Schiffe für ${
         this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
       }!`;
     }
