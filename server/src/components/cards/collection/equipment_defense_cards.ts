@@ -90,7 +90,7 @@ export class Card312 extends EquipmentCard {
     });
   }
   override getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter(cs => cs.profile.shield == 0);
+    return super.getValidTargets(player).filter(cs => cs.profile.shield == 0);
   }
   override get instantRecharge(): boolean {
     return true;
@@ -125,7 +125,7 @@ export class Card426 extends EquipmentCard {
     });
   }
   override getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.filter(cs => cs.profile.shield > 0);
+    return super.getValidTargets(player).filter(cs => cs.profile.shield > 0);
   }
 }
 
