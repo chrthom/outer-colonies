@@ -34,7 +34,7 @@ export class Card117 extends HullCard {
 export class Card120 extends HullCard {
   constructor() {
     super(120, 'Kreuzer (Bug)', 3, cruiserMultipart, {
-      hp: 9,
+      hp: 11,
       speed: -1,
       theta: 1,
       phi: 1,
@@ -91,7 +91,7 @@ export class Card134 extends HullCard {
 export class Card306 extends HullCard {
   constructor() {
     super(306, 'Schlachtschiff (Bug)', 4, battleshipMultipart, {
-      hp: 11,
+      hp: 13,
       xi: 1,
       omega: 1
     });
@@ -101,7 +101,7 @@ export class Card306 extends HullCard {
 export class Card308 extends HullCard {
   constructor() {
     super(308, 'Schlachtschiff (Kern)', 4, battleshipMultipart, {
-      hp: 7,
+      hp: 8,
       theta: 2,
       xi: 2,
       omega: 1
@@ -112,7 +112,7 @@ export class Card308 extends HullCard {
 export class Card309 extends HullCard {
   constructor() {
     super(309, 'Schlachtschiff (Heck)', 4, battleshipMultipart, {
-      hp: 7,
+      hp: 8,
       speed: 2,
       energy: -2,
       xi: 1,
@@ -124,7 +124,7 @@ export class Card309 extends HullCard {
 export class Card313 extends HullCard {
   constructor() {
     super(313, 'Schlachtschiff (Bug)', 3, battleshipMultipart, {
-      hp: 8,
+      hp: 9,
       xi: 2,
       omega: 2
     });
@@ -134,7 +134,7 @@ export class Card313 extends HullCard {
 export class Card314 extends HullCard {
   constructor() {
     super(314, 'Schlachtschiff (Kern)', 3, battleshipMultipart, {
-      hp: 8,
+      hp: 9,
       xi: 3,
       omega: 1
     });
@@ -144,7 +144,7 @@ export class Card314 extends HullCard {
 export class Card315 extends HullCard {
   constructor() {
     super(315, 'Schlachtschiff (Heck)', 3, battleshipMultipart, {
-      hp: 8,
+      hp: 9,
       speed: 1,
       energy: -1,
       xi: 1,

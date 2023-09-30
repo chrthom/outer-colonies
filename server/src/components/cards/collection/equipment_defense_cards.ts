@@ -56,6 +56,7 @@ export class Card171 extends EquipmentCard {
   constructor() {
     super(171, 'Titanplattenplanzer', 1, {
       armour: 2,
+      hp: -1,
       omega: -1
     });
   }
@@ -142,7 +143,7 @@ export class Card406 extends EquipmentCard {
 export class Card447 extends EquipmentCardRechargeable {
   constructor() {
     super(447, 'Schildgondel', 1, {
-      hp: 1,
+      hp: 2,
       shield: 1,
       omega: -2
     });

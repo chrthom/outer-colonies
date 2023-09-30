@@ -81,7 +81,7 @@ export class Card351 extends CardCorvette {
 export class Card436 extends HullCard {
   constructor() {
     super(436, 'Panzerschiff', 2, HullMultipart.noMultipart, {
-      hp: 7,
+      hp: 8,
       speed: 2,
       xi: 1,
       omega: 2
