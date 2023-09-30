@@ -26,11 +26,12 @@ export default abstract class HullCard extends Card {
       cs =>
         cs.type == CardType.Hull &&
         (<HullCard>cs.card).multipart.neededPartIds.includes(this.id) &&
-        !cs.cards.some(c => c.name == this.name)
-    ); // Reconsider if matching by name is a bad idea
+        !cs.cards.some(c => c.name == this.name) &&
+        cs.profile.combine(this.profile).isValid
+    );
   }
   private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
-    return cardStacks.filter(cs => cs.type == CardType.Colony && this.profile.energy >= 0);
+    return cardStacks.filter(cs => cs.type == CardType.Colony && this.profile.isValid);
   }
   onEnterGame() {}
   onLeaveGame() {}

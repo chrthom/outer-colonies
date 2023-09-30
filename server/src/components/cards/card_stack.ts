@@ -98,13 +98,12 @@ export default class CardStack {
       : [];
   }
   get hasInsufficientEnergy(): boolean {
-    const rootCardStack = this.rootCardStack;
     if (this.type == CardType.Colony) {
       return false;
-    } else if (rootCardStack.zone == Zone.Colony && rootCardStack.type == CardType.Infrastructure) {
+    } else if (this.rootCardStack.zone == Zone.Colony && this.rootCardStack.type == CardType.Infrastructure) {
       return this.card.profile.energy < 0 && this.player.colonyCardStack.profile.energy < 0;
     } else {
-      return this.card.profile.energy < 0 && rootCardStack.profile.energy < 0;
+      return this.card.profile.energy < 0 && this.rootCardStack.profile.energy < 0;
     }
   }
   get isFlightReady(): boolean {
