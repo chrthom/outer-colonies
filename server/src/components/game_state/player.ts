@@ -87,7 +87,7 @@ export default class Player {
     }
   }
   get handCardLimit(): number {
-    return this.colonyCardStack ? this.colonyCardStack.profile.handCardLimit : 0;
+    return this.cardStacks.map(cs => cs.profile.handCardLimit).reduce((a, b) => a + b);
   }
   get originalActions(): ActionPool {
     return this.cardStacks.map(cs => cs.actionPool).reduce((a, b) => a.combine(b), new ActionPool());
