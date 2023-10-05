@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-website",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "description": "Outer Colonies Website",
   "scripts": {
     "ng": "ng",

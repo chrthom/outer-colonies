@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-server",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "description": "Outer Colonies Server",
   "main": "dist/app.js",
   "scripts": {
