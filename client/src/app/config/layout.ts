@@ -61,8 +61,8 @@ class LayoutConfig {
       yDistance: 50
     },
     retractCardButton: {
-      xOffset: 0,
-      yOffset: -248
+      xOffset: -45,
+      yOffset: -252
     }
   };
   readonly maxedTacticCard = {
