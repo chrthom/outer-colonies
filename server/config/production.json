@@ -9,5 +9,6 @@
     "database": "outercolonies",
     "user": "outercolonies",
     "connectionLimit": 25
-  }
+  },
+  "terminate_on_error": false
 }
