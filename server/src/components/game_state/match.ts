@@ -13,7 +13,7 @@ export default class Match {
   activePlayerNo: number = 0;
   actionPendingByPlayerNo: number = 0;
   turnPhase!: TurnPhase;
-  battle: Battle;
+  battle: Battle = new Battle(BattleType.None);
   gameResult!: GameResult;
   constructor(room: string) {
     this.room = room;

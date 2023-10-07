@@ -1,7 +1,7 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
-import { BattleType, Zone } from '../../shared/config/enums';
+import { BattleType, CardType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
@@ -67,7 +67,7 @@ export default class Battle {
         this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
       });
       match.players.forEach(player => {
-        const destroyedCardStacks = this.getDestroyedCardStacks(player.no);
+        const destroyedCardStacks = this.getDestroyedCardStacks(player.no).filter(cs => cs.type != CardType.Colony);
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
         player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));

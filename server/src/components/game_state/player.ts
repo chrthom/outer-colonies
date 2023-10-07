@@ -53,7 +53,7 @@ export default class Player {
     uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
   }
   get colonyCardStack(): CardStack {
-    return this.cardStacks.filter(c => c.card.type == CardType.Colony)[0];
+    return this.cardStacks.find(c => c.card.type == CardType.Colony);
   }
   get isActivePlayer(): boolean {
     return this.no == this.match.activePlayerNo;
