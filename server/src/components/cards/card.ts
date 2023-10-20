@@ -1,6 +1,6 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase, Zone, CardDurability } from '../../shared/config/enums';
+import { CardType, TurnPhase, Zone, CardDurability, Intervention } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 
@@ -28,6 +28,9 @@ export default abstract class Card {
   get canDefend(): boolean {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
+  }
+  canIntervene(intervention: Intervention): boolean {
+    return false;
   }
   deactivationPriority(cardStack: CardStack): number {
     let priority = this.instantRecharge ? 0 : 15;
