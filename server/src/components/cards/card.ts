@@ -59,14 +59,6 @@ export default abstract class Card {
   isInRange(range: number): boolean {
     return false;
   }
-  isPlayable(player: Player): boolean {
-    return (
-      player.actionPool.hasActionFor(this) &&
-      player.no == player.match.activePlayerNo &&
-      player.match.turnPhase == TurnPhase.Build &&
-      this.getValidTargets(player).length > 0
-    );
-  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isFlightReady(cards: Card[]): boolean {
     return false;

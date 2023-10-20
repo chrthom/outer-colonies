@@ -23,7 +23,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       playable: c.isPlayable,
       validTargets: c.validTargets.map(cs => cs.uuid)
     };
-  });
+  }, this);
   const cardStacks: ClientCardStack[] = [true, false].flatMap(ownedByPlayer => {
     const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
     return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {

@@ -1,5 +1,4 @@
 import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
-import Player from '../../game_state/player';
 import Card from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';

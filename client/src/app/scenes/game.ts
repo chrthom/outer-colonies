@@ -77,6 +77,24 @@ export default class Game extends Phaser.Scene {
   preload() {
     this.preloader = new Preloader(this);
     this.load.baseURL = `${environment.urls.api}/assets/`;
+    backgroundConfig.orbs
+      .map(o => o.name)
+      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
+    backgroundConfig.rings.forEach(name =>
+      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
+    );
+    this.load.image('background_sun', 'background/sun.png');
+    [
+      'asteroid1',
+      'corvette1',
+      'corvette2',
+      'corvette3',
+      'freighter1',
+      'freighter2',
+      'freighter3',
+      'station1',
+      'torpedos1'
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
       .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
@@ -121,24 +139,6 @@ export default class Game extends Phaser.Scene {
       'lost'
     ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
     this.load.image('prompt_box', 'utils/prompt_box.png');
-    backgroundConfig.orbs
-      .map(o => o.name)
-      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
-    backgroundConfig.rings.forEach(name =>
-      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
-    );
-    this.load.image('background_sun', 'background/sun.png');
-    [
-      'asteroid1',
-      'corvette1',
-      'corvette2',
-      'corvette3',
-      'freighter1',
-      'freighter2',
-      'freighter3',
-      'station1',
-      'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
   }
 
   create() {

@@ -12,5 +12,6 @@
     "database": "outercolonies_staging",
     "user": "outercolonies_staging",
     "connectionLimit": 3
-  }
+  },
+  "terminate_on_error": true
 }

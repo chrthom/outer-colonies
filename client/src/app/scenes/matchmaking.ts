@@ -38,7 +38,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.Matchmaking, (status, params) => {
       switch (status) {
         case 'search':
-          this.status.setText('Suche Gegner...\nDerzeit mit ' + params + ' anderen Spielern im Matchmaking');
+          this.status.setText('Suche Mitspieler...');
           break;
         case 'start':
           this.socket.off(MsgTypeOutbound.Connect);

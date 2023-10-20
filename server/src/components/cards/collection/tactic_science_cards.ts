@@ -37,6 +37,9 @@ export class Card144 extends ScienceTacticCard {
   override get durability(): CardDurability {
     return CardDurability.Permanent;
   }
+  override get isAttachSelfManaging(): boolean {
+    return true;
+  }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {
     let handCard: CardStack;
     if (target.type == CardType.Colony) handCard = player.hand.find(cs => cs.card.name == 'Kraftwerk');

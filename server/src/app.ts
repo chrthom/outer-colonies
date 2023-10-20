@@ -39,7 +39,8 @@ httpServer.listen(config.get<number>('server.port'), () => {
   console.log(`Server started on stage ${config.get('stage')}`);
 });
 
-process.on('uncaughtException', err => {
-  //if (err.name == 'SqlError' && err.message.includes('socket has unexpectedly been closed'))
-  console.log(`WARN: Caught exception: ${err}`);
-});
+if (!config.get<boolean>('terminate_on_error')) {
+  process.on('uncaughtException', err => {
+    console.log(`WARN: Caught exception: ${err}`);
+  });
+}

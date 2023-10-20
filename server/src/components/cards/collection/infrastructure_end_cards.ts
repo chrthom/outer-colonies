@@ -22,7 +22,7 @@ export class Card114 extends InfrastructureEndOfTurnCard {
 
 export class Card155 extends InfrastructureEndOfTurnCard {
   constructor() {
-    super(155, 'Müllverarbetungsanlage', 2, {
+    super(155, 'Müllverarbeitungsanlage', 2, {
       energy: -1,
       psi: -1
     });
