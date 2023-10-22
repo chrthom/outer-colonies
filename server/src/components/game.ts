@@ -81,7 +81,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       console.log(
         `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
       );
-    } else if (!handCard.isPlayable) {
+    } else if (!handCard.hasValidTargets) {
       console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
     } else if (!handCard.canBeAttachedTo(target)) {
       console.log(

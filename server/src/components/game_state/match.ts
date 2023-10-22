@@ -63,7 +63,11 @@ export default class Match {
       .cardStacks.flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
-    this.prepareBuildPhase();
+    if (this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
+      this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    } else {
+      this.prepareBuildPhase();
+    }
   }
   prepareBuildPhase() {
     this.turnPhase = TurnPhase.Build;

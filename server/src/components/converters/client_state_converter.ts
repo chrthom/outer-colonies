@@ -20,7 +20,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       uuid: c.uuid,
       cardId: c.card.id,
       index: index,
-      playable: c.isPlayable,
+      playable: c.hasValidTargets,
       validTargets: c.validTargets.map(cs => cs.uuid)
     };
   }, this);

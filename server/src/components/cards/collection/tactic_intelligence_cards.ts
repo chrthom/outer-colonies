@@ -22,7 +22,7 @@ abstract class IntelligenceTacticCard extends TacticCard {
       this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
     }
     getValidTargets(player: Player): CardStack[] {
-      return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+      return player.isActivePlayer ? [] : this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
     }
     override canIntervene(intervention: Intervention): boolean {
       return intervention == Intervention.OpponentTurnStart;
