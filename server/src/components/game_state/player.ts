@@ -85,6 +85,7 @@ export default class Player {
         target.attach(handCard);
       }
     }
+    this.match.checkToNextPhase();
   }
   get handCardLimit(): number {
     return this.cardStacks.map(cs => cs.profile.handCardLimit).reduce((a, b) => a + b);

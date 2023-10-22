@@ -80,6 +80,9 @@ export default class ContinueButton {
       this.showGameOver(this.scene.state.gameResult);
     } else if (this.scene.state.playerPendingAction) {
       switch (this.scene.state.turnPhase) {
+        case TurnPhase.Start:
+          this.showIntervene();
+          break;
         case TurnPhase.Build:
           if (!this.scene.state.playerIsActive) {
             if (!this.canIntercept) {
@@ -153,6 +156,9 @@ export default class ContinueButton {
   }
   private showEndPhase() {
     this.show('Karten ablegen', 'active_select');
+  }
+  private showIntervene() {
+    this.show('Überspringen', 'inactive_select', () => this.scene.socket.emit(MsgTypeInbound.Ready, this.scene.state.turnPhase));
   }
   private showGameOver(gameResult: ClientGameResult) {
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {

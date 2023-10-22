@@ -63,13 +63,10 @@ export default class Match {
       .cardStacks.flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
-    if (this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
-      this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
-    } else {
-      this.prepareBuildPhase();
-    }
+    this.checkStartPhaseIntervention();
   }
   prepareBuildPhase() {
+    this.actionPendingByPlayerNo = this.activePlayerNo;
     this.turnPhase = TurnPhase.Build;
   }
   prepareBuildPhaseReaction(plannedBattle: ClientPlannedBattle) {
@@ -100,5 +97,17 @@ export default class Match {
   }
   processBattleRound() {
     this.battle.processBattleRound(this);
+  }
+  checkToNextPhase() {
+    if (this.turnPhase == TurnPhase.Start && this.activePlayerNo != this.actionPendingByPlayerNo) {
+      this.checkStartPhaseIntervention();
+    }
+  }
+  private checkStartPhaseIntervention() {
+    if (this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
+      this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    } else {
+      this.prepareBuildPhase();
+    }
   }
 }

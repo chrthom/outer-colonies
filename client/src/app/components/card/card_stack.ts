@@ -187,6 +187,13 @@ export default class CardStack {
     const state = this.scene.state;
     if (state.playerPendingAction) {
       switch (state.turnPhase) {
+        case TurnPhase.Start:
+          if (!state.playerIsActive) {
+            if (this.scene.activeCards.hand) {
+              this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+            }
+          }
+          break;
         case TurnPhase.Build:
           if (state.playerIsActive) {
             if (this.scene.activeCards.hand) {
