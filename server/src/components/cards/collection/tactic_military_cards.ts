@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, Intervention, TacticDiscipline, TurnPhase } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -49,5 +49,23 @@ export class Card338 extends MilitaryTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card428 extends MilitaryTacticCard {
+  private speedLimit = 2;
+  constructor() {
+    super(428, 'Ausmanövriert', 2);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.cardStacks.forEach(cs => cs.attackAvailable = false);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    if (player.match.turnPhase != TurnPhase.Combat) return [];
+    return player.match.battle.ships[player.match.getWaitingPlayerNo()]
+      .filter(cs => cs.profile.speed <= this.speedLimit);
+  }
+  override canIntervene(intervention: Intervention): boolean {
+    return intervention == Intervention.BattleRoundStart;
   }
 }

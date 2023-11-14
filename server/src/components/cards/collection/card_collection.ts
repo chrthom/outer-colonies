@@ -133,7 +133,7 @@ import {
   Card314,
   Card315
 } from './hull_3_part_cards';
-import { Card174, Card337, Card338 } from './tactic_military_cards';
+import { Card174, Card337, Card338, Card428 } from './tactic_military_cards';
 import { Card110, Card144, Card162, Card316 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -293,6 +293,7 @@ export default class CardCollection {
     424: <Card>new Card424(),
     426: <Card>new Card426(),
     427: <Card>new Card427(),
+    428: <Card>new Card428(),
     432: <Card>new Card432(),
     433: <Card>new Card433(),
     434: <Card>new Card434(),

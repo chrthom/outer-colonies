@@ -60,7 +60,7 @@ export default class Battle {
               .reduce((a, b) => Math.min(a, b))))
     );
   }
-  processBattleRound(match: Match) {
+  processBattleRound(match: Match) { // TODO: #252 Intervention cards
     if (match.actionPendingByPlayerNo == opponentPlayerNo(match.activePlayerNo)) {
       this.range--;
       match.players.forEach(player => {
