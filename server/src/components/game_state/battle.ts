@@ -62,22 +62,7 @@ export default class Battle {
   }
   processBattleRound(match: Match) { // TODO: #252 Intervention cards
     if (match.actionPendingByPlayerNo == opponentPlayerNo(match.activePlayerNo)) {
-      this.range--;
-      match.players.forEach(player => {
-        this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
-      });
-      match.players.forEach(player => {
-        const destroyedCardStacks = this.getDestroyedCardStacks(player.no).filter(cs => cs.type != CardType.Colony);
-        destroyedCardStacks.forEach(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
-        destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
-        player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
-        player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
-      });
-      if (this.range == 1 && this.type == BattleType.Raid) {
-        this.ships[match.actionPendingByPlayerNo].push(
-          ...match.players[match.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
-        );
-      }
+      this.processEndOfBattlePhase(match)
     }
     match.actionPendingByPlayerNo = opponentPlayerNo(match.actionPendingByPlayerNo);
     if (this.range == 0) {
@@ -92,8 +77,26 @@ export default class Battle {
       if (!hasAttack || !hasTarget) this.processBattleRound(match);
     }
   }
-  resetRecentEvents() {
+  resetRecentAttack() {
     this.recentAttack = null;
+  }
+  private processEndOfBattlePhase(match: Match) {
+    this.range--;
+    match.players.forEach(player => {
+      this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
+    });
+    match.players.forEach(player => {
+      const destroyedCardStacks = this.getDestroyedCardStacks(player.no).filter(cs => cs.type != CardType.Colony);
+      destroyedCardStacks.forEach(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
+      destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
+      player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
+      player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
+    });
+    if (this.range == 1 && this.type == BattleType.Raid) {
+      this.ships[match.actionPendingByPlayerNo].push(
+        ...match.players[match.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
+      );
+    }
   }
   private applyMissionResult(match: Match) {
     const player = match.getActivePlayer();
