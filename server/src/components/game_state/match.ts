@@ -70,7 +70,7 @@ export default class Match {
       .cardStacks.flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
-    this.checkStartPhaseIntervention();
+    this.checkIntervention(Intervention.OpponentTurnStart);
   }
   prepareBuildPhase() {
     this.actionPendingByPlayerNo = this.activePlayerNo;
@@ -104,24 +104,55 @@ export default class Match {
   }
   processBattleRound() {
     if (this.actionPendingByPlayerNo == opponentPlayerNo(this.activePlayerNo)) {
-      this.battle.processEndOfBattlePhase(this)
+      this.actionPendingByPlayerNo = this.activePlayerNo;
+      this.checkIntervention(Intervention.BattleRoundEnd);
+    } else {
+      this.battle.processBattleRound(this);
     }
-    this.battle.processBattleRound(this);
   }
   checkToNextPhase() {
-    if (this.intervention?.type == Intervention.OpponentTurnStart) {
-      this.checkStartPhaseIntervention();
+    if (this.intervention) {
+      this.checkIntervention(this.intervention.type);
     }
   }
-  private checkStartPhaseIntervention() {
+  checkIntervention(intervention: Intervention) {
     this.intervention = {
-      type: Intervention.OpponentTurnStart
+      type: intervention
     };
-    this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
-    if (!this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
-      this.intervention = undefined;
-      this.actionPendingByPlayerNo = this.activePlayerNo;
-      this.prepareBuildPhase();
+    if (intervention == Intervention.OpponentTurnStart) {
+      this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    }
+    if (!this.getPendingActionPlayer().hand.some(cs => cs.hasValidTargets)) {
+      this.skipIntervention();
+    }
+  }
+  skipIntervention() {
+    const intervention = this.intervention?.type;
+    this.intervention = undefined;
+    switch (intervention) {
+      case Intervention.OpponentTurnStart:
+        this.actionPendingByPlayerNo = this.activePlayerNo;
+        this.prepareBuildPhase();
+        break;
+      case Intervention.BattleRoundEnd:
+        if (this.actionPendingByPlayerNo == this.activePlayerNo) {
+          this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+          this.checkIntervention(Intervention.BattleRoundEnd);
+        } else {
+          this.actionPendingByPlayerNo = this.activePlayerNo;
+          this.battle.processEndOfBattlePhase(this);
+          this.battle.processBattleRound(this);
+          this.checkIntervention(Intervention.BattleRoundStart);
+        }
+        break;
+      case Intervention.BattleRoundEnd:
+          if (this.actionPendingByPlayerNo == this.activePlayerNo) {
+            this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+            this.checkIntervention(Intervention.BattleRoundStart);
+          } else {
+            this.actionPendingByPlayerNo = this.activePlayerNo;
+          }
+          break;
     }
   }
 }

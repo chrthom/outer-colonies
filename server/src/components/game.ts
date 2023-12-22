@@ -43,17 +43,21 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         match.players[socketData(socket).playerNo].ready = true;
         if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
       } else if (socketData(socket).playerNo == match.actionPendingByPlayerNo) {
-        switch (turnPhase) {
-          case TurnPhase.Build:
-            if (socketData(socket).playerNo == match.activePlayerNo) {
-              match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
-            } else {
-              match.prepareCombatPhase(<string[]>data);
-            }
-            break;
-          case TurnPhase.Combat:
-            match.processBattleRound();
-            break;
+        if (match.intervention) {
+          match.skipIntervention();
+        } else {
+          switch (turnPhase) {
+            case TurnPhase.Build:
+              if (socketData(socket).playerNo == match.activePlayerNo) {
+                match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
+              } else {
+                match.prepareCombatPhase(<string[]>data);
+              }
+              break;
+            case TurnPhase.Combat:
+              match.processBattleRound();
+              break;
+          }
         }
       }
     }
