@@ -8,6 +8,7 @@ import {
   ClientDefenseIcon,
   ClientGameResult,
   ClientHandCard,
+  ClientIntervention,
   ClientOpponent,
   ClientState
 } from '../../shared/interfaces/client_state';
@@ -85,6 +86,11 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     range: match.battle.range,
     recentAttack: match.battle.recentAttack
   };
+  const intervention: ClientIntervention = match.intervention ? {
+    type: match.intervention.type,
+    attack: match.intervention.attack,
+    tacticCard: match.intervention.tacticCard
+  } : null;
   const opponentData: ClientOpponent = {
     name: opponent.name,
     handCardSize: opponent.hand.length,
@@ -110,6 +116,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     discardPileIds: player.discardPile.map(c => c.id),
     cardStacks: cardStacks,
     battle: battle,
+    intervention: intervention,
     gameResult: gameResult,
     hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
   };

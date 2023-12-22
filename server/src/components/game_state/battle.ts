@@ -9,7 +9,7 @@ import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../
 import Match from './match';
 import Player from './player';
 
-export class Attack {
+export interface Attack {
   sourceUUID: string;
   sourceIndex: number;
   targetUUID: string;

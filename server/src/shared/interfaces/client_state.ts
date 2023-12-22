@@ -1,4 +1,4 @@
-import { EventType, BattleType, TurnPhase, Zone, GameResultType } from '../config/enums';
+import { EventType, BattleType, TurnPhase, Zone, GameResultType, Intervention } from '../config/enums';
 
 export interface ClientOpponent {
   name: string;
@@ -15,6 +15,12 @@ export interface ClientAttack {
   shield: number;
   armour: number;
   damage: number;
+}
+
+export interface ClientIntervention {
+  type: Intervention;
+  attack?: ClientAttack;
+  tacticCard?: number;
 }
 
 export interface ClientBattle {
@@ -86,7 +92,8 @@ export interface ClientState {
   deckSize: number;
   discardPileIds: number[];
   cardStacks: ClientCardStack[];
-  battle?: ClientBattle;
+  battle: ClientBattle;
+  intervention?: ClientIntervention;
   gameResult?: ClientGameResult;
   hasToRetractCards: boolean;
 }

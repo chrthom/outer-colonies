@@ -1,11 +1,17 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
-import { BattleType, CardDurability, TurnPhase } from '../../shared/config/enums';
-import Battle from './battle';
+import { BattleType, CardDurability, Intervention, TurnPhase } from '../../shared/config/enums';
+import Battle, { Attack } from './battle';
 import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
 import GameResult from './game_result';
+
+export interface MatchIntervention {
+  type: Intervention;
+  attack?: Attack;
+  tacticCard?: number;
+}
 
 export default class Match {
   readonly room!: string;
@@ -15,6 +21,7 @@ export default class Match {
   turnPhase!: TurnPhase;
   battle: Battle = new Battle(BattleType.None);
   gameResult!: GameResult;
+  intervention?: MatchIntervention;
   constructor(room: string) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
@@ -99,6 +106,7 @@ export default class Match {
     this.battle.processBattleRound(this);
   }
   checkToNextPhase() {
+    this.intervention = undefined;
     if (this.turnPhase == TurnPhase.Start && this.activePlayerNo != this.actionPendingByPlayerNo) {
       this.checkStartPhaseIntervention();
     }
@@ -106,6 +114,9 @@ export default class Match {
   private checkStartPhaseIntervention() {
     if (this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
       this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+      this.intervention = {
+        type: Intervention.OpponentTurnStart
+      };
     } else {
       this.prepareBuildPhase();
     }
