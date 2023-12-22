@@ -92,7 +92,7 @@ export default class CardStack {
     else return this;
   }
   get validTargets(): CardStack[] {
-    let canIntervene = this.player.isPendingPlayer
+    const canIntervene = this.player.isPendingPlayer
       && this.match.intervention
       && this.card.canIntervene(this.match.intervention.type);
     const canPlayInBuildPhase = this.player.isActivePlayer
