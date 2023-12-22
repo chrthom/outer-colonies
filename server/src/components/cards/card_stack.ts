@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 import { spliceCardStackByUUID } from '../utils/helpers';
+import Match from '../game_state/match';
 
 export default class CardStack {
   card!: Card;
@@ -32,11 +33,11 @@ export default class CardStack {
       console.log(
         `WARN: ${this.player.name} tried to attack with a card ${this.card.name}, which cannot attack`
       );
-    } else if (!this.card.isInRange(this.player.match.battle.range)) {
+    } else if (!this.card.isInRange(this.match.battle.range)) {
       console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} at wrong range`);
     } else {
       const attackResult = this.card.attack(this, target);
-      this.player.match.battle.recentAttack = {
+      this.match.battle.recentAttack = {
         sourceUUID: this.rootCardStack.uuid,
         sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),
         targetUUID: target.uuid,
@@ -59,13 +60,12 @@ export default class CardStack {
     return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
   }
   get canBeRetracted(): boolean {
-    const player = this.player;
     return (
-      player.isActivePlayer &&
-      player.isPendingPlayer &&
-      player.match.turnPhase == TurnPhase.Build &&
+      this.player.isActivePlayer &&
+      this.player.isPendingPlayer &&
+      this.match.turnPhase == TurnPhase.Build &&
       this.card.canBeRetracted(this.isRootCard) &&
-      player.actionPool.toString() == player.originalActions.toString()
+      this.player.actionPool.toString() == this.player.originalActions.toString()
     );
   }
   combatPhaseReset(initial: boolean) {
@@ -84,17 +84,19 @@ export default class CardStack {
   get player(): Player {
     return this.parentCardStack ? this.parentCardStack.player : this.parentPlayer;
   }
+  get match(): Match {
+    return this.player.match;
+  }
   get rootCardStack(): CardStack {
     if (this.parentCardStack) return this.parentCardStack.rootCardStack;
     else return this;
   }
   get validTargets(): CardStack[] {
-    let canIntervene = false;
-    if (!this.player.isActivePlayer && this.player.match.turnPhase == TurnPhase.Start) {
-      canIntervene = this.card.canIntervene(Intervention.OpponentTurnStart);
-    }
+    let canIntervene = this.player.isPendingPlayer
+      && this.match.intervention
+      && this.card.canIntervene(this.match.intervention.type);
     const canPlayInBuildPhase = this.player.isActivePlayer
-      && this.player.match.turnPhase == TurnPhase.Build
+      && this.match.turnPhase == TurnPhase.Build
       && !this.player.hasInsufficientEnergyCard;
     return this.zone == Zone.Hand
       && (canIntervene || canPlayInBuildPhase)

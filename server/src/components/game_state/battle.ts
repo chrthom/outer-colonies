@@ -60,10 +60,7 @@ export default class Battle {
               .reduce((a, b) => Math.min(a, b))))
     );
   }
-  processBattleRound(match: Match) { // TODO: #252 Intervention cards
-    if (match.actionPendingByPlayerNo == opponentPlayerNo(match.activePlayerNo)) {
-      this.processEndOfBattlePhase(match)
-    }
+  processBattleRound(match: Match) {
     match.actionPendingByPlayerNo = opponentPlayerNo(match.actionPendingByPlayerNo);
     if (this.range == 0) {
       if (this.type == BattleType.Mission) this.applyMissionResult(match);
@@ -77,10 +74,7 @@ export default class Battle {
       if (!hasAttack || !hasTarget) this.processBattleRound(match);
     }
   }
-  resetRecentAttack() {
-    this.recentAttack = null;
-  }
-  private processEndOfBattlePhase(match: Match) {
+  processEndOfBattlePhase(match: Match) {
     this.range--;
     match.players.forEach(player => {
       this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
@@ -97,6 +91,9 @@ export default class Battle {
         ...match.players[match.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
       );
     }
+  }
+  resetRecentAttack() {
+    this.recentAttack = null;
   }
   private applyMissionResult(match: Match) {
     const player = match.getActivePlayer();

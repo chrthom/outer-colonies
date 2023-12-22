@@ -103,21 +103,24 @@ export default class Match {
     }
   }
   processBattleRound() {
+    if (this.actionPendingByPlayerNo == opponentPlayerNo(this.activePlayerNo)) {
+      this.battle.processEndOfBattlePhase(this)
+    }
     this.battle.processBattleRound(this);
   }
   checkToNextPhase() {
-    this.intervention = undefined;
-    if (this.turnPhase == TurnPhase.Start && this.activePlayerNo != this.actionPendingByPlayerNo) {
+    if (this.intervention?.type == Intervention.OpponentTurnStart) {
       this.checkStartPhaseIntervention();
     }
   }
   private checkStartPhaseIntervention() {
-    if (this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
-      this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
-      this.intervention = {
-        type: Intervention.OpponentTurnStart
-      };
-    } else {
+    this.intervention = {
+      type: Intervention.OpponentTurnStart
+    };
+    this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    if (!this.getInactivePlayer().hand.some(cs => cs.hasValidTargets)) {
+      this.intervention = undefined;
+      this.actionPendingByPlayerNo = this.activePlayerNo;
       this.prepareBuildPhase();
     }
   }
