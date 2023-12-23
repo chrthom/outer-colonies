@@ -23,6 +23,22 @@ export class Card174 extends MilitaryTacticCard {
   }
 }
 
+export class Card331 extends MilitaryTacticCard {
+  private readonly damageToRepair = 3;
+  constructor() {
+    super(331, 'Schadenskontrolle', 2);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.damage -= Math.min(this.damageToRepair, target.damage);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
+  }
+  override canIntervene(intervention: Intervention): boolean {
+    return intervention == Intervention.BattleRoundEnd;
+  }
+}
+
 export class Card337 extends MilitaryTacticCard {
   private oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
