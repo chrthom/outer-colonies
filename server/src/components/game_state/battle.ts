@@ -71,7 +71,7 @@ export default class Battle {
         .filter(cs => cs.attackAvailable)
         .some(cs => (<EquipmentCard>cs.card).attackProfile.range >= this.range);
       const hasTarget = this.ships[match.getWaitingPlayerNo()].length > 0;
-      if (!hasAttack || !hasTarget) this.processBattleRound(match);
+      if (!hasAttack || !hasTarget) match.processBattleRound();
     }
   }
   processEndOfBattlePhase(match: Match) {
