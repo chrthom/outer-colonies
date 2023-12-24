@@ -186,65 +186,64 @@ export default class CardStack {
   private onClickAction(cardData: ClientCard) {
     const state = this.scene.state;
     if (state.playerPendingAction) {
-      switch (state.turnPhase) {
-        case TurnPhase.Start:
-          if (!state.playerIsActive) {
-            if (this.scene.activeCards.hand) {
-              this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
-            }
-          }
-          break;
-        case TurnPhase.Build:
-          if (state.playerIsActive) {
-            if (this.scene.activeCards.hand) {
-              this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
-            } else if (this.isOpponentColony) {
-              this.scene.resetView(
-                this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
-              );
-            } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
-              if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
-                this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(
-                  id => id != this.uuid
+      if (state.intervention) {
+        if (this.scene.activeCards.hand) {
+          this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+        }
+      } else {
+        switch (state.turnPhase) {
+          case TurnPhase.Build:
+            if (state.playerIsActive) {
+              if (this.scene.activeCards.hand) {
+                this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+              } else if (this.isOpponentColony) {
+                this.scene.resetView(
+                  this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
                 );
-              } else {
-                this.scene.plannedBattle.shipIds.push(this.uuid);
+              } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
+                if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
+                  this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(
+                    id => id != this.uuid
+                  );
+                } else {
+                  this.scene.plannedBattle.shipIds.push(this.uuid);
+                }
+              }
+            } else {
+              if (this.data.missionReady) {
+                if (this.scene.interceptShipIds.includes(this.uuid)) {
+                  this.scene.interceptShipIds = this.scene.interceptShipIds.filter(id => id != this.uuid);
+                } else if (this.data.interceptionReady) {
+                  this.scene.interceptShipIds.push(this.uuid);
+                }
               }
             }
-          } else {
-            if (this.data.missionReady) {
-              if (this.scene.interceptShipIds.includes(this.uuid)) {
-                this.scene.interceptShipIds = this.scene.interceptShipIds.filter(id => id != this.uuid);
-              } else if (this.data.interceptionReady) {
-                this.scene.interceptShipIds.push(this.uuid);
-              }
+            break;
+          case TurnPhase.Combat:
+            if (
+              this.scene.activeCards.stack == this.uuid &&
+              this.scene.activeCards.stackIndex == cardData.index
+            ) {
+              this.scene.activeCards.stack = undefined;
+              this.scene.activeCards.stackIndex = undefined;
+              this.scene.activeCards.hand = undefined;
+            } else if (cardData.battleReady) {
+              this.scene.activeCards.stack = this.uuid;
+              this.scene.activeCards.stackIndex = cardData.index;
+              this.scene.activeCards.hand = undefined;
+            } else if (
+              this.scene.activeCards.stack &&
+              this.scene.state.battle?.opponentShipIds.includes(this.uuid)
+            ) {
+              this.scene.socket.emit(
+                MsgTypeInbound.Attack,
+                this.scene.activeCards.stack,
+                this.scene.activeCards.stackIndex,
+                this.uuid
+              );
             }
-          }
-          break;
-        case TurnPhase.Combat:
-          if (
-            this.scene.activeCards.stack == this.uuid &&
-            this.scene.activeCards.stackIndex == cardData.index
-          ) {
-            this.scene.activeCards.stack = undefined;
-            this.scene.activeCards.stackIndex = undefined;
-            this.scene.activeCards.hand = undefined;
-          } else if (cardData.battleReady) {
-            this.scene.activeCards.stack = this.uuid;
-            this.scene.activeCards.stackIndex = cardData.index;
-            this.scene.activeCards.hand = undefined;
-          } else if (
-            this.scene.activeCards.stack &&
-            this.scene.state.battle?.opponentShipIds.includes(this.uuid)
-          ) {
-            this.scene.socket.emit(
-              MsgTypeInbound.Attack,
-              this.scene.activeCards.stack,
-              this.scene.activeCards.stackIndex,
-              this.uuid
-            );
-          }
-          break;
+            break;
+        }
       }
       this.scene.updateView();
     }
