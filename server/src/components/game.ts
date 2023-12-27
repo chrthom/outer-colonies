@@ -22,7 +22,7 @@ function emitState(io: Server, match: Match) {
     if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
     else console.log('WARN: Could not find socket to emit state');
   });
-  match.battle.resetRecentAttack();
+  match.resetTempStates();
 }
 
 function initMatch(io: Server, match: Match) {

@@ -79,7 +79,7 @@ export class Card428 extends MilitaryTacticCard {
   getValidTargets(player: Player): CardStack[] {
     if (player.match.turnPhase != TurnPhase.Combat) return [];
     return player.match.battle.ships[player.match.getWaitingPlayerNo()]
-      .filter(cs => cs.profile.speed <= this.speedLimit);
+      .filter(cs => cs.profile.speed <= this.speedLimit && cs.isInBattle);
   }
   override canIntervene(intervention: Intervention): boolean {
     return intervention == Intervention.BattleRoundStart;

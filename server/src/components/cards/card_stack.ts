@@ -92,13 +92,14 @@ export default class CardStack {
     else return this;
   }
   get validTargets(): CardStack[] {
-    const canIntervene = this.player.isPendingPlayer
-      && this.match.intervention
+    const canIntervene = this.match.intervention
       && this.card.canIntervene(this.match.intervention.type);
-    const canPlayInBuildPhase = this.player.isActivePlayer
+    const canPlayInBuildPhase = !this.match.intervention
+      && this.player.isActivePlayer
       && this.match.turnPhase == TurnPhase.Build
       && !this.player.hasInsufficientEnergyCard;
-    return this.zone == Zone.Hand
+    return this.player.isPendingPlayer
+      && this.zone == Zone.Hand
       && (canIntervene || canPlayInBuildPhase)
       && this.player.actionPool.hasActionFor(this.card)
       ? this.card.getValidTargets(this.player)
@@ -172,6 +173,9 @@ export default class CardStack {
     this.removeCardStack();
     this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
     this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
+  }
+  get isInBattle(): boolean {
+    return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);
   }
   get type(): CardType {
     return this.card.type;

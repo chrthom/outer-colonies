@@ -52,6 +52,9 @@ export default class Match {
     f(0);
     f(1);
   }
+  resetTempStates() {
+    this.battle.resetRecentAttack();
+  }
   setStartPlayer() {
     if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
     else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
@@ -145,14 +148,14 @@ export default class Match {
           this.checkIntervention(Intervention.BattleRoundStart);
         }
         break;
-      case Intervention.BattleRoundEnd:
-          if (this.actionPendingByPlayerNo == this.activePlayerNo) {
-            this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
-            this.checkIntervention(Intervention.BattleRoundStart);
-          } else {
-            this.actionPendingByPlayerNo = this.activePlayerNo;
-          }
-          break;
+      case Intervention.BattleRoundStart:
+        if (this.actionPendingByPlayerNo == this.activePlayerNo) {
+          this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+          this.checkIntervention(Intervention.BattleRoundStart);
+        } else {
+          this.actionPendingByPlayerNo = this.activePlayerNo;
+        }
+        break;
     }
   }
 }
