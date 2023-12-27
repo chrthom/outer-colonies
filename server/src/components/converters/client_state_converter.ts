@@ -51,7 +51,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           return {
             id: cs.card.id,
             index: index,
-            battleReady: cs.canAttack(player),
+            battleReady: cs.canAttack,
             retractable: ownedByPlayer && cs.canBeRetracted,
             insufficientEnergy: cs.hasInsufficientEnergy
           };

@@ -118,12 +118,24 @@ export default class Match {
       this.checkIntervention(this.intervention.type);
     }
   }
+  planAttack(srcWeapon: CardStack, target: CardStack) {
+    this.checkIntervention(Intervention.Attack);
+    if (this.intervention) {
+      this.intervention.attack = {
+        sourceUUID: srcWeapon.rootCardStack.uuid,
+        sourceIndex: srcWeapon.rootCardStack.cardStacks.findIndex(cs => cs.uuid == srcWeapon.uuid),
+        targetUUID: target.uuid
+      };
+    }
+  }
   checkIntervention(intervention: Intervention) {
     this.intervention = {
       type: intervention
     };
     if (intervention == Intervention.OpponentTurnStart) {
       this.actionPendingByPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    } else if (intervention == Intervention.Attack) {
+      this.actionPendingByPlayerNo = this.getWaitingPlayerNo();
     }
     if (!this.getPendingActionPlayer().hand.some(cs => cs.hasValidTargets)) {
       this.skipIntervention();
@@ -156,6 +168,20 @@ export default class Match {
           this.actionPendingByPlayerNo = this.activePlayerNo;
         }
         break;
+      case Intervention.Attack:
+        this.actionPendingByPlayerNo = this.getWaitingPlayerNo();
+        const attack = this.intervention.attack;
+        this.getSrcWeapon(attack.sourceUUID, attack.sourceIndex).attack(this.getAttackTarget(attack.targetUUID));
+        break;
     }
+  }
+  getSrcWeapon(srcId: string, srcIndex: number): CardStack | null {
+    const playerShips = this.battle.ships[this.actionPendingByPlayerNo];
+    const srcShip = playerShips.find(cs => cs.uuid == srcId);
+    return srcShip ? srcShip.cardStacks[srcIndex] : null;
+  }
+  getAttackTarget(targetId: string): CardStack | null {
+    const opponentShips = this.battle.ships[this.getWaitingPlayerNo()];
+    return opponentShips.find(cs => cs.uuid == targetId);
   }
 }

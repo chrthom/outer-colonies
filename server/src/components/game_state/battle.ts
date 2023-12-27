@@ -13,10 +13,10 @@ export interface Attack {
   sourceUUID: string;
   sourceIndex: number;
   targetUUID: string;
-  pointDefense: number;
-  shield: number;
-  armour: number;
-  damage: number;
+  pointDefense?: number;
+  shield?: number;
+  armour?: number;
+  damage?: number;
 }
 
 export default class Battle {

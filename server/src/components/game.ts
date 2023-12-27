@@ -132,25 +132,16 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
     const match = socketData(socket).match;
     const player = getPlayer(socket);
-    const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
-    const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
-    const srcShip = playerShips.find(cs => cs.uuid == srcId);
-    const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
-    const target = opponentShips.find(cs => cs.uuid == targetId);
-    if (!srcShip) {
-      console.log(`WARN: ${player.name} tried to attack from non-existing ship ${srcId}`);
-    } else if (!srcWeapon) {
-      console.log(
-        `WARN: ${player.name} tried to attack from invalid weapon index ${srcIndex} of ${srcShip.card.name}`
-      );
+    const srcWeapon = match.getSrcWeapon(srcId, srcIndex);
+    const target = match.getAttackTarget(targetId);
+    if (!srcWeapon) {
+      console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
     } else if (!target) {
       console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
-    } else if (!srcWeapon.attackAvailable) {
-      console.log(
-        `WARN: ${player.name} tried to attack from deactivated weapon index ${srcIndex} (${srcWeapon.card.name})`
-      );
+    } else if (!srcWeapon.canAttack) {
+      console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} which cannot attack`);
     } else {
-      srcWeapon.attack(target);
+      this.match.planAttack(srcWeapon, target);
     }
     emitState(io, match);
   });

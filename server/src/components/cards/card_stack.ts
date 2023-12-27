@@ -29,30 +29,22 @@ export default class CardStack {
     this.attachedCardStacks.push(cardStack);
   }
   attack(target: CardStack) {
-    if (!this.attackAvailable) {
-      console.log(
-        `WARN: ${this.player.name} tried to attack with a card ${this.card.name}, which cannot attack`
-      );
-    } else if (!this.card.isInRange(this.match.battle.range)) {
-      console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} at wrong range`);
-    } else {
-      const attackResult = this.card.attack(this, target);
-      this.match.battle.recentAttack = {
-        sourceUUID: this.rootCardStack.uuid,
-        sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),
-        targetUUID: target.uuid,
-        pointDefense: attackResult.pointDefense,
-        shield: attackResult.shield,
-        armour: attackResult.armour,
-        damage: attackResult.damage
-      };
-      this.attackAvailable = false;
-    }
+    const attackResult = this.card.attack(this, target);
+    this.match.battle.recentAttack = {
+      sourceUUID: this.rootCardStack.uuid,
+      sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),
+      targetUUID: target.uuid,
+      pointDefense: attackResult.pointDefense,
+      shield: attackResult.shield,
+      armour: attackResult.armour,
+      damage: attackResult.damage
+    };
+    this.attackAvailable = false;
   }
-  canAttack(player: Player): boolean {
+  get canAttack(): boolean {
     return (
       this.attackAvailable &&
-      this.card.isInRange(player.match.battle.range) &&
+      this.isInCombatRange &&
       this.rootCardStack.isFlightReady
     );
   }
@@ -190,6 +182,9 @@ export default class CardStack {
   }
   private get isRootCard() {
     return !this.parentCardStack;
+  }
+  private get isInCombatRange() {
+    return this.card.isInRange(this.match.battle.range);
   }
 }
 
