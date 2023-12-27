@@ -6,6 +6,7 @@ import ActionPool from './action_pool';
 import Player from '../game_state/player';
 import { spliceCardStackByUUID } from '../utils/helpers';
 import Match from '../game_state/match';
+import TacticCard from './types/tactic_card';
 
 export default class CardStack {
   card!: Card;
@@ -28,8 +29,8 @@ export default class CardStack {
     cardStack.parentCardStack = this;
     this.attachedCardStacks.push(cardStack);
   }
-  attack(target: CardStack) {
-    const attackResult = this.card.attack(this, target);
+  attack(target: CardStack, interventionCard?: TacticCard) {
+    const attackResult = this.card.attack(this, target, interventionCard);
     this.match.battle.recentAttack = {
       sourceUUID: this.rootCardStack.uuid,
       sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),

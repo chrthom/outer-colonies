@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, CardDurability, Intervention } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { opponentPlayerNo } from '../../utils/helpers';
 import Card from '../card';
@@ -12,6 +12,9 @@ export default abstract class TacticCard extends Card {
   onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
+  adjustedAttackDamageByIntervention(weapon: CardStack, target: CardStack, damage: number): number {
+    return damage;
+  }
   override canBeRetracted(): boolean {
     return false;
   }

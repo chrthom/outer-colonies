@@ -3,6 +3,7 @@ import CardProfile, { CardProfileConfig } from './card_profile';
 import { CardType, TurnPhase, Zone, CardDurability, Intervention } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
+import TacticCard from './types/tactic_card';
 
 export default abstract class Card {
   readonly id!: number;
@@ -19,7 +20,7 @@ export default abstract class Card {
   }
   abstract getValidTargets(player: Player): CardStack[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  attack(attackingShip: CardStack, target: CardStack): AttackResult {
+  attack(attackingShip: CardStack, target: CardStack, interventionCard?: TacticCard): AttackResult {
     return new AttackResult(0);
   }
   get canAttack(): boolean {

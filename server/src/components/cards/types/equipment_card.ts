@@ -4,6 +4,7 @@ import CardStack from '../card_stack';
 import { AttackProfile } from '../card_profile';
 import { CardType, DefenseType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import TacticCard from './tactic_card';
 
 export default abstract class EquipmentCard extends Card {
   readonly attackProfile?: AttackProfile;
@@ -31,12 +32,16 @@ export default abstract class EquipmentCard extends Card {
   onStartTurn() {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEndTurn(player: Player, source: CardStack) {}
-  override attack(weapon: CardStack, target: CardStack): AttackResult {
+  override attack(weapon: CardStack, target: CardStack, interventionCard?: TacticCard): AttackResult {
     const attackingShip = weapon.rootCardStack;
     const match = attackingShip.player.match;
     let damage = this.attackDamageBeforeReductions(target);
-    if (attackingShip.profile.speed + match.battle.range < target.profile.speed)
+    if (interventionCard) {
+      damage = interventionCard.adjustedAttackDamageByIntervention(weapon, target, damage);
+    }
+    if (attackingShip.profile.speed + match.battle.range < target.profile.speed) {
       damage = Math.round(damage / 2);
+    }
     const attackResult = this.attackStep(
       target,
       match.battle.ships[match.getWaitingPlayerNo()],
