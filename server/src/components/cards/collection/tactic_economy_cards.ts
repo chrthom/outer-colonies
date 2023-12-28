@@ -68,14 +68,15 @@ export class Card235 extends EconomyTacticCard {
   constructor() {
     super(235, 'Blindgänger', 1);
   }
-  onEnterGame(player: Player, target: CardStack) { // TODO: This should be a generic function in a central place
+  onEnterGame(player: Player, target: CardStack) {
+    // TODO: This should be a generic function in a central place
     player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
     const intervention = player.match.intervention;
-    intervention.attackSrc.attack(intervention.attackTarget, this);
+    intervention.attackSrc.attack(target, this);
   }
   getValidTargets(player: Player): CardStack[] {
     const attackTarget = player.match.intervention?.attackTarget;
-    return attackTarget && player.match.intervention?.attackSrc.profile.phi > 0 ? [ attackTarget ] : [];
+    return attackTarget && player.match.intervention?.attackSrc.profile.phi > 0 ? [attackTarget] : [];
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;

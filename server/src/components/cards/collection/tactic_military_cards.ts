@@ -1,4 +1,4 @@
-import { CardType, Intervention, TacticDiscipline, TurnPhase } from '../../../shared/config/enums';
+import { CardType, Intervention, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -74,11 +74,12 @@ export class Card428 extends MilitaryTacticCard {
     super(428, 'Ausmanövriert', 2);
   }
   onEnterGame(player: Player, target: CardStack) {
-    target.cardStacks.forEach(cs => cs.attackAvailable = false);
+    target.cardStacks.forEach(cs => (cs.attackAvailable = false));
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.match.battle.ships[player.match.getWaitingPlayerNo()]
-      .filter(cs => cs.profile.speed <= this.speedLimit && cs.isInBattle);
+    return player.match.battle.ships[player.match.getWaitingPlayerNo()].filter(
+      cs => cs.profile.speed <= this.speedLimit && cs.isInBattle
+    );
   }
   override canIntervene(intervention: Intervention): boolean {
     return intervention == Intervention.BattleRoundStart;

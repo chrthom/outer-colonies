@@ -90,7 +90,9 @@ export default class Prompt {
     this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showIntervention() {
-    this.show('Unterbreche den gegnerischen Zug durch das\nSpielen einer Taktikkarte mit der Eigenschaft\n"Intervention"!');
+    this.show(
+      'Unterbreche den gegnerischen Zug durch das\nSpielen einer Taktikkarte mit der Eigenschaft\n"Intervention"!'
+    );
   }
   private showGameOver(gameResult: ClientGameResult) {
     let gameOverText: string;

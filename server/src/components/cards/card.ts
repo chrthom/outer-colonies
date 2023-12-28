@@ -1,6 +1,6 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase, Zone, CardDurability, Intervention } from '../../shared/config/enums';
+import { CardType, Zone, CardDurability, Intervention } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 import TacticCard from './types/tactic_card';
@@ -30,6 +30,7 @@ export default abstract class Card {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canIntervene(intervention: Intervention): boolean {
     return false;
   }

@@ -157,7 +157,9 @@ export default class ContinueButton {
     this.show('Karten ablegen', 'active_select');
   }
   private showIntervention(isActivePlayer: boolean) {
-    this.show('Überspringen', `${isActivePlayer ? '' : 'in'}active_select`, () => this.scene.socket.emit(MsgTypeInbound.Ready, this.scene.state.turnPhase));
+    this.show('Überspringen', `${isActivePlayer ? '' : 'in'}active_select`, () =>
+      this.scene.socket.emit(MsgTypeInbound.Ready, this.scene.state.turnPhase)
+    );
   }
   private showGameOver(gameResult: ClientGameResult) {
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {

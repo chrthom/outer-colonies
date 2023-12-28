@@ -11,10 +11,7 @@ abstract class IntelligenceTacticCard extends TacticCard {
 }
 
 export class Card231 extends IntelligenceTacticCard {
-  removeActions: CardAction[] = [
-    CardType.Hull,
-    CardType.Equipment
-  ].map(ct => new CardAction(ct));
+  removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(ct => new CardAction(ct));
   constructor() {
     super(231, 'Unruhen schüren', 2);
   }

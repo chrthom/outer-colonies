@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { CardType, Intervention, TurnPhase, Zone } from '../../shared/config/enums';
+import { CardType, TurnPhase, Zone } from '../../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -43,11 +43,7 @@ export default class CardStack {
     this.attackAvailable = false;
   }
   get canAttack(): boolean {
-    return (
-      this.attackAvailable &&
-      this.isInCombatRange &&
-      this.rootCardStack.isFlightReady
-    );
+    return this.attackAvailable && this.isInCombatRange && this.rootCardStack.isFlightReady;
   }
   canBeAttachedTo(cardStack: CardStack): boolean {
     return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
@@ -85,16 +81,16 @@ export default class CardStack {
     else return this;
   }
   get validTargets(): CardStack[] {
-    const canIntervene = this.match.intervention
-      && this.card.canIntervene(this.match.intervention.type);
-    const canPlayInBuildPhase = !this.match.intervention
-      && this.player.isActivePlayer
-      && this.match.turnPhase == TurnPhase.Build
-      && !this.player.hasInsufficientEnergyCard;
-    return this.player.isPendingPlayer
-      && this.zone == Zone.Hand
-      && (canIntervene || canPlayInBuildPhase)
-      && this.player.actionPool.hasActionFor(this.card)
+    const canIntervene = this.match.intervention && this.card.canIntervene(this.match.intervention.type);
+    const canPlayInBuildPhase =
+      !this.match.intervention &&
+      this.player.isActivePlayer &&
+      this.match.turnPhase == TurnPhase.Build &&
+      !this.player.hasInsufficientEnergyCard;
+    return this.player.isPendingPlayer &&
+      this.zone == Zone.Hand &&
+      (canIntervene || canPlayInBuildPhase) &&
+      this.player.actionPool.hasActionFor(this.card)
       ? this.card.getValidTargets(this.player)
       : [];
   }
@@ -136,7 +132,8 @@ export default class CardStack {
   }
   get profile(): CardProfile {
     const profile = this.cards.map(c => c.profile).reduce((a, b) => a.combine(b));
-    if (this.type == CardType.Colony) {7
+    if (this.type == CardType.Colony) {
+      7;
       profile.energy = this.player.cardStacks
         .filter(cs => cs.zone == Zone.Colony)
         .filter(cs => cs.type == CardType.Infrastructure)

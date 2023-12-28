@@ -142,7 +142,9 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     } else if (!target) {
       console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
     } else if (!srcWeapon.canAttack) {
-      console.log(`WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`);
+      console.log(
+        `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
+      );
     } else {
       this.match.planAttack(srcWeapon, target);
     }

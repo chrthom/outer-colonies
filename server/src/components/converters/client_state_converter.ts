@@ -86,21 +86,26 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     range: match.battle.range,
     recentAttack: match.battle.recentAttack
   };
-  const intervention: ClientIntervention = match.intervention ? {
-    type: match.intervention.type,
-    attack: match.intervention.attackSrc && match.intervention.attackTarget ?
-      {
-        sourceUUID: match.intervention.attackSrc.uuid,
-        sourceIndex: match.intervention.attackSrc.rootCardStack.cardStacks
-          .findIndex(cs => cs.uuid == match.intervention.attackSrc.uuid),
-        targetUUID: match.intervention.attackTarget.uuid,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        damage: 0
-      } : undefined,
-    tacticCard: match.intervention.tacticCard
-  } : null;
+  const intervention: ClientIntervention = match.intervention
+    ? {
+        type: match.intervention.type,
+        attack:
+          match.intervention.attackSrc && match.intervention.attackTarget
+            ? {
+                sourceUUID: match.intervention.attackSrc.uuid,
+                sourceIndex: match.intervention.attackSrc.rootCardStack.cardStacks.findIndex(
+                  cs => cs.uuid == match.intervention.attackSrc.uuid
+                ),
+                targetUUID: match.intervention.attackTarget.uuid,
+                pointDefense: 0,
+                shield: 0,
+                armour: 0,
+                damage: 0
+              }
+            : undefined,
+        tacticCard: match.intervention.tacticCard
+      }
+    : null;
   const opponentData: ClientOpponent = {
     name: opponent.name,
     handCardSize: opponent.hand.length,

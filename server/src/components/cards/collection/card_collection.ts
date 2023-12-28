@@ -67,7 +67,7 @@ import {
   Card452,
   Card453
 } from './infrastructure_energy_cards';
-import { Card141, Card165, Card232, Card321, Card427 } from './tactic_economy_cards';
+import { Card141, Card165, Card232, Card235, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import {
   Card166,
@@ -234,6 +234,7 @@ export default class CardCollection {
     231: <Card>new Card231(),
     232: <Card>new Card232(),
     234: <Card>new Card234(),
+    235: <Card>new Card235(),
     237: <Card>new Card237(),
     238: <Card>new Card238(),
     240: <Card>new Card240(),

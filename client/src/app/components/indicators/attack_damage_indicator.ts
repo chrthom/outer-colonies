@@ -12,6 +12,7 @@ export default class AttackDamageIndicator {
     this.cardImage = cardStack.cards[0].image;
     ['pointDefense', 'shield', 'armour', 'damage']
       .map(key => [attack[key], layoutConfig.attack.color[key]])
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([value, _]) => value > 0)
       .forEach(
         ([value, color], index) =>
@@ -26,6 +27,7 @@ export default class AttackDamageIndicator {
       ['white', attack.armour * 2],
       ['red', attack.damage * 2]
     ]
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, n]) => Number(n) > 0)
       .map(([color, n]) => {
         const emitter = this.createParticleEmitter(String(color));
