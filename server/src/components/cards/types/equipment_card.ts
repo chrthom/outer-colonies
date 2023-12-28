@@ -37,7 +37,7 @@ export default abstract class EquipmentCard extends Card {
     const match = attackingShip.player.match;
     let damage = this.attackDamageBeforeReductions(target);
     if (interventionCard) {
-      damage = interventionCard.adjustedAttackDamageByIntervention(weapon, target, damage);
+      damage = interventionCard.adjustedAttackDamageByIntervention(damage);
     }
     if (attackingShip.profile.speed + match.battle.range < target.profile.speed) {
       damage = Math.round(damage / 2);

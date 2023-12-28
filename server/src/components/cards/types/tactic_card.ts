@@ -12,7 +12,7 @@ export default abstract class TacticCard extends Card {
   onLeaveGame() {}
   onStartTurn() {}
   onEndTurn() {}
-  adjustedAttackDamageByIntervention(weapon: CardStack, target: CardStack, damage: number): number {
+  adjustedAttackDamageByIntervention(damage: number): number {
     return damage;
   }
   override canBeRetracted(): boolean {
@@ -27,5 +27,10 @@ export default abstract class TacticCard extends Card {
   }
   protected getOpponentPlayer(player: Player): Player {
     return player.match.players[opponentPlayerNo(player.no)];
+  }
+  protected onEnterGameAttackIntervention(player: Player, target: CardStack) {
+    player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
+    const intervention = player.match.intervention;
+    intervention.attackSrc.attack(target, this);
   }
 }

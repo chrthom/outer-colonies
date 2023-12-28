@@ -15,9 +15,7 @@ export class Card173 extends MilitaryTacticCard {
     super(173, 'Ausweichmanöver', 1);
   }
   onEnterGame(player: Player, target: CardStack) {
-    player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
-    const intervention = player.match.intervention;
-    intervention.attackSrc.attack(target, this);
+    this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
     const attackTarget = player.match.intervention?.attackTarget;
