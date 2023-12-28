@@ -146,7 +146,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
       );
     } else {
-      this.match.planAttack(srcWeapon, target);
+      match.planAttack(srcWeapon, target);
     }
     emitState(io, match);
   });

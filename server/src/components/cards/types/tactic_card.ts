@@ -31,6 +31,7 @@ export default abstract class TacticCard extends Card {
   protected onEnterGameAttackIntervention(player: Player, target: CardStack) {
     player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
     const intervention = player.match.intervention;
+    player.match.intervention = undefined;
     intervention.attackSrc.attack(target, this);
   }
 }

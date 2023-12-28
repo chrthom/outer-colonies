@@ -61,7 +61,7 @@ export default class Battle {
     );
   }
   processBattleRound(match: Match) {
-    match.actionPendingByPlayerNo = opponentPlayerNo(match.actionPendingByPlayerNo);
+    match.actionPendingByPlayerNo = match.getWaitingPlayerNo();
     if (this.range == 0) {
       if (this.type == BattleType.Mission) this.applyMissionResult(match);
       match.prepareEndPhase();

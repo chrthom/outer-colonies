@@ -73,7 +73,7 @@ export class Card235 extends EconomyTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     const attackTarget = player.match.intervention?.attackTarget;
-    return attackTarget && player.match.intervention?.attackSrc.profile.phi > 0 ? [attackTarget] : [];
+    return attackTarget && player.match.intervention?.attackSrc.profile.phi < 0 ? [attackTarget] : [];
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;
