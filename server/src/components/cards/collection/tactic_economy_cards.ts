@@ -69,7 +69,6 @@ export class Card235 extends EconomyTacticCard {
     super(235, 'Blindgänger', 1);
   }
   onEnterGame(player: Player, target: CardStack) {
-    // TODO: This should be a generic function in a central place
     player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
     const intervention = player.match.intervention;
     intervention.attackSrc.attack(target, this);

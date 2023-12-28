@@ -10,6 +10,27 @@ abstract class MilitaryTacticCard extends TacticCard {
   }
 }
 
+export class Card173 extends MilitaryTacticCard {
+  constructor() {
+    super(173, 'Ausweichmanöver', 1);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
+    const intervention = player.match.intervention;
+    intervention.attackSrc.attack(target, this);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    const attackTarget = player.match.intervention?.attackTarget;
+    return attackTarget && attackTarget.profile.speed >= 3 ? [attackTarget] : [];
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  override canIntervene(intervention: Intervention): boolean {
+    return intervention == Intervention.Attack;
+  }
+}
+
 export class Card174 extends MilitaryTacticCard {
   private readonly damageToRepair = 8;
   constructor() {
