@@ -1,7 +1,7 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
 import { BattleType, CardDurability, Intervention, TurnPhase } from '../../shared/config/enums';
-import Battle, { Attack } from './battle';
+import Battle from './battle';
 import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
@@ -9,7 +9,8 @@ import GameResult from './game_result';
 
 export interface MatchIntervention {
   type: Intervention;
-  attack?: Attack;
+  attackSrc?: CardStack;
+  attackTarget?: CardStack;
   tacticCard?: number;
 }
 
@@ -121,11 +122,8 @@ export default class Match {
   planAttack(srcWeapon: CardStack, target: CardStack) {
     this.checkIntervention(Intervention.Attack);
     if (this.intervention) {
-      this.intervention.attack = {
-        sourceUUID: srcWeapon.rootCardStack.uuid,
-        sourceIndex: srcWeapon.rootCardStack.cardStacks.findIndex(cs => cs.uuid == srcWeapon.uuid),
-        targetUUID: target.uuid
-      };
+      this.intervention.attackSrc = srcWeapon;
+      this.intervention.attackTarget = target;
     }
   }
   checkIntervention(intervention: Intervention) {
@@ -142,9 +140,9 @@ export default class Match {
     }
   }
   skipIntervention() {
-    const intervention = this.intervention?.type;
+    const intervention = this.intervention;
     this.intervention = undefined;
-    switch (intervention) {
+    switch (intervention?.type) {
       case Intervention.OpponentTurnStart:
         this.actionPendingByPlayerNo = this.activePlayerNo;
         this.prepareBuildPhase();
@@ -170,18 +168,8 @@ export default class Match {
         break;
       case Intervention.Attack:
         this.actionPendingByPlayerNo = this.getWaitingPlayerNo();
-        const attack = this.intervention.attack;
-        this.getSrcWeapon(attack.sourceUUID, attack.sourceIndex).attack(this.getAttackTarget(attack.targetUUID));
+        intervention.attackSrc.attack(intervention.attackTarget);
         break;
     }
-  }
-  getSrcWeapon(srcId: string, srcIndex: number): CardStack | null {
-    const playerShips = this.battle.ships[this.actionPendingByPlayerNo];
-    const srcShip = playerShips.find(cs => cs.uuid == srcId);
-    return srcShip ? srcShip.cardStacks[srcIndex] : null;
-  }
-  getAttackTarget(targetId: string): CardStack | null {
-    const opponentShips = this.battle.ships[this.getWaitingPlayerNo()];
-    return opponentShips.find(cs => cs.uuid == targetId);
   }
 }

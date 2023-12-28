@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { CardType, Intervention, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -61,6 +61,27 @@ export class Card232 extends EconomyTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card235 extends EconomyTacticCard {
+  constructor() {
+    super(235, 'Blindgänger', 1);
+  }
+  onEnterGame(player: Player, target: CardStack) { // TODO: This should be a generic function in a central place
+    player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
+    const intervention = player.match.intervention;
+    intervention.attackSrc.attack(intervention.attackTarget, this);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    const attackTarget = player.match.intervention?.attackTarget;
+    return attackTarget && player.match.intervention?.attackSrc.profile.phi > 0 ? [ attackTarget ] : [];
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  override canIntervene(intervention: Intervention): boolean {
+    return intervention == Intervention.Attack;
   }
 }
 

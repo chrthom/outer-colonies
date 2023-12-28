@@ -132,14 +132,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
     const match = socketData(socket).match;
     const player = getPlayer(socket);
-    const srcWeapon = match.getSrcWeapon(srcId, srcIndex);
-    const target = match.getAttackTarget(targetId);
+    const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
+    const srcShip = playerShips.find(cs => cs.uuid == srcId);
+    const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
+    const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
+    const target = opponentShips.find(cs => cs.uuid == targetId);
     if (!srcWeapon) {
       console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
     } else if (!target) {
       console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
     } else if (!srcWeapon.canAttack) {
-      console.log(`WARN: ${this.player.name} tried to attack with a card ${this.card.name} which cannot attack`);
+      console.log(`WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`);
     } else {
       this.match.planAttack(srcWeapon, target);
     }
