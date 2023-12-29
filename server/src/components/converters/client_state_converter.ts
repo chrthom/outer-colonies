@@ -1,5 +1,5 @@
 import Match from '../game_state/match';
-import { CardType, Zone } from '../../shared/config/enums';
+import { CardType, InterventionType, Zone } from '../../shared/config/enums';
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/helpers';
 import {
@@ -12,6 +12,7 @@ import {
   ClientOpponent,
   ClientState
 } from '../../shared/interfaces/client_state';
+import { InterventionAttack } from '../game_state/intervention';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];
@@ -90,20 +91,22 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     ? {
         type: match.intervention.type,
         attack:
-          match.intervention.attackSrc && match.intervention.attackTarget
+          match.intervention.type == InterventionType.Attack
             ? {
-                sourceUUID: match.intervention.attackSrc.uuid,
-                sourceIndex: match.intervention.attackSrc.rootCardStack.cardStacks.findIndex(
-                  cs => cs.uuid == match.intervention.attackSrc.uuid
+                sourceUUID: (match.intervention as InterventionAttack).src.uuid,
+                sourceIndex: (
+                  match.intervention as InterventionAttack
+                ).src.rootCardStack.cardStacks.findIndex(
+                  cs => cs.uuid == (match.intervention as InterventionAttack).src.uuid
                 ),
-                targetUUID: match.intervention.attackTarget.uuid,
+                targetUUID: (match.intervention as InterventionAttack).target.uuid,
                 pointDefense: 0,
                 shield: 0,
                 armour: 0,
                 damage: 0
               }
             : undefined,
-        tacticCard: match.intervention.tacticCard
+        tacticCard: undefined // TODO: Add when tactic counters are implemented
       }
     : null;
   const opponentData: ClientOpponent = {

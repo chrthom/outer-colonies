@@ -1,4 +1,4 @@
-import { CardType, Intervention, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -18,14 +18,13 @@ export class Card173 extends MilitaryTacticCard {
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    const attackTarget = player.match.intervention?.attackTarget;
-    return attackTarget && attackTarget.profile.speed >= 3 ? [attackTarget] : [];
+    return this.getValidTargetsAttackIntervention(player, i => i.target.profile.speed >= 3);
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.Attack;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.Attack;
   }
 }
 
@@ -53,8 +52,8 @@ export class Card331 extends MilitaryTacticCard {
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.BattleRoundEnd;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.BattleRoundEnd;
   }
 }
 
@@ -100,7 +99,7 @@ export class Card428 extends MilitaryTacticCard {
       cs => cs.profile.speed <= this.speedLimit && cs.isInBattle && cs.type == CardType.Hull
     );
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.BattleRoundStart;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.BattleRoundStart;
   }
 }

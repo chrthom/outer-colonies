@@ -1,4 +1,5 @@
-import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
+import { InterventionAttack } from '../../game_state/intervention';
 import Player from '../../game_state/player';
 import { opponentPlayerNo } from '../../utils/helpers';
 import Card from '../card';
@@ -30,8 +31,16 @@ export default abstract class TacticCard extends Card {
   }
   protected onEnterGameAttackIntervention(player: Player, target: CardStack) {
     player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
-    const intervention = player.match.intervention;
+    const intervention = player.match.intervention as InterventionAttack;
     player.match.intervention = undefined;
-    intervention.attackSrc.attack(target, this);
+    intervention.src.attack(target, this);
+  }
+  protected getValidTargetsAttackIntervention(
+    player: Player,
+    condition: (i: InterventionAttack) => boolean
+  ): CardStack[] {
+    if (player.match.intervention.type != InterventionType.Attack) return [];
+    const intervention = player.match.intervention as InterventionAttack;
+    return condition(intervention) ? [intervention.target] : [];
   }
 }

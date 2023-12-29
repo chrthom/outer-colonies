@@ -1,4 +1,4 @@
-import { CardType, Intervention, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -18,15 +18,14 @@ export class Card129 extends IntelligenceTacticCard {
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    const attackTarget = player.match.intervention?.attackTarget;
     const colony = this.onlyColonyTarget(player.cardStacks);
-    return attackTarget && attackTarget.uuid == colony[0].uuid ? [attackTarget] : [];
+    return this.getValidTargetsAttackIntervention(player, i => i.target.uuid == colony[0].uuid);
   }
   override adjustedAttackDamageByIntervention(damage: number): number {
     return Math.round(damage / 2);
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.Attack;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.Attack;
   }
 }
 
@@ -41,7 +40,7 @@ export class Card231 extends IntelligenceTacticCard {
   getValidTargets(player: Player): CardStack[] {
     return player.isActivePlayer ? [] : this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.OpponentTurnStart;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.OpponentTurnStart;
   }
 }

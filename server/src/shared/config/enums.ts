@@ -35,7 +35,7 @@ export enum EventType {
   Tactic = 'tactic'
 }
 
-export enum Intervention {
+export enum InterventionType {
   Attack = 'attack',
   BattleRoundEnd = 'battle_round_end',
   BattleRoundStart = 'battle_round_start',

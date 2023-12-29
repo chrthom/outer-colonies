@@ -1,4 +1,4 @@
-import { CardType, Intervention, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -72,14 +72,13 @@ export class Card235 extends EconomyTacticCard {
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    const attackTarget = player.match.intervention?.attackTarget;
-    return attackTarget && player.match.intervention?.attackSrc.profile.phi < 0 ? [attackTarget] : [];
+    return this.getValidTargetsAttackIntervention(player, i => i.src.profile.phi < 0);
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;
   }
-  override canIntervene(intervention: Intervention): boolean {
-    return intervention == Intervention.Attack;
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.Attack;
   }
 }
 

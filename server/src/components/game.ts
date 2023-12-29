@@ -44,7 +44,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
       } else if (socketData(socket).playerNo == match.actionPendingByPlayerNo) {
         if (match.intervention) {
-          match.skipIntervention();
+          match.checkToNextPhase();
         } else {
           switch (turnPhase) {
             case TurnPhase.Build:

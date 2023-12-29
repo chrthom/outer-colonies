@@ -1,4 +1,4 @@
-import { EventType, BattleType, TurnPhase, Zone, GameResultType, Intervention } from '../config/enums';
+import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionType } from '../config/enums';
 
 export interface ClientOpponent {
   name: string;
@@ -18,7 +18,7 @@ export interface ClientAttack {
 }
 
 export interface ClientIntervention {
-  type: Intervention;
+  type: InterventionType;
   attack?: ClientAttack;
   tacticCard?: number;
 }
