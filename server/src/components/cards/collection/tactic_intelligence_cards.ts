@@ -19,7 +19,7 @@ export class Card129 extends IntelligenceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     const colony = this.onlyColonyTarget(player.cardStacks);
-    return this.getValidTargetsAttackIntervention(player, i => i.target.uuid == colony[0].uuid);
+    return this.getValidTargetsInterventionAttack(player, i => i.target.uuid == colony[0].uuid);
   }
   override adjustedAttackDamageByIntervention(damage: number): number {
     return Math.round(damage / 2);

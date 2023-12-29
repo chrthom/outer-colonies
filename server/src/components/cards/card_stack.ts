@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { CardType, TurnPhase, Zone } from '../../shared/config/enums';
+import { CardDurability, CardType, TurnPhase, Zone } from '../../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -47,6 +47,19 @@ export default class CardStack {
   }
   canBeAttachedTo(cardStack: CardStack): boolean {
     return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
+  }
+  playHandCard(target: CardStack) {
+    this.performImmediateEffect(target);
+    if (!this.card.isAttachSelfManaging) {
+      if (this.card.durability == CardDurability.Instant) {
+        this.player.discardCards(this.card);
+      } else if (target.type == CardType.Colony && this.type != CardType.Orb) {
+        this.zone = Zone.Colony;
+        this.player.cardStacks.push(this);
+      } else {
+        target.attach(this);
+      }
+    }
   }
   get canBeRetracted(): boolean {
     return (

@@ -1,5 +1,5 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
-import { InterventionAttack } from '../../game_state/intervention';
+import { InterventionAttack, InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
 import { opponentPlayerNo } from '../../utils/helpers';
 import Card from '../card';
@@ -30,18 +30,36 @@ export default abstract class TacticCard extends Card {
     return player.match.players[opponentPlayerNo(player.no)];
   }
   protected onEnterGameAttackIntervention(player: Player, target: CardStack) {
-    player.match.actionPendingByPlayerNo = player.match.getWaitingPlayerNo();
+    player.match.switchPendingPlayer();
     const intervention = player.match.intervention as InterventionAttack;
     player.match.intervention = undefined;
     intervention.src.attack(target, this);
   }
-  protected getValidTargetsAttackIntervention(
+  protected onEnterGameInterventionTacticCard(player: Player) {
+    player.match.switchPendingPlayer();
+    const intervention = player.match.intervention as InterventionTacticCard;
+    player.discardCards(intervention.src.card);
+    intervention.skip();
+  }
+  protected getValidTargetsInterventionAttack(
     player: Player,
     condition: (i: InterventionAttack) => boolean
   ): CardStack[] {
     if (player.match.intervention?.type == InterventionType.Attack) {
       const intervention = player.match.intervention as InterventionAttack;
       return condition(intervention) ? [intervention.target] : [];
+    }
+    return [];
+  }
+  protected getValidTargetsInterventionTacticCard(
+    player: Player,
+    disciplines: TacticDiscipline[]
+  ): CardStack[] {
+    if (player.match.intervention?.type == InterventionType.TacticCard) {
+      const intervention = player.match.intervention as InterventionTacticCard;
+      return disciplines.includes((intervention.src.card as TacticCard).discipline)
+        ? this.onlyColonyTarget(player.match.getWaitingPlayer().cardStacks)
+        : [];
     }
     return [];
   }

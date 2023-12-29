@@ -18,7 +18,7 @@ export class Card173 extends MilitaryTacticCard {
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getValidTargetsAttackIntervention(player, i => i.target.profile.speed >= 3);
+    return this.getValidTargetsInterventionAttack(player, i => i.target.profile.speed >= 3);
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;

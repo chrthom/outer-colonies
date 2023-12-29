@@ -29,7 +29,7 @@ export default abstract class Intervention {
     this.match.actionPendingByPlayerNo = this.match.activePlayerNo;
   }
   switchPendingPlayer() {
-    this.match.actionPendingByPlayerNo = opponentPlayerNo(this.match.actionPendingByPlayerNo);
+    this.match.switchPendingPlayer();
   }
   protected get switchPendingPlayerOnInit() {
     return true;
@@ -91,5 +91,23 @@ export class InterventionAttack extends Intervention {
     this.switchPendingPlayer();
     this.remove();
     this.src.attack(this.target);
+  }
+}
+
+export class InterventionTacticCard extends Intervention {
+  src!: CardStack;
+  target!: CardStack;
+  parentIntervention?: Intervention;
+  constructor(match: Match, src: CardStack, target: CardStack) {
+    super(InterventionType.TacticCard, match);
+    this.src = src;
+    this.target = target;
+    this.parentIntervention = this.match.intervention;
+  }
+  skip() {
+    this.switchPendingPlayer();
+    this.match.intervention = this.parentIntervention;
+    this.src.playHandCard(this.target);
+    this.match.checkToNextPhase();
   }
 }

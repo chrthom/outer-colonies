@@ -1,4 +1,5 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -72,13 +73,32 @@ export class Card235 extends EconomyTacticCard {
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getValidTargetsAttackIntervention(player, i => i.src.profile.phi < 0);
+    return this.getValidTargetsInterventionAttack(player, i => i.src.profile.phi < 0);
   }
   override adjustedAttackDamageByIntervention(): number {
     return 0;
   }
   override canIntervene(intervention: InterventionType): boolean {
     return intervention == InterventionType.Attack;
+  }
+}
+
+export class Card236 extends EconomyTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Science, TacticDiscipline.Trade];
+  constructor() {
+    super(236, 'Handelsembargo', 1);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  override canIntervene(intervention: InterventionType): boolean {
+    return intervention == InterventionType.TacticCard;
   }
 }
 

@@ -44,6 +44,9 @@ export default class Match {
   getWaitingPlayerNo(): number {
     return opponentPlayerNo(this.actionPendingByPlayerNo);
   }
+  switchPendingPlayer() {
+    this.actionPendingByPlayerNo = this.getWaitingPlayerNo();
+  }
   forAllPlayers(f: (playerNo: number) => void) {
     f(0);
     f(1);

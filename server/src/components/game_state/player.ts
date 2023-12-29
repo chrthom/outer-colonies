@@ -5,6 +5,7 @@ import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
+import { InterventionTacticCard } from './intervention';
 
 export default class Player {
   socketId!: string;
@@ -72,20 +73,15 @@ export default class Player {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
   playHandCard(handCard: CardStack, target: CardStack, freeAction?: boolean) {
+    // TODO: Check if "freeAction" is still needed
     if (!freeAction) this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
-    handCard.performImmediateEffect(target);
-    if (!handCard.card.isAttachSelfManaging) {
-      if (handCard.card.durability == CardDurability.Instant) {
-        this.discardCards(handCard.card);
-      } else if (target.type == CardType.Colony && handCard.type != CardType.Orb) {
-        handCard.zone = Zone.Colony;
-        this.cardStacks.push(handCard);
-      } else {
-        target.attach(handCard);
-      }
+    if (handCard.type == CardType.Tactic) {
+      new InterventionTacticCard(this.match, handCard, target);
+    } else {
+      handCard.playHandCard(target);
+      this.match.checkToNextPhase();
     }
-    this.match.checkToNextPhase();
   }
   get handCardLimit(): number {
     return this.cardStacks.map(cs => cs.profile.handCardLimit).reduce((a, b) => a + b);
