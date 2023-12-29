@@ -42,9 +42,13 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       if (turnPhase == TurnPhase.Init) {
         match.players[socketData(socket).playerNo].ready = true;
         if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
-      } else if (socketData(socket).playerNo == match.actionPendingByPlayerNo) {
+      } else if (
+        (socketData(socket).playerNo == match.actionPendingByPlayerNo && match.intervention) ||
+        turnPhase == TurnPhase.Build ||
+        turnPhase == TurnPhase.Combat
+      ) {
         if (match.intervention) {
-          match.checkToNextPhase();
+          match.skipIntervention();
         } else {
           switch (turnPhase) {
             case TurnPhase.Build:

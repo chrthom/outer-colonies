@@ -39,8 +39,10 @@ export default abstract class TacticCard extends Card {
     player: Player,
     condition: (i: InterventionAttack) => boolean
   ): CardStack[] {
-    if (player.match.intervention.type != InterventionType.Attack) return [];
-    const intervention = player.match.intervention as InterventionAttack;
-    return condition(intervention) ? [intervention.target] : [];
+    if (player.match.intervention?.type == InterventionType.Attack) {
+      const intervention = player.match.intervention as InterventionAttack;
+      return condition(intervention) ? [intervention.target] : [];
+    }
+    return [];
   }
 }

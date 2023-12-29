@@ -31,7 +31,7 @@ export default abstract class Intervention {
   switchPendingPlayer() {
     this.match.actionPendingByPlayerNo = opponentPlayerNo(this.match.actionPendingByPlayerNo);
   }
-  protected switchPendingPlayerOnInit() {
+  protected get switchPendingPlayerOnInit() {
     return true;
   }
 }
@@ -53,7 +53,6 @@ export class InterventionBattleRoundEnd extends Intervention {
   }
   skip() {
     if (this.match.actionPendingByPlayerNo == this.match.activePlayerNo) {
-      this.switchPendingPlayer();
       new InterventionBattleRoundEnd(this.match).init();
     } else {
       this.match.battle.processEndOfBattlePhase(this.match);
@@ -75,7 +74,7 @@ export class InterventionBattleRoundStart extends Intervention {
       this.remove();
     }
   }
-  protected override switchPendingPlayerOnInit() {
+  protected override get switchPendingPlayerOnInit() {
     return false;
   }
 }

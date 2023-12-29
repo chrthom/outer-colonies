@@ -119,4 +119,7 @@ export default class Match {
   checkToNextPhase() {
     this.intervention?.checkSkip();
   }
+  skipIntervention() {
+    this.intervention?.skip();
+  }
 }
