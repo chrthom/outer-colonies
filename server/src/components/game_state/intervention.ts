@@ -1,6 +1,5 @@
 import { InterventionType } from '../../shared/config/enums';
 import CardStack from '../cards/card_stack';
-import { opponentPlayerNo } from '../utils/helpers';
 import Match from './match';
 
 export default abstract class Intervention {

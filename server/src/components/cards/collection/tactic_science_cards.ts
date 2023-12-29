@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -85,5 +85,21 @@ export class Card316 extends ScienceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card443 extends ScienceTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Science];
+  constructor() {
+    super(443, 'Computer-Virus', 1);
+  }
+  onEnterGame(player: Player) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.TacticCard;
   }
 }

@@ -67,7 +67,7 @@ import {
   Card452,
   Card453
 } from './infrastructure_energy_cards';
-import { Card141, Card165, Card232, Card235, Card321, Card427 } from './tactic_economy_cards';
+import { Card141, Card165, Card232, Card235, Card236, Card321, Card427 } from './tactic_economy_cards';
 import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
 import {
   Card166,
@@ -133,8 +133,8 @@ import {
   Card314,
   Card315
 } from './hull_3_part_cards';
-import { Card173, Card174, Card331, Card337, Card338, Card428 } from './tactic_military_cards';
-import { Card110, Card144, Card162, Card316 } from './tactic_science_cards';
+import { Card173, Card174, Card331, Card337, Card338, Card346, Card428 } from './tactic_military_cards';
+import { Card110, Card144, Card162, Card316, Card443 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
 import { Card230, Card333, Card435 } from './infrastructure_start_cards';
@@ -143,7 +143,7 @@ import { Rarity } from '../../../shared/config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
 import { Card146, Card159, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
-import { Card129, Card231 } from './tactic_intelligence_cards';
+import { Card129, Card176, Card231 } from './tactic_intelligence_cards';
 
 export default class CardCollection {
   static cards = {
@@ -209,6 +209,7 @@ export default class CardCollection {
     172: <Card>new Card172(),
     173: <Card>new Card173(),
     174: <Card>new Card174(),
+    176: <Card>new Card176(),
     177: <Card>new Card177(),
     178: <Card>new Card178(),
     179: <Card>new Card179(),
@@ -237,6 +238,7 @@ export default class CardCollection {
     232: <Card>new Card232(),
     234: <Card>new Card234(),
     235: <Card>new Card235(),
+    236: <Card>new Card236(),
     237: <Card>new Card237(),
     238: <Card>new Card238(),
     240: <Card>new Card240(),
@@ -276,6 +278,7 @@ export default class CardCollection {
     343: <Card>new Card343(),
     344: <Card>new Card344(),
     345: <Card>new Card345(),
+    346: <Card>new Card346(),
     347: <Card>new Card347(),
     348: <Card>new Card348(),
     349: <Card>new Card349(),
@@ -307,6 +310,7 @@ export default class CardCollection {
     439: <Card>new Card439(),
     440: <Card>new Card440(),
     441: <Card>new Card441(),
+    443: <Card>new Card443(),
     444: <Card>new Card444(),
     445: <Card>new Card445(),
     446: <Card>new Card446(),

@@ -24,8 +24,24 @@ export class Card129 extends IntelligenceTacticCard {
   override adjustedAttackDamageByIntervention(damage: number): number {
     return Math.round(damage / 2);
   }
-  override canIntervene(intervention: InterventionType): boolean {
-    return intervention == InterventionType.Attack;
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
+  }
+}
+
+export class Card176 extends IntelligenceTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Military];
+  constructor() {
+    super(176, 'Gegenspionage', 1);
+  }
+  onEnterGame(player: Player) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.TacticCard;
   }
 }
 
@@ -40,7 +56,7 @@ export class Card231 extends IntelligenceTacticCard {
   getValidTargets(player: Player): CardStack[] {
     return player.isActivePlayer ? [] : this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
-  override canIntervene(intervention: InterventionType): boolean {
-    return intervention == InterventionType.OpponentTurnStart;
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
   }
 }

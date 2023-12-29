@@ -30,9 +30,11 @@ export default abstract class Card {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canIntervene(intervention: InterventionType): boolean {
-    return false;
+    return intervention == this.interventionType;
+  }
+  protected get interventionType(): InterventionType | undefined {
+    return undefined;
   }
   deactivationPriority(cardStack: CardStack): number {
     let priority = this.instantRecharge ? 0 : 15;

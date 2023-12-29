@@ -23,8 +23,8 @@ export class Card173 extends MilitaryTacticCard {
   override adjustedAttackDamageByIntervention(): number {
     return 0;
   }
-  override canIntervene(intervention: InterventionType): boolean {
-    return intervention == InterventionType.Attack;
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
   }
 }
 
@@ -52,8 +52,8 @@ export class Card331 extends MilitaryTacticCard {
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
   }
-  override canIntervene(intervention: InterventionType): boolean {
-    return intervention == InterventionType.BattleRoundEnd;
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
   }
 }
 
@@ -86,6 +86,22 @@ export class Card338 extends MilitaryTacticCard {
   }
 }
 
+export class Card346 extends MilitaryTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Military, TacticDiscipline.Trade];
+  constructor() {
+    super(346, 'Space Marines', 1);
+  }
+  onEnterGame(player: Player) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.TacticCard;
+  }
+}
+
 export class Card428 extends MilitaryTacticCard {
   private speedLimit = 2;
   constructor() {
@@ -99,7 +115,7 @@ export class Card428 extends MilitaryTacticCard {
       cs => cs.profile.speed <= this.speedLimit && cs.isInBattle && cs.type == CardType.Hull
     );
   }
-  override canIntervene(intervention: InterventionType): boolean {
-    return intervention == InterventionType.BattleRoundStart;
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
   }
 }
