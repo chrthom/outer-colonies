@@ -7,10 +7,13 @@ export interface ClientOpponent {
   discardPileIds: number[];
 }
 
-export interface ClientAttack {
+export interface ClientPlannedAttack {
   sourceUUID: string;
   sourceIndex: number;
   targetUUID: string;
+}
+
+export interface ClientAttack extends ClientPlannedAttack {
   pointDefense: number;
   shield: number;
   armour: number;
@@ -19,7 +22,7 @@ export interface ClientAttack {
 
 export interface ClientIntervention {
   type: InterventionType;
-  attack?: ClientAttack;
+  attack?: ClientPlannedAttack;
   tacticCard?: number;
 }
 

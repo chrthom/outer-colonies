@@ -99,11 +99,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
                 ).src.rootCardStack.cardStacks.findIndex(
                   cs => cs.uuid == (match.intervention as InterventionAttack).src.uuid
                 ),
-                targetUUID: (match.intervention as InterventionAttack).target.uuid,
-                pointDefense: 0,
-                shield: 0,
-                armour: 0,
-                damage: 0
+                targetUUID: (match.intervention as InterventionAttack).target.uuid
               }
             : undefined,
         tacticCard: undefined // TODO: Add when tactic counters are implemented
