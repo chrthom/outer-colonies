@@ -244,8 +244,8 @@ export default class Background {
       y: this.isColonyOrb
         ? backgroundConfig.animation.orbYPlayer
         : this.isColonyOrb == undefined
-        ? layoutConfig.scene.height / 2
-        : backgroundConfig.animation.orbYOpponent,
+          ? layoutConfig.scene.height / 2
+          : backgroundConfig.animation.orbYOpponent,
       scale: backgroundConfig.animation.orbScale
     });
   }
@@ -469,8 +469,8 @@ export default class Background {
     return this.targetRing == this.currentRing
       ? this.targetRing
       : this.movingInwards
-      ? this.currentRing - 1
-      : this.currentRing + 1;
+        ? this.currentRing - 1
+        : this.currentRing + 1;
   }
 
   private get outCoordinates(): [number, number] {
