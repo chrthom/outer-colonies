@@ -12,7 +12,6 @@ export default abstract class Intervention {
   init() {
     this.match.intervention = this;
     if (this.switchPendingPlayerOnInit) this.switchPendingPlayer();
-    console.log(`Check Intervention ${this.type} for player ${this.match.actionPendingByPlayerNo}`); ////
     this.checkSkip();
   }
   abstract skip(): void;
@@ -20,8 +19,8 @@ export default abstract class Intervention {
     return this.match.getPendingActionPlayer().hand.some(cs => cs.hasValidTargets);
   }
   checkSkip() {
+    console.log(`Check Intervention ${this.type} for player ${this.match.actionPendingByPlayerNo}`); ////
     if (!this.hasValidTargets) {
-      console.log(`Skip ${this.type}`); ////
       this.skip();
     } else {
       console.log(`Ask to perform intervention ${this.type}`); ////
@@ -46,6 +45,7 @@ export class InterventionOpponentTurnStart extends Intervention {
     super(InterventionType.OpponentTurnStart, match);
   }
   skip() {
+    console.log(`Skip ${this.type}`); ////
     this.switchPendingPlayer();
     this.remove();
     this.match.prepareBuildPhase();
@@ -57,6 +57,7 @@ export class InterventionBattleRoundEnd extends Intervention {
     super(InterventionType.BattleRoundEnd, match);
   }
   skip() {
+    console.log(`Skip ${this.type}`); ////
     if (this.match.actionPendingByPlayerNo == this.match.activePlayerNo) {
       new InterventionBattleRoundEnd(this.match).init();
     } else {
@@ -72,6 +73,7 @@ export class InterventionBattleRoundStart extends Intervention {
     super(InterventionType.BattleRoundStart, match);
   }
   skip() {
+    console.log(`Skip ${this.type}`); ////
     this.switchPendingPlayer();
     if (this.match.actionPendingByPlayerNo == this.match.getInactivePlayerNo()) {
       new InterventionBattleRoundStart(this.match).init();
@@ -93,6 +95,7 @@ export class InterventionAttack extends Intervention {
     this.target = target;
   }
   skip() {
+    console.log(`Skip ${this.type}`); ////
     this.switchPendingPlayer();
     this.remove();
     this.src.attack(this.target);
@@ -110,6 +113,7 @@ export class InterventionTacticCard extends Intervention {
     this.parentIntervention = this.match.intervention;
   }
   skip() {
+    console.log(`Skip ${this.type}`); ////
     this.switchPendingPlayer();
     this.match.intervention = this.parentIntervention;
     this.src.playHandCard(this.target);

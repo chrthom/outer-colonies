@@ -77,7 +77,7 @@ export default class Player {
     if (!freeAction) this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     if (handCard.type == CardType.Tactic) {
-      new InterventionTacticCard(this.match, handCard, target);
+      new InterventionTacticCard(this.match, handCard, target).init();
     } else {
       handCard.playHandCard(target);
       this.match.checkToNextPhase();
