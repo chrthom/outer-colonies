@@ -12,6 +12,7 @@ export default abstract class Intervention {
   init() {
     this.match.intervention = this;
     if (this.switchPendingPlayerOnInit) this.switchPendingPlayer();
+    console.log(`Check Intervention ${this.type} for player ${this.match.actionPendingByPlayerNo}`); ////
     this.checkSkip();
   }
   abstract skip(): void;
@@ -19,7 +20,12 @@ export default abstract class Intervention {
     return this.match.getPendingActionPlayer().hand.some(cs => cs.hasValidTargets);
   }
   checkSkip() {
-    if (!this.hasValidTargets) this.skip();
+    if (!this.hasValidTargets) {
+      console.log(`Skip ${this.type}`); ////
+      this.skip();
+    } else {
+      console.log(`Ask to perform intervention ${this.type}`); ////
+    }
   }
   remove() {
     this.match.intervention = undefined;
