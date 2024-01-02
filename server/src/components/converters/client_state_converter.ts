@@ -8,6 +8,7 @@ import {
   ClientDefenseIcon,
   ClientGameResult,
   ClientHandCard,
+  ClientHighlightCard,
   ClientIntervention,
   ClientOpponent,
   ClientState
@@ -101,23 +102,28 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
                 ),
                 targetUUID: (match.intervention as InterventionAttack).target.uuid
               }
-            : undefined,
-        tacticCard: undefined // TODO: Add when tactic counters are implemented
+            : undefined
       }
-    : null;
+    : undefined;
   const opponentData: ClientOpponent = {
     name: opponent.name,
     handCardSize: opponent.hand.length,
     deckSize: opponent.deck.length,
     discardPileIds: opponent.discardPile.map(c => c.id)
   };
+  const highlightCards: ClientHighlightCard[] = match.recentHighlightCards.map(cs => {
+    return {
+      uuid: cs.uuid,
+      cardId: cs.card.id
+    };
+  });
   const gameResult: ClientGameResult = match.gameResult.gameOver
     ? {
         won: match.gameResult.winnerNo == player.no,
         type: match.gameResult.type,
         sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol
       }
-    : null;
+    : undefined;
   return {
     playerIsActive: match.activePlayerNo == playerNo,
     playerPendingAction: match.actionPendingByPlayerNo == playerNo,
@@ -132,6 +138,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     battle: battle,
     intervention: intervention,
     gameResult: gameResult,
-    hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
+    hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
+    highlightCards: highlightCards
   };
 }

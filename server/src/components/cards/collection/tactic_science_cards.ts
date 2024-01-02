@@ -45,7 +45,7 @@ export class Card144 extends ScienceTacticCard {
     if (target.type == CardType.Colony) handCard = player.hand.find(cs => cs.card.name == 'Kraftwerk');
     if (!handCard) handCard = player.hand.find(cs => cs.card.name == 'Fusionsreaktor');
     handCard.attach(cardStack);
-    player.playHandCard(handCard, target, true);
+    handCard.playHandCard(target);
   }
   getValidTargets(player: Player): CardStack[] {
     const validTargetsWithDuplicates = player.hand

@@ -72,11 +72,10 @@ export default class Player {
   pickCardsFromTopOfDiscardPile(num: number): Card[] {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
-  playHandCard(handCard: CardStack, target: CardStack, freeAction?: boolean) {
-    // TODO: Check if "freeAction" is still needed
-    if (!freeAction) this.actionPool.activate(handCard.card);
-    spliceCardStackByUUID(this.hand, handCard.uuid);
+  playHandCard(handCard: CardStack, target: CardStack) {
+    this.actionPool.activate(handCard.card);
     if (handCard.type == CardType.Tactic) {
+      this.match.highlightCard(handCard);
       new InterventionTacticCard(this.match, handCard, target).init();
     } else {
       handCard.playHandCard(target);

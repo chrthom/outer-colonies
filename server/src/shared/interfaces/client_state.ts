@@ -23,7 +23,6 @@ export interface ClientAttack extends ClientPlannedAttack {
 export interface ClientIntervention {
   type: InterventionType;
   attack?: ClientPlannedAttack;
-  tacticCard?: number;
 }
 
 export interface ClientBattle {
@@ -84,6 +83,11 @@ export interface ClientGameResult {
   sol: number;
 }
 
+export interface ClientHighlightCard {
+  uuid: string;
+  cardId: number;
+}
+
 export interface ClientState {
   playerIsActive: boolean;
   playerPendingAction: boolean;
@@ -99,4 +103,5 @@ export interface ClientState {
   intervention?: ClientIntervention;
   gameResult?: ClientGameResult;
   hasToRetractCards: boolean;
+  highlightCards: ClientHighlightCard[];
 }

@@ -38,7 +38,7 @@ export default abstract class TacticCard extends Card {
   protected onEnterGameInterventionTacticCard(player: Player) {
     player.match.switchPendingPlayer();
     const intervention = player.match.intervention as InterventionTacticCard;
-    player.discardCards(intervention.src.card);
+    intervention.src.discard();
     player.match.intervention = intervention.parentIntervention;
     player.match.intervention.skip();
   }

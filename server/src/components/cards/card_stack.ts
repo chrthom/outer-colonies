@@ -27,6 +27,7 @@ export default class CardStack {
   }
   attach(cardStack: CardStack) {
     cardStack.parentCardStack = this;
+    cardStack.zone = undefined;
     this.attachedCardStacks.push(cardStack);
   }
   attack(target: CardStack, interventionCard?: TacticCard) {
@@ -49,15 +50,18 @@ export default class CardStack {
     return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
   }
   playHandCard(target: CardStack) {
-    this.performImmediateEffect(target);
-    if (!this.card.isAttachSelfManaging) {
-      if (this.card.durability == CardDurability.Instant) {
-        this.player.discardCards(this.card);
-      } else if (target.type == CardType.Colony && this.type != CardType.Orb) {
-        this.zone = Zone.Colony;
-        this.player.cardStacks.push(this);
-      } else {
-        target.attach(this);
+    if (this.zone == Zone.Hand) {
+      spliceCardStackByUUID(this.player.hand, this.uuid);
+      this.performImmediateEffect(target);
+      if (!this.card.isAttachSelfManaging) {
+        if (this.card.durability == CardDurability.Instant) {
+          this.player.discardCards(this.card);
+        } else if (target.type == CardType.Colony && this.type != CardType.Orb) {
+          this.zone = Zone.Colony;
+          this.player.cardStacks.push(this);
+        } else {
+          target.attach(this);
+        }
       }
     }
   }
@@ -184,12 +188,16 @@ export default class CardStack {
     return this.card.type;
   }
   private removeCardStack() {
-    if (this.isRootCard) {
-      spliceCardStackByUUID(this.player.cardStacks, this.uuid);
+    if (this.rootCardStack.zone == Zone.Hand) {
+      spliceCardStackByUUID(this.player.hand, this.uuid);
     } else {
-      spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
+      if (this.isRootCard) {
+        spliceCardStackByUUID(this.player.cardStacks, this.uuid);
+      } else {
+        spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
+      }
+      this.cards.forEach(c => c.onLeaveGame(this.player));
     }
-    this.cards.forEach(c => c.onLeaveGame(this.player));
   }
   private get isRootCard() {
     return !this.parentCardStack;
