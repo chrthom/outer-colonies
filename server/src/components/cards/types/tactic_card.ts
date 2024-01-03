@@ -40,7 +40,7 @@ export default abstract class TacticCard extends Card {
     const intervention = player.match.intervention as InterventionTacticCard;
     intervention.src.discard();
     player.match.intervention = intervention.parentIntervention;
-    player.match.intervention.skip();
+    player.match.intervention?.skip();
   }
   protected getValidTargetsInterventionAttack(
     player: Player,
