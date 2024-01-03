@@ -28,7 +28,7 @@ export default class CardStack {
   }
   discard(toDeck?: boolean) {
     this.destroyIndicators();
-    this.cards.forEach(c => c.discard(this.data.ownedByPlayer, toDeck));
+    this.cards.forEach(c => c.discard(toDeck));
   }
   update(data: ClientCardStack) {
     this.destroyIndicators();
@@ -43,7 +43,7 @@ export default class CardStack {
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
-      c.discard(this.data.ownedByPlayer, toDeck);
+      c.discard(toDeck);
     }, this);
     this.data.cards = data.cards;
     this.data.criticalDamage = data.criticalDamage;

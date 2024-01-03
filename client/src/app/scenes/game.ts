@@ -59,6 +59,7 @@ export default class Game extends Phaser.Scene {
   interceptShipIds: Array<string> = [];
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
+  maximizedTacticCard?: CardImage;
   obj: StaticObjects = {};
   retractCardsExist = false;
 
@@ -162,6 +163,7 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
+    this.maximizedTacticCard?.discard(); // TODO: Not correct for attached tactic cards
     this.time.delayedCall(
       this.animateHighlightTacticCard(oldState)
         ? animationConfig.duration.showTacticCard + animationConfig.duration.waitBeforeDiscard
@@ -220,7 +222,7 @@ export default class Game extends Phaser.Scene {
             layoutConfig.discardPile.yOpponent,
             cardId,
             true
-          ).maximizeTacticCard(true);
+          ).maximizeTacticCard();
         }
       }
     }
@@ -268,9 +270,9 @@ export default class Game extends Phaser.Scene {
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
     this.hand.map(h => {
       const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-      if (newData) h.update(newData); // Move hand card to new position
-      else if (oldState.turnPhase != TurnPhase.Build || h.uuid == this.state.highlightCardUUID)
-        h.discard(true);
+      if (h.uuid != this.state.highlightCardUUID) {} // TODO: There is an issue here...
+      else if (newData) h.update(newData); // Move hand card to new position
+      else if (oldState.turnPhase != TurnPhase.Build) h.discard();
       else h.destroy(); // Attach card to another card stack
     }, this);
     newHandCards // Draw new hand cards

@@ -1,3 +1,4 @@
+import { InterventionType } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -30,30 +31,32 @@ export default class CardImage {
     this.imageHighlight.destroy();
     this.imageMask.destroy();
   }
-  discard(ownedByPlayer: boolean, toDeck?: boolean) {
+  discard(toDeck?: boolean) {
     const discardPileIds = this.scene.state.discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
       x: toDeck ? layoutConfig.deck.x : layoutConfig.discardPile.x,
-      y: ownedByPlayer
+      y: this.ownedByPlayer
         ? toDeck
           ? layoutConfig.deck.y
           : layoutConfig.discardPile.y
         : layoutConfig.discardPile.yOpponent,
-      angle: ownedByPlayer ? 0 : 180,
+      angle: this.ownedByPlayer ? 0 : 180,
       scale: layoutConfig.cards.scale.normal,
       onComplete: () => {
-        if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
+        if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
       }
     });
   }
-  showAndDiscardTacticCard(ownedByPlayer: boolean) {
-    // TODO: Remove when not needed anymore as part of #252
+  maximizeTacticCard() {
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
+    if (this.scene.state.intervention?.type == InterventionType.TacticCard) {
+      this.scene.maximizedTacticCard = this;
+    }
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
@@ -63,23 +66,9 @@ export default class CardImage {
       scale: layoutConfig.maxedTacticCard.scale,
       completeDelay: animationConfig.duration.waitBeforeDiscard,
       onComplete: () => {
-        this.discard(ownedByPlayer);
-      }
-    });
-  }
-  maximizeTacticCard(discardAutomatically?: boolean) {
-    this.setDepth(layoutConfig.depth.maxedTacticCard);
-    this.highlightReset();
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.maxedTacticCard.x,
-      y: layoutConfig.maxedTacticCard.y,
-      angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale,
-      completeDelay: animationConfig.duration.waitBeforeDiscard,
-      onComplete: () => {
-        if (discardAutomatically) this.discard(this.ownedByPlayer);
+        if (this.scene.state.intervention?.type != InterventionType.TacticCard) {
+          this.discard();
+        }
       }
     });
   }

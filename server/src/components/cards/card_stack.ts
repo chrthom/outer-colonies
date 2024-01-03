@@ -51,7 +51,6 @@ export default class CardStack {
   }
   playHandCard(target: CardStack) {
     if (this.zone == Zone.Hand) {
-      spliceCardStackByUUID(this.player.hand, this.uuid);
       this.performImmediateEffect(target);
       if (!this.card.isAttachSelfManaging) {
         if (this.card.durability == CardDurability.Instant) {
