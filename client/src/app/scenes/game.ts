@@ -31,7 +31,7 @@ interface InitData {
   gameParams: ClientGameParams;
 }
 
-class StaticObjects {
+interface StaticObjects {
   actionPool?: ActionPool;
   background?: Background;
   continueButton?: ContinueButton;
@@ -43,7 +43,7 @@ class StaticObjects {
   missionCards?: MissionCards;
 }
 
-class ActiveCards {
+interface ActiveCards {
   hand?: string;
   stack?: string;
   stackIndex?: number;
@@ -54,12 +54,12 @@ export default class Game extends Phaser.Scene {
   gameParams: ClientGameParams;
   preloader: Preloader;
   state: ClientState;
-  activeCards: ActiveCards = new ActiveCards();
+  activeCards: ActiveCards = {};
   plannedBattle: ClientPlannedBattle;
   interceptShipIds: Array<string> = [];
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
-  obj: StaticObjects = new StaticObjects();
+  obj: StaticObjects = {};
   retractCardsExist = false;
 
   constructor() {
@@ -162,17 +162,23 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
-    const attackPerformed = this.animateAttack();
-    this.time.delayedCall(attackPerformed ? animationConfig.duration.attack : 0, () => {
-      const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
-      this.retractCardsExist = false; // If true, then the hand animations are delayed
-      this.updateCardStacks(newHandCards);
-      this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-        this.updateHandCards(newHandCards, oldState);
-        this.showOpponentTacticCardAction(oldState);
-        this.resetView();
-      });
-    });
+    this.time.delayedCall(
+      this.animateHighlightTacticCard()
+        ? animationConfig.duration.showTacticCard + animationConfig.duration.waitBeforeDiscard
+        : 0,
+      () => {
+        this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
+          const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
+          this.retractCardsExist = false; // If true, then the hand animations are delayed
+          this.updateCardStacks(newHandCards);
+          this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
+            this.updateHandCards(newHandCards, oldState);
+            this.showOpponentTacticCardAction(oldState);
+            this.resetView();
+          });
+        });
+      }
+    );
   }
 
   resetView(battleType?: BattleType) {
@@ -200,6 +206,11 @@ export default class Game extends Phaser.Scene {
     this.obj.missionCards?.update();
     this.obj.maxCard?.hide();
     this.updateHighlighting();
+  }
+
+  private animateHighlightTacticCard(): boolean {
+    this.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.maximizeTacticCard();
+    return !!this.state.highlightCardUUID;
   }
 
   private animateAttack(): boolean {
@@ -243,15 +254,10 @@ export default class Game extends Phaser.Scene {
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
     this.hand.map(h => {
       const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-      const isTacticCard = !this.state.cardStacks
-        .flatMap(cs => cs.cards)
-        .map(c => c.id)
-        .includes(h.cardId);
       if (newData) h.update(newData); // Move hand card to new position
-      else if (oldState.turnPhase == TurnPhase.Build && isTacticCard)
-        h.showAndDiscardTacticCard(true); // Play tactic card
-      else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
-      else h.discard(true); // Discard hand card
+      else if (oldState.turnPhase != TurnPhase.Build || h.uuid == this.state.highlightCardUUID)
+        h.discard(true);
+      else h.destroy(); // Attach card to another card stack
     }, this);
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
@@ -259,6 +265,7 @@ export default class Game extends Phaser.Scene {
     this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid), this);
   }
 
+  // TODO: Remove once opponent hand cards are shown and use animateHighlightTacticCard() instead
   private showOpponentTacticCardAction(oldState: ClientState) {
     const opponent = this.state.opponent;
     const oldOpponent = oldState.opponent;

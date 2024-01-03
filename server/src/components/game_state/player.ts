@@ -75,7 +75,7 @@ export default class Player {
   playHandCard(handCard: CardStack, target: CardStack) {
     this.actionPool.activate(handCard.card);
     if (handCard.type == CardType.Tactic) {
-      this.match.highlightCard(handCard);
+      this.match.highlightCard = handCard;
       new InterventionTacticCard(this.match, handCard, target).init();
     } else {
       handCard.playHandCard(target);

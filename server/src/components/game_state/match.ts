@@ -21,7 +21,7 @@ export default class Match {
   battle: Battle = new Battle(BattleType.None);
   gameResult!: GameResult;
   intervention?: Intervention;
-  recentHighlightCards: CardStack[] = [];
+  highlightCard?: CardStack;
   constructor(room: string) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
@@ -57,7 +57,7 @@ export default class Match {
   }
   resetTempStates() {
     this.battle.resetRecentAttack();
-    this.recentHighlightCards = [];
+    this.highlightCard = undefined;
   }
   setStartPlayer() {
     if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
@@ -126,8 +126,5 @@ export default class Match {
   }
   skipIntervention() {
     this.intervention?.skip();
-  }
-  highlightCard(cardStack: CardStack) {
-    this.recentHighlightCards.push(cardStack);
   }
 }

@@ -49,6 +49,7 @@ export default class CardImage {
     });
   }
   showAndDiscardTacticCard(ownedByPlayer: boolean) {
+    // TODO: Remove when not needed anymore as part of #252
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     this.tween({
@@ -62,6 +63,18 @@ export default class CardImage {
       onComplete: () => {
         this.discard(ownedByPlayer);
       }
+    });
+  }
+  maximizeTacticCard() {
+    this.setDepth(layoutConfig.depth.maxedTacticCard);
+    this.highlightReset();
+    this.tween({
+      targets: undefined,
+      duration: animationConfig.duration.showTacticCard,
+      x: layoutConfig.maxedTacticCard.x,
+      y: layoutConfig.maxedTacticCard.y,
+      angle: 0,
+      scale: layoutConfig.maxedTacticCard.scale
     });
   }
   highlightDisabled() {
