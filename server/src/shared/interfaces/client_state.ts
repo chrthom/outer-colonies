@@ -2,6 +2,7 @@ import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionTyp
 
 export interface ClientOpponent {
   name: string;
+  hand: ClientHandCard[];
   handCardSize: number;
   deckSize: number;
   discardPileIds: number[];
@@ -67,6 +68,7 @@ export interface ClientHandCard {
   index: number;
   playable: boolean;
   validTargets: string[];
+  ownedByPlayer: boolean;
 }
 
 export interface ClientEvent {

@@ -13,19 +13,23 @@ import {
   ClientState
 } from '../../shared/interfaces/client_state';
 import { InterventionAttack } from '../game_state/intervention';
+import CardStack from '../cards/card_stack';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
+  const toHand: (hand: CardStack[]) => ClientHandCard[] = (hand: CardStack[]) => {
+    return hand.map((c, index) => {
+      return {
+        uuid: c.uuid,
+        cardId: c.card.id,
+        index: index,
+        playable: c.hasValidTargets,
+        validTargets: c.validTargets.map(cs => cs.uuid),
+        ownedByPlayer: c.player.no == playerNo
+      };
+    }, this);
+  };
   const player = match.players[playerNo];
   const opponent = match.players[opponentPlayerNo(playerNo)];
-  const hand: ClientHandCard[] = player.hand.map((c, index) => {
-    return {
-      uuid: c.uuid,
-      cardId: c.card.id,
-      index: index,
-      playable: c.hasValidTargets,
-      validTargets: c.validTargets.map(cs => cs.uuid)
-    };
-  }, this);
   const cardStacks: ClientCardStack[] = [true, false].flatMap(ownedByPlayer => {
     const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
     return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
@@ -106,6 +110,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     : undefined;
   const opponentData: ClientOpponent = {
     name: opponent.name,
+    hand: toHand(opponent.hand),
     handCardSize: opponent.hand.length,
     deckSize: opponent.deck.length,
     discardPileIds: opponent.discardPile.map(c => c.id)
@@ -123,7 +128,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     turnPhase: match.turnPhase,
     actionPool: actionPool,
     opponent: opponentData,
-    hand: hand,
+    hand: toHand(player.hand),
     handCardLimit: player.handCardLimit,
     deckSize: player.deck.length,
     discardPileIds: player.discardPile.map(c => c.id),

@@ -7,10 +7,12 @@ export default class CardImage {
   cardId!: number;
   protected scene!: Game;
   protected imageHighlight!: Phaser.GameObjects.Image;
+  protected ownedByPlayer!: boolean;
   private imageMask!: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
     this.scene = scene;
     this.cardId = cardId;
+    this.ownedByPlayer = !opponentCard;
     const setImageProps = (image: Phaser.GameObjects.Image) =>
       image
         .setOrigin(0.5, 1)
@@ -65,7 +67,7 @@ export default class CardImage {
       }
     });
   }
-  maximizeTacticCard() {
+  maximizeTacticCard(discardAutomatically?: boolean) {
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     this.tween({
@@ -74,7 +76,11 @@ export default class CardImage {
       x: layoutConfig.maxedTacticCard.x,
       y: layoutConfig.maxedTacticCard.y,
       angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale
+      scale: layoutConfig.maxedTacticCard.scale,
+      completeDelay: animationConfig.duration.waitBeforeDiscard,
+      onComplete: () => {
+        if (discardAutomatically) this.discard(this.ownedByPlayer);
+      }
     });
   }
   highlightDisabled() {

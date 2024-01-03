@@ -163,7 +163,7 @@ export default class Game extends Phaser.Scene {
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     this.time.delayedCall(
-      this.animateHighlightTacticCard()
+      this.animateHighlightTacticCard(oldState)
         ? animationConfig.duration.showTacticCard + animationConfig.duration.waitBeforeDiscard
         : 0,
       () => {
@@ -173,7 +173,6 @@ export default class Game extends Phaser.Scene {
           this.updateCardStacks(newHandCards);
           this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
             this.updateHandCards(newHandCards, oldState);
-            this.showOpponentTacticCardAction(oldState);
             this.resetView();
           });
         });
@@ -208,8 +207,23 @@ export default class Game extends Phaser.Scene {
     this.updateHighlighting();
   }
 
-  private animateHighlightTacticCard(): boolean {
-    this.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.maximizeTacticCard();
+  private animateHighlightTacticCard(oldState: ClientState): boolean {
+    if (this.state.highlightCardUUID) {
+      const playerHandCard = this.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID);
+      if (playerHandCard) playerHandCard.maximizeTacticCard();
+      else {
+        const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
+        if (cardId) {
+          new CardImage(
+            this,
+            layoutConfig.discardPile.x,
+            layoutConfig.discardPile.yOpponent,
+            cardId,
+            true
+          ).maximizeTacticCard(true);
+        }
+      }
+    }
     return !!this.state.highlightCardUUID;
   }
 
@@ -263,39 +277,6 @@ export default class Game extends Phaser.Scene {
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.hand.push(h), this);
     this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid), this);
-  }
-
-  // TODO: Remove once opponent hand cards are shown and use animateHighlightTacticCard() instead
-  private showOpponentTacticCardAction(oldState: ClientState) {
-    const opponent = this.state.opponent;
-    const oldOpponent = oldState.opponent;
-    if (
-      opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize &&
-      opponent.discardPileIds.length > oldOpponent.discardPileIds.length &&
-      this.state.turnPhase == TurnPhase.Build &&
-      oldState.turnPhase == TurnPhase.Build
-    ) {
-      // Opponent playing tactic card
-      const cardId =
-        opponent.discardPileIds.length > 0
-          ? opponent.discardPileIds[opponent.discardPileIds.length - 1]
-          : null;
-      if (
-        cardId &&
-        !this.state.cardStacks
-          .flatMap(cs => cs.cards)
-          .map(c => c.id)
-          .includes(cardId)
-      ) {
-        new CardImage(
-          this,
-          layoutConfig.discardPile.x,
-          layoutConfig.discardPile.yOpponent,
-          cardId,
-          true
-        ).showAndDiscardTacticCard(false);
-      }
-    }
   }
 
   private updateHighlighting() {
