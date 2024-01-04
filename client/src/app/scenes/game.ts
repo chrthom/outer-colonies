@@ -216,7 +216,8 @@ export default class Game extends Phaser.Scene {
     const intervention = this.state.intervention?.attack;
     console.log(JSON.stringify(intervention)); ////
     if (intervention) {
-      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID).cards[intervention.sourceIndex].highlightSelected();
+      console.log(this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)?.data.cards); ////
+      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)?.cards[intervention.sourceIndex].highlightSelected();
       this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
     }
     return !!attack;
