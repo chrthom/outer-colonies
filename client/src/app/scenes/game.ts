@@ -172,6 +172,7 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, oldState);
         this.animateOpponentTacticCard(oldState);
         this.resetView();
+        this.highlightAttackIntervention();
         this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () => this.discardMaximizedTacticCard());
       });
     });
@@ -213,17 +214,19 @@ export default class Game extends Phaser.Scene {
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
     }
+    return !!attack;
+  }
+
+  private highlightAttackIntervention() {
     const intervention = this.state.intervention?.attack;
     if (intervention) {
       console.log('----------'); ////
       console.log(JSON.stringify(intervention)); ////
-      console.log(this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)); ////
       console.log(this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)?.data.cards); ////
-      console.log(this.cardStacks.map(cs => cs.uuid)); ////
-      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)?.cards[intervention.sourceIndex].highlightSelected();
+      console.log(this.cardStacks.find(cs => cs.uuid == intervention.targetUUID)); ////
+      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID).cards[intervention.sourceIndex].highlightSelected();
       this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
     }
-    return !!attack;
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
