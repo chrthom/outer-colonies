@@ -3,7 +3,6 @@ import ContinueButton from '../components/buttons/continue_button';
 import { ClientHandCard, ClientState } from '../../../../server/src/shared/interfaces/client_state';
 import {
   BattleType,
-  InterventionType,
   MsgTypeInbound,
   MsgTypeOutbound,
   TurnPhase
@@ -173,7 +172,9 @@ export default class Game extends Phaser.Scene {
         this.animateOpponentTacticCard(oldState);
         this.resetView();
         this.highlightAttackIntervention();
-        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () => this.discardMaximizedTacticCard());
+        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
+          this.discardMaximizedTacticCard()
+        );
       });
     });
   }
@@ -220,11 +221,9 @@ export default class Game extends Phaser.Scene {
   private highlightAttackIntervention() {
     const intervention = this.state.intervention?.attack;
     if (intervention) {
-      console.log('----------'); ////
-      console.log(JSON.stringify(intervention)); ////
-      console.log(this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID)?.data.cards); ////
-      console.log(this.cardStacks.find(cs => cs.uuid == intervention.targetUUID)); ////
-      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID).cards[intervention.sourceIndex].highlightSelected();
+      this.cardStacks
+        .find(cs => cs.uuid == intervention.sourceUUID)
+        .cards[intervention.sourceIndex].highlightSelected();
       this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
     }
   }

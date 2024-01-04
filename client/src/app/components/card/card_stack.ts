@@ -158,10 +158,7 @@ export default class CardStack {
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
       } else if (!this.data.ownedByPlayer) {
-        this.cards[0]
-          .setX(layoutConfig.discardPile.x)
-          .setY(layoutConfig.discardPile.yOpponent)
-          .setAngle(180);
+        this.cards[0].setX(layoutConfig.discardPile.x).setY(layoutConfig.discardPile.yOpponent).setAngle(180);
       }
       this.tween();
     }
