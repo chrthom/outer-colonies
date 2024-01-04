@@ -213,6 +213,11 @@ export default class Game extends Phaser.Scene {
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
     }
+    const intervention = this.state.intervention.attack;
+    if (intervention) {
+      this.cardStacks.find(cs => cs.uuid == intervention.sourceUUID).cards[intervention.sourceIndex].highlightSelected();
+      this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
+    }
     return !!attack;
   }
 
