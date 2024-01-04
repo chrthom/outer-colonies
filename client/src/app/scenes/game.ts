@@ -172,7 +172,7 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, oldState);
         this.animateOpponentTacticCard(oldState);
         this.resetView();
-        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, this.discardMaximizedTacticCard);
+        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () => this.discardMaximizedTacticCard());
       });
     });
   }
@@ -205,17 +205,15 @@ export default class Game extends Phaser.Scene {
   }
 
   private animateAttack(): boolean {
-    const attack = this.state.battle ? this.state.battle.recentAttack : null;
+    const attack = this.state.battle?.recentAttack;
     if (attack) {
       const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceUUID);
       if (!attacker?.data.ownedByPlayer) {
         attacker?.animateAttack(attack.sourceIndex);
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
-      return true;
-    } else {
-      return false;
     }
+    return !!attack;
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
