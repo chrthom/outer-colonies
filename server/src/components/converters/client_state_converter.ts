@@ -1,5 +1,5 @@
 import Match from '../game_state/match';
-import { CardType, Zone } from '../../shared/config/enums';
+import { CardType, InterventionType, Zone } from '../../shared/config/enums';
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/helpers';
 import {
@@ -8,22 +8,28 @@ import {
   ClientDefenseIcon,
   ClientGameResult,
   ClientHandCard,
+  ClientIntervention,
   ClientOpponent,
   ClientState
 } from '../../shared/interfaces/client_state';
+import { InterventionAttack } from '../game_state/intervention';
+import CardStack from '../cards/card_stack';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
+  const toHand: (hand: CardStack[]) => ClientHandCard[] = (hand: CardStack[]) => {
+    return hand.map((c, index) => {
+      return {
+        uuid: c.uuid,
+        cardId: c.card.id,
+        index: index,
+        playable: c.hasValidTargets,
+        validTargets: c.validTargets.map(cs => cs.uuid),
+        ownedByPlayer: c.player.no == playerNo
+      };
+    }, this);
+  };
   const player = match.players[playerNo];
   const opponent = match.players[opponentPlayerNo(playerNo)];
-  const hand: ClientHandCard[] = player.hand.map((c, index) => {
-    return {
-      uuid: c.uuid,
-      cardId: c.card.id,
-      index: index,
-      playable: c.isPlayable,
-      validTargets: c.validTargets.map(cs => cs.uuid)
-    };
-  }, this);
   const cardStacks: ClientCardStack[] = [true, false].flatMap(ownedByPlayer => {
     const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
     return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
@@ -50,7 +56,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           return {
             id: cs.card.id,
             index: index,
-            battleReady: cs.canAttack(player),
+            battleReady: cs.canAttack,
             retractable: ownedByPlayer && cs.canBeRetracted,
             insufficientEnergy: cs.hasInsufficientEnergy
           };
@@ -85,8 +91,26 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     range: match.battle.range,
     recentAttack: match.battle.recentAttack
   };
+  const intervention: ClientIntervention = match.intervention
+    ? {
+        type: match.intervention.type,
+        attack:
+          match.intervention.type == InterventionType.Attack
+            ? {
+                sourceUUID: (match.intervention as InterventionAttack).src.rootCardStack.uuid,
+                sourceIndex: (
+                  match.intervention as InterventionAttack
+                ).src.rootCardStack.cardStacks.findIndex(
+                  cs => cs.uuid == (match.intervention as InterventionAttack).src.uuid
+                ),
+                targetUUID: (match.intervention as InterventionAttack).target.uuid
+              }
+            : undefined
+      }
+    : undefined;
   const opponentData: ClientOpponent = {
     name: opponent.name,
+    hand: toHand(opponent.hand),
     handCardSize: opponent.hand.length,
     deckSize: opponent.deck.length,
     discardPileIds: opponent.discardPile.map(c => c.id)
@@ -97,20 +121,22 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         type: match.gameResult.type,
         sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol
       }
-    : null;
+    : undefined;
   return {
     playerIsActive: match.activePlayerNo == playerNo,
     playerPendingAction: match.actionPendingByPlayerNo == playerNo,
     turnPhase: match.turnPhase,
     actionPool: actionPool,
     opponent: opponentData,
-    hand: hand,
+    hand: toHand(player.hand),
     handCardLimit: player.handCardLimit,
     deckSize: player.deck.length,
     discardPileIds: player.discardPile.map(c => c.id),
     cardStacks: cardStacks,
     battle: battle,
+    intervention: intervention,
     gameResult: gameResult,
-    hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy)
+    hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
+    highlightCardUUID: match.highlightCard?.uuid
   };
 }

@@ -30,9 +30,7 @@ io.on(MsgTypeInbound.Connect, socket => {
 });
 
 setInterval(matchMakingCron, 1000, io);
-
 app.use(express.json());
-
 restAPI(app);
 
 httpServer.listen(config.get<number>('server.port'), () => {
@@ -41,6 +39,6 @@ httpServer.listen(config.get<number>('server.port'), () => {
 
 if (!config.get<boolean>('terminate_on_error')) {
   process.on('uncaughtException', err => {
-    console.log(`WARN: Caught exception: ${err}`);
+    console.log(`ERROR: Caught exception: ${err.name} -> ${err.message}${err.stack ? '\n' + err.stack : ''}`);
   });
 }

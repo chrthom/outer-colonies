@@ -78,7 +78,11 @@ export default class ContinueButton {
     this.prompt.update();
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
-    } else if (this.scene.state.playerPendingAction) {
+    } else if (!this.scene.state.playerPendingAction) {
+      this.waitState();
+    } else if (this.scene.state.intervention) {
+      this.showIntervention(this.scene.state.playerIsActive);
+    } else {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
           if (!this.scene.state.playerIsActive) {
@@ -108,8 +112,6 @@ export default class ContinueButton {
         default:
           this.waitState();
       }
-    } else {
-      this.waitState();
     }
   }
   showPrompt() {
@@ -153,6 +155,11 @@ export default class ContinueButton {
   }
   private showEndPhase() {
     this.show('Karten ablegen', 'active_select');
+  }
+  private showIntervention(isActivePlayer: boolean) {
+    this.show('Überspringen', `${isActivePlayer ? '' : 'in'}active_select`, () =>
+      this.scene.socket.emit(MsgTypeInbound.Ready, this.scene.state.turnPhase)
+    );
   }
   private showGameOver(gameResult: ClientGameResult) {
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {

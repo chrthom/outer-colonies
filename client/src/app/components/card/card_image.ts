@@ -7,10 +7,12 @@ export default class CardImage {
   cardId!: number;
   protected scene!: Game;
   protected imageHighlight!: Phaser.GameObjects.Image;
+  protected ownedByPlayer!: boolean;
   private imageMask!: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
     this.scene = scene;
     this.cardId = cardId;
+    this.ownedByPlayer = !opponentCard;
     const setImageProps = (image: Phaser.GameObjects.Image) =>
       image
         .setOrigin(0.5, 1)
@@ -28,27 +30,29 @@ export default class CardImage {
     this.imageHighlight.destroy();
     this.imageMask.destroy();
   }
-  discard(ownedByPlayer: boolean, toDeck?: boolean) {
+  discard(toDeck?: boolean) {
     const discardPileIds = this.scene.state.discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
       x: toDeck ? layoutConfig.deck.x : layoutConfig.discardPile.x,
-      y: ownedByPlayer
+      y: this.ownedByPlayer
         ? toDeck
           ? layoutConfig.deck.y
           : layoutConfig.discardPile.y
         : layoutConfig.discardPile.yOpponent,
-      angle: ownedByPlayer ? 0 : 180,
+      angle: this.ownedByPlayer ? 0 : 180,
       scale: layoutConfig.cards.scale.normal,
       onComplete: () => {
-        if (ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
+        if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
       }
     });
   }
-  showAndDiscardTacticCard(ownedByPlayer: boolean) {
+  maximizeTacticCard() {
+    this.scene.maximizedTacticCard?.discard();
+    this.scene.maximizedTacticCard = this;
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     this.tween({
@@ -57,11 +61,7 @@ export default class CardImage {
       x: layoutConfig.maxedTacticCard.x,
       y: layoutConfig.maxedTacticCard.y,
       angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale,
-      completeDelay: animationConfig.duration.waitBeforeDiscard,
-      onComplete: () => {
-        this.discard(ownedByPlayer);
-      }
+      scale: layoutConfig.maxedTacticCard.scale
     });
   }
   highlightDisabled() {
@@ -113,6 +113,10 @@ export default class CardImage {
   }
   setDepth(depth: number): this {
     this.forAllImages(i => i.setDepth(depth));
+    return this;
+  }
+  setScale(scale: number): this {
+    this.forAllImages(i => i.setScale(scale));
     return this;
   }
   enableMaximizeOnMouseover() {

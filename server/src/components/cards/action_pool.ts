@@ -52,7 +52,6 @@ export default class ActionPool {
     cardActions
       .map(a => a.toString())
       .forEach(s => {
-        console.log(`Remove ${s} | Found ${this.cardActions.filter(p => p.toString() == s)}`); /////
         this.cardActions.filter(p => p.toString() == s)[0].depleted = true;
         this.removeDepleted();
       });

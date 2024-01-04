@@ -6,6 +6,11 @@ import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_batt
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
 import GameResult from './game_result';
+import Intervention, {
+  InterventionAttack,
+  InterventionBattleRoundEnd,
+  InterventionOpponentTurnStart
+} from './intervention';
 
 export default class Match {
   readonly room!: string;
@@ -15,6 +20,8 @@ export default class Match {
   turnPhase!: TurnPhase;
   battle: Battle = new Battle(BattleType.None);
   gameResult!: GameResult;
+  intervention?: Intervention;
+  highlightCard?: CardStack;
   constructor(room: string) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
@@ -29,9 +36,6 @@ export default class Match {
   getInactivePlayerNo(): number {
     return opponentPlayerNo(this.activePlayerNo);
   }
-  getInPlayCardStacks(): CardStack[] {
-    return this.players.flatMap(p => p.cardStacks);
-  }
   getPendingActionPlayer(): Player {
     return this.players[this.actionPendingByPlayerNo];
   }
@@ -41,9 +45,19 @@ export default class Match {
   getWaitingPlayerNo(): number {
     return opponentPlayerNo(this.actionPendingByPlayerNo);
   }
+  switchPendingPlayer() {
+    this.actionPendingByPlayerNo = this.getWaitingPlayerNo();
+  }
   forAllPlayers(f: (playerNo: number) => void) {
     f(0);
     f(1);
+  }
+  getInPlayCardStacks(): CardStack[] {
+    return this.players.flatMap(p => p.cardStacks);
+  }
+  resetTempStates() {
+    this.battle.resetRecentAttack();
+    this.highlightCard = undefined;
   }
   setStartPlayer() {
     if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
@@ -63,9 +77,10 @@ export default class Match {
       .cardStacks.flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
-    this.prepareBuildPhase();
+    new InterventionOpponentTurnStart(this).init();
   }
   prepareBuildPhase() {
+    this.actionPendingByPlayerNo = this.activePlayerNo;
     this.turnPhase = TurnPhase.Build;
   }
   prepareBuildPhaseReaction(plannedBattle: ClientPlannedBattle) {
@@ -95,6 +110,21 @@ export default class Match {
     }
   }
   processBattleRound() {
-    this.battle.processBattleRound(this);
+    if (this.actionPendingByPlayerNo == this.getInactivePlayerNo()) {
+      // End of battle round
+      new InterventionBattleRoundEnd(this).init();
+    } else {
+      // Switch to opponent player in same battle round
+      this.battle.processBattleRound(this);
+    }
+  }
+  planAttack(srcWeapon: CardStack, target: CardStack) {
+    new InterventionAttack(this, srcWeapon, target).init();
+  }
+  checkToNextPhase() {
+    this.intervention?.checkSkip();
+  }
+  skipIntervention() {
+    this.intervention?.skip();
   }
 }

@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -61,6 +61,40 @@ export class Card232 extends EconomyTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card235 extends EconomyTacticCard {
+  constructor() {
+    super(235, 'Blindgänger', 1);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.onEnterGameAttackIntervention(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionAttack(player, i => i.src.profile.phi < 0);
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
+  }
+}
+
+export class Card236 extends EconomyTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Science, TacticDiscipline.Trade];
+  constructor() {
+    super(236, 'Handelsembargo', 1);
+  }
+  onEnterGame(player: Player) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.TacticCard;
   }
 }
 

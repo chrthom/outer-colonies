@@ -9,9 +9,8 @@ import { AuthLoginResponse } from '../../../server/src/shared/interfaces/rest_ap
 })
 export default class AuthService {
   private readonly cookieExpiry = 100;
-  private username?: string; // TODO: Make private
-  private sessionToken?: string; // TODO: Make private
-
+  private username?: string;
+  private sessionToken?: string;
   constructor(
     private cookieService: CookieService,
     private authAPIService: AuthApiService

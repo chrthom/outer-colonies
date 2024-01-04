@@ -31,7 +31,7 @@ interface InitData {
   gameParams: ClientGameParams;
 }
 
-class StaticObjects {
+interface StaticObjects {
   actionPool?: ActionPool;
   background?: Background;
   continueButton?: ContinueButton;
@@ -43,7 +43,7 @@ class StaticObjects {
   missionCards?: MissionCards;
 }
 
-class ActiveCards {
+interface ActiveCards {
   hand?: string;
   stack?: string;
   stackIndex?: number;
@@ -54,12 +54,13 @@ export default class Game extends Phaser.Scene {
   gameParams: ClientGameParams;
   preloader: Preloader;
   state: ClientState;
-  activeCards: ActiveCards = new ActiveCards();
+  activeCards: ActiveCards = {};
   plannedBattle: ClientPlannedBattle;
   interceptShipIds: Array<string> = [];
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
-  obj: StaticObjects = new StaticObjects();
+  maximizedTacticCard?: CardImage;
+  obj: StaticObjects = {};
   retractCardsExist = false;
 
   constructor() {
@@ -162,15 +163,18 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
-    const attackPerformed = this.animateAttack();
-    this.time.delayedCall(attackPerformed ? animationConfig.duration.attack : 0, () => {
+    this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
       const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
       this.retractCardsExist = false; // If true, then the hand animations are delayed
       this.updateCardStacks(newHandCards);
       this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
         this.updateHandCards(newHandCards, oldState);
-        this.showOpponentTacticCardAction(oldState);
+        this.animateOpponentTacticCard(oldState);
         this.resetView();
+        this.highlightAttackIntervention();
+        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
+          this.discardMaximizedTacticCard()
+        );
       });
     });
   }
@@ -203,35 +207,50 @@ export default class Game extends Phaser.Scene {
   }
 
   private animateAttack(): boolean {
-    const attack = this.state.battle ? this.state.battle.recentAttack : null;
+    const attack = this.state.battle?.recentAttack;
     if (attack) {
       const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceUUID);
       if (!attacker?.data.ownedByPlayer) {
         attacker?.animateAttack(attack.sourceIndex);
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
-      return true;
-    } else {
-      return false;
+    }
+    return !!attack;
+  }
+
+  private highlightAttackIntervention() {
+    const intervention = this.state.intervention?.attack;
+    if (intervention) {
+      this.cardStacks
+        .find(cs => cs.uuid == intervention.sourceUUID)
+        .cards[intervention.sourceIndex].highlightSelected();
+      this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
     }
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-      if (newData) cs.update(newData); // Move card stacks
+      if (newData) cs.update(newData); // Move existing card stacks
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
         this.retractCardsExist = true;
       } else cs.discard(); // Discard card stack
     }, this);
+    // Create new card stacks
     this.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
-        const originHandCard = this.hand.find(h => h.uuid == cs.uuid);
-        if (originHandCard) originHandCard.destroy();
-        return new CardStack(this, cs, true, originHandCard);
+        let origin: CardImage;
+        if (this.maximizedTacticCard?.cardId == cs.cards[0].id) {
+          origin = this.maximizedTacticCard; // Origin is maximized tactic card
+          this.maximizedTacticCard = undefined;
+        } else {
+          origin = this.hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
+        }
+        origin?.destroy();
+        return new CardStack(this, cs, origin);
       }, this)
       .forEach(cs => this.cardStacks.push(cs), this);
     this.cardStacks = this.cardStacks.filter(
@@ -243,52 +262,33 @@ export default class Game extends Phaser.Scene {
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
     this.hand.map(h => {
       const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-      const isTacticCard = !this.state.cardStacks
-        .flatMap(cs => cs.cards)
-        .map(c => c.id)
-        .includes(h.cardId);
-      if (newData) h.update(newData); // Move hand card to new position
-      else if (oldState.turnPhase == TurnPhase.Build && isTacticCard)
-        h.showAndDiscardTacticCard(true); // Play tactic card
-      else if (oldState.turnPhase == TurnPhase.Build) h.destroy(); // Attach card to another card stack
-      else h.discard(true); // Discard hand card
+      if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
+      else if (newData) h.update(newData); // Move existing hand card to new position
+      else if (oldState.turnPhase != TurnPhase.Build) h.discard();
+      else h.destroy(); // Card was attached to a card stack in updateCardStacks()
     }, this);
+
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.hand.push(h), this);
     this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid), this);
   }
 
-  private showOpponentTacticCardAction(oldState: ClientState) {
-    const opponent = this.state.opponent;
-    const oldOpponent = oldState.opponent;
-    if (
-      opponent.handCardSize + opponent.deckSize < oldOpponent.handCardSize + oldOpponent.deckSize &&
-      opponent.discardPileIds.length > oldOpponent.discardPileIds.length &&
-      this.state.turnPhase == TurnPhase.Build &&
-      oldState.turnPhase == TurnPhase.Build
-    ) {
-      // Opponent playing tactic card
-      const cardId =
-        opponent.discardPileIds.length > 0
-          ? opponent.discardPileIds[opponent.discardPileIds.length - 1]
-          : null;
-      if (
-        cardId &&
-        !this.state.cardStacks
-          .flatMap(cs => cs.cards)
-          .map(c => c.id)
-          .includes(cardId)
-      ) {
-        new CardImage(
-          this,
-          layoutConfig.discardPile.x,
-          layoutConfig.discardPile.yOpponent,
-          cardId,
-          true
-        ).showAndDiscardTacticCard(false);
-      }
+  private animateOpponentTacticCard(oldState: ClientState) {
+    const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
+    if (cardId) {
+      new CardImage(
+        this,
+        layoutConfig.discardPile.x,
+        layoutConfig.discardPile.yOpponent,
+        cardId,
+        true
+      ).maximizeTacticCard();
     }
+  }
+
+  private discardMaximizedTacticCard() {
+    if (!this.state.intervention) this.maximizedTacticCard?.discard();
   }
 
   private updateHighlighting() {

@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, CardDurability } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -45,7 +45,7 @@ export class Card144 extends ScienceTacticCard {
     if (target.type == CardType.Colony) handCard = player.hand.find(cs => cs.card.name == 'Kraftwerk');
     if (!handCard) handCard = player.hand.find(cs => cs.card.name == 'Fusionsreaktor');
     handCard.attach(cardStack);
-    player.playHandCard(handCard, target, true);
+    handCard.playHandCard(target);
   }
   getValidTargets(player: Player): CardStack[] {
     const validTargetsWithDuplicates = player.hand
@@ -85,5 +85,21 @@ export class Card316 extends ScienceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card443 extends ScienceTacticCard {
+  private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Science];
+  constructor() {
+    super(443, 'Computer-Virus', 1);
+  }
+  onEnterGame(player: Player) {
+    this.onEnterGameInterventionTacticCard(player);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionTacticCard(player, this.countersDisciplines);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.TacticCard;
   }
 }

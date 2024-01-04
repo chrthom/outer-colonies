@@ -1,8 +1,9 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, TurnPhase, Zone, CardDurability } from '../../shared/config/enums';
+import { CardType, Zone, CardDurability, InterventionType } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
+import TacticCard from './types/tactic_card';
 
 export default abstract class Card {
   readonly id!: number;
@@ -19,7 +20,7 @@ export default abstract class Card {
   }
   abstract getValidTargets(player: Player): CardStack[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  attack(attackingShip: CardStack, target: CardStack): AttackResult {
+  attack(attackingShip: CardStack, target: CardStack, interventionCard?: TacticCard): AttackResult {
     return new AttackResult(0);
   }
   get canAttack(): boolean {
@@ -28,6 +29,12 @@ export default abstract class Card {
   get canDefend(): boolean {
     const p = this.profile;
     return [p.armour, p.shield, p.pointDefense].some(n => n > 0);
+  }
+  canIntervene(intervention: InterventionType): boolean {
+    return intervention == this.interventionType;
+  }
+  protected get interventionType(): InterventionType | undefined {
+    return undefined;
   }
   deactivationPriority(cardStack: CardStack): number {
     let priority = this.instantRecharge ? 0 : 15;

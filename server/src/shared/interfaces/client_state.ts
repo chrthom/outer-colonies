@@ -1,20 +1,29 @@
-import { EventType, BattleType, TurnPhase, Zone, GameResultType } from '../config/enums';
+import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionType } from '../config/enums';
 
 export interface ClientOpponent {
   name: string;
+  hand: ClientHandCard[];
   handCardSize: number;
   deckSize: number;
   discardPileIds: number[];
 }
 
-export interface ClientAttack {
+export interface ClientPlannedAttack {
   sourceUUID: string;
   sourceIndex: number;
   targetUUID: string;
+}
+
+export interface ClientAttack extends ClientPlannedAttack {
   pointDefense: number;
   shield: number;
   armour: number;
   damage: number;
+}
+
+export interface ClientIntervention {
+  type: InterventionType;
+  attack?: ClientPlannedAttack;
 }
 
 export interface ClientBattle {
@@ -59,6 +68,7 @@ export interface ClientHandCard {
   index: number;
   playable: boolean;
   validTargets: string[];
+  ownedByPlayer: boolean;
 }
 
 export interface ClientEvent {
@@ -86,7 +96,9 @@ export interface ClientState {
   deckSize: number;
   discardPileIds: number[];
   cardStacks: ClientCardStack[];
-  battle?: ClientBattle;
+  battle: ClientBattle;
+  intervention?: ClientIntervention;
   gameResult?: ClientGameResult;
   hasToRetractCards: boolean;
+  highlightCardUUID?: string;
 }

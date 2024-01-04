@@ -35,6 +35,14 @@ export enum EventType {
   Tactic = 'tactic'
 }
 
+export enum InterventionType {
+  Attack = 'attack',
+  BattleRoundEnd = 'battle_round_end',
+  BattleRoundStart = 'battle_round_start',
+  OpponentTurnStart = 'turn_start',
+  TacticCard = 'tactic_card'
+}
+
 export enum ItemType {
   Box = 'box',
   Booster = 'booster'

@@ -25,7 +25,11 @@ export default class Prompt {
   update() {
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
-    } else if (this.scene.state.playerPendingAction) {
+    } else if (!this.scene.state.playerPendingAction) {
+      this.show('Warte auf Gegenspieler...');
+    } else if (this.scene.state.intervention) {
+      this.showIntervention();
+    } else {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
           if (this.scene.state.playerIsActive) this.showBuildPhase();
@@ -40,8 +44,6 @@ export default class Prompt {
         default:
           this.show('Lädt...');
       }
-    } else {
-      this.show('Warte auf Gegenspieler...');
     }
   }
   setVisible(visible: boolean) {
@@ -86,6 +88,11 @@ export default class Prompt {
   private showEndPhase() {
     const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
     this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
+  }
+  private showIntervention() {
+    this.show(
+      'Unterbreche den gegnerischen Zug durch das\nSpielen einer Taktikkarte mit der Eigenschaft\n"Intervention"!'
+    );
   }
   private showGameOver(gameResult: ClientGameResult) {
     let gameOverText: string;
