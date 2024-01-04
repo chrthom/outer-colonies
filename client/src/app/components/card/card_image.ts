@@ -53,11 +53,9 @@ export default class CardImage {
   }
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.discard();
+    this.scene.maximizedTacticCard = this;
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
-    if (this.scene.state.intervention?.type == InterventionType.TacticCard) {
-      this.scene.maximizedTacticCard = this;
-    }
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
