@@ -20,11 +20,11 @@ export default class CardStack {
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
   private scene!: Game;
-  constructor(scene: Game, data: ClientCardStack, fromHand?: boolean, origin?: CardImage) {
+  constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
-    this.createCards(origin, fromHand);
+    this.createCards(true, origin);
   }
   discard(toDeck?: boolean) {
     this.destroyIndicators();
@@ -117,7 +117,7 @@ export default class CardStack {
     if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
     if (this.defenseIndicator) this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
   }
-  private createCards(origin?: CardImage, fromHand?: boolean) {
+  private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
       c => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
     );
@@ -152,13 +152,18 @@ export default class CardStack {
     }
     if (fromHand) {
       if (origin) {
-        this.cards[0].setX(origin.image.x).setY(origin.image.y).setAngle(origin.image.angle);
-        this.tween();
+        this.cards[0]
+          .setX(origin.image.x)
+          .setY(origin.image.y)
+          .setAngle(origin.image.angle)
+          .setScale(origin.image.scale);
+      } else if (!this.data.ownedByPlayer) {
+        this.cards[0]
+          .setX(layoutConfig.discardPile.x)
+          .setY(layoutConfig.discardPile.yOpponent)
+          .setAngle(180);
       }
-      if (!this.data.ownedByPlayer) {
-        this.cards[0].setX(layoutConfig.discardPile.x).setY(layoutConfig.discardPile.yOpponent).setAngle(180);
-        this.tween();
-      }
+      this.tween();
     }
   }
   private x() {

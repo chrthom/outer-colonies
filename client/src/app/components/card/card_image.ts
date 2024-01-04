@@ -63,13 +63,7 @@ export default class CardImage {
       x: layoutConfig.maxedTacticCard.x,
       y: layoutConfig.maxedTacticCard.y,
       angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale,
-      completeDelay: animationConfig.duration.waitBeforeDiscard,
-      onComplete: () => {
-        if (this.scene.state.intervention?.type != InterventionType.TacticCard) {
-          this.discard();
-        }
-      }
+      scale: layoutConfig.maxedTacticCard.scale
     });
   }
   highlightDisabled() {
@@ -121,6 +115,10 @@ export default class CardImage {
   }
   setDepth(depth: number): this {
     this.forAllImages(i => i.setDepth(depth));
+    return this;
+  }
+  setScale(scale: number): this {
+    this.forAllImages(i => i.setScale(scale));
     return this;
   }
   enableMaximizeOnMouseover() {

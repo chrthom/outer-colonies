@@ -3,6 +3,7 @@ import ContinueButton from '../components/buttons/continue_button';
 import { ClientHandCard, ClientState } from '../../../../server/src/shared/interfaces/client_state';
 import {
   BattleType,
+  InterventionType,
   MsgTypeInbound,
   MsgTypeOutbound,
   TurnPhase
@@ -163,23 +164,17 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
-    this.maximizedTacticCard?.discard(); // TODO: Not correct for attached tactic cards
-    this.time.delayedCall(
-      this.animateHighlightTacticCard(oldState)
-        ? animationConfig.duration.showTacticCard + animationConfig.duration.waitBeforeDiscard
-        : 0,
-      () => {
-        this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
-          const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
-          this.retractCardsExist = false; // If true, then the hand animations are delayed
-          this.updateCardStacks(newHandCards);
-          this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-            this.updateHandCards(newHandCards, oldState);
-            this.resetView();
-          });
-        });
-      }
-    );
+    this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
+      const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
+      this.retractCardsExist = false; // If true, then the hand animations are delayed
+      this.updateCardStacks(newHandCards);
+      this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
+        this.updateHandCards(newHandCards, oldState);
+        this.animateOpponentTacticCard(oldState);
+        this.resetView();
+        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, this.discardMaximizedTacticCard);
+      });
+    });
   }
 
   resetView(battleType?: BattleType) {
@@ -209,26 +204,6 @@ export default class Game extends Phaser.Scene {
     this.updateHighlighting();
   }
 
-  private animateHighlightTacticCard(oldState: ClientState): boolean {
-    if (this.state.highlightCardUUID) {
-      const playerHandCard = this.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID);
-      if (playerHandCard) playerHandCard.maximizeTacticCard();
-      else {
-        const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
-        if (cardId) {
-          new CardImage(
-            this,
-            layoutConfig.discardPile.x,
-            layoutConfig.discardPile.yOpponent,
-            cardId,
-            true
-          ).maximizeTacticCard();
-        }
-      }
-    }
-    return !!this.state.highlightCardUUID;
-  }
-
   private animateAttack(): boolean {
     const attack = this.state.battle ? this.state.battle.recentAttack : null;
     if (attack) {
@@ -246,19 +221,26 @@ export default class Game extends Phaser.Scene {
   private updateCardStacks(newHandCards: ClientHandCard[]) {
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-      if (newData) cs.update(newData); // Move card stacks
+      if (newData) cs.update(newData); // Move existing card stacks
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
         this.retractCardsExist = true;
       } else cs.discard(); // Discard card stack
     }, this);
+    // Create new card stacks
     this.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
-        const originHandCard = this.hand.find(h => h.uuid == cs.uuid);
-        if (originHandCard) originHandCard.destroy();
-        return new CardStack(this, cs, true, originHandCard);
+        let origin: CardImage;
+        if (this.maximizedTacticCard?.cardId == cs.cards[0].id) {
+          origin = this.maximizedTacticCard; // Origin is maximized tactic card
+          this.maximizedTacticCard = undefined;
+        } else {
+          origin = this.hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
+        }
+        origin?.destroy();
+        return new CardStack(this, cs, origin);
       }, this)
       .forEach(cs => this.cardStacks.push(cs), this);
     this.cardStacks = this.cardStacks.filter(
@@ -270,15 +252,33 @@ export default class Game extends Phaser.Scene {
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
     this.hand.map(h => {
       const newData = this.state.hand.find(hcd => hcd.uuid == h.uuid);
-      if (h.uuid != this.state.highlightCardUUID) {} // TODO: There is an issue here...
-      else if (newData) h.update(newData); // Move hand card to new position
+      if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
+      else if (newData) h.update(newData); // Move existing hand card to new position
       else if (oldState.turnPhase != TurnPhase.Build) h.discard();
-      else h.destroy(); // Attach card to another card stack
+      else h.destroy(); // Card was attached to a card stack in updateCardStacks()
     }, this);
+
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.hand.push(h), this);
     this.hand = this.hand.filter(h => this.state.hand.find(hcd => hcd.uuid == h.uuid), this);
+  }
+
+  private animateOpponentTacticCard(oldState: ClientState) {
+    const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
+    if (cardId) {
+      new CardImage(
+        this,
+        layoutConfig.discardPile.x,
+        layoutConfig.discardPile.yOpponent,
+        cardId,
+        true
+      ).maximizeTacticCard();
+    }
+  }
+
+  private discardMaximizedTacticCard() {
+    if (this.state.intervention?.type == InterventionType.TacticCard) this.maximizedTacticCard?.discard();
   }
 
   private updateHighlighting() {
