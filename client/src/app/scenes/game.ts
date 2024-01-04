@@ -162,8 +162,7 @@ export default class Game extends Phaser.Scene {
   updateState(state: ClientState) {
     const oldState = this.state ? this.state : state;
     this.state = state;
-    console.log('-------------'); ////
-    console.log(JSON.stringify(state.intervention)); ////
+    //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
       const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
@@ -278,7 +277,7 @@ export default class Game extends Phaser.Scene {
 
   private discardMaximizedTacticCard() { // TODO: This does not work correctly
     console.log(`Intervention: ${this.state.intervention?.type}`); ////
-    if (this.state.intervention?.type == InterventionType.TacticCard) this.maximizedTacticCard?.discard();
+    //if (this.state.intervention?.type == InterventionType.TacticCard) this.maximizedTacticCard?.discard();
   }
 
   private updateHighlighting() {
