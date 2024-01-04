@@ -52,6 +52,7 @@ export default class CardImage {
     });
   }
   maximizeTacticCard() {
+    this.scene.maximizedTacticCard?.discard();
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     if (this.scene.state.intervention?.type == InterventionType.TacticCard) {

@@ -275,9 +275,8 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  private discardMaximizedTacticCard() { // TODO: This does not work correctly
-    console.log(`Intervention: ${this.state.intervention?.type}`); ////
-    //if (this.state.intervention?.type == InterventionType.TacticCard) this.maximizedTacticCard?.discard();
+  private discardMaximizedTacticCard() {
+    if (!this.state.intervention) this.maximizedTacticCard?.discard();
   }
 
   private updateHighlighting() {
