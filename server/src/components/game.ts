@@ -127,6 +127,8 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     if (!handCard) {
       console.log(`WARN: ${player.name} tried to discard non-existing card ${handCardUUID}`);
+    } else if (player.handCardLimit >= player.hand.length) {
+      console.log(`WARN: ${player.name} tried to discard card dispite not over hand card limit`);
     } else {
       player.discardHandCards(handCardUUID);
       match.prepareEndPhase();
