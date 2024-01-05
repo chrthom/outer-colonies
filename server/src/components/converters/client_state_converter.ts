@@ -37,7 +37,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       return zoneCardStacks.map((cs, index) => {
         const interceptionReady =
           ownedByPlayer &&
-          match.getInactivePlayerNo() == playerNo &&
+          match.inactivePlayerNo == playerNo &&
           match.battle.canInterceptMission(playerNo, cs);
         const defenseIcons: ClientDefenseIcon[] = cs.cardStacks
           .filter(c => c.card.canDefend)
@@ -124,7 +124,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     : undefined;
   return {
     playerIsActive: match.activePlayerNo == playerNo,
-    playerPendingAction: match.actionPendingByPlayerNo == playerNo,
+    playerPendingAction: match.pendingActionPlayerNo == playerNo,
     turnPhase: match.turnPhase,
     actionPool: actionPool,
     opponent: opponentData,

@@ -16,7 +16,7 @@ export default abstract class Intervention {
   }
   abstract skip(): void;
   get hasValidTargets() {
-    return this.match.getPendingActionPlayer().hand.some(cs => cs.hasValidTargets);
+    return this.match.pendingActionPlayer.hand.some(cs => cs.hasValidTargets);
   }
   checkSkip() {
     if (!this.hasValidTargets) this.skip();
@@ -25,7 +25,7 @@ export default abstract class Intervention {
     this.match.intervention = undefined;
   }
   activateActivePlayer() {
-    this.match.actionPendingByPlayerNo = this.match.activePlayerNo;
+    this.match.pendingActionPlayerNo = this.match.activePlayerNo;
   }
   switchPendingPlayer() {
     this.match.switchPendingPlayer();
@@ -51,7 +51,7 @@ export class InterventionBattleRoundEnd extends Intervention {
     super(InterventionType.BattleRoundEnd, match);
   }
   skip() {
-    if (this.match.actionPendingByPlayerNo == this.match.activePlayerNo) {
+    if (this.match.pendingActionPlayerNo == this.match.activePlayerNo) {
       new InterventionBattleRoundEnd(this.match).init();
     } else {
       this.match.battle.processEndOfBattlePhase(this.match);
@@ -67,7 +67,7 @@ export class InterventionBattleRoundStart extends Intervention {
   }
   skip() {
     this.switchPendingPlayer();
-    if (this.match.actionPendingByPlayerNo == this.match.getInactivePlayerNo()) {
+    if (this.match.pendingActionPlayerNo == this.match.inactivePlayerNo) {
       new InterventionBattleRoundStart(this.match).init();
     } else {
       this.remove();

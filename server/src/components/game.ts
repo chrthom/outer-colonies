@@ -43,7 +43,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         match.players[socketData(socket).playerNo].ready = true;
         if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
       } else if (
-        (socketData(socket).playerNo == match.actionPendingByPlayerNo && match.intervention) ||
+        (socketData(socket).playerNo == match.pendingActionPlayerNo && match.intervention) ||
         turnPhase == TurnPhase.Build ||
         turnPhase == TurnPhase.Combat
       ) {
@@ -82,7 +82,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const match = socketData(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
-    const target = getCardStackByUUID(match.getInPlayCardStacks(), targetUUID);
+    const target = getCardStackByUUID(match.allCardStacks, targetUUID);
     if (!handCard) {
       console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
     } else if (!target) {
@@ -136,10 +136,10 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
     const match = socketData(socket).match;
     const player = getPlayer(socket);
-    const playerShips = match.battle.ships[match.actionPendingByPlayerNo];
+    const playerShips = match.battle.ships[match.pendingActionPlayerNo];
     const srcShip = playerShips.find(cs => cs.uuid == srcId);
     const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
-    const opponentShips = match.battle.ships[match.getWaitingPlayerNo()];
+    const opponentShips = match.battle.ships[match.waitingPlayerNo];
     const target = opponentShips.find(cs => cs.uuid == targetId);
     if (!srcWeapon) {
       console.log(`WARN: ${player.name} tried to attack from invalid weapon`);

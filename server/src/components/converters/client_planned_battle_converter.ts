@@ -6,22 +6,22 @@ import { getCardStackByUUID } from '../utils/helpers';
 
 export default function toBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
   const ships = plannedBattle.shipIds
-    .map(id => getCardStackByUUID(match.getActivePlayer().cardStacks, id))
+    .map(id => getCardStackByUUID(match.activePlayer.cardStacks, id))
     .filter(cs => cs.isMissionReady);
   if (plannedBattle.shipIds.length == 0) return new Battle(BattleType.None);
   let battle: Battle;
-  const downsideCards = match.getActivePlayer().pickCardsFromDeck(plannedBattle.downsideCardsNum);
-  const upsideCards = match.getActivePlayer().pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
+  const downsideCards = match.activePlayer.pickCardsFromDeck(plannedBattle.downsideCardsNum);
+  const upsideCards = match.activePlayer.pickCardsFromTopOfDiscardPile(plannedBattle.upsideCardsNum);
   switch (plannedBattle.type) {
     case BattleType.Mission:
       battle = new Battle(BattleType.Mission);
-      battle.ships[match.actionPendingByPlayerNo] = ships;
+      battle.ships[match.pendingActionPlayerNo] = ships;
       battle.downsidePriceCards = downsideCards;
       battle.upsidePriceCards = upsideCards;
       break;
     case BattleType.Raid:
       battle = new Battle(BattleType.Raid);
-      battle.ships[match.actionPendingByPlayerNo] = ships;
+      battle.ships[match.pendingActionPlayerNo] = ships;
       break;
     default:
       battle = new Battle(BattleType.None);

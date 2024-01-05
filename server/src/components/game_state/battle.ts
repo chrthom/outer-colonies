@@ -32,7 +32,7 @@ export default class Battle {
   static fromClientPlannedBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
     const battle = toBattle(match, plannedBattle);
     if (battle.type != BattleType.None) {
-      battle.ships[match.actionPendingByPlayerNo].forEach(cs => (cs.zone = Zone.Neutral));
+      battle.ships[match.pendingActionPlayerNo].forEach(cs => (cs.zone = Zone.Neutral));
     }
     return battle;
   }
@@ -61,16 +61,16 @@ export default class Battle {
     );
   }
   processBattleRound(match: Match) {
-    match.actionPendingByPlayerNo = match.getWaitingPlayerNo();
+    match.pendingActionPlayerNo = match.waitingPlayerNo;
     if (this.range == 0) {
       if (this.type == BattleType.Mission) this.applyMissionResult(match);
       match.prepareEndPhase();
     } else {
-      const hasAttack = this.ships[match.actionPendingByPlayerNo]
+      const hasAttack = this.ships[match.pendingActionPlayerNo]
         .flatMap(cs => cs.cardStacks)
         .filter(cs => cs.attackAvailable)
         .some(cs => (<EquipmentCard>cs.card).attackProfile.range >= this.range);
-      const hasTarget = this.ships[match.getWaitingPlayerNo()].length > 0;
+      const hasTarget = this.ships[match.waitingPlayerNo].length > 0;
       if (!hasAttack || !hasTarget) match.processBattleRound();
     }
   }
@@ -89,8 +89,8 @@ export default class Battle {
       player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
     });
     if (this.range == 1 && this.type == BattleType.Raid) {
-      this.ships[match.actionPendingByPlayerNo].push(
-        ...match.players[match.actionPendingByPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
+      this.ships[match.pendingActionPlayerNo].push(
+        ...match.players[match.pendingActionPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
       );
     }
   }
@@ -98,7 +98,7 @@ export default class Battle {
     this.recentAttack = null;
   }
   private applyMissionResult(match: Match) {
-    const player = match.getActivePlayer();
+    const player = match.activePlayer;
     if (this.ships[match.activePlayerNo].length > 0) {
       player.takeCards(this.downsidePriceCards);
       player.deck.push(...this.upsidePriceCards);

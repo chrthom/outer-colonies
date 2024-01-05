@@ -60,7 +60,7 @@ export default class Player {
     return this.no == this.match.activePlayerNo;
   }
   get isPendingPlayer(): boolean {
-    return this.no == this.match.actionPendingByPlayerNo;
+    return this.no == this.match.pendingActionPlayerNo;
   }
   takeCards(cards: Card[]) {
     this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
