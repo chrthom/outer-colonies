@@ -15,8 +15,7 @@ export default class CombatRangeIndicator {
   }
   update() {
     this.hide();
-    if (this.scene.state.battle && this.scene.state.battle.range < 5)
-      this.show(this.scene.state.battle.range);
+    if (this.scene.state.battle?.range < 5) this.show(this.scene.state.battle.range);
   }
   show(range: number) {
     this.images[range - 1].setVisible(true);

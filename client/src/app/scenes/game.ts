@@ -159,7 +159,7 @@ export default class Game extends Phaser.Scene {
   }
 
   updateState(state: ClientState) {
-    const oldState = this.state ? this.state : state;
+    const oldState = this.state ?? state;
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
@@ -185,7 +185,7 @@ export default class Game extends Phaser.Scene {
     this.activeCards.stackIndex = undefined;
     this.interceptShipIds = [];
     this.plannedBattle = {
-      type: battleType ? battleType : BattleType.None,
+      type: battleType ?? BattleType.None,
       downsideCardsNum: 0,
       upsideCardsNum: 0,
       shipIds: []

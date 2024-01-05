@@ -33,7 +33,7 @@ export default class Card extends CardImage {
     this.destroyButton();
   }
   destroyButton() {
-    if (this.retractCardButton) this.retractCardButton.destroy();
+    this.retractCardButton?.destroy();
   }
   animateAttack() {
     this.highlightSelected();
@@ -41,6 +41,6 @@ export default class Card extends CardImage {
   }
   override tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     super.tween(tweenConfig);
-    if (this.retractCardButton) this.retractCardButton.tween(tweenConfig['x'], tweenConfig['y']);
+    this.retractCardButton?.tween(tweenConfig['x'], tweenConfig['y']);
   }
 }
