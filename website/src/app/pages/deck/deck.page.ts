@@ -223,7 +223,7 @@ class DeckBox {
               isAsc
             );
           case 'defense':
-            return compare(a.defense ? a.defense : a.hp, b.defense ? b.defense : b.hp, isAsc);
+            return compare(a.defense ?? a.hp, b.defense ?? b.hp, isAsc);
           case 'rarity':
             return compare(a.rarity, b.rarity, isAsc);
           case 'edition':

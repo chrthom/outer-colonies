@@ -24,21 +24,9 @@ export class OpenItemComponent {
     if (this.content) {
       const numberOfElements =
         this.content.sol.length + this.content.boosters.length + this.content.cards.length;
-      switch (numberOfElements) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-          return `width-${numberOfElements} height-1`;
-        case 6:
-          return 'width-3 height-2';
-        case 7:
-        case 8:
-          return 'width-4 height-2';
-        default:
-          return 'width-5 height-2';
-      }
+      const width = numberOfElements > 5 ? Math.round(numberOfElements / 2) : numberOfElements;
+      const height = numberOfElements > 5 ? 2 : 1;
+      return `width-${width} height-${height}`;
     } else return '';
   }
   closeBox() {

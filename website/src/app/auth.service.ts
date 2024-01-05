@@ -29,10 +29,11 @@ export default class AuthService {
   }
 
   logout() {
-    if (this.sessionToken)
+    if (this.sessionToken) {
       this.authAPIService.logout(this.sessionToken).subscribe(() => {
         /* Do nothing */
       });
+    }
     this.username = undefined;
     this.sessionToken = undefined;
     this.cookieService.delete('u');
@@ -77,10 +78,10 @@ export default class AuthService {
   }
 
   get displayname(): string {
-    return this.username ? this.username : '';
+    return this.username ?? '';
   }
 
   get token(): string {
-    return this.sessionToken ? this.sessionToken : '';
+    return this.sessionToken ?? '';
   }
 }
