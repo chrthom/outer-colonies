@@ -93,8 +93,7 @@ export default class CardStack {
     return this.player.match;
   }
   get rootCardStack(): CardStack {
-    if (this.parentCardStack) return this.parentCardStack.rootCardStack;
-    else return this;
+    return this.parentCardStack ? this.parentCardStack.rootCardStack : this;
   }
   get validTargets(): CardStack[] {
     const canIntervene = this.match.intervention && this.card.canIntervene(this.match.intervention.type);
@@ -149,7 +148,6 @@ export default class CardStack {
   get profile(): CardProfile {
     const profile = this.cards.map(c => c.profile).reduce((a, b) => a.combine(b));
     if (this.type == CardType.Colony) {
-      7;
       profile.energy = this.player.cardStacks
         .filter(cs => cs.zone == Zone.Colony)
         .filter(cs => cs.type == CardType.Infrastructure)

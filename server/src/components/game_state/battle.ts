@@ -95,7 +95,7 @@ export default class Battle {
     }
   }
   resetRecentAttack() {
-    this.recentAttack = null;
+    this.recentAttack = undefined;
   }
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;

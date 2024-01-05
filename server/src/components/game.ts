@@ -105,9 +105,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const player = getPlayer(socket);
     const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
     const targetCardStack =
-      rootCardStack && rootCardStack.cardStacks.length > cardIndex
-        ? rootCardStack.cardStacks[cardIndex]
-        : null;
+      rootCardStack?.cardStacks.length > cardIndex ? rootCardStack.cardStacks[cardIndex] : undefined;
     if (!rootCardStack) {
       console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
     } else if (!targetCardStack) {
@@ -140,7 +138,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const player = getPlayer(socket);
     const playerShips = match.battle.ships[match.pendingActionPlayerNo];
     const srcShip = playerShips.find(cs => cs.uuid == srcId);
-    const srcWeapon = srcShip ? srcShip.cardStacks[srcIndex] : null;
+    const srcWeapon = srcShip?.cardStacks[srcIndex];
     const opponentShips = match.battle.ships[match.waitingPlayerNo];
     const target = opponentShips.find(cs => cs.uuid == targetId);
     if (!srcWeapon) {
