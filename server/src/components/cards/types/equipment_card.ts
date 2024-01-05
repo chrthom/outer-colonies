@@ -44,7 +44,7 @@ export default abstract class EquipmentCard extends Card {
     }
     const attackResult = this.attackStep(
       target,
-      match.battle.ships[match.getWaitingPlayerNo()],
+      match.battle.ships[match.waitingPlayerNo],
       new AttackResult(damage)
     );
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);

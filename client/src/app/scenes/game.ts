@@ -267,7 +267,6 @@ export default class Game extends Phaser.Scene {
       else if (oldState.turnPhase != TurnPhase.Build) h.discard();
       else h.destroy(); // Card was attached to a card stack in updateCardStacks()
     }, this);
-
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.hand.push(h), this);

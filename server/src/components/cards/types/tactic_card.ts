@@ -59,7 +59,7 @@ export default abstract class TacticCard extends Card {
     if (player.match.intervention?.type == InterventionType.TacticCard) {
       const intervention = player.match.intervention as InterventionTacticCard;
       return disciplines.includes((intervention.src.card as TacticCard).discipline)
-        ? this.onlyColonyTarget(player.match.getWaitingPlayer().cardStacks)
+        ? this.onlyColonyTarget(player.match.waitingPlayer.cardStacks)
         : [];
     }
     return [];
