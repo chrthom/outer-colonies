@@ -73,8 +73,8 @@ export default class Match {
     this.activePlayer.callBackShipsFromNeutralZone();
     this.activePlayer.drawCards(rules.cardsToDrawPerTurn);
     this.activePlayer.cardStacks.forEach(cs => cs.onStartTurn());
-    this.activePlayer
-      .cardStacks.flatMap(cs => cs.cardStacks)
+    this.activePlayer.cardStacks
+      .flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
     new InterventionOpponentTurnStart(this).init();
@@ -101,10 +101,7 @@ export default class Match {
     this.pendingActionPlayerNo = this.activePlayerNo;
     this.battle = new Battle(BattleType.None);
     this.activePlayer.moveFlightReadyShipsToOrbit();
-    if (
-      this.activePlayer.hand.length <= this.activePlayer.handCardLimit &&
-      !this.gameResult.gameOver
-    ) {
+    if (this.activePlayer.hand.length <= this.activePlayer.handCardLimit && !this.gameResult.gameOver) {
       this.activePlayer.cardStacks.forEach(cs => cs.onEndTurn());
       this.prepareStartPhase();
     }

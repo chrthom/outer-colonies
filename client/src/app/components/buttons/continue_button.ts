@@ -61,17 +61,14 @@ export default class ContinueButton {
     (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
       o =>
         o
-          .on('pointerdown', () => {
-            this.onClickAction();
-          })
-          .on('pointerover', () => {
-            this.text.setColor(layoutConfig.font.colorHover);
-          })
-          .on('pointerout', () => {
-            this.text.setColor(layoutConfig.font.color);
-          }),
+          .on('pointerdown', () => this.onClickAction())
+          .on('pointerover', () => this.text.setColor(layoutConfig.font.colorHover))
+          .on('pointerout', () => this.text.setColor(layoutConfig.font.color)),
       this
     );
+    this.scene.input.keyboard
+      .addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, true)
+      .on('down', () => this.onClickAction());
     this.waitState();
   }
   update() {
