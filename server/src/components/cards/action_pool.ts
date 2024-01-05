@@ -30,8 +30,7 @@ export class CardAction {
 export default class ActionPool {
   private cardActions!: CardAction[];
   constructor(...cardActions: CardAction[]) {
-    if (cardActions) this.cardActions = cardActions;
-    else this.cardActions = [];
+    this.cardActions = cardActions ?? [];
   }
   get pool() {
     return this.cardActions.slice();

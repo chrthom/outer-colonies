@@ -39,6 +39,7 @@ abstract class SolarPanelCard extends InfrastructureEnergyCard {
   override getValidTargets(player: Player): CardStack[] {
     let validTargets = super.getValidTargets(player);
     if (player.colonyCardStack.cards.some(c => c.id == 433)) {
+      // TODO: Refactor as part of #283
       validTargets = validTargets.filter(cs => cs.card.type != CardType.Colony);
     } else if (player.colonyCardStack.cards.some(c => c.id == 403)) {
       validTargets = [];

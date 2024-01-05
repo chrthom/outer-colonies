@@ -114,8 +114,8 @@ export default class CardStack {
         angle: this.data.ownedByPlayer ? 0 : 180
       });
     });
-    if (this.damageIndicator) this.damageIndicator.tween(this.x(), this.zoneLayout().y);
-    if (this.defenseIndicator) this.defenseIndicator.tween(this.x(), this.zoneLayout().y);
+    this.damageIndicator?.tween(this.x(), this.zoneLayout().y);
+    this.defenseIndicator?.tween(this.x(), this.zoneLayout().y);
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
