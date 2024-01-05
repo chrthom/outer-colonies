@@ -66,7 +66,9 @@ export default class ContinueButton {
           .on('pointerout', () => this.text.setColor(layoutConfig.font.color)),
       this
     );
-    this.scene.input.keyboard.on('keydown_SPACE', () => this.onClickAction());
+    this.scene.input.keyboard
+      .addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, true)
+      .on('down', () => this.onClickAction());
     this.waitState();
   }
   update() {
