@@ -7,7 +7,7 @@ export default class VersonIndicator {
       .text(
         layoutConfig.version.x,
         layoutConfig.version.y,
-        `Epimetheus (v1.8.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Helene (v1.9.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.font.size)
       .setFontFamily(layoutConfig.font.captionFamily)
