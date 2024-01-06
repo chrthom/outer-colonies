@@ -1,6 +1,6 @@
 # OUTER COLONIES
 
-## 1. Release & Deployment
+## 1. Release & deployment
 
 ### 1.1 Deployment
 
@@ -29,14 +29,23 @@ Run `npm run build:staging` for staging or `npm run build:prod` for production b
 
 ### 1.2 Release
 
-#### 1.2.1 Create Tag & Release
+#### 1.2.1 Create release branch
+
+1. Create branch via `git checkout -b release/<x.x>`
+2. Push branch via `git push --set-upstream origin release/<x.x>`
+
+#### 1.2.2 Create tag
 
 1. Create tag via `git tag -a v<x.x.x> -m "<tag description from milestone>"`
 2. Push tag via `git push origin v<x.x.x>`
-3. Create new [GitHub Release](https://github.com/chrthom/outer-colonies/releases/new), refering to the existing tag
+3. Switch back to main branch `git checkout main`
 
-#### 1.2.2 Increment version
+#### 1.2.3 Create release
 
-1. Run `npm version`
+Create new [GitHub Release](https://github.com/chrthom/outer-colonies/releases/new), refering to the existing tag.
+
+#### 1.2.4 Increment version
+
+1. Run `npm run version`
 2. Enter the new version number
 3. Enter the new Release name
