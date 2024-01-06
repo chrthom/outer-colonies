@@ -1,5 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
 import { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -58,5 +59,23 @@ export class Card231 extends IntelligenceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;
+  }
+}
+
+export class Card416 extends IntelligenceTacticCard {
+  private speedLimit = 0;
+  constructor() {
+    super(416, 'Lücke im Verteidigungsnetz', 3);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    spliceCardStackByUUID(player.match.battle.ships[opponentPlayerNo(player.no)], target.uuid);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(
+      cs => cs.profile.speed <= this.speedLimit && cs.isInBattle && cs.type == CardType.Hull
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
   }
 }
