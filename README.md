@@ -32,7 +32,7 @@ Run `npm run build:staging` for staging or `npm run build:prod` for production b
 #### 1.2.1 Create release branch
 
 1. Create branch via `git checkout -b release/<x.x>`
-2. Push branch via `git push`
+2. Push branch via `git push --set-upstream origin release/<x.x>`
 
 #### 1.2.2 Create tag
 
@@ -46,6 +46,6 @@ Create new [GitHub Release](https://github.com/chrthom/outer-colonies/releases/n
 
 #### 1.2.4 Increment version
 
-1. Run `npm version`
+1. Run `npm run version`
 2. Enter the new version number
 3. Enter the new Release name
