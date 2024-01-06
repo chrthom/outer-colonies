@@ -11,9 +11,9 @@ export default class AttackDamageIndicator {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;
     ['pointDefense', 'shield', 'armour', 'damage']
-      .map(key => [attack[key], layoutConfig.attack.color[key]])
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([value, _]) => value > 0)
+      .map(key => [key, attack[key]])
+      .filter(([key, value]) => key == 'damage' || value > 0)
+      .map(([key, value]) => [value, layoutConfig.attack.color[key]])
       .forEach(
         ([value, color], index) =>
           this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
