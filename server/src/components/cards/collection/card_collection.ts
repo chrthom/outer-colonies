@@ -143,7 +143,7 @@ import { Rarity } from '../../../shared/config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
 import { Card146, Card159, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
-import { Card129, Card176, Card231 } from './tactic_intelligence_cards';
+import { Card129, Card176, Card231, Card416 } from './tactic_intelligence_cards';
 
 export default class CardCollection {
   static cards = {
@@ -293,6 +293,7 @@ export default class CardCollection {
     409: <Card>new Card409(),
     410: <Card>new Card410(),
     412: <Card>new Card412(),
+    416: <Card>new Card416(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),
     421: <Card>new Card421(),
