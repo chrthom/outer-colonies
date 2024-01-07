@@ -432,7 +432,19 @@ export default class CardCollection {
     this.starterDeckExpedition
   ];
 
-  private static pickRandomCard(edition: number, rarity: Rarity) {
+  static generateBoosterContent(edition: number): Card[] {
+    const cards: Card[] = [];
+    [Array(6).fill(Rarity.Common), Array(3).fill(Rarity.Uncommon), Array(1).fill(Rarity.Rare)]
+      .flat()
+      .forEach(rarity => {
+        const pickAction = () => this.pickRandomCard(edition, rarity);
+        const newCard = pickAction();
+        cards.push(cards.some(c => c.id == newCard.id) ? pickAction() : newCard);
+      });
+    return cards;
+  }
+
+  private static pickRandomCard(edition: number, rarity: Rarity): Card {
     const relevantCards = this.allCards
       .filter(c => Math.floor(c.id / 100) == edition)
       .filter(
@@ -460,13 +472,5 @@ export default class CardCollection {
         }
       });
     return relevantCards[Math.floor(Math.random() * relevantCards.length)];
-  }
-
-  static generateBooster(edition: number): Card[] {
-    const cards: Card[] = [];
-    for (let i = 0; i < 6; i++) cards.push(this.pickRandomCard(edition, Rarity.Common));
-    for (let i = 0; i < 3; i++) cards.push(this.pickRandomCard(edition, Rarity.Uncommon));
-    cards.push(this.pickRandomCard(edition, Rarity.Rare));
-    return cards;
   }
 }
