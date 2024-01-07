@@ -230,7 +230,7 @@ export default function restAPI(app: Express) {
         if (item) {
           DBItemsDAO.delete(itemId);
           if (item.type == ItemType.Booster) {
-            const cards = CardCollection.generateBooster(Number(item.content)).map(c => c.id);
+            const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
             cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
             const response: OpenItemResponse = {
               itemId: item.itemId,
