@@ -22,13 +22,14 @@ export default abstract class HullCard extends Card {
     );
   }
   private filterAttachableHull(cardStacks: CardStack[]): CardStack[] {
-    return cardStacks.filter(
-      cs =>
-        cs.type == CardType.Hull &&
-        (<HullCard>cs.card).multipart.neededPartIds.includes(this.id) &&
-        !cs.cards.some(c => c.name == this.name) &&
-        cs.profile.combine(this.profile).isValid
-    );
+    return cardStacks
+      .filter(cs => cs.type == CardType.Hull) // Only attachable to other hull cards
+      .filter(cs => (cs.card as HullCard).multipart.neededPartIds.includes(this.id)) // Hull card hav to be required by card stack
+      .filter(
+        // Either duplicates are allowed or is not duplicated
+        cs => (cs.card as HullCard).multipart.duplicatesAllowed || !cs.cards.some(c => c.name == this.name)
+      )
+      .filter(cs => cs.profile.combine(this.profile).isValid); // Sufficient sockets and energy available
   }
   private filterAttachableColony(cardStacks: CardStack[]): CardStack[] {
     return cardStacks.filter(cs => cs.type == CardType.Colony && this.profile.isValid);
@@ -41,15 +42,12 @@ export default abstract class HullCard extends Card {
     return isRootCard;
   }
   override isFlightReady(cards: Card[]): boolean {
-    return cards.filter(c => c.type == CardType.Hull).length == this.multipart.partNo;
+    return cards.filter(c => c.type == CardType.Hull).length == this.multipart.numberOfRequiredParts;
   }
 }
 
-export class HullMultipart {
-  partNo!: number;
-  neededPartIds!: number[];
-  static noMultipart: HullMultipart = {
-    partNo: 1,
-    neededPartIds: []
-  };
+export interface HullMultipart {
+  numberOfRequiredParts: number;
+  neededPartIds: number[];
+  duplicatesAllowed: boolean;
 }
