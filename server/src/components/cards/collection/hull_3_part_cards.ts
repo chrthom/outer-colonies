@@ -2,8 +2,9 @@ import HullCard, { HullMultipart } from '../types/hull_card';
 
 function toMultipart(...neededPartIds: number[]): HullMultipart {
   return {
-    partNo: 3,
-    neededPartIds: neededPartIds
+    numberOfRequiredParts: 3,
+    neededPartIds: neededPartIds,
+    duplicatesAllowed: false
   };
 }
 

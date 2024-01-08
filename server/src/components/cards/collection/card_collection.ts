@@ -68,7 +68,7 @@ import {
   Card453
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card235, Card236, Card321, Card427 } from './tactic_economy_cards';
-import { Card119, Card152, Card153, Card228, Card446 } from './hull_staton_cards';
+import { Card119, Card152, Card153, Card228, Card446 } from './hull_station_cards';
 import {
   Card166,
   Card182,
