@@ -68,7 +68,17 @@ import {
   Card453
 } from './infrastructure_energy_cards';
 import { Card141, Card165, Card232, Card235, Card236, Card321, Card427 } from './tactic_economy_cards';
-import { Card119, Card152, Card153, Card228, Card446 } from './hull_station_cards';
+import {
+  Card102,
+  Card113,
+  Card119,
+  Card128,
+  Card152,
+  Card153,
+  Card228,
+  Card311,
+  Card446
+} from './hull_station_cards';
 import {
   Card166,
   Card182,
@@ -149,6 +159,7 @@ export default class CardCollection {
   static cards = {
     0: <Card>new ColonyCard(),
     101: <Card>new Card101(),
+    102: <Card>new Card102(),
     103: <Card>new Card103(),
     104: <Card>new Card104(),
     105: <Card>new Card105(),
@@ -156,6 +167,7 @@ export default class CardCollection {
     107: <Card>new Card107(),
     109: <Card>new Card109(),
     110: <Card>new Card110(),
+    113: <Card>new Card113(),
     114: <Card>new Card114(),
     115: <Card>new Card115(),
     116: <Card>new Card116(),
@@ -168,6 +180,7 @@ export default class CardCollection {
     125: <Card>new Card125(),
     126: <Card>new Card126(),
     127: <Card>new Card127(),
+    128: <Card>new Card128(),
     129: <Card>new Card129(),
     130: <Card>new Card130(),
     131: <Card>new Card131(),
@@ -253,6 +266,7 @@ export default class CardCollection {
     308: <Card>new Card308(),
     309: <Card>new Card309(),
     310: <Card>new Card310(),
+    311: <Card>new Card311(),
     312: <Card>new Card312(),
     313: <Card>new Card313(),
     314: <Card>new Card314(),
