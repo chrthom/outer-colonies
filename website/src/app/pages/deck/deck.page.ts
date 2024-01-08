@@ -133,6 +133,60 @@ export class DeckPage implements OnInit {
         return '';
     }
   }
+  typeTooltip(type: string): string {
+    switch (type) {
+      case 'hull':
+        return 'Rumpf';
+      case 'equipment':
+        return 'Ausrüstung';
+      case 'infrastructure':
+        return 'Infrastruktur';
+      case 'orb':
+        return 'Himmelskörper';
+      case 'tactic':
+        return 'Taktik';
+      default:
+        return '';
+    }
+  }
+  defenseTooltip(defense: string): string {
+    switch (defense) {
+      case 'armour_1':
+        return '1x Panzerung';
+      case 'armour_2':
+        return '2x Panzerung';
+      case 'armour_3':
+        return '3x Panzerung';
+      case 'shield_1':
+        return '1x Schild';
+      case 'shield_2':
+        return '2x Schild';
+      case 'point_defense_1':
+        return '1x Punktabwehr';
+      case 'point_defense_2':
+        return '2x Punktabwehr';
+      default:
+        return '';
+    }
+  }
+  rarityTooltip(rarity: number): string {
+    switch (rarity) {
+      case 0:
+        return 'Häufig';
+      case 1:
+        return 'Gewöhnlich';
+      case 2:
+        return 'Ungewöhnlich';
+      case 3:
+        return 'Selten';
+      case 4:
+        return 'Außergewöhnlich';
+      case 5:
+        return 'Legendär';
+      default:
+        return '';
+    }
+  }
   get statistics(): DeckStatistics[] {
     return this.statisticsTemplate.map(st => {
       const profileValues = this.$activeCards.value.map(dcs => st.get(dcs) * dcs.numOfCards);
