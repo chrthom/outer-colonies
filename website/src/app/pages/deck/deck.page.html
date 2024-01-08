@@ -41,21 +41,32 @@
             </td>
             <td class="id-col">{{ card.cardId }}</td>
             <td class="name-col">{{ card.name }}</td>
-            <td class="type-col"><img [src]="cardTypeToUrl(card.type)" /></td>
+            <td class="type-col">
+              <img [src]="cardTypeToUrl(card.type)" [matTooltip]="typeTooltip(card.type)" />
+            </td>
             <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
             <td class="attack-col">
-              <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)" />
+              <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)" matTooltip="Reichweite" />
               <h3 *ngIf="card.damage">{{ card.damage }}</h3>
-              <img *ngIf="card.damage" [src]="toIconUrl('damage')" />
+              <img *ngIf="card.damage" [src]="toIconUrl('damage')" matTooltip="Verursachter Schaden" />
             </td>
             <td class="defense-col">
-              <img *ngIf="card.defense" [src]="toIconUrl(card.defense)" />
+              <img
+                *ngIf="card.defense"
+                [src]="toIconUrl(card.defense)"
+                [matTooltip]="defenseTooltip(card.defense)"
+              />
               <h3 *ngIf="card.hp && card.defense">+</h3>
               <h3 *ngIf="card.hp">{{ card.hp }}</h3>
-              <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')" />
+              <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')" matTooltip="H&uuml;llenintegrit&auml;t" />
             </td>
             <td class="rarity-col">
-              <div class="rarity" [class.active]="i <= card.rarity" *ngFor="let i of [ 1, 2, 3, 4, 5 ]"></div>
+              <div
+                class="rarity"
+                [class.active]="i <= card.rarity"
+                *ngFor="let i of [ 1, 2, 3, 4, 5 ]"
+                [matTooltip]="rarityTooltip(card.rarity)"
+              ></div>
             </td>
             <td class="edition-col">
               <img [src]="cardIdToEditionUrl(card.cardId)" />
