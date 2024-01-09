@@ -24,10 +24,10 @@ export default abstract class HullCard extends Card {
   private filterAttachableHull(cardStacks: CardStack[]): CardStack[] {
     return cardStacks
       .filter(cs => cs.type == CardType.Hull) // Only attachable to other hull cards
-      .filter(cs => (cs.card as HullCard).multipart.neededPartIds.includes(this.id)) // Hull card hav to be required by card stack
+      .filter(cs => (<HullCard>cs.card).multipart.neededPartIds.includes(this.id)) // Hull card hav to be required by card stack
       .filter(
         // Either duplicates are allowed or is not duplicated
-        cs => (cs.card as HullCard).multipart.duplicatesAllowed || !cs.cards.some(c => c.name == this.name)
+        cs => (<HullCard>cs.card).multipart.duplicatesAllowed || !cs.cards.some(c => c.name == this.name)
       )
       .filter(cs => cs.profile.combine(this.profile).isValid); // Sufficient sockets and energy available
   }

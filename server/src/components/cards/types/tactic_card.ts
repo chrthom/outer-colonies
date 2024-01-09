@@ -31,13 +31,13 @@ export default abstract class TacticCard extends Card {
   }
   protected onEnterGameAttackIntervention(player: Player, target: CardStack) {
     player.match.switchPendingPlayer();
-    const intervention = player.match.intervention as InterventionAttack;
+    const intervention = <InterventionAttack>player.match.intervention;
     player.match.intervention = undefined;
     intervention.src.attack(target, this);
   }
   protected onEnterGameInterventionTacticCard(player: Player) {
     player.match.switchPendingPlayer();
-    const intervention = player.match.intervention as InterventionTacticCard;
+    const intervention = <InterventionTacticCard>player.match.intervention;
     intervention.src.discard();
     player.match.intervention = intervention.parentIntervention;
     player.match.intervention?.skip();
@@ -47,7 +47,7 @@ export default abstract class TacticCard extends Card {
     condition: (i: InterventionAttack) => boolean
   ): CardStack[] {
     if (player.match.intervention?.type == InterventionType.Attack) {
-      const intervention = player.match.intervention as InterventionAttack;
+      const intervention = <InterventionAttack>player.match.intervention;
       return condition(intervention) ? [intervention.target] : [];
     }
     return [];
@@ -57,8 +57,8 @@ export default abstract class TacticCard extends Card {
     disciplines: TacticDiscipline[]
   ): CardStack[] {
     if (player.match.intervention?.type == InterventionType.TacticCard) {
-      const intervention = player.match.intervention as InterventionTacticCard;
-      return disciplines.includes((intervention.src.card as TacticCard).discipline)
+      const intervention = <InterventionTacticCard>player.match.intervention;
+      return disciplines.includes((<TacticCard>intervention.src.card).discipline)
         ? this.onlyColonyTarget(player.match.waitingPlayer.cardStacks)
         : [];
     }

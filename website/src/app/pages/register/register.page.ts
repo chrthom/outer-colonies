@@ -12,6 +12,9 @@ import { Observable, map } from 'rxjs';
 import ApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { starterDecks } from '../../../../../server/src/shared/config/starter_decks';
+import { environment } from 'src/environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 
 @Component({
   selector: 'oc-page-register',
@@ -32,10 +35,13 @@ export class RegisterPage {
       [Validators.required, Validators.email, Validators.maxLength(60)],
       [this.emailExistsValidator]
     ),
-    startDeck: new FormControl('', [Validators.required])
+    starterDeck: new FormControl('', [Validators.required])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authAPIService: ApiService) {}
+  constructor(
+    private authAPIService: ApiService,
+    private dialog: MatDialog
+  ) {}
   get username(): any {
     return this.registerForm.get('username');
   }
@@ -51,8 +57,18 @@ export class RegisterPage {
   get usernameErrors(): string {
     return JSON.stringify(this.username.errors);
   }
-  get starterDeckCards(): number[] {
+  get starterDeckCards(): number[][] {
     return starterDecks[this.starterDeck.value];
+  }
+  cardIdToUrl(cardId: number): string {
+    return `${environment.url.assets}/cards/${cardId}.png`;
+  }
+  openImgInModal(cardId: number) {
+    this.dialog.open(ImageModalComponent, {
+      data: this.cardIdToUrl(cardId),
+      height: '95vh',
+      maxHeight: '95vh'
+    });
   }
   submit() {
     this.authAPIService

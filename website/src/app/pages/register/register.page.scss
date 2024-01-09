@@ -14,3 +14,22 @@
   width: 100%;
   margin-bottom: 15px;
 }
+
+#starter-deck-cards {
+  margin: 20px auto;
+}
+
+#end-starter-deck-cards {
+  clear: both;
+}
+
+mat-card {
+  background: color-mix(in srgb, var(--color-dark), transparent 70%);
+  width: 140px;
+  float: left;
+  margin-left: 10px;
+  margin-top: 10px;
+  img {
+    cursor: pointer;
+  }
+}

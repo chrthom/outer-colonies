@@ -48,7 +48,7 @@ export default abstract class OrbCard extends Card {
         c.type == cardType ||
         (this.isTacticDiscipline(cardType) &&
           c.type == CardType.Tactic &&
-          (c as TacticCard).discipline == cardType)
+          (<TacticCard>c).discipline == cardType)
     );
     if (relevantCardDrawn) player.drawCards(1);
   }

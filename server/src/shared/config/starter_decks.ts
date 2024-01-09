@@ -1,104 +1,104 @@
-export const starterDecks: number[][] = [
+export const starterDecks: number[][][] = [
   // Terranische Siedler
   [
     // 70 cards
     // Hull (18)
-    Array(6).fill(186), // Korvette
-    Array(4).fill(160), // Leichter Frachter
-    Array(2).fill(133), // Kreuzer
-    Array(2).fill(116), // Kreuzer
-    Array(2).fill(134), // Kreuzer
-    Array(2).fill(446), // Außenposten
+    [6, 186], // Korvette
+    [4, 160], // Leichter Frachter
+    [2, 133], // Kreuzer
+    [2, 116], // Kreuzer
+    [2, 134], // Kreuzer
+    [2, 446], // Außenposten
     // Equipment (27 - 19/24 Theta, 2/4 Xi)
-    Array(2).fill(421), // Salvenlaser
-    Array(4).fill(441), // Flechettewerfer
-    Array(3).fill(234), // Punktabwehrlaser
-    Array(4).fill(237), // Fokus-Laser
-    Array(4).fill(157), // Plasmawerfer
-    Array(2).fill(151), // Kinetikwaffenbatterie
-    Array(2).fill(170), // Strahlenschilde
-    Array(2).fill(447), // Schildgondel
-    Array(4).fill(184), // Rumpferweiterung
+    [2, 421], // Salvenlaser
+    [4, 441], // Flechettewerfer
+    [3, 234], // Punktabwehrlaser
+    [4, 237], // Fokus-Laser
+    [4, 157], // Plasmawerfer
+    [2, 151], // Kinetikwaffenbatterie
+    [2, 170], // Strahlenschilde
+    [2, 447], // Schildgondel
+    [4, 184], // Rumpferweiterung
     // Infrastructure (13)
-    Array(2).fill(185), // Kraftwerk
-    Array(2).fill(183), // Industriekomplex
-    Array(3).fill(187), // Atomreaktor
-    Array(2).fill(188), // Solarpanele
-    Array(2).fill(172), // Ressourcensilo
-    Array(1).fill(164), // Rüstungsschmiede
-    Array(1).fill(435), // Gewerbegebiet
+    [2, 185], // Kraftwerk
+    [2, 183], // Industriekomplex
+    [3, 187], // Atomreaktor
+    [2, 188], // Solarpanele
+    [2, 172], // Ressourcensilo
+    [1, 164], // Rüstungsschmiede
+    [1, 435], // Gewerbegebiet
     // Tactic (12)
-    Array(4).fill(232), // Warenlieferung
-    Array(2).fill(165), // Konvoi
-    Array(2).fill(427), // Immigranten von der Erde
-    Array(2).fill(321), // Recycling
-    Array(2).fill(174) // Feldreperaturen
-  ].flat(),
+    [4, 232], // Warenlieferung
+    [2, 165], // Konvoi
+    [2, 427], // Immigranten von der Erde
+    [2, 321], // Recycling
+    [2, 174] // Feldreperaturen
+  ],
 
   // Freihändler-Clans
   [
     // 70 cards
     // Hull (18)
-    Array(6).fill(243), // Korvette
-    Array(4).fill(348), // Kanonenboot
-    Array(3).fill(221), // Schwerer Frachter
-    Array(3).fill(327), // Schwerer Frachter
-    Array(2).fill(446), // Außenposten
+    [6, 243], // Korvette
+    [4, 348], // Kanonenboot
+    [3, 221], // Schwerer Frachter
+    [3, 327], // Schwerer Frachter
+    [2, 446], // Außenposten
     // Equipment (27 - 16/19 Theta, 4/4 Xi)
-    Array(4).fill(180), // Railgun
-    Array(4).fill(224), // Bergbaulaser
-    Array(4).fill(237), // Mini-Railgun
-    Array(3).fill(339), // Gatling
-    Array(3).fill(166), // Laserkanone
-    Array(2).fill(166), // Laserphalanx
-    Array(5).fill(240), // Ceramo-Stahl
-    Array(2).fill(171), // Titanplattenpanzer
+    [4, 180], // Railgun
+    [4, 224], // Bergbaulaser
+    [4, 237], // Mini-Railgun
+    [3, 339], // Gatling
+    [3, 166], // Laserkanone
+    [2, 166], // Laserphalanx
+    [5, 240], // Ceramo-Stahl
+    [2, 171], // Titanplattenpanzer
     // Infrastructure (15)
-    Array(1).fill(242), // Kraftwerk
-    Array(1).fill(183), // Industriekomplex
-    Array(5).fill(244), // Atomreaktor
-    Array(2).fill(245), // Solarpanele
-    Array(2).fill(172), // Ressourcensilo
-    Array(1).fill(135), // Werft
-    Array(2).fill(164), // Rüstungsschmiede
-    Array(1).fill(230), // Verwaltungsbüro
+    [1, 242], // Kraftwerk
+    [1, 183], // Industriekomplex
+    [5, 244], // Atomreaktor
+    [2, 245], // Solarpanele
+    [2, 172], // Ressourcensilo
+    [1, 135], // Werft
+    [2, 164], // Rüstungsschmiede
+    [1, 230], // Verwaltungsbüro
     // Tactic (10)
-    Array(2).fill(232), // Warenlieferung
-    Array(2).fill(165), // Konvoi
-    Array(2).fill(321), // Recycling
-    Array(2).fill(174), // Feldreperaturen
-    Array(2).fill(141) // Externe Arbeitskräfte
-  ].flat(),
+    [2, 232], // Warenlieferung
+    [2, 165], // Konvoi
+    [2, 321], // Recycling
+    [2, 174], // Feldreperaturen
+    [2, 141] // Externe Arbeitskräfte
+  ],
 
   // Trans-Jupiter Expedition
   [
     // 70 cards
     // Hull (18)
-    Array(6).fill(351), // Korvette
-    Array(4).fill(342), // Torpedoboot
-    Array(3).fill(444), // Zerstörer
-    Array(3).fill(445), // Zerstörer
-    Array(2).fill(446), // Außenposten
+    [6, 351], // Korvette
+    [4, 342], // Torpedoboot
+    [3, 444], // Zerstörer
+    [3, 445], // Zerstörer
+    [2, 446], // Außenposten
     // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
-    Array(2).fill(340), // Abfangraketenwerfer
-    Array(3).fill(167), // Atombombentorpedos
-    Array(2).fill(182), // Dual-Lasergeschütz
-    Array(5).fill(440), // Impulskanone
-    Array(4).fill(168), // Automatikkanone
-    Array(5).fill(179), // Pulskanone
-    Array(4).fill(163), // Verbundpanzerung
-    Array(2).fill(170), // Strahlenschilde
+    [2, 340], // Abfangraketenwerfer
+    [3, 167], // Atombombentorpedos
+    [2, 182], // Dual-Lasergeschütz
+    [5, 440], // Impulskanone
+    [4, 168], // Automatikkanone
+    [5, 179], // Pulskanone
+    [4, 163], // Verbundpanzerung
+    [2, 170], // Strahlenschilde
     // Infrastructure (13)
-    Array(2).fill(350), // Kraftwerk
-    Array(2).fill(183), // Industriekomplex
-    Array(3).fill(352), // Atomreaktor
-    Array(2).fill(353), // Solarpanele
-    Array(2).fill(172), // Ressourcensilo
-    Array(1).fill(333), // Marsianisches Konsulat
-    Array(1).fill(155), // Müllverarbeitungsanlage
+    [2, 350], // Kraftwerk
+    [2, 183], // Industriekomplex
+    [3, 352], // Atomreaktor
+    [2, 353], // Solarpanele
+    [2, 172], // Ressourcensilo
+    [1, 333], // Marsianisches Konsulat
+    [1, 155], // Müllverarbeitungsanlage
     // Tactic (12)
-    Array(6).fill(337), // Militärpioniere
-    Array(4).fill(338), // Nachschub
-    Array(2).fill(174) // Feldreperaturen
-  ].flat()
+    [6, 337], // Militärpioniere
+    [4, 338], // Nachschub
+    [2, 174] // Feldreperaturen
+  ]
 ];

@@ -340,8 +340,12 @@ export default class CardCollection {
   };
 
   static allCards = Object.values(this.cards);
-
-  static starterDecks: Card[][] = starterDecks.map(sd => sd.map(cid => this.cards[cid]));
+  static starterDecks: Card[][] = starterDecks.map(sd =>
+    sd
+      .map(c => Array(c[0]).fill(c[1]))
+      .flat()
+      .map(cid => <Card>this.cards[cid])
+  );
 
   static generateBoosterContent(edition: number): Card[] {
     const cards: Card[] = [];
