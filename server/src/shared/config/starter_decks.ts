@@ -1,93 +1,85 @@
 export const starterDecks: number[][][] = [
   // Terranische Siedler
   [
-    // 70 cards
-    // Hull (18)
-    [6, 186], // Korvette
-    [4, 160], // Leichter Frachter
+    // Hull (16)
+    [8, 160], // Leichter Frachter
     [2, 133], // Kreuzer
     [2, 116], // Kreuzer
     [2, 134], // Kreuzer
     [2, 446], // Außenposten
-    // Equipment (27 - 19/24 Theta, 2/4 Xi)
-    [2, 421], // Salvenlaser
-    [4, 441], // Flechettewerfer
+    // Equipment (21 - 13/14 Theta, 2/4 Xi)
+    [3, 441], // Flechettewerfer
     [3, 234], // Punktabwehrlaser
     [4, 237], // Fokus-Laser
-    [4, 157], // Plasmawerfer
+    [3, 157], // Plasmawerfer
     [2, 151], // Kinetikwaffenbatterie
-    [2, 170], // Strahlenschilde
-    [2, 447], // Schildgondel
-    [4, 184], // Rumpferweiterung
-    // Infrastructure (13)
+    [3, 170], // Strahlenschilde
+    [3, 163], // Verbundpanzerung
+    // Infrastructure (11)
     [2, 185], // Kraftwerk
     [2, 183], // Industriekomplex
-    [3, 187], // Atomreaktor
+    [2, 187], // Atomreaktor
     [2, 188], // Solarpanele
-    [2, 172], // Ressourcensilo
-    [1, 164], // Rüstungsschmiede
-    [1, 435], // Gewerbegebiet
+    [1, 172], // Ressourcensilo
+    [1, 147], // Kommandozentrale
+    [1, 333], // Marsianisches Konsulat
     // Tactic (12)
-    [4, 232], // Warenlieferung
-    [2, 165], // Konvoi
-    [2, 427], // Immigranten von der Erde
-    [2, 321], // Recycling
-    [2, 174] // Feldreperaturen
+    [4, 338], // Nachschub
+    [2, 337], // Militärpioniere
+    [2, 173], // Ausweichmanöver
+    [2, 331], // Schadenskontrolle
+    [1, 346], // Space Marines
+    [1, 174] // Feldreperaturen
   ],
 
   // Freihändler-Clans
   [
-    // 70 cards
-    // Hull (18)
-    [6, 243], // Korvette
-    [4, 348], // Kanonenboot
-    [3, 221], // Schwerer Frachter
-    [3, 327], // Schwerer Frachter
+    // Hull (19)
+    [9, 348], // Kanonenboot
+    [4, 221], // Schwerer Frachter
+    [4, 327], // Schwerer Frachter
     [2, 446], // Außenposten
-    // Equipment (27 - 16/19 Theta, 4/4 Xi)
-    [4, 180], // Railgun
-    [4, 224], // Bergbaulaser
-    [4, 237], // Mini-Railgun
-    [3, 339], // Gatling
-    [3, 166], // Laserkanone
-    [2, 166], // Laserphalanx
-    [5, 240], // Ceramo-Stahl
+    // Equipment (21 - 6/6 Theta, 9/9 Xi)
+    [6, 180], // Railgun
+    [3, 130], // Flakartillerie
+    [2, 224], // Bergbaulaser
+    [2, 237], // Mini-Railgun
+    [2, 339], // Gatling
+    [4, 240], // Ceramo-Stahl
     [2, 171], // Titanplattenpanzer
-    // Infrastructure (15)
-    [1, 242], // Kraftwerk
-    [1, 183], // Industriekomplex
-    [5, 244], // Atomreaktor
+    // Infrastructure (9)
+    [1, 145], // Fusionsreaktor
+    [2, 244], // Atomreaktor
     [2, 245], // Solarpanele
-    [2, 172], // Ressourcensilo
-    [1, 135], // Werft
-    [2, 164], // Rüstungsschmiede
-    [1, 230], // Verwaltungsbüro
-    // Tactic (10)
+    [1, 172], // Ressourcensilo
+    [2, 138], // Handelsposten
+    [1, 435], // Gewerbegebiet
+    // Tactic (11)
     [2, 232], // Warenlieferung
     [2, 165], // Konvoi
-    [2, 321], // Recycling
-    [2, 174], // Feldreperaturen
-    [2, 141] // Externe Arbeitskräfte
+    [1, 321], // Recycling
+    [1, 236], // Handelsembargo
+    [1, 235], // Blindgänger
+    [4, 141] // Externe Arbeitskräfte
   ],
 
   // Trans-Jupiter Expedition
   [
-    // 70 cards
     // Hull (18)
-    [6, 351], // Korvette
+    [6, 351], // Mittelschwerer Frachter
     [4, 342], // Torpedoboot
     [3, 444], // Zerstörer
     [3, 445], // Zerstörer
     [2, 446], // Außenposten
-    // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
+    // Equipment (22 - 10/13 Theta, 2/3 Xi, 5/7 Phi)
     [2, 340], // Abfangraketenwerfer
     [3, 167], // Atombombentorpedos
     [2, 182], // Dual-Lasergeschütz
-    [5, 440], // Impulskanone
-    [4, 168], // Automatikkanone
-    [5, 179], // Pulskanone
-    [4, 163], // Verbundpanzerung
-    [2, 170], // Strahlenschilde
+    [3, 440], // Impulskanone
+    [3, 168], // Automatikkanone
+    [4, 179], // Pulskanone
+    [2, 447], // Schildgondel
+    [3, 184], // Rumpferweiterung
     // Infrastructure (13)
     [2, 350], // Kraftwerk
     [2, 183], // Industriekomplex
