@@ -46,14 +46,17 @@
         <mat-error *ngIf="email.hasError('required')"> Bitte gib eine valide E-Mail Adresse an </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Start Deck</mat-label>
-        <mat-select formControlName="startDeck">
+        <mat-label>Start-Deck</mat-label>
+        <mat-select formControlName="starterDeck">
           <mat-option value="0">Terranische Siedler</mat-option>
           <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
           <mat-option value="2">Trans-Jupiter Expedition</mat-option>
         </mat-select>
-        <mat-error *ngIf="startDeck.hasError('required')"> Bitte w&auml;hle ein Start Deck </mat-error>
+        <mat-error *ngIf="startDeck.hasError('required')"> Bitte w&auml;hle ein Start-Deck </mat-error>
       </mat-form-field>
+      <div *ngIf="starterDeck.value >= 0">
+        <div *ngFor="let card of starterDeckCards"><!-- --></div>
+      </div>
       <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
         Neuen Nutzer registrieren
       </button>

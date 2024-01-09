@@ -11,6 +11,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
 import ApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
+import { starterDecks } from '../../../../../server/src/shared/config/starter_decks';
 
 @Component({
   selector: 'oc-page-register',
@@ -44,19 +45,22 @@ export class RegisterPage {
   get email(): any {
     return this.registerForm.get('email');
   }
-  get startDeck(): any {
-    return this.registerForm.get('startDeck');
+  get starterDeck(): any {
+    return this.registerForm.get('starterDeck');
   }
   get usernameErrors(): string {
     return JSON.stringify(this.username.errors);
+  }
+  get starterDeckCards(): number[] {
+    return starterDecks[this.starterDeck.value];
   }
   submit() {
     this.authAPIService
       .register({
         username: this.registerForm.value.username.trim(),
         password: this.registerForm.value.password,
-        email: this.registerForm.value.email,
-        startDeck: this.registerForm.value.startDeck
+        email: this.registerForm.value.email.trim(),
+        starterDeck: this.registerForm.value.starterDeck
       })
       .subscribe(success => (this.registrationSuccessful = success));
   }
