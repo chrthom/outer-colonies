@@ -46,13 +46,13 @@
         <mat-error *ngIf="email.hasError('required')"> Bitte gib eine valide E-Mail Adresse an </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Start Deck</mat-label>
-        <mat-select formControlName="startDeck">
+        <mat-label>Start-Deck</mat-label>
+        <mat-select formControlName="starterDeck">
           <mat-option value="0">Terranische Siedler</mat-option>
           <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
           <mat-option value="2">Trans-Jupiter Expedition</mat-option>
         </mat-select>
-        <mat-error *ngIf="startDeck.hasError('required')"> Bitte w&auml;hle ein Start Deck </mat-error>
+        <mat-error *ngIf="starterDeck.hasError('required')"> Bitte w&auml;hle ein Start-Deck </mat-error>
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
         Neuen Nutzer registrieren
@@ -61,6 +61,23 @@
         Ein unerwarteter Fehler ist bei der Registrierung aufgetreten. Bitte versuchen sie es sp&auml;ter
         erneut.
       </mat-error>
+      <div id="starter-deck-cards" *ngIf="starterDeck.value !== ''">
+        <mat-card
+          *ngFor="let card of starterDeckCards"
+          [matBadge]="card[0] + 'x'"
+          matBadgePosition="before"
+          [matBadgeHidden]="card[0] === 1"
+          matBadgeColor="primary"
+        >
+          <img
+            mat-card-image
+            tabindex="null"
+            [src]="cardIdToUrl(card[1])"
+            (click)="openImgInModal(card[1])"
+          />
+        </mat-card>
+      </div>
+      <div id="end-starter-deck-cards"></div>
     </form>
     <p *ngIf="registrationSuccessful">Registrierung erfolgreich</p>
     <p id="back-link"><a routerLink="/login">&lt; Zur&uuml;ck</a></p>

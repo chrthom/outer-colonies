@@ -154,6 +154,7 @@ import { Card302, Card401 } from './equipment_weapon_super_cards';
 import { Card146, Card159, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 import { Card129, Card176, Card231, Card416 } from './tactic_intelligence_cards';
+import { starterDecks } from '../../../shared/config/starter_decks';
 
 export default class CardCollection {
   static cards = {
@@ -339,112 +340,12 @@ export default class CardCollection {
   };
 
   static allCards = Object.values(this.cards);
-
-  static starterDeckSettlers: Card[] = [
-    // 70 cards
-    // Hull (18)
-    Array(6).fill(this.cards[186]), // Korvette
-    Array(4).fill(this.cards[160]), // Leichter Frachter
-    Array(2).fill(this.cards[133]), // Kreuzer
-    Array(2).fill(this.cards[116]), // Kreuzer
-    Array(2).fill(this.cards[134]), // Kreuzer
-    Array(2).fill(this.cards[446]), // Außenposten
-    // Equipment (27 - 19/24 Theta, 2/4 Xi)
-    Array(2).fill(this.cards[421]), // Salvenlaser
-    Array(4).fill(this.cards[441]), // Flechettewerfer
-    Array(3).fill(this.cards[234]), // Punktabwehrlaser
-    Array(4).fill(this.cards[237]), // Fokus-Laser
-    Array(4).fill(this.cards[157]), // Plasmawerfer
-    Array(2).fill(this.cards[151]), // Kinetikwaffenbatterie
-    Array(2).fill(this.cards[170]), // Strahlenschilde
-    Array(2).fill(this.cards[447]), // Schildgondel
-    Array(4).fill(this.cards[184]), // Rumpferweiterung
-    // Infrastructure (13)
-    Array(2).fill(this.cards[185]), // Kraftwerk
-    Array(2).fill(this.cards[183]), // Industriekomplex
-    Array(3).fill(this.cards[187]), // Atomreaktor
-    Array(2).fill(this.cards[188]), // Solarpanele
-    Array(2).fill(this.cards[172]), // Ressourcensilo
-    Array(1).fill(this.cards[164]), // Rüstungsschmiede
-    Array(1).fill(this.cards[435]), // Gewerbegebiet
-    // Tactic (12)
-    Array(4).fill(this.cards[232]), // Warenlieferung
-    Array(2).fill(this.cards[165]), // Konvoi
-    Array(2).fill(this.cards[427]), // Immigranten von der Erde
-    Array(2).fill(this.cards[321]), // Recycling
-    Array(2).fill(this.cards[174]) // Feldreperaturen
-  ].flat();
-
-  static starterDeckTraders: Card[] = [
-    // 70 cards
-    // Hull (18)
-    Array(6).fill(this.cards[243]), // Korvette
-    Array(4).fill(this.cards[348]), // Kanonenboot
-    Array(3).fill(this.cards[221]), // Schwerer Frachter
-    Array(3).fill(this.cards[327]), // Schwerer Frachter
-    Array(2).fill(this.cards[446]), // Außenposten
-    // Equipment (27 - 16/19 Theta, 4/4 Xi)
-    Array(4).fill(this.cards[180]), // Railgun
-    Array(4).fill(this.cards[224]), // Bergbaulaser
-    Array(4).fill(this.cards[237]), // Mini-Railgun
-    Array(3).fill(this.cards[339]), // Gatling
-    Array(3).fill(this.cards[166]), // Laserkanone
-    Array(2).fill(this.cards[166]), // Laserphalanx
-    Array(5).fill(this.cards[240]), // Ceramo-Stahl
-    Array(2).fill(this.cards[171]), // Titanplattenpanzer
-    // Infrastructure (15)
-    Array(1).fill(this.cards[242]), // Kraftwerk
-    Array(1).fill(this.cards[183]), // Industriekomplex
-    Array(5).fill(this.cards[244]), // Atomreaktor
-    Array(2).fill(this.cards[245]), // Solarpanele
-    Array(2).fill(this.cards[172]), // Ressourcensilo
-    Array(1).fill(this.cards[135]), // Werft
-    Array(2).fill(this.cards[164]), // Rüstungsschmiede
-    Array(1).fill(this.cards[230]), // Verwaltungsbüro
-    // Tactic (10)
-    Array(2).fill(this.cards[232]), // Warenlieferung
-    Array(2).fill(this.cards[165]), // Konvoi
-    Array(2).fill(this.cards[321]), // Recycling
-    Array(2).fill(this.cards[174]), // Feldreperaturen
-    Array(2).fill(this.cards[141]) // Externe Arbeitskräfte
-  ].flat();
-
-  static starterDeckExpedition: Card[] = [
-    // 70 cards
-    // Hull (18)
-    Array(6).fill(this.cards[351]), // Korvette
-    Array(4).fill(this.cards[342]), // Torpedoboot
-    Array(3).fill(this.cards[444]), // Zerstörer
-    Array(3).fill(this.cards[445]), // Zerstörer
-    Array(2).fill(this.cards[446]), // Außenposten
-    // Equipment (27 - 14/19 Theta, 2/3 Xi, 5/7 Phi)
-    Array(2).fill(this.cards[340]), // Abfangraketenwerfer
-    Array(3).fill(this.cards[167]), // Atombombentorpedos
-    Array(2).fill(this.cards[182]), // Dual-Lasergeschütz
-    Array(5).fill(this.cards[440]), // Impulskanone
-    Array(4).fill(this.cards[168]), // Automatikkanone
-    Array(5).fill(this.cards[179]), // Pulskanone
-    Array(4).fill(this.cards[163]), // Verbundpanzerung
-    Array(2).fill(this.cards[170]), // Strahlenschilde
-    // Infrastructure (13)
-    Array(2).fill(this.cards[350]), // Kraftwerk
-    Array(2).fill(this.cards[183]), // Industriekomplex
-    Array(3).fill(this.cards[352]), // Atomreaktor
-    Array(2).fill(this.cards[353]), // Solarpanele
-    Array(2).fill(this.cards[172]), // Ressourcensilo
-    Array(1).fill(this.cards[333]), // Marsianisches Konsulat
-    Array(1).fill(this.cards[155]), // Müllverarbeitungsanlage
-    // Tactic (12)
-    Array(6).fill(this.cards[337]), // Militärpioniere
-    Array(4).fill(this.cards[338]), // Nachschub
-    Array(2).fill(this.cards[174]) // Feldreperaturen
-  ].flat();
-
-  static starterDecks: Card[][] = [
-    this.starterDeckSettlers,
-    this.starterDeckTraders,
-    this.starterDeckExpedition
-  ];
+  static starterDecks: Card[][] = starterDecks.map(sd =>
+    sd
+      .map(c => Array(c[0]).fill(c[1]))
+      .flat()
+      .map(cid => <Card>this.cards[cid])
+  );
 
   static generateBoosterContent(edition: number): Card[] {
     const cards: Card[] = [];

@@ -496,7 +496,7 @@ export default class Background {
   }
 
   private get game(): Game {
-    return this.scene as Game;
+    return <Game>this.scene;
   }
 
   private get inCombat(): boolean {

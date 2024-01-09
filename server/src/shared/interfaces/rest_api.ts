@@ -4,7 +4,7 @@ export interface AuthRegisterRequest {
   username: string;
   password: string;
   email: string;
-  startDeck: number;
+  starterDeck: number;
 }
 
 export interface AuthLoginRequest {

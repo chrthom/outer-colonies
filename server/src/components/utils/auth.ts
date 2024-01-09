@@ -21,7 +21,7 @@ export default class Auth {
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
     DBProfilesDAO.create(credential.userId);
     DBDailiesDAO.create(credential.userId);
-    CardCollection.starterDecks[registrationData.startDeck]
+    CardCollection.starterDecks[registrationData.starterDeck]
       .map(c => c.id)
       .forEach(id => DBDecksDAO.create(id, credential.userId, true));
     return credential;
