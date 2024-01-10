@@ -19,8 +19,9 @@ export const starterDecks: number[][][] = [
     [2, 185], // Kraftwerk
     [2, 183], // Industriekomplex
     [2, 187], // Atomreaktor
-    [2, 188], // Solarpanele
+    [1, 188], // Solarpanele
     [1, 172], // Ressourcensilo
+    [1, 345], // Autonomer Stützpunkt
     [1, 147], // Kommandozentrale
     [1, 333], // Marsianisches Konsulat
     // Tactic (12)
@@ -45,13 +46,13 @@ export const starterDecks: number[][][] = [
     [2, 224], // Bergbaulaser
     [2, 237], // Mini-Railgun
     [2, 339], // Gatling
-    [4, 240], // Ceramo-Stahl
-    [2, 171], // Titanplattenpanzer
+    [3, 184], // Rumpferweiterung
+    [3, 171], // Titanplattenpanzer
     // Infrastructure (9)
     [1, 145], // Fusionsreaktor
     [2, 244], // Atomreaktor
     [2, 245], // Solarpanele
-    [1, 172], // Ressourcensilo
+    [1, 238], // Schugglernest
     [2, 138], // Handelsposten
     [1, 435], // Gewerbegebiet
     // Tactic (11)
@@ -79,18 +80,21 @@ export const starterDecks: number[][][] = [
     [3, 168], // Automatikkanone
     [4, 179], // Pulskanone
     [2, 447], // Schildgondel
-    [3, 184], // Rumpferweiterung
-    // Infrastructure (13)
+    [3, 240], // Ceramo-Stahl
+    // Infrastructure (11)
     [2, 350], // Kraftwerk
     [2, 183], // Industriekomplex
-    [3, 352], // Atomreaktor
-    [2, 353], // Solarpanele
-    [2, 172], // Ressourcensilo
-    [1, 333], // Marsianisches Konsulat
-    [1, 155], // Müllverarbeitungsanlage
-    // Tactic (12)
-    [6, 337], // Militärpioniere
-    [4, 338], // Nachschub
-    [2, 174] // Feldreperaturen
+    [1, 145], // Fusionsreaktor
+    [2, 352], // Atomreaktor
+    [1, 353], // Solarpanele
+    [2, 448], // Schildkuppel
+    [1, 169], // Planetares Verteidigungsnetz
+    // Tactic (9)
+    [2, 232], // Warenlieferung
+    [2, 162], // Schildüberladung
+    [2, 144], // Kalte Fusion
+    [1, 176], // Gegenspionage
+    [1, 231], // Unruhen schüren
+    [1, 443] // Computer-Virus
   ]
 ];
