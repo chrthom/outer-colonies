@@ -70,11 +70,13 @@ import {
 import { Card141, Card165, Card232, Card235, Card236, Card321, Card427 } from './tactic_economy_cards';
 import {
   Card102,
+  Card111,
   Card113,
   Card119,
   Card128,
   Card152,
   Card153,
+  Card158,
   Card228,
   Card311,
   Card446
@@ -168,6 +170,7 @@ export default class CardCollection {
     107: <Card>new Card107(),
     109: <Card>new Card109(),
     110: <Card>new Card110(),
+    111: <Card>new Card111(),
     113: <Card>new Card113(),
     114: <Card>new Card114(),
     115: <Card>new Card115(),
@@ -207,6 +210,7 @@ export default class CardCollection {
     155: <Card>new Card155(),
     156: <Card>new Card156(),
     157: <Card>new Card157(),
+    158: <Card>new Card158(),
     159: <Card>new Card159(),
     160: <Card>new Card160(),
     161: <Card>new Card161(),
