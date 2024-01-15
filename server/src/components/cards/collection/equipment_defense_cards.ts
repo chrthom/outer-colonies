@@ -82,7 +82,7 @@ export class Card240 extends EquipmentCard {
   }
 }
 
-export class Card312 extends EquipmentCard {
+export class Card312 extends EquipmentCardRechargeable {
   constructor() {
     super(312, 'Refraktorfeld', 3, {
       energy: -2,
@@ -117,7 +117,7 @@ export class Card349 extends EquipmentCard {
   }
 }
 
-export class Card426 extends EquipmentCard {
+export class Card426 extends EquipmentCardRechargeable {
   constructor() {
     super(426, 'Schildbooster', 2, {
       energy: -1,
