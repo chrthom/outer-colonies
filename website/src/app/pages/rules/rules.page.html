@@ -28,7 +28,7 @@
             <img [src]="imgUrl('setup')" class="left size-40" />
             <img [src]="imgUrl('intro')" class="right size-20" />
             <p>
-              Willkommen zu <i>Outer Colonies</i> , dem Trading Card Game, welches dich in den unwirtlichen
+              Willkommen zu <i>Outer Colonies</i>, dem Trading Card Game, welches dich in den unwirtlichen
               Rand unseres Sonnensystems entführt. Sei einer der abenteuerlustigen Anführer, die fernab der
               überbevölkerten und von Kriegen zerrütteten Erde und den marsianischen Oligarchien auf den
               äußeren Monden und Asteroiden um die Vorherrschaft auf Lebensraum und Ressourcen kämpfen.
@@ -130,10 +130,30 @@
               die Karten, an die diese Karte angelegt wird, diese Eigenschaftspunkte nicht zur Verfügung
               stellen.
             </p>
+            <h4>Aktion <i>(Kartentyp)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />,
+              <img [src]="iconUrl('infrastructure')" class="oc-icon" /> und
+              <img [src]="iconUrl('orb')" class="oc-icon" />. Erhöhe sofort die Anzahl der Karten, die du vom
+              angegebenen Kartentyp ausspielen darfst (Aktionslimit) um 1. <br />Ist dieses Schlagwort auf
+              einer <img [src]="iconUrl('tactic')" class="oc-icon" />, so gilt die Erhöhung des Aktionslimits
+              für den Kartentyp nur für den aktuellen Spielzug, in allen anderen Fällen dauerhaft, solange die
+              Karte bei Rundenbeginn noch im Spiel ist. <br />Wird das Aktionslimit für
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> erhöht, so können zusätzlich eine oder mehrere
+              Disziplinen angebenen sein, die die
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschränken, die zusätzlich ausgespielt
+              werden dürfen. <br />Steht vor dm Kartentyp ein Faktor (z.B. "3x"), so wird das Aktionslimit
+              nicht um 1, sondern um den angegebenen Faktor erhöht. <br />Es können gleichzeitig verschiedene
+              Kartentypen angegeben sein: <br />&bull; Sind diese mit <b>+</b> verbunden, wird das
+              Aktionslimit <b>aller</b> angegebenen Kartentypen um 1 erhöht. <br />&bull; Sind diese mit
+              <b>|</b> verbunden, wird das Aktionslimit <b>eines</b> beleibign angegebenen Kartentyps um 1
+              erhöht.
+            </p>
             <h4>aktiv / aktivieren</h4>
             <p>
-              Karten die im Gefecht noch nicht deaktivert wurden. Wird eine Karte wieder aktiviert, kann sie
-              diese Gefechtsrunde wieder verwendet werden.
+              Karten die im Gefecht noch nicht deaktivert wurden. Nur aktive Karten können in Gechtensphasen
+              verwendet werden. Wird eine Karte wieder aktiviert, kann sie diese Gefechtsrunde wieder
+              verwendet werden.
             </p>
             <h4>Ausrüstungskarte <img [src]="iconUrl('equipment')" class="oc-icon" /></h4>
             <p>
@@ -148,7 +168,7 @@
             <p>
               Subtypen der <img [src]="iconUrl('tactic')" class="oc-icon" />. Einige Karten erlauben dir z.B.
               eine weitere <img [src]="iconUrl('tactic')" class="oc-icon" /> der Disziplin „Wissenschaft“
-              auszuspielen.
+              auszuspielen oder eine entsprechende Karte unwirksam zu machen.
             </p>
             <h4>Eigenschaftspunkte</h4>
             <p>
@@ -160,6 +180,14 @@
               <img [src]="iconUrl('shield_1')" class="oc-icon" /> und
               <img [src]="iconUrl('armour_1')" class="oc-icon" /> sind Eigenschaftspunkte. Sie werden unter
               dem Titel der Karte in blauen und roten Kästen angezeigt.
+            </p>
+            <h4>Einmalige Verwendung</h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('equipment')" class="oc-icon" />. Diese Karte wwird zum Ende
+              einer Gefechtsphase nicht wieder aktiviert, sondern erst zum Ende des Gefechts. Dies betrifft
+              Waffensysteme (z.B. Torpedos), die pro Gefecht nur einmal eingesetzt werden können, als auch
+              defensive Systeme (z.B. Panzerung), die nachdem sie deaktiviert wurden, nicht wieder aktiviert
+              werden.
             </p>
             <h4>Energie <img [src]="iconUrl('energy')" class="oc-icon" /></h4>
             <p>
@@ -181,13 +209,25 @@
               <img [src]="iconUrl('speed')" class="oc-icon" /> plus die Reichweite der aktuellen Gefechtsphase
               sind kleiner oder gleich der <img [src]="iconUrl('speed')" class="oc-icon" /> des Ziel, so wir
               der vom Angriff verursachte <img [src]="iconUrl('damage')" class="oc-icon" /> halbiert
-              (aufgerundet).
+              (aufgerundet und vor allen anderen Abzügen).
+            </p>
+            <h4>Haltbarkeit <i>(Spielphase)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />. Diese Karte wwird nach dem
+              Ausspielen nicht direkt abgelegt, sondern bleiben im Spiel. Sie werden abgelegt sobald die
+              angegebene Spielphase vorbei ist: <br />&bull; Gefechtsphase: Die Karte wird abgelegt, sobald
+              die aktuelle Gefechtphase beendet ist (nachdem
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> reaktiviert und zerstörte Schiffe entfernt
+              wurden) <br />&bull; Permanent: Diese Karte muss an eine andere Karte angelegt werden. Die
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> wird nur abgelegt, wenn die Karte abgelegt
+              wird an die sie angelegt ist. <br />&bull; Spielzug: Die Karte wird zu Beginn deines nächsten
+              Spielzugs abgelegt.
             </p>
             <h4>Himmelsk&ouml;rperkarte <img [src]="iconUrl('orb')" class="oc-icon" /></h4>
             <p>
               Ein Kartentyp, der an die Kolonie angelegt wird, von der jeder Spieler nur eine im Spiel haben
-              kann, die nicht zurück auf die Hand genommen werden kann und nicht Ziel von Angriffen und Karten
-              sein kann.
+              kann, die nicht zurück auf die Hand genommen werden kann und nicht Ziel von Angriffen und
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> sein kann.
             </p>
             <h4>Hüllenintegrität <img [src]="iconUrl('hitpoints')" class="oc-icon" /></h4>
             <p>
@@ -206,14 +246,18 @@
               Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt können alle
               Sockel-Anforderungen ignoriert werden.
             </p>
-            <h4>Jederzeit spielbar</h4>
+            <h4>Intervention <i>(Spielphase)</i></h4>
             <p>
-              Regeltext auf einigen <img [src]="iconUrl('tactic')" class="oc-icon" />. Diese Karten dürfen
-              auch ausgespielt werden, wenn du gerade nicht der aktive Spieler bist. Sie dürfen verwendet
-              werden, um eine beliebige Aktion zu unterbrechen (z.B.
-              <img [src]="iconUrl('damage')" class="oc-icon" /> im Gefecht ermitteln). Wird eine
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> als Reaktion auf eine andere Karte gespielt,
-              wird die zuletzt ausgespielte Karte zuerst angewandt.
+              Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />. Diese Karte darf auch
+              außerhalb der Aufbauphase gespielt werden und auch, wenn du gerade nicht der aktive Spieler
+              bist. Der exakte Zeitpunkt, zu dem diese Karten außerhalb deiner eigenen Aufbauphase gespielt
+              werden dürfen ist stets mit angegeben: <br />&bull; Angriff: Wenn eines deiner Schiffe in einem
+              Gefecht angegriffen wird <br />&bull; Gefechtsphasenbeginn: Zu Beginn einer beliebigen
+              Gefechtsphase <br />&bull; Gefechtsphasenende: Zum Ende einer beliebigen Gefechtsphase bevor
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> reaktiviert und zerstörte Schiffe entfernt
+              werden <br />&bull; Rundenbeginn: Zu Beginn des Spielzuges deines Gegners, nachdem dieser seine
+              2 Karten gezogen hat <br />&bull; Taktik - <i>Disziplinen</i>: Wenn dein Gegner eine
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> der angegebenen Disziplinen spielt.
             </p>
             <h4>Koloniezone</h4>
             <p>
@@ -224,6 +268,12 @@
               der Koloniezone können während eines Überfälls nur in der Gefechtsphase mt Reichweite 1
               angegriffen werden.
             </p>
+            <h4>Komponenten <i>(Bauteile)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('hull')" class="oc-icon" />. Ein Schiff aus diesen
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> besteht aus mehreren Teilen. Alle in Klammern
+              angegebene Teile müssen angelegt sein, damit das Schiff als fertig gilt.
+            </p>
             <h4>Mission</h4>
             <p>
               Der aktive Spieler kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission
@@ -231,6 +281,19 @@
               (offene Missionskarten vom Ablagestapel und/oder verdeckte Missonskarten vom Deck). Ist die
               Mission erfolgreich (kein Abfangversuch, oder mindestens ein überlebendes Schiff), so darf er
               verdeckte Missionskarte auf die Hand nehmen und offene Missionskarten in sein Deck mischen.
+            </p>
+            <h4>Multiplikator <i>(Kartentyp)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('infrastructure')" class="oc-icon" /> und
+              <img [src]="iconUrl('orb')" class="oc-icon" />. Ziehst du zu Beginn deines Spielzugs mindestens
+              eine Karte des angegebenen Kartentyps, zeige deinem Gegner diese Karte und ziehe eine weitere
+              Karte von deinem Deck. <br />Hast du mehrere Karten mit diesem Schlagwort im Spiel, so ziehst du
+              gegebenenfalls für jede dieser Karten eine zusätzliche Karte. <br />Gilt der Multiplikator für
+              <img [src]="iconUrl('tactic')" class="oc-icon" />, so können zusätzlich eine oder mehrere
+              Disziplinen angebenen sein, die die
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschränken, für die eine weitere Karte
+              gezogen werden dürfen. <br />In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte
+              nachgezogen werden.
             </p>
             <h4>Neutrale Zone</h4>
             <p>
@@ -252,6 +315,25 @@
               <img [src]="iconUrl('armour_2')" class="oc-icon" /> und dreifache
               <img [src]="iconUrl('armour_3')" class="oc-icon" /> bereit. Diese werden vor der einfachen
               <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> eingesetzt.
+            </p>
+            <h4>Paralysierend</h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('equipment')" class="oc-icon" />. Wenn diese Karten durch
+              einen Angriff einem Schiff mindestens 1
+              <img [src]="iconUrl('damage')" class="oc-icon" /> zufügen, kann das betroffene Schiff in der
+              nächsten Gefechtsphase nicht angreifen und es werden alle
+              <img [src]="iconUrl('equipment')" class="oc-icon" />, welche
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> oder
+              <img [src]="iconUrl('shield_1')" class="oc-icon" /> bieten deaktiviert.
+            </p>
+            <h4>Planetar</h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('infrastructure')" class="oc-icon" />. Diese Karte kann
+              ausschließlich an die Kolonie angelegt werden. <br />Stellt diese Karte
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" />,
+              <img [src]="iconUrl('shield_1')" class="oc-icon" /> oder
+              <img [src]="iconUrl('armour_1')" class="oc-icon" /> zur Verfügung, so können diese nur gegen
+              Angriffe eingesetzt werden, die die Kolonie oder eine Karte in der Koloniezone zum Ziel haben.
             </p>
             <h4>Punktabwehr <img [src]="iconUrl('point_defense_1')" class="oc-icon" /></h4>
             <p>
@@ -301,8 +383,8 @@
             </p>
             <h4>Spielzug</h4>
             <p>
-              Von Rundenbeginn des aktiven Spielers bis zum nächsten Rundenbeginn desselben Spielers. Ein Zug
-              beinhaltet somit auch explizit die Spielphasen der anderen Spieler.
+              Von Rundenbeginn des aktiven Spielers bis zum nächsten Rundenbeginn desselben Spielers. Ein
+              Spielzug beinhaltet somit auch explizit die Spielphasen der anderen Spieler.
             </p>
             <h4>Taktikkarte <img [src]="iconUrl('tactic')" class="oc-icon" /></h4>
             <p>
@@ -310,12 +392,32 @@
               außer sie werden zusammen mit einer anderen Karte angelegt. Jede
               <img [src]="iconUrl('tactic')" class="oc-icon" /> gehört zu genau einer Disziplin.
             </p>
+            <h4>Tribut <i>(Anzahl Karten)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />. Um diese Karten spielen zu
+              können muss zuvor die angegebene Anzahl Karten von der Hand abgelegt werden.
+            </p>
             <h4>Überfall</h4>
             <p>
               Ein Angriff des aktiven Spielers auf die Kolonie eines anderen Spielers. Schiffe mit
               <img [src]="iconUrl('speed')" class="oc-icon" /> des verteidigenden Spielers müssen am Gefecht
               teilnehmen. Auf Reichweite 1 eines Überfalls können die Kolonie und Karten in der Koloniezone
               des Verteidigers angegrffen werden.
+            </p>
+            <h4>Verheerend <i>(Ziel)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('equipment')" class="oc-icon" />. Diese Karte fügt dem
+              genannten Ziel (z.B. der Kolonie oder Schiffen mit einer bestimmten
+              <img [src]="iconUrl('speed')" class="oc-icon" />) den doppelten Schaden zu (nach Abzügen durch
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" />,
+              <img [src]="iconUrl('shield_1')" class="oc-icon" />,
+              <img [src]="iconUrl('armour_1')" class="oc-icon" /> und anderen Effekten).
+            </p>
+            <h4>Wirkungslos <i>(Ziel)</i></h4>
+            <p>
+              Schlagwort auf <img [src]="iconUrl('equipment')" class="oc-icon" />. Diese Karte kann dem
+              genannten Ziel (z.B. der Kolonie oder Schiffen mit einer bestimmten
+              <img [src]="iconUrl('speed')" class="oc-icon" />) keinen Schaden zufügen.
             </p>
           </div>
           <div *ngSwitchCase="'cards'">
@@ -372,8 +474,8 @@
             </p>
             <p>
               Welche <img [src]="iconUrl('hull')" class="oc-icon" /> benötigt werden, damit das Schiff
-              vollständig ist, wird auf der Karte selbst angezeigt. Vollständige Schiffe werden an Rundenende
-              von der Koloniezone in die orbitale Zone verschoben.
+              vollständig ist, wird auf der Karte selbst hinter dem Schlagwort <b>Komponenten</b>angezeigt.
+              Vollständige Schiffe werden an Rundenende von der Koloniezone in die orbitale Zone verschoben.
             </p>
           </div>
           <div *ngSwitchCase="'equipment-cards'">
@@ -487,6 +589,10 @@
               <li>
                 Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.
               </li>
+              <li>
+                Dein Gegenspieler kann <img [src]="iconUrl('tactic')" class="oc-icon" /> ausspielen, die das
+                Schlagwort <i>Intervention (Rundenbeginn)</i> besitzen.
+              </li>
             </ul>
             <h2>2. Aufbauphase</h2>
             <ul>
@@ -598,6 +704,11 @@
             </p>
             <p>Folgende Schritte werden in jeder der bis zu 4 Gefechtsphasen durchgeführt:</p>
             <ol>
+              <li>
+                Beide Spieler (beginnend beim aktiven Spieler) haben die Möglichkeit
+                <img [src]="iconUrl('tactic')" class="oc-icon" /> mit dem Schlagwort
+                <i>Intervention (Gefechtsphasenbeginn)</i> auszuspielen.
+              </li>
               <li>Der aktive Spieler führt seine Angriffe in beliebiger Reihenfolge durch.</li>
               <li>
                 Der verteidigende / abfangende Spieler führt seine Angriffe in beliebiger Reihenfolge durch.
@@ -606,6 +717,11 @@
                 Alle am Gefecht teilnehmenden Karten werden wieder aktiviert (außer deaktivierte Karten, die
                 <img [src]="iconUrl('armour_1')" class="oc-icon" /> bieten oder dessen Regeltext besagt, dass
                 sie nur einmal pro Gefecht eingesetzt werden können).
+              </li>
+              <li>
+                Beide Spieler (beginnend beim aktiven Spieler) haben die Möglichkeit
+                <img [src]="iconUrl('tactic')" class="oc-icon" /> mit dem Schlagwort
+                <i>Intervention (Gefechtsphasenende)</i> auszuspielen.
               </li>
               <li>
                 Schiffe und an die Kolonie angelegte
