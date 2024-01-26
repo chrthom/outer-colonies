@@ -11,7 +11,7 @@ abstract class MilitaryTacticCard extends TacticCard {
 }
 
 export class Card139 extends MilitaryTacticCard {
-  private deactivations = 3;
+  private deactivations = 4;
   constructor() {
     super(139, 'ECM-Emitter', 2);
   }
@@ -20,7 +20,10 @@ export class Card139 extends MilitaryTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return player.match.battle.ships[player.match.waitingPlayerNo].filter(
-      cs => cs.profile.pointDefense && cs.isInBattle && cs.type == CardType.Hull
+      cs =>
+        cs.isInBattle &&
+        cs.type == CardType.Hull &&
+        cs.cardStacks.some(scs => scs.card.profile.pointDefense && scs.defenseAvailable)
     );
   }
   protected override get interventionType(): InterventionType | undefined {
