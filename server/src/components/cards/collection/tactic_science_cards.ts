@@ -121,6 +121,23 @@ export class Card316 extends ScienceTacticCard {
   }
 }
 
+export class Card429 extends ScienceTacticCard {
+  private oneTimeActionPool = new ActionPool(
+    new CardAction(CardType.Equipment),
+    new CardAction(CardType.Infrastructure),
+    new CardAction(CardType.Infrastructure)
+  );
+  constructor() {
+    super(429, 'Futuristische Industrie', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
 export class Card443 extends ScienceTacticCard {
   private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Science];
   constructor() {
