@@ -121,6 +121,21 @@ export class Card316 extends ScienceTacticCard {
   }
 }
 
+export class Card324 extends ScienceTacticCard {
+  constructor() {
+    super(324, 'Überladene Triebwerke', 2, {
+      speed: 1
+    });
+  }
+  override get durability(): CardDurability {
+    return CardDurability.Turn;
+  }
+  onEnterGame() {}
+  getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profile.speed > 0);
+  }
+}
+
 export class Card335 extends ScienceTacticCard {
   constructor() {
     super(335, 'Schilddämpfer', 2);
