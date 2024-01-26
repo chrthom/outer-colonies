@@ -21,6 +21,19 @@ export class Card159 extends OrbCard {
   }
 }
 
+export class Card301 extends OrbCard {
+  constructor() {
+    super(301, 'Io', 5, {
+      energy: 6,
+      pointDefense: 1
+    });
+  }
+  override onStartTurn(): void {}
+  override get instantRecharge(): boolean {
+    return true;
+  }
+}
+
 export class Card317 extends OrbCard {
   constructor() {
     super(317, 'Kallisto', 3, {}, [TacticDiscipline.Military]);
