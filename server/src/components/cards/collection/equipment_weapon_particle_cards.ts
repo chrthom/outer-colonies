@@ -1,4 +1,4 @@
-import { Zone } from '../../../shared/config/enums';
+import { CardType } from '../../../shared/config/enums';
 import CardStack from '../card_stack';
 import { EquipmentCardColonyKillerRechargeable, EquipmentCardRechargeable } from '../types/equipment_card';
 
@@ -44,6 +44,30 @@ export class Card107 extends EquipmentCardRechargeable {
   }
 }
 
+export class Card203 extends EquipmentCardRechargeable {
+  constructor() {
+    super(
+      203,
+      'Leerenfeld',
+      5,
+      {
+        energy: -1,
+        xi: -1
+      },
+      {
+        range: 3,
+        damage: 6,
+        pointDefense: 0,
+        shield: -1,
+        armour: -99
+      }
+    );
+  }
+  protected override attackDamageBeforeReductions(target: CardStack) {
+    return target.type == CardType.Colony ? 0 : this.attackProfile.damage;
+  }
+}
+
 export class Card207 extends EquipmentCardRechargeable {
   constructor() {
     super(
@@ -85,7 +109,7 @@ export class Card405 extends EquipmentCardColonyKillerRechargeable {
   }
 }
 
-export class Card438 extends EquipmentCardColonyKillerRechargeable {
+export class Card438 extends EquipmentCardRechargeable {
   constructor() {
     super(
       438,
@@ -104,6 +128,6 @@ export class Card438 extends EquipmentCardColonyKillerRechargeable {
     );
   }
   protected override attackDamageBeforeReductions(target: CardStack) {
-    return target.zone == Zone.Colony ? 0 : this.attackProfile.damage;
+    return target.type == CardType.Colony ? 0 : this.attackProfile.damage;
   }
 }
