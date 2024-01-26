@@ -70,6 +70,39 @@ export class Card162 extends ScienceTacticCard {
   }
 }
 
+export class Card233 extends ScienceTacticCard {
+  private activations = 4;
+  constructor() {
+    super(233, 'ABM-KI', 1);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.activatePointDefense(target, this.activations);
+    this.onEnterGameAttackIntervention(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionAttack(player, i =>
+      i.target.cardStacks.some(cs => cs.card.profile.pointDefense && !cs.defenseAvailable)
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
+  }
+  private activatePointDefense(target: CardStack, remainingActivations: number) {
+    const pd2 = this.getPointDefense(target, 2);
+    const pd1 = this.getPointDefense(target, 1);
+    if (remainingActivations >= 2 && pd2) {
+      pd2.defenseAvailable = true;
+      this.activatePointDefense(target, remainingActivations - 2);
+    } else if (remainingActivations && pd1) {
+      pd1.defenseAvailable = true;
+      this.activatePointDefense(target, remainingActivations - 1);
+    }
+  }
+  private getPointDefense(target: CardStack, level: number): CardStack | undefined {
+    return target.cardStacks.find(cs => !cs.defenseAvailable && cs.card.profile.pointDefense == level);
+  }
+}
+
 export class Card316 extends ScienceTacticCard {
   private oneTimeActionPool = new ActionPool(
     new CardAction(TacticDiscipline.Military),
