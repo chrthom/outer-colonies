@@ -10,6 +10,38 @@ abstract class MilitaryTacticCard extends TacticCard {
   }
 }
 
+export class Card139 extends MilitaryTacticCard {
+  private deactivations = 3;
+  constructor() {
+    super(139, 'ECM-Emitter', 2);
+  }
+  onEnterGame(player: Player) {
+    this.deactivatePointDefense(player.match.battle.ships[player.match.waitingPlayerNo], this.deactivations);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(
+      cs => cs.profile.pointDefense && cs.isInBattle && cs.type == CardType.Hull
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+  private deactivatePointDefense(targets: CardStack[], remainingDeactivations: number) {
+    const pd2 = this.getPointDefense(targets, 2);
+    const pd1 = this.getPointDefense(targets, 1);
+    if (remainingDeactivations >= 2 && pd2) {
+      pd2.defenseAvailable = false;
+      this.deactivatePointDefense(targets, remainingDeactivations - 2);
+    } else if (remainingDeactivations && pd1) {
+      pd1.defenseAvailable = false;
+      this.deactivatePointDefense(targets, remainingDeactivations - 1);
+    }
+  }
+  private getPointDefense(targets: CardStack[], level: number): CardStack | undefined {
+    return targets.flatMap(cs => cs.cardStacks).find(cs => cs.card.profile.pointDefense == level);
+  }
+}
+
 export class Card173 extends MilitaryTacticCard {
   constructor() {
     super(173, 'Ausweichmanöver', 1);
