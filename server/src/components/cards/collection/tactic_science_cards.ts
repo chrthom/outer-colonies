@@ -121,6 +121,26 @@ export class Card316 extends ScienceTacticCard {
   }
 }
 
+export class Card335 extends ScienceTacticCard {
+  constructor() {
+    super(335, 'Schilddämpfer', 2);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.cardStacks.filter(cs => cs.card.profile.shield).forEach(cs => (cs.defenseAvailable = false));
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(
+      cs =>
+        cs.isInBattle &&
+        cs.type == CardType.Hull &&
+        cs.cardStacks.some(scs => scs.card.profile.shield && scs.defenseAvailable)
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
 export class Card429 extends ScienceTacticCard {
   private oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
