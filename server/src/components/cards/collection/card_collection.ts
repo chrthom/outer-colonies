@@ -101,7 +101,7 @@ import {
 } from './equipment_weapon_kinetic_cards';
 import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
-import { Card106, Card107, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
+import { Card106, Card107, Card203, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
 import {
   Card101,
   Card127,
@@ -145,7 +145,16 @@ import {
   Card314,
   Card315
 } from './hull_3_part_cards';
-import { Card173, Card174, Card331, Card337, Card338, Card346, Card428 } from './tactic_military_cards';
+import {
+  Card139,
+  Card173,
+  Card174,
+  Card331,
+  Card337,
+  Card338,
+  Card346,
+  Card428
+} from './tactic_military_cards';
 import { Card110, Card144, Card162, Card316, Card443 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -195,6 +204,7 @@ export default class CardCollection {
     136: <Card>new Card136(),
     137: <Card>new Card137(),
     138: <Card>new Card138(),
+    139: <Card>new Card139(),
     140: <Card>new Card140(),
     141: <Card>new Card141(),
     144: <Card>new Card144(),
@@ -240,6 +250,7 @@ export default class CardCollection {
     186: <Card>new Card186(),
     187: <Card>new Card187(),
     188: <Card>new Card188(),
+    203: <Card>new Card203(),
     207: <Card>new Card207(),
     209: <Card>new Card209(),
     213: <Card>new Card213(),
