@@ -155,7 +155,7 @@ import {
   Card346,
   Card428
 } from './tactic_military_cards';
-import { Card110, Card144, Card162, Card233, Card316, Card443 } from './tactic_science_cards';
+import { Card110, Card144, Card162, Card233, Card316, Card429, Card443 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
 import { Card230, Card333, Card435 } from './infrastructure_start_cards';
@@ -334,6 +334,7 @@ export default class CardCollection {
     426: <Card>new Card426(),
     427: <Card>new Card427(),
     428: <Card>new Card428(),
+    429: <Card>new Card429(),
     432: <Card>new Card432(),
     433: <Card>new Card433(),
     434: <Card>new Card434(),
