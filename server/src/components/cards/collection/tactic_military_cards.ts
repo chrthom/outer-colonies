@@ -38,7 +38,9 @@ export class Card139 extends MilitaryTacticCard {
     }
   }
   private getPointDefense(targets: CardStack[], level: number): CardStack | undefined {
-    return targets.flatMap(cs => cs.cardStacks).find(cs => cs.card.profile.pointDefense == level);
+    return targets
+      .flatMap(cs => cs.cardStacks)
+      .find(cs => cs.defenseAvailable && cs.card.profile.pointDefense == level);
   }
 }
 
