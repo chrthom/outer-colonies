@@ -65,12 +65,6 @@ class LayoutConfig {
       yOffset: -252
     }
   };
-  readonly maxedTacticCard = {
-    x: 1200,
-    y: 900,
-    yOpponent: 300,
-    scale: 0.8
-  };
   readonly combatRange = {
     x: 1760,
     y: 730
@@ -80,6 +74,11 @@ class LayoutConfig {
     y: 60,
     xTextOffset: -120,
     fontSize: 36
+  };
+  readonly countdownIndicator = {
+    x: 2350,
+    y: 600,
+    fontSize: 30
   };
   readonly deck = {
     x: 1930,
@@ -109,6 +108,12 @@ class LayoutConfig {
     x: 2110,
     y: 820,
     scale: 0.75
+  };
+  readonly maxedTacticCard = {
+    x: 1200,
+    y: 900,
+    yOpponent: 300,
+    scale: 0.8
   };
   readonly missionCards = {
     x: 1760,

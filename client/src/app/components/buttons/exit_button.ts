@@ -16,7 +16,7 @@ export default class ExitButton {
       .text(
         layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
         layoutConfig.exitButton.y + layoutConfig.exitButton.yTextOffset,
-        ['']
+        ''
       )
       .setFontSize(layoutConfig.exitButton.fontSize)
       .setFontFamily(layoutConfig.font.captionFamily)
@@ -30,7 +30,7 @@ export default class ExitButton {
         layoutConfig.exitButton.y +
           layoutConfig.exitButton.yTextOffset +
           layoutConfig.exitButton.yConfirmOffset,
-        ['Kapitulation bestätigen']
+        'Kapitulation bestätigen'
       )
       .setFontSize(layoutConfig.exitButton.fontSize)
       .setFontFamily(layoutConfig.font.captionFamily)
