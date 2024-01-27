@@ -78,6 +78,26 @@ export class Card174 extends MilitaryTacticCard {
   }
 }
 
+export class Card319 extends MilitaryTacticCard {
+  constructor() {
+    super(319, 'Zusatztorpedos', 2);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.cardStacks.filter(cs => cs.card.profile.phi).forEach(cs => (cs.attackAvailable = true));
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.no].filter(
+      cs =>
+        cs.isInBattle &&
+        cs.type == CardType.Hull &&
+        cs.cardStacks.some(scs => scs.card.profile.phi && !scs.attackAvailable)
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
 export class Card331 extends MilitaryTacticCard {
   private readonly damageToRepair = 3;
   constructor() {

@@ -92,9 +92,10 @@ export const starterDecks: number[][][] = [
     // Tactic (9)
     [2, 232], // Warenlieferung
     [2, 162], // Schildüberladung
-    [2, 144], // Kalte Fusion
+    [1, 144], // Kalte Fusion
     [1, 176], // Gegenspionage
     [1, 231], // Unruhen schüren
+    [1, 429], // Futuristische Industrie
     [1, 443] // Computer-Virus
   ]
 ];
