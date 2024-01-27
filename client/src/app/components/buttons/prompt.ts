@@ -107,7 +107,7 @@ export default class Prompt {
         case GameResultType.Destruction:
           gameOverText = 'Gegnerische Kolonie zerstört';
           break;
-        default:
+        case GameResultType.Surrender:
           gameOverText = 'Gegner hat kapituliert';
       }
     } else {
@@ -118,7 +118,7 @@ export default class Prompt {
         case GameResultType.Depletion:
           gameOverText = 'Eigenes Deck aufgebraucht';
           break;
-        default:
+        case GameResultType.Destruction:
           gameOverText = 'Eigene Kolonie zerstört';
       }
     }

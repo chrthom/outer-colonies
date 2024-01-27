@@ -169,6 +169,7 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
+    this.resetSelection();
     this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
       const newHandCards = this.state.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
       this.retractCardsExist = false; // If true, then the hand animations are delayed
@@ -176,7 +177,7 @@ export default class Game extends Phaser.Scene {
       this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
         this.updateHandCards(newHandCards, oldState);
         this.animateOpponentTacticCard(oldState);
-        this.resetView();
+        this.updateView();
         this.highlightAttackIntervention();
         this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
           this.discardMaximizedTacticCard()
@@ -186,16 +187,7 @@ export default class Game extends Phaser.Scene {
   }
 
   resetView(battleType?: BattleType) {
-    this.activeCards.hand = undefined;
-    this.activeCards.stack = undefined;
-    this.activeCards.stackIndex = undefined;
-    this.interceptShipIds = [];
-    this.plannedBattle = {
-      type: battleType ?? BattleType.None,
-      downsideCardsNum: 0,
-      upsideCardsNum: 0,
-      shipIds: []
-    };
+    this.resetSelection(battleType);
     this.updateView();
   }
 
@@ -210,6 +202,19 @@ export default class Game extends Phaser.Scene {
     this.obj.missionCards?.update();
     this.obj.maxCard?.hide();
     this.updateHighlighting();
+  }
+
+  private resetSelection(battleType?: BattleType) {
+    this.activeCards.hand = undefined;
+    this.activeCards.stack = undefined;
+    this.activeCards.stackIndex = undefined;
+    this.interceptShipIds = [];
+    this.plannedBattle = {
+      type: battleType ?? BattleType.None,
+      downsideCardsNum: 0,
+      upsideCardsNum: 0,
+      shipIds: []
+    };
   }
 
   private animateAttack(): boolean {
