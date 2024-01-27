@@ -141,7 +141,7 @@ export function gameCron(io: Server) {
     .filter(match => !match.gameResult.gameOver)
     .forEach(match => {
       if (--match.pendingActionPlayer.countdown <= 0) {
-        match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
+        match.gameResult.setWinnerByTimeout(match.pendingActionPlayer);
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
