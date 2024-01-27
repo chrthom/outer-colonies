@@ -7,7 +7,7 @@ export default class VersonIndicator {
       .text(
         layoutConfig.version.x,
         layoutConfig.version.y,
-        `Helene (v1.9.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Phoebe (v2.0.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.font.size)
       .setFontFamily(layoutConfig.font.captionFamily)
