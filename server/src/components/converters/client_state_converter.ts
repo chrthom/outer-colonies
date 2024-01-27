@@ -123,6 +123,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   return {
     playerIsActive: match.activePlayerNo == playerNo,
     playerPendingAction: match.pendingActionPlayerNo == playerNo,
+    name: player.name,
     turnPhase: match.turnPhase,
     actionPool: actionPool,
     opponent: opponentData,

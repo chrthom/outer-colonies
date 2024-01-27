@@ -25,6 +25,7 @@ import { layoutConfig } from '../config/layout';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import { backgroundConfig } from '../config/background';
+import CountdownIndicator from '../components/indicators/countdown_indicator';
 
 interface InitData {
   socket: Socket;
@@ -36,6 +37,7 @@ interface StaticObjects {
   background?: Background;
   continueButton?: ContinueButton;
   combatRangeIndicator?: CombatRangeIndicator;
+  countdownIndicator?: CountdownIndicator;
   deck?: DeckCard;
   discardPile?: DiscardPile;
   exitButton?: ExitButton;
@@ -146,16 +148,20 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
       this.updateState(state);
     });
-    this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
+      this.obj.countdownIndicator?.update(countdown[0], countdown[1]);
+    });
     this.obj.background?.initInterface();
     this.obj.actionPool = new ActionPool(this);
     this.obj.combatRangeIndicator = new CombatRangeIndicator(this);
     this.obj.continueButton = new ContinueButton(this);
+    this.obj.countdownIndicator = new CountdownIndicator(this);
     this.obj.deck = new DeckCard(this);
     this.obj.discardPile = new DiscardPile(this);
     this.obj.exitButton = new ExitButton(this);
     this.obj.maxCard = new MaxCard(this);
     this.obj.missionCards = new MissionCards(this);
+    this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
 
   updateState(state: ClientState) {

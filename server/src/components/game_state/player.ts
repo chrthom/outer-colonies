@@ -6,6 +6,7 @@ import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
 import { InterventionTacticCard } from './intervention';
+import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId!: string;
@@ -13,6 +14,7 @@ export default class Player {
   match!: Match;
   no!: number;
   ready: boolean = false;
+  countdown: number = rules.countdownTimer;
   deck!: Card[];
   discardPile: Card[] = [];
   hand: CardStack[] = [];

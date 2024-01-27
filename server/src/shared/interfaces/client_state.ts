@@ -88,6 +88,7 @@ export interface ClientGameResult {
 export interface ClientState {
   playerIsActive: boolean;
   playerPendingAction: boolean;
+  name: string;
   turnPhase: TurnPhase;
   actionPool: string[];
   opponent: ClientOpponent;

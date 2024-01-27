@@ -97,12 +97,30 @@ export default class Prompt {
   private showGameOver(gameResult: ClientGameResult) {
     let gameOverText: string;
     if (gameResult.won) {
-      if (gameResult.type == GameResultType.Depletion) gameOverText = 'Gegnerisches Deck aufgebraucht';
-      else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Gegnerische Kolonie zerstört';
-      else if (gameResult.type == GameResultType.Surrender) gameOverText = 'Gegner hat kapituliert';
+      switch (gameResult.type) {
+        case GameResultType.Countdown:
+          gameOverText = 'Zeit des Gegners ist abgelaufen';
+          break;
+        case GameResultType.Depletion:
+          gameOverText = 'Gegnerisches Deck aufgebraucht';
+          break;
+        case GameResultType.Destruction:
+          gameOverText = 'Gegnerische Kolonie zerstört';
+          break;
+        default:
+          gameOverText = 'Gegner hat kapituliert';
+      }
     } else {
-      if (gameResult.type == GameResultType.Depletion) gameOverText = 'Eigenes Deck aufgebraucht';
-      else if (gameResult.type == GameResultType.Destruction) gameOverText = 'Eigene Kolonie zerstört';
+      switch (gameResult.type) {
+        case GameResultType.Countdown:
+          gameOverText = 'Eigene Zeit ist abgelaufen';
+          break;
+        case GameResultType.Depletion:
+          gameOverText = 'Eigenes Deck aufgebraucht';
+          break;
+        default:
+          gameOverText = 'Eigene Kolonie zerstört';
+      }
     }
     this.show(
       `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
