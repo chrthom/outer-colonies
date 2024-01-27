@@ -135,22 +135,24 @@ export function gameCron(io: Server) {
     .filter(room => !room[1].has(room[0]) && room[0] != matchmakingRoom)
     .map(r => {
       const [clientId] = r[1];
-      return clientId;
+      return getSocketData(io.sockets.sockets.get(clientId))?.match;
     })
-    .forEach(clientId => {
-      const match = getSocketData(io.sockets.sockets.get(clientId))?.match;
-      if (match?.players[0].ready && match?.players[1].ready) {
-        match.pendingActionPlayer.countdown--;
-        match.forAllPlayers((playerNo: number) => {
-          const socket = getSocket(io, match, playerNo);
-          if (socket)
-            socket.emit(MsgTypeOutbound.Countdown, [
-              match.players[playerNo].countdown,
-              match.players[opponentPlayerNo(playerNo)].countdown
-            ]);
-          else console.log('WARN: Could not find socket to emit countdown');
-        });
+    .filter(match => match?.players[0].ready && match?.players[1].ready)
+    .filter(match => !match.gameResult.gameOver)
+    .forEach(match => {
+      if (--match.pendingActionPlayer.countdown <= 0) {
+        match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
+        emitState(io, match);
       }
+      match.forAllPlayers((playerNo: number) => {
+        const socket = getSocket(io, match, playerNo);
+        if (socket)
+          socket.emit(MsgTypeOutbound.Countdown, [
+            match.players[playerNo].countdown,
+            match.players[opponentPlayerNo(playerNo)].countdown
+          ]);
+        else console.log('WARN: Could not find socket to emit countdown');
+      });
     });
 }
 

@@ -17,6 +17,10 @@ export default class GameResult {
   constructor(match: Match) {
     this.match = match;
   }
+  setWinnerByCountdown(expiredPlayer: Player) {
+    this.type = GameResultType.Countdown;
+    this.setGameOver(expiredPlayer);
+  }
   setWinnerByDeckDepletion(depletedPlayer: Player) {
     this.type = GameResultType.Depletion;
     this.setGameOver(depletedPlayer);
