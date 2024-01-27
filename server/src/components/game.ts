@@ -2,48 +2,22 @@ import Match from './game_state/match';
 import toClientState from './converters/client_state_converter';
 import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { getCardStackByUUID } from './utils/helpers';
+import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import { ClientPlannedBattle } from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
-
-function getSocket(io: Server, match: Match, playerNo: number): Socket {
-  return io.sockets.sockets.get(match.players[playerNo].socketId);
-}
-
-function getPlayer(socket: Socket): Player {
-  return socketData(socket).match.players[socketData(socket).playerNo];
-}
-
-function emitState(io: Server, match: Match) {
-  match.forAllPlayers((playerNo: number) => {
-    const socket = getSocket(io, match, playerNo);
-    if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
-    else console.log('WARN: Could not find socket to emit state');
-  });
-  match.resetTempStates();
-}
-
-function initMatch(io: Server, match: Match) {
-  match.setStartPlayer();
-  match.players.forEach(player => {
-    player.shuffleDeck();
-    player.drawCards(rules.initialCardsToDraw);
-  });
-  match.prepareStartPhase();
-  emitState(io, match);
-}
+import { matchmakingRoom } from './matchmaking';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     if (match && turnPhase == match.turnPhase) {
       if (turnPhase == TurnPhase.Init) {
-        match.players[socketData(socket).playerNo].ready = true;
-        if (match.players[socketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
+        match.players[getSocketData(socket).playerNo].ready = true;
+        if (match.players[getSocketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
       } else if (
-        (socketData(socket).playerNo == match.pendingActionPlayerNo && match.intervention) ||
+        (getSocketData(socket).playerNo == match.pendingActionPlayerNo && match.intervention) ||
         turnPhase == TurnPhase.Build ||
         turnPhase == TurnPhase.Combat
       ) {
@@ -52,7 +26,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else {
           switch (turnPhase) {
             case TurnPhase.Build:
-              if (socketData(socket).playerNo == match.activePlayerNo) {
+              if (getSocketData(socket).playerNo == match.activePlayerNo) {
                 match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
               } else {
                 match.prepareCombatPhase(<string[]>data);
@@ -68,7 +42,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     if (match) {
       if (!match.gameResult.gameOver) {
         const player = getPlayer(socket);
@@ -79,7 +53,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     }
   });
   socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     const target = getCardStackByUUID(match.allCardStacks, targetUUID);
@@ -101,7 +75,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
     const targetCardStack =
@@ -120,7 +94,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     const handCard = getCardStackByUUID(player.hand, handCardUUID);
     if (!handCard) {
@@ -134,7 +108,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     emitState(io, match);
   });
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
-    const match = socketData(socket).match;
+    const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     const playerShips = match.battle.ships[match.pendingActionPlayerNo];
     const srcShip = playerShips.find(cs => cs.uuid == srcId);
@@ -156,6 +130,57 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   });
 }
 
-function socketData(socket: Socket): SocketData {
+export function gameCron(io: Server) {
+  Array.from(io.sockets.adapter.rooms)
+    .filter(room => !room[1].has(room[0]) && room[0] != matchmakingRoom)
+    .map(r => {
+      const [clientId] = r[1];
+      return clientId;
+    })
+    .forEach(clientId => {
+      const match = getSocketData(io.sockets.sockets.get(clientId))?.match;
+      if (match?.players[0].ready && match?.players[1].ready) {
+        match.pendingActionPlayer.countdown--;
+        match.forAllPlayers((playerNo: number) => {
+          const socket = getSocket(io, match, playerNo);
+          if (socket)
+            socket.emit(MsgTypeOutbound.Countdown, [
+              match.players[playerNo].countdown,
+              match.players[opponentPlayerNo(playerNo)].countdown
+            ]);
+          else console.log('WARN: Could not find socket to emit countdown');
+        });
+      }
+    });
+}
+
+function getSocketData(socket: Socket): SocketData {
   return <SocketData>socket.data;
+}
+
+function getSocket(io: Server, match: Match, playerNo: number): Socket {
+  return io.sockets.sockets.get(match.players[playerNo].socketId);
+}
+
+function getPlayer(socket: Socket): Player {
+  return getSocketData(socket).match.players[getSocketData(socket).playerNo];
+}
+
+function emitState(io: Server, match: Match) {
+  match.forAllPlayers((playerNo: number) => {
+    const socket = getSocket(io, match, playerNo);
+    if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
+    else console.log('WARN: Could not find socket to emit state');
+  });
+  match.resetTempStates();
+}
+
+function initMatch(io: Server, match: Match) {
+  match.setStartPlayer();
+  match.players.forEach(player => {
+    player.shuffleDeck();
+    player.drawCards(rules.initialCardsToDraw);
+  });
+  match.prepareStartPhase();
+  emitState(io, match);
 }

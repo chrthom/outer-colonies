@@ -4,7 +4,7 @@ import config from 'config';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
-import { gameSocketListeners } from './components/game';
+import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import restAPI from './components/rest_api';
 import process from 'node:process';
@@ -30,6 +30,8 @@ io.on(MsgTypeInbound.Connect, socket => {
 });
 
 setInterval(matchMakingCron, 1000, io);
+setInterval(gameCron, 1000, io);
+
 app.use(express.json());
 restAPI(app);
 

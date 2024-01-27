@@ -146,6 +146,9 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
       this.updateState(state);
     });
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
+      this.updateCountdown(countdown[0], countdown[1]);
+    });
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
     this.obj.background?.initInterface();
     this.obj.actionPool = new ActionPool(this);
@@ -177,6 +180,10 @@ export default class Game extends Phaser.Scene {
         );
       });
     });
+  }
+
+  updateCountdown(playerCountdown: number, opponentCountdown: number) {
+    //
   }
 
   resetView(battleType?: BattleType) {
