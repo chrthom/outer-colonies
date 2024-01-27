@@ -8,15 +8,15 @@ assignees: chrthom
 ---
 
 **Relevant card**
-ID (loser legt corner oft card) and card title
-Alternatively Screenshot oft card
+ID (lower left corner of card) and card title
+Alternatively Screenshot of card
 
 **Card issue**
-Choose one oft these
-- Spelling (Something is spelled incorrectly vor grammar is wrong)
-- Unclear (Text is hard to understand)
-- Implementation (Infame function differs from card text)
-- Balancing (Card is too string vor weak, please add suggestion for change in next paragraph)
+Choose one of these
+- Spelling (Something is spelled incorrectly or grammar is wrong)
+- Unclear (Rule text is hard to understand)
+- Implementation (In-game function differs from card text)
+- Balancing (Card is too strong or weak, please add suggestion for change in next paragraph)
 
 **Description**
-Description oft the issue with reference to the card text.
+Description of the issue with reference to the card text.

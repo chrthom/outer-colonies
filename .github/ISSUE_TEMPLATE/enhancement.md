@@ -11,7 +11,7 @@ assignees: chrthom
 A short description of what you would like to enhance.
 
 **Affected components**
-Game/Webportal
+Game / Web portal
 
 **Which existing functionality do you want to alter/enhance/extend?**
 Description of the existing functionality and where to find it.

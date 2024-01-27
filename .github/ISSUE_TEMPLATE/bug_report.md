@@ -11,7 +11,7 @@ assignees: chrthom
 A short description of what the bug is.
 
 **Affected components**
-Game/Webportal
+Game / Web portal
 
 **To Reproduce**
 Steps to reproduce the behavior:
