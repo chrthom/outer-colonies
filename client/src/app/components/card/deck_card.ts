@@ -3,10 +3,10 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 
 export default class DeckCard extends CardImage {
-  indicator: ValueIndicator;
+  indicator?: ValueIndicator;
   constructor(scene: Game) {
     super(scene, layoutConfig.deck.x, layoutConfig.deck.y, 1);
     this.image.on('pointerdown', () => this.onClickAction());
@@ -32,13 +32,13 @@ export default class DeckCard extends CardImage {
       this.scene.state.turnPhase == TurnPhase.Build &&
       !this.scene.activeCards.hand
     ) {
-      if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+      if (ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
         this.scene.resetView(BattleType.None);
       } else {
         if (this.scene.plannedBattle.type != BattleType.Mission) {
           this.scene.resetView(BattleType.Mission);
         }
-        if (!ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+        if (!ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
           this.scene.plannedBattle.downsideCardsNum++;
           this.scene.updateView();
         }

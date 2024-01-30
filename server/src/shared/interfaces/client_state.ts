@@ -103,3 +103,31 @@ export interface ClientState {
   hasToRetractCards: boolean;
   highlightCardUUID?: string;
 }
+
+export const emptyClientState = {
+  playerIsActive: false,
+  playerPendingAction: false,
+  name: '',
+  turnPhase: TurnPhase.Init,
+  actionPool: [],
+  opponent: {
+    name: '',
+    hand: [],
+    handCardSize: 0,
+    deckSize: 0,
+    discardPileIds: []
+  },
+  hand: [],
+  handCardLimit: 0,
+  deckSize: 0,
+  discardPileIds: [],
+  cardStacks: [],
+  battle: {
+    type: BattleType.None,
+    playerShipIds: [],
+    opponentShipIds: [],
+    priceCardIds: [],
+    range: 0
+  },
+  hasToRetractCards: false
+};

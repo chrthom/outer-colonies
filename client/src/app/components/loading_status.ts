@@ -45,7 +45,7 @@ export default class LoadingStatus {
       angle += 30;
     }
     let index = 0;
-    const tweens = [];
+    const tweens: Phaser.Tweens.Tween[] = [];
     this.scene.time.addEvent({
       delay: 70,
       loop: true,

@@ -121,7 +121,7 @@ class LayoutConfig {
     xDistance: 20,
     yDistance: 10
   };
-  readonly opponent = {
+  readonly opponent: FactionLayout = {
     color: '#991111',
     colony: {
       x: 120,
@@ -148,10 +148,16 @@ class LayoutConfig {
     neutral: {
       x: 120,
       y: 670,
-      maxWidth: 650
+      maxWidth: 650,
+      corners: { // TODO: Not used
+        xLeft: 10,
+        xRight: 1760,
+        yTop: 397,
+        yBottom: 953
+      }
     }
   };
-  readonly player = {
+  readonly player: FactionLayoutPlayer = {
     color: '#119999',
     hand: {
       x: 2370,
@@ -221,6 +227,41 @@ class LayoutConfig {
     x: 2360,
     y: 1340
   };
+}
+
+export interface FactionLayout {
+  color: string;
+  colony: FactionLayoutZone;
+  orbital: FactionLayoutZone;
+  neutral: FactionLayoutZone;
+}
+
+export interface FactionLayoutPlayer extends FactionLayout {
+  hand: FactionLayoutHand;
+}
+
+interface FactionLayoutElement {
+  x: number;
+  y: number;
+}
+
+interface FactionLayoutHand extends FactionLayoutElement {
+  angleStep: number;
+  xStep: number;
+  yStep: number;
+  startAngle: number;
+}
+
+export interface FactionLayoutZone extends FactionLayoutElement {
+  maxWidth: number;
+  corners: FactionLayoutZoneCorners;
+}
+
+interface FactionLayoutZoneCorners {
+  xLeft: number;
+  xRight: number;
+  yTop: number;
+  yBottom: number;
 }
 
 export const layoutConfig = new LayoutConfig();
