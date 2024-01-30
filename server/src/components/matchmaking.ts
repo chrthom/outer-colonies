@@ -4,7 +4,7 @@ import Player from './game_state/player';
 import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
-import { ClientGameParams } from '../shared/interfaces/client_game_params';
+import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 
 export const matchmakingRoom = 'matchmaking';

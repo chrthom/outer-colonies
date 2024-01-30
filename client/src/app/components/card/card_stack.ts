@@ -1,6 +1,6 @@
-import { layoutConfig } from '../../config/layout';
+import { FactionLayout, FactionLayoutZone, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
   ClientAttack,
   ClientCard,
@@ -91,7 +91,7 @@ export default class CardStack {
     });
   }
   get isOpponentColony(): boolean {
-    return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop().id == 0;
+    return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == 0;
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
@@ -175,10 +175,11 @@ export default class CardStack {
     const yDistance = layoutConfig.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
-  private zoneLayout() {
-    return this.data.ownedByPlayer
-      ? layoutConfig.player[this.data.zone]
-      : layoutConfig.opponent[this.data.zone];
+  private zoneLayout(): FactionLayoutZone {
+    const zoneLayout = this.data.ownedByPlayer ? layoutConfig.player : layoutConfig.opponent;
+    if (this.data.zone == Zone.Colony) return zoneLayout.colony;
+    else if (this.data.zone = Zone.Oribital) return zoneLayout.orbital;
+    else return zoneLayout.neutral;
   }
   private destroyIndicators() {
     if (this.damageIndicator) this.damageIndicator.destroy();

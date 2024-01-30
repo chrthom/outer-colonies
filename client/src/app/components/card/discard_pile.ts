@@ -1,5 +1,5 @@
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
@@ -7,7 +7,7 @@ import ValueIndicator from '../indicators/value_indicator';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
-  indicator: ValueIndicator;
+  indicator?: ValueIndicator;
   constructor(scene: Game) {
     super(scene, layoutConfig.discardPile.x, layoutConfig.discardPile.y, 1);
     this.update([]);
@@ -49,13 +49,13 @@ export default class DiscardPile extends CardImage {
       this.scene.state.turnPhase == TurnPhase.Build &&
       !this.scene.activeCards.hand
     ) {
-      if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+      if (ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
         this.scene.resetView(BattleType.None);
       } else if (this.scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
         if (this.scene.plannedBattle.type != BattleType.Mission) {
           this.scene.resetView(BattleType.Mission);
         }
-        if (!ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+        if (!ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
           this.scene.plannedBattle.upsideCardsNum++;
           this.scene.updateView();
         }

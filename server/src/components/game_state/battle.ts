@@ -3,7 +3,7 @@ import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
 import { BattleType, CardType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
-import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
+import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
 import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';

@@ -8,9 +8,9 @@ import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
 
 export default class Matchmaking extends Phaser.Scene {
-  sessionToken: string;
-  status: LoadingStatus;
-  socket: Socket;
+  sessionToken!: string;
+  status!: LoadingStatus;
+  socket!: Socket;
 
   constructor() {
     super({

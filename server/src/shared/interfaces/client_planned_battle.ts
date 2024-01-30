@@ -1,15 +1,26 @@
 import { BattleType } from '../config/enums';
 import { rules } from '../config/rules';
 
-export class ClientPlannedBattle {
+export default interface ClientPlannedBattle {
   type: BattleType;
   downsideCardsNum: number;
   upsideCardsNum: number;
   shipIds: string[];
+}
+
+export class ClientPlannedBattleHelper {
   static cardLimitReached(plannedBattle: ClientPlannedBattle): boolean {
-    return ClientPlannedBattle.missingCards(plannedBattle) == 0;
+    return ClientPlannedBattleHelper.missingCards(plannedBattle) == 0;
   }
   static missingCards(plannedBattle: ClientPlannedBattle): number {
     return rules.cardsPerMission - plannedBattle.downsideCardsNum - plannedBattle.upsideCardsNum;
+  }
+  static get empty(): ClientPlannedBattle {
+    return {
+      type: BattleType.None,
+      downsideCardsNum: 0,
+      upsideCardsNum: 0,
+      shipIds: []
+    };
   }
 }

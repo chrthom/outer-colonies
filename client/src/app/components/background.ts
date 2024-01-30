@@ -124,9 +124,12 @@ export default class Background {
   }
 
   private moveToOrb(orb: string, playerOrb?: boolean) {
-    this.targetOrb = backgroundConfig.orbs.find(o => o.name == orb);
-    this.isColonyOrb = playerOrb;
-    this.moveToRing(this.targetOrb.ring);
+    const backgroundOrb = backgroundConfig.orbs.find(o => o.name == orb);
+    if (backgroundOrb) {
+      this.targetOrb = backgroundOrb;
+      this.isColonyOrb = playerOrb;
+      this.moveToRing(this.targetOrb.ring);
+    }
   }
 
   private moveToRing(ring: number) {
@@ -136,27 +139,28 @@ export default class Background {
   }
 
   private tween(initial: boolean) {
-    const movingInwards = this.targetRing < this.currentRing;
-    if (initial) {
-      this.tweenOutCurrentObjects();
-      this.tweenStars();
-      this.tweenSun();
-    } else {
-      if (this.targetOrb && this.nextRing == this.targetRing) {
-        this.createOrbAndTweenToPosition(movingInwards);
+    if (this.targetRing) {
+      if (initial) {
+        this.tweenOutCurrentObjects();
+        this.tweenStars();
+        this.tweenSun();
+      } else {
+        if (this.targetOrb && this.nextRing == this.targetRing) {
+          this.createOrbAndTweenToPosition(this.movingInwards);
+        }
+        if (this.currentRing != this.targetRing) {
+          this.tweenRing();
+        }
       }
-      if (this.currentRing != this.targetRing) {
-        this.tweenRing();
+      if (!initial) {
+        this.currentRing = this.nextRing;
       }
-    }
-    if (!initial) {
-      this.currentRing = this.nextRing;
-    }
-    if (initial || this.currentRing != this.targetRing) {
-      this.scene.time.delayedCall(backgroundConfig.animation.durationNextRing, () => this.tween(false));
-    } else {
-      this.targetRing = undefined;
-      this.targetOrb = undefined;
+      if (initial || this.currentRing != this.targetRing) {
+        this.scene.time.delayedCall(backgroundConfig.animation.durationNextRing, () => this.tween(false));
+      } else {
+        this.targetRing = undefined;
+        this.targetOrb = undefined;
+      }
     }
   }
 
@@ -173,27 +177,31 @@ export default class Background {
   }
 
   private tweenStars() {
-    this.scene.tweens.add({
-      targets: this.starsImage,
-      duration:
-        backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
-        backgroundConfig.animation.durationObjectTransition,
-      y: this.starsYCorrdinates(this.targetRing),
-      ease: 'Quad.inOut'
-    });
+    if (this.targetRing) {
+      this.scene.tweens.add({
+        targets: this.starsImage,
+        duration:
+          backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
+          backgroundConfig.animation.durationObjectTransition,
+        y: this.starsYCorrdinates(this.targetRing),
+        ease: 'Quad.inOut'
+      });
+    }
   }
 
   private tweenSun() {
-    this.scene.tweens.add({
-      targets: this.sunImage,
-      duration:
-        backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
-        backgroundConfig.animation.durationObjectTransition,
-      x: this.sunCoordinatesAndScale(this.targetRing)[0],
-      y: this.sunCoordinatesAndScale(this.targetRing)[1],
-      scale: this.sunCoordinatesAndScale(this.targetRing)[2],
-      ease: 'Quad.inOut'
-    });
+    if (this.targetRing) {
+      this.scene.tweens.add({
+        targets: this.sunImage,
+        duration:
+          backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
+          backgroundConfig.animation.durationObjectTransition,
+        x: this.sunCoordinatesAndScale(this.targetRing)[0],
+        y: this.sunCoordinatesAndScale(this.targetRing)[1],
+        scale: this.sunCoordinatesAndScale(this.targetRing)[2],
+        ease: 'Quad.inOut'
+      });
+    }
   }
 
   private tweenRing() {
@@ -219,20 +227,22 @@ export default class Background {
   }
 
   private createOrbAndTweenToPosition(movingInwards: boolean) {
-    let x: number, y: number;
-    if (movingInwards) [x, y] = this.inCoordinates;
-    else {
-      x = this.outCoordinates[0];
-      if (this.isColonyOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
-      else y = -backgroundConfig.animation.offDistance;
+    if (this.targetOrb) {
+      let x: number, y: number;
+      if (movingInwards) [x, y] = this.inCoordinates;
+      else {
+        x = this.outCoordinates[0];
+        if (this.isColonyOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+        else y = -backgroundConfig.animation.offDistance;
+      }
+      this.orbImage = this.scene.add
+        .image(x, y, `background_orb_${this.targetOrb.name}`)
+        .setOrigin(0.5, 0.5)
+        .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
+        .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
+        .setTint(...this.getTint(this.isColonyOrb ? 0 : 270));
+      this.tweenOrbToPosition();
     }
-    this.orbImage = this.scene.add
-      .image(x, y, `background_orb_${this.targetOrb.name}`)
-      .setOrigin(0.5, 0.5)
-      .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
-      .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
-      .setTint(...this.getTint(this.isColonyOrb ? 0 : 270));
-    this.tweenOrbToPosition();
   }
 
   private tweenOrbToPosition() {
@@ -448,12 +458,13 @@ export default class Background {
 
   private checkPlayerOrbs() {
     this.game.state.cardStacks
-      .filter(cs => cs.cards.slice(-1).pop().id == 0)
-      .filter(cs => backgroundConfig.orbs.some(o => o.cardId == cs.cards[0].id))
+      .filter(cs => cs.cards.slice(-1).pop()?.id == 0)
       .forEach(cs => {
-        const orbName = backgroundConfig.orbs.find(o => o.cardId == cs.cards[0].id).name;
-        if (cs.ownedByPlayer) this.playerOrb = orbName;
-        else this.opponentOrb = orbName;
+        const orb = backgroundConfig.orbs.find(o => o.cardId == cs.cards[0].id);
+        if (orb) {
+          if (cs.ownedByPlayer) this.playerOrb = orb.name;
+          else this.opponentOrb = orb.name;
+        }
       });
   }
 
@@ -462,7 +473,7 @@ export default class Background {
   }
 
   private get movingInwards(): boolean {
-    return this.targetRing < this.currentRing;
+    return (this.targetRing ?? -1) < this.currentRing;
   }
 
   private get nextRing(): number {

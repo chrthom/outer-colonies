@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
-import { ClientHandCard, ClientState } from '../../../../server/src/shared/interfaces/client_state';
+import { ClientHandCard, ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
 import {
   BattleType,
   MsgTypeInbound,
@@ -11,8 +11,8 @@ import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import { ClientPlannedBattle } from '../../../../server/src/shared/interfaces/client_planned_battle';
-import { ClientGameParams } from '../../../../server/src/shared/interfaces/client_game_params';
+import ClientPlannedBattle, { ClientPlannedBattleHelper } from '../../../../server/src/shared/interfaces/client_planned_battle';
+import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import MissionCards from '../components/card/mission_cards';
@@ -33,16 +33,15 @@ interface InitData {
 }
 
 interface StaticObjects {
-  actionPool?: ActionPool;
-  background?: Background;
-  continueButton?: ContinueButton;
-  combatRangeIndicator?: CombatRangeIndicator;
-  countdownIndicator?: CountdownIndicator;
-  deck?: DeckCard;
-  discardPile?: DiscardPile;
-  exitButton?: ExitButton;
-  maxCard?: MaxCard;
-  missionCards?: MissionCards;
+  actionPool: ActionPool;
+  continueButton: ContinueButton;
+  combatRangeIndicator: CombatRangeIndicator;
+  countdownIndicator: CountdownIndicator;
+  deck: DeckCard;
+  discardPile: DiscardPile;
+  exitButton: ExitButton;
+  maxCard: MaxCard;
+  missionCards: MissionCards;
 }
 
 interface ActiveCards {
@@ -52,17 +51,18 @@ interface ActiveCards {
 }
 
 export default class Game extends Phaser.Scene {
-  socket: Socket;
-  gameParams: ClientGameParams;
-  preloader: Preloader;
-  state: ClientState;
+  socket!: Socket;
+  gameParams!: ClientGameParams;
+  preloader!: Preloader;
+  state: ClientState = emptyClientState;
   activeCards: ActiveCards = {};
-  plannedBattle: ClientPlannedBattle;
+  plannedBattle: ClientPlannedBattle = ClientPlannedBattleHelper.empty;
   interceptShipIds: Array<string> = [];
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
-  obj: StaticObjects = {};
+  background!: Background;
+  obj!: StaticObjects;
   retractCardsExist = false;
 
   constructor() {
@@ -74,11 +74,11 @@ export default class Game extends Phaser.Scene {
   init(data: InitData) {
     this.socket = data.socket;
     this.gameParams = data.gameParams;
-    this.obj.background = new Background(this);
+    this.background = new Background(this);
   }
 
   preload() {
-    this.preloader = new Preloader(this);
+    this.preloader = new Preloader(this)
     this.load.baseURL = `${environment.urls.api}/assets/`;
     backgroundConfig.orbs
       .map(o => o.name)
@@ -99,7 +99,7 @@ export default class Game extends Phaser.Scene {
       'torpedos1'
     ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
     [0, 1]
-      .concat(this.gameParams.preloadCardIds)
+      .concat(this.gameParams?.preloadCardIds ?? [])
       .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
     [
       'equipment',
@@ -151,16 +151,18 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
       this.obj.countdownIndicator?.update(countdown[0], countdown[1]);
     });
-    this.obj.background?.initInterface();
-    this.obj.actionPool = new ActionPool(this);
-    this.obj.combatRangeIndicator = new CombatRangeIndicator(this);
-    this.obj.continueButton = new ContinueButton(this);
-    this.obj.countdownIndicator = new CountdownIndicator(this);
-    this.obj.deck = new DeckCard(this);
-    this.obj.discardPile = new DiscardPile(this);
-    this.obj.exitButton = new ExitButton(this);
-    this.obj.maxCard = new MaxCard(this);
-    this.obj.missionCards = new MissionCards(this);
+    this.background.initInterface();
+    this.obj = {
+      actionPool: new ActionPool(this),
+      combatRangeIndicator: new CombatRangeIndicator(this),
+      continueButton: new ContinueButton(this),
+      countdownIndicator: new CountdownIndicator(this),
+      deck: new DeckCard(this),
+      discardPile: new DiscardPile(this),
+      exitButton: new ExitButton(this),
+      maxCard: new MaxCard(this),
+      missionCards: new MissionCards(this)
+    };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
 
@@ -192,15 +194,15 @@ export default class Game extends Phaser.Scene {
   }
 
   updateView() {
-    this.obj.actionPool?.update();
-    this.obj.background?.update();
-    this.obj.continueButton?.update();
-    this.obj.combatRangeIndicator?.update();
-    this.obj.deck?.update();
-    this.obj.discardPile?.update();
-    this.obj.exitButton?.update();
-    this.obj.missionCards?.update();
-    this.obj.maxCard?.hide();
+    this.background.update();
+    this.obj.actionPool.update();
+    this.obj.continueButton.update();
+    this.obj.combatRangeIndicator.update();
+    this.obj.deck.update();
+    this.obj.discardPile.update();
+    this.obj.exitButton.update();
+    this.obj.missionCards.update();
+    this.obj.maxCard.hide();
     this.updateHighlighting();
   }
 
@@ -209,12 +211,8 @@ export default class Game extends Phaser.Scene {
     this.activeCards.stack = undefined;
     this.activeCards.stackIndex = undefined;
     this.interceptShipIds = [];
-    this.plannedBattle = {
-      type: battleType ?? BattleType.None,
-      downsideCardsNum: 0,
-      upsideCardsNum: 0,
-      shipIds: []
-    };
+    this.plannedBattle = ClientPlannedBattleHelper.empty;
+    this.plannedBattle.type = battleType ?? this.plannedBattle.type;
   }
 
   private animateAttack(): boolean {
@@ -234,8 +232,8 @@ export default class Game extends Phaser.Scene {
     if (intervention) {
       this.cardStacks
         .find(cs => cs.uuid == intervention.sourceUUID)
-        .cards[intervention.sourceIndex].highlightSelected();
-      this.cardStacks.find(cs => cs.uuid == intervention.targetUUID).highlightSelected();
+        ?.cards[intervention.sourceIndex].highlightSelected();
+      this.cardStacks.find(cs => cs.uuid == intervention.targetUUID)?.highlightSelected();
     }
   }
 
@@ -253,7 +251,7 @@ export default class Game extends Phaser.Scene {
     this.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
-        let origin: CardImage;
+        let origin: CardImage | undefined;
         if (this.maximizedTacticCard?.cardId == cs.cards[0].id) {
           origin = this.maximizedTacticCard; // Origin is maximized tactic card
           this.maximizedTacticCard = undefined;

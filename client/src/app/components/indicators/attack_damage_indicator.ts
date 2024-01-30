@@ -11,13 +11,13 @@ export default class AttackDamageIndicator {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;
     ['pointDefense', 'shield', 'armour', 'damage']
-      .map(key => [key, attack[key]])
-      .filter(([key, value]) => key == 'damage' || value > 0)
-      .map(([key, value]) => [value, layoutConfig.attack.color[key]])
+      .map(key => [key, attack[key as keyof ClientAttack]])
+      .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
+      .map(([key, value]) => [value, layoutConfig.attack.color[key as keyof typeof layoutConfig.attack.color]])
       .forEach(
         ([value, color], index) =>
           this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
-            this.tween(this.createIndicator(value, color))
+            this.tween(this.createIndicator(<number>value, <string>color))
           ),
         this
       );

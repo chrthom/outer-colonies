@@ -1,5 +1,5 @@
 import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -62,9 +62,9 @@ export default class Prompt {
         'bzw. dein Deck oder Ablagestapel für eine Mission.';
     } else if (
       this.scene.plannedBattle.type == BattleType.Mission &&
-      !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)
+      !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)
     ) {
-      const missingCards = ClientPlannedBattle.missingCards(this.scene.plannedBattle);
+      const missingCards = ClientPlannedBattleHelper.missingCards(this.scene.plannedBattle);
       text = `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}!`;
     } else {
       text = `Wähle Schiffe für ${
@@ -95,7 +95,7 @@ export default class Prompt {
     );
   }
   private showGameOver(gameResult: ClientGameResult) {
-    let gameOverText: string;
+    let gameOverText = '';
     if (gameResult.won) {
       switch (gameResult.type) {
         case GameResultType.Countdown:

@@ -4,7 +4,7 @@ import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
 import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
-import { ClientPlannedBattle } from '../shared/interfaces/client_planned_battle';
+import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { matchmakingRoom } from './matchmaking';
