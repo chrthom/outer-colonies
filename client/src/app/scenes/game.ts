@@ -1,6 +1,10 @@
 import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
-import { ClientHandCard, ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import {
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '../../../../server/src/shared/interfaces/client_state';
 import {
   BattleType,
   MsgTypeInbound,
@@ -11,7 +15,9 @@ import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import MaxCard from '../components/card/max_card';
-import ClientPlannedBattle, { ClientPlannedBattleHelper } from '../../../../server/src/shared/interfaces/client_planned_battle';
+import ClientPlannedBattle, {
+  ClientPlannedBattleHelper
+} from '../../../../server/src/shared/interfaces/client_planned_battle';
 import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
@@ -78,7 +84,7 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    this.preloader = new Preloader(this)
+    this.preloader = new Preloader(this);
     this.load.baseURL = `${environment.urls.api}/assets/`;
     backgroundConfig.orbs
       .map(o => o.name)

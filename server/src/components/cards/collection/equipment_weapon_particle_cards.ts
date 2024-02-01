@@ -64,7 +64,7 @@ export class Card203 extends EquipmentCardRechargeable {
     );
   }
   protected override attackDamageBeforeReductions(target: CardStack) {
-    return target.type == CardType.Colony ? 0 : this.attackProfile.damage;
+    return target.type == CardType.Colony || !this.attackProfile ? 0 : this.attackProfile.damage;
   }
 }
 
@@ -128,6 +128,6 @@ export class Card438 extends EquipmentCardRechargeable {
     );
   }
   protected override attackDamageBeforeReductions(target: CardStack) {
-    return target.type == CardType.Colony ? 0 : this.attackProfile.damage;
+    return target.type == CardType.Colony || !this.attackProfile ? 0 : this.attackProfile.damage;
   }
 }

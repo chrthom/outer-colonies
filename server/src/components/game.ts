@@ -11,122 +11,127 @@ import { matchmakingRoom } from './matchmaking';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
-    const match = getSocketData(socket).match;
-    if (match && turnPhase == match.turnPhase) {
-      if (turnPhase == TurnPhase.Init) {
-        match.players[getSocketData(socket).playerNo].ready = true;
-        if (match.players[getSocketData(socket).opponentPlayerNo()].ready) initMatch(io, match);
-      } else if (
-        (getSocketData(socket).playerNo == match.pendingActionPlayerNo && match.intervention) ||
-        turnPhase == TurnPhase.Build ||
-        turnPhase == TurnPhase.Combat
-      ) {
-        if (match.intervention) {
-          match.skipIntervention();
-        } else {
-          switch (turnPhase) {
-            case TurnPhase.Build:
-              if (getSocketData(socket).playerNo == match.activePlayerNo) {
-                match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
-              } else {
-                match.prepareCombatPhase(<string[]>data);
-              }
-              break;
-            case TurnPhase.Combat:
-              match.processBattleRound();
-              break;
+    doWithMatchAndPlayer(socket, (match, player) => {
+      if (turnPhase == match.turnPhase) {
+        if (turnPhase == TurnPhase.Init) {
+          match.players[player.no].ready = true;
+          if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
+        } else if (
+          (getSocketData(socket).playerNo == match.pendingActionPlayerNo && match.intervention) ||
+          turnPhase == TurnPhase.Build ||
+          turnPhase == TurnPhase.Combat
+        ) {
+          if (match.intervention) {
+            match.skipIntervention();
+          } else {
+            switch (turnPhase) {
+              case TurnPhase.Build:
+                if (getSocketData(socket).playerNo == match.activePlayerNo) {
+                  match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
+                } else {
+                  match.prepareCombatPhase(<string[]>data);
+                }
+                break;
+              case TurnPhase.Combat:
+                match.processBattleRound();
+                break;
+            }
           }
         }
       }
-    }
-    emitState(io, match);
+      emitState(io, match);
+    });
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
-    const match = getSocketData(socket).match;
-    if (match) {
+    doWithMatchAndPlayer(socket, (match, player) => {
       if (!match.gameResult.gameOver) {
-        const player = getPlayer(socket);
         console.log(`Player ${player.name} disconnected from active game`);
         match.gameResult.setWinnerBySurrender(player);
       }
       emitState(io, match);
-    }
+    });
   });
   socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-    const match = getSocketData(socket).match;
-    const player = getPlayer(socket);
-    const handCard = getCardStackByUUID(player.hand, handCardUUID);
-    const target = getCardStackByUUID(match.allCardStacks, targetUUID);
-    if (!handCard) {
-      console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
-    } else if (!target) {
-      console.log(
-        `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
-      );
-    } else if (!handCard.hasValidTargets) {
-      console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
-    } else if (!handCard.canBeAttachedTo(target)) {
-      console.log(
-        `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
-      );
-    } else {
-      player.playHandCard(handCard, target);
-    }
-    emitState(io, match);
+    doWithMatchAndPlayer(socket, (match, player) => {
+      const handCard = getCardStackByUUID(player.hand, handCardUUID);
+      const target = getCardStackByUUID(match.allCardStacks, targetUUID);
+      if (!handCard) {
+        console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
+      } else if (!target) {
+        console.log(
+          `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
+        );
+      } else if (!handCard.hasValidTargets) {
+        console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
+      } else if (!handCard.canBeAttachedTo(target)) {
+        console.log(
+          `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
+        );
+      } else {
+        player.playHandCard(handCard, target);
+      }
+      emitState(io, match);
+    });
   });
   socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
-    const match = getSocketData(socket).match;
-    const player = getPlayer(socket);
-    const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
-    const targetCardStack =
-      rootCardStack?.cardStacks.length > cardIndex ? rootCardStack.cardStacks[cardIndex] : undefined;
-    if (!rootCardStack) {
-      console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
-    } else if (!targetCardStack) {
-      console.log(
-        `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`
-      );
-    } else if (!targetCardStack.canBeRetracted) {
-      console.log(`WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`);
-    } else {
-      targetCardStack.retract();
-    }
-    emitState(io, match);
+    doWithMatchAndPlayer(socket, (match, player) => {
+      const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
+      const targetCardStack =
+        rootCardStack && rootCardStack.cardStacks.length > cardIndex
+          ? rootCardStack.cardStacks[cardIndex]
+          : undefined;
+      if (!rootCardStack) {
+        console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
+      } else if (!targetCardStack) {
+        console.log(
+          `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`
+        );
+      } else if (!targetCardStack.canBeRetracted) {
+        console.log(
+          `WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`
+        );
+      } else {
+        targetCardStack.retract();
+      }
+      emitState(io, match);
+    });
   });
   socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
-    const match = getSocketData(socket).match;
-    const player = getPlayer(socket);
-    const handCard = getCardStackByUUID(player.hand, handCardUUID);
-    if (!handCard) {
-      console.log(`WARN: ${player.name} tried to discard non-existing card ${handCardUUID}`);
-    } else if (player.handCardLimit >= player.hand.length) {
-      console.log(`WARN: ${player.name} tried to discard card dispite not over hand card limit`);
-    } else {
-      player.discardHandCards(handCardUUID);
-      match.prepareEndPhase();
-    }
-    emitState(io, match);
+    doWithMatchAndPlayer(socket, (match, player) => {
+      const handCard = getCardStackByUUID(player.hand, handCardUUID);
+      if (!handCard) {
+        console.log(`WARN: ${player.name} tried to discard non-existing card ${handCardUUID}`);
+      } else if (player.handCardLimit >= player.hand.length) {
+        console.log(`WARN: ${player.name} tried to discard card dispite not over hand card limit`);
+      } else {
+        player.discardHandCards(handCardUUID);
+        match.prepareEndPhase();
+      }
+      emitState(io, match);
+    });
   });
   socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
-    const playerShips = match.battle.ships[match.pendingActionPlayerNo];
-    const srcShip = playerShips.find(cs => cs.uuid == srcId);
-    const srcWeapon = srcShip?.cardStacks[srcIndex];
-    const opponentShips = match.battle.ships[match.waitingPlayerNo];
-    const target = opponentShips.find(cs => cs.uuid == targetId);
-    if (!srcWeapon) {
-      console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
-    } else if (!target) {
-      console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
-    } else if (!srcWeapon.canAttack) {
-      console.log(
-        `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
-      );
-    } else {
-      match.planAttack(srcWeapon, target);
+    if (match && player) {
+      const playerShips = match.battle.ships[match.pendingActionPlayerNo];
+      const srcShip = playerShips.find(cs => cs.uuid == srcId);
+      const srcWeapon = srcShip?.cardStacks[srcIndex];
+      const opponentShips = match.battle.ships[match.waitingPlayerNo];
+      const target = opponentShips.find(cs => cs.uuid == targetId);
+      if (!srcWeapon) {
+        console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
+      } else if (!target) {
+        console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
+      } else if (!srcWeapon.canAttack) {
+        console.log(
+          `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
+        );
+      } else {
+        match.planAttack(srcWeapon, target);
+      }
+      emitState(io, match);
     }
-    emitState(io, match);
   });
 }
 
@@ -135,10 +140,12 @@ export function gameCron(io: Server) {
     .filter(room => !room[1].has(room[0]) && room[0] != matchmakingRoom)
     .map(r => {
       const [clientId] = r[1];
-      return getSocketData(io.sockets.sockets.get(clientId))?.match;
+      return io.sockets.sockets.get(clientId);
     })
-    .filter(match => match?.players[0].ready && match?.players[1].ready)
-    .filter(match => !match.gameResult.gameOver)
+    .filter((socket): socket is Socket => !!socket)
+    .map(socket => getSocketData(socket).match)
+    .filter((match): match is Match => !!match)
+    .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
     .forEach(match => {
       if (--match.pendingActionPlayer.countdown <= 0) {
         match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
@@ -156,16 +163,24 @@ export function gameCron(io: Server) {
     });
 }
 
+function doWithMatchAndPlayer(socket: Socket, f: (m: Match, p: Player) => void) {
+  const match = getSocketData(socket).match;
+  const player = getPlayer(socket);
+  if (match && player) f(match, player);
+  else console.log(`WARN: Match or player in socket ${socket.id} not initialized`);
+}
+
 function getSocketData(socket: Socket): SocketData {
   return <SocketData>socket.data;
 }
 
-function getSocket(io: Server, match: Match, playerNo: number): Socket {
+function getSocket(io: Server, match: Match, playerNo: number): Socket | undefined {
   return io.sockets.sockets.get(match.players[playerNo].socketId);
 }
 
-function getPlayer(socket: Socket): Player {
-  return getSocketData(socket).match.players[getSocketData(socket).playerNo];
+function getPlayer(socket: Socket): Player | undefined {
+  const playerNo = getSocketData(socket).playerNo;
+  return playerNo ? getSocketData(socket).match?.players[playerNo] : undefined;
 }
 
 function emitState(io: Server, match: Match) {

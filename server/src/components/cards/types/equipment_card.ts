@@ -25,7 +25,7 @@ export default abstract class EquipmentCard extends Card {
     return Boolean(this.attackProfile);
   }
   override isInRange(range: number): boolean {
-    return this.attackProfile.range >= range;
+    return !!this.attackProfile && this.attackProfile.range >= range;
   }
   onEnterGame() {}
   onLeaveGame() {}
@@ -53,7 +53,7 @@ export default abstract class EquipmentCard extends Card {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected attackDamageBeforeReductions(target: CardStack) {
-    return this.attackProfile.damage;
+    return this.attackProfile?.damage ?? 0;
   }
   protected attackDamageAfterReductions(target: CardStack, damage: number) {
     return damage;
@@ -79,7 +79,7 @@ export default abstract class EquipmentCard extends Card {
       .filter(cs => fromProfile(cs.card.profile) && cs.canDefend(target))
       .sort((a, b) => a.deactivationPriority - b.deactivationPriority)
       .pop();
-    if (attackResult.damage == 0) {
+    if (attackResult.damage == 0 || !this.attackProfile) {
       return attackResult;
     } else if (fromProfile(this.attackProfile) == 0 || !bestDefense) {
       switch (defenseType) {

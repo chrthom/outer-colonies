@@ -26,7 +26,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         validTargets: c.validTargets.map(cs => cs.uuid),
         ownedByPlayer: c.player.no == playerNo
       };
-    }, this);
+    });
   };
   const player = match.players[playerNo];
   const opponent = match.players[opponentPlayerNo(playerNo)];
@@ -91,7 +91,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     range: match.battle.range,
     recentAttack: match.battle.recentAttack
   };
-  const intervention: ClientIntervention = match.intervention
+  const intervention: ClientIntervention | undefined = match.intervention
     ? {
         type: match.intervention.type,
         attack:
@@ -113,7 +113,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     deckSize: opponent.deck.length,
     discardPileIds: opponent.discardPile.map(c => c.id)
   };
-  const gameResult: ClientGameResult = match.gameResult.gameOver
+  const gameResult: ClientGameResult | undefined = match.gameResult.gameOver
     ? {
         won: match.gameResult.winnerNo == player.no,
         type: match.gameResult.type,
