@@ -14,7 +14,7 @@ export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
   return [a1, a2];
 }
 
-export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack {
+export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack | undefined {
   return cardStacks.find(cs => cs.uuid == uuid);
 }
 

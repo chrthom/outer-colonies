@@ -12,6 +12,11 @@ export interface AuthLoginRequest {
   password: string;
 }
 
+export interface AuthRegistrationResponse {
+  id: number;
+  username: string;
+}
+
 export interface AuthLoginResponse {
   sessionToken: string;
   username: string;
@@ -73,7 +78,7 @@ interface ItemListResponseElement {
 }
 
 export interface ItemListResponseBox extends ItemListResponseElement {
-  message: string;
+  message?: string;
   sol: number[];
   cards: number[];
   boosters: number[];

@@ -1,12 +1,14 @@
 import { BattleType } from '../config/enums';
 import { rules } from '../config/rules';
 
-export default interface ClientPlannedBattle {
+interface ClientPlannedBattle {
   type: BattleType;
   downsideCardsNum: number;
   upsideCardsNum: number;
   shipIds: string[];
 }
+
+export default ClientPlannedBattle;
 
 export class ClientPlannedBattleHelper {
   static cardLimitReached(plannedBattle: ClientPlannedBattle): boolean {

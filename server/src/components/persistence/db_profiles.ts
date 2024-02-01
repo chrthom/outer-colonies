@@ -29,7 +29,7 @@ export default class DBProfilesDAO {
   }
   static async decreaseSol(userId: number, sol: number): Promise<boolean> {
     const user = await this.getByUserId(userId);
-    if (user.sol >= sol) {
+    if (user && user.sol >= sol) {
       await this.increaseSol(userId, -sol);
       return true;
     } else {

@@ -46,7 +46,7 @@ export class Card401 extends EquipmentCardRechargeable {
   protected override attackDamageBeforeReductions(target: CardStack) {
     const damage = Math.max(
       0,
-      this.attackProfile.damage - target.profile.speed * this.damageReductionPerSpeedPoint
+      (this.attackProfile?.damage ?? 0) - target.profile.speed * this.damageReductionPerSpeedPoint
     );
     return target.zone == Zone.Colony ? 0 : damage;
   }

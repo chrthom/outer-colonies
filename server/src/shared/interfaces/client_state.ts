@@ -81,7 +81,7 @@ export interface ClientEvent {
 
 export interface ClientGameResult {
   won: boolean;
-  type: GameResultType;
+  type?: GameResultType;
   sol: number;
 }
 

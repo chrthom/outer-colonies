@@ -1,4 +1,4 @@
-import { FactionLayout, FactionLayoutZone, layoutConfig } from '../../config/layout';
+import { FactionLayoutZone, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
@@ -178,7 +178,7 @@ export default class CardStack {
   private zoneLayout(): FactionLayoutZone {
     const zoneLayout = this.data.ownedByPlayer ? layoutConfig.player : layoutConfig.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
-    else if (this.data.zone = Zone.Oribital) return zoneLayout.orbital;
+    else if ((this.data.zone = Zone.Oribital)) return zoneLayout.orbital;
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {

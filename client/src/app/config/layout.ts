@@ -149,7 +149,8 @@ class LayoutConfig {
       x: 120,
       y: 670,
       maxWidth: 650,
-      corners: { // TODO: Not used
+      corners: {
+        // TODO: Not used
         xLeft: 10,
         xRight: 1760,
         yTop: 397,
@@ -229,14 +230,14 @@ class LayoutConfig {
   };
 }
 
-export interface FactionLayout {
+interface FactionLayout {
   color: string;
   colony: FactionLayoutZone;
   orbital: FactionLayoutZone;
   neutral: FactionLayoutZone;
 }
 
-export interface FactionLayoutPlayer extends FactionLayout {
+interface FactionLayoutPlayer extends FactionLayout {
   hand: FactionLayoutHand;
 }
 

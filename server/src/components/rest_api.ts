@@ -6,15 +6,17 @@ import {
   AuthLoginRequest,
   AuthLoginResponse,
   AuthRegisterRequest,
+  AuthRegistrationResponse,
   DailyGetResponse,
   DeckCard,
   DeckListResponse,
   ItemListResponse,
+  ItemListResponseBox,
   OpenItemResponse,
   ProfileGetResponse
 } from '../shared/interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
-import DBCredentialsDAO, { DBCredential } from './persistence/db_credentials';
+import DBCredentialsDAO, { DBCredentialWithSessionToken } from './persistence/db_credentials';
 import CardCollection from './cards/collection/card_collection';
 import Card from './cards/card';
 import config from 'config';
@@ -26,7 +28,11 @@ import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import EquipmentCard from './cards/types/equipment_card';
 
-function performWithSessionTokenCheck(req: Request, res: Response, f: (u: DBCredential) => void) {
+function performWithSessionTokenCheck(
+  req: Request,
+  res: Response,
+  f: (u: DBCredentialWithSessionToken) => void
+) {
   const sessionToken = req.header('session-token');
   if (sessionToken) {
     DBCredentialsDAO.getBySessionToken(sessionToken).then(u => (u ? f(u) : res.sendStatus(403)));
@@ -54,8 +60,8 @@ export default function restAPI(app: Express) {
             res.sendStatus(409);
           } else {
             Auth.register(registerRequest).then(credential => {
-              const payload: AuthLoginResponse = {
-                sessionToken: credential.sessionToken,
+              const payload: AuthRegistrationResponse = {
+                id: credential.userId,
                 username: credential.username
               };
               res.status(201).send(payload);
@@ -69,12 +75,15 @@ export default function restAPI(app: Express) {
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
-      if (!usernameAndToken) res.sendStatus(401);
-      const payload: AuthLoginResponse = {
-        sessionToken: usernameAndToken[1],
-        username: usernameAndToken[0]
-      };
-      res.send(payload);
+      if (!usernameAndToken) {
+        res.sendStatus(401);
+      } else {
+        const payload: AuthLoginResponse = {
+          sessionToken: usernameAndToken[1],
+          username: usernameAndToken[0]
+        };
+        res.send(payload);
+      }
     });
   });
 
@@ -114,7 +123,7 @@ export default function restAPI(app: Express) {
   // List all cards
   app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {
-      const cardData: Card = CardCollection.cards[c.cardId];
+      const cardData: Card = CardCollection.cards[c.cardId as keyof typeof CardCollection.cards];
       let defenseIcon: string | undefined;
       if (cardData.profile.armour > 0) defenseIcon = `armour_${cardData.profile.armour}`;
       else if (cardData.profile.shield > 0) defenseIcon = `shield_${cardData.profile.shield}`;
@@ -171,9 +180,13 @@ export default function restAPI(app: Express) {
 
   // Get user profile
   app.get('/api/profile', (req, res) => {
-    const sendProfileResponse = (profile: DBProfile) => {
-      const payload: ProfileGetResponse = profile;
-      res.send(payload);
+    const sendProfileResponse = (profile: DBProfile | undefined) => {
+      if (profile) {
+        const payload: ProfileGetResponse = profile;
+        res.send(payload);
+      } else {
+        res.sendStatus(404);
+      }
     };
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse);
@@ -182,9 +195,13 @@ export default function restAPI(app: Express) {
 
   // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
-    const sendDailyResponse = (daily: DBDaily) => {
-      const payload: DailyGetResponse = daily;
-      res.send(payload);
+    const sendDailyResponse = (daily: DBDaily | undefined) => {
+      if (daily) {
+        const payload: DailyGetResponse = daily;
+        res.send(payload);
+      } else {
+        res.sendStatus(404);
+      }
     };
     performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse);
@@ -195,13 +212,14 @@ export default function restAPI(app: Express) {
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
       const content = <DBItemBoxContent[]>JSON.parse(i.content);
-      return {
+      const payload: ItemListResponseBox = {
         itemId: i.itemId,
         message: i.message,
         sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
         cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
         boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
       };
+      return payload;
     };
     const toBooster = (i: DBItem) => {
       return {

@@ -1,4 +1,4 @@
-import mariadb from 'mariadb';
+import mariadb, { SqlError } from 'mariadb';
 import config from 'config';
 
 export default class DBConnection {
@@ -17,13 +17,13 @@ export default class DBConnection {
     });
   }
   async query<T>(query: string, noRetry?: boolean): Promise<T> {
-    let conn: mariadb.PoolConnection;
+    let conn: mariadb.PoolConnection | undefined = undefined;
     try {
       conn = await this.pool.getConnection();
       return conn.query(query);
     } catch (err) {
-      console.log(`WARN: DB error ${err.code}`);
-      if (err.code == 'ER_GET_CONNECTION_TIMEOUT') {
+      console.log(`WARN: DB error ${err}`);
+      if (err instanceof SqlError && err.code == 'ER_GET_CONNECTION_TIMEOUT') {
         return this.query<T>(query);
       } else if (!noRetry) {
         return this.query(query, true);

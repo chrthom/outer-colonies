@@ -376,7 +376,7 @@ export default class CardCollection {
     sd
       .map(c => Array(c[0]).fill(c[1]))
       .flat()
-      .map(cid => <Card>this.cards[cid])
+      .map(cid => <Card>this.cards[cid as keyof typeof this.cards])
   );
 
   static generateBoosterContent(edition: number): Card[] {
