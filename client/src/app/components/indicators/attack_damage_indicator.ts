@@ -16,7 +16,7 @@ export default class AttackDamageIndicator {
       .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
       .map(([key, value]) => [
         value,
-        designConfig.attackColor[key as keyof typeof designConfig.attackColor]
+        designConfig.color[key as keyof typeof designConfig.color]
       ])
       .forEach(
         ([value, color], index) =>
@@ -66,7 +66,7 @@ export default class AttackDamageIndicator {
     return this.scene.add
       .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
       .setFontSize(layoutConfig.fontSize.large)
-      .setFontFamily(designConfig.font.captionFamily)
+      .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)
       .setAlign('center')
       .setOrigin(0.5, 1)

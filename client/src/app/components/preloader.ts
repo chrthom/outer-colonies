@@ -10,7 +10,7 @@ export default class Preloader {
     this.progressBar = scene.add.graphics();
     this.progressBox = scene.add
       .graphics()
-      .fillStyle(designConfig.colors.primary, designConfig.colors.fadedAlpha)
+      .fillStyle(designConfig.tint.primary, designConfig.alpha.faded)
       .fillRect(
         layoutConfig.load.preloader.x - layoutConfig.load.preloader.width / 2 - layoutConfig.load.preloader.boxPadding,
         layoutConfig.load.preloader.y - layoutConfig.load.preloader.boxPadding,
@@ -24,14 +24,14 @@ export default class Preloader {
         'Lade Spieldaten...'
       )
       .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.font.textFamily)
-      .setColor(designConfig.font.color)
+      .setFontFamily(designConfig.fontFamily.text)
+      .setColor(designConfig.color.neutral)
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     scene.load.on('progress', (value: number) => {
       this.progressBar
         .clear()
-        .fillStyle(designConfig.colors.primary, designConfig.colors.alpha)
+        .fillStyle(designConfig.tint.primary, designConfig.alpha.normal)
         .fillRect(
           layoutConfig.load.preloader.x - layoutConfig.load.preloader.width / 2,
           layoutConfig.load.preloader.y,

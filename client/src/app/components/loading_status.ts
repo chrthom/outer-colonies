@@ -14,8 +14,8 @@ export default class LoadingStatus {
         'Verbinde mit Server...'
       )
       .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.font.textFamily)
-      .setColor(designConfig.font.color)
+      .setFontFamily(designConfig.fontFamily.text)
+      .setColor(designConfig.color.neutral)
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     this.createLoadingAnimation();
@@ -39,9 +39,9 @@ export default class LoadingStatus {
         Phaser.Math.DEG_TO_RAD * angle
       );
       const bar = this.scene.add
-        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.colors.primary)
+        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.primary)
         .setAngle(angle)
-        .setAlpha(designConfig.colors.alpha);
+        .setAlpha(designConfig.alpha.normal);
       this.bars.push(bar);
       angle += 30;
     }
@@ -59,9 +59,9 @@ export default class LoadingStatus {
           const tween = this.scene.tweens.add({
             repeat: -1,
             targets: bar,
-            alpha: designConfig.colors.fadedAlpha,
+            alpha: designConfig.tint.faded,
             duration: 400,
-            onStart: () => (bar.alpha = designConfig.colors.alpha)
+            onStart: () => (bar.alpha = designConfig.alpha.normal)
           });
           tweens.push(tween);
         }

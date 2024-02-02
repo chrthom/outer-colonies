@@ -11,8 +11,8 @@ export default class VersonIndicator {
         `Phoebe (v2.0.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.font.captionFamily)
-      .setColor(designConfig.font.color)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 1);
   }

@@ -26,8 +26,8 @@ export default class ValueIndicator {
           this.y(cardY),
           64,
           32,
-          critical ? designConfig.colors.secondary : designConfig.colors.primary,
-          designConfig.colors.alpha
+          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layoutConfig.depth.indicators);
@@ -39,8 +39,8 @@ export default class ValueIndicator {
           12,
           16,
           22,
-          critical ? designConfig.colors.secondary : designConfig.colors.primary,
-          designConfig.colors.alpha
+          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layoutConfig.depth.indicators);
@@ -48,8 +48,8 @@ export default class ValueIndicator {
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
       .setFontSize(layoutConfig.fontSize.small)
-      .setFontFamily(designConfig.font.captionFamily)
-      .setColor(designConfig.font.colorHover)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.hover)
       .setAlign('center')
       .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.indicators);

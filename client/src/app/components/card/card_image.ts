@@ -59,27 +59,27 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.ui.maxedTacticCard.x,
-      y: layoutConfig.ui.maxedTacticCard.y,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
       angle: 0,
       scale: layoutConfig.game.cards.scale.max
     });
   }
   highlightDisabled() {
     this.highlightReset();
-    this.image.setTint(designConfig.colors.fadedTint);
+    this.image.setTint(designConfig.tint.faded);
   }
   highlightSelectable() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(designConfig.colors.neutral);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.neutral);
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(designConfig.colors.secondary);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.secondary);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
-    this.image.setTint(designConfig.colors.neutral);
+    this.image.setTint(designConfig.tint.neutral);
   }
   setCardId(cardId: number) {
     this.cardId = cardId;

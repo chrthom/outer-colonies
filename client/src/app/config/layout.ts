@@ -30,23 +30,9 @@ class LayoutConfig {
   
 
   readonly ui = {
-    actionPool: {
-      x: 2370,
-      y: 1040,
-      yDistance: -55
-    },
     combatRange: {
       x: 1760,
       y: 730
-    },
-    continueButton: {
-      x: 2370,
-      y: 60,
-      xTextOffset: -120
-    },
-    countdownIndicator: {
-      x: 2350,
-      y: 600
     },
     deck: {
       x: 1930,
@@ -57,34 +43,11 @@ class LayoutConfig {
       y: 1070,
       yOpponent: -400
     },
-    exitButton: {
-      x: 2350,
-      y: 450,
-      xTextOffset: -30,
-      yTextOffset: -4,
-      yConfirmOffset: 35
-    },
-    maxCard: {
-      x: 2110,
-      y: 820
-    },
-    maxedTacticCard: {
-      x: 1200,
-      y: 900
-    },
     missionCards: {
       x: 1760,
       y: 650,
       xDistance: 20,
       yDistance: 10
-    },
-    prompt: {
-      box: {
-        x: 1850,
-        y: 120
-      },
-      x: 1875,
-      y: 165
     }
   }
   readonly opponent: FactionLayout = {

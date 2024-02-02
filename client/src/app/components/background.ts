@@ -33,7 +33,7 @@ export default class Background {
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
       .setOrigin(0, 0)
       .setDepth(layoutConfig.depth.background)
-      .setAlpha(designConfig.colors.fadedAlpha);
+      .setAlpha(designConfig.alpha.faded);
     this.sunImage = scene.add
       .image(
         this.sunCoordinatesAndScale(this.currentRing)[0],
@@ -74,9 +74,9 @@ export default class Background {
       this.scene.add
         .text(c.xLeft, c.yBottom, caption)
         .setFontSize(layoutConfig.fontSize.normal)
-        .setFontFamily(designConfig.font.captionFamily)
+        .setFontFamily(designConfig.fontFamily.caption)
         .setColor(opponent ? layoutConfig.opponent.color : layoutConfig.player.color)
-        .setAlpha(designConfig.colors.alpha)
+        .setAlpha(designConfig.alpha.normal)
         .setAlign('right')
         .setOrigin(0, 1);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
@@ -302,8 +302,8 @@ export default class Background {
   private getTint(angle: number): [number, number, number, number] {
     const tintCorner = (corner: number) =>
       angle >= (corner - 0.5) * 90 && angle < (corner + 0.5) * 90
-        ? designConfig.colors.neutral
-        : designConfig.colors.fadedTint;
+        ? designConfig.tint.neutral
+        : designConfig.tint.faded;
     return <[number, number, number, number]>[0, 2, 3, 1].map(tintCorner);
   }
 

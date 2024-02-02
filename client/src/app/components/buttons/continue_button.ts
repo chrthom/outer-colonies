@@ -49,13 +49,13 @@ export default class ContinueButton {
     };
     this.text = scene.add
       .text(
-        layoutConfig.ui.continueButton.x + layoutConfig.ui.continueButton.xTextOffset,
-        layoutConfig.ui.continueButton.y,
+        layoutConfig.game.ui.continueButton.x + layoutConfig.game.ui.continueButton.xTextOffset,
+        layoutConfig.game.ui.continueButton.y,
         ['']
       )
       .setFontSize(layoutConfig.fontSize.large)
-      .setFontFamily(designConfig.font.captionFamily)
-      .setColor(designConfig.font.color)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
@@ -63,8 +63,8 @@ export default class ContinueButton {
       o =>
         o
           .on('pointerdown', () => this.onClickAction())
-          .on('pointerover', () => this.text.setColor(designConfig.font.colorHover))
-          .on('pointerout', () => this.text.setColor(designConfig.font.color)),
+          .on('pointerover', () => this.text.setColor(designConfig.color.hover))
+          .on('pointerout', () => this.text.setColor(designConfig.color.neutral)),
       this
     );
     this.scene.input.keyboard
@@ -120,7 +120,7 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(layoutConfig.ui.continueButton.x, layoutConfig.ui.continueButton.y, `button_${name}`)
+      .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

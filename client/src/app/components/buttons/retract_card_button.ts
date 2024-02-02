@@ -23,7 +23,7 @@ export default class RetractCardButton {
         'icon_retract_card'
       )
       .setOrigin(0.5, 0.5)
-      .setAlpha(designConfig.colors.alpha)
+      .setAlpha(designConfig.alpha.normal)
       .setDepth(layoutConfig.depth.indicators)
       .setInteractive()
       .on('pointerover', () => this.setTintHover())
@@ -36,22 +36,22 @@ export default class RetractCardButton {
   }
   setTintNormal() {
     this.image.setTint(
-      designConfig.colors.primary,
-      designConfig.colors.neutral,
-      designConfig.colors.primary,
-      designConfig.colors.primary
+      designConfig.tint.primary,
+      designConfig.tint.neutral,
+      designConfig.tint.primary,
+      designConfig.tint.primary
     );
   }
   setTintCritical() {
     this.image.setTint(
-      designConfig.colors.secondary,
-      designConfig.colors.neutral,
-      designConfig.colors.secondary,
-      designConfig.colors.secondary
+      designConfig.tint.secondary,
+      designConfig.tint.neutral,
+      designConfig.tint.secondary,
+      designConfig.tint.secondary
     );
   }
   setTintHover() {
-    this.image.setTint(designConfig.colors.neutral);
+    this.image.setTint(designConfig.tint.neutral);
   }
   tween(cardX: number, cardY: number) {
     this.scene.tweens.add({

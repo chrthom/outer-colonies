@@ -8,10 +8,10 @@ export default class CountdownIndicator {
   constructor(scene: Game) {
     this.scene = scene;
     this.text = this.scene.add
-      .text(layoutConfig.ui.countdownIndicator.x, layoutConfig.ui.countdownIndicator.y, '')
+      .text(layoutConfig.game.ui.countdownIndicator.x, layoutConfig.game.ui.countdownIndicator.y, '')
       .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.font.captionFamily)
-      .setColor(designConfig.font.color)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5);
   }
@@ -22,7 +22,7 @@ export default class CountdownIndicator {
       ${state?.name} ${this.formatCountdown(playerCountdown)}
     `);
     if (playerCountdown < 120 || opponentCountdown < 120) {
-      this.text.setColor(designConfig.font.colorWarn);
+      this.text.setColor(designConfig.color.warn);
     }
   }
   private formatCountdown(countdown: number): string {

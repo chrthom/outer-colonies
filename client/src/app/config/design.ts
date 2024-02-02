@@ -1,26 +1,29 @@
 class DesignConfig {
-  readonly colors = {
-    alpha: 0.8,
-    fadedAlpha: 0.3,
-    fadedTint: 0x666666,
+  readonly alpha = {
+    normal: 0.8,
+    faded: 0.3
+  }
+  readonly tint = {
+    faded: 0x666666,
     neutral: 0xffffff,
     primary: 0x119999,
     secondary: 0x991111
-
+  }
+  readonly fontFamily = {
+    caption: 'latin-modern-mono-caps',
+    text: 'latin-modern-sans',
   };
-  readonly font = {
-    captionFamily: 'latin-modern-mono-caps',
-    textFamily: 'latin-modern-sans',
-    color: '#ffffff',
-    colorHover: '#eeeeaa',
-    colorWarn: '#991111'
-  };
-  readonly attackColor = {
+  readonly color = {
+    neutral: '#ffffff',
+    hover: '#eeeeaa',
+    warn: '#991111',
     pointDefense: '#999911',
     shield: '#119999',
     armour: '#999999',
-    damage: '#991111'
-  }
+    damage: '#991111',
+    player: '#119999',
+    opponent: '#991111'
+  };
 }
 
 export const designConfig = new DesignConfig();

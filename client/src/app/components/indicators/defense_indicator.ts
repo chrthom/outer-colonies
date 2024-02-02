@@ -18,12 +18,12 @@ export default class DefenseIndicator {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
     this.images = defenseIcons.map((icon, index) => {
-      const color = icon.depleted ? designConfig.colors.secondary : designConfig.colors.primary;
+      const color = icon.depleted ? designConfig.tint.secondary : designConfig.tint.primary;
       return scene.add
         .image(this.x(cardX), this.y(cardY, index), `icon_${icon.icon}`)
         .setOrigin(0.5, 0.5)
-        .setTint(color, designConfig.colors.neutral, color, color)
-        .setAlpha(designConfig.colors.alpha)
+        .setTint(color, designConfig.tint.neutral, color, color)
+        .setAlpha(designConfig.alpha.normal)
         .setDepth(layoutConfig.depth.indicators);
     });
   }

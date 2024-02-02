@@ -16,18 +16,18 @@ export default class ActionPool {
     this.images = this.scene.state.actionPool.map((action, index) =>
       this.scene.add
         .image(
-          layoutConfig.ui.actionPool.x,
-          layoutConfig.ui.actionPool.y + index * layoutConfig.ui.actionPool.yDistance,
+          layoutConfig.game.ui.actionPool.x,
+          layoutConfig.game.ui.actionPool.y + index * layoutConfig.game.ui.actionPool.yDistance,
           `icon_${action}`
         )
         .setOrigin(0.5, 0.5)
         .setTint(
-          designConfig.colors.primary,
-          designConfig.colors.neutral,
-          designConfig.colors.primary,
-          designConfig.colors.primary
+          designConfig.tint.primary,
+          designConfig.tint.neutral,
+          designConfig.tint.primary,
+          designConfig.tint.primary
         )
-        .setAlpha(designConfig.colors.alpha)
+        .setAlpha(designConfig.alpha.normal)
     );
   }
 }
