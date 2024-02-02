@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -17,7 +18,7 @@ export default class CardImage {
       image
         .setOrigin(0.5, 1)
         .setAngle(opponentCard ? 180 : 0)
-        .setScale(scale ? scale : layoutConfig.cards.scale.normal);
+        .setScale(scale ? scale : layoutConfig.game.cards.scale.normal);
     this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
     this.image = setImageProps(
       scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
@@ -36,14 +37,14 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
-      x: toDeck ? layoutConfig.deck.x : layoutConfig.discardPile.x,
+      x: toDeck ? layoutConfig.ui.deck.x : layoutConfig.ui.discardPile.x,
       y: this.ownedByPlayer
         ? toDeck
-          ? layoutConfig.deck.y
-          : layoutConfig.discardPile.y
-        : layoutConfig.discardPile.yOpponent,
+          ? layoutConfig.ui.deck.y
+          : layoutConfig.ui.discardPile.y
+        : layoutConfig.ui.discardPile.yOpponent,
       angle: this.ownedByPlayer ? 0 : 180,
-      scale: layoutConfig.cards.scale.normal,
+      scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
         if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
         this.destroy();
@@ -58,27 +59,27 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.maxedTacticCard.x,
-      y: layoutConfig.maxedTacticCard.y,
+      x: layoutConfig.ui.maxedTacticCard.x,
+      y: layoutConfig.ui.maxedTacticCard.y,
       angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale
+      scale: layoutConfig.game.cards.scale.max
     });
   }
   highlightDisabled() {
     this.highlightReset();
-    this.image.setTint(layoutConfig.colors.fadedTint);
+    this.image.setTint(designConfig.colors.fadedTint);
   }
   highlightSelectable() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.neutral);
+    this.imageHighlight.setVisible(true).setTint(designConfig.colors.neutral);
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.secondary);
+    this.imageHighlight.setVisible(true).setTint(designConfig.colors.secondary);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
-    this.image.setTint(layoutConfig.colors.neutral);
+    this.image.setTint(designConfig.colors.neutral);
   }
   setCardId(cardId: number) {
     this.cardId = cardId;

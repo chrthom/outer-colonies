@@ -15,11 +15,11 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layoutConfig.missionCards.x + index * layoutConfig.missionCards.xDistance,
-          layoutConfig.missionCards.y + index * layoutConfig.missionCards.yDistance,
+          layoutConfig.ui.missionCards.x + index * layoutConfig.ui.missionCards.xDistance,
+          layoutConfig.ui.missionCards.y + index * layoutConfig.ui.missionCards.yDistance,
           id,
           false,
-          layoutConfig.cards.scale.min
+          layoutConfig.game.cards.scale.min
         );
       });
       this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());

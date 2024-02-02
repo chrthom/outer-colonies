@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
@@ -17,12 +18,12 @@ export default class RetractCardButton {
     this.scene = scene;
     this.image = scene.add
       .image(
-        cardX + layoutConfig.cards.retractCardButton.xOffset,
-        cardY + layoutConfig.cards.retractCardButton.yOffset,
+        cardX + layoutConfig.game.cards.retractCardButton.xOffset,
+        cardY + layoutConfig.game.cards.retractCardButton.yOffset,
         'icon_retract_card'
       )
       .setOrigin(0.5, 0.5)
-      .setAlpha(layoutConfig.colors.alpha)
+      .setAlpha(designConfig.colors.alpha)
       .setDepth(layoutConfig.depth.indicators)
       .setInteractive()
       .on('pointerover', () => this.setTintHover())
@@ -35,29 +36,29 @@ export default class RetractCardButton {
   }
   setTintNormal() {
     this.image.setTint(
-      layoutConfig.colors.primary,
-      layoutConfig.colors.neutral,
-      layoutConfig.colors.primary,
-      layoutConfig.colors.primary
+      designConfig.colors.primary,
+      designConfig.colors.neutral,
+      designConfig.colors.primary,
+      designConfig.colors.primary
     );
   }
   setTintCritical() {
     this.image.setTint(
-      layoutConfig.colors.secondary,
-      layoutConfig.colors.neutral,
-      layoutConfig.colors.secondary,
-      layoutConfig.colors.secondary
+      designConfig.colors.secondary,
+      designConfig.colors.neutral,
+      designConfig.colors.secondary,
+      designConfig.colors.secondary
     );
   }
   setTintHover() {
-    this.image.setTint(layoutConfig.colors.neutral);
+    this.image.setTint(designConfig.colors.neutral);
   }
   tween(cardX: number, cardY: number) {
     this.scene.tweens.add({
       targets: this.image,
       duration: animationConfig.duration.move,
-      x: cardX + layoutConfig.cards.retractCardButton.xOffset,
-      y: cardY + layoutConfig.cards.retractCardButton.yOffset
+      x: cardX + layoutConfig.game.cards.retractCardButton.xOffset,
+      y: cardY + layoutConfig.game.cards.retractCardButton.yOffset
     });
   }
 }

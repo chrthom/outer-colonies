@@ -11,6 +11,7 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
 import Phaser from 'phaser';
+import { designConfig } from 'src/app/config/design';
 
 interface ButtonImages {
   active_build: Phaser.GameObjects.Image;
@@ -48,13 +49,13 @@ export default class ContinueButton {
     };
     this.text = scene.add
       .text(
-        layoutConfig.continueButton.x + layoutConfig.continueButton.xTextOffset,
-        layoutConfig.continueButton.y,
+        layoutConfig.ui.continueButton.x + layoutConfig.ui.continueButton.xTextOffset,
+        layoutConfig.ui.continueButton.y,
         ['']
       )
-      .setFontSize(layoutConfig.continueButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.large)
+      .setFontFamily(designConfig.font.captionFamily)
+      .setColor(designConfig.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5)
       .setInteractive();
@@ -62,8 +63,8 @@ export default class ContinueButton {
       o =>
         o
           .on('pointerdown', () => this.onClickAction())
-          .on('pointerover', () => this.text.setColor(layoutConfig.font.colorHover))
-          .on('pointerout', () => this.text.setColor(layoutConfig.font.color)),
+          .on('pointerover', () => this.text.setColor(designConfig.font.colorHover))
+          .on('pointerout', () => this.text.setColor(designConfig.font.color)),
       this
     );
     this.scene.input.keyboard
@@ -119,7 +120,7 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(layoutConfig.continueButton.x, layoutConfig.continueButton.y, `button_${name}`)
+      .image(layoutConfig.ui.continueButton.x, layoutConfig.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

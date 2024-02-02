@@ -8,7 +8,7 @@ import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/inte
 export default class DeckCard extends CardImage {
   indicator?: ValueIndicator;
   constructor(scene: Game) {
-    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, 1);
+    super(scene, layoutConfig.ui.deck.x, layoutConfig.ui.deck.y, 1);
     this.image.on('pointerdown', () => this.onClickAction());
   }
   update() {
@@ -18,8 +18,8 @@ export default class DeckCard extends CardImage {
       this.scene,
       this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
       this.scene.state.deckSize - cardsForMission < 10,
-      layoutConfig.deck.x,
-      layoutConfig.deck.y,
+      layoutConfig.ui.deck.x,
+      layoutConfig.ui.deck.y,
       true,
       true
     );

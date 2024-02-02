@@ -56,13 +56,13 @@ export default class CardStack {
       const x = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.x
-          : layoutConfig.deck.x
-        : layoutConfig.discardPile.x;
+          : layoutConfig.ui.deck.x
+        : layoutConfig.ui.discardPile.x;
       const y = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.y
-          : layoutConfig.deck.y
-        : layoutConfig.discardPile.yOpponent;
+          : layoutConfig.ui.deck.y
+        : layoutConfig.ui.discardPile.yOpponent;
       const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
@@ -158,7 +158,7 @@ export default class CardStack {
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
       } else if (!this.data.ownedByPlayer) {
-        this.cards[0].setX(layoutConfig.discardPile.x).setY(layoutConfig.discardPile.yOpponent).setAngle(180);
+        this.cards[0].setX(layoutConfig.ui.discardPile.x).setY(layoutConfig.ui.discardPile.yOpponent).setAngle(180);
       }
       this.tween();
     }
@@ -172,7 +172,7 @@ export default class CardStack {
     );
   }
   private y(index: number) {
-    const yDistance = layoutConfig.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
+    const yDistance = layoutConfig.game.cardStackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
   private zoneLayout(): FactionLayoutZone {

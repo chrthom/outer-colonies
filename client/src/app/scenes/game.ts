@@ -60,16 +60,18 @@ export default class Game extends Phaser.Scene {
   socket!: Socket;
   gameParams!: ClientGameParams;
   preloader!: Preloader;
+
   state: ClientState = emptyClientState;
   activeCards: ActiveCards = {};
   plannedBattle: ClientPlannedBattle = ClientPlannedBattleHelper.empty;
   interceptShipIds: Array<string> = [];
+  retractCardsExist = false;
+
   hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
   background!: Background;
   obj!: StaticObjects;
-  retractCardsExist = false;
 
   constructor() {
     super({
@@ -293,8 +295,8 @@ export default class Game extends Phaser.Scene {
     if (cardId) {
       new CardImage(
         this,
-        layoutConfig.discardPile.x,
-        layoutConfig.discardPile.yOpponent,
+        layoutConfig.ui.discardPile.x,
+        layoutConfig.ui.discardPile.yOpponent,
         cardId,
         true
       ).maximizeTacticCard();

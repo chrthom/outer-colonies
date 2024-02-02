@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { layoutConfig } from 'src/app/config/layout';
 import Game from 'src/app/scenes/game';
 
@@ -7,10 +8,10 @@ export default class CountdownIndicator {
   constructor(scene: Game) {
     this.scene = scene;
     this.text = this.scene.add
-      .text(layoutConfig.countdownIndicator.x, layoutConfig.countdownIndicator.y, '')
-      .setFontSize(layoutConfig.exitButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .text(layoutConfig.ui.countdownIndicator.x, layoutConfig.ui.countdownIndicator.y, '')
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.font.captionFamily)
+      .setColor(designConfig.font.color)
       .setAlign('right')
       .setOrigin(1, 0.5);
   }
@@ -21,7 +22,7 @@ export default class CountdownIndicator {
       ${state?.name} ${this.formatCountdown(playerCountdown)}
     `);
     if (playerCountdown < 120 || opponentCountdown < 120) {
-      this.text.setColor(layoutConfig.font.colorWarn);
+      this.text.setColor(designConfig.font.colorWarn);
     }
   }
   private formatCountdown(countdown: number): string {

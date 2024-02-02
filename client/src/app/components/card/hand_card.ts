@@ -9,7 +9,7 @@ export default class HandCard extends CardImage {
   uuid!: string;
   data!: ClientHandCard;
   constructor(scene: Game, data: ClientHandCard) {
-    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, data.cardId);
+    super(scene, layoutConfig.ui.deck.x, layoutConfig.ui.deck.y, data.cardId);
     this.uuid = data.uuid;
     this.update(data);
     this.image.on('pointerdown', () => this.onClickAction());

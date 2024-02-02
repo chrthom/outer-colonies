@@ -1,5 +1,6 @@
 import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
+import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
@@ -12,18 +13,18 @@ interface CornerConfig {
 }
 
 export default class Background {
-  private scene!: Matchmaking | Game;
+  private scene: Matchmaking | Game;
   private playerOrb!: string;
   private opponentOrb!: string;
   private currentRing = 0;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
   private isColonyOrb?: boolean;
-  private starsImage!: Phaser.GameObjects.Image;
-  private sunImage!: Phaser.GameObjects.Image;
+  private starsImage: Phaser.GameObjects.Image;
+  private sunImage: Phaser.GameObjects.Image;
   private ringImage!: Phaser.GameObjects.Image;
   private orbImage?: Phaser.GameObjects.Image;
-  private zoneMarkers!: Phaser.GameObjects.Group;
+  private zoneMarkers: Phaser.GameObjects.Group;
 
   constructor(scene: Matchmaking | Game) {
     this.scene = scene;
@@ -32,7 +33,7 @@ export default class Background {
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
       .setOrigin(0, 0)
       .setDepth(layoutConfig.depth.background)
-      .setAlpha(layoutConfig.colors.fadedAlpha);
+      .setAlpha(designConfig.colors.fadedAlpha);
     this.sunImage = scene.add
       .image(
         this.sunCoordinatesAndScale(this.currentRing)[0],
@@ -72,10 +73,10 @@ export default class Background {
     const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
       this.scene.add
         .text(c.xLeft, c.yBottom, caption)
-        .setFontSize(layoutConfig.font.size)
-        .setFontFamily(layoutConfig.font.captionFamily)
+        .setFontSize(layoutConfig.fontSize.normal)
+        .setFontFamily(designConfig.font.captionFamily)
         .setColor(opponent ? layoutConfig.opponent.color : layoutConfig.player.color)
-        .setAlpha(layoutConfig.colors.alpha)
+        .setAlpha(designConfig.colors.alpha)
         .setAlign('right')
         .setOrigin(0, 1);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
@@ -301,8 +302,8 @@ export default class Background {
   private getTint(angle: number): [number, number, number, number] {
     const tintCorner = (corner: number) =>
       angle >= (corner - 0.5) * 90 && angle < (corner + 0.5) * 90
-        ? layoutConfig.colors.neutral
-        : layoutConfig.colors.fadedTint;
+        ? designConfig.colors.neutral
+        : designConfig.colors.fadedTint;
     return <[number, number, number, number]>[0, 2, 3, 1].map(tintCorner);
   }
 

@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { ClientAttack } from '../../../../../server/src/shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
@@ -15,7 +16,7 @@ export default class AttackDamageIndicator {
       .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
       .map(([key, value]) => [
         value,
-        layoutConfig.attack.color[key as keyof typeof layoutConfig.attack.color]
+        designConfig.attackColor[key as keyof typeof designConfig.attackColor]
       ])
       .forEach(
         ([value, color], index) =>
@@ -64,8 +65,8 @@ export default class AttackDamageIndicator {
         : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
       .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
-      .setFontSize(layoutConfig.attack.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
+      .setFontSize(layoutConfig.fontSize.large)
+      .setFontFamily(designConfig.font.captionFamily)
       .setColor(color)
       .setAlign('center')
       .setOrigin(0.5, 1)
