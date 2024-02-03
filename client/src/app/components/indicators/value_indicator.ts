@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -25,8 +26,8 @@ export default class ValueIndicator {
           this.y(cardY),
           64,
           32,
-          critical ? layoutConfig.colors.secondary : layoutConfig.colors.primary,
-          layoutConfig.colors.alpha
+          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layoutConfig.depth.indicators);
@@ -38,17 +39,17 @@ export default class ValueIndicator {
           12,
           16,
           22,
-          critical ? layoutConfig.colors.secondary : layoutConfig.colors.primary,
-          layoutConfig.colors.alpha
+          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)
         .setDepth(layoutConfig.depth.indicators);
     }
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
-      .setFontSize(layoutConfig.cards.damageIndicator.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.colorHover)
+      .setFontSize(layoutConfig.fontSize.small)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.hover)
       .setAlign('center')
       .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.indicators);
@@ -69,16 +70,16 @@ export default class ValueIndicator {
     return (
       cardX +
       (this.ownedByPlayer
-        ? layoutConfig.cards.damageIndicator.xOffsetPlayer
-        : layoutConfig.cards.damageIndicator.xOffsetOpponent)
+        ? layoutConfig.game.cards.damageIndicator.xOffsetPlayer
+        : layoutConfig.game.cards.damageIndicator.xOffsetOpponent)
     );
   }
   private y(cardY: number) {
     return (
       cardY +
       (this.ownedByPlayer
-        ? layoutConfig.cards.damageIndicator.yOffsetPlayer
-        : layoutConfig.cards.damageIndicator.yOffsetOpponent)
+        ? layoutConfig.game.cards.damageIndicator.yOffsetPlayer
+        : layoutConfig.game.cards.damageIndicator.yOffsetOpponent)
     );
   }
 }

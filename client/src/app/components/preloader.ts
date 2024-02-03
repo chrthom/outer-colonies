@@ -1,3 +1,4 @@
+import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 
@@ -9,33 +10,35 @@ export default class Preloader {
     this.progressBar = scene.add.graphics();
     this.progressBox = scene.add
       .graphics()
-      .fillStyle(layoutConfig.colors.primary, layoutConfig.colors.fadedAlpha)
+      .fillStyle(designConfig.tint.primary, designConfig.alpha.faded)
       .fillRect(
-        layoutConfig.preloader.x - layoutConfig.preloader.width / 2 - layoutConfig.preloader.boxPadding,
-        layoutConfig.preloader.y - layoutConfig.preloader.boxPadding,
-        layoutConfig.preloader.width + 2 * layoutConfig.preloader.boxPadding,
-        layoutConfig.preloader.height + 2 * layoutConfig.preloader.boxPadding
+        layoutConfig.load.preloader.x -
+          layoutConfig.load.preloader.width / 2 -
+          layoutConfig.load.preloader.boxPadding,
+        layoutConfig.load.preloader.y - layoutConfig.load.preloader.boxPadding,
+        layoutConfig.load.preloader.width + 2 * layoutConfig.load.preloader.boxPadding,
+        layoutConfig.load.preloader.height + 2 * layoutConfig.load.preloader.boxPadding
       );
     this.text = scene.add
       .text(
-        layoutConfig.preloader.x,
-        layoutConfig.preloader.y + layoutConfig.preloader.textOffsetY,
+        layoutConfig.load.preloader.x,
+        layoutConfig.load.preloader.y + layoutConfig.load.preloader.textOffsetY,
         'Lade Spieldaten...'
       )
-      .setFontSize(layoutConfig.font.size)
-      .setFontFamily(layoutConfig.font.textFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.text)
+      .setColor(designConfig.color.neutral)
       .setAlign('center')
       .setOrigin(0.5, 0.5);
     scene.load.on('progress', (value: number) => {
       this.progressBar
         .clear()
-        .fillStyle(layoutConfig.colors.primary, layoutConfig.colors.alpha)
+        .fillStyle(designConfig.tint.primary, designConfig.alpha.normal)
         .fillRect(
-          layoutConfig.preloader.x - layoutConfig.preloader.width / 2,
-          layoutConfig.preloader.y,
-          layoutConfig.preloader.width * value,
-          layoutConfig.preloader.height
+          layoutConfig.load.preloader.x - layoutConfig.load.preloader.width / 2,
+          layoutConfig.load.preloader.y,
+          layoutConfig.load.preloader.width * value,
+          layoutConfig.load.preloader.height
         );
     });
     scene.load.on('complete', () => {

@@ -6,11 +6,11 @@ export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(
       scene,
-      layoutConfig.maxCard.x,
-      layoutConfig.maxCard.y,
-      layoutConfig.cards.scale.max,
+      layoutConfig.game.fixed.maxCard.x,
+      layoutConfig.game.fixed.maxCard.y,
+      0,
       false,
-      layoutConfig.maxCard.scale
+      layoutConfig.game.cards.scale.max
     );
     this.hide();
   }

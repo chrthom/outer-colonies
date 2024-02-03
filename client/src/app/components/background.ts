@@ -1,5 +1,6 @@
 import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
+import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
@@ -12,18 +13,18 @@ interface CornerConfig {
 }
 
 export default class Background {
-  private scene!: Matchmaking | Game;
+  private scene: Matchmaking | Game;
   private playerOrb!: string;
   private opponentOrb!: string;
   private currentRing = 0;
   private targetRing?: number;
   private targetOrb?: BackgroundOrb;
   private isColonyOrb?: boolean;
-  private starsImage!: Phaser.GameObjects.Image;
-  private sunImage!: Phaser.GameObjects.Image;
+  private starsImage: Phaser.GameObjects.Image;
+  private sunImage: Phaser.GameObjects.Image;
   private ringImage!: Phaser.GameObjects.Image;
   private orbImage?: Phaser.GameObjects.Image;
-  private zoneMarkers!: Phaser.GameObjects.Group;
+  private zoneMarkers: Phaser.GameObjects.Group;
 
   constructor(scene: Matchmaking | Game) {
     this.scene = scene;
@@ -32,7 +33,7 @@ export default class Background {
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
       .setOrigin(0, 0)
       .setDepth(layoutConfig.depth.background)
-      .setAlpha(layoutConfig.colors.fadedAlpha);
+      .setAlpha(designConfig.alpha.faded);
     this.sunImage = scene.add
       .image(
         this.sunCoordinatesAndScale(this.currentRing)[0],
@@ -60,22 +61,15 @@ export default class Background {
   }
 
   initInterface() {
-    const l = {
-      pColony: layoutConfig.player.colony.corners,
-      pOrbital: layoutConfig.player.orbital.corners,
-      pNeutral: layoutConfig.player.neutral.corners,
-      oColony: layoutConfig.opponent.colony.corners,
-      oOrbital: layoutConfig.opponent.orbital.corners
-    };
     const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
       this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
     const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
       this.scene.add
         .text(c.xLeft, c.yBottom, caption)
-        .setFontSize(layoutConfig.font.size)
-        .setFontFamily(layoutConfig.font.captionFamily)
-        .setColor(opponent ? layoutConfig.opponent.color : layoutConfig.player.color)
-        .setAlpha(layoutConfig.colors.alpha)
+        .setFontSize(layoutConfig.fontSize.normal)
+        .setFontFamily(designConfig.fontFamily.caption)
+        .setColor(opponent ? designConfig.color.opponent : designConfig.color.player)
+        .setAlpha(designConfig.alpha.normal)
         .setAlign('right')
         .setOrigin(0, 1);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
@@ -85,18 +79,18 @@ export default class Background {
       addCorner(c.xRight, c.yBottom, 180, opponent)
     ];
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZoneElements(l.pColony, false),
-      addZoneElements(l.pOrbital, false),
-      addZoneElements(l.pNeutral, false),
-      addZoneElements(l.oColony, true),
-      addZoneElements(l.oOrbital, true)
+      addZoneElements(layoutConfig.game.ui.zones.playerColony, false),
+      addZoneElements(layoutConfig.game.ui.zones.playerOrbit, false),
+      addZoneElements(layoutConfig.game.ui.zones.neutral, false),
+      addZoneElements(layoutConfig.game.ui.zones.opponentColony, true),
+      addZoneElements(layoutConfig.game.ui.zones.opponentOrbit, true)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
-      addCaption(l.pColony, 'Koloniezone', false),
-      addCaption(l.pOrbital, 'Orbitale Zone', false),
-      addCaption(l.pNeutral, 'Neutrale Zone', false),
-      addCaption(l.oColony, 'Koloniezone', true),
-      addCaption(l.oOrbital, 'Orbitale Zone', true)
+      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', false),
+      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', false),
+      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', false),
+      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', true),
+      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', true)
     ];
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }
@@ -301,8 +295,8 @@ export default class Background {
   private getTint(angle: number): [number, number, number, number] {
     const tintCorner = (corner: number) =>
       angle >= (corner - 0.5) * 90 && angle < (corner + 0.5) * 90
-        ? layoutConfig.colors.neutral
-        : layoutConfig.colors.fadedTint;
+        ? designConfig.tint.neutral
+        : designConfig.tint.faded;
     return <[number, number, number, number]>[0, 2, 3, 1].map(tintCorner);
   }
 
