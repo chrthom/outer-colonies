@@ -1,6 +1,6 @@
 import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
-import { layoutConfig } from '../../config/layout';
+import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class CardImage {
@@ -34,15 +34,14 @@ export default class CardImage {
   discard(toDeck?: boolean) {
     const discardPileIds = this.scene.state.discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
+    const placementConfig = layoutConfig.game.cards.placement;
+    const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
+    const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
-      x: toDeck ? layoutConfig.ui.deck.x : layoutConfig.ui.discardPile.x,
-      y: this.ownedByPlayer
-        ? toDeck
-          ? layoutConfig.ui.deck.y
-          : layoutConfig.ui.discardPile.y
-        : layoutConfig.ui.discardPile.yOpponent,
+      x: targetCoordinates.x,
+      y: targetCoordinates.y,
       angle: this.ownedByPlayer ? 0 : 180,
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
@@ -59,8 +58,8 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.game.ui.maxedTacticCard.x,
-      y: layoutConfig.game.ui.maxedTacticCard.y,
+      x: layoutConfig.game.fixed.maxedTacticCard.x,
+      y: layoutConfig.game.fixed.maxedTacticCard.y,
       angle: 0,
       scale: layoutConfig.game.cards.scale.max
     });

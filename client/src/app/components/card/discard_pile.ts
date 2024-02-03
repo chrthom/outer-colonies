@@ -9,7 +9,12 @@ export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
   indicator?: ValueIndicator;
   constructor(scene: Game) {
-    super(scene, layoutConfig.ui.discardPile.x, layoutConfig.ui.discardPile.y, 1);
+    super(
+      scene,
+      layoutConfig.game.cards.placement.player.discardPile.x,
+      layoutConfig.game.cards.placement.player.discardPile.y,
+      1
+    );
     this.update([]);
   }
   update(cardIds?: number[]) {
@@ -27,8 +32,8 @@ export default class DiscardPile extends CardImage {
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        layoutConfig.ui.discardPile.x,
-        layoutConfig.ui.discardPile.y,
+        layoutConfig.game.cards.placement.player.discardPile.x,
+        layoutConfig.game.cards.placement.player.discardPile.y,
         true,
         true
       );

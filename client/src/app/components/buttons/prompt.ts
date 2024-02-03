@@ -12,11 +12,11 @@ export default class Prompt {
   constructor(scene: Game) {
     this.scene = scene;
     this.image = this.scene.add
-      .image(layoutConfig.game.ui.prompt.box.x, layoutConfig.game.ui.prompt.box.y, 'prompt_box')
+      .image(layoutConfig.game.fixed.prompt.box.x, layoutConfig.game.fixed.prompt.box.y, 'prompt_box')
       .setOrigin(0, 0)
       .setScale(0.8);
     this.text = scene.add
-      .text(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'Lädt...')
+      .text(layoutConfig.game.fixed.prompt.x, layoutConfig.game.fixed.prompt.y, 'Lädt...')
       .setFontSize(layoutConfig.fontSize.small)
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)

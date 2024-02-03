@@ -61,13 +61,6 @@ export default class Background {
   }
 
   initInterface() {
-    const l = {
-      pColony: layoutConfig.player.colony.corners,
-      pOrbital: layoutConfig.player.orbital.corners,
-      pNeutral: layoutConfig.player.neutral.corners,
-      oColony: layoutConfig.opponent.colony.corners,
-      oOrbital: layoutConfig.opponent.orbital.corners
-    };
     const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
       this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
     const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
@@ -75,7 +68,7 @@ export default class Background {
         .text(c.xLeft, c.yBottom, caption)
         .setFontSize(layoutConfig.fontSize.normal)
         .setFontFamily(designConfig.fontFamily.caption)
-        .setColor(opponent ? layoutConfig.opponent.color : layoutConfig.player.color)
+        .setColor(opponent ? designConfig.color.opponent : designConfig.color.player)
         .setAlpha(designConfig.alpha.normal)
         .setAlign('right')
         .setOrigin(0, 1);
@@ -86,18 +79,18 @@ export default class Background {
       addCorner(c.xRight, c.yBottom, 180, opponent)
     ];
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZoneElements(l.pColony, false),
-      addZoneElements(l.pOrbital, false),
-      addZoneElements(l.pNeutral, false),
-      addZoneElements(l.oColony, true),
-      addZoneElements(l.oOrbital, true)
+      addZoneElements(layoutConfig.game.ui.zones.playerColony, false),
+      addZoneElements(layoutConfig.game.ui.zones.playerOrbit, false),
+      addZoneElements(layoutConfig.game.ui.zones.neutral, false),
+      addZoneElements(layoutConfig.game.ui.zones.opponentColony, true),
+      addZoneElements(layoutConfig.game.ui.zones.opponentOrbit, true)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
-      addCaption(l.pColony, 'Koloniezone', false),
-      addCaption(l.pOrbital, 'Orbitale Zone', false),
-      addCaption(l.pNeutral, 'Neutrale Zone', false),
-      addCaption(l.oColony, 'Koloniezone', true),
-      addCaption(l.oOrbital, 'Orbitale Zone', true)
+      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', false),
+      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', false),
+      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', false),
+      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', true),
+      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', true)
     ];
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }

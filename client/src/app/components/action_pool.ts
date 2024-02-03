@@ -16,8 +16,8 @@ export default class ActionPool {
     this.images = this.scene.state.actionPool.map((action, index) =>
       this.scene.add
         .image(
-          layoutConfig.game.ui.actionPool.x,
-          layoutConfig.game.ui.actionPool.y + index * layoutConfig.game.ui.actionPool.yDistance,
+          layoutConfig.game.fixed.actionPool.x,
+          layoutConfig.game.fixed.actionPool.y + index * layoutConfig.game.fixed.actionPool.yDistance,
           `icon_${action}`
         )
         .setOrigin(0.5, 0.5)

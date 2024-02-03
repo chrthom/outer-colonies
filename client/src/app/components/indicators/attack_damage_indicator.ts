@@ -14,10 +14,7 @@ export default class AttackDamageIndicator {
     ['pointDefense', 'shield', 'armour', 'damage']
       .map(key => [key, attack[key as keyof ClientAttack]])
       .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
-      .map(([key, value]) => [
-        value,
-        designConfig.color[key as keyof typeof designConfig.color]
-      ])
+      .map(([key, value]) => [value, designConfig.color[key as keyof typeof designConfig.color]])
       .forEach(
         ([value, color], index) =>
           this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>

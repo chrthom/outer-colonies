@@ -1,4 +1,4 @@
-import { FactionLayoutZone, layoutConfig } from '../../config/layout';
+import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
@@ -52,17 +52,17 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.hand.find(h => h.cardId == c.cardId);
+      const handCard = this.scene.hand.find(h => h.cardId == c.cardId); // TODO: Include checking opponent hand cards
       const x = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.x
-          : layoutConfig.ui.deck.x
-        : layoutConfig.ui.discardPile.x;
+          : layoutConfig.game.cards.placement.player.deck.x
+        : layoutConfig.game.cards.placement.opponent.deck.x;
       const y = this.data.ownedByPlayer
         ? handCard
           ? handCard.image.y
-          : layoutConfig.ui.deck.y
-        : layoutConfig.ui.discardPile.yOpponent;
+          : layoutConfig.game.cards.placement.player.deck.y
+        : layoutConfig.game.cards.placement.opponent.deck.y;
       const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
@@ -158,7 +158,10 @@ export default class CardStack {
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
       } else if (!this.data.ownedByPlayer) {
-        this.cards[0].setX(layoutConfig.ui.discardPile.x).setY(layoutConfig.ui.discardPile.yOpponent).setAngle(180);
+        this.cards[0] // TODO: Tween from opponent hand
+          .setX(layoutConfig.game.cards.placement.opponent.deck.x)
+          .setY(layoutConfig.game.cards.placement.opponent.deck.y)
+          .setAngle(180);
       }
       this.tween();
     }
@@ -167,18 +170,20 @@ export default class CardStack {
     return (
       this.zoneLayout().x +
       (this.data.zoneCardsNum == 1
-        ? this.zoneLayout().maxWidth / 2
-        : (this.data.index * this.zoneLayout().maxWidth) / (this.data.zoneCardsNum - 1))
+        ? layoutConfig.game.cards.placement.zoneWidth / 2
+        : (this.data.index * layoutConfig.game.cards.placement.zoneWidth) / (this.data.zoneCardsNum - 1))
     );
   }
   private y(index: number) {
     const yDistance = layoutConfig.game.cardStackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
-  private zoneLayout(): FactionLayoutZone {
-    const zoneLayout = this.data.ownedByPlayer ? layoutConfig.player : layoutConfig.opponent;
+  private zoneLayout(): Coordinates {
+    const zoneLayout = this.data.ownedByPlayer
+      ? layoutConfig.game.cards.placement.player
+      : layoutConfig.game.cards.placement.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
-    else if ((this.data.zone = Zone.Oribital)) return zoneLayout.orbital;
+    else if ((this.data.zone = Zone.Oribital)) return zoneLayout.orbit;
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {

@@ -12,7 +12,9 @@ export default class Preloader {
       .graphics()
       .fillStyle(designConfig.tint.primary, designConfig.alpha.faded)
       .fillRect(
-        layoutConfig.load.preloader.x - layoutConfig.load.preloader.width / 2 - layoutConfig.load.preloader.boxPadding,
+        layoutConfig.load.preloader.x -
+          layoutConfig.load.preloader.width / 2 -
+          layoutConfig.load.preloader.boxPadding,
         layoutConfig.load.preloader.y - layoutConfig.load.preloader.boxPadding,
         layoutConfig.load.preloader.width + 2 * layoutConfig.load.preloader.boxPadding,
         layoutConfig.load.preloader.height + 2 * layoutConfig.load.preloader.boxPadding

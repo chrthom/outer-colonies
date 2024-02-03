@@ -8,7 +8,7 @@ export default class CountdownIndicator {
   constructor(scene: Game) {
     this.scene = scene;
     this.text = this.scene.add
-      .text(layoutConfig.game.ui.countdownIndicator.x, layoutConfig.game.ui.countdownIndicator.y, '')
+      .text(layoutConfig.game.fixed.countdownIndicator.x, layoutConfig.game.fixed.countdownIndicator.y, '')
       .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.neutral)

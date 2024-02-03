@@ -9,7 +9,12 @@ export default class HandCard extends CardImage {
   uuid!: string;
   data!: ClientHandCard;
   constructor(scene: Game, data: ClientHandCard) {
-    super(scene, layoutConfig.ui.deck.x, layoutConfig.ui.deck.y, data.cardId);
+    super(
+      scene,
+      layoutConfig.game.cards.placement.player.deck.x,
+      layoutConfig.game.cards.placement.player.deck.y,
+      data.cardId
+    );
     this.uuid = data.uuid;
     this.update(data);
     this.image.on('pointerdown', () => this.onClickAction());
@@ -34,14 +39,21 @@ export default class HandCard extends CardImage {
     return this.scene.state.hand.length - data.index - 1;
   }
   private x() {
-    return layoutConfig.player.hand.x + this.invIndex(this.data) * layoutConfig.player.hand.xStep;
+    return (
+      layoutConfig.game.cards.placement.player.hand.x +
+      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
+    );
   }
   private y() {
-    return layoutConfig.player.hand.y + this.invIndex(this.data) * layoutConfig.player.hand.yStep;
+    return (
+      layoutConfig.game.cards.placement.player.hand.y +
+      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+    );
   }
   private angle() {
     return (
-      layoutConfig.player.hand.startAngle + this.invIndex(this.data) * layoutConfig.player.hand.angleStep
+      layoutConfig.game.cards.placement.hand.startAngle +
+      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep
     );
   }
   private onClickAction() {

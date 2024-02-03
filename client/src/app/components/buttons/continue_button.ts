@@ -49,8 +49,8 @@ export default class ContinueButton {
     };
     this.text = scene.add
       .text(
-        layoutConfig.game.ui.continueButton.x + layoutConfig.game.ui.continueButton.xTextOffset,
-        layoutConfig.game.ui.continueButton.y,
+        layoutConfig.game.fixed.continueButton.x + layoutConfig.game.fixed.continueButton.xTextOffset,
+        layoutConfig.game.fixed.continueButton.y,
         ['']
       )
       .setFontSize(layoutConfig.fontSize.large)
@@ -120,7 +120,11 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
+      .image(
+        layoutConfig.game.fixed.continueButton.x,
+        layoutConfig.game.fixed.continueButton.y,
+        `button_${name}`
+      )
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

@@ -15,8 +15,8 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layoutConfig.ui.missionCards.x + index * layoutConfig.ui.missionCards.xDistance,
-          layoutConfig.ui.missionCards.y + index * layoutConfig.ui.missionCards.yDistance,
+          layoutConfig.game.ui.missionCards.x + index * layoutConfig.game.ui.missionCards.xDistance,
+          layoutConfig.game.ui.missionCards.y + index * layoutConfig.game.ui.missionCards.yDistance,
           id,
           false,
           layoutConfig.game.cards.scale.min

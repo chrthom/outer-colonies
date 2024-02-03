@@ -293,10 +293,10 @@ export default class Game extends Phaser.Scene {
   private animateOpponentTacticCard(oldState: ClientState) {
     const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
     if (cardId) {
-      new CardImage(
+      new CardImage( // TODO: Animate from opponent hand
         this,
-        layoutConfig.ui.discardPile.x,
-        layoutConfig.ui.discardPile.yOpponent,
+        layoutConfig.game.cards.placement.opponent.deck.x,
+        layoutConfig.game.cards.placement.opponent.deck.y,
         cardId,
         true
       ).maximizeTacticCard();
