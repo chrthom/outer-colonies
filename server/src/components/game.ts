@@ -180,7 +180,7 @@ function getSocket(io: Server, match: Match, playerNo: number): Socket | undefin
 
 function getPlayer(socket: Socket): Player | undefined {
   const playerNo = getSocketData(socket).playerNo;
-  return playerNo ? getSocketData(socket).match?.players[playerNo] : undefined;
+  return playerNo == 0 || playerNo == 1 ? getSocketData(socket).match?.players[playerNo] : undefined;
 }
 
 function emitState(io: Server, match: Match) {
