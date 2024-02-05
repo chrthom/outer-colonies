@@ -82,7 +82,7 @@ class LayoutGameConfig {
       normal: 0.25,
       max: 0.75
     },
-    stackYDistance: 35
+    stackYDistance: 38
   };
   readonly fixed = {
     actionPool: {
