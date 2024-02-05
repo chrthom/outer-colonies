@@ -3,6 +3,12 @@ import { animationConfig } from '../../config/animation';
 import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
+export interface CardImageConfig {
+  isOpponentCard?: boolean,
+  cropped?: boolean,
+  scale?: number
+}
+
 export default class CardImage {
   image!: Phaser.GameObjects.Image;
   cardId!: number;
@@ -10,20 +16,20 @@ export default class CardImage {
   protected imageHighlight!: Phaser.GameObjects.Image;
   protected ownedByPlayer!: boolean;
   private imageMask!: Phaser.GameObjects.Image;
-  constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
+  constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;
     this.cardId = cardId;
-    this.ownedByPlayer = !opponentCard;
+    this.ownedByPlayer = !config?.isOpponentCard;
     const setImageProps = (image: Phaser.GameObjects.Image) =>
       image
         .setOrigin(0.5, 1)
-        .setAngle(opponentCard ? 180 : 0)
-        .setScale(scale ? scale : layoutConfig.game.cards.scale.normal);
-    this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
+        .setAngle(config?.isOpponentCard ? 180 : 0)
+        .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal);
+    this.imageHighlight = setImageProps(scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false));
     this.image = setImageProps(
       scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
     );
-    this.imageMask = setImageProps(scene.add.image(x, y, 'card_mask').setVisible(false));
+    this.imageMask = setImageProps(scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false));
     this.image.setMask(this.imageMask.createBitmapMask());
   }
   destroy() {

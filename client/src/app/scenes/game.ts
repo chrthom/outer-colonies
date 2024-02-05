@@ -130,8 +130,12 @@ export default class Game extends Phaser.Scene {
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
-    this.load.image('card_mask', 'utils/card_mask.png');
-    this.load.image('card_glow', 'utils/card_glow.png');
+    [
+      'mask',
+      'mask_small',
+      'glow',
+      'glow_small'
+    ].forEach(name => this.load.image(`card_${name}`, `utils/card_${name}.png`));
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
@@ -298,7 +302,9 @@ export default class Game extends Phaser.Scene {
         layoutConfig.game.cards.placement.opponent.deck.x,
         layoutConfig.game.cards.placement.opponent.deck.y,
         cardId,
-        true
+        {
+          isOpponentCard: true
+        }
       ).maximizeTacticCard();
     }
   }

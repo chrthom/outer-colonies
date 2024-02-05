@@ -8,9 +8,10 @@ export default class MaxCard extends CardImage {
       scene,
       layoutConfig.game.fixed.maxCard.x,
       layoutConfig.game.fixed.maxCard.y,
-      0,
-      false,
-      layoutConfig.game.cards.scale.max
+      1,
+      {
+        scale: layoutConfig.game.cards.scale.max
+      }
     );
     this.hide();
   }
