@@ -175,7 +175,7 @@ export default class CardStack {
     );
   }
   private y(index: number) {
-    const yDistance = layoutConfig.game.cardStackYDistance * (this.data.ownedByPlayer ? 1 : -1);
+    const yDistance = layoutConfig.game.cards.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
     return this.zoneLayout().y + index * yDistance;
   }
   private zoneLayout(): Coordinates {

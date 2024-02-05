@@ -1,5 +1,4 @@
 class LayoutGameConfig {
-  readonly cardStackYDistance = 30;
   readonly cards = {
     damageIndicator: {
       xOffsetPlayer: -75,
@@ -82,7 +81,8 @@ class LayoutGameConfig {
       min: 0.1,
       normal: 0.25,
       max: 0.75
-    }
+    },
+    stackYDistance: 35
   };
   readonly fixed = {
     actionPool: {
