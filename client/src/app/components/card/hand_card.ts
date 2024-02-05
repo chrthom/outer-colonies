@@ -4,6 +4,7 @@ import Game from '../../scenes/game';
 import { ClientHandCard } from '../../../../../server/src/shared/interfaces/client_state';
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class HandCard extends CardImage {
   uuid: string;
@@ -13,7 +14,7 @@ export default class HandCard extends CardImage {
       scene,
       layoutConfig.game.cards.placement.player.deck.x,
       layoutConfig.game.cards.placement.player.deck.y,
-      data.cardId,
+      data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
       {
         isOpponentCard: !data.ownedByPlayer
       }

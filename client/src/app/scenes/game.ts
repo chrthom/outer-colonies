@@ -71,13 +71,12 @@ export default class Game extends Phaser.Scene {
   interceptShipIds: Array<string> = [];
   retractCardsExist = false;
 
-  hand: Array<HandCard> = [];
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
   background!: Background;
   obj!: FixedUIElements;
   player!: PlayerUIElements;
-  //opponent: PlayerUIElements; // TODO: Implement for opponent too
+  opponent!: PlayerUIElements;
 
   constructor() {
     super({
@@ -167,6 +166,13 @@ export default class Game extends Phaser.Scene {
       this.player?.countdownIndicator.update(countdown[0]);
     });
     this.background.initInterface();
+    this.opponent = {
+      actionPool: new ActionPool(this, false),
+      countdownIndicator: new CountdownIndicator(this, false),
+      deck: new DeckCard(this, false),
+      discardPile: new DiscardPile(this, false),
+      hand: []
+    };
     this.player = {
       actionPool: new ActionPool(this, true),
       countdownIndicator: new CountdownIndicator(this, true),

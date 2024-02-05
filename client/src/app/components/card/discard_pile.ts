@@ -3,6 +3,7 @@ import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/inte
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
@@ -12,7 +13,7 @@ export default class DiscardPile extends CardImage {
       scene,
       DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.x,
       DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.y,
-      1,
+      constants.cardBackSideID,
       {
         isOpponentCard: !ownedByPlayer
       }

@@ -42,7 +42,7 @@ export default class CardImage {
     this.imageMask.destroy();
   }
   discard(toDeck?: boolean) {
-    const discardPileIds = this.scene.state.player.discardPileIds.slice(); // TODO: Also check opponent
+    const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
@@ -55,8 +55,9 @@ export default class CardImage {
       angle: this.ownedByPlayer ? 0 : 180,
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
-        if (this.ownedByPlayer && !toDeck) {
-          this.scene.player.discardPile.update(discardPileIds);
+        if (!toDeck) {
+          const discardPile = this.ownedByPlayer ? this.scene.player.discardPile : this.scene.opponent.discardPile;
+          discardPile.update(discardPileIds);
         }
         this.destroy();
       }

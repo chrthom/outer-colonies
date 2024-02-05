@@ -3,6 +3,7 @@ import Game from '../../scenes/game';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class DeckCard extends CardImage {
   indicator?: ValueIndicator;
@@ -11,7 +12,7 @@ export default class DeckCard extends CardImage {
       scene,
       DeckCard.getPlacementConfig(ownedByPlayer).deck.x,
       DeckCard.getPlacementConfig(ownedByPlayer).deck.y,
-      1,
+      constants.cardBackSideID,
       {
         isOpponentCard: !ownedByPlayer
       }
