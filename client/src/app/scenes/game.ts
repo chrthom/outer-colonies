@@ -33,27 +33,31 @@ import { environment } from '../../environments/environment';
 import { backgroundConfig } from '../config/background';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 
-interface InitData {
-  socket: Socket;
-  gameParams: ClientGameParams;
+interface ActiveCards {
+  hand?: string;
+  stack?: string;
+  stackIndex?: number;
 }
 
-interface StaticObjects {
-  actionPool: ActionPool;
+interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
-  countdownIndicator: CountdownIndicator;
-  deck: DeckCard;
-  discardPile: DiscardPile;
   exitButton: ExitButton;
   maxCard: MaxCard;
   missionCards: MissionCards;
 }
 
-interface ActiveCards {
-  hand?: string;
-  stack?: string;
-  stackIndex?: number;
+interface InitData {
+  socket: Socket;
+  gameParams: ClientGameParams;
+}
+
+interface PlayerUIElements {
+  actionPool: ActionPool;
+  countdownIndicator: CountdownIndicator;
+  deck: DeckCard;
+  discardPile: DiscardPile;
+  hand: Array<HandCard>;
 }
 
 export default class Game extends Phaser.Scene {
@@ -71,7 +75,9 @@ export default class Game extends Phaser.Scene {
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
   background!: Background;
-  obj!: StaticObjects;
+  obj!: FixedUIElements;
+  player!: PlayerUIElements;
+  //opponent: PlayerUIElements; // TODO: Implement for opponent too
 
   constructor() {
     super({
@@ -130,12 +136,9 @@ export default class Game extends Phaser.Scene {
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
-    [
-      'mask',
-      'mask_small',
-      'glow',
-      'glow_small'
-    ].forEach(name => this.load.image(`card_${name}`, `utils/card_${name}.png`));
+    ['mask', 'mask_small', 'glow', 'glow_small'].forEach(name =>
+      this.load.image(`card_${name}`, `utils/card_${name}.png`)
+    );
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
@@ -161,16 +164,19 @@ export default class Game extends Phaser.Scene {
       this.updateState(state);
     });
     this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
-      this.obj.countdownIndicator?.update(countdown[0], countdown[1]);
+      this.player?.countdownIndicator.update(countdown[0], countdown[1]);
     });
     this.background.initInterface();
-    this.obj = {
+    this.player = {
       actionPool: new ActionPool(this),
-      combatRangeIndicator: new CombatRangeIndicator(this),
-      continueButton: new ContinueButton(this),
       countdownIndicator: new CountdownIndicator(this),
       deck: new DeckCard(this),
       discardPile: new DiscardPile(this),
+      hand: []
+    };
+    this.obj = {
+      combatRangeIndicator: new CombatRangeIndicator(this),
+      continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
       maxCard: new MaxCard(this),
       missionCards: new MissionCards(this)
@@ -207,11 +213,13 @@ export default class Game extends Phaser.Scene {
 
   updateView() {
     this.background.update();
-    this.obj.actionPool.update();
+    [this.player].forEach(ui => {
+      ui.actionPool.update();
+      ui.deck.update();
+      ui.discardPile.update();
+    });
     this.obj.continueButton.update();
     this.obj.combatRangeIndicator.update();
-    this.obj.deck.update();
-    this.obj.discardPile.update();
     this.obj.exitButton.update();
     this.obj.missionCards.update();
     this.obj.maxCard.hide();
@@ -314,15 +322,16 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHighlighting() {
-    this.obj.deck?.highlightReset();
-    this.obj.discardPile?.highlightReset();
+    this.player.deck.highlightReset();
+    this.player.discardPile.highlightReset();
     this.hand.forEach(c => c.highlightReset());
     this.cardStacks.forEach(c => c.highlightReset());
     if (this.state.playerPendingAction) {
       if (this.plannedBattle.type == BattleType.Mission) {
-        this.obj.deck?.highlightSelected();
-        if (this.obj.discardPile && this.obj.discardPile.cardIds.length > 0)
-          this.obj.discardPile.highlightSelected();
+        this.player.deck.highlightSelected();
+        if (this.player.discardPile.cardIds.length > 0) {
+          this.player.discardPile.highlightSelected();
+        }
       }
       this.hand.forEach(c => {
         if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();

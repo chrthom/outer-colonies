@@ -4,9 +4,9 @@ import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export interface CardImageConfig {
-  isOpponentCard?: boolean,
-  cropped?: boolean,
-  scale?: number
+  isOpponentCard?: boolean;
+  cropped?: boolean;
+  scale?: number;
 }
 
 export default class CardImage {
@@ -25,11 +25,15 @@ export default class CardImage {
         .setOrigin(0.5, 1)
         .setAngle(config?.isOpponentCard ? 180 : 0)
         .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal);
-    this.imageHighlight = setImageProps(scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false));
+    this.imageHighlight = setImageProps(
+      scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
+    );
     this.image = setImageProps(
       scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
     );
-    this.imageMask = setImageProps(scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false));
+    this.imageMask = setImageProps(
+      scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
+    );
     this.image.setMask(this.imageMask.createBitmapMask());
   }
   destroy() {
@@ -51,7 +55,9 @@ export default class CardImage {
       angle: this.ownedByPlayer ? 0 : 180,
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
-        if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
+        if (this.ownedByPlayer && !toDeck) {
+          this.scene.player.discardPile.update(discardPileIds);
+        }
         this.destroy();
       }
     });
