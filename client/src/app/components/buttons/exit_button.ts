@@ -15,8 +15,8 @@ export default class ExitButton {
     this.isMatchmaking = !(scene instanceof Game);
     this.text = scene.add
       .text(
-        layoutConfig.game.fixed.exitButton.x + layoutConfig.game.fixed.exitButton.xTextOffset,
-        layoutConfig.game.fixed.exitButton.y + layoutConfig.game.fixed.exitButton.yTextOffset,
+        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
+        layoutConfig.game.ui.exitButton.y + layoutConfig.game.ui.exitButton.yTextOffset,
         ''
       )
       .setFontSize(layoutConfig.fontSize.normal)
@@ -27,10 +27,10 @@ export default class ExitButton {
       .setInteractive();
     this.confirmText = scene.add
       .text(
-        layoutConfig.game.fixed.exitButton.x + layoutConfig.game.fixed.exitButton.xTextOffset,
-        layoutConfig.game.fixed.exitButton.y +
-          layoutConfig.game.fixed.exitButton.yTextOffset +
-          layoutConfig.game.fixed.exitButton.yConfirmOffset,
+        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
+        layoutConfig.game.ui.exitButton.y +
+          layoutConfig.game.ui.exitButton.yTextOffset +
+          layoutConfig.game.ui.exitButton.yConfirmOffset,
         'Kapitulation bestätigen'
       )
       .setFontSize(layoutConfig.fontSize.normal)
@@ -40,7 +40,7 @@ export default class ExitButton {
       .setOrigin(1, 0.5)
       .setInteractive();
     this.image = this.scene.add
-      .image(layoutConfig.game.fixed.exitButton.x, layoutConfig.game.fixed.exitButton.y, 'icon_exit')
+      .image(layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
       .setInteractive();
     (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(

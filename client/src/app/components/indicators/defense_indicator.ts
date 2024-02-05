@@ -5,9 +5,9 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class DefenseIndicator {
-  images: Phaser.GameObjects.Image[];
-  private scene!: Game;
-  private ownedByPlayer!: boolean;
+  private images: Phaser.GameObjects.Image[];
+  private scene: Game;
+  private ownedByPlayer: boolean;
   constructor(
     scene: Game,
     defenseIcons: ClientDefenseIcon[],

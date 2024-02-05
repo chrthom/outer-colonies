@@ -9,7 +9,7 @@ import {
   ClientGameResult,
   ClientHandCard,
   ClientIntervention,
-  ClientOpponent,
+  ClientPlayer,
   ClientState
 } from '../../shared/interfaces/client_state';
 import { InterventionAttack } from '../game_state/intervention';
@@ -77,10 +77,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       });
     });
   });
-  const actionPool = player.actionPool.pool
-    .filter(a => a.possibleCardTypes[0] != CardType.Orb)
-    .sort(ActionPool.sortOrder)
-    .map(a => a.toString());
   const battle: ClientBattle = {
     type: match.battle.type,
     playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
@@ -106,13 +102,25 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
             : undefined
       }
     : undefined;
-  const opponentData: ClientOpponent = {
-    name: opponent.name,
-    hand: toHand(opponent.hand),
-    handCardSize: opponent.hand.length,
-    deckSize: opponent.deck.length,
-    discardPileIds: opponent.discardPile.map(c => c.id)
-  };
+  const players: ClientPlayer[] = [player, opponent].map(p => {
+    const actionPool = p.actionPool.pool
+      .filter(a => a.possibleCardTypes[0] != CardType.Orb)
+      .sort(ActionPool.sortOrder)
+      .map(a => a.toString());
+    const hasToRetractCards = cardStacks
+      .filter(cs => cs.ownedByPlayer === (p.no == playerNo))
+      .flatMap(cs => cs.cards)
+      .some(c => c.insufficientEnergy);
+    return {
+      actionPool: actionPool,
+      deckSize: p.deck.length,
+      discardPileIds: p.discardPile.map(c => c.id),
+      hand: toHand(p.hand),
+      handCardLimit: p.handCardLimit,
+      hasToRetractCards: hasToRetractCards,
+      name: p.name
+    };
+  });
   const gameResult: ClientGameResult | undefined = match.gameResult.gameOver
     ? {
         won: match.gameResult.winnerNo == player.no,
@@ -121,21 +129,15 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       }
     : undefined;
   return {
+    battle: battle,
+    cardStacks: cardStacks,
+    gameResult: gameResult,
+    highlightCardUUID: match.highlightCard?.uuid,
+    intervention: intervention,
+    opponent: players[1],
+    player: players[0],
     playerIsActive: match.activePlayerNo == playerNo,
     playerPendingAction: match.pendingActionPlayerNo == playerNo,
-    name: player.name,
     turnPhase: match.turnPhase,
-    actionPool: actionPool,
-    opponent: opponentData,
-    hand: toHand(player.hand),
-    handCardLimit: player.handCardLimit,
-    deckSize: player.deck.length,
-    discardPileIds: player.discardPile.map(c => c.id),
-    cardStacks: cardStacks,
-    battle: battle,
-    intervention: intervention,
-    gameResult: gameResult,
-    hasToRetractCards: cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy),
-    highlightCardUUID: match.highlightCard?.uuid
   };
 }

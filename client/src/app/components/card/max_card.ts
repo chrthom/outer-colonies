@@ -4,7 +4,7 @@ import Game from '../../scenes/game';
 
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
-    super(scene, layoutConfig.game.fixed.maxCard.x, layoutConfig.game.fixed.maxCard.y, 1, {
+    super(scene, layoutConfig.game.ui.maxCard.x, layoutConfig.game.ui.maxCard.y, 1, {
       scale: layoutConfig.game.cards.scale.max
     });
     this.hide();

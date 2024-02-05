@@ -15,8 +15,8 @@ import CardImage from './card_image';
 
 export default class CardStack {
   cards!: Array<Card>;
-  uuid!: string;
-  data!: ClientCardStack;
+  uuid: string;
+  data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
   private scene!: Game;
@@ -39,7 +39,7 @@ export default class CardStack {
     this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
     this.filterCardsByIdList(removedCardIds).forEach(c => {
       let toDeck = false;
-      if (this.scene.state.discardPileIds.slice(-1).pop() != c.cardId) {
+      if (this.scene.state.player.discardPileIds.slice(-1).pop() != c.cardId) { // TODO: Also check opponent discard pile
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
@@ -109,17 +109,17 @@ export default class CardStack {
       c.tween({
         targets: undefined,
         duration: animationConfig.duration.move,
-        x: this.x(),
+        x: this.x,
         y: this.y(index),
         angle: this.data.ownedByPlayer ? 0 : 180
       });
     });
-    this.damageIndicator?.tween(this.x(), this.zoneLayout().y);
-    this.defenseIndicator?.tween(this.x(), this.zoneLayout().y);
+    this.damageIndicator?.tween(this.x, this.zoneLayout.y);
+    this.defenseIndicator?.tween(this.x, this.zoneLayout.y);
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
-      c => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
+      c => new Card(this.scene, this.x, this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
     );
     this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -130,8 +130,8 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        this.x(),
-        this.zoneLayout().y,
+        this.x,
+        this.zoneLayout.y,
         this.data.ownedByPlayer,
         false
       );
@@ -145,8 +145,8 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        this.x(),
-        this.zoneLayout().y,
+        this.x,
+        this.zoneLayout.y,
         this.data.ownedByPlayer
       );
     }
@@ -166,9 +166,9 @@ export default class CardStack {
       this.tween();
     }
   }
-  private x() {
+  private get x() {
     return (
-      this.zoneLayout().x +
+      this.zoneLayout.x +
       (this.data.zoneCardsNum == 1
         ? layoutConfig.game.cards.placement.zoneWidth / 2
         : (this.data.index * layoutConfig.game.cards.placement.zoneWidth) / (this.data.zoneCardsNum - 1))
@@ -176,9 +176,9 @@ export default class CardStack {
   }
   private y(index: number) {
     const yDistance = layoutConfig.game.cards.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
-    return this.zoneLayout().y + index * yDistance;
+    return this.zoneLayout.y + index * yDistance;
   }
-  private zoneLayout(): Coordinates {
+  private get zoneLayout(): Coordinates {
     const zoneLayout = this.data.ownedByPlayer
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;

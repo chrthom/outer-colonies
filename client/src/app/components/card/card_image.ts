@@ -10,12 +10,12 @@ export interface CardImageConfig {
 }
 
 export default class CardImage {
-  image!: Phaser.GameObjects.Image;
-  cardId!: number;
-  protected scene!: Game;
-  protected imageHighlight!: Phaser.GameObjects.Image;
-  protected ownedByPlayer!: boolean;
-  private imageMask!: Phaser.GameObjects.Image;
+  image: Phaser.GameObjects.Image;
+  cardId: number;
+  protected scene: Game;
+  protected imageHighlight: Phaser.GameObjects.Image;
+  protected ownedByPlayer: boolean;
+  private imageMask: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;
     this.cardId = cardId;
@@ -42,7 +42,7 @@ export default class CardImage {
     this.imageMask.destroy();
   }
   discard(toDeck?: boolean) {
-    const discardPileIds = this.scene.state.discardPileIds.slice();
+    const discardPileIds = this.scene.state.player.discardPileIds.slice(); // TODO: Also check opponent
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
@@ -70,8 +70,8 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.game.fixed.maxedTacticCard.x,
-      y: layoutConfig.game.fixed.maxedTacticCard.y,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
       angle: 0,
       scale: layoutConfig.game.cards.scale.max
     });
@@ -142,7 +142,13 @@ export default class CardImage {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
     this.scene.tweens.add(tweenConfig);
   }
+  protected get placementConfig() {
+    return CardImage.getPlacementConfig(this.ownedByPlayer);
+  }
   private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  }
+  protected static getPlacementConfig(ownedByPlayer: boolean) {
+    return ownedByPlayer ? layoutConfig.game.cards.placement.player : layoutConfig.game.cards.placement.opponent;
   }
 }

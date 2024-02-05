@@ -1,5 +1,4 @@
 import CardImage from './card_image';
-import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
@@ -7,25 +6,29 @@ import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/inte
 
 export default class DeckCard extends CardImage {
   indicator?: ValueIndicator;
-  constructor(scene: Game) {
+  constructor(scene: Game, ownedByPlayer: boolean) {
     super(
       scene,
-      layoutConfig.game.cards.placement.player.deck.x,
-      layoutConfig.game.cards.placement.player.deck.y,
-      1
+      DeckCard.getPlacementConfig(ownedByPlayer).deck.x,
+      DeckCard.getPlacementConfig(ownedByPlayer).deck.y,
+      1,
+      {
+        isOpponentCard: !ownedByPlayer
+      }
     );
     this.image.on('pointerdown', () => this.onClickAction());
   }
   update() {
     if (this.indicator) this.indicator.destroy();
     const cardsForMission = this.scene.plannedBattle.downsideCardsNum;
+    const deckSize = this.scene.getPlayerState(this.ownedByPlayer).deckSize;
     this.indicator = new ValueIndicator(
       this.scene,
-      this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
-      this.scene.state.deckSize - cardsForMission < 10,
-      layoutConfig.game.cards.placement.player.deck.x,
-      layoutConfig.game.cards.placement.player.deck.y,
-      true,
+      deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
+      deckSize - cardsForMission < 10,
+      this.placementConfig.deck.x,
+      this.placementConfig.deck.y,
+      this.ownedByPlayer,
       true
     );
   }

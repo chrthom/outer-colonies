@@ -4,10 +4,10 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class ValueIndicator {
-  shape!: Phaser.GameObjects.Shape;
-  text!: Phaser.GameObjects.Text;
-  private scene!: Game;
-  private ownedByPlayer!: boolean;
+  private shape: Phaser.GameObjects.Shape;
+  private text: Phaser.GameObjects.Text;
+  private scene: Game;
+  private ownedByPlayer: boolean;
   constructor(
     scene: Game,
     value: string,

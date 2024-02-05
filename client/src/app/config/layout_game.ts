@@ -84,11 +84,22 @@ class LayoutGameConfig {
     },
     stackYDistance: 38
   };
-  readonly fixed = {
+  readonly ui = {
     actionPool: {
-      x: 2370,
-      y: 1040,
-      yDistance: -55
+      player: {
+        x: 2370,
+        y: 1040,
+        yDistance: -55
+      },
+      opponent: {
+        x: 2370,
+        y: -100,
+        yDistance: 55
+      }
+    },
+    combatRange: {
+      x: 1760,
+      y: 730
     },
     continueButton: {
       x: 2370,
@@ -114,6 +125,12 @@ class LayoutGameConfig {
       x: 1200,
       y: 900
     },
+    missionCards: {
+      x: 1760,
+      y: 650,
+      xDistance: 20,
+      yDistance: 10
+    },
     prompt: {
       box: {
         x: 1850,
@@ -121,18 +138,6 @@ class LayoutGameConfig {
       },
       x: 1875,
       y: 165
-    }
-  };
-  readonly ui = {
-    combatRange: {
-      x: 1760,
-      y: 730
-    },
-    missionCards: {
-      x: 1760,
-      y: 650,
-      xDistance: 20,
-      yDistance: 10
     },
     zones: {
       playerColony: {

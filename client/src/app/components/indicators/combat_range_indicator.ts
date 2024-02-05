@@ -2,8 +2,8 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export default class CombatRangeIndicator {
-  private scene!: Game;
-  private images!: Phaser.GameObjects.Image[];
+  private scene: Game;
+  private images: Phaser.GameObjects.Image[];
   constructor(scene: Game) {
     this.scene = scene;
     this.images = [1, 2, 3, 4].map(i =>

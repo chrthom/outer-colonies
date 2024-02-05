@@ -6,18 +6,23 @@ import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src
 import { animationConfig } from '../../config/animation';
 
 export default class HandCard extends CardImage {
-  uuid!: string;
+  uuid: string;
   data!: ClientHandCard;
   constructor(scene: Game, data: ClientHandCard) {
     super(
       scene,
       layoutConfig.game.cards.placement.player.deck.x,
       layoutConfig.game.cards.placement.player.deck.y,
-      data.cardId
+      data.cardId,
+      {
+        isOpponentCard: !data.ownedByPlayer
+      }
     );
     this.uuid = data.uuid;
     this.update(data);
-    this.image.on('pointerdown', () => this.onClickAction());
+    if (this.ownedByPlayer) {
+      this.image.on('pointerdown', () => this.onClickAction());
+    }
     this.setDepth(layoutConfig.depth.handCard);
     this.enableMaximizeOnMouseover();
   }
@@ -26,9 +31,9 @@ export default class HandCard extends CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.draw,
-      x: this.x(),
-      y: this.y(),
-      angle: this.angle()
+      x: this.x,
+      y: this.y,
+      angle: this.angle
     });
   }
   highlightPlayability() {
@@ -36,21 +41,22 @@ export default class HandCard extends CardImage {
     if (this.data.playable) this.highlightSelectable();
   }
   private invIndex(data: ClientHandCard) {
-    return this.scene.state.hand.length - data.index - 1;
+    const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
+    return handData.hand.length - data.index - 1;
   }
-  private x() {
+  private get x() {
     return (
-      layoutConfig.game.cards.placement.player.hand.x +
+      this.placementConfig.hand.x +
       this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private y() {
+  private get y() {
     return (
-      layoutConfig.game.cards.placement.player.hand.y +
+      this.placementConfig.hand.y +
       this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
-  private angle() {
+  private get angle() {
     return (
       layoutConfig.game.cards.placement.hand.startAngle +
       this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep
