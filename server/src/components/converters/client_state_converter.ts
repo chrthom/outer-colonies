@@ -138,6 +138,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     player: players[0],
     playerIsActive: match.activePlayerNo == playerNo,
     playerPendingAction: match.pendingActionPlayerNo == playerNo,
-    turnPhase: match.turnPhase,
+    turnPhase: match.turnPhase
   };
 }

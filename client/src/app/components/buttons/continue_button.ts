@@ -120,11 +120,7 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(
-        layoutConfig.game.ui.continueButton.x,
-        layoutConfig.game.ui.continueButton.y,
-        `button_${name}`
-      )
+      .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

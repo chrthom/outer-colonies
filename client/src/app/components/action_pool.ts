@@ -15,14 +15,12 @@ export default class ActionPool {
   }
   update() {
     this.destroy();
-    const placementConfig = this.ownedByPlayer ? layoutConfig.game.ui.actionPool.player : layoutConfig.game.ui.actionPool.player;
+    const placementConfig = this.ownedByPlayer
+      ? layoutConfig.game.ui.actionPool.player
+      : layoutConfig.game.ui.actionPool.player;
     this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
       this.scene.add
-        .image(
-          placementConfig.x,
-          placementConfig.y + index * placementConfig.yDistance,
-          `icon_${action}`
-        )
+        .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
         .setOrigin(0.5, 0.5)
         .setTint(
           designConfig.tint.primary,

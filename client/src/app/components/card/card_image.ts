@@ -149,6 +149,8 @@ export default class CardImage {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
-    return ownedByPlayer ? layoutConfig.game.cards.placement.player : layoutConfig.game.cards.placement.opponent;
+    return ownedByPlayer
+      ? layoutConfig.game.cards.placement.player
+      : layoutConfig.game.cards.placement.opponent;
   }
 }

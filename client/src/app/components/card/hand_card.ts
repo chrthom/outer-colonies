@@ -46,14 +46,12 @@ export default class HandCard extends CardImage {
   }
   private get x() {
     return (
-      this.placementConfig.hand.x +
-      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
+      this.placementConfig.hand.x + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
   private get y() {
     return (
-      this.placementConfig.hand.y +
-      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+      this.placementConfig.hand.y + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
   private get angle() {
