@@ -18,8 +18,9 @@ export default class MissionCards {
           layoutConfig.game.ui.missionCards.x + index * layoutConfig.game.ui.missionCards.xDistance,
           layoutConfig.game.ui.missionCards.y + index * layoutConfig.game.ui.missionCards.yDistance,
           id,
-          false,
-          layoutConfig.game.cards.scale.min
+          {
+            scale: layoutConfig.game.cards.scale.min
+          }
         );
       });
       this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());
