@@ -198,7 +198,7 @@ export default class Game extends Phaser.Scene {
     this.preloader.destroy();
     this.resetSelection();
     this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
-      const newHandCards = this.state.player.hand.filter(c => !this.hand.some(h => h.uuid == c.uuid), this);
+      const newHandCards = this.newHandCards;
       this.retractCardsExist = false; // If true, then the hand animations are delayed
       this.updateCardStacks(newHandCards);
       this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
@@ -291,7 +291,7 @@ export default class Game extends Phaser.Scene {
           origin = this.maximizedTacticCard; // Origin is maximized tactic card
           this.maximizedTacticCard = undefined;
         } else {
-          origin = this.hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
+          origin = this.getPlayerUI(cs.ownedByPlayer).hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
         }
         origin?.destroy();
         return new CardStack(this, cs, origin);
@@ -304,17 +304,33 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
-    this.hand.map(h => {
-      const newData = this.state.player.hand.find(hcd => hcd.uuid == h.uuid);
-      if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
-      else if (newData) h.update(newData); // Move existing hand card to new position
-      else if (oldState.turnPhase != TurnPhase.Build) h.discard();
-      else h.destroy(); // Card was attached to a card stack in updateCardStacks()
+    [true, false].map(isPlayer => {
+      this.getPlayerUI(isPlayer).hand.map(h => {
+        const newData = this.getPlayerState(isPlayer).hand.find(hcd => hcd.uuid == h.uuid);
+        if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
+        else if (newData) h.update(newData); // Move existing hand card to new position
+        else if (oldState.turnPhase != TurnPhase.Build) h.discard();
+        else h.destroy(); // Card was attached to a card stack in updateCardStacks()
+      }, this);
     }, this);
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
-      .forEach(h => this.hand.push(h), this);
-    this.hand = this.hand.filter(h => this.state.player.hand.find(hcd => hcd.uuid == h.uuid), this);
+      .forEach(h => this.getPlayerUI(h.ownedByPlayer).hand.push(h), this);
+    [true, false].forEach(isPlayer => {
+      this.getPlayerUI(isPlayer).hand = this.getPlayerUI(isPlayer).hand.filter(
+        h => this.state.player.hand.find(hcd => hcd.uuid == h.uuid),
+        this
+      );
+    }, this);
+  }
+
+  private get newHandCards(): ClientHandCard[] {
+    return [true, false].flatMap(isPlayer =>
+      this.getPlayerState(isPlayer).hand.filter(
+        c => !this.getPlayerUI(isPlayer).hand.some(h => h.uuid == c.uuid),
+        this
+      )
+    );
   }
 
   private animateOpponentTacticCard(oldState: ClientState) {
@@ -337,9 +353,11 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHighlighting() {
-    this.player.deck.highlightReset();
-    this.player.discardPile.highlightReset();
-    this.hand.forEach(c => c.highlightReset());
+    [this.player, this.opponent].forEach(uiElements => {
+      uiElements.deck.highlightReset();
+      uiElements.discardPile.highlightReset();
+      uiElements.hand.forEach(c => c.highlightReset());
+    });
     this.cardStacks.forEach(c => c.highlightReset());
     if (this.state.playerPendingAction) {
       if (this.plannedBattle.type == BattleType.Mission) {
@@ -348,7 +366,7 @@ export default class Game extends Phaser.Scene {
           this.player.discardPile.highlightSelected();
         }
       }
-      this.hand.forEach(c => {
+      this.player.hand.forEach(c => {
         if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
         else if (this.activeCards.hand == c.uuid) c.highlightSelected();
         else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
@@ -357,7 +375,7 @@ export default class Game extends Phaser.Scene {
       this.cardStacks.forEach(cs => {
         if (this.activeCards.hand) {
           // Choose target for hand card
-          const activeCard = this.hand.find(c => c.uuid == this.activeCards.hand);
+          const activeCard = this.player.hand.find(c => c.uuid == this.activeCards.hand);
           if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
         } else {
           const allShips = this.state.battle?.playerShipIds.concat(this.state.battle.opponentShipIds);

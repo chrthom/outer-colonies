@@ -12,9 +12,9 @@ export interface CardImageConfig {
 export default class CardImage {
   image: Phaser.GameObjects.Image;
   cardId: number;
+  ownedByPlayer: boolean;
   protected scene: Game;
   protected imageHighlight: Phaser.GameObjects.Image;
-  protected ownedByPlayer: boolean;
   private imageMask: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;

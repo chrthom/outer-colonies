@@ -53,18 +53,18 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.hand.find(h => h.cardId == c.cardId); // TODO: Include checking opponent hand cards
-      const x = this.data.ownedByPlayer
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId); // TODO: Include checking opponent hand cards
+      const x = this.ownedByPlayer
         ? handCard
           ? handCard.image.x
           : layoutConfig.game.cards.placement.player.deck.x
         : layoutConfig.game.cards.placement.opponent.deck.x;
-      const y = this.data.ownedByPlayer
+      const y = this.ownedByPlayer
         ? handCard
           ? handCard.image.y
           : layoutConfig.game.cards.placement.player.deck.y
         : layoutConfig.game.cards.placement.opponent.deck.y;
-      const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
+      const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
@@ -91,8 +91,11 @@ export default class CardStack {
       c.highlightReset();
     });
   }
+  get ownedByPlayer() {
+    return this.data.ownedByPlayer;
+  }
   get isOpponentColony(): boolean {
-    return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == 0;
+    return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == 0;
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
@@ -112,7 +115,7 @@ export default class CardStack {
         duration: animationConfig.duration.move,
         x: this.x,
         y: this.y(index),
-        angle: this.data.ownedByPlayer ? 0 : 180
+        angle: this.ownedByPlayer ? 0 : 180
       });
     });
     this.damageIndicator?.tween(this.x, this.zoneLayout.y);
@@ -120,7 +123,7 @@ export default class CardStack {
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
-      c => new Card(this.scene, this.x, this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
+      c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c)
     );
     this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -133,7 +136,7 @@ export default class CardStack {
         this.data.criticalDamage,
         this.x,
         this.zoneLayout.y,
-        this.data.ownedByPlayer,
+        this.ownedByPlayer,
         false
       );
     }
@@ -148,7 +151,7 @@ export default class CardStack {
         this.data.defenseIcons,
         this.x,
         this.zoneLayout.y,
-        this.data.ownedByPlayer
+        this.ownedByPlayer
       );
     }
     if (fromHand) {
@@ -158,7 +161,7 @@ export default class CardStack {
           .setY(origin.image.y)
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
-      } else if (!this.data.ownedByPlayer) {
+      } else if (!this.ownedByPlayer) {
         this.cards[0] // TODO: Tween from opponent hand
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)
@@ -176,11 +179,11 @@ export default class CardStack {
     );
   }
   private y(index: number) {
-    const yDistance = layoutConfig.game.cards.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
+    const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
     return this.zoneLayout.y + index * yDistance;
   }
   private get zoneLayout(): Coordinates {
-    const zoneLayout = this.data.ownedByPlayer
+    const zoneLayout = this.ownedByPlayer
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
