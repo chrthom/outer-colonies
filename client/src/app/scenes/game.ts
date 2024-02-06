@@ -165,6 +165,7 @@ export default class Game extends Phaser.Scene {
     });
     this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
       this.player?.countdownIndicator.update(countdown[0]);
+      this.opponent?.countdownIndicator.update(countdown[1]);
     });
     this.background.initInterface();
     this.opponent = {
@@ -220,7 +221,7 @@ export default class Game extends Phaser.Scene {
 
   updateView() {
     this.background.update();
-    [this.player].forEach(ui => {
+    [this.player, this.opponent].forEach(ui => {
       ui.actionPool.update();
       ui.deck.update();
       ui.discardPile.update();

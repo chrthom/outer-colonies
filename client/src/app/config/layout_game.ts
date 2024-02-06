@@ -53,15 +53,15 @@ class LayoutGameConfig {
         },
         deck: {
           x: 1930,
-          y: -300
+          y: 205
         },
         discardPile: {
           x: 2190,
-          y: -300
+          y: 205
         },
         hand: {
           x: 2370,
-          y: -580
+          y: -75
         },
         orbit: {
           x: 1000,
@@ -103,23 +103,29 @@ class LayoutGameConfig {
     },
     continueButton: {
       x: 2370,
-      y: 60,
+      y: 600,
       xTextOffset: -120
     },
     countdownIndicator: {
-      x: 2350,
-      y: 600
+      player: {
+        x: 2325,
+        y: 675
+      },
+      opponent: {
+        x: 2325,
+        y: 525
+      }
     },
     exitButton: {
-      x: 2350,
-      y: 450,
+      x: 2330,
+      y: 735,
       xTextOffset: -30,
       yTextOffset: -4,
       yConfirmOffset: 35
     },
     maxCard: {
       x: 2110,
-      y: 820
+      y: 1060
     },
     maxedTacticCard: {
       x: 1200,
@@ -133,10 +139,10 @@ class LayoutGameConfig {
     },
     prompt: {
       box: {
-        x: 1850,
+        x: 2850, // -1000
         y: 120
       },
-      x: 1875,
+      x: 2875, // -1000
       y: 165
     },
     zones: {

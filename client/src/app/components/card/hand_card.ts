@@ -52,14 +52,23 @@ export default class HandCard extends CardImage {
   }
   private get y() {
     return (
-      this.placementConfig.hand.y + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+      this.placementConfig.hand.y +
+      this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
   private get angle() {
     return (
-      layoutConfig.game.cards.placement.hand.startAngle +
-      this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep
+      this.orientation +
+      this.factor *
+        (layoutConfig.game.cards.placement.hand.startAngle +
+          this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep)
     );
+  }
+  private get factor() {
+    return this.ownedByPlayer ? 1 : -1;
+  }
+  private get orientation() {
+    return this.ownedByPlayer ? 0 : 180;
   }
   private onClickAction() {
     if (this.scene.state.playerPendingAction) {
