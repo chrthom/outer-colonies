@@ -56,8 +56,7 @@ export default class CardImage {
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
         if (!toDeck) {
-          const discardPile = this.ownedByPlayer ? this.scene.player.discardPile : this.scene.opponent.discardPile;
-          discardPile.update(discardPileIds);
+          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
         }
         this.destroy();
       }

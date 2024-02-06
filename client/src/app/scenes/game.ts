@@ -2,6 +2,7 @@ import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
 import {
   ClientHandCard,
+  ClientPlayer,
   ClientState,
   emptyClientState
 } from '../../../../server/src/shared/interfaces/client_state';
@@ -232,7 +233,11 @@ export default class Game extends Phaser.Scene {
     this.updateHighlighting();
   }
 
-  getPlayerState(isPlayer: boolean) {
+  getPlayerUI(isPlayer: boolean): PlayerUIElements {
+    return isPlayer ? this.player : this.opponent;
+  }
+
+  getPlayerState(isPlayer: boolean): ClientPlayer {
     return isPlayer ? this.state.player : this.state.opponent;
   }
 
