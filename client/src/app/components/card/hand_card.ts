@@ -34,12 +34,19 @@ export default class HandCard extends CardImage {
       duration: animationConfig.duration.draw,
       x: this.x,
       y: this.y,
-      angle: this.angle
+      angle: this.shortestAngle(this.angle)
     });
   }
   highlightPlayability() {
     this.highlightReset();
     if (this.data.playable) this.highlightSelectable();
+  }
+  override discard(toDeck?: boolean) {
+    if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
+      this.cardId = this.data.cardId;
+      this.image.setTexture(`card_${this.cardId}`);
+    }
+    super.discard(toDeck);
   }
   private invIndex(data: ClientHandCard) {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;

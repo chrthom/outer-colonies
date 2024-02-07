@@ -116,7 +116,7 @@ export default class CardStack {
         duration: animationConfig.duration.move,
         x: this.x,
         y: this.y(index),
-        angle: this.ownedByPlayer ? 0 : 180
+        angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
     this.damageIndicator?.tween(this.x, this.zoneLayout.y);
@@ -163,6 +163,7 @@ export default class CardStack {
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
       } else if (!this.ownedByPlayer) {
+        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
         this.cards[0] // TODO: Tween from opponent hand
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)

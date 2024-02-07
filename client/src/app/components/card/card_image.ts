@@ -52,7 +52,7 @@ export default class CardImage {
       duration: animationConfig.duration.move,
       x: targetCoordinates.x,
       y: targetCoordinates.y,
-      angle: this.ownedByPlayer ? 0 : 180,
+      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
         if (!toDeck) {
@@ -72,7 +72,7 @@ export default class CardImage {
       duration: animationConfig.duration.showTacticCard,
       x: layoutConfig.game.ui.maxedTacticCard.x,
       y: layoutConfig.game.ui.maxedTacticCard.y,
-      angle: 0,
+      angle: this.shortestAngle(0),
       scale: layoutConfig.game.cards.scale.max
     });
   }
@@ -141,6 +141,9 @@ export default class CardImage {
   tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
     this.scene.tweens.add(tweenConfig);
+  }
+  shortestAngle(targetAngle: number): number {
+    return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);
   }
   protected get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
