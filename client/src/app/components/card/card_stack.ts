@@ -12,6 +12,7 @@ import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -95,7 +96,7 @@ export default class CardStack {
     return this.data.ownedByPlayer;
   }
   get isOpponentColony(): boolean {
-    return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == 0;
+    return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == constants.colonyID;
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();

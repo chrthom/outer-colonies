@@ -12,8 +12,8 @@ export default class HandCard extends CardImage {
   constructor(scene: Game, data: ClientHandCard) {
     super(
       scene,
-      layoutConfig.game.cards.placement.player.deck.x,
-      layoutConfig.game.cards.placement.player.deck.y,
+      HandCard.getPlacementConfig(data.ownedByPlayer).deck.x,
+      HandCard.getPlacementConfig(data.ownedByPlayer).deck.y,
       data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
       {
         isOpponentCard: !data.ownedByPlayer

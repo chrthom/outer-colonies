@@ -1,4 +1,5 @@
 class OCConstants {
+  colonyID = 0;
   cardBackSideID = 1;
 }
 
