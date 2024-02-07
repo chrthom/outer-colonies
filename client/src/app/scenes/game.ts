@@ -305,33 +305,31 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], previousTurnPhase: TurnPhase) {
-    [true, false].map(isPlayer => {
-      this.getPlayerUI(isPlayer).hand.map(h => {
-        const newData = this.getPlayerState(isPlayer).hand.find(hcd => hcd.uuid == h.uuid);
-        if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
+    this.forBothPlayers((state, ui) =>
+      ui.hand.map(h => {
+        const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
+        if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
         else if (newData) h.update(newData); // Move existing hand card to new position
         else if (previousTurnPhase != TurnPhase.Build) h.discard();
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
-      }, this);
-    }, this);
+      }, this)
+    );
     newHandCards // Draw new hand cards
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.getPlayerUI(h.ownedByPlayer).hand.push(h), this);
-    [true, false].forEach(isPlayer => {
-      this.getPlayerUI(isPlayer).hand = this.getPlayerUI(isPlayer).hand.filter(
-        h => this.state.player.hand.find(hcd => hcd.uuid == h.uuid),
-        this
-      );
-    }, this);
+    this.forBothPlayers(
+      (state, ui) => (ui.hand = ui.hand.filter(h => state.hand.find(chc => chc.uuid == h.uuid)))
+    );
   }
 
   private get newHandCards(): ClientHandCard[] {
-    return [true, false].flatMap(isPlayer =>
-      this.getPlayerState(isPlayer).hand.filter(
-        c => !this.getPlayerUI(isPlayer).hand.some(h => h.uuid == c.uuid),
-        this
-      )
-    );
+    return this.forBothPlayers((state, ui) =>
+      state.hand.filter(c => !ui.hand.some(h => h.uuid == c.uuid))
+    ).flat();
+  }
+
+  private forBothPlayers<T>(f: (state: ClientPlayer, ui: PlayerUIElements) => T): T[] {
+    return [true, false].map(isPlayer => f(this.getPlayerState(isPlayer), this.getPlayerUI(isPlayer)), this);
   }
 
   private animateOpponentTacticCard(oldState: ClientState) {
