@@ -203,7 +203,7 @@ export default class Game extends Phaser.Scene {
       this.retractCardsExist = false; // If true, then the hand animations are delayed
       this.updateCardStacks(newHandCards);
       this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-        this.updateHandCards(newHandCards, oldState);
+        this.updateHandCards(newHandCards, oldState.turnPhase);
         this.animateOpponentTacticCard(oldState);
         this.updateView();
         this.highlightAttackIntervention();
@@ -304,13 +304,13 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  private updateHandCards(newHandCards: ClientHandCard[], oldState: ClientState) {
+  private updateHandCards(newHandCards: ClientHandCard[], previousTurnPhase: TurnPhase) {
     [true, false].map(isPlayer => {
       this.getPlayerUI(isPlayer).hand.map(h => {
         const newData = this.getPlayerState(isPlayer).hand.find(hcd => hcd.uuid == h.uuid);
         if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard(); //
         else if (newData) h.update(newData); // Move existing hand card to new position
-        else if (oldState.turnPhase != TurnPhase.Build) h.discard();
+        else if (previousTurnPhase != TurnPhase.Build) h.discard();
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
       }, this);
     }, this);
