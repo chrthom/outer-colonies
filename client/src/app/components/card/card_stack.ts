@@ -173,6 +173,8 @@ export default class CardStack {
     }
   }
   private get x() {
+    let zoneWidth = layoutConfig.game.cards.placement.zoneWidth;
+    if (this.data.zone == Zone.Neutral) zoneWidth /= 2; 
     return (
       this.zoneLayout.x +
       (this.data.zoneCardsNum == 1

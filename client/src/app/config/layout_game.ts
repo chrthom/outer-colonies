@@ -13,7 +13,7 @@ class LayoutGameConfig {
       yDistance: 50
     },
     placement: {
-      zoneWidth: 1530, //863 || -220
+      zoneWidth: 1530,
       hand: {
         angleStep: -5,
         xStep: -50,
@@ -21,17 +21,6 @@ class LayoutGameConfig {
         startAngle: 10
       },
       player: {
-        /*
-        xLeft +110
-        xRight -760
-        yTop +270
-        yBottom -90
-        
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 1094,
-        yBottom: 1340
-        */
         colony: {
           x: 120,
           y: 1365
@@ -109,7 +98,7 @@ class LayoutGameConfig {
       }
     },
     combatRange: {
-      x: 1760,
+      x: 1800,
       y: 730
     },
     continueButton: {
@@ -144,7 +133,7 @@ class LayoutGameConfig {
     },
     missionCards: {
       x: 1760,
-      y: 650,
+      y: 720,
       xDistance: 20,
       yDistance: 10
     },
