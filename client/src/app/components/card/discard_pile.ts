@@ -1,19 +1,22 @@
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
-import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
   indicator?: ValueIndicator;
-  constructor(scene: Game) {
+  constructor(scene: Game, ownedByPlayer: boolean) {
     super(
       scene,
-      layoutConfig.game.cards.placement.player.discardPile.x,
-      layoutConfig.game.cards.placement.player.discardPile.y,
-      1
+      DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.x,
+      DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.y,
+      constants.cardBackSideID,
+      {
+        isOpponentCard: !ownedByPlayer
+      }
     );
     this.update([]);
   }
@@ -32,8 +35,8 @@ export default class DiscardPile extends CardImage {
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        layoutConfig.game.cards.placement.player.discardPile.x,
-        layoutConfig.game.cards.placement.player.discardPile.y,
+        this.placementConfig.discardPile.x,
+        this.placementConfig.discardPile.y,
         true,
         true
       );

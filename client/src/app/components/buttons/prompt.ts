@@ -12,11 +12,11 @@ export default class Prompt {
   constructor(scene: Game) {
     this.scene = scene;
     this.image = this.scene.add
-      .image(layoutConfig.game.fixed.prompt.box.x, layoutConfig.game.fixed.prompt.box.y, 'prompt_box')
+      .image(layoutConfig.game.ui.prompt.box.x, layoutConfig.game.ui.prompt.box.y, 'prompt_box')
       .setOrigin(0, 0)
       .setScale(0.8);
     this.text = scene.add
-      .text(layoutConfig.game.fixed.prompt.x, layoutConfig.game.fixed.prompt.y, 'Lädt...')
+      .text(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'Lädt...')
       .setFontSize(layoutConfig.fontSize.small)
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
@@ -53,7 +53,7 @@ export default class Prompt {
   }
   private showBuildPhase() {
     let text: string;
-    if (this.scene.state.hasToRetractCards) {
+    if (this.scene.state.player.hasToRetractCards) {
       text = 'Einige deiner Karten haben nicht genügend Energie.\nNimm sie auf die Hand zurück!\n';
     } else if (this.scene.plannedBattle.type == BattleType.None) {
       text =
@@ -87,7 +87,7 @@ export default class Prompt {
     );
   }
   private showEndPhase() {
-    const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
+    const cardsToDrop = this.scene.state.player.hand.length - this.scene.state.player.handCardLimit;
     this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showIntervention() {

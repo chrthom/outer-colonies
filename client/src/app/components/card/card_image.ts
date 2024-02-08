@@ -4,18 +4,18 @@ import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
 export interface CardImageConfig {
-  isOpponentCard?: boolean,
-  cropped?: boolean,
-  scale?: number
+  isOpponentCard?: boolean;
+  cropped?: boolean;
+  scale?: number;
 }
 
 export default class CardImage {
-  image!: Phaser.GameObjects.Image;
-  cardId!: number;
-  protected scene!: Game;
-  protected imageHighlight!: Phaser.GameObjects.Image;
-  protected ownedByPlayer!: boolean;
-  private imageMask!: Phaser.GameObjects.Image;
+  image: Phaser.GameObjects.Image;
+  cardId: number;
+  ownedByPlayer: boolean;
+  protected scene: Game;
+  protected imageHighlight: Phaser.GameObjects.Image;
+  private imageMask: Phaser.GameObjects.Image;
   constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;
     this.cardId = cardId;
@@ -25,11 +25,15 @@ export default class CardImage {
         .setOrigin(0.5, 1)
         .setAngle(config?.isOpponentCard ? 180 : 0)
         .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal);
-    this.imageHighlight = setImageProps(scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false));
+    this.imageHighlight = setImageProps(
+      scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
+    );
     this.image = setImageProps(
       scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
     );
-    this.imageMask = setImageProps(scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false));
+    this.imageMask = setImageProps(
+      scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
+    );
     this.image.setMask(this.imageMask.createBitmapMask());
   }
   destroy() {
@@ -38,7 +42,7 @@ export default class CardImage {
     this.imageMask.destroy();
   }
   discard(toDeck?: boolean) {
-    const discardPileIds = this.scene.state.discardPileIds.slice();
+    const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
@@ -48,10 +52,12 @@ export default class CardImage {
       duration: animationConfig.duration.move,
       x: targetCoordinates.x,
       y: targetCoordinates.y,
-      angle: this.ownedByPlayer ? 0 : 180,
+      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
       scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
-        if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
+        if (!toDeck) {
+          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+        }
         this.destroy();
       }
     });
@@ -64,9 +70,9 @@ export default class CardImage {
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.game.fixed.maxedTacticCard.x,
-      y: layoutConfig.game.fixed.maxedTacticCard.y,
-      angle: 0,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
+      angle: this.shortestAngle(0),
       scale: layoutConfig.game.cards.scale.max
     });
   }
@@ -136,7 +142,18 @@ export default class CardImage {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
     this.scene.tweens.add(tweenConfig);
   }
+  shortestAngle(targetAngle: number): number {
+    return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);
+  }
+  protected get placementConfig() {
+    return CardImage.getPlacementConfig(this.ownedByPlayer);
+  }
   private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  }
+  protected static getPlacementConfig(ownedByPlayer: boolean) {
+    return ownedByPlayer
+      ? layoutConfig.game.cards.placement.player
+      : layoutConfig.game.cards.placement.opponent;
   }
 }

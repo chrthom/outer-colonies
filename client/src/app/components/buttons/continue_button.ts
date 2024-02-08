@@ -49,8 +49,8 @@ export default class ContinueButton {
     };
     this.text = scene.add
       .text(
-        layoutConfig.game.fixed.continueButton.x + layoutConfig.game.fixed.continueButton.xTextOffset,
-        layoutConfig.game.fixed.continueButton.y,
+        layoutConfig.game.ui.continueButton.x + layoutConfig.game.ui.continueButton.xTextOffset,
+        layoutConfig.game.ui.continueButton.y,
         ['']
       )
       .setFontSize(layoutConfig.fontSize.large)
@@ -90,7 +90,7 @@ export default class ContinueButton {
               });
             }
             this.showIncept();
-          } else if (this.scene.state.hasToRetractCards) {
+          } else if (this.scene.state.player.hasToRetractCards) {
             this.waitState();
           } else {
             this.showNextPhase();
@@ -120,11 +120,7 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(
-        layoutConfig.game.fixed.continueButton.x,
-        layoutConfig.game.fixed.continueButton.y,
-        `button_${name}`
-      )
+      .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
       .setInteractive()
       .setVisible(false);

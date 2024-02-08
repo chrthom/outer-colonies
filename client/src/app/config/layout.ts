@@ -21,6 +21,7 @@ class LayoutConfig {
     discardCard: 50,
     handCard: 70,
     battleEffects: 85,
+    maxCard: 95,
     maxedTacticCard: 100
   };
   readonly fontSize = new FontSizeConfig();

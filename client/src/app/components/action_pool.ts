@@ -4,22 +4,23 @@ import Game from '../scenes/game';
 
 export default class ActionPool {
   images: Phaser.GameObjects.Image[] = [];
-  private scene!: Game;
-  constructor(scene: Game) {
+  private scene: Game;
+  private ownedByPlayer: boolean;
+  constructor(scene: Game, ownedByPlayer: boolean) {
     this.scene = scene;
+    this.ownedByPlayer = ownedByPlayer;
   }
   destroy() {
     this.images.forEach(s => s.destroy());
   }
   update() {
     this.destroy();
-    this.images = this.scene.state.actionPool.map((action, index) =>
+    const placementConfig = this.ownedByPlayer
+      ? layoutConfig.game.ui.actionPool.player
+      : layoutConfig.game.ui.actionPool.player;
+    this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
       this.scene.add
-        .image(
-          layoutConfig.game.fixed.actionPool.x,
-          layoutConfig.game.fixed.actionPool.y + index * layoutConfig.game.fixed.actionPool.yDistance,
-          `icon_${action}`
-        )
+        .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
         .setOrigin(0.5, 0.5)
         .setTint(
           designConfig.tint.primary,

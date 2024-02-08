@@ -1,11 +1,13 @@
 import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionType } from '../config/enums';
 
-export interface ClientOpponent {
-  name: string;
-  hand: ClientHandCard[];
-  handCardSize: number;
+export interface ClientPlayer {
+  actionPool: string[];
   deckSize: number;
   discardPileIds: number[];
+  hand: ClientHandCard[];
+  handCardLimit: number;
+  hasToRetractCards: boolean;
+  name: string;
 }
 
 export interface ClientPlannedAttack {
@@ -86,42 +88,19 @@ export interface ClientGameResult {
 }
 
 export interface ClientState {
+  battle: ClientBattle;
+  cardStacks: ClientCardStack[];
+  gameResult?: ClientGameResult;
+  highlightCardUUID?: string;
+  intervention?: ClientIntervention;
+  opponent: ClientPlayer;
+  player: ClientPlayer;
   playerIsActive: boolean;
   playerPendingAction: boolean;
-  name: string;
   turnPhase: TurnPhase;
-  actionPool: string[];
-  opponent: ClientOpponent;
-  hand: ClientHandCard[];
-  handCardLimit: number;
-  deckSize: number;
-  discardPileIds: number[];
-  cardStacks: ClientCardStack[];
-  battle: ClientBattle;
-  intervention?: ClientIntervention;
-  gameResult?: ClientGameResult;
-  hasToRetractCards: boolean;
-  highlightCardUUID?: string;
 }
 
-export const emptyClientState = {
-  playerIsActive: false,
-  playerPendingAction: false,
-  name: '',
-  turnPhase: TurnPhase.Init,
-  actionPool: [],
-  opponent: {
-    name: '',
-    hand: [],
-    handCardSize: 0,
-    deckSize: 0,
-    discardPileIds: []
-  },
-  hand: [],
-  handCardLimit: 0,
-  deckSize: 0,
-  discardPileIds: [],
-  cardStacks: [],
+export const emptyClientState: ClientState = {
   battle: {
     type: BattleType.None,
     playerShipIds: [],
@@ -129,5 +108,26 @@ export const emptyClientState = {
     priceCardIds: [],
     range: 0
   },
-  hasToRetractCards: false
+  cardStacks: [],
+  opponent: {
+    actionPool: [],
+    deckSize: 0,
+    discardPileIds: [],
+    hand: [],
+    handCardLimit: 0,
+    hasToRetractCards: false,
+    name: ''
+  },
+  player: {
+    actionPool: [],
+    deckSize: 0,
+    discardPileIds: [],
+    hand: [],
+    handCardLimit: 0,
+    hasToRetractCards: false,
+    name: ''
+  },
+  playerIsActive: false,
+  playerPendingAction: false,
+  turnPhase: TurnPhase.Init
 };

@@ -4,7 +4,7 @@ import Game from '../../scenes/game';
 
 export default class MissionCards {
   minCards: CardImage[] = [];
-  private scene!: Game;
+  private scene: Game;
   constructor(scene: Game) {
     this.scene = scene;
   }
