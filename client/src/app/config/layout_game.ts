@@ -13,7 +13,7 @@ class LayoutGameConfig {
       yDistance: 50
     },
     placement: {
-      zoneWidth: 650,
+      zoneWidth: 1530, //863 || -220
       hand: {
         angleStep: -5,
         xStep: -50,
@@ -21,9 +21,20 @@ class LayoutGameConfig {
         startAngle: 10
       },
       player: {
+        /*
+        xLeft +110
+        xRight -760
+        yTop +270
+        yBottom -90
+        
+        xLeft: 10,
+        xRight: 1760,
+        yTop: 1094,
+        yBottom: 1340
+        */
         colony: {
-          x: 1000,
-          y: 1250
+          x: 120,
+          y: 1365
         },
         deck: {
           x: 1930,
@@ -39,17 +50,17 @@ class LayoutGameConfig {
         },
         orbit: {
           x: 120,
-          y: 1250
+          y: 1069
         },
         neutral: {
           x: 1000,
-          y: 670
+          y: 773
         }
       },
       opponent: {
         colony: {
           x: 120,
-          y: 100
+          y: -15
         },
         deck: {
           x: 1930,
@@ -64,12 +75,12 @@ class LayoutGameConfig {
           y: -75
         },
         orbit: {
-          x: 1000,
-          y: 100
+          x: 120,
+          y: 281
         },
         neutral: {
           x: 120,
-          y: 670
+          y: 577
         }
       }
     },
@@ -147,34 +158,34 @@ class LayoutGameConfig {
     },
     zones: {
       playerColony: {
-        xLeft: 897,
+        xLeft: 10,
         xRight: 1760,
-        yTop: 977,
+        yTop: 1094,
         yBottom: 1340
       },
       playerOrbit: {
         xLeft: 10,
-        xRight: 873,
-        yTop: 977,
-        yBottom: 1340
+        xRight: 1760,
+        yTop: 823,
+        yBottom: 1069
       },
       neutral: {
         xLeft: 10,
         xRight: 1760,
-        yTop: 397,
-        yBottom: 953
+        yTop: 552,
+        yBottom: 798
       },
       opponentColony: {
         xLeft: 10,
-        xRight: 873,
-        yTop: 10,
-        yBottom: 373
-      },
-      opponentOrbit: {
-        xLeft: 897,
         xRight: 1760,
         yTop: 10,
-        yBottom: 373
+        yBottom: 256
+      },
+      opponentOrbit: {
+        xLeft: 10,
+        xRight: 1760,
+        yTop: 281,
+        yBottom: 527
       }
     }
   };
