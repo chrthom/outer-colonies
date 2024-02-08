@@ -193,7 +193,7 @@ export default class Game extends Phaser.Scene {
   }
 
   updateState(state: ClientState) {
-    const oldState = this.state ?? state;
+    const previousTurnPhase = this.state?.turnPhase ?? TurnPhase.Init;
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
@@ -203,8 +203,7 @@ export default class Game extends Phaser.Scene {
       this.retractCardsExist = false; // If true, then the hand animations are delayed
       this.updateCardStacks(newHandCards);
       this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-        this.updateHandCards(newHandCards, oldState.turnPhase);
-        this.animateOpponentTacticCard(oldState);
+        this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
         this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
@@ -330,21 +329,6 @@ export default class Game extends Phaser.Scene {
 
   private forBothPlayers<T>(f: (state: ClientPlayer, ui: PlayerUIElements) => T): T[] {
     return [true, false].map(isPlayer => f(this.getPlayerState(isPlayer), this.getPlayerUI(isPlayer)), this);
-  }
-
-  private animateOpponentTacticCard(oldState: ClientState) {
-    const cardId = oldState.opponent.hand.find(hcd => hcd.uuid == this.state.highlightCardUUID)?.cardId;
-    if (cardId) {
-      new CardImage( // TODO: Animate from opponent hand
-        this,
-        layoutConfig.game.cards.placement.opponent.deck.x,
-        layoutConfig.game.cards.placement.opponent.deck.y,
-        cardId,
-        {
-          isOpponentCard: true
-        }
-      ).maximizeTacticCard();
-    }
   }
 
   private discardMaximizedTacticCard() {
