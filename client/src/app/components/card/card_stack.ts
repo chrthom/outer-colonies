@@ -191,7 +191,7 @@ export default class CardStack {
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
-    else if ((this.data.zone = Zone.Oribital)) return zoneLayout.orbit;
+    else if (this.data.zone == Zone.Oribital) return zoneLayout.orbit;
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {
