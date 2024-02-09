@@ -16,6 +16,10 @@ export default class MaxCard extends CardImage {
   }
   show(cardId: number) {
     this.setCardId(cardId);
+    this.updatePosition();
     this.image.setVisible(true);
+  }
+  updatePosition() {
+    this.setX(this.scene.input.mousePointer.x + 315).setY(this.scene.input.mousePointer.y + 100);
   }
 }
