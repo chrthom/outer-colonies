@@ -63,13 +63,13 @@ export default class Background {
   initInterface() {
     const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
       this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
-    const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
+    const addCaption = (c: CornerConfig, caption: string, color: string) =>
       this.scene.add
         .text((c.xLeft + c.xRight) / 2, (c.yTop + c.yBottom) / 2, caption)
-        .setFontSize(layoutConfig.fontSize.large)
+        .setFontSize(layoutConfig.fontSize.huge)
         .setFontFamily(designConfig.fontFamily.caption)
-        .setColor(opponent ? designConfig.color.opponent : designConfig.color.player)
-        .setAlpha(designConfig.alpha.normal)
+        .setColor(color)
+        .setAlpha(designConfig.alpha.faded)
         .setAlign('center')
         .setOrigin(0.5, 0.5);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
@@ -86,11 +86,11 @@ export default class Background {
       addZoneElements(layoutConfig.game.ui.zones.opponentOrbit, true)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
-      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', false),
-      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', false),
-      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', false),
-      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', true),
-      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', true)
+      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', designConfig.color.player),
+      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', designConfig.color.player),
+      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', designConfig.color.neutral),
+      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', designConfig.color.opponent),
+      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', designConfig.color.opponent)
     ];
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }
