@@ -99,7 +99,7 @@ class LayoutGameConfig {
       }
     },
     combatRange: {
-      x: 1860,
+      x: 1855,
       y: 600
     },
     continueButton: {
@@ -134,7 +134,7 @@ class LayoutGameConfig {
     },
     missionCards: {
       x: 1760,
-      y: 730,
+      y: 735,
       xDistance: 20,
       yDistance: 10
     },
