@@ -29,9 +29,16 @@ export default class CardImage {
       scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
     );
     this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive({
-        useHandCursor: true
-      })
+      scene.add.image(x, y, `card_${cardId}`)
+        .setCrop(
+          layoutConfig.game.cards.size.normal.x,
+          layoutConfig.game.cards.size.normal.y,
+          layoutConfig.game.cards.size.normal.width,
+          layoutConfig.game.cards.size.normal.height
+        )
+        .setInteractive({
+          useHandCursor: true
+        })
     );
     this.imageMask = setImageProps(
       scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
