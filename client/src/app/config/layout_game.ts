@@ -14,6 +14,7 @@ class LayoutGameConfig {
     },
     placement: {
       zoneWidth: 1530,
+      halfZoneWidth: 650,
       hand: {
         angleStep: -5,
         xStep: -50,
@@ -23,7 +24,7 @@ class LayoutGameConfig {
       player: {
         colony: {
           x: 120,
-          y: 1365
+          y: 1360
         },
         deck: {
           x: 1930,
@@ -39,17 +40,17 @@ class LayoutGameConfig {
         },
         orbit: {
           x: 120,
-          y: 1069
+          y: 1074
         },
         neutral: {
           x: 1000,
-          y: 773
+          y: 798
         }
       },
       opponent: {
         colony: {
           x: 120,
-          y: -15
+          y: -10
         },
         deck: {
           x: 1930,
@@ -65,11 +66,11 @@ class LayoutGameConfig {
         },
         orbit: {
           x: 120,
-          y: 281
+          y: 276
         },
         neutral: {
           x: 120,
-          y: 577
+          y: 552
         }
       }
     },
@@ -93,7 +94,7 @@ class LayoutGameConfig {
       },
       opponent: {
         x: 2370,
-        y: -100,
+        y: 235,
         yDistance: 55
       }
     },

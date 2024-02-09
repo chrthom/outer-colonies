@@ -173,13 +173,12 @@ export default class CardStack {
     }
   }
   private get x() {
-    let zoneWidth = layoutConfig.game.cards.placement.zoneWidth;
-    if (this.data.zone == Zone.Neutral) zoneWidth /= 2; 
+    const zoneWidth = this.data.zone == Zone.Neutral ? layoutConfig.game.cards.placement.halfZoneWidth : layoutConfig.game.cards.placement.zoneWidth;
     return (
       this.zoneLayout.x +
       (this.data.zoneCardsNum == 1
-        ? layoutConfig.game.cards.placement.zoneWidth / 2
-        : (this.data.index * layoutConfig.game.cards.placement.zoneWidth) / (this.data.zoneCardsNum - 1))
+        ? zoneWidth / 2
+        : (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1))
     );
   }
   private y(index: number) {

@@ -17,16 +17,17 @@ export default class ActionPool {
     this.destroy();
     const placementConfig = this.ownedByPlayer
       ? layoutConfig.game.ui.actionPool.player
-      : layoutConfig.game.ui.actionPool.player;
+      : layoutConfig.game.ui.actionPool.opponent;
+    const color = this.ownedByPlayer ? designConfig.tint.primary : designConfig.tint.secondary;
     this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
       this.scene.add
         .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
         .setOrigin(0.5, 0.5)
         .setTint(
-          designConfig.tint.primary,
+          color,
           designConfig.tint.neutral,
-          designConfig.tint.primary,
-          designConfig.tint.primary
+          color,
+          color
         )
         .setAlpha(designConfig.alpha.normal)
     );
