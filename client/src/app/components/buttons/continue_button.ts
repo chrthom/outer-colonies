@@ -58,7 +58,9 @@ export default class ContinueButton {
       .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
       o =>
         o
@@ -122,7 +124,9 @@ export default class ContinueButton {
     return this.scene.add
       .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
-      .setInteractive()
+      .setInteractive({
+        useHandCursor: true
+      })
       .setVisible(false);
   }
   private showNextPhase() {

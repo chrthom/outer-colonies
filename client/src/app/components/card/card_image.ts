@@ -29,7 +29,9 @@ export default class CardImage {
       scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
     );
     this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
+      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive({
+        useHandCursor: true
+      })
     );
     this.imageMask = setImageProps(
       scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
@@ -94,18 +96,7 @@ export default class CardImage {
   }
   setCardId(cardId: number) {
     this.cardId = cardId;
-    const x = this.image.x;
-    const y = this.image.y;
-    const angle = this.image.angle;
-    const scale = this.image.scale;
-    this.image.destroy();
-    this.image = this.scene.add
-      .image(x, y, `card_${cardId}`)
-      .setCrop(41, 41, 740, 1040)
-      .setOrigin(0.5, 1)
-      .setAngle(angle)
-      .setScale(scale)
-      .setInteractive();
+    this.image.setTexture(`card_${cardId}`);
   }
   setVisible(visible: boolean) {
     this.image.setVisible(visible);
