@@ -23,12 +23,7 @@ export default class ActionPool {
       this.scene.add
         .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
         .setOrigin(0.5, 0.5)
-        .setTint(
-          color,
-          designConfig.tint.neutral,
-          color,
-          color
-        )
+        .setTint(color, designConfig.tint.neutral, color, color)
         .setAlpha(designConfig.alpha.normal)
     );
   }

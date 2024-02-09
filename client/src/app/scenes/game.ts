@@ -28,7 +28,6 @@ import { animationConfig } from '../config/animation';
 import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 import CardImage from '../components/card/card_image';
-import { layoutConfig } from '../config/layout';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import { backgroundConfig } from '../config/background';

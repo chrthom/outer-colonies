@@ -99,7 +99,7 @@ class LayoutGameConfig {
       }
     },
     combatRange: {
-      x: 1900,
+      x: 1860,
       y: 600
     },
     continueButton: {
