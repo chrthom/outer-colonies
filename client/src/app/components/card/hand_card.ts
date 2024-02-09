@@ -25,7 +25,7 @@ export default class HandCard extends CardImage {
       this.image.on('pointerdown', () => this.onClickAction());
     }
     this.setDepth(layoutConfig.depth.handCard);
-    this.enableMaximizeOnMouseover();
+    if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
   }
   update(data: ClientHandCard) {
     this.data = data;

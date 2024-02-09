@@ -25,7 +25,9 @@ export default class RetractCardButton {
       .setOrigin(0.5, 0.5)
       .setAlpha(designConfig.alpha.normal)
       .setDepth(layoutConfig.depth.indicators)
-      .setInteractive()
+      .setInteractive({
+        useHandCursor: true
+      })
       .on('pointerover', () => this.setTintHover())
       .on('pointerout', () => (crititcal ? this.setTintCritical() : this.setTintNormal()))
       .on('pointerdown', () => scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex));

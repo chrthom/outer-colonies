@@ -17,7 +17,7 @@ export default class DeckCard extends CardImage {
         isOpponentCard: !ownedByPlayer
       }
     );
-    this.image.on('pointerdown', () => this.onClickAction());
+    if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());
   }
   update() {
     if (this.indicator) this.indicator.destroy();

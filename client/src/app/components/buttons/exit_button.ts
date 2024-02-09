@@ -24,7 +24,9 @@ export default class ExitButton {
       .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     this.confirmText = scene.add
       .text(
         layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
@@ -38,11 +40,15 @@ export default class ExitButton {
       .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     this.image = this.scene.add
       .image(layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(
       o =>
         o
