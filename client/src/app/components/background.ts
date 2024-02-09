@@ -65,13 +65,13 @@ export default class Background {
       this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
     const addCaption = (c: CornerConfig, caption: string, opponent: boolean) =>
       this.scene.add
-        .text(c.xLeft, c.yBottom, caption)
-        .setFontSize(layoutConfig.fontSize.normal)
+        .text((c.xLeft + c.xRight) / 2, (c.yTop + c.yBottom) / 2, caption)
+        .setFontSize(layoutConfig.fontSize.large)
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(opponent ? designConfig.color.opponent : designConfig.color.player)
         .setAlpha(designConfig.alpha.normal)
-        .setAlign('right')
-        .setOrigin(0, 1);
+        .setAlign('center')
+        .setOrigin(0.5, 0.5);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
       addCorner(c.xLeft, c.yTop, 0, opponent),
       addCorner(c.xRight, c.yTop, 90, opponent),
