@@ -173,11 +173,15 @@ export default class CardStack {
     }
   }
   private get x() {
+    const zoneWidth =
+      this.data.zone == Zone.Neutral
+        ? layoutConfig.game.cards.placement.halfZoneWidth
+        : layoutConfig.game.cards.placement.zoneWidth;
     return (
       this.zoneLayout.x +
       (this.data.zoneCardsNum == 1
-        ? layoutConfig.game.cards.placement.zoneWidth / 2
-        : (this.data.index * layoutConfig.game.cards.placement.zoneWidth) / (this.data.zoneCardsNum - 1))
+        ? zoneWidth / 2
+        : (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1))
     );
   }
   private y(index: number) {
@@ -189,7 +193,7 @@ export default class CardStack {
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
-    else if ((this.data.zone = Zone.Oribital)) return zoneLayout.orbit;
+    else if (this.data.zone == Zone.Oribital) return zoneLayout.orbit;
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {
