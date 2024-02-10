@@ -1,7 +1,8 @@
 class DesignConfig {
   readonly alpha = {
     normal: 0.8,
-    faded: 0.3
+    faded: 0.3,
+    transparent: 0.1
   };
   readonly tint = {
     faded: 0x666666,

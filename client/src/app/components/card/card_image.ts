@@ -29,9 +29,17 @@ export default class CardImage {
       scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
     );
     this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive({
-        useHandCursor: true
-      })
+      scene.add
+        .image(x, y, `card_${cardId}`)
+        .setCrop(
+          layoutConfig.game.cards.size.normal.x,
+          layoutConfig.game.cards.size.normal.y,
+          layoutConfig.game.cards.size.normal.width,
+          layoutConfig.game.cards.size.normal.height
+        )
+        .setInteractive({
+          useHandCursor: true
+        })
     );
     this.imageMask = setImageProps(
       scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
@@ -94,13 +102,15 @@ export default class CardImage {
     this.imageHighlight.setVisible(false);
     this.image.setTint(designConfig.tint.neutral);
   }
-  setCardId(cardId: number) {
+  setCardId(cardId: number): this {
     this.cardId = cardId;
     this.image.setTexture(`card_${cardId}`);
+    return this;
   }
-  setVisible(visible: boolean) {
+  setVisible(visible: boolean): this {
     this.image.setVisible(visible);
     if (!visible) this.imageHighlight.setVisible(visible);
+    return this;
   }
   setX(x: number): this {
     this.forAllImages(i => i.setX(x));
@@ -123,11 +133,13 @@ export default class CardImage {
     return this;
   }
   enableMaximizeOnMouseover() {
-    this.image.off('pointerover');
-    this.image.off('pointerout');
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard?.show(this.cardId))
-      .on('pointerout', () => this.scene.obj.maxCard?.hide());
+      .off('pointerover')
+      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
+      .off('pointerout')
+      .on('pointerout', () => this.scene.obj.maxCard.hide())
+      .off('pointermove')
+      .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
   }
   tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];

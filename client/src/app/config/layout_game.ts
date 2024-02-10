@@ -83,6 +83,18 @@ class LayoutGameConfig {
       normal: 0.25,
       max: 0.75
     },
+    size: {
+      original: {
+        width: 822,
+        height: 1122
+      },
+      normal: {
+        x: 41,
+        y: 41,
+        width: 740,
+        height: 1040
+      }
+    },
     stackYDistance: 38
   };
   readonly ui = {
@@ -125,8 +137,8 @@ class LayoutGameConfig {
       yConfirmOffset: 35
     },
     maxCard: {
-      x: 2110,
-      y: 1060
+      xOffset: 350,
+      yOffset: 100
     },
     maxedTacticCard: {
       x: 1200,

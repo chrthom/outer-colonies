@@ -66,10 +66,10 @@ export default class Background {
     const addCaption = (c: CornerConfig, caption: string, color: string) =>
       this.scene.add
         .text((c.xLeft + c.xRight) / 2, (c.yTop + c.yBottom) / 2, caption)
-        .setFontSize(layoutConfig.fontSize.huge)
+        .setFontSize(layoutConfig.fontSize.giant)
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(color)
-        .setAlpha(designConfig.alpha.faded)
+        .setAlpha(designConfig.alpha.transparent)
         .setAlign('center')
         .setOrigin(0.5, 0.5);
     const addZoneElements = (c: CornerConfig, opponent: boolean) => [
