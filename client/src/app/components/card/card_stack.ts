@@ -54,7 +54,7 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId); // TODO: Include checking opponent hand cards
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId);
       const x = this.ownedByPlayer
         ? handCard
           ? handCard.image.x
@@ -177,12 +177,14 @@ export default class CardStack {
       this.data.zone == Zone.Neutral
         ? layoutConfig.game.cards.placement.halfZoneWidth
         : layoutConfig.game.cards.placement.zoneWidth;
-    return (
-      this.zoneLayout.x +
-      (this.data.zoneCardsNum == 1
-        ? zoneWidth / 2
-        : (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1))
-    );
+    let x = zoneWidth;
+    if (this.data.zoneCardsNum <= 2) x /= 2;
+    if (this.data.zoneCardsNum >= 2) {
+      x += this.zoneLayout.x;
+      if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
+      else x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
+    }
+    return x;
   }
   private y(index: number) {
     const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
