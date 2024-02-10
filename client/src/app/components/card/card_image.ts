@@ -29,7 +29,8 @@ export default class CardImage {
       scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
     );
     this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`)
+      scene.add
+        .image(x, y, `card_${cardId}`)
         .setCrop(
           layoutConfig.game.cards.size.normal.x,
           layoutConfig.game.cards.size.normal.y,

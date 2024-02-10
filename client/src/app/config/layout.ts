@@ -10,7 +10,7 @@ export class FontSizeConfig {
   readonly small = 20;
   readonly normal = 28;
   readonly large = 36;
-  readonly huge = 80;
+  readonly giant = 150;
 }
 
 class LayoutConfig {

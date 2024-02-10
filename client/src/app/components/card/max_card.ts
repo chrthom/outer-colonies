@@ -20,13 +20,14 @@ export default class MaxCard extends CardImage {
     this.image.setVisible(true);
   }
   updatePosition() {
-    let x = this.scene.input.mousePointer.x + layoutConfig.game.ui.maxCard.xOffset;
-    if (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2) {
-      x = this.scene.input.mousePointer.x - layoutConfig.game.ui.maxCard.xOffset;
-    }
+    let x =
+      this.scene.input.mousePointer.x +
+      layoutConfig.game.ui.maxCard.xOffset *
+        (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1);
     let y = this.scene.input.mousePointer.y + layoutConfig.game.ui.maxCard.yOffset;
-    const cardHeight = layoutConfig.game.cards.size.normal.height * layoutConfig.game.cards.scale.max;
+    const cardHeight = layoutConfig.game.cards.size.original.height * layoutConfig.game.cards.scale.max;
     if (y < cardHeight) y = cardHeight;
+    else if (y > layoutConfig.scene.height) y = layoutConfig.scene.height;
     this.setX(x).setY(y);
   }
 }
