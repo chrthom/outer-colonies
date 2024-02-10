@@ -20,7 +20,7 @@ export default class MaxCard extends CardImage {
     this.image.setVisible(true);
   }
   updatePosition() {
-    let x =
+    const x =
       this.scene.input.mousePointer.x +
       layoutConfig.game.ui.maxCard.xOffset *
         (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1);
