@@ -72,20 +72,6 @@ export default class CardImage {
       }
     });
   }
-  maximizeTacticCard() {
-    this.scene.maximizedTacticCard?.discard();
-    this.scene.maximizedTacticCard = this;
-    this.setDepth(layoutConfig.depth.maxedTacticCard);
-    this.highlightReset();
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.game.ui.maxedTacticCard.x,
-      y: layoutConfig.game.ui.maxedTacticCard.y,
-      angle: this.shortestAngle(0),
-      scale: layoutConfig.game.cards.scale.max
-    });
-  }
   highlightDisabled() {
     this.highlightReset();
     this.image.setTint(designConfig.tint.faded);

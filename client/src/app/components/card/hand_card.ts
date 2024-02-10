@@ -41,6 +41,21 @@ export default class HandCard extends CardImage {
     this.highlightReset();
     if (this.data.playable) this.highlightSelectable();
   }
+  maximizeTacticCard() {
+    this.scene.maximizedTacticCard?.discard();
+    this.scene.maximizedTacticCard = this;
+    this.setCardId(this.data.cardId);
+    this.setDepth(layoutConfig.depth.maxedTacticCard);
+    this.highlightReset();
+    this.tween({
+      targets: undefined,
+      duration: animationConfig.duration.showTacticCard,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
+      angle: this.shortestAngle(0),
+      scale: layoutConfig.game.cards.scale.max
+    });
+  }
   override discard(toDeck?: boolean) {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
       this.cardId = this.data.cardId;

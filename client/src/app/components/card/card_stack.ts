@@ -40,7 +40,7 @@ export default class CardStack {
     this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
     this.filterCardsByIdList(removedCardIds).forEach(c => {
       let toDeck = false;
-      if (this.scene.state.player.discardPileIds.slice(-1).pop() != c.cardId) {
+      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
         // TODO: Also check opponent discard pile
         toDeck = true;
         this.scene.retractCardsExist = true;
