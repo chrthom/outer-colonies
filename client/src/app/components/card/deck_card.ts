@@ -4,6 +4,7 @@ import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/e
 import ValueIndicator from '../indicators/value_indicator';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { layoutConfig } from 'src/app/config/layout';
 
 export default class DeckCard extends CardImage {
   indicator?: ValueIndicator;
@@ -14,7 +15,8 @@ export default class DeckCard extends CardImage {
       DeckCard.getPlacementConfig(ownedByPlayer).deck.y,
       constants.cardBackSideID,
       {
-        isOpponentCard: !ownedByPlayer
+        isOpponentCard: !ownedByPlayer,
+        perspective: layoutConfig.game.perspective.board
       }
     );
     if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());

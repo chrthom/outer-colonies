@@ -31,7 +31,7 @@ export default class CardImage {
     this.image.setMask(this.imageMask.createBitmapMask());
     this.setAngle(config?.isOpponentCard ? 180 : 0)
       .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal)
-      .setXRotation(config?.perspective ?? layoutConfig.game.perspective);
+      .setXRotation(config?.perspective ?? layoutConfig.game.perspective.neutral);
   }
   destroy() {
     this.image.destroy();
@@ -44,21 +44,26 @@ export default class CardImage {
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.move,
-      x: targetCoordinates.x,
-      y: targetCoordinates.y,
-      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
-      scale: layoutConfig.game.cards.scale.normal,
-      onComplete: () => {
-        if (!toDeck) {
-          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+    this.tween(
+      {
+        targets: undefined,
+        duration: animationConfig.duration.move,
+        x: targetCoordinates.x,
+        y: targetCoordinates.y,
+        angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+        scale: layoutConfig.game.cards.scale.normal,
+        onComplete: () => {
+          if (!toDeck) {
+            this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+          }
+          this.destroy();
         }
-        this.destroy();
+      },
+      {
+        targets: undefined,
+        x: Phaser.Math.DegToRad(layoutConfig.game.perspective.board)
       }
-    });
-    // TODO: Tween model rotation
+    );
   }
   highlightDisabled() {
     this.highlightReset();
@@ -119,9 +124,20 @@ export default class CardImage {
       .off('pointermove')
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
   }
-  tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
+  tween(
+    tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig,
+    tweenRotationConfig?: Phaser.Types.Tweens.TweenBuilderConfig
+  ) {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
     this.scene.tweens.add(tweenConfig);
+    if (tweenRotationConfig) {
+      tweenRotationConfig.targets = [
+        this.image.modelRotation,
+        this.imageHighlight.modelRotation,
+        this.imageMask.modelRotation
+      ];
+      this.scene.tweens.add(tweenRotationConfig);
+    }
   }
   shortestAngle(targetAngle: number): number {
     return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);

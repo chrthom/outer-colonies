@@ -16,7 +16,8 @@ export default class HandCard extends CardImage {
       HandCard.getPlacementConfig(data.ownedByPlayer).deck.y,
       data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
       {
-        isOpponentCard: !data.ownedByPlayer
+        isOpponentCard: !data.ownedByPlayer,
+        perspective: layoutConfig.game.perspective.board
       }
     );
     this.uuid = data.uuid;
@@ -29,13 +30,19 @@ export default class HandCard extends CardImage {
   }
   update(data: ClientHandCard) {
     this.data = data;
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.draw,
-      x: this.x,
-      y: this.y,
-      angle: this.shortestAngle(this.angle)
-    });
+    this.tween(
+      {
+        targets: undefined,
+        duration: animationConfig.duration.draw,
+        x: this.x,
+        y: this.y,
+        angle: this.shortestAngle(this.angle)
+      },
+      {
+        targets: undefined,
+        x: layoutConfig.game.perspective.neutral
+      }
+    );
   }
   highlightPlayability() {
     this.highlightReset();
@@ -47,14 +54,20 @@ export default class HandCard extends CardImage {
     this.setCardId(this.data.cardId);
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.game.ui.maxedTacticCard.x,
-      y: layoutConfig.game.ui.maxedTacticCard.y,
-      angle: this.shortestAngle(0),
-      scale: layoutConfig.game.cards.scale.max
-    });
+    this.tween(
+      {
+        targets: undefined,
+        duration: animationConfig.duration.showTacticCard,
+        x: layoutConfig.game.ui.maxedTacticCard.x,
+        y: layoutConfig.game.ui.maxedTacticCard.y,
+        angle: this.shortestAngle(0),
+        scale: layoutConfig.game.cards.scale.max
+      },
+      {
+        targets: undefined,
+        x: layoutConfig.game.perspective.neutral
+      }
+    );
   }
   override discard(toDeck?: boolean) {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {

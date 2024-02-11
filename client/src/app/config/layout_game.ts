@@ -1,5 +1,9 @@
 class LayoutGameConfig {
-  readonly perspective = -30;
+  readonly perspective = {
+    none: 0,
+    neutral: -10,
+    board: -30
+  };
   readonly cards = {
     damageIndicator: {
       xOffsetPlayer: -75,

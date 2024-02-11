@@ -6,7 +6,7 @@ import { constants } from '../../../../../server/src/shared/config/constants';
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(scene, 0, 0, constants.cardBackSideID, {
-      perspective: 0,
+      perspective: layoutConfig.game.perspective.none,
       scale: layoutConfig.game.cards.scale.max
     });
     this.image.setDepth(layoutConfig.depth.maxCard);

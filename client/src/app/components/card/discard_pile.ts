@@ -4,6 +4,7 @@ import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { layoutConfig } from 'src/app/config/layout';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
@@ -15,7 +16,8 @@ export default class DiscardPile extends CardImage {
       DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.y,
       constants.cardBackSideID,
       {
-        isOpponentCard: !ownedByPlayer
+        isOpponentCard: !ownedByPlayer,
+        perspective: layoutConfig.game.perspective.board
       }
     );
     this.update([]);
