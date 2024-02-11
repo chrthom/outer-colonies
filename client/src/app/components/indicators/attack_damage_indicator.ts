@@ -7,7 +7,7 @@ import CardStack from '../card/card_stack';
 
 export default class AttackDamageIndicator {
   private scene: Game;
-  private cardImage: Phaser.GameObjects.Image;
+  private cardImage: Phaser.GameObjects.Plane;
   constructor(scene: Game, cardStack: CardStack, attack: ClientAttack) {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;

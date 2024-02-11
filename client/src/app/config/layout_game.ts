@@ -1,4 +1,5 @@
 class LayoutGameConfig {
+  readonly perspective = -30;
   readonly cards = {
     damageIndicator: {
       xOffsetPlayer: -75,
@@ -24,53 +25,53 @@ class LayoutGameConfig {
       player: {
         colony: {
           x: 120,
-          y: 1360
+          y: 1220
         },
         deck: {
           x: 1930,
-          y: 1070
+          y: 930
         },
         discardPile: {
           x: 2190,
-          y: 1070
+          y: 930
         },
         hand: {
           x: 2370,
-          y: 1350
+          y: 1220
         },
         orbit: {
           x: 120,
-          y: 1074
+          y: 934
         },
         neutral: {
           x: 1000,
-          y: 798
+          y: 658
         }
       },
       opponent: {
         colony: {
           x: 120,
-          y: -10
+          y: 130
         },
         deck: {
           x: 1930,
-          y: 205
+          y: 345
         },
         discardPile: {
           x: 2190,
-          y: 205
+          y: 345
         },
         hand: {
           x: 2370,
-          y: -75
+          y: 65
         },
         orbit: {
           x: 120,
-          y: 276
+          y: 416
         },
         neutral: {
           x: 120,
-          y: 552
+          y: 692
         }
       }
     },
@@ -138,11 +139,11 @@ class LayoutGameConfig {
     },
     maxCard: {
       xOffset: 350,
-      yOffset: 100
+      yOffset: -320
     },
     maxedTacticCard: {
       x: 1200,
-      y: 900
+      y: 675
     },
     missionCards: {
       x: 1760,

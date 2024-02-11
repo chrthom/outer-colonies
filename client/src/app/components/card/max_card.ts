@@ -6,6 +6,7 @@ import { constants } from '../../../../../server/src/shared/config/constants';
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(scene, 0, 0, constants.cardBackSideID, {
+      perspective: 0,
       scale: layoutConfig.game.cards.scale.max
     });
     this.image.setDepth(layoutConfig.depth.maxCard);
@@ -25,9 +26,10 @@ export default class MaxCard extends CardImage {
       layoutConfig.game.ui.maxCard.xOffset *
         (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1);
     let y = this.scene.input.mousePointer.y + layoutConfig.game.ui.maxCard.yOffset;
-    const cardHeight = layoutConfig.game.cards.size.original.height * layoutConfig.game.cards.scale.max;
-    if (y < cardHeight) y = cardHeight;
-    else if (y > layoutConfig.scene.height) y = layoutConfig.scene.height;
+    const halfCardHeight =
+      (layoutConfig.game.cards.size.original.height * layoutConfig.game.cards.scale.max) / 2;
+    if (y < halfCardHeight) y = halfCardHeight;
+    else if (y > layoutConfig.scene.height - halfCardHeight) y = layoutConfig.scene.height - halfCardHeight;
     this.setX(x).setY(y);
   }
 }
