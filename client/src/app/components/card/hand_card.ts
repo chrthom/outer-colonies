@@ -34,9 +34,9 @@ export default class HandCard extends CardImage {
       {
         targets: undefined,
         duration: animationConfig.duration.draw,
-        x: this.x,
-        y: this.y,
-        angle: this.shortestAngle(this.angle)
+        x: this.targetX,
+        y: this.targetY,
+        angle: this.shortestAngle(this.targetAngle)
       },
       {
         targets: undefined,
@@ -80,18 +80,18 @@ export default class HandCard extends CardImage {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
     return handData.hand.length - data.index - 1;
   }
-  private get x() {
+  private get targetX() {
     return (
       this.placementConfig.hand.x + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private get y() {
+  private get targetY() {
     return (
       this.placementConfig.hand.y +
       this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
-  private get angle() {
+  private get targetAngle() {
     return (
       this.orientation +
       this.factor *

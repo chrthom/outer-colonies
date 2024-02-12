@@ -95,25 +95,43 @@ export default class CardImage {
     this.forAllImages(i => i.setX(x));
     return this;
   }
+  get x(): number {
+    return this.image.x;
+  }
   setY(y: number): this {
     this.forAllImages(i => i.setY(y));
     return this;
+  }
+  get y(): number {
+    return this.image.y;
   }
   setAngle(angle: number): this {
     this.forAllImages(i => i.setAngle(angle));
     return this;
   }
+  get angle(): number {
+    return this.image.angle;
+  }
   setDepth(depth: number): this {
     this.forAllImages(i => i.setDepth(depth));
     return this;
+  }
+  get depth(): number {
+    return this.image.depth;
   }
   setScale(scale: number): this {
     this.forAllImages(i => i.setScale(scale));
     return this;
   }
+  get scale(): number {
+    return this.image.scale;
+  }
   setXRotation(x: number): this {
-    this.forAllImages(i => (i.modelRotation.x = Phaser.Math.DegToRad(x) * (this.ownedByPlayer ? 1 : -1)));
+    this.forAllImages(i => (i.modelRotation.x = this.perspectiveDegToRad(x)));
     return this;
+  }
+  get xRotation(): number {
+    return Phaser.Math.RadToDeg(this.image.modelRotation.x) * (this.ownedByPlayer ? 1 : -1)
   }
   enableMaximizeOnMouseover() {
     this.image
@@ -136,6 +154,7 @@ export default class CardImage {
         this.imageHighlight.modelRotation,
         this.imageMask.modelRotation
       ];
+      tweenRotationConfig['x'] = this.perspectiveDegToRad(tweenRotationConfig['x']);
       this.scene.tweens.add(tweenRotationConfig);
     }
   }
@@ -147,6 +166,9 @@ export default class CardImage {
   }
   private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  }
+  private perspectiveDegToRad(deg: number): number {
+    return Phaser.Math.DegToRad(deg) * (this.ownedByPlayer ? 1 : -1);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer

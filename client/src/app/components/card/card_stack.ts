@@ -157,10 +157,11 @@ export default class CardStack {
     if (fromHand) {
       if (origin) {
         this.cards[0]
-          .setX(origin.image.x)
-          .setY(origin.image.y)
-          .setAngle(origin.image.angle)
-          .setScale(origin.image.scale);
+          .setX(origin.x)
+          .setY(origin.y)
+          .setAngle(origin.angle)
+          .setScale(origin.scale)
+          .setXRotation(origin.xRotation);
       } else if (!this.ownedByPlayer) {
         console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
         this.cards[0] // TODO: Tween from opponent hand

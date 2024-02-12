@@ -3,6 +3,7 @@ import Game from '../../scenes/game';
 import CardImage from './card_image';
 import RetractCardButton from '../buttons/retract_card_button';
 import { animationConfig } from 'src/app/config/animation';
+import { layoutConfig } from 'src/app/config/layout';
 
 export default class Card extends CardImage {
   data: ClientCard;
@@ -15,7 +16,7 @@ export default class Card extends CardImage {
     cardStackUUID: string,
     data: ClientCard
   ) {
-    super(scene, x, y, data.id, { isOpponentCard: opponentCard, cropped: true });
+    super(scene, x, y, data.id, { isOpponentCard: opponentCard, cropped: true, perspective: layoutConfig.game.perspective.board });
     this.data = data;
     if (data.retractable) {
       this.retractCardButton = new RetractCardButton(
@@ -40,7 +41,10 @@ export default class Card extends CardImage {
     this.scene.time.delayedCall(animationConfig.duration.attack, () => this.highlightReset());
   }
   override tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
-    super.tween(tweenConfig);
+    super.tween(tweenConfig, {
+      targets: undefined,
+      x: layoutConfig.game.perspective.board
+    });
     this.retractCardButton?.tween(tweenConfig['x'], tweenConfig['y']);
   }
 }
