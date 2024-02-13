@@ -18,7 +18,7 @@ export default class ActionPool {
     const placementConfig = this.ownedByPlayer
       ? layoutConfig.game.ui.actionPool.player
       : layoutConfig.game.ui.actionPool.opponent;
-    const color = this.ownedByPlayer ? designConfig.tint.primary : designConfig.tint.secondary;
+    const color = this.ownedByPlayer ? designConfig.tint.player : designConfig.tint.opponent;
     this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
       this.scene.add
         .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)

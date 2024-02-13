@@ -1,8 +1,8 @@
 class LayoutGameConfig {
   readonly perspective = {
-    none: 0,
-    neutral: -10,
-    board: -30
+    none: Phaser.Math.DegToRad(0),
+    neutral: Phaser.Math.DegToRad(-10),
+    board: Phaser.Math.DegToRad(-30)
   };
   readonly cards = {
     damageIndicator: {
@@ -165,34 +165,24 @@ class LayoutGameConfig {
     },
     zones: {
       playerColony: {
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 1094,
-        yBottom: 1340
+        x: 885,
+        y: 1217
       },
       playerOrbit: {
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 823,
-        yBottom: 1069
+        x: 885,
+        y: 946
       },
       neutral: {
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 552,
-        yBottom: 798
+        x: 885,
+        y: 675
       },
       opponentColony: {
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 10,
-        yBottom: 256
+        x: 885,
+        y: 133
       },
       opponentOrbit: {
-        xLeft: 10,
-        xRight: 1760,
-        yTop: 281,
-        yBottom: 527
+        x: 885,
+        y: 404
       }
     }
   };

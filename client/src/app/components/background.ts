@@ -1,16 +1,9 @@
 import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { designConfig } from '../config/design';
-import { layoutConfig } from '../config/layout';
+import { Coordinates, layoutConfig } from '../config/layout';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
-
-interface CornerConfig {
-  xLeft: number;
-  xRight: number;
-  yTop: number;
-  yBottom: number;
-}
 
 export default class Background {
   private scene: Matchmaking | Game;
@@ -40,7 +33,6 @@ export default class Background {
         this.sunCoordinatesAndScale(this.currentRing)[1],
         'background_sun'
       )
-      .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     if (this.isGame) {
@@ -61,36 +53,33 @@ export default class Background {
   }
 
   initInterface() {
-    const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
-      this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
-    const addCaption = (c: CornerConfig, caption: string, color: string) =>
+    const addCaption = (c: Coordinates, caption: string, color: string) =>
       this.scene.add
-        .text((c.xLeft + c.xRight) / 2, (c.yTop + c.yBottom) / 2, caption)
+        .text(c.x, c.y, caption)
         .setFontSize(layoutConfig.fontSize.giant)
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(color)
         .setAlpha(designConfig.alpha.transparent)
-        .setAlign('center')
-        .setOrigin(0.5, 0.5);
-    const addZoneElements = (c: CornerConfig, opponent: boolean) => [
-      addCorner(c.xLeft, c.yTop, 0, opponent),
-      addCorner(c.xRight, c.yTop, 90, opponent),
-      addCorner(c.xLeft, c.yBottom, 270, opponent),
-      addCorner(c.xRight, c.yBottom, 180, opponent)
-    ];
+        .setAlign('center');
+    const addZone = (c: Coordinates, tint: number) => {
+      const zone = this.scene.add.plane(c.x, c.y, 'zone').setTint(tint);
+      zone.modelRotation.x = layoutConfig.game.perspective.board;
+      return zone;
+    };
+    const zConf = layoutConfig.game.ui.zones;
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZoneElements(layoutConfig.game.ui.zones.playerColony, false),
-      addZoneElements(layoutConfig.game.ui.zones.playerOrbit, false),
-      addZoneElements(layoutConfig.game.ui.zones.neutral, false),
-      addZoneElements(layoutConfig.game.ui.zones.opponentColony, true),
-      addZoneElements(layoutConfig.game.ui.zones.opponentOrbit, true)
+      addZone(zConf.playerColony, designConfig.tint.player),
+      addZone(zConf.playerOrbit, designConfig.tint.player),
+      addZone(zConf.neutral, designConfig.tint.neutral),
+      addZone(zConf.opponentColony, designConfig.tint.opponent),
+      addZone(zConf.opponentOrbit, designConfig.tint.opponent)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
-      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', designConfig.color.player),
-      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', designConfig.color.player),
-      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', designConfig.color.neutral),
-      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', designConfig.color.opponent),
-      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', designConfig.color.opponent)
+      addCaption(zConf.playerColony, 'Koloniezone', designConfig.color.player),
+      addCaption(zConf.playerOrbit, 'Orbitale Zone', designConfig.color.player),
+      addCaption(zConf.neutral, 'Neutrale Zone', designConfig.color.neutral),
+      addCaption(zConf.opponentColony, 'Koloniezone', designConfig.color.opponent),
+      addCaption(zConf.opponentOrbit, 'Orbitale Zone', designConfig.color.opponent)
     ];
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }

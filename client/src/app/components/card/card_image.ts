@@ -61,7 +61,7 @@ export default class CardImage {
       },
       {
         targets: undefined,
-        x: Phaser.Math.DegToRad(layoutConfig.game.perspective.board)
+        x: layoutConfig.game.perspective.board
       }
     );
   }
@@ -75,7 +75,7 @@ export default class CardImage {
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(designConfig.tint.secondary);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.opponent);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
@@ -127,11 +127,11 @@ export default class CardImage {
     return this.image.scale;
   }
   setXRotation(x: number): this {
-    this.forAllImages(i => (i.modelRotation.x = this.perspectiveDegToRad(x)));
+    this.forAllImages(i => (i.modelRotation.x = this.ownedByPlayer ? x : -x));
     return this;
   }
   get xRotation(): number {
-    return Phaser.Math.RadToDeg(this.image.modelRotation.x) * (this.ownedByPlayer ? 1 : -1);
+    return this.image.modelRotation.x * (this.ownedByPlayer ? 1 : -1);
   }
   enableMaximizeOnMouseover() {
     this.disableMaximizeOnMouseover();
@@ -155,7 +155,7 @@ export default class CardImage {
         this.imageHighlight.modelRotation,
         this.imageMask.modelRotation
       ];
-      tweenRotationConfig['x'] = this.perspectiveDegToRad(tweenRotationConfig['x']);
+      tweenRotationConfig['x'] = tweenRotationConfig['x'] * (this.ownedByPlayer ? 1 : -1);
       this.scene.tweens.add(tweenRotationConfig);
     }
   }
@@ -167,9 +167,6 @@ export default class CardImage {
   }
   private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
-  }
-  private perspectiveDegToRad(deg: number): number {
-    return Phaser.Math.DegToRad(deg) * (this.ownedByPlayer ? 1 : -1);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer

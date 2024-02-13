@@ -99,6 +99,7 @@ export default class Game extends Phaser.Scene {
     backgroundConfig.rings.forEach(name =>
       this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
     );
+    this.load.image('background_zone', 'background/zone.png');
     this.load.image('background_sun', 'background/sun.png');
     [
       'asteroid1',
@@ -141,8 +142,6 @@ export default class Game extends Phaser.Scene {
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
-    this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
-    this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
       'active_build',

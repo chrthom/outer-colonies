@@ -39,7 +39,7 @@ export default class LoadingStatus {
         Phaser.Math.DEG_TO_RAD * angle
       );
       const bar = this.scene.add
-        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.primary)
+        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.player)
         .setAngle(angle)
         .setAlpha(designConfig.alpha.normal);
       this.bars.push(bar);

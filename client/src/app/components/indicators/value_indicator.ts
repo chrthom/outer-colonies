@@ -26,7 +26,7 @@ export default class ValueIndicator {
           this.y(cardY),
           64,
           32,
-          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)
@@ -39,7 +39,7 @@ export default class ValueIndicator {
           12,
           16,
           22,
-          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
         .setOrigin(0.5, 0.5)

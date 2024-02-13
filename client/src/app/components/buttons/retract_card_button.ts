@@ -38,18 +38,18 @@ export default class RetractCardButton {
   }
   setTintNormal() {
     this.image.setTint(
-      designConfig.tint.primary,
+      designConfig.tint.player,
       designConfig.tint.neutral,
-      designConfig.tint.primary,
-      designConfig.tint.primary
+      designConfig.tint.player,
+      designConfig.tint.player
     );
   }
   setTintCritical() {
     this.image.setTint(
-      designConfig.tint.secondary,
+      designConfig.tint.opponent,
       designConfig.tint.neutral,
-      designConfig.tint.secondary,
-      designConfig.tint.secondary
+      designConfig.tint.opponent,
+      designConfig.tint.opponent
     );
   }
   setTintHover() {

@@ -18,7 +18,7 @@ export default class DefenseIndicator {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
     this.images = defenseIcons.map((icon, index) => {
-      const color = icon.depleted ? designConfig.tint.secondary : designConfig.tint.primary;
+      const color = icon.depleted ? designConfig.tint.opponent : designConfig.tint.player;
       return scene.add
         .image(this.x(cardX), this.y(cardY, index), `icon_${icon.icon}`)
         .setOrigin(0.5, 0.5)

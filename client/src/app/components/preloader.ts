@@ -10,7 +10,7 @@ export default class Preloader {
     this.progressBar = scene.add.graphics();
     this.progressBox = scene.add
       .graphics()
-      .fillStyle(designConfig.tint.primary, designConfig.alpha.faded)
+      .fillStyle(designConfig.tint.player, designConfig.alpha.faded)
       .fillRect(
         layoutConfig.load.preloader.x -
           layoutConfig.load.preloader.width / 2 -
@@ -33,7 +33,7 @@ export default class Preloader {
     scene.load.on('progress', (value: number) => {
       this.progressBar
         .clear()
-        .fillStyle(designConfig.tint.primary, designConfig.alpha.normal)
+        .fillStyle(designConfig.tint.player, designConfig.alpha.normal)
         .fillRect(
           layoutConfig.load.preloader.x - layoutConfig.load.preloader.width / 2,
           layoutConfig.load.preloader.y,
