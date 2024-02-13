@@ -131,16 +131,17 @@ export default class CardImage {
     return this;
   }
   get xRotation(): number {
-    return Phaser.Math.RadToDeg(this.image.modelRotation.x) * (this.ownedByPlayer ? 1 : -1)
+    return Phaser.Math.RadToDeg(this.image.modelRotation.x) * (this.ownedByPlayer ? 1 : -1);
   }
   enableMaximizeOnMouseover() {
+    this.disableMaximizeOnMouseover();
     this.image
-      .off('pointerover')
       .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
-      .off('pointerout')
       .on('pointerout', () => this.scene.obj.maxCard.hide())
-      .off('pointermove')
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
+  }
+  disableMaximizeOnMouseover() {
+    this.image.off('pointerover').off('pointerout').off('pointermove');
   }
   tween(
     tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig,

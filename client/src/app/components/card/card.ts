@@ -16,7 +16,11 @@ export default class Card extends CardImage {
     cardStackUUID: string,
     data: ClientCard
   ) {
-    super(scene, x, y, data.id, { isOpponentCard: opponentCard, cropped: true, perspective: layoutConfig.game.perspective.board });
+    super(scene, x, y, data.id, {
+      isOpponentCard: opponentCard,
+      cropped: true,
+      perspective: layoutConfig.game.perspective.board
+    });
     this.data = data;
     if (data.retractable) {
       this.retractCardButton = new RetractCardButton(

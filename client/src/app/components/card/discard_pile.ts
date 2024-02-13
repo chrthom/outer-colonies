@@ -25,13 +25,11 @@ export default class DiscardPile extends CardImage {
   update(cardIds?: number[]) {
     if (cardIds) this.cardIds = cardIds;
     if (this.indicator) this.indicator.destroy();
-    if (this.cardIds.length == 0) {
-      this.setVisible(false);
+    if (this.topCard == constants.cardBackSideID) {
+      this.setVisible(false).disableMaximizeOnMouseover();
     } else {
-      this.setCardId(this.getTopCard());
+      this.setCardId(this.topCard).setVisible(true).enableMaximizeOnMouseover();
       this.image.off('pointerdown').on('pointerdown', () => this.onClickAction());
-      this.setVisible(true);
-      this.enableMaximizeOnMouseover();
       const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
       this.indicator = new ValueIndicator(
         this.scene,
@@ -48,8 +46,17 @@ export default class DiscardPile extends CardImage {
     super.destroy();
     if (this.indicator) this.indicator.destroy();
   }
-  private getTopCard() {
-    return this.cardIds.length == 0 ? 1 : this.cardIds[this.cardIds.length - 1];
+  private get topCard() {
+    if (this.cardIds.length == 0) return constants.cardBackSideID;
+    let topCard = this.cardIds[this.cardIds.length - 1];
+    if (
+      this.scene.maximizedTacticCard?.cardId == topCard &&
+      this.scene.maximizedTacticCard?.ownedByPlayer == this.ownedByPlayer
+    ) {
+      if (this.cardIds.length <= 1) return constants.cardBackSideID;
+      topCard = this.cardIds[this.cardIds.length - 2];
+    }
+    return topCard;
   }
   private onClickAction() {
     if (
