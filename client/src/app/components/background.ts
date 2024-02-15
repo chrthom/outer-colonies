@@ -60,19 +60,21 @@ export default class Background {
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(color)
         .setAlpha(designConfig.alpha.transparent)
+        .setOrigin(0.5)
         .setAlign('center');
-    const addZone = (c: Coordinates, tint: number) => {
-      const zone = this.scene.add.plane(c.x, c.y, 'zone').setTint(tint);
+    const addZone = (c: Coordinates, tint: number, index: number) => {
+      const zone = this.scene.add.plane(c.x, c.y, 'background_zone').setTint(tint);
       zone.modelRotation.x = layoutConfig.game.perspective.board;
+      zone.modelPosition.z = -index * 0.5;
       return zone;
     };
     const zConf = layoutConfig.game.ui.zones;
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZone(zConf.playerColony, designConfig.tint.player),
-      addZone(zConf.playerOrbit, designConfig.tint.player),
-      addZone(zConf.neutral, designConfig.tint.neutral),
-      addZone(zConf.opponentColony, designConfig.tint.opponent),
-      addZone(zConf.opponentOrbit, designConfig.tint.opponent)
+      addZone(zConf.playerColony, designConfig.tint.player, 0),
+      addZone(zConf.playerOrbit, designConfig.tint.player, 1),
+      addZone(zConf.neutral, designConfig.tint.neutral, 2),
+      addZone(zConf.opponentColony, designConfig.tint.opponent, 4),
+      addZone(zConf.opponentOrbit, designConfig.tint.opponent, 3)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
       addCaption(zConf.playerColony, 'Koloniezone', designConfig.color.player),
