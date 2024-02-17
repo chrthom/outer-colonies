@@ -155,17 +155,17 @@ export default class CardImage {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
       duration: config.duration
     };
-    if (config.x) pTweenConfig['x'] = config.x;
-    if (config.y) pTweenConfig['y'] = config.y;
-    if (config.z) pTweenConfig['z'] = config.z;
+    if (config.x != undefined) pTweenConfig['x'] = config.x;
+    if (config.y != undefined) pTweenConfig['y'] = config.y;
+    if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
     this.scene.tweens.add(pTweenConfig);
     const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
       duration: config.duration
     };
-    if (config.xRotation) rTweenConfig['x'] = config.xRotation;
-    if (config.zRotation) rTweenConfig['z'] = Phaser.Math.DegToRad(config.zRotation); // TODO Remove conversion
+    if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
+    if (config.zRotation != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.zRotation); // TODO Remove conversion
     this.scene.tweens.add(rTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
