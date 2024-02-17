@@ -26,6 +26,7 @@ export default class CardStack {
     this.uuid = data.uuid;
     this.data = data;
     this.createCards(true, origin);
+    this.tween();
   }
   discard(toDeck?: boolean) {
     this.destroyIndicators();
@@ -53,17 +54,17 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId);
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId); // TODO: Also search opponent hand
       const x = this.ownedByPlayer
         ? handCard
-          ? handCard.image.x
-          : layoutConfig.game.cards.placement.player.deck.x
-        : layoutConfig.game.cards.placement.opponent.deck.x;
+          ? handCard.x
+          : this.scene.player.deck.x
+        : this.scene.opponent.deck.x;
       const y = this.ownedByPlayer
         ? handCard
-          ? handCard.image.y
-          : layoutConfig.game.cards.placement.player.deck.y
-        : layoutConfig.game.cards.placement.opponent.deck.y;
+          ? handCard.y
+          : this.scene.player.deck.y
+        : this.scene.opponent.deck.y;
       const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setZRotation(angle);
     });
@@ -162,14 +163,13 @@ export default class CardStack {
           .setZRotation(origin.zRotation)
           .setXRotation(origin.xRotation);
       } else if (!this.ownedByPlayer) {
-        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
-        this.cards[0] // TODO: Tween from opponent hand
+        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); // TODO: Fix
+        this.cards[0]
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)
           .setZ(layoutConfig.game.perspective.z.board)
           .setZRotation(180);
       }
-      this.tween();
     }
   }
   private get x() {

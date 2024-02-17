@@ -1,7 +1,7 @@
 class LayoutGameConfig {
   readonly perspective = {
     z: {
-      near: -4,
+      near: -0.7,
       board: -10,
       far: -25,
       stackStep: 0.01,
@@ -158,8 +158,8 @@ class LayoutGameConfig {
       yOffset: -320
     },
     maxedTacticCard: {
-      x: 1200,
-      y: 675
+      x: 0,
+      y: 0
     },
     missionCards: {
       x: 1760,

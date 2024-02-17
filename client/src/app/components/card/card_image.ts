@@ -56,12 +56,14 @@ export default class CardImage {
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
+    this.highlightReset();
     this.tween(
       {
         duration: animationConfig.duration.move,
         x: targetCoordinates.x,
         y: targetCoordinates.y,
         z: layoutConfig.game.perspective.z.board,
+        xRotation: layoutConfig.game.cards.perspective.board,
         zRotation: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
         onComplete: () => {
           if (!toDeck) {
