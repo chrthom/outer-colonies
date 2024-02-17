@@ -19,7 +19,7 @@ export default class MissionCards {
           layoutConfig.game.ui.missionCards.y + index * layoutConfig.game.ui.missionCards.yDistance,
           id,
           {
-            perspective: layoutConfig.game.perspective.board,
+            perspective: layoutConfig.game.cards.perspective.board,
             z: layoutConfig.game.perspective.z.far
           }
         );

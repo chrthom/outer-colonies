@@ -32,18 +32,18 @@ export default class CardImage {
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
     this.imageHighlight = scene.add
-      .plane(layoutConfig.game.perspective.x, layoutConfig.game.perspective.y, `card_glow${config?.cropped ? '_small' : ''}`)
+      .plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_glow${config?.cropped ? '_small' : ''}`)
       .setVisible(false);
     this.imageMask = scene.add
-      .plane(layoutConfig.game.perspective.x, layoutConfig.game.perspective.y, `card_mask${config?.cropped ? '_small' : ''}`)
+      .plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_mask${config?.cropped ? '_small' : ''}`)
       .setVisible(false);
-    this.image = scene.add.plane(layoutConfig.game.perspective.x, layoutConfig.game.perspective.y, `card_${cardId}`).setInteractive();
+    this.image = scene.add.plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_${cardId}`).setInteractive();
     this.image.setMask(this.imageMask.createBitmapMask());
     this.setZRotation(config?.isOpponentCard ? 180 : 0)
       .setX(x)
       .setY(y)
       .setZ(config?.z ?? layoutConfig.game.perspective.z.board)
-      .setXRotation(config?.perspective ?? layoutConfig.game.perspective.neutral);
+      .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
   destroy() {
     this.image.destroy();

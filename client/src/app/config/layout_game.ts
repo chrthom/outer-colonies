@@ -1,34 +1,33 @@
 class LayoutGameConfig {
-  private readonly xFactor = 0.00458;
-  private readonly yFactor = -0.00326;
-  private readonly originX = 1200;
-  private readonly originY = 675;
-  private withCardXFactor(x: number) {
-    return x * this.xFactor;
-  }
-  private withCardYFactor(y: number) {
-    return y * this.yFactor;
-  }
-  private toCardX(x: number): number {
-    return this.withCardXFactor(x - this.originX);
-  }
-  private toCardY(y: number): number {
-    return this.withCardYFactor(y - this.originY);
-  }
   readonly perspective = {
-    none: Phaser.Math.DegToRad(0),
-    neutral: Phaser.Math.DegToRad(-10),
-    board: Phaser.Math.DegToRad(-30),
-    x: 1200,
-    y: 675,
     z: {
       near: -4,
       board: -10,
       far: -25,
       stackStep: 0.01,
       zoneStep: 0.2
+    },
+    origin: {
+      x: 1200,
+      y: 675
+    },
+    factor: {
+      x: 0.0048,
+      y: -0.0039
     }
   };
+  private withCardXFactor(x: number) {
+    return x * this.perspective.factor.x;
+  }
+  private withCardYFactor(y: number) {
+    return y * this.perspective.factor.y;
+  }
+  private toCardX(x: number): number {
+    return this.withCardXFactor(x - this.perspective.origin.x);
+  }
+  private toCardY(y: number): number {
+    return this.withCardYFactor(y - this.perspective.origin.y);
+  }
   readonly cards = {
     damageIndicator: {
       xOffsetPlayer: -75,
@@ -41,6 +40,11 @@ class LayoutGameConfig {
       yOffsetPlayer: -190,
       yOffsetOpponent: 20,
       yDistance: 50
+    },
+    perspective: {
+      none: Phaser.Math.DegToRad(0),
+      neutral: Phaser.Math.DegToRad(-10),
+      board: Phaser.Math.DegToRad(-30)
     },
     placement: {
       zoneWidth: this.withCardXFactor(1530),
@@ -108,7 +112,7 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    stackYDistance: 38 // TODO: Apply conversion
+    stackYDistance: this.withCardYFactor(38)
   };
   readonly ui = {
     actionPool: {

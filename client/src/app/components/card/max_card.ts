@@ -6,7 +6,7 @@ import { constants } from '../../../../../server/src/shared/config/constants';
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(scene, 0, 0, constants.cardBackSideID, {
-      perspective: layoutConfig.game.perspective.none,
+      perspective: layoutConfig.game.cards.perspective.none,
       z: layoutConfig.game.perspective.z.near
     });
     this.image.setDepth(layoutConfig.depth.maxCard);
@@ -18,7 +18,7 @@ export default class MaxCard extends CardImage {
   show(cardId: number) {
     this.setCardId(cardId);
     this.updatePosition();
-    this.image.setVisible(true);
+    //this.image.setVisible(true); // TODO: Reenable
   }
   updatePosition() {
     const x =

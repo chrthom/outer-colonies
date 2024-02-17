@@ -16,7 +16,7 @@ export default class DeckCard extends CardImage {
       constants.cardBackSideID,
       {
         isOpponentCard: !ownedByPlayer,
-        perspective: layoutConfig.game.perspective.board
+        perspective: layoutConfig.game.cards.perspective.board
       }
     );
     if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());

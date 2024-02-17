@@ -19,7 +19,7 @@ export default class Card extends CardImage {
     super(scene, x, y, data.id, {
       isOpponentCard: opponentCard,
       cropped: true,
-      perspective: layoutConfig.game.perspective.board
+      perspective: layoutConfig.game.cards.perspective.board
     });
     this.data = data;
     if (data.retractable) {
@@ -45,7 +45,7 @@ export default class Card extends CardImage {
     this.scene.time.delayedCall(animationConfig.duration.attack, () => this.highlightReset());
   }
   override tween(config: CardTweenConfig) {
-    config.xRotation = layoutConfig.game.perspective.board;
+    config.xRotation = layoutConfig.game.cards.perspective.board;
     this.retractCardButton?.tween(config.x, config.y);
     super.tween(config);
   }

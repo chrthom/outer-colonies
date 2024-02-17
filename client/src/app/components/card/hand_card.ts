@@ -17,7 +17,7 @@ export default class HandCard extends CardImage {
       data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
       {
         isOpponentCard: !data.ownedByPlayer,
-        perspective: layoutConfig.game.perspective.board
+        perspective: layoutConfig.game.cards.perspective.board
       }
     );
     this.uuid = data.uuid;
@@ -35,7 +35,7 @@ export default class HandCard extends CardImage {
         duration: animationConfig.duration.draw,
         x: this.targetX,
         y: this.targetY,
-        xRotation: layoutConfig.game.perspective.neutral,
+        xRotation: layoutConfig.game.cards.perspective.neutral,
         zRotation: this.shortestAngle(this.targetAngle)
       }
     );
@@ -56,7 +56,7 @@ export default class HandCard extends CardImage {
         x: layoutConfig.game.ui.maxedTacticCard.x,
         y: layoutConfig.game.ui.maxedTacticCard.y,
         z: layoutConfig.game.perspective.z.near,
-        xRotation: layoutConfig.game.perspective.neutral,
+        xRotation: layoutConfig.game.cards.perspective.neutral,
         zRotation: this.shortestAngle(0)
       }
     );

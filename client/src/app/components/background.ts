@@ -64,7 +64,7 @@ export default class Background {
         .setAlign('center');
     const addZone = (c: Coordinates, tint: number, index: number) => {
       const zone = this.scene.add.plane(c.x, c.y, 'background_zone').setTint(tint);
-      zone.modelRotation.x = layoutConfig.game.perspective.board;
+      zone.modelRotation.x = layoutConfig.game.cards.perspective.board;
       zone.modelPosition.z = -index * 0.5;
       return zone;
     };

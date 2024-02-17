@@ -17,7 +17,7 @@ export default class DiscardPile extends CardImage {
       constants.cardBackSideID,
       {
         isOpponentCard: !ownedByPlayer,
-        perspective: layoutConfig.game.perspective.board
+        perspective: layoutConfig.game.cards.perspective.board
       }
     );
     this.update([]);

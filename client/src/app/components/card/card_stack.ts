@@ -179,11 +179,9 @@ export default class CardStack {
         : layoutConfig.game.cards.placement.zoneWidth;
     let x = zoneWidth;
     if (this.data.zoneCardsNum <= 2) x /= 2;
-    if (this.data.zoneCardsNum >= 2) {
-      x += this.zoneLayout.x;
-      if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
-      else x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
-    }
+    if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
+    else if (this.data.zoneCardsNum > 2) x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
+    x += this.zoneLayout.x;
     return x;
   }
   private y(index: number) {
