@@ -7,7 +7,7 @@ export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(scene, 0, 0, constants.cardBackSideID, {
       perspective: layoutConfig.game.perspective.none,
-      scale: layoutConfig.game.cards.scale.max
+      z: layoutConfig.game.perspective.z.near
     });
     this.image.setDepth(layoutConfig.depth.maxCard);
     this.hide();
@@ -26,10 +26,12 @@ export default class MaxCard extends CardImage {
       layoutConfig.game.ui.maxCard.xOffset *
         (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1);
     let y = this.scene.input.mousePointer.y + layoutConfig.game.ui.maxCard.yOffset;
+    /* // TODO: Fix calculation
     const halfCardHeight =
       (layoutConfig.game.cards.size.original.height * layoutConfig.game.cards.scale.max) / 2;
     if (y < halfCardHeight) y = halfCardHeight;
     else if (y > layoutConfig.scene.height - halfCardHeight) y = layoutConfig.scene.height - halfCardHeight;
+    */
     this.setX(x).setY(y);
   }
 }

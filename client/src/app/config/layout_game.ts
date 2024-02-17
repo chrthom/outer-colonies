@@ -1,8 +1,33 @@
 class LayoutGameConfig {
+  private readonly xFactor = 0.00458;
+  private readonly yFactor = -0.00326;
+  private readonly originX = 1200;
+  private readonly originY = 675;
+  private withCardXFactor(x: number) {
+    return x * this.xFactor;
+  }
+  private withCardYFactor(y: number) {
+    return y * this.yFactor;
+  }
+  private toCardX(x: number): number {
+    return this.withCardXFactor(x - this.originX);
+  }
+  private toCardY(y: number): number {
+    return this.withCardYFactor(y - this.originY);
+  }
   readonly perspective = {
     none: Phaser.Math.DegToRad(0),
     neutral: Phaser.Math.DegToRad(-10),
-    board: Phaser.Math.DegToRad(-30)
+    board: Phaser.Math.DegToRad(-30),
+    x: 1200,
+    y: 675,
+    z: {
+      near: -4,
+      board: -10,
+      far: -25,
+      stackStep: 0.01,
+      zoneStep: 0.2
+    }
   };
   readonly cards = {
     damageIndicator: {
@@ -18,64 +43,64 @@ class LayoutGameConfig {
       yDistance: 50
     },
     placement: {
-      zoneWidth: 1530,
-      halfZoneWidth: 650,
+      zoneWidth: this.withCardXFactor(1530),
+      halfZoneWidth: this.withCardXFactor(650),
       hand: {
         angleStep: -5,
-        xStep: -50,
-        yStep: 5,
-        startAngle: 10
+        startAngle: 10,
+        xStep: this.withCardXFactor(-50),
+        yStep: this.withCardYFactor(5)
       },
       player: {
         colony: {
-          x: 120,
-          y: 1220
+          x: this.toCardX(120),
+          y: this.toCardY(1220)
         },
         deck: {
-          x: 1930,
-          y: 930
+          x: this.toCardX(1930),
+          y: this.toCardY(930)
         },
         discardPile: {
-          x: 2190,
-          y: 930
+          x: this.toCardX(2190),
+          y: this.toCardY(930)
         },
         hand: {
-          x: 2370,
-          y: 1220
+          x: this.toCardX(2370),
+          y: this.toCardY(1220)
         },
         orbit: {
-          x: 120,
-          y: 934
+          x: this.toCardX(120),
+          y: this.toCardY(934)
         },
         neutral: {
-          x: 1000,
-          y: 658
+          x: this.toCardX(1000),
+          y: this.toCardY(658)
         }
       },
       opponent: {
         colony: {
-          x: 120,
-          y: 130
+          x: this.toCardX(120),
+          y: this.toCardY(130)
         },
         deck: {
-          x: 1930,
-          y: 345
+          x: this.toCardX(1930),
+          y: this.toCardY(345)
         },
         discardPile: {
-          x: 2190,
-          y: 345
+          x: this.toCardX(2190),
+          y: this.toCardY(345)
         },
         hand: {
-          x: 2370,
-          y: 65
+          x: this.toCardX(2370),
+          y: this.toCardY(65)
         },
         orbit: {
-          x: 120,
-          y: 416
+          x: this.toCardX(120),
+          y: this.toCardY(416)
         },
         neutral: {
-          x: 120,
-          y: 692
+          x: this.toCardX(120),
+          y: this.toCardY(692)
         }
       }
     },
@@ -83,24 +108,7 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    scale: {
-      min: 0.1,
-      normal: 0.25,
-      max: 0.75
-    },
-    size: {
-      original: {
-        width: 822,
-        height: 1122
-      },
-      normal: {
-        x: 41,
-        y: 41,
-        width: 740,
-        height: 1040
-      }
-    },
-    stackYDistance: 38
+    stackYDistance: 38 // TODO: Apply conversion
   };
   readonly ui = {
     actionPool: {

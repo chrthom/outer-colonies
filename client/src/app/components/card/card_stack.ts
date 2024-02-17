@@ -65,7 +65,7 @@ export default class CardStack {
           : layoutConfig.game.cards.placement.player.deck.y
         : layoutConfig.game.cards.placement.opponent.deck.y;
       const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
-      c.setX(x).setY(y).setAngle(angle);
+      c.setX(x).setY(y).setZRotation(angle);
     });
     this.tween();
   }
@@ -111,11 +111,10 @@ export default class CardStack {
   private tween() {
     this.cards.forEach((c, index) => {
       c.tween({
-        targets: undefined,
         duration: animationConfig.duration.move,
         x: this.x,
         y: this.y(index),
-        angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
+        zRotation: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
     this.damageIndicator?.tween(this.x, this.zoneLayout.y);
@@ -159,15 +158,16 @@ export default class CardStack {
         this.cards[0]
           .setX(origin.x)
           .setY(origin.y)
-          .setAngle(origin.angle)
-          .setScale(origin.scale)
+          .setZ(origin.z)
+          .setZRotation(origin.zRotation)
           .setXRotation(origin.xRotation);
       } else if (!this.ownedByPlayer) {
         console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
         this.cards[0] // TODO: Tween from opponent hand
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)
-          .setAngle(180);
+          .setZ(layoutConfig.game.perspective.z.board)
+          .setZRotation(180);
       }
       this.tween();
     }

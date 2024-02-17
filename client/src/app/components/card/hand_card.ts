@@ -32,15 +32,11 @@ export default class HandCard extends CardImage {
     this.data = data;
     this.tween(
       {
-        targets: undefined,
         duration: animationConfig.duration.draw,
         x: this.targetX,
         y: this.targetY,
-        angle: this.shortestAngle(this.targetAngle)
-      },
-      {
-        targets: undefined,
-        x: layoutConfig.game.perspective.neutral
+        xRotation: layoutConfig.game.perspective.neutral,
+        zRotation: this.shortestAngle(this.targetAngle)
       }
     );
   }
@@ -56,16 +52,12 @@ export default class HandCard extends CardImage {
     this.highlightReset();
     this.tween(
       {
-        targets: undefined,
         duration: animationConfig.duration.showTacticCard,
         x: layoutConfig.game.ui.maxedTacticCard.x,
         y: layoutConfig.game.ui.maxedTacticCard.y,
-        angle: this.shortestAngle(0),
-        scale: layoutConfig.game.cards.scale.max
-      },
-      {
-        targets: undefined,
-        x: layoutConfig.game.perspective.neutral
+        z: layoutConfig.game.perspective.z.near,
+        xRotation: layoutConfig.game.perspective.neutral,
+        zRotation: this.shortestAngle(0)
       }
     );
   }

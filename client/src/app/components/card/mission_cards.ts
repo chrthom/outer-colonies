@@ -20,7 +20,7 @@ export default class MissionCards {
           id,
           {
             perspective: layoutConfig.game.perspective.board,
-            scale: layoutConfig.game.cards.scale.min
+            z: layoutConfig.game.perspective.z.far
           }
         );
       });

@@ -1,6 +1,6 @@
 import { ClientCard } from '../../../../../server/src/shared/interfaces/client_state';
 import Game from '../../scenes/game';
-import CardImage from './card_image';
+import CardImage, { CardTweenConfig } from './card_image';
 import RetractCardButton from '../buttons/retract_card_button';
 import { animationConfig } from 'src/app/config/animation';
 import { layoutConfig } from 'src/app/config/layout';
@@ -44,11 +44,9 @@ export default class Card extends CardImage {
     this.highlightSelected();
     this.scene.time.delayedCall(animationConfig.duration.attack, () => this.highlightReset());
   }
-  override tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
-    super.tween(tweenConfig, {
-      targets: undefined,
-      x: layoutConfig.game.perspective.board
-    });
-    this.retractCardButton?.tween(tweenConfig['x'], tweenConfig['y']);
+  override tween(config: CardTweenConfig) {
+    config.xRotation = layoutConfig.game.perspective.board;
+    this.retractCardButton?.tween(config.x, config.y);
+    super.tween(config);
   }
 }
