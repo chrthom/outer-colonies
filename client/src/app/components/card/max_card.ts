@@ -1,26 +1,33 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
-    super(
-      scene,
-      layoutConfig.maxCard.x,
-      layoutConfig.maxCard.y,
-      layoutConfig.cards.scale.max,
-      false,
-      layoutConfig.maxCard.scale
-    );
+    super(scene, 0, 0, constants.cardBackSideID, {
+      scale: layoutConfig.game.cards.scale.max
+    });
+    this.image.setDepth(layoutConfig.depth.maxCard);
     this.hide();
   }
   hide() {
     this.image.setVisible(false);
-    this.scene.obj.continueButton?.showPrompt();
   }
   show(cardId: number) {
-    this.image.setTexture(`card_${cardId}`);
+    this.setCardId(cardId);
+    this.updatePosition();
     this.image.setVisible(true);
-    this.scene.obj.continueButton?.hidePrompt();
+  }
+  updatePosition() {
+    const x =
+      this.scene.input.mousePointer.x +
+      layoutConfig.game.ui.maxCard.xOffset *
+        (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1);
+    let y = this.scene.input.mousePointer.y + layoutConfig.game.ui.maxCard.yOffset;
+    const cardHeight = layoutConfig.game.cards.size.original.height * layoutConfig.game.cards.scale.max;
+    if (y < cardHeight) y = cardHeight;
+    else if (y > layoutConfig.scene.height) y = layoutConfig.scene.height;
+    this.setX(x).setY(y);
   }
 }

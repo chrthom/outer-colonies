@@ -1,3 +1,5 @@
-export class ClientGameParams {
+interface ClientGameParams {
   preloadCardIds: number[];
 }
+
+export default ClientGameParams;

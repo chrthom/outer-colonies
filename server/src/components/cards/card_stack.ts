@@ -8,16 +8,16 @@ import { spliceCardStackByUUID } from '../utils/helpers';
 import Match from '../game_state/match';
 import TacticCard from './types/tactic_card';
 
-export default class CardStack {
-  card!: Card;
-  zone: Zone;
-  uuid!: string;
+export default abstract class CardStack {
+  card: Card;
+  zone?: Zone;
+  uuid: string;
   attachedCardStacks: CardStack[] = [];
   damage: number = 0;
   attackAvailable: boolean = false;
   defenseAvailable: boolean = false;
-  protected parentCardStack: CardStack;
-  protected parentPlayer: Player;
+  protected parentCardStack?: CardStack;
+  protected parentPlayer?: Player;
   constructor(card: Card) {
     this.card = card;
     this.uuid = uuidv4();
@@ -87,7 +87,9 @@ export default class CardStack {
     return this.attachedCardStacks.flatMap(cs => cs.cardStacks).concat(this);
   }
   get player(): Player {
-    return this.parentCardStack ? this.parentCardStack.player : this.parentPlayer;
+    if (this.parentCardStack) return this.parentCardStack.player;
+    else if (this.parentPlayer) return this.parentPlayer;
+    else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
   }
   get match(): Match {
     return this.player.match;
@@ -190,7 +192,7 @@ export default class CardStack {
     } else {
       if (this.isRootCard) {
         spliceCardStackByUUID(this.player.cardStacks, this.uuid);
-      } else {
+      } else if (this.parentCardStack) {
         spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
       }
       this.cards.forEach(c => c.onLeaveGame(this.player));

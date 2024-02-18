@@ -3,11 +3,12 @@ import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
 import { BattleType, CardType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
-import { ClientPlannedBattle } from '../../shared/interfaces/client_planned_battle';
+import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
 import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';
 import Player from './player';
+import { AttackProfile } from '../cards/card_profile';
 
 export interface Attack {
   sourceUUID: string;
@@ -40,7 +41,7 @@ export default class Battle {
     if (this.type == BattleType.Mission) {
       this.ships[player.no] = interceptingShipIds
         .map(id => getCardStackByUUID(player.cardStacks, id))
-        .filter(cs => cs.isMissionReady);
+        .filter((cs): cs is CardStack => !!cs && cs.isMissionReady);
       this.ships[player.no].map(cs => (cs.zone = Zone.Neutral));
     } else if (this.type == BattleType.Raid) {
       player.cardStacks
@@ -69,7 +70,9 @@ export default class Battle {
       const hasAttack = this.ships[match.pendingActionPlayerNo]
         .flatMap(cs => cs.cardStacks)
         .filter(cs => cs.attackAvailable)
-        .some(cs => (<EquipmentCard>cs.card).attackProfile.range >= this.range);
+        .map(cs => (<EquipmentCard>cs.card).attackProfile)
+        .filter((ap): ap is AttackProfile => !!ap)
+        .some(ap => ap.range >= this.range);
       const hasTarget = this.ships[match.waitingPlayerNo].length > 0;
       if (!hasAttack || !hasTarget) match.processBattleRound();
     }

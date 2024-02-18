@@ -1,27 +1,31 @@
-import { layoutConfig } from 'src/app/config/layout';
+import { designConfig } from 'src/app/config/design';
+import { Coordinates, layoutConfig } from 'src/app/config/layout';
 import Game from 'src/app/scenes/game';
 
 export default class CountdownIndicator {
-  private scene!: Game;
-  private text!: Phaser.GameObjects.Text;
-  constructor(scene: Game) {
+  private scene: Game;
+  private text: Phaser.GameObjects.Text;
+  private ownedByPlayer: boolean;
+  constructor(scene: Game, ownedByPlayer: boolean) {
     this.scene = scene;
+    this.ownedByPlayer = ownedByPlayer;
+    const countdownLayout = layoutConfig.game.ui.countdownIndicator;
+    const coordinates: Coordinates = ownedByPlayer ? countdownLayout.player : countdownLayout.opponent;
     this.text = this.scene.add
-      .text(layoutConfig.countdownIndicator.x, layoutConfig.countdownIndicator.y, '')
-      .setFontSize(layoutConfig.exitButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .text(coordinates.x, coordinates.y, '')
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5);
   }
-  update(playerCountdown: number, opponentCountdown: number) {
-    const state = this.scene.state;
+  update(playerCountdown: number) {
+    const playerData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
     this.text.setText(`
-      ${state?.opponent.name} ${this.formatCountdown(opponentCountdown)}\n
-      ${state?.name} ${this.formatCountdown(playerCountdown)}
+      ${playerData.name} ${this.formatCountdown(playerCountdown)}
     `);
-    if (playerCountdown < 120 || opponentCountdown < 120) {
-      this.text.setColor(layoutConfig.font.colorWarn);
+    if (playerCountdown < 120) {
+      this.text.setColor(designConfig.color.warn);
     }
   }
   private formatCountdown(countdown: number): string {

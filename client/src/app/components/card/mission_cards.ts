@@ -4,7 +4,7 @@ import Game from '../../scenes/game';
 
 export default class MissionCards {
   minCards: CardImage[] = [];
-  private scene!: Game;
+  private scene: Game;
   constructor(scene: Game) {
     this.scene = scene;
   }
@@ -15,11 +15,12 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layoutConfig.missionCards.x + index * layoutConfig.missionCards.xDistance,
-          layoutConfig.missionCards.y + index * layoutConfig.missionCards.yDistance,
+          layoutConfig.game.ui.missionCards.x + index * layoutConfig.game.ui.missionCards.xDistance,
+          layoutConfig.game.ui.missionCards.y + index * layoutConfig.game.ui.missionCards.yDistance,
           id,
-          false,
-          layoutConfig.cards.scale.min
+          {
+            scale: layoutConfig.game.cards.scale.min
+          }
         );
       });
       this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());

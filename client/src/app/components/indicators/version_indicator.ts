@@ -1,17 +1,18 @@
 import { environment } from 'src/environments/environment';
 import { layoutConfig } from '../../config/layout';
+import { designConfig } from 'src/app/config/design';
 
 export default class VersonIndicator {
   constructor(scene: Phaser.Scene) {
     scene.add
       .text(
-        layoutConfig.version.x,
-        layoutConfig.version.y,
-        `Helene (v1.9.1)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        layoutConfig.load.version.x,
+        layoutConfig.load.version.y,
+        `Phoebe (v2.0.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
-      .setFontSize(layoutConfig.font.size)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 1);
   }

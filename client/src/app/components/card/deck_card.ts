@@ -1,26 +1,35 @@
 import CardImage from './card_image';
-import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import ValueIndicator from '../indicators/value_indicator';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class DeckCard extends CardImage {
-  indicator: ValueIndicator;
-  constructor(scene: Game) {
-    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, 1);
-    this.image.on('pointerdown', () => this.onClickAction());
+  indicator?: ValueIndicator;
+  constructor(scene: Game, ownedByPlayer: boolean) {
+    super(
+      scene,
+      DeckCard.getPlacementConfig(ownedByPlayer).deck.x,
+      DeckCard.getPlacementConfig(ownedByPlayer).deck.y,
+      constants.cardBackSideID,
+      {
+        isOpponentCard: !ownedByPlayer
+      }
+    );
+    if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());
   }
   update() {
     if (this.indicator) this.indicator.destroy();
     const cardsForMission = this.scene.plannedBattle.downsideCardsNum;
+    const deckSize = this.scene.getPlayerState(this.ownedByPlayer).deckSize;
     this.indicator = new ValueIndicator(
       this.scene,
-      this.scene.state.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
-      this.scene.state.deckSize - cardsForMission < 10,
-      layoutConfig.deck.x,
-      layoutConfig.deck.y,
-      true,
+      deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
+      deckSize - cardsForMission < 10,
+      this.placementConfig.deck.x,
+      this.placementConfig.deck.y,
+      this.ownedByPlayer,
       true
     );
   }
@@ -32,13 +41,13 @@ export default class DeckCard extends CardImage {
       this.scene.state.turnPhase == TurnPhase.Build &&
       !this.scene.activeCards.hand
     ) {
-      if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+      if (ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
         this.scene.resetView(BattleType.None);
       } else {
         if (this.scene.plannedBattle.type != BattleType.Mission) {
           this.scene.resetView(BattleType.Mission);
         }
-        if (!ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+        if (!ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
           this.scene.plannedBattle.downsideCardsNum++;
           this.scene.updateView();
         }

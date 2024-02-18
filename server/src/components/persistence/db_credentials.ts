@@ -7,6 +7,12 @@ export interface DBCredential {
   sessionToken: string | null;
 }
 
+export interface DBCredentialWithSessionToken {
+  userId: number;
+  username: string;
+  sessionToken: string;
+}
+
 export default class DBCredentialsDAO {
   static async getByUsername(username: string, password?: string): Promise<DBCredential | null> {
     const passwordQuery = password ? ` AND password = '${password}'` : '';
@@ -16,8 +22,17 @@ export default class DBCredentialsDAO {
     const passwordQuery = password ? ` AND password = '${password}'` : '';
     return this.getBy(`email = '${email}'${passwordQuery}`);
   }
-  static async getBySessionToken(sessionToken: string): Promise<DBCredential | null> {
-    return this.getBy(`session_token = '${sessionToken}' AND session_valid_until > current_timestamp()`);
+  static async getBySessionToken(sessionToken: string): Promise<DBCredentialWithSessionToken | null> {
+    return this.getBy(`session_token = '${sessionToken}' AND session_valid_until > current_timestamp()`).then(
+      r =>
+        r && r.sessionToken
+          ? {
+              userId: r.userId,
+              username: r.username,
+              sessionToken: r.sessionToken
+            }
+          : null
+    );
   }
   static async getBy(whereClause: string): Promise<DBCredential | null> {
     const queryResult: any[] = await DBConnection.instance.query(

@@ -2,6 +2,7 @@ import Matchmaking from 'src/app/scenes/matchmaking';
 import { environment } from '../../../environments/environment';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { designConfig } from 'src/app/config/design';
 
 export default class ExitButton {
   private isMatchmaking!: boolean;
@@ -14,34 +15,40 @@ export default class ExitButton {
     this.isMatchmaking = !(scene instanceof Game);
     this.text = scene.add
       .text(
-        layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
-        layoutConfig.exitButton.y + layoutConfig.exitButton.yTextOffset,
+        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
+        layoutConfig.game.ui.exitButton.y + layoutConfig.game.ui.exitButton.yTextOffset,
         ''
       )
-      .setFontSize(layoutConfig.exitButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     this.confirmText = scene.add
       .text(
-        layoutConfig.exitButton.x + layoutConfig.exitButton.xTextOffset,
-        layoutConfig.exitButton.y +
-          layoutConfig.exitButton.yTextOffset +
-          layoutConfig.exitButton.yConfirmOffset,
+        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
+        layoutConfig.game.ui.exitButton.y +
+          layoutConfig.game.ui.exitButton.yTextOffset +
+          layoutConfig.game.ui.exitButton.yConfirmOffset,
         'Kapitulation bestätigen'
       )
-      .setFontSize(layoutConfig.exitButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     this.image = this.scene.add
-      .image(layoutConfig.exitButton.x, layoutConfig.exitButton.y, 'icon_exit')
+      .image(layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'icon_exit')
       .setOrigin(0.5, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(
       o =>
         o
@@ -49,10 +56,10 @@ export default class ExitButton {
             this.onClickAction();
           })
           .on('pointerover', () => {
-            this.text.setColor(layoutConfig.font.colorWarn);
+            this.text.setColor(designConfig.color.warn);
           })
           .on('pointerout', () => {
-            this.text.setColor(layoutConfig.font.color);
+            this.text.setColor(designConfig.color.neutral);
           }),
       this
     );
@@ -61,12 +68,12 @@ export default class ExitButton {
         this.onClickAction(true);
       })
       .on('pointerover', () => {
-        this.confirmText.setColor(layoutConfig.font.colorWarn);
+        this.confirmText.setColor(designConfig.color.warn);
       })
       .on(
         'pointerout',
         () => {
-          this.confirmText.setColor(layoutConfig.font.color);
+          this.confirmText.setColor(designConfig.color.neutral);
         },
         this
       );

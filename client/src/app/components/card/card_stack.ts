@@ -1,6 +1,6 @@
-import { layoutConfig } from '../../config/layout';
+import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
   ClientAttack,
   ClientCard,
@@ -12,11 +12,12 @@ import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class CardStack {
   cards!: Array<Card>;
-  uuid!: string;
-  data!: ClientCardStack;
+  uuid: string;
+  data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
   private scene!: Game;
@@ -39,7 +40,8 @@ export default class CardStack {
     this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
     this.filterCardsByIdList(removedCardIds).forEach(c => {
       let toDeck = false;
-      if (this.scene.state.discardPileIds.slice(-1).pop() != c.cardId) {
+      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
+        // TODO: Also check opponent discard pile
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
@@ -52,18 +54,18 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.hand.find(h => h.cardId == c.cardId);
-      const x = this.data.ownedByPlayer
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId);
+      const x = this.ownedByPlayer
         ? handCard
           ? handCard.image.x
-          : layoutConfig.deck.x
-        : layoutConfig.discardPile.x;
-      const y = this.data.ownedByPlayer
+          : layoutConfig.game.cards.placement.player.deck.x
+        : layoutConfig.game.cards.placement.opponent.deck.x;
+      const y = this.ownedByPlayer
         ? handCard
           ? handCard.image.y
-          : layoutConfig.deck.y
-        : layoutConfig.discardPile.yOpponent;
-      const angle = this.data.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
+          : layoutConfig.game.cards.placement.player.deck.y
+        : layoutConfig.game.cards.placement.opponent.deck.y;
+      const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
@@ -90,8 +92,11 @@ export default class CardStack {
       c.highlightReset();
     });
   }
+  get ownedByPlayer() {
+    return this.data.ownedByPlayer;
+  }
   get isOpponentColony(): boolean {
-    return !this.data.ownedByPlayer && this.data.cards.slice(-1).pop().id == 0;
+    return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == constants.colonyID;
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
@@ -109,17 +114,17 @@ export default class CardStack {
       c.tween({
         targets: undefined,
         duration: animationConfig.duration.move,
-        x: this.x(),
+        x: this.x,
         y: this.y(index),
-        angle: this.data.ownedByPlayer ? 0 : 180
+        angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
-    this.damageIndicator?.tween(this.x(), this.zoneLayout().y);
-    this.defenseIndicator?.tween(this.x(), this.zoneLayout().y);
+    this.damageIndicator?.tween(this.x, this.zoneLayout.y);
+    this.defenseIndicator?.tween(this.x, this.zoneLayout.y);
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
-      c => new Card(this.scene, this.x(), this.y(c.index), !this.data.ownedByPlayer, this.uuid, c)
+      c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c)
     );
     this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -130,9 +135,9 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        this.x(),
-        this.zoneLayout().y,
-        this.data.ownedByPlayer,
+        this.x,
+        this.zoneLayout.y,
+        this.ownedByPlayer,
         false
       );
     }
@@ -145,9 +150,9 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        this.x(),
-        this.zoneLayout().y,
-        this.data.ownedByPlayer
+        this.x,
+        this.zoneLayout.y,
+        this.ownedByPlayer
       );
     }
     if (fromHand) {
@@ -157,28 +162,41 @@ export default class CardStack {
           .setY(origin.image.y)
           .setAngle(origin.image.angle)
           .setScale(origin.image.scale);
-      } else if (!this.data.ownedByPlayer) {
-        this.cards[0].setX(layoutConfig.discardPile.x).setY(layoutConfig.discardPile.yOpponent).setAngle(180);
+      } else if (!this.ownedByPlayer) {
+        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
+        this.cards[0] // TODO: Tween from opponent hand
+          .setX(layoutConfig.game.cards.placement.opponent.deck.x)
+          .setY(layoutConfig.game.cards.placement.opponent.deck.y)
+          .setAngle(180);
       }
       this.tween();
     }
   }
-  private x() {
-    return (
-      this.zoneLayout().x +
-      (this.data.zoneCardsNum == 1
-        ? this.zoneLayout().maxWidth / 2
-        : (this.data.index * this.zoneLayout().maxWidth) / (this.data.zoneCardsNum - 1))
-    );
+  private get x() {
+    const zoneWidth =
+      this.data.zone == Zone.Neutral
+        ? layoutConfig.game.cards.placement.halfZoneWidth
+        : layoutConfig.game.cards.placement.zoneWidth;
+    let x = zoneWidth;
+    if (this.data.zoneCardsNum <= 2) x /= 2;
+    if (this.data.zoneCardsNum >= 2) {
+      x += this.zoneLayout.x;
+      if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
+      else x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
+    }
+    return x;
   }
   private y(index: number) {
-    const yDistance = layoutConfig.stackYDistance * (this.data.ownedByPlayer ? 1 : -1);
-    return this.zoneLayout().y + index * yDistance;
+    const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
+    return this.zoneLayout.y + index * yDistance;
   }
-  private zoneLayout() {
-    return this.data.ownedByPlayer
-      ? layoutConfig.player[this.data.zone]
-      : layoutConfig.opponent[this.data.zone];
+  private get zoneLayout(): Coordinates {
+    const zoneLayout = this.ownedByPlayer
+      ? layoutConfig.game.cards.placement.player
+      : layoutConfig.game.cards.placement.opponent;
+    if (this.data.zone == Zone.Colony) return zoneLayout.colony;
+    else if (this.data.zone == Zone.Oribital) return zoneLayout.orbit;
+    else return zoneLayout.neutral;
   }
   private destroyIndicators() {
     if (this.damageIndicator) this.damageIndicator.destroy();

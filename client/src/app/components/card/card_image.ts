@@ -1,28 +1,49 @@
+import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
-import { layoutConfig } from '../../config/layout';
+import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
+export interface CardImageConfig {
+  isOpponentCard?: boolean;
+  cropped?: boolean;
+  scale?: number;
+}
+
 export default class CardImage {
-  image!: Phaser.GameObjects.Image;
-  cardId!: number;
-  protected scene!: Game;
-  protected imageHighlight!: Phaser.GameObjects.Image;
-  protected ownedByPlayer!: boolean;
-  private imageMask!: Phaser.GameObjects.Image;
-  constructor(scene: Game, x: number, y: number, cardId: number, opponentCard?: boolean, scale?: number) {
+  image: Phaser.GameObjects.Image;
+  cardId: number;
+  ownedByPlayer: boolean;
+  protected scene: Game;
+  protected imageHighlight: Phaser.GameObjects.Image;
+  private imageMask: Phaser.GameObjects.Image;
+  constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;
     this.cardId = cardId;
-    this.ownedByPlayer = !opponentCard;
+    this.ownedByPlayer = !config?.isOpponentCard;
     const setImageProps = (image: Phaser.GameObjects.Image) =>
       image
         .setOrigin(0.5, 1)
-        .setAngle(opponentCard ? 180 : 0)
-        .setScale(scale ? scale : layoutConfig.cards.scale.normal);
-    this.imageHighlight = setImageProps(scene.add.image(x, y, 'card_glow').setVisible(false));
-    this.image = setImageProps(
-      scene.add.image(x, y, `card_${cardId}`).setCrop(41, 41, 740, 1040).setInteractive()
+        .setAngle(config?.isOpponentCard ? 180 : 0)
+        .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal);
+    this.imageHighlight = setImageProps(
+      scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
     );
-    this.imageMask = setImageProps(scene.add.image(x, y, 'card_mask').setVisible(false));
+    this.image = setImageProps(
+      scene.add
+        .image(x, y, `card_${cardId}`)
+        .setCrop(
+          layoutConfig.game.cards.size.normal.x,
+          layoutConfig.game.cards.size.normal.y,
+          layoutConfig.game.cards.size.normal.width,
+          layoutConfig.game.cards.size.normal.height
+        )
+        .setInteractive({
+          useHandCursor: true
+        })
+    );
+    this.imageMask = setImageProps(
+      scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
+    );
     this.image.setMask(this.imageMask.createBitmapMask());
   }
   destroy() {
@@ -31,73 +52,51 @@ export default class CardImage {
     this.imageMask.destroy();
   }
   discard(toDeck?: boolean) {
-    const discardPileIds = this.scene.state.discardPileIds.slice();
+    const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
+    const placementConfig = layoutConfig.game.cards.placement;
+    const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
+    const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.move,
-      x: toDeck ? layoutConfig.deck.x : layoutConfig.discardPile.x,
-      y: this.ownedByPlayer
-        ? toDeck
-          ? layoutConfig.deck.y
-          : layoutConfig.discardPile.y
-        : layoutConfig.discardPile.yOpponent,
-      angle: this.ownedByPlayer ? 0 : 180,
-      scale: layoutConfig.cards.scale.normal,
+      x: targetCoordinates.x,
+      y: targetCoordinates.y,
+      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+      scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
-        if (this.ownedByPlayer && !toDeck) this.scene.obj.discardPile.update(discardPileIds);
+        if (!toDeck) {
+          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+        }
         this.destroy();
       }
     });
   }
-  maximizeTacticCard() {
-    this.scene.maximizedTacticCard?.discard();
-    this.scene.maximizedTacticCard = this;
-    this.setDepth(layoutConfig.depth.maxedTacticCard);
-    this.highlightReset();
-    this.tween({
-      targets: undefined,
-      duration: animationConfig.duration.showTacticCard,
-      x: layoutConfig.maxedTacticCard.x,
-      y: layoutConfig.maxedTacticCard.y,
-      angle: 0,
-      scale: layoutConfig.maxedTacticCard.scale
-    });
-  }
   highlightDisabled() {
     this.highlightReset();
-    this.image.setTint(layoutConfig.colors.fadedTint);
+    this.image.setTint(designConfig.tint.faded);
   }
   highlightSelectable() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.neutral);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.neutral);
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(layoutConfig.colors.secondary);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.secondary);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
-    this.image.setTint(layoutConfig.colors.neutral);
+    this.image.setTint(designConfig.tint.neutral);
   }
-  setCardId(cardId: number) {
+  setCardId(cardId: number): this {
     this.cardId = cardId;
-    const x = this.image.x;
-    const y = this.image.y;
-    const angle = this.image.angle;
-    const scale = this.image.scale;
-    this.image.destroy();
-    this.image = this.scene.add
-      .image(x, y, `card_${cardId}`)
-      .setCrop(41, 41, 740, 1040)
-      .setOrigin(0.5, 1)
-      .setAngle(angle)
-      .setScale(scale)
-      .setInteractive();
+    this.image.setTexture(`card_${cardId}`);
+    return this;
   }
-  setVisible(visible: boolean) {
+  setVisible(visible: boolean): this {
     this.image.setVisible(visible);
     if (!visible) this.imageHighlight.setVisible(visible);
+    return this;
   }
   setX(x: number): this {
     this.forAllImages(i => i.setX(x));
@@ -120,17 +119,30 @@ export default class CardImage {
     return this;
   }
   enableMaximizeOnMouseover() {
-    this.image.off('pointerover');
-    this.image.off('pointerout');
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard?.show(this.cardId))
-      .on('pointerout', () => this.scene.obj.maxCard?.hide());
+      .off('pointerover')
+      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
+      .off('pointerout')
+      .on('pointerout', () => this.scene.obj.maxCard.hide())
+      .off('pointermove')
+      .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
   }
   tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
     tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
     this.scene.tweens.add(tweenConfig);
   }
+  shortestAngle(targetAngle: number): number {
+    return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);
+  }
+  protected get placementConfig() {
+    return CardImage.getPlacementConfig(this.ownedByPlayer);
+  }
   private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  }
+  protected static getPlacementConfig(ownedByPlayer: boolean) {
+    return ownedByPlayer
+      ? layoutConfig.game.cards.placement.player
+      : layoutConfig.game.cards.placement.opponent;
   }
 }

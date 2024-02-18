@@ -1,3 +1,4 @@
+import { designConfig } from 'src/app/config/design';
 import { ClientAttack } from '../../../../../server/src/shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
@@ -5,19 +6,19 @@ import Game from '../../scenes/game';
 import CardStack from '../card/card_stack';
 
 export default class AttackDamageIndicator {
-  private scene!: Game;
-  private cardImage!: Phaser.GameObjects.Image;
+  private scene: Game;
+  private cardImage: Phaser.GameObjects.Image;
   constructor(scene: Game, cardStack: CardStack, attack: ClientAttack) {
     this.scene = scene;
     this.cardImage = cardStack.cards[0].image;
     ['pointDefense', 'shield', 'armour', 'damage']
-      .map(key => [key, attack[key]])
-      .filter(([key, value]) => key == 'damage' || value > 0)
-      .map(([key, value]) => [value, layoutConfig.attack.color[key]])
+      .map(key => [key, attack[key as keyof ClientAttack]])
+      .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
+      .map(([key, value]) => [value, designConfig.color[key as keyof typeof designConfig.color]])
       .forEach(
         ([value, color], index) =>
           this.scene.time.delayedCall(animationConfig.attack.indicator.spawnInterval * index, () =>
-            this.tween(this.createIndicator(value, color))
+            this.tween(this.createIndicator(<number>value, <string>color))
           ),
         this
       );
@@ -61,8 +62,8 @@ export default class AttackDamageIndicator {
         : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
       .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
-      .setFontSize(layoutConfig.attack.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
+      .setFontSize(layoutConfig.fontSize.large)
+      .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)
       .setAlign('center')
       .setOrigin(0.5, 1)

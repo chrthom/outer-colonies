@@ -12,8 +12,8 @@ export default class GameResult {
   gameOver: boolean = false;
   winnerNo?: number;
   type?: GameResultType;
-  winnerSol?: number;
-  loserSol?: number;
+  winnerSol: number = 0;
+  loserSol: number = 0;
   constructor(match: Match) {
     this.match = match;
   }
@@ -55,11 +55,15 @@ export default class GameResult {
     }
     sol = Math.max(0, sol);
     DBCredentialsDAO.getByUsername(player.name).then(c => {
-      DBProfilesDAO.increaseSol(c.userId, sol);
-      if (won) DBDailiesDAO.achieveVictory(c.userId);
-      if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
-      if (player.colonyCardStack.profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
-      if (player.cardStacks.filter(c => c.isFlightReady).length >= 5) DBDailiesDAO.achieveShips(c.userId);
+      if (c) {
+        DBProfilesDAO.increaseSol(c.userId, sol);
+        if (won) DBDailiesDAO.achieveVictory(c.userId);
+        if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
+        if (player.colonyCardStack.profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
+        if (player.cardStacks.filter(c => c.isFlightReady).length >= 5) DBDailiesDAO.achieveShips(c.userId);
+      } else {
+        console.log(`ERROR: Could not find user ${player.name} in database`);
+      }
     });
     return sol;
   }

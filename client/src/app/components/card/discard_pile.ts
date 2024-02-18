@@ -1,15 +1,23 @@
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
-import { layoutConfig } from '../../config/layout';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
-  indicator: ValueIndicator;
-  constructor(scene: Game) {
-    super(scene, layoutConfig.discardPile.x, layoutConfig.discardPile.y, 1);
+  indicator?: ValueIndicator;
+  constructor(scene: Game, ownedByPlayer: boolean) {
+    super(
+      scene,
+      DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.x,
+      DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.y,
+      constants.cardBackSideID,
+      {
+        isOpponentCard: !ownedByPlayer
+      }
+    );
     this.update([]);
   }
   update(cardIds?: number[]) {
@@ -27,8 +35,8 @@ export default class DiscardPile extends CardImage {
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        layoutConfig.discardPile.x,
-        layoutConfig.discardPile.y,
+        this.placementConfig.discardPile.x,
+        this.placementConfig.discardPile.y,
         true,
         true
       );
@@ -49,13 +57,13 @@ export default class DiscardPile extends CardImage {
       this.scene.state.turnPhase == TurnPhase.Build &&
       !this.scene.activeCards.hand
     ) {
-      if (ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+      if (ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
         this.scene.resetView(BattleType.None);
       } else if (this.scene.plannedBattle.upsideCardsNum < this.cardIds.length) {
         if (this.scene.plannedBattle.type != BattleType.Mission) {
           this.scene.resetView(BattleType.Mission);
         }
-        if (!ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)) {
+        if (!ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
           this.scene.plannedBattle.upsideCardsNum++;
           this.scene.updateView();
         }

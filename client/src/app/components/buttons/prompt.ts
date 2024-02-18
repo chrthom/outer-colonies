@@ -1,5 +1,6 @@
+import { designConfig } from 'src/app/config/design';
 import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -11,14 +12,14 @@ export default class Prompt {
   constructor(scene: Game) {
     this.scene = scene;
     this.image = this.scene.add
-      .image(layoutConfig.prompt.box.x, layoutConfig.prompt.box.y, 'prompt_box')
+      .image(layoutConfig.game.ui.prompt.box.x, layoutConfig.game.ui.prompt.box.y, 'prompt_box')
       .setOrigin(0, 0)
       .setScale(0.8);
     this.text = scene.add
-      .text(layoutConfig.prompt.x, layoutConfig.prompt.y, 'Lädt...')
-      .setFontSize(layoutConfig.prompt.fontSize)
-      .setFontFamily(layoutConfig.font.textFamily)
-      .setColor(layoutConfig.font.color)
+      .text(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'Lädt...')
+      .setFontSize(layoutConfig.fontSize.small)
+      .setFontFamily(designConfig.fontFamily.text)
+      .setColor(designConfig.color.neutral)
       .setAlign('left')
       .setOrigin(0, 0);
   }
@@ -52,7 +53,7 @@ export default class Prompt {
   }
   private showBuildPhase() {
     let text: string;
-    if (this.scene.state.hasToRetractCards) {
+    if (this.scene.state.player.hasToRetractCards) {
       text = 'Einige deiner Karten haben nicht genügend Energie.\nNimm sie auf die Hand zurück!\n';
     } else if (this.scene.plannedBattle.type == BattleType.None) {
       text =
@@ -62,9 +63,9 @@ export default class Prompt {
         'bzw. dein Deck oder Ablagestapel für eine Mission.';
     } else if (
       this.scene.plannedBattle.type == BattleType.Mission &&
-      !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle)
+      !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)
     ) {
-      const missingCards = ClientPlannedBattle.missingCards(this.scene.plannedBattle);
+      const missingCards = ClientPlannedBattleHelper.missingCards(this.scene.plannedBattle);
       text = `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}!`;
     } else {
       text = `Wähle Schiffe für ${
@@ -86,7 +87,7 @@ export default class Prompt {
     );
   }
   private showEndPhase() {
-    const cardsToDrop = this.scene.state.hand.length - this.scene.state.handCardLimit;
+    const cardsToDrop = this.scene.state.player.hand.length - this.scene.state.player.handCardLimit;
     this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showIntervention() {
@@ -95,7 +96,7 @@ export default class Prompt {
     );
   }
   private showGameOver(gameResult: ClientGameResult) {
-    let gameOverText: string;
+    let gameOverText = '';
     if (gameResult.won) {
       switch (gameResult.type) {
         case GameResultType.Countdown:
@@ -125,7 +126,7 @@ export default class Prompt {
     this.show(
       `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
     );
-    this.text.setFontSize(layoutConfig.prompt.fontSizeBig);
+    this.text.setFontSize(layoutConfig.fontSize.normal);
   }
   private show(text: string) {
     this.text.setText(text);

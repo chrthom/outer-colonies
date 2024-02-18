@@ -4,7 +4,7 @@ import Player from './game_state/player';
 import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
-import { ClientGameParams } from '../shared/interfaces/client_game_params';
+import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 
 export const matchmakingRoom = 'matchmaking';
@@ -18,7 +18,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
           console.log(`Player logged in: ${user.username}`);
           socket.data = new SocketData(user);
           socket.join(matchmakingRoom);
-          socket.emit(MsgTypeOutbound.Matchmaking, 'search', numberOfPlayersInMatchMaking(io) - 1);
+          socket.emit(MsgTypeOutbound.Matchmaking, 'search', clientsInMatchMaking(io).size - 1);
         } else {
           console.log(`WARN: Invalid session token ${sessionToken} provided`);
         }
@@ -28,27 +28,23 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
 }
 
 export function matchMakingCron(io: Server) {
-  const clients = clientsInMatchMaking(io);
-  const numClients = numberOfPlayersInMatchMaking(io);
-  if (numClients > 1) {
+  const clients: Socket[] = Array.from(clientsInMatchMaking(io))
+    .map(cid => io.sockets.sockets.get(cid))
+    .filter((c): c is Socket => !!c);
+  const numClients = clients.length;
+  if (clients.length > 1) {
     console.log(`Performing matchmaking for ${numClients} clients...`);
     let partnerSocket = null;
-    for (const clientId of clients) {
-      const clientSocket = io.sockets.sockets.get(clientId);
-      clientSocket.emit(matchmakingRoom, 'search', numClients - 1);
-      if (partnerSocket) initGame(io, clientSocket, partnerSocket);
-      else partnerSocket = clientSocket;
+    for (const client of clients) {
+      client.emit(matchmakingRoom, 'search', numClients - 1);
+      if (partnerSocket) initGame(io, client, partnerSocket);
+      else partnerSocket = client;
     }
   }
 }
 
-function clientsInMatchMaking(io: Server) {
-  return io.sockets.adapter.rooms.get(matchmakingRoom);
-}
-
-function numberOfPlayersInMatchMaking(io: Server): number {
-  const clients = clientsInMatchMaking(io);
-  return clients ? clients.size : 0;
+function clientsInMatchMaking(io: Server): Set<string> {
+  return io.sockets.adapter.rooms.get(matchmakingRoom) ?? new Set();
 }
 
 function joinGame(socket: Socket, match: Match, playerNo: number): void {

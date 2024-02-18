@@ -5,12 +5,13 @@ import {
   MsgTypeOutbound,
   TurnPhase
 } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattle } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
 import Phaser from 'phaser';
+import { designConfig } from 'src/app/config/design';
 
 interface ButtonImages {
   active_build: Phaser.GameObjects.Image;
@@ -48,26 +49,28 @@ export default class ContinueButton {
     };
     this.text = scene.add
       .text(
-        layoutConfig.continueButton.x + layoutConfig.continueButton.xTextOffset,
-        layoutConfig.continueButton.y,
+        layoutConfig.game.ui.continueButton.x + layoutConfig.game.ui.continueButton.xTextOffset,
+        layoutConfig.game.ui.continueButton.y,
         ['']
       )
-      .setFontSize(layoutConfig.continueButton.fontSize)
-      .setFontFamily(layoutConfig.font.captionFamily)
-      .setColor(layoutConfig.font.color)
+      .setFontSize(layoutConfig.fontSize.large)
+      .setFontFamily(designConfig.fontFamily.caption)
+      .setColor(designConfig.color.neutral)
       .setAlign('right')
       .setOrigin(1, 0.5)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
       o =>
         o
           .on('pointerdown', () => this.onClickAction())
-          .on('pointerover', () => this.text.setColor(layoutConfig.font.colorHover))
-          .on('pointerout', () => this.text.setColor(layoutConfig.font.color)),
+          .on('pointerover', () => this.text.setColor(designConfig.color.hover))
+          .on('pointerout', () => this.text.setColor(designConfig.color.neutral)),
       this
     );
     this.scene.input.keyboard
-      .addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, true)
+      ?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, true)
       .on('down', () => this.onClickAction());
     this.waitState();
   }
@@ -89,7 +92,7 @@ export default class ContinueButton {
               });
             }
             this.showIncept();
-          } else if (this.scene.state.hasToRetractCards) {
+          } else if (this.scene.state.player.hasToRetractCards) {
             this.waitState();
           } else {
             this.showNextPhase();
@@ -119,16 +122,18 @@ export default class ContinueButton {
   }
   private createButtonImage(name: string) {
     return this.scene.add
-      .image(layoutConfig.continueButton.x, layoutConfig.continueButton.y, `button_${name}`)
+      .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
       .setOrigin(1, 0.5)
-      .setInteractive()
+      .setInteractive({
+        useHandCursor: true
+      })
       .setVisible(false);
   }
   private showNextPhase() {
     const text =
       this.scene.plannedBattle.shipIds.length == 0 ||
       (this.scene.plannedBattle.type == BattleType.Mission &&
-        !ClientPlannedBattle.cardLimitReached(this.scene.plannedBattle))
+        !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle))
         ? 'Zug beenden'
         : `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
     this.show(text, 'active_build', () =>
@@ -175,7 +180,7 @@ export default class ContinueButton {
   }
   private showButton(name: string) {
     Object.values(this.buttonImages).forEach(i => i.setVisible(false));
-    this.buttonImages[name].setVisible(true);
+    this.buttonImages[name as keyof ButtonImages].setVisible(true);
   }
   private waitState() {
     const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;

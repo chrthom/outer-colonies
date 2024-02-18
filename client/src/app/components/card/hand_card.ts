@@ -4,45 +4,93 @@ import Game from '../../scenes/game';
 import { ClientHandCard } from '../../../../../server/src/shared/interfaces/client_state';
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
+import { constants } from '../../../../../server/src/shared/config/constants';
 
 export default class HandCard extends CardImage {
-  uuid!: string;
+  uuid: string;
   data!: ClientHandCard;
   constructor(scene: Game, data: ClientHandCard) {
-    super(scene, layoutConfig.deck.x, layoutConfig.deck.y, data.cardId);
+    super(
+      scene,
+      HandCard.getPlacementConfig(data.ownedByPlayer).deck.x,
+      HandCard.getPlacementConfig(data.ownedByPlayer).deck.y,
+      data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
+      {
+        isOpponentCard: !data.ownedByPlayer
+      }
+    );
     this.uuid = data.uuid;
     this.update(data);
-    this.image.on('pointerdown', () => this.onClickAction());
+    if (this.ownedByPlayer) {
+      this.image.on('pointerdown', () => this.onClickAction());
+    }
     this.setDepth(layoutConfig.depth.handCard);
-    this.enableMaximizeOnMouseover();
+    if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
   }
   update(data: ClientHandCard) {
     this.data = data;
     this.tween({
       targets: undefined,
       duration: animationConfig.duration.draw,
-      x: this.x(),
-      y: this.y(),
-      angle: this.angle()
+      x: this.x,
+      y: this.y,
+      angle: this.shortestAngle(this.angle)
     });
   }
   highlightPlayability() {
     this.highlightReset();
     if (this.data.playable) this.highlightSelectable();
   }
+  maximizeTacticCard() {
+    this.scene.maximizedTacticCard?.discard();
+    this.scene.maximizedTacticCard = this;
+    this.setCardId(this.data.cardId);
+    this.setDepth(layoutConfig.depth.maxedTacticCard);
+    this.highlightReset();
+    this.tween({
+      targets: undefined,
+      duration: animationConfig.duration.showTacticCard,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
+      angle: this.shortestAngle(0),
+      scale: layoutConfig.game.cards.scale.max
+    });
+  }
+  override discard(toDeck?: boolean) {
+    if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
+      this.cardId = this.data.cardId;
+      this.image.setTexture(`card_${this.cardId}`);
+    }
+    super.discard(toDeck);
+  }
   private invIndex(data: ClientHandCard) {
-    return this.scene.state.hand.length - data.index - 1;
+    const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
+    return handData.hand.length - data.index - 1;
   }
-  private x() {
-    return layoutConfig.player.hand.x + this.invIndex(this.data) * layoutConfig.player.hand.xStep;
-  }
-  private y() {
-    return layoutConfig.player.hand.y + this.invIndex(this.data) * layoutConfig.player.hand.yStep;
-  }
-  private angle() {
+  private get x() {
     return (
-      layoutConfig.player.hand.startAngle + this.invIndex(this.data) * layoutConfig.player.hand.angleStep
+      this.placementConfig.hand.x + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
+  }
+  private get y() {
+    return (
+      this.placementConfig.hand.y +
+      this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+    );
+  }
+  private get angle() {
+    return (
+      this.orientation +
+      this.factor *
+        (layoutConfig.game.cards.placement.hand.startAngle +
+          this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep)
+    );
+  }
+  private get factor() {
+    return this.ownedByPlayer ? 1 : -1;
+  }
+  private get orientation() {
+    return this.ownedByPlayer ? 0 : 180;
   }
   private onClickAction() {
     if (this.scene.state.playerPendingAction) {

@@ -1,11 +1,13 @@
 import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionType } from '../config/enums';
 
-export interface ClientOpponent {
-  name: string;
-  hand: ClientHandCard[];
-  handCardSize: number;
+export interface ClientPlayer {
+  actionPool: string[];
   deckSize: number;
   discardPileIds: number[];
+  hand: ClientHandCard[];
+  handCardLimit: number;
+  hasToRetractCards: boolean;
+  name: string;
 }
 
 export interface ClientPlannedAttack {
@@ -81,25 +83,51 @@ export interface ClientEvent {
 
 export interface ClientGameResult {
   won: boolean;
-  type: GameResultType;
+  type?: GameResultType;
   sol: number;
 }
 
 export interface ClientState {
+  battle: ClientBattle;
+  cardStacks: ClientCardStack[];
+  gameResult?: ClientGameResult;
+  highlightCardUUID?: string;
+  intervention?: ClientIntervention;
+  opponent: ClientPlayer;
+  player: ClientPlayer;
   playerIsActive: boolean;
   playerPendingAction: boolean;
-  name: string;
   turnPhase: TurnPhase;
-  actionPool: string[];
-  opponent: ClientOpponent;
-  hand: ClientHandCard[];
-  handCardLimit: number;
-  deckSize: number;
-  discardPileIds: number[];
-  cardStacks: ClientCardStack[];
-  battle: ClientBattle;
-  intervention?: ClientIntervention;
-  gameResult?: ClientGameResult;
-  hasToRetractCards: boolean;
-  highlightCardUUID?: string;
 }
+
+export const emptyClientState: ClientState = {
+  battle: {
+    type: BattleType.None,
+    playerShipIds: [],
+    opponentShipIds: [],
+    priceCardIds: [],
+    range: 0
+  },
+  cardStacks: [],
+  opponent: {
+    actionPool: [],
+    deckSize: 0,
+    discardPileIds: [],
+    hand: [],
+    handCardLimit: 0,
+    hasToRetractCards: false,
+    name: ''
+  },
+  player: {
+    actionPool: [],
+    deckSize: 0,
+    discardPileIds: [],
+    hand: [],
+    handCardLimit: 0,
+    hasToRetractCards: false,
+    name: ''
+  },
+  playerIsActive: false,
+  playerPendingAction: false,
+  turnPhase: TurnPhase.Init
+};
