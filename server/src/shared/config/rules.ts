@@ -5,7 +5,7 @@ class OCRules {
   readonly initialCardsToDraw = 7;
   readonly maxHandCards = 7;
   readonly maxRange = 4;
-  readonly countdownTimer = 900;
+  readonly countdownTimer = 1800;
 
   readonly dailyEarnings = {
     login: 35,
