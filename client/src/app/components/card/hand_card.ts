@@ -5,6 +5,7 @@ import { ClientHandCard } from '../../../../../server/src/shared/interfaces/clie
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class HandCard extends CardImage {
   uuid: string;
@@ -30,15 +31,13 @@ export default class HandCard extends CardImage {
   }
   update(data: ClientHandCard) {
     this.data = data;
-    this.tween(
-      {
-        duration: animationConfig.duration.draw,
-        x: this.targetX,
-        y: this.targetY,
-        xRotation: layoutConfig.game.cards.perspective.neutral,
-        zRotation: this.shortestAngle(this.targetAngle)
-      }
-    );
+    this.tween({
+      duration: animationConfig.duration.draw,
+      x: this.targetX,
+      y: this.targetY,
+      xRotation: layoutConfig.game.cards.perspective.neutral,
+      zRotation: this.shortestAngle(this.targetAngle)
+    });
   }
   highlightPlayability() {
     this.highlightReset();
@@ -50,16 +49,14 @@ export default class HandCard extends CardImage {
     this.setCardId(this.data.cardId);
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
-    this.tween(
-      {
-        duration: animationConfig.duration.showTacticCard,
-        x: layoutConfig.game.ui.maxedTacticCard.x,
-        y: layoutConfig.game.ui.maxedTacticCard.y,
-        z: layoutConfig.game.perspective.z.near,
-        xRotation: layoutConfig.game.cards.perspective.neutral,
-        zRotation: this.shortestAngle(0)
-      }
-    );
+    this.tween({
+      duration: animationConfig.duration.showTacticCard,
+      x: layoutConfig.game.ui.maxedTacticCard.x,
+      y: layoutConfig.game.ui.maxedTacticCard.y,
+      z: perspectiveConfig.distance.near,
+      xRotation: layoutConfig.game.cards.perspective.neutral,
+      zRotation: this.shortestAngle(0)
+    });
   }
   override discard(toDeck?: boolean) {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {

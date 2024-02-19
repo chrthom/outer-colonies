@@ -2,6 +2,7 @@ import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enum
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { designConfig } from '../config/design';
 import { Coordinates, layoutConfig } from '../config/layout';
+import { perspectiveConfig } from '../config/perspective';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
 
@@ -53,6 +54,7 @@ export default class Background {
   }
 
   initInterface() {
+    const zConf = layoutConfig.game.ui.zones;
     const addCaption = (c: Coordinates, caption: string, color: string) =>
       this.scene.add
         .text(c.x, c.y, caption)
@@ -62,19 +64,55 @@ export default class Background {
         .setAlpha(designConfig.alpha.transparent)
         .setOrigin(0.5)
         .setAlign('center');
-    const addZone = (c: Coordinates, tint: number, index: number) => {
-      const zone = this.scene.add.plane(c.x, c.y, 'background_zone').setTint(tint);
-      zone.modelRotation.x = layoutConfig.game.cards.perspective.board;
-      zone.modelPosition.z = -index * 0.5;
-      return zone;
+    const addCorner = (x: number, y: number, z: number, angle: number, tint: number) => {
+      const corner = this.scene.add
+        .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'zone_corner')
+        .setTint(tint);
+      corner.modelPosition.x = perspectiveConfig.toCornerX(x);
+      corner.modelPosition.y = perspectiveConfig.toCornerY(y);
+      corner.modelPosition.z = z;
+      corner.modelRotation.x = layoutConfig.game.cards.perspective.board;
+      corner.modelRotation.z = Phaser.Math.DegToRad(angle);
+      return corner;
     };
-    const zConf = layoutConfig.game.ui.zones;
+    const addZone = (c: Coordinates, tint: number, index: number) => {
+      return [
+        addCorner(
+          c.x - zConf.width / 2 + index * zConf.xOffsetTop,
+          c.y - zConf.height / 2,
+          (index + 1) * zConf.zOffset,
+          0,
+          tint
+        ),
+        addCorner(
+          c.x + zConf.width / 2 - index * zConf.xOffsetTop,
+          c.y - zConf.height / 2,
+          (index + 1) * zConf.zOffset,
+          270,
+          tint
+        ),
+        addCorner(
+          c.x - zConf.width / 2 + (index - 1) * zConf.xOffsetTop + zConf.xOffsetBottom,
+          c.y + zConf.height / 2,
+          index * zConf.zOffset,
+          90,
+          tint
+        ),
+        addCorner(
+          c.x + zConf.width / 2 - (index - 1) * zConf.xOffsetTop - zConf.xOffsetBottom,
+          c.y + zConf.height / 2,
+          index * zConf.zOffset,
+          180,
+          tint
+        )
+      ];
+    };
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZone(zConf.playerColony, designConfig.tint.player, 0),
-      addZone(zConf.playerOrbit, designConfig.tint.player, 1),
-      addZone(zConf.neutral, designConfig.tint.neutral, 2),
-      addZone(zConf.opponentColony, designConfig.tint.opponent, 4),
-      addZone(zConf.opponentOrbit, designConfig.tint.opponent, 3)
+      addZone(zConf.playerColony, designConfig.tint.player, 1),
+      addZone(zConf.playerOrbit, designConfig.tint.player, 2),
+      addZone(zConf.neutral, designConfig.tint.neutral, 3),
+      addZone(zConf.opponentColony, designConfig.tint.opponent, 5),
+      addZone(zConf.opponentOrbit, designConfig.tint.opponent, 4)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
       addCaption(zConf.playerColony, 'Koloniezone', designConfig.color.player),

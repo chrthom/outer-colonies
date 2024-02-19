@@ -1,33 +1,6 @@
+import { perspectiveConfig } from './perspective';
+
 class LayoutGameConfig {
-  readonly perspective = {
-    z: {
-      near: -0.7,
-      board: -10,
-      far: -25,
-      stackStep: 0.01,
-      zoneStep: 0.2
-    },
-    origin: {
-      x: 1200,
-      y: 675
-    },
-    factor: {
-      x: 0.0048,
-      y: -0.0039
-    }
-  };
-  private withCardXFactor(x: number) {
-    return x * this.perspective.factor.x;
-  }
-  private withCardYFactor(y: number) {
-    return y * this.perspective.factor.y;
-  }
-  private toCardX(x: number): number {
-    return this.withCardXFactor(x - this.perspective.origin.x);
-  }
-  private toCardY(y: number): number {
-    return this.withCardYFactor(y - this.perspective.origin.y);
-  }
   readonly cards = {
     damageIndicator: {
       xOffsetPlayer: -75,
@@ -43,68 +16,68 @@ class LayoutGameConfig {
     },
     perspective: {
       none: Phaser.Math.DegToRad(0),
-      neutral: Phaser.Math.DegToRad(-10),
+      neutral: Phaser.Math.DegToRad(-5),
       board: Phaser.Math.DegToRad(-30)
     },
     placement: {
-      zoneWidth: this.withCardXFactor(1530),
-      halfZoneWidth: this.withCardXFactor(650),
+      zoneWidth: perspectiveConfig.toCardXOffset(1530),
+      halfZoneWidth: perspectiveConfig.toCardXOffset(650),
       hand: {
-        angleStep: -5,
-        startAngle: 10,
-        xStep: this.withCardXFactor(-50),
-        yStep: this.withCardYFactor(5)
+        angleStep: 5,
+        startAngle: -10,
+        xStep: perspectiveConfig.toCardXOffset(-50),
+        yStep: perspectiveConfig.toCardYOffset(5)
       },
       player: {
         colony: {
-          x: this.toCardX(120),
-          y: this.toCardY(1220)
+          x: perspectiveConfig.toCardX(120),
+          y: perspectiveConfig.toCardY(1220)
         },
         deck: {
-          x: this.toCardX(1930),
-          y: this.toCardY(930)
+          x: perspectiveConfig.toCardX(1930),
+          y: perspectiveConfig.toCardY(930)
         },
         discardPile: {
-          x: this.toCardX(2190),
-          y: this.toCardY(930)
+          x: perspectiveConfig.toCardX(2190),
+          y: perspectiveConfig.toCardY(930)
         },
         hand: {
-          x: this.toCardX(2370),
-          y: this.toCardY(1220)
+          x: perspectiveConfig.toCardX(2370),
+          y: perspectiveConfig.toCardY(1220)
         },
         orbit: {
-          x: this.toCardX(120),
-          y: this.toCardY(934)
+          x: perspectiveConfig.toCardX(120),
+          y: perspectiveConfig.toCardY(934)
         },
         neutral: {
-          x: this.toCardX(1000),
-          y: this.toCardY(658)
+          x: perspectiveConfig.toCardX(1000),
+          y: perspectiveConfig.toCardY(658)
         }
       },
       opponent: {
         colony: {
-          x: this.toCardX(120),
-          y: this.toCardY(130)
+          x: perspectiveConfig.toCardX(120),
+          y: perspectiveConfig.toCardY(130)
         },
         deck: {
-          x: this.toCardX(1930),
-          y: this.toCardY(345)
+          x: perspectiveConfig.toCardX(1930),
+          y: perspectiveConfig.toCardY(345)
         },
         discardPile: {
-          x: this.toCardX(2190),
-          y: this.toCardY(345)
+          x: perspectiveConfig.toCardX(2190),
+          y: perspectiveConfig.toCardY(345)
         },
         hand: {
-          x: this.toCardX(2370),
-          y: this.toCardY(65)
+          x: perspectiveConfig.toCardX(2370),
+          y: perspectiveConfig.toCardY(65)
         },
         orbit: {
-          x: this.toCardX(120),
-          y: this.toCardY(416)
+          x: perspectiveConfig.toCardX(120),
+          y: perspectiveConfig.toCardY(416)
         },
         neutral: {
-          x: this.toCardX(120),
-          y: this.toCardY(692)
+          x: perspectiveConfig.toCardX(120),
+          y: perspectiveConfig.toCardY(692)
         }
       }
     },
@@ -112,7 +85,7 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    stackYDistance: this.withCardYFactor(38)
+    stackYDistance: perspectiveConfig.toCardYOffset(38)
   };
   readonly ui = {
     actionPool: {
@@ -176,6 +149,11 @@ class LayoutGameConfig {
       y: 165
     },
     zones: {
+      height: 240,
+      width: 1750,
+      xOffsetTop: 15,
+      xOffsetBottom: 4,
+      zOffset: -0.1,
       playerColony: {
         x: 885,
         y: 1217

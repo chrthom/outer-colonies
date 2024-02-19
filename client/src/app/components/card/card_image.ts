@@ -2,6 +2,7 @@ import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
 import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export interface CardImageConfig {
   cropped?: boolean;
@@ -11,13 +12,13 @@ export interface CardImageConfig {
 }
 
 export interface CardTweenConfig {
-  duration: number,
-  x: number,
-  y: number,
-  z?: number,
-  xRotation?: number,
-  zRotation?: number,
-  onComplete?: () => void
+  duration: number;
+  x: number;
+  y: number;
+  z?: number;
+  xRotation?: number;
+  zRotation?: number;
+  onComplete?: () => void;
 }
 
 export default class CardImage {
@@ -32,17 +33,27 @@ export default class CardImage {
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
     this.imageHighlight = scene.add
-      .plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_glow${config?.cropped ? '_small' : ''}`)
+      .plane(
+        perspectiveConfig.origin.x,
+        perspectiveConfig.origin.y,
+        `card_glow${config?.cropped ? '_small' : ''}`
+      )
       .setVisible(false);
     this.imageMask = scene.add
-      .plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_mask${config?.cropped ? '_small' : ''}`)
+      .plane(
+        perspectiveConfig.origin.x,
+        perspectiveConfig.origin.y,
+        `card_mask${config?.cropped ? '_small' : ''}`
+      )
       .setVisible(false);
-    this.image = scene.add.plane(layoutConfig.game.perspective.origin.x, layoutConfig.game.perspective.origin.y, `card_${cardId}`).setInteractive();
+    this.image = scene.add
+      .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, `card_${cardId}`)
+      .setInteractive();
     this.image.setMask(this.imageMask.createBitmapMask());
     this.setZRotation(config?.isOpponentCard ? 180 : 0)
       .setX(x)
       .setY(y)
-      .setZ(config?.z ?? layoutConfig.game.perspective.z.board)
+      .setZ(config?.z ?? perspectiveConfig.distance.board)
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
   destroy() {
@@ -57,22 +68,20 @@ export default class CardImage {
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.highlightReset();
-    this.tween(
-      {
-        duration: animationConfig.duration.move,
-        x: targetCoordinates.x,
-        y: targetCoordinates.y,
-        z: layoutConfig.game.perspective.z.board,
-        xRotation: layoutConfig.game.cards.perspective.board,
-        zRotation: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
-        onComplete: () => {
-          if (!toDeck) {
-            this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
-          }
-          this.destroy();
+    this.tween({
+      duration: animationConfig.duration.move,
+      x: targetCoordinates.x,
+      y: targetCoordinates.y,
+      z: perspectiveConfig.distance.board,
+      xRotation: layoutConfig.game.cards.perspective.board,
+      zRotation: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+      onComplete: () => {
+        if (!toDeck) {
+          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
         }
+        this.destroy();
       }
-    );
+    });
   }
   highlightDisabled() {
     this.highlightReset();
@@ -101,21 +110,21 @@ export default class CardImage {
     return this;
   }
   setX(x: number): this {
-    this.forAllImages(i => i.modelPosition.x = x);
+    this.forAllImages(i => (i.modelPosition.x = x));
     return this;
   }
   get x(): number {
     return this.image.modelPosition.x;
   }
   setY(y: number): this {
-    this.forAllImages(i => i.modelPosition.y = y);
+    this.forAllImages(i => (i.modelPosition.y = y));
     return this;
   }
   get y(): number {
     return this.image.modelPosition.y;
   }
   setZ(z: number): this {
-    this.forAllImages(i => i.modelPosition.z = z);
+    this.forAllImages(i => (i.modelPosition.z = z));
     return this;
   }
   get z(): number {
@@ -129,14 +138,14 @@ export default class CardImage {
     return this.image.depth;
   }
   setXRotation(x: number): this {
-    this.forAllImages(i => i.modelRotation.x = x);
+    this.forAllImages(i => (i.modelRotation.x = x));
     return this;
   }
   get xRotation(): number {
     return this.image.modelRotation.x;
   }
   setZRotation(angle: number): this {
-    this.forAllImages(i => i.modelRotation.z = Phaser.Math.DegToRad(angle)); // TODO: Remove conversion
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle))); // TODO: Remove conversion
     return this;
   }
   get zRotation(): number {

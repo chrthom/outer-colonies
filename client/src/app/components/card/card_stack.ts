@@ -13,6 +13,7 @@ import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -167,7 +168,7 @@ export default class CardStack {
         this.cards[0]
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)
-          .setZ(layoutConfig.game.perspective.z.board)
+          .setZ(perspectiveConfig.distance.board)
           .setZRotation(180);
       }
     }

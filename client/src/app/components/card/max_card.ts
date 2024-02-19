@@ -2,12 +2,13 @@ import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
     super(scene, 0, 0, constants.cardBackSideID, {
       perspective: layoutConfig.game.cards.perspective.none,
-      z: layoutConfig.game.perspective.z.near
+      z: perspectiveConfig.distance.near
     });
     this.image.setDepth(layoutConfig.depth.maxCard);
     this.hide();

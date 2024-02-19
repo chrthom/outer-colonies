@@ -1,6 +1,7 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class MissionCards {
   minCards: CardImage[] = [];
@@ -20,7 +21,7 @@ export default class MissionCards {
           id,
           {
             perspective: layoutConfig.game.cards.perspective.board,
-            z: layoutConfig.game.perspective.z.far
+            z: perspectiveConfig.distance.far
           }
         );
       });
