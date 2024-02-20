@@ -41,7 +41,6 @@ export default class CardStack {
     this.filterCardsByIdList(removedCardIds).forEach(c => {
       let toDeck = false;
       if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
-        // TODO: Also check opponent discard pile
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
@@ -54,18 +53,10 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId);
-      const x = this.ownedByPlayer
-        ? handCard
-          ? handCard.image.x
-          : layoutConfig.game.cards.placement.player.deck.x
-        : layoutConfig.game.cards.placement.opponent.deck.x;
-      const y = this.ownedByPlayer
-        ? handCard
-          ? handCard.image.y
-          : layoutConfig.game.cards.placement.player.deck.y
-        : layoutConfig.game.cards.placement.opponent.deck.y;
-      const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
+      const x = handCard ? handCard.image.x : c.placementConfig.deck.x;
+      const y = handCard ? handCard.image.y : c.placementConfig.deck.y;
+      const angle = handCard ? handCard.image.angle : (this.ownedByPlayer ? 0 : 180);
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();

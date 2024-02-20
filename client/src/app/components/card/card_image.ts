@@ -134,7 +134,7 @@ export default class CardImage {
   shortestAngle(targetAngle: number): number {
     return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);
   }
-  protected get placementConfig() {
+  get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
   private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
