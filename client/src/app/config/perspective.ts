@@ -2,18 +2,20 @@ class PerspectiveConfig {
   readonly distance = {
     near: -0.7,
     board: -10,
-    far: -25,
-    stackStep: 0.01,
-    zoneStep: 0.2
+    far: -25
   };
   readonly origin = {
-    x: 1200,
+    x: 885,
     y: 675
   };
   private readonly factor = {
     card: {
       x: 0.0054,
       y: -0.00395
+    },
+    maxCard: {
+      x: 0.002,
+      y: -0.0016
     },
     corner: {
       x: 0.0164,
@@ -49,6 +51,12 @@ class PerspectiveConfig {
   }
   toCornerY(y: number): number {
     return (y - this.origin.y) * this.factor.corner.y;
+  }
+  toMaxCardX(x: number): number {
+    return (x - this.origin.x) * this.factor.maxCard.x;
+  }
+  toMaxCardY(y: number): number {
+    return (y - this.origin.y) * this.factor.maxCard.y;
   }
 }
 

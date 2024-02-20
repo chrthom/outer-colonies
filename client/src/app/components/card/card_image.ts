@@ -17,7 +17,7 @@ export interface CardTweenConfig {
   y: number;
   z?: number;
   xRotation?: number;
-  zRotation?: number;
+  angle?: number;
   onComplete?: () => void;
 }
 
@@ -50,7 +50,7 @@ export default class CardImage {
       .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, `card_${cardId}`)
       .setInteractive();
     this.image.setMask(this.imageMask.createBitmapMask());
-    this.setZRotation(config?.isOpponentCard ? 180 : 0)
+    this.setAngle(config?.isOpponentCard ? 180 : 0)
       .setX(x)
       .setY(y)
       .setZ(config?.z ?? perspectiveConfig.distance.board)
@@ -74,7 +74,7 @@ export default class CardImage {
       y: targetCoordinates.y,
       z: perspectiveConfig.distance.board,
       xRotation: layoutConfig.game.cards.perspective.board,
-      zRotation: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
       onComplete: () => {
         if (!toDeck) {
           this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
@@ -144,12 +144,12 @@ export default class CardImage {
   get xRotation(): number {
     return this.image.modelRotation.x;
   }
-  setZRotation(angle: number): this {
-    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle))); // TODO: Remove conversion
+  setAngle(angle: number): this {
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)));
     return this;
   }
-  get zRotation(): number {
-    return Phaser.Math.RadToDeg(this.image.modelRotation.z); // TODO: Remove conversion
+  get angle(): number {
+    return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
   enableMaximizeOnMouseover() {
     this.disableMaximizeOnMouseover();
@@ -176,7 +176,7 @@ export default class CardImage {
       duration: config.duration
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
-    if (config.zRotation != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.zRotation); // TODO Remove conversion
+    if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
     this.scene.tweens.add(rTweenConfig);
   }
   shortestAngle(targetAngle: number): number {

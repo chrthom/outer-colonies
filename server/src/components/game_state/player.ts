@@ -33,12 +33,12 @@ export default class Player {
     this.actionPool = this.originalActions;
   }
   callBackShipsFromNeutralZone() {
-    this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => (cs.zone = Zone.Oribital));
+    this.cardStacks.filter(cs => cs.zone == Zone.Neutral).forEach(cs => (cs.zone = Zone.Orbital));
   }
   moveFlightReadyShipsToOrbit() {
     this.cardStacks
       .filter(cs => cs.zone == Zone.Colony && cs.isFlightReady)
-      .forEach(cs => (cs.zone = Zone.Oribital));
+      .forEach(cs => (cs.zone = Zone.Orbital));
   }
   shuffleDeck() {
     this.deck = shuffle(this.deck);

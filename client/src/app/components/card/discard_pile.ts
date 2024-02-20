@@ -5,6 +5,7 @@ import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { layoutConfig } from 'src/app/config/layout';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
@@ -35,8 +36,8 @@ export default class DiscardPile extends CardImage {
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        this.placementConfig.discardPile.x,
-        this.placementConfig.discardPile.y,
+        perspectiveConfig.fromCardX(this.placementConfig.discardPile.x),
+        perspectiveConfig.fromCardY(this.placementConfig.discardPile.y),
         true,
         true
       );

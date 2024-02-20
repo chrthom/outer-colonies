@@ -78,30 +78,30 @@ export default class Background {
     const addZone = (c: Coordinates, tint: number, index: number) => {
       return [
         addCorner(
-          c.x - zConf.width / 2 + index * zConf.xOffsetTop,
+          c.x - zConf.width / 2 + index * zConf.offset.xTop,
           c.y - zConf.height / 2,
-          (index + 1) * zConf.zOffset,
+          (index + 1) * zConf.offset.z,
           0,
           tint
         ),
         addCorner(
-          c.x + zConf.width / 2 - index * zConf.xOffsetTop,
+          c.x + zConf.width / 2 - index * zConf.offset.xTop,
           c.y - zConf.height / 2,
-          (index + 1) * zConf.zOffset,
+          (index + 1) * zConf.offset.z,
           270,
           tint
         ),
         addCorner(
-          c.x - zConf.width / 2 + (index - 1) * zConf.xOffsetTop + zConf.xOffsetBottom,
+          c.x - zConf.width / 2 + (index - 1) * zConf.offset.xTop + zConf.offset.xBottom,
           c.y + zConf.height / 2,
-          index * zConf.zOffset,
+          index * zConf.offset.z,
           90,
           tint
         ),
         addCorner(
-          c.x + zConf.width / 2 - (index - 1) * zConf.xOffsetTop - zConf.xOffsetBottom,
+          c.x + zConf.width / 2 - (index - 1) * zConf.offset.xTop - zConf.offset.xBottom,
           c.y + zConf.height / 2,
-          index * zConf.zOffset,
+          index * zConf.offset.z,
           180,
           tint
         )

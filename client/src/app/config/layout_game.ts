@@ -21,17 +21,23 @@ class LayoutGameConfig {
     },
     placement: {
       zoneWidth: perspectiveConfig.toCardXOffset(1530),
-      halfZoneWidth: perspectiveConfig.toCardXOffset(650),
+      halfZoneWidth: perspectiveConfig.toCardXOffset(680),
       hand: {
         angleStep: 5,
         startAngle: -10,
         xStep: perspectiveConfig.toCardXOffset(-50),
         yStep: perspectiveConfig.toCardYOffset(5)
       },
+      mission: {
+        x: perspectiveConfig.toCardX(1760),
+        y: perspectiveConfig.toCardX(735),
+        xDistance: perspectiveConfig.toCardXOffset(20),
+        yDistance: perspectiveConfig.toCardXOffset(10)
+      },
       player: {
         colony: {
           x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(1220)
+          y: perspectiveConfig.toCardY(1205)
         },
         deck: {
           x: perspectiveConfig.toCardX(1930),
@@ -47,17 +53,17 @@ class LayoutGameConfig {
         },
         orbit: {
           x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(934)
+          y: perspectiveConfig.toCardY(925)
         },
         neutral: {
           x: perspectiveConfig.toCardX(1000),
-          y: perspectiveConfig.toCardY(658)
+          y: perspectiveConfig.toCardY(650)
         }
       },
       opponent: {
         colony: {
           x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(130)
+          y: perspectiveConfig.toCardY(160)
         },
         deck: {
           x: perspectiveConfig.toCardX(1930),
@@ -73,11 +79,11 @@ class LayoutGameConfig {
         },
         orbit: {
           x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(416)
+          y: perspectiveConfig.toCardY(430)
         },
         neutral: {
           x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(692)
+          y: perspectiveConfig.toCardY(695)
         }
       }
     },
@@ -85,7 +91,7 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    stackYDistance: perspectiveConfig.toCardYOffset(38)
+    stackYDistance: perspectiveConfig.toCardYOffset(31)
   };
   readonly ui = {
     actionPool: {
@@ -134,12 +140,6 @@ class LayoutGameConfig {
       x: 0,
       y: 0
     },
-    missionCards: {
-      x: 1760,
-      y: 735,
-      xDistance: 20,
-      yDistance: 10
-    },
     prompt: {
       box: {
         x: 2850, // -1000
@@ -151,9 +151,11 @@ class LayoutGameConfig {
     zones: {
       height: 240,
       width: 1750,
-      xOffsetTop: 15,
-      xOffsetBottom: 4,
-      zOffset: -0.1,
+      offset: {
+        xTop: 18,
+        xBottom: 4,
+        z: -0.1
+      },
       playerColony: {
         x: 885,
         y: 1217

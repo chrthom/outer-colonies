@@ -20,7 +20,7 @@ class LayoutConfig {
     background: -1000,
     indicators: 20,
     discardCard: 50,
-    handCard: 70, // TODO: Playing cards should be shown in front of hand cards
+    handCard: 70,
     battleEffects: 85,
     maxCard: 95,
     maxedTacticCard: 100

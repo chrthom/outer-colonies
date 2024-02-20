@@ -36,7 +36,7 @@ export default class HandCard extends CardImage {
       x: this.targetX,
       y: this.targetY,
       xRotation: layoutConfig.game.cards.perspective.neutral,
-      zRotation: this.shortestAngle(this.targetAngle)
+      angle: this.shortestAngle(this.targetAngle)
     });
   }
   highlightPlayability() {
@@ -55,13 +55,12 @@ export default class HandCard extends CardImage {
       y: layoutConfig.game.ui.maxedTacticCard.y,
       z: perspectiveConfig.distance.near,
       xRotation: layoutConfig.game.cards.perspective.neutral,
-      zRotation: this.shortestAngle(0)
+      angle: this.shortestAngle(0)
     });
   }
   override discard(toDeck?: boolean) {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
-      this.cardId = this.data.cardId;
-      this.image.setTexture(`card_${this.cardId}`);
+      this.setCardId(this.data.cardId);
     }
     super.discard(toDeck);
   }
