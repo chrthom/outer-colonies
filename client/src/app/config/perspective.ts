@@ -14,8 +14,8 @@ class PerspectiveConfig {
       y: -0.00395
     },
     maxCard: {
-      x: 0.002,
-      y: -0.0016
+      x: 0.0015,
+      y: -0.00115
     },
     corner: {
       x: 0.0164,

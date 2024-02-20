@@ -133,8 +133,8 @@ class LayoutGameConfig {
       yConfirmOffset: 35
     },
     maxCard: {
-      xOffset: 350,
-      yOffset: -320
+      xOffset: 400,
+      yOffset: -400
     },
     maxedTacticCard: {
       x: 0,
