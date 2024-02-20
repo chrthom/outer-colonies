@@ -2,12 +2,6 @@ import { perspectiveConfig } from './perspective';
 
 class LayoutGameConfig {
   readonly cards = {
-    damageIndicator: {
-      xOffsetPlayer: -75,
-      yOffsetPlayer: -265,
-      xOffsetOpponent: -75,
-      yOffsetOpponent: 265
-    },
     defenseIndicator: {
       xOffset: -85,
       yOffsetPlayer: -190,
@@ -91,7 +85,13 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    stackYDistance: perspectiveConfig.toCardYOffset(31)
+    stackYDistance: perspectiveConfig.toCardYOffset(31),
+    valueIndicator: {
+      xOffsetPlayer: -85,
+      yOffsetPlayer: -115,
+      xOffsetOpponent: -65,
+      yOffsetOpponent: 115
+    }
   };
   readonly ui = {
     actionPool: {

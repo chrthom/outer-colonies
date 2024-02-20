@@ -70,16 +70,16 @@ export default class ValueIndicator {
     return (
       cardX +
       (this.ownedByPlayer
-        ? layoutConfig.game.cards.damageIndicator.xOffsetPlayer
-        : layoutConfig.game.cards.damageIndicator.xOffsetOpponent)
+        ? layoutConfig.game.cards.valueIndicator.xOffsetPlayer
+        : layoutConfig.game.cards.valueIndicator.xOffsetOpponent)
     );
   }
   private y(cardY: number) {
     return (
       cardY +
       (this.ownedByPlayer
-        ? layoutConfig.game.cards.damageIndicator.yOffsetPlayer
-        : layoutConfig.game.cards.damageIndicator.yOffsetOpponent)
+        ? layoutConfig.game.cards.valueIndicator.yOffsetPlayer
+        : layoutConfig.game.cards.valueIndicator.yOffsetOpponent)
     );
   }
 }

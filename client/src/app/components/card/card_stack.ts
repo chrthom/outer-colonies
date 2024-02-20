@@ -135,8 +135,8 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        this.x,
-        this.zoneLayout.y,
+        perspectiveConfig.fromCardX(this.x),
+        perspectiveConfig.fromCardY(this.zoneLayout.y),
         this.ownedByPlayer,
         false
       );

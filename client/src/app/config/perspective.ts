@@ -44,7 +44,7 @@ class PerspectiveConfig {
     return this.toCardYOffset(y - this.origin.y);
   }
   fromCardY(y: number): number {
-    return this.fromCardXOffset(y) + this.origin.y;
+    return this.fromCardYOffset(y) + this.origin.y;
   }
   toCornerX(x: number): number {
     return (x - this.origin.x) * this.factor.corner.x;
