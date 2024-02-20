@@ -17,7 +17,7 @@ export default class LoadingStatus {
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
       .setAlign('center')
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5);
     this.createLoadingAnimation();
   }
   setText(text: string): this {

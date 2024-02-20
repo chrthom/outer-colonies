@@ -21,7 +21,7 @@ export default class DefenseIndicator {
       const color = icon.depleted ? designConfig.tint.opponent : designConfig.tint.player;
       return scene.add
         .image(this.x(cardX), this.y(cardY, index), `icon_${icon.icon}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setTint(color, designConfig.tint.neutral, color, color)
         .setAlpha(designConfig.alpha.normal)
         .setDepth(layoutConfig.depth.indicators);

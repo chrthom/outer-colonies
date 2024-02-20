@@ -29,7 +29,7 @@ export default class Preloader {
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
       .setAlign('center')
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5);
     scene.load.on('progress', (value: number) => {
       this.progressBar
         .clear()

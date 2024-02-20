@@ -22,7 +22,7 @@ export default class ActionPool {
     this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
       this.scene.add
         .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setTint(color, designConfig.tint.neutral, color, color)
         .setAlpha(designConfig.alpha.normal)
     );

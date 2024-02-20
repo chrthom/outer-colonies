@@ -29,7 +29,7 @@ export default class ValueIndicator {
           critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.indicators);
     } else {
       this.shape = scene.add
@@ -42,7 +42,7 @@ export default class ValueIndicator {
           critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.indicators);
     }
     this.text = scene.add
@@ -51,7 +51,7 @@ export default class ValueIndicator {
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.hover)
       .setAlign('center')
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setDepth(layoutConfig.depth.indicators);
   }
   destroy() {

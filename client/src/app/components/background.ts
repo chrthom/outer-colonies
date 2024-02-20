@@ -25,7 +25,7 @@ export default class Background {
     this.zoneMarkers = scene.add.group();
     this.starsImage = scene.add
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
-      .setOrigin(0, 0)
+      .setOrigin(0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(designConfig.alpha.faded);
     this.sunImage = scene.add
@@ -242,7 +242,7 @@ export default class Background {
     const angle = Math.random() * 360 - 45;
     return this.scene.add
       .image(x, y, `background_ring_${backgroundConfig.rings[ring]}`)
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setAngle(angle)
       .setDepth(layoutConfig.depth.background + backgroundConfig.depth.ring + ring)
       .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
@@ -260,7 +260,7 @@ export default class Background {
       }
       this.orbImage = this.scene.add
         .image(x, y, `background_orb_${this.targetOrb.name}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
         .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
         .setTint(...this.getTint(this.isColonyOrb ? 0 : 270));
@@ -337,7 +337,7 @@ export default class Background {
       .forEach(rv => {
         const vessel = this.scene.add
           .image(rv.startX, rv.startY, `background_vessel_${rv.vessel}`)
-          .setOrigin(0.5, 0.5)
+          .setOrigin(0.5)
           .setDepth(layoutConfig.depth.background + backgroundConfig.depth.vessel)
           .setScale(rv.startScale ? rv.startScale : 1)
           .setAngle(rv.startAngle ? rv.startAngle : 0)

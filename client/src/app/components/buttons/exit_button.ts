@@ -45,7 +45,7 @@ export default class ExitButton {
       });
     this.image = this.scene.add
       .image(layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'icon_exit')
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setInteractive({
         useHandCursor: true
       });

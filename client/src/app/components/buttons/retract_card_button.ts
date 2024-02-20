@@ -22,7 +22,7 @@ export default class RetractCardButton {
         cardY + layoutConfig.game.cards.retractCardButton.yOffset,
         'icon_retract_card'
       )
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setAlpha(designConfig.alpha.normal)
       .setDepth(layoutConfig.depth.indicators)
       .setInteractive({
