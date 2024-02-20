@@ -87,10 +87,10 @@ class LayoutGameConfig {
     },
     stackYDistance: perspectiveConfig.toCardYOffset(31),
     valueIndicator: {
-      xOffsetPlayer: -85,
-      yOffsetPlayer: -115,
+      xOffsetPlayer: -95,
+      yOffsetPlayer: -100,
       xOffsetOpponent: -65,
-      yOffsetOpponent: 115
+      yOffsetOpponent: 95
     }
   };
   readonly ui = {
