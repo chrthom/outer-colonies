@@ -18,8 +18,8 @@ class PerspectiveConfig {
       y: -0.00115
     },
     minCard: {
-      x: 0.0108,
-      y: -0.0079
+      x: 0.0115,
+      y: -0.0085
     },
     corner: {
       x: 0.0164,

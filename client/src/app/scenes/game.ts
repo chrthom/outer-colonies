@@ -170,9 +170,6 @@ export default class Game extends Phaser.Scene {
       missionCards: new MissionCards(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
-    ////
-    new CardImage(this, perspectiveConfig.toMinCardX(0), perspectiveConfig.toMinCardY(0), 1, { z: perspectiveConfig.distance.far }); ////
-    ////
   }
 
   updateState(state: ClientState) {

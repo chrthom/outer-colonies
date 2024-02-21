@@ -46,14 +46,19 @@ export default class AttackDamageIndicator {
         ? animationConfig.attack.flare.yOffset
         : animationConfig.attack.flare.yOffsetOpponent;
     return this.scene.add
-      .particles(perspectiveConfig.fromCardX(this.cardImage.x), perspectiveConfig.fromCardY(this.cardImage.y) + yOffset, `flare_${color}`, {
-        lifespan: animationConfig.attack.flare.lifetime,
-        speed: { min: 200, max: 500 },
-        scale: { start: 0.8, end: 0 },
-        gravityY: 15,
-        blendMode: 'ADD',
-        emitting: false
-      })
+      .particles(
+        perspectiveConfig.fromCardX(this.cardImage.x),
+        perspectiveConfig.fromCardY(this.cardImage.y) + yOffset,
+        `flare_${color}`,
+        {
+          lifespan: animationConfig.attack.flare.lifetime,
+          speed: { min: 200, max: 500 },
+          scale: { start: 0.8, end: 0 },
+          gravityY: 15,
+          blendMode: 'ADD',
+          emitting: false
+        }
+      )
       .setDepth(layoutConfig.depth.battleEffects);
   }
   private createIndicator(value: number, color: string) {
@@ -62,7 +67,11 @@ export default class AttackDamageIndicator {
         ? animationConfig.attack.indicator.yOffset
         : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
-      .text(perspectiveConfig.fromCardX(this.cardImage.x), perspectiveConfig.fromCardY(this.cardImage.y) + yOffset, String(value))
+      .text(
+        perspectiveConfig.fromCardX(this.cardImage.x),
+        perspectiveConfig.fromCardY(this.cardImage.y) + yOffset,
+        String(value)
+      )
       .setFontSize(layoutConfig.fontSize.large)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)
