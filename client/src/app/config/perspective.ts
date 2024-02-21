@@ -17,6 +17,10 @@ class PerspectiveConfig {
       x: 0.0015,
       y: -0.00115
     },
+    minCard: {
+      x: 0.0108,
+      y: -0.0079
+    },
     corner: {
       x: 0.0164,
       y: -0.0164
@@ -57,6 +61,18 @@ class PerspectiveConfig {
   }
   toMaxCardY(y: number): number {
     return (y - this.origin.y) * this.factor.maxCard.y;
+  }
+  toMinCardXOffset(x: number) {
+    return x * this.factor.minCard.x;
+  }
+  toMinCardX(x: number): number {
+    return this.toMinCardXOffset(x - this.origin.x);
+  }
+  toMinCardYOffset(y: number) {
+    return y * this.factor.minCard.y;
+  }
+  toMinCardY(y: number): number {
+    return this.toMinCardYOffset(y - this.origin.y);
   }
 }
 

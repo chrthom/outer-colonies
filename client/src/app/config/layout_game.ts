@@ -23,10 +23,10 @@ class LayoutGameConfig {
         yStep: perspectiveConfig.toCardYOffset(5)
       },
       mission: {
-        x: perspectiveConfig.toCardX(1760),
-        y: perspectiveConfig.toCardX(735),
-        xDistance: perspectiveConfig.toCardXOffset(20),
-        yDistance: perspectiveConfig.toCardXOffset(10)
+        x: perspectiveConfig.toMinCardX(1760),
+        y: perspectiveConfig.toMinCardX(735),
+        xDistance: perspectiveConfig.toMinCardXOffset(20),
+        yDistance: perspectiveConfig.toMinCardXOffset(10)
       },
       player: {
         colony: {
@@ -134,7 +134,7 @@ class LayoutGameConfig {
     },
     maxCard: {
       xOffset: 400,
-      yOffset: -400
+      yOffset: -330
     },
     maxedTacticCard: {
       x: 0,

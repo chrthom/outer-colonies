@@ -30,9 +30,7 @@ import CombatRangeIndicator from '../components/indicators/combat_range_indicato
 import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
-import { backgroundConfig } from '../config/background';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
-import { layoutConfig } from '../config/layout';
 import { perspectiveConfig } from '../config/perspective';
 
 interface ActiveCards {
@@ -97,7 +95,7 @@ export default class Game extends Phaser.Scene {
     this.load.baseURL = `${environment.urls.api}/assets/`;
     this.load.image('zone_corner', 'utils/zone_corner.png');
     [0, 1]
-      .concat(this.gameParams?.preloadCardIds ?? [])
+      .concat(this.gameParams.preloadCardIds)
       .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
     [
       'equipment',
@@ -172,6 +170,9 @@ export default class Game extends Phaser.Scene {
       missionCards: new MissionCards(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
+    ////
+    new CardImage(this, perspectiveConfig.toMinCardX(0), perspectiveConfig.toMinCardY(0), 1, { z: perspectiveConfig.distance.far }); ////
+    ////
   }
 
   updateState(state: ClientState) {

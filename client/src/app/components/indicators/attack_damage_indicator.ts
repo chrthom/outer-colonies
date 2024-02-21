@@ -4,6 +4,7 @@ import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardStack from '../card/card_stack';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class AttackDamageIndicator {
   private scene: Game;
@@ -45,7 +46,7 @@ export default class AttackDamageIndicator {
         ? animationConfig.attack.flare.yOffset
         : animationConfig.attack.flare.yOffsetOpponent;
     return this.scene.add
-      .particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
+      .particles(perspectiveConfig.fromCardX(this.cardImage.x), perspectiveConfig.fromCardY(this.cardImage.y) + yOffset, `flare_${color}`, {
         lifespan: animationConfig.attack.flare.lifetime,
         speed: { min: 200, max: 500 },
         scale: { start: 0.8, end: 0 },
@@ -61,7 +62,7 @@ export default class AttackDamageIndicator {
         ? animationConfig.attack.indicator.yOffset
         : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
-      .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
+      .text(perspectiveConfig.fromCardX(this.cardImage.x), perspectiveConfig.fromCardY(this.cardImage.y) + yOffset, String(value))
       .setFontSize(layoutConfig.fontSize.large)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)
