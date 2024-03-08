@@ -44,12 +44,6 @@ export default class DefenseIndicator {
     return cardX + layoutConfig.game.cards.defenseIndicator.xOffset;
   }
   private y(cardY: number, index: number) {
-    return (
-      cardY +
-      (this.ownedByPlayer
-        ? layoutConfig.game.cards.defenseIndicator.yOffsetPlayer
-        : layoutConfig.game.cards.defenseIndicator.yOffsetOpponent) +
-      index * layoutConfig.game.cards.defenseIndicator.yDistance
-    );
+    return cardY + index * layoutConfig.game.cards.defenseIndicator.yDistance;
   }
 }
