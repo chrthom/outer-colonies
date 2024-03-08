@@ -119,8 +119,14 @@ export default class CardStack {
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
-    this.damageIndicator?.tween(this.x, this.zoneLayout.y);
-    this.defenseIndicator?.tween(this.x, this.zoneLayout.y);
+    this.damageIndicator?.tween(
+      perspectiveConfig.fromCardX(this.x),
+      perspectiveConfig.fromCardY(this.zoneLayout.y)
+    );
+    this.defenseIndicator?.tween(
+      perspectiveConfig.fromCardX(this.x),
+      perspectiveConfig.fromCardY(this.zoneLayout.y)
+    );
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
@@ -150,8 +156,8 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        this.x,
-        this.zoneLayout.y,
+        perspectiveConfig.fromCardX(this.x),
+        perspectiveConfig.fromCardY(this.zoneLayout.y),
         this.ownedByPlayer
       );
     }

@@ -4,8 +4,8 @@ class LayoutGameConfig {
   readonly cards = {
     defenseIndicator: {
       xOffset: -85,
-      yOffsetPlayer: -190,
-      yOffsetOpponent: 20,
+      yOffsetPlayer: 0,
+      yOffsetOpponent: 0,
       yDistance: 50
     },
     perspective: {
