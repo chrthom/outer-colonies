@@ -58,7 +58,7 @@ export default class CardStack {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.image.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.image.y : c.placementConfig.deck.y;
-      const angle = handCard ? handCard.image.angle : (this.ownedByPlayer ? 0 : 180);
+      const angle = handCard ? handCard.image.angle : this.ownedByPlayer ? 0 : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
