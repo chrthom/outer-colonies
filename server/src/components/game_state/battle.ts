@@ -47,7 +47,7 @@ export default class Battle {
       player.cardStacks
         .filter(cs => cs.isMissionReady && !interceptingShipIds.includes(cs.uuid))
         .forEach(cs => (cs.zone = Zone.Neutral));
-      this.ships[player.no] = player.cardStacks.filter(cs => cs.zone == Zone.Oribital);
+      this.ships[player.no] = player.cardStacks.filter(cs => cs.zone == Zone.Orbital);
     }
   }
   canInterceptMission(interceptingPlayerNo: number, cardStack: CardStack): boolean {

@@ -43,7 +43,7 @@ export class Card165 extends EconomyTacticCard {
   }
   private calcFreePsiSockets(player: Player): number {
     return player.cardStacks
-      .filter(cs => cs.zone == Zone.Oribital)
+      .filter(cs => cs.zone == Zone.Orbital)
       .map(cs => cs.profile)
       .filter(p => p.speed >= 2 && p.psi > 0)
       .map(p => p.psi)

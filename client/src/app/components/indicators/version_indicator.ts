@@ -14,6 +14,6 @@ export default class VersonIndicator {
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.neutral)
       .setAlign('right')
-      .setOrigin(1, 1);
+      .setOrigin(1);
   }
 }

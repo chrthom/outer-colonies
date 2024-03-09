@@ -13,7 +13,7 @@ export default class Prompt {
     this.scene = scene;
     this.image = this.scene.add
       .image(layoutConfig.game.ui.prompt.box.x, layoutConfig.game.ui.prompt.box.y, 'prompt_box')
-      .setOrigin(0, 0)
+      .setOrigin(0)
       .setScale(0.8);
     this.text = scene.add
       .text(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'Lädt...')
@@ -21,7 +21,7 @@ export default class Prompt {
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
       .setAlign('left')
-      .setOrigin(0, 0);
+      .setOrigin(0);
   }
   update() {
     if (this.scene.state.gameResult) {

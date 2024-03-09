@@ -13,6 +13,7 @@ import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -26,6 +27,7 @@ export default class CardStack {
     this.uuid = data.uuid;
     this.data = data;
     this.createCards(true, origin);
+    this.tween();
   }
   discard(toDeck?: boolean) {
     this.destroyIndicators();
@@ -103,15 +105,20 @@ export default class CardStack {
   private tween() {
     this.cards.forEach((c, index) => {
       c.tween({
-        targets: undefined,
         duration: animationConfig.duration.move,
         x: this.x,
         y: this.y(index),
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
-    this.damageIndicator?.tween(this.x, this.zoneLayout.y);
-    this.defenseIndicator?.tween(this.x, this.zoneLayout.y);
+    this.damageIndicator?.tween(
+      perspectiveConfig.fromCardX(this.x),
+      perspectiveConfig.fromCardY(this.zoneLayout.y)
+    );
+    this.defenseIndicator?.tween(
+      perspectiveConfig.fromCardX(this.x),
+      perspectiveConfig.fromCardY(this.zoneLayout.y)
+    );
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
@@ -126,8 +133,8 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        this.x,
-        this.zoneLayout.y,
+        perspectiveConfig.fromCardX(this.x),
+        perspectiveConfig.fromCardY(this.zoneLayout.y),
         this.ownedByPlayer,
         false
       );
@@ -141,40 +148,47 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        this.x,
-        this.zoneLayout.y,
+        perspectiveConfig.fromCardX(this.x),
+        perspectiveConfig.fromCardY(this.zoneLayout.y),
         this.ownedByPlayer
       );
     }
     if (fromHand) {
       if (origin) {
         this.cards[0]
-          .setX(origin.image.x)
-          .setY(origin.image.y)
-          .setAngle(origin.image.angle)
-          .setScale(origin.image.scale);
+          .setX(origin.x)
+          .setY(origin.y)
+          .setZ(origin.z)
+          .setAngle(origin.angle)
+          .setXRotation(origin.xRotation);
       } else if (!this.ownedByPlayer) {
-        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); ////
-        this.cards[0] // TODO: Tween from opponent hand
+        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); // TODO: Fix
+        this.cards[0]
           .setX(layoutConfig.game.cards.placement.opponent.deck.x)
           .setY(layoutConfig.game.cards.placement.opponent.deck.y)
+          .setZ(perspectiveConfig.distance.board)
           .setAngle(180);
       }
-      this.tween();
     }
   }
   private get x() {
-    const zoneWidth =
+    let zoneWidth =
       this.data.zone == Zone.Neutral
         ? layoutConfig.game.cards.placement.halfZoneWidth
         : layoutConfig.game.cards.placement.zoneWidth;
+    let shrinkZone = perspectiveConfig.toCardXOffset(
+      layoutConfig.game.ui.zones.offset.xTop + layoutConfig.game.ui.zones.offset.xBottom
+    );
+    if (this.data.zone == Zone.Colony && this.ownedByPlayer) shrinkZone *= 0;
+    else if (this.data.zone == Zone.Neutral) shrinkZone *= 2;
+    else if (this.data.zone == Zone.Orbital && !this.ownedByPlayer) shrinkZone *= 3;
+    else if (this.data.zone == Zone.Colony) shrinkZone *= 4;
+    zoneWidth -= shrinkZone * 2;
     let x = zoneWidth;
     if (this.data.zoneCardsNum <= 2) x /= 2;
-    if (this.data.zoneCardsNum >= 2) {
-      x += this.zoneLayout.x;
-      if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
-      else x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
-    }
+    if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
+    else if (this.data.zoneCardsNum > 2) x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
+    x += this.zoneLayout.x + shrinkZone;
     return x;
   }
   private y(index: number) {
@@ -186,7 +200,7 @@ export default class CardStack {
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;
     if (this.data.zone == Zone.Colony) return zoneLayout.colony;
-    else if (this.data.zone == Zone.Oribital) return zoneLayout.orbit;
+    else if (this.data.zone == Zone.Orbital) return zoneLayout.orbit;
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {

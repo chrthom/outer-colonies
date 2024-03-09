@@ -1,16 +1,10 @@
 import { BattleType, TurnPhase } from '../../../../server/src/shared/config/enums';
 import { BackgroundOrb, backgroundConfig } from '../config/background';
 import { designConfig } from '../config/design';
-import { layoutConfig } from '../config/layout';
+import { Coordinates, layoutConfig } from '../config/layout';
+import { perspectiveConfig } from '../config/perspective';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
-
-interface CornerConfig {
-  xLeft: number;
-  xRight: number;
-  yTop: number;
-  yBottom: number;
-}
 
 export default class Background {
   private scene: Matchmaking | Game;
@@ -31,7 +25,7 @@ export default class Background {
     this.zoneMarkers = scene.add.group();
     this.starsImage = scene.add
       .image(0, this.starsYCorrdinates(this.currentRing), 'background')
-      .setOrigin(0, 0)
+      .setOrigin(0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(designConfig.alpha.faded);
     this.sunImage = scene.add
@@ -40,7 +34,6 @@ export default class Background {
         this.sunCoordinatesAndScale(this.currentRing)[1],
         'background_sun'
       )
-      .setOrigin(0.5, 0.5)
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
     if (this.isGame) {
@@ -61,36 +54,72 @@ export default class Background {
   }
 
   initInterface() {
-    const addCorner = (x: number, y: number, angle: number, opponent: boolean) =>
-      this.scene.add.image(x, y, `zone_corner_${opponent ? 'opponent' : 'player'}`).setAngle(angle);
-    const addCaption = (c: CornerConfig, caption: string, color: string) =>
+    const zConf = layoutConfig.game.ui.zones;
+    const addCaption = (c: Coordinates, caption: string, color: string) =>
       this.scene.add
-        .text((c.xLeft + c.xRight) / 2, (c.yTop + c.yBottom) / 2, caption)
+        .text(c.x, c.y, caption)
         .setFontSize(layoutConfig.fontSize.giant)
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(color)
         .setAlpha(designConfig.alpha.transparent)
-        .setAlign('center')
-        .setOrigin(0.5, 0.5);
-    const addZoneElements = (c: CornerConfig, opponent: boolean) => [
-      addCorner(c.xLeft, c.yTop, 0, opponent),
-      addCorner(c.xRight, c.yTop, 90, opponent),
-      addCorner(c.xLeft, c.yBottom, 270, opponent),
-      addCorner(c.xRight, c.yBottom, 180, opponent)
-    ];
+        .setOrigin(0.5)
+        .setAlign('center');
+    const addCorner = (x: number, y: number, z: number, angle: number, tint: number) => {
+      const corner = this.scene.add
+        .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'zone_corner')
+        .setTint(tint);
+      corner.modelPosition.x = perspectiveConfig.toCornerX(x);
+      corner.modelPosition.y = perspectiveConfig.toCornerY(y);
+      corner.modelPosition.z = z;
+      corner.modelRotation.x = layoutConfig.game.cards.perspective.board;
+      corner.modelRotation.z = Phaser.Math.DegToRad(angle);
+      return corner;
+    };
+    const addZone = (c: Coordinates, tint: number, index: number) => {
+      return [
+        addCorner(
+          c.x - zConf.width / 2 + index * zConf.offset.xTop,
+          c.y - zConf.height / 2,
+          (index + 1) * zConf.offset.z,
+          0,
+          tint
+        ),
+        addCorner(
+          c.x + zConf.width / 2 - index * zConf.offset.xTop,
+          c.y - zConf.height / 2,
+          (index + 1) * zConf.offset.z,
+          270,
+          tint
+        ),
+        addCorner(
+          c.x - zConf.width / 2 + (index - 1) * zConf.offset.xTop + zConf.offset.xBottom,
+          c.y + zConf.height / 2,
+          index * zConf.offset.z,
+          90,
+          tint
+        ),
+        addCorner(
+          c.x + zConf.width / 2 - (index - 1) * zConf.offset.xTop - zConf.offset.xBottom,
+          c.y + zConf.height / 2,
+          index * zConf.offset.z,
+          180,
+          tint
+        )
+      ];
+    };
     const corners: Phaser.GameObjects.GameObject[] = [
-      addZoneElements(layoutConfig.game.ui.zones.playerColony, false),
-      addZoneElements(layoutConfig.game.ui.zones.playerOrbit, false),
-      addZoneElements(layoutConfig.game.ui.zones.neutral, false),
-      addZoneElements(layoutConfig.game.ui.zones.opponentColony, true),
-      addZoneElements(layoutConfig.game.ui.zones.opponentOrbit, true)
+      addZone(zConf.playerColony, designConfig.tint.player, 1),
+      addZone(zConf.playerOrbit, designConfig.tint.player, 2),
+      addZone(zConf.neutral, designConfig.tint.neutral, 3),
+      addZone(zConf.opponentColony, designConfig.tint.opponent, 5),
+      addZone(zConf.opponentOrbit, designConfig.tint.opponent, 4)
     ].flat();
     const captions: Phaser.GameObjects.GameObject[] = [
-      addCaption(layoutConfig.game.ui.zones.playerColony, 'Koloniezone', designConfig.color.player),
-      addCaption(layoutConfig.game.ui.zones.playerOrbit, 'Orbitale Zone', designConfig.color.player),
-      addCaption(layoutConfig.game.ui.zones.neutral, 'Neutrale Zone', designConfig.color.neutral),
-      addCaption(layoutConfig.game.ui.zones.opponentColony, 'Koloniezone', designConfig.color.opponent),
-      addCaption(layoutConfig.game.ui.zones.opponentOrbit, 'Orbitale Zone', designConfig.color.opponent)
+      addCaption(zConf.playerColony, 'Koloniezone', designConfig.color.player),
+      addCaption(zConf.playerOrbit, 'Orbitale Zone', designConfig.color.player),
+      addCaption(zConf.neutral, 'Neutrale Zone', designConfig.color.neutral),
+      addCaption(zConf.opponentColony, 'Koloniezone', designConfig.color.opponent),
+      addCaption(zConf.opponentOrbit, 'Orbitale Zone', designConfig.color.opponent)
     ];
     this.zoneMarkers.addMultiple(corners.concat(captions));
   }
@@ -213,7 +242,7 @@ export default class Background {
     const angle = Math.random() * 360 - 45;
     return this.scene.add
       .image(x, y, `background_ring_${backgroundConfig.rings[ring]}`)
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setAngle(angle)
       .setDepth(layoutConfig.depth.background + backgroundConfig.depth.ring + ring)
       .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
@@ -231,7 +260,7 @@ export default class Background {
       }
       this.orbImage = this.scene.add
         .image(x, y, `background_orb_${this.targetOrb.name}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
         .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
         .setTint(...this.getTint(this.isColonyOrb ? 0 : 270));
@@ -308,7 +337,7 @@ export default class Background {
       .forEach(rv => {
         const vessel = this.scene.add
           .image(rv.startX, rv.startY, `background_vessel_${rv.vessel}`)
-          .setOrigin(0.5, 0.5)
+          .setOrigin(0.5)
           .setDepth(layoutConfig.depth.background + backgroundConfig.depth.vessel)
           .setScale(rv.startScale ? rv.startScale : 1)
           .setAngle(rv.startAngle ? rv.startAngle : 0)

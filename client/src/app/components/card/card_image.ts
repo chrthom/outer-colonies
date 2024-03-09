@@ -2,49 +2,59 @@ import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
 import { Coordinates, layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export interface CardImageConfig {
-  isOpponentCard?: boolean;
   cropped?: boolean;
-  scale?: number;
+  isOpponentCard?: boolean;
+  perspective?: number;
+  z?: number;
+}
+
+export interface CardTweenConfig {
+  duration: number;
+  x: number;
+  y: number;
+  z?: number;
+  xRotation?: number;
+  angle?: number;
+  onComplete?: () => void;
 }
 
 export default class CardImage {
-  image: Phaser.GameObjects.Image;
+  image: Phaser.GameObjects.Plane;
   cardId: number;
   ownedByPlayer: boolean;
   protected scene: Game;
-  protected imageHighlight: Phaser.GameObjects.Image;
-  private imageMask: Phaser.GameObjects.Image;
+  protected imageHighlight: Phaser.GameObjects.Plane;
+  private imageMask: Phaser.GameObjects.Plane;
   constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
     this.scene = scene;
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
-    const setImageProps = (image: Phaser.GameObjects.Image) =>
-      image
-        .setOrigin(0.5, 1)
-        .setAngle(config?.isOpponentCard ? 180 : 0)
-        .setScale(config?.scale ?? layoutConfig.game.cards.scale.normal);
-    this.imageHighlight = setImageProps(
-      scene.add.image(x, y, `card_glow${config?.cropped ? '_small' : ''}`).setVisible(false)
-    );
-    this.image = setImageProps(
-      scene.add
-        .image(x, y, `card_${cardId}`)
-        .setCrop(
-          layoutConfig.game.cards.size.normal.x,
-          layoutConfig.game.cards.size.normal.y,
-          layoutConfig.game.cards.size.normal.width,
-          layoutConfig.game.cards.size.normal.height
-        )
-        .setInteractive({
-          useHandCursor: true
-        })
-    );
-    this.imageMask = setImageProps(
-      scene.add.image(x, y, `card_mask${config?.cropped ? '_small' : ''}`).setVisible(false)
-    );
+    this.imageHighlight = scene.add
+      .plane(
+        perspectiveConfig.origin.x,
+        perspectiveConfig.origin.y,
+        `card_glow${config?.cropped ? '_small' : ''}`
+      )
+      .setVisible(false);
+    this.imageMask = scene.add
+      .plane(
+        perspectiveConfig.origin.x,
+        perspectiveConfig.origin.y,
+        `card_mask${config?.cropped ? '_small' : ''}`
+      )
+      .setVisible(false);
+    this.image = scene.add
+      .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, `card_${cardId}`)
+      .setInteractive();
     this.image.setMask(this.imageMask.createBitmapMask());
+    this.setAngle(config?.isOpponentCard ? 180 : 0)
+      .setX(x)
+      .setY(y)
+      .setZ(config?.z ?? perspectiveConfig.distance.board)
+      .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
   destroy() {
     this.image.destroy();
@@ -57,13 +67,14 @@ export default class CardImage {
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
+    this.highlightReset();
     this.tween({
-      targets: undefined,
       duration: animationConfig.duration.move,
       x: targetCoordinates.x,
       y: targetCoordinates.y,
+      z: perspectiveConfig.distance.board,
+      xRotation: layoutConfig.game.cards.perspective.board,
       angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
-      scale: layoutConfig.game.cards.scale.normal,
       onComplete: () => {
         if (!toDeck) {
           this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
@@ -82,7 +93,7 @@ export default class CardImage {
   }
   highlightSelected() {
     this.highlightReset();
-    this.imageHighlight.setVisible(true).setTint(designConfig.tint.secondary);
+    this.imageHighlight.setVisible(true).setTint(designConfig.tint.opponent);
   }
   highlightReset() {
     this.imageHighlight.setVisible(false);
@@ -99,45 +110,83 @@ export default class CardImage {
     return this;
   }
   setX(x: number): this {
-    this.forAllImages(i => i.setX(x));
+    this.forAllImages(i => (i.modelPosition.x = x));
     return this;
+  }
+  get x(): number {
+    return this.image.modelPosition.x;
   }
   setY(y: number): this {
-    this.forAllImages(i => i.setY(y));
+    this.forAllImages(i => (i.modelPosition.y = y));
     return this;
   }
-  setAngle(angle: number): this {
-    this.forAllImages(i => i.setAngle(angle));
+  get y(): number {
+    return this.image.modelPosition.y;
+  }
+  setZ(z: number): this {
+    this.forAllImages(i => (i.modelPosition.z = z));
     return this;
+  }
+  get z(): number {
+    return this.image.modelPosition.z;
   }
   setDepth(depth: number): this {
     this.forAllImages(i => i.setDepth(depth));
     return this;
   }
-  setScale(scale: number): this {
-    this.forAllImages(i => i.setScale(scale));
+  get depth(): number {
+    return this.image.depth;
+  }
+  setXRotation(x: number): this {
+    this.forAllImages(i => (i.modelRotation.x = x));
     return this;
   }
+  get xRotation(): number {
+    return this.image.modelRotation.x;
+  }
+  setAngle(angle: number): this {
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)));
+    return this;
+  }
+  get angle(): number {
+    return Phaser.Math.RadToDeg(this.image.modelRotation.z);
+  }
   enableMaximizeOnMouseover() {
+    this.disableMaximizeOnMouseover();
     this.image
-      .off('pointerover')
       .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
-      .off('pointerout')
       .on('pointerout', () => this.scene.obj.maxCard.hide())
-      .off('pointermove')
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
   }
-  tween(tweenConfig: Phaser.Types.Tweens.TweenBuilderConfig) {
-    tweenConfig.targets = [this.image, this.imageHighlight, this.imageMask];
-    this.scene.tweens.add(tweenConfig);
+  disableMaximizeOnMouseover() {
+    this.image.off('pointerover').off('pointerout').off('pointermove');
+  }
+  tween(config: CardTweenConfig) {
+    const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
+      targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
+      duration: config.duration
+    };
+    if (config.x != undefined) pTweenConfig['x'] = config.x;
+    if (config.y != undefined) pTweenConfig['y'] = config.y;
+    if (config.z != undefined) pTweenConfig['z'] = config.z;
+    if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
+    this.scene.tweens.add(pTweenConfig);
+    const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
+      targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
+      duration: config.duration
+    };
+    if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
+    if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
+    this.scene.tweens.add(rTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
-    return this.image.angle + Phaser.Math.Angle.ShortestBetween(this.image.angle, targetAngle);
+    const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);
+    return deg + Phaser.Math.Angle.ShortestBetween(deg, targetAngle);
   }
   get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
-  private forAllImages(f: (i: Phaser.GameObjects.Image) => void) {
+  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
     [this.image, this.imageHighlight, this.imageMask].forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {

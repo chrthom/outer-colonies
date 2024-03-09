@@ -18,10 +18,10 @@ export default class DefenseIndicator {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
     this.images = defenseIcons.map((icon, index) => {
-      const color = icon.depleted ? designConfig.tint.secondary : designConfig.tint.primary;
+      const color = icon.depleted ? designConfig.tint.opponent : designConfig.tint.player;
       return scene.add
         .image(this.x(cardX), this.y(cardY, index), `icon_${icon.icon}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setTint(color, designConfig.tint.neutral, color, color)
         .setAlpha(designConfig.alpha.normal)
         .setDepth(layoutConfig.depth.indicators);
@@ -44,12 +44,6 @@ export default class DefenseIndicator {
     return cardX + layoutConfig.game.cards.defenseIndicator.xOffset;
   }
   private y(cardY: number, index: number) {
-    return (
-      cardY +
-      (this.ownedByPlayer
-        ? layoutConfig.game.cards.defenseIndicator.yOffsetPlayer
-        : layoutConfig.game.cards.defenseIndicator.yOffsetOpponent) +
-      index * layoutConfig.game.cards.defenseIndicator.yDistance
-    );
+    return cardY + index * layoutConfig.game.cards.defenseIndicator.yDistance;
   }
 }

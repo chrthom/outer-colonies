@@ -30,7 +30,6 @@ import CombatRangeIndicator from '../components/indicators/combat_range_indicato
 import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
-import { backgroundConfig } from '../config/background';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 
 interface ActiveCards {
@@ -93,26 +92,9 @@ export default class Game extends Phaser.Scene {
   preload() {
     this.preloader = new Preloader(this);
     this.load.baseURL = `${environment.urls.api}/assets/`;
-    backgroundConfig.orbs
-      .map(o => o.name)
-      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
-    backgroundConfig.rings.forEach(name =>
-      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
-    );
-    this.load.image('background_sun', 'background/sun.png');
-    [
-      'asteroid1',
-      'corvette1',
-      'corvette2',
-      'corvette3',
-      'freighter1',
-      'freighter2',
-      'freighter3',
-      'station1',
-      'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
+    this.load.image('zone_corner', 'utils/zone_corner.png');
     [0, 1]
-      .concat(this.gameParams?.preloadCardIds ?? [])
+      .concat(this.gameParams.preloadCardIds)
       .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
     [
       'equipment',
@@ -141,8 +123,6 @@ export default class Game extends Phaser.Scene {
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
-    this.load.image('zone_corner_player', 'utils/zone_corner_blue.png');
-    this.load.image('zone_corner_opponent', 'utils/zone_corner_red.png');
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
       'active_build',
@@ -331,7 +311,10 @@ export default class Game extends Phaser.Scene {
   }
 
   private discardMaximizedTacticCard() {
-    if (!this.state.intervention) this.maximizedTacticCard?.discard();
+    if (!this.state.intervention) {
+      this.maximizedTacticCard?.discard();
+      this.maximizedTacticCard = undefined;
+    }
   }
 
   private updateHighlighting() {

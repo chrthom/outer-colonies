@@ -33,7 +33,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   const opponent = match.players[opponentPlayerNo(playerNo)];
   const cardStacks: ClientCardStack[] = [true, false].flatMap(ownedByPlayer => {
     const playerCardStacks = ownedByPlayer ? player.cardStacks : opponent.cardStacks;
-    return [Zone.Colony, Zone.Oribital, Zone.Neutral].flatMap(zone => {
+    return [Zone.Colony, Zone.Orbital, Zone.Neutral].flatMap(zone => {
       const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
       return zoneCardStacks.map((cs, index) => {
         const interceptionReady =
