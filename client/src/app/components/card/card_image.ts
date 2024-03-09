@@ -183,7 +183,7 @@ export default class CardImage {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);
     return deg + Phaser.Math.Angle.ShortestBetween(deg, targetAngle);
   }
-  protected get placementConfig() {
+  get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
   private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {

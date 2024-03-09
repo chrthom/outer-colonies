@@ -55,18 +55,10 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.cardId == c.cardId); // TODO: Also search opponent hand
-      const x = this.ownedByPlayer
-        ? handCard
-          ? handCard.x
-          : this.scene.player.deck.x
-        : this.scene.opponent.deck.x;
-      const y = this.ownedByPlayer
-        ? handCard
-          ? handCard.y
-          : this.scene.player.deck.y
-        : this.scene.opponent.deck.y;
-      const angle = this.ownedByPlayer ? (handCard ? handCard.image.angle : 0) : 180;
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
+      const x = handCard ? handCard.image.x : c.placementConfig.deck.x;
+      const y = handCard ? handCard.image.y : c.placementConfig.deck.y;
+      const angle = handCard ? handCard.image.angle : (this.ownedByPlayer ? 0 : 180);
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
