@@ -153,9 +153,19 @@ export default class CardImage {
   }
   enableMaximizeOnMouseover() {
     this.disableMaximizeOnMouseover();
+    let timerEvent: Phaser.Time.TimerEvent;
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
-      .on('pointerout', () => this.scene.obj.maxCard.hide())
+      .on(
+        'pointerover',
+        () =>
+          (timerEvent = this.scene.time.delayedCall(animationConfig.duration.waitBeforeMaximize, () =>
+            this.scene.obj.maxCard.show(this.cardId)
+          ))
+      )
+      .on('pointerout', () => {
+        timerEvent.destroy();
+        this.scene.obj.maxCard.hide();
+      })
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
   }
   disableMaximizeOnMouseover() {

@@ -5,6 +5,7 @@ class AnimationConfig {
     move: 500,
     showTacticCard: 600,
     waitBeforeDiscard: 2000,
+    waitBeforeMaximize: 500,
     buffer: 50
   };
   readonly attack = {
