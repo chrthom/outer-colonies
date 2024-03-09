@@ -52,9 +52,9 @@ export class Card157 extends EquipmentCardRechargeable {
       },
       {
         range: 1,
-        damage: 8,
+        damage: 7,
         pointDefense: 0,
-        shield: -6,
+        shield: -7,
         armour: -1
       }
     );
