@@ -16,9 +16,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         if (turnPhase == TurnPhase.Init) {
           match.players[player.no].ready = true;
           if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
-        } else if (
-          getSocketData(socket).playerNo == match.pendingActionPlayerNo
-        ) {
+        } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
           if (match.intervention) {
             match.skipIntervention();
           } else {

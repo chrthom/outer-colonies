@@ -22,9 +22,9 @@ class LayoutGameConfig {
       },
       mission: {
         x: perspectiveConfig.toMinCardX(1760),
-        y: perspectiveConfig.toMinCardX(735),
+        y: perspectiveConfig.toMinCardY(650),
         xDistance: perspectiveConfig.toMinCardXOffset(20),
-        yDistance: perspectiveConfig.toMinCardXOffset(10)
+        yDistance: perspectiveConfig.toMinCardYOffset(10)
       },
       player: {
         colony: {
