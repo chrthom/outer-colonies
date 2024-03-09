@@ -17,7 +17,7 @@ export default class LoadingStatus {
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
       .setAlign('center')
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5);
     this.createLoadingAnimation();
   }
   setText(text: string): this {
@@ -39,7 +39,7 @@ export default class LoadingStatus {
         Phaser.Math.DEG_TO_RAD * angle
       );
       const bar = this.scene.add
-        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.primary)
+        .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.player)
         .setAngle(angle)
         .setAlpha(designConfig.alpha.normal);
       this.bars.push(bar);

@@ -9,7 +9,7 @@ export default class CombatRangeIndicator {
     this.images = [1, 2, 3, 4].map(i =>
       this.scene.add
         .image(layoutConfig.game.ui.combatRange.x, layoutConfig.game.ui.combatRange.y, `range_${i}`)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setVisible(false)
     );
   }

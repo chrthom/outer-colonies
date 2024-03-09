@@ -127,7 +127,7 @@ export default abstract class CardStack {
     return this.card.deactivationPriority(this);
   }
   get isMissionReady(): boolean {
-    return this.zone == Zone.Oribital && this.type == CardType.Hull && this.profile.speed > 0;
+    return this.zone == Zone.Orbital && this.type == CardType.Hull && this.profile.speed > 0;
   }
   get hasValidTargets(): boolean {
     return this.validTargets.length > 0;

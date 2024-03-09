@@ -5,6 +5,7 @@ import { ClientHandCard } from '../../../../../server/src/shared/interfaces/clie
 import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class HandCard extends CardImage {
   uuid: string;
@@ -16,7 +17,8 @@ export default class HandCard extends CardImage {
       HandCard.getPlacementConfig(data.ownedByPlayer).deck.y,
       data.ownedByPlayer ? data.cardId : constants.cardBackSideID,
       {
-        isOpponentCard: !data.ownedByPlayer
+        isOpponentCard: !data.ownedByPlayer,
+        perspective: layoutConfig.game.cards.perspective.board
       }
     );
     this.uuid = data.uuid;
@@ -30,11 +32,11 @@ export default class HandCard extends CardImage {
   update(data: ClientHandCard) {
     this.data = data;
     this.tween({
-      targets: undefined,
       duration: animationConfig.duration.draw,
-      x: this.x,
-      y: this.y,
-      angle: this.shortestAngle(this.angle)
+      x: this.targetX,
+      y: this.targetY,
+      xRotation: layoutConfig.game.cards.perspective.neutral,
+      angle: this.shortestAngle(this.targetAngle)
     });
   }
   highlightPlayability() {
@@ -48,18 +50,17 @@ export default class HandCard extends CardImage {
     this.setDepth(layoutConfig.depth.maxedTacticCard);
     this.highlightReset();
     this.tween({
-      targets: undefined,
       duration: animationConfig.duration.showTacticCard,
       x: layoutConfig.game.ui.maxedTacticCard.x,
       y: layoutConfig.game.ui.maxedTacticCard.y,
-      angle: this.shortestAngle(0),
-      scale: layoutConfig.game.cards.scale.max
+      z: perspectiveConfig.distance.near,
+      xRotation: layoutConfig.game.cards.perspective.neutral,
+      angle: this.shortestAngle(0)
     });
   }
   override discard(toDeck?: boolean) {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
-      this.cardId = this.data.cardId;
-      this.image.setTexture(`card_${this.cardId}`);
+      this.setCardId(this.data.cardId);
     }
     super.discard(toDeck);
   }
@@ -67,18 +68,18 @@ export default class HandCard extends CardImage {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
     return handData.hand.length - data.index - 1;
   }
-  private get x() {
+  private get targetX() {
     return (
       this.placementConfig.hand.x + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private get y() {
+  private get targetY() {
     return (
       this.placementConfig.hand.y +
       this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
-  private get angle() {
+  private get targetAngle() {
     return (
       this.orientation +
       this.factor *

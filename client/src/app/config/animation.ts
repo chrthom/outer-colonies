@@ -9,15 +9,11 @@ class AnimationConfig {
   };
   readonly attack = {
     indicator: {
-      yOffset: -230,
-      yOffsetOpponent: 50,
       yTween: -150,
       spawnInterval: 200,
       duration: 2300
     },
     flare: {
-      yOffset: -160,
-      yOffsetOpponent: 120,
       lifetime: 1600
     }
   };

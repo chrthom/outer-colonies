@@ -1,6 +1,7 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class MissionCards {
   minCards: CardImage[] = [];
@@ -15,11 +16,14 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layoutConfig.game.ui.missionCards.x + index * layoutConfig.game.ui.missionCards.xDistance,
-          layoutConfig.game.ui.missionCards.y + index * layoutConfig.game.ui.missionCards.yDistance,
+          layoutConfig.game.cards.placement.mission.x +
+            index * layoutConfig.game.cards.placement.mission.xDistance,
+          layoutConfig.game.cards.placement.mission.y +
+            index * layoutConfig.game.cards.placement.mission.yDistance,
           id,
           {
-            scale: layoutConfig.game.cards.scale.min
+            perspective: layoutConfig.game.cards.perspective.board,
+            z: perspectiveConfig.distance.far
           }
         );
       });

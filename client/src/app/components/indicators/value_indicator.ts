@@ -26,10 +26,10 @@ export default class ValueIndicator {
           this.y(cardY),
           64,
           32,
-          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.indicators);
     } else {
       this.shape = scene.add
@@ -39,10 +39,10 @@ export default class ValueIndicator {
           12,
           16,
           22,
-          critical ? designConfig.tint.secondary : designConfig.tint.primary,
+          critical ? designConfig.tint.opponent : designConfig.tint.player,
           designConfig.alpha.normal
         )
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0.5)
         .setDepth(layoutConfig.depth.indicators);
     }
     this.text = scene.add
@@ -51,7 +51,7 @@ export default class ValueIndicator {
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.hover)
       .setAlign('center')
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setDepth(layoutConfig.depth.indicators);
   }
   destroy() {
@@ -70,16 +70,16 @@ export default class ValueIndicator {
     return (
       cardX +
       (this.ownedByPlayer
-        ? layoutConfig.game.cards.damageIndicator.xOffsetPlayer
-        : layoutConfig.game.cards.damageIndicator.xOffsetOpponent)
+        ? layoutConfig.game.cards.valueIndicator.xOffsetPlayer
+        : layoutConfig.game.cards.valueIndicator.xOffsetOpponent)
     );
   }
   private y(cardY: number) {
     return (
       cardY +
       (this.ownedByPlayer
-        ? layoutConfig.game.cards.damageIndicator.yOffsetPlayer
-        : layoutConfig.game.cards.damageIndicator.yOffsetOpponent)
+        ? layoutConfig.game.cards.valueIndicator.yOffsetPlayer
+        : layoutConfig.game.cards.valueIndicator.yOffsetOpponent)
     );
   }
 }

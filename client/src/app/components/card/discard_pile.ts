@@ -4,6 +4,8 @@ import Game from '../../scenes/game';
 import CardImage from './card_image';
 import ValueIndicator from '../indicators/value_indicator';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { layoutConfig } from 'src/app/config/layout';
+import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
@@ -15,7 +17,8 @@ export default class DiscardPile extends CardImage {
       DiscardPile.getPlacementConfig(ownedByPlayer).discardPile.y,
       constants.cardBackSideID,
       {
-        isOpponentCard: !ownedByPlayer
+        isOpponentCard: !ownedByPlayer,
+        perspective: layoutConfig.game.cards.perspective.board
       }
     );
     this.update([]);
@@ -23,20 +26,18 @@ export default class DiscardPile extends CardImage {
   update(cardIds?: number[]) {
     if (cardIds) this.cardIds = cardIds;
     if (this.indicator) this.indicator.destroy();
-    if (this.cardIds.length == 0) {
-      this.setVisible(false);
+    if (this.topCard == constants.cardBackSideID) {
+      this.setVisible(false).disableMaximizeOnMouseover();
     } else {
-      this.setCardId(this.getTopCard());
+      this.setCardId(this.topCard).setVisible(true).enableMaximizeOnMouseover();
       this.image.off('pointerdown').on('pointerdown', () => this.onClickAction());
-      this.setVisible(true);
-      this.enableMaximizeOnMouseover();
       const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
       this.indicator = new ValueIndicator(
         this.scene,
         this.cardIds.length + (cardsForMission ? `/-${cardsForMission}` : ''),
         false,
-        this.placementConfig.discardPile.x,
-        this.placementConfig.discardPile.y,
+        perspectiveConfig.fromCardX(this.placementConfig.discardPile.x),
+        perspectiveConfig.fromCardY(this.placementConfig.discardPile.y),
         true,
         true
       );
@@ -46,8 +47,17 @@ export default class DiscardPile extends CardImage {
     super.destroy();
     if (this.indicator) this.indicator.destroy();
   }
-  private getTopCard() {
-    return this.cardIds.length == 0 ? 1 : this.cardIds[this.cardIds.length - 1];
+  private get topCard() {
+    if (this.cardIds.length == 0) return constants.cardBackSideID;
+    let topCard = this.cardIds[this.cardIds.length - 1];
+    if (
+      this.scene.maximizedTacticCard?.cardId == topCard &&
+      this.scene.maximizedTacticCard?.ownedByPlayer == this.ownedByPlayer
+    ) {
+      if (this.cardIds.length <= 1) return constants.cardBackSideID;
+      topCard = this.cardIds[this.cardIds.length - 2];
+    }
+    return topCard;
   }
   private onClickAction() {
     if (

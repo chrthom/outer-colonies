@@ -4,13 +4,15 @@ import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardStack from '../card/card_stack';
+import { perspectiveConfig } from 'src/app/config/perspective';
+import CardImage from '../card/card_image';
 
 export default class AttackDamageIndicator {
   private scene: Game;
-  private cardImage: Phaser.GameObjects.Image;
+  private targetCard: CardImage;
   constructor(scene: Game, cardStack: CardStack, attack: ClientAttack) {
     this.scene = scene;
-    this.cardImage = cardStack.cards[0].image;
+    this.targetCard = cardStack.cards[0];
     ['pointDefense', 'shield', 'armour', 'damage']
       .map(key => [key, attack[key as keyof ClientAttack]])
       .filter(([key, value]) => <string>key == 'damage' || <number>value > 0)
@@ -40,28 +42,29 @@ export default class AttackDamageIndicator {
     });
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
-    const yOffset =
-      this.cardImage.angle == 0
-        ? animationConfig.attack.flare.yOffset
-        : animationConfig.attack.flare.yOffsetOpponent;
     return this.scene.add
-      .particles(this.cardImage.x, this.cardImage.y + yOffset, `flare_${color}`, {
-        lifespan: animationConfig.attack.flare.lifetime,
-        speed: { min: 200, max: 500 },
-        scale: { start: 0.8, end: 0 },
-        gravityY: 15,
-        blendMode: 'ADD',
-        emitting: false
-      })
+      .particles(
+        perspectiveConfig.fromCardX(this.targetCard.x),
+        perspectiveConfig.fromCardY(this.targetCard.y),
+        `flare_${color}`,
+        {
+          lifespan: animationConfig.attack.flare.lifetime,
+          speed: { min: 200, max: 500 },
+          scale: { start: 0.8, end: 0 },
+          gravityY: 15,
+          blendMode: 'ADD',
+          emitting: false
+        }
+      )
       .setDepth(layoutConfig.depth.battleEffects);
   }
   private createIndicator(value: number, color: string) {
-    const yOffset =
-      this.cardImage.angle == 0
-        ? animationConfig.attack.indicator.yOffset
-        : animationConfig.attack.indicator.yOffsetOpponent;
     return this.scene.add
-      .text(this.cardImage.x, this.cardImage.y + yOffset, String(value))
+      .text(
+        perspectiveConfig.fromCardX(this.targetCard.x),
+        perspectiveConfig.fromCardY(this.targetCard.y),
+        String(value)
+      )
       .setFontSize(layoutConfig.fontSize.large)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)

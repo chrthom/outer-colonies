@@ -22,7 +22,7 @@ export default class RetractCardButton {
         cardY + layoutConfig.game.cards.retractCardButton.yOffset,
         'icon_retract_card'
       )
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5)
       .setAlpha(designConfig.alpha.normal)
       .setDepth(layoutConfig.depth.indicators)
       .setInteractive({
@@ -38,18 +38,18 @@ export default class RetractCardButton {
   }
   setTintNormal() {
     this.image.setTint(
-      designConfig.tint.primary,
+      designConfig.tint.player,
       designConfig.tint.neutral,
-      designConfig.tint.primary,
-      designConfig.tint.primary
+      designConfig.tint.player,
+      designConfig.tint.player
     );
   }
   setTintCritical() {
     this.image.setTint(
-      designConfig.tint.secondary,
+      designConfig.tint.opponent,
       designConfig.tint.neutral,
-      designConfig.tint.secondary,
-      designConfig.tint.secondary
+      designConfig.tint.opponent,
+      designConfig.tint.opponent
     );
   }
   setTintHover() {

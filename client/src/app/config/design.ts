@@ -7,8 +7,8 @@ class DesignConfig {
   readonly tint = {
     faded: 0x666666,
     neutral: 0xffffff,
-    primary: 0x119999,
-    secondary: 0x991111
+    player: 0x119999,
+    opponent: 0x991111
   };
   readonly fontFamily = {
     caption: 'latin-modern-mono-caps',
