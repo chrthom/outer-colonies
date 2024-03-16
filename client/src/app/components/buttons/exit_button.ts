@@ -79,6 +79,15 @@ export default class ExitButton {
       );
     this.update();
   }
+  show() {
+    this.image.setVisible(true);
+    this.text.setVisible(true);
+  }
+  hide() {
+    this.image.setVisible(false);
+    this.text.setVisible(false);
+    this.confirmText.setVisible(false);
+  }
   update() {
     this.confirmText.setVisible(false);
     if (this.isMatchmaking) this.text.setText('Spielersuche abbrechen');

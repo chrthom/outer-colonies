@@ -139,12 +139,12 @@ class LayoutGameConfig {
       y: new CardYPosition(650)
     },
     prompt: {
-      box: {
-        x: 2850, // -1000
-        y: 120
+      textOffset: {
+        x: 25,
+        y: 45
       },
-      x: 2875, // -1000
-      y: 165
+      x: 1840,
+      y: 630
     },
     zones: {
       height: 240,

@@ -4,6 +4,7 @@ import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/inte
 import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { animationConfig } from 'src/app/config/animation';
 
 export default class Prompt {
   private scene: Game;
@@ -12,24 +13,34 @@ export default class Prompt {
   constructor(scene: Game) {
     this.scene = scene;
     this.image = this.scene.add
-      .image(layoutConfig.game.ui.prompt.box.x, layoutConfig.game.ui.prompt.box.y, 'prompt_box')
+      .image(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'prompt_box')
+      .setDepth(layoutConfig.depth.prompt)
       .setOrigin(0)
       .setScale(0.8);
     this.text = scene.add
-      .text(layoutConfig.game.ui.prompt.x, layoutConfig.game.ui.prompt.y, 'Lädt...')
-      .setFontSize(layoutConfig.fontSize.small)
+      .text(
+        layoutConfig.game.ui.prompt.x + layoutConfig.game.ui.prompt.textOffset.x,
+        layoutConfig.game.ui.prompt.y + layoutConfig.game.ui.prompt.textOffset.y,
+        'Lädt...'
+      )
+      .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.neutral)
       .setAlign('left')
+      .setDepth(layoutConfig.depth.prompt)
       .setOrigin(0);
+    this.hide();
   }
   update() {
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
+      this.show();
     } else if (!this.scene.state.playerPendingAction) {
-      this.show('Warte auf Gegenspieler...');
+      this.setText('Warte auf Gegenspieler...');
+      this.show(true);
     } else if (this.scene.state.intervention) {
       this.showIntervention();
+      this.show(true);
     } else {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
@@ -41,26 +52,41 @@ export default class Prompt {
           break;
         case TurnPhase.End:
           this.showEndPhase();
+          this.show(true);
           break;
         default:
-          this.show('Lädt...');
+          this.setText('Lädt...');
       }
     }
   }
-  setVisible(visible: boolean) {
+  show(withCountdown?: boolean) {
+    this.setVisible(true);
+    if (withCountdown) {
+      this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
+    }
+    this.scene.obj?.exitButton.hide();
+    this.scene.player?.countdownIndicator.hide();
+  }
+  hide() {
+    this.setVisible(false);
+    this.scene.obj?.exitButton.show();
+    this.scene.player?.countdownIndicator.show();
+  }
+  private setVisible(visible: boolean) {
     this.text.setVisible(visible);
     this.image.setVisible(visible);
   }
   private showBuildPhase() {
     let text: string;
     if (this.scene.state.player.hasToRetractCards) {
-      text = 'Einige deiner Karten haben nicht genügend Energie.\nNimm sie auf die Hand zurück!\n';
+      text = 'Einige deiner Karten haben nicht genügend\nEnergie.\nNimm sie auf die Hand zurück!';
     } else if (this.scene.plannedBattle.type == BattleType.None) {
       text =
         'Spiele Karten von deiner Hand aus.\n' +
-        'Plane dann eine Mission oder Überfall.\n' +
-        'Klicke die gegnerische Kolonie für einen Überfall\n' +
-        'bzw. dein Deck oder Ablagestapel für eine Mission.';
+        'Plane dann eine Mission oder Überfall.\n\n' +
+        'Klicke die gegnerische Kolonie für\n' +
+        'einen Überfall bzw. dein Deck oder\n' +
+        'Ablagestapel für eine Mission.';
     } else if (
       this.scene.plannedBattle.type == BattleType.Mission &&
       !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)
@@ -72,27 +98,29 @@ export default class Prompt {
         this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
       }!`;
     }
-    this.show(text);
+    this.setText(text);
   }
   private showInterceptPhase() {
     const battleText =
       this.scene.state.battle?.type == BattleType.Raid
-        ? 'zur Verteidigung deiner Kolonie'
-        : 'zum Abfangen der gegenerischen\nMission';
-    this.show(`Wähle Schiffe ${battleText}!`);
+        ? 'zur Verteidigung\ndeiner Kolonie'
+        : 'zum Abfangen der\ngegenerischen Mission';
+    this.setText(`Wähle Schiffe ${battleText}!`);
   }
   private showCombatPhase() {
-    this.show(
-      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen Waffensystemen durch!`
+    this.setText(
+      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
     );
   }
   private showEndPhase() {
     const cardsToDrop = this.scene.state.player.hand.length - this.scene.state.player.handCardLimit;
-    this.show(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
+    this.setText(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
   }
   private showIntervention() {
-    this.show(
-      'Unterbreche den gegnerischen Zug durch das\nSpielen einer Taktikkarte mit der Eigenschaft\n"Intervention"!'
+    this.setText(
+      'Unterbreche den gegnerischen Zug durch das\n' +
+        'Spielen einer Taktikkarte mit der\n' +
+        'Eigenschaft "Intervention"!'
     );
   }
   private showGameOver(gameResult: ClientGameResult) {
@@ -123,12 +151,12 @@ export default class Prompt {
           gameOverText = 'Eigene Kolonie zerstört';
       }
     }
-    this.show(
+    this.setText(
       `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
     );
     this.text.setFontSize(layoutConfig.fontSize.normal);
   }
-  private show(text: string) {
+  private setText(text: string) {
     this.text.setText(text);
   }
 }

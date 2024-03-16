@@ -65,8 +65,14 @@ export default class ContinueButton {
       o =>
         o
           .on('pointerdown', () => this.onClickAction())
-          .on('pointerover', () => this.text.setColor(designConfig.color.hover))
-          .on('pointerout', () => this.text.setColor(designConfig.color.neutral)),
+          .on('pointerover', () => {
+            this.text.setColor(designConfig.color.hover);
+            this.prompt.show();
+          })
+          .on('pointerout', () => {
+            this.text.setColor(designConfig.color.neutral);
+            this.prompt.hide();
+          }),
       this
     );
     this.scene.input.keyboard
@@ -113,12 +119,6 @@ export default class ContinueButton {
           this.waitState();
       }
     }
-  }
-  showPrompt() {
-    this.prompt.setVisible(true);
-  }
-  hidePrompt() {
-    this.prompt.setVisible(false);
   }
   private createButtonImage(name: string) {
     return this.scene.add

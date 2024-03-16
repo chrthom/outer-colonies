@@ -22,6 +22,7 @@ class LayoutConfig {
     discardCard: 50,
     handCard: 70,
     battleEffects: 85,
+    prompt: 90,
     maxCard: 95,
     maxedTacticCard: 100
   };

@@ -6,7 +6,8 @@ class AnimationConfig {
     showTacticCard: 600,
     waitBeforeDiscard: 2000,
     waitBeforeMaximize: 500,
-    buffer: 50
+    buffer: 50,
+    promptShow: 3000
   };
   readonly attack = {
     indicator: {
