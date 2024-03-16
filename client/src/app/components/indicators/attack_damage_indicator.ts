@@ -4,7 +4,6 @@ import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import CardStack from '../card/card_stack';
-import { perspectiveConfig } from 'src/app/config/perspective';
 import CardImage from '../card/card_image';
 
 export default class AttackDamageIndicator {
@@ -43,28 +42,19 @@ export default class AttackDamageIndicator {
   }
   private createParticleEmitter(color: string): Phaser.GameObjects.Particles.ParticleEmitter {
     return this.scene.add
-      .particles(
-        perspectiveConfig.fromCardX(this.targetCard.x),
-        perspectiveConfig.fromCardY(this.targetCard.y),
-        `flare_${color}`,
-        {
-          lifespan: animationConfig.attack.flare.lifetime,
-          speed: { min: 200, max: 500 },
-          scale: { start: 0.8, end: 0 },
-          gravityY: 15,
-          blendMode: 'ADD',
-          emitting: false
-        }
-      )
+      .particles(this.targetCard.x.value2d, this.targetCard.y.value2d, `flare_${color}`, {
+        lifespan: animationConfig.attack.flare.lifetime,
+        speed: { min: 200, max: 500 },
+        scale: { start: 0.8, end: 0 },
+        gravityY: 15,
+        blendMode: 'ADD',
+        emitting: false
+      })
       .setDepth(layoutConfig.depth.battleEffects);
   }
   private createIndicator(value: number, color: string) {
     return this.scene.add
-      .text(
-        perspectiveConfig.fromCardX(this.targetCard.x),
-        perspectiveConfig.fromCardY(this.targetCard.y),
-        String(value)
-      )
+      .text(this.targetCard.x.value2d, this.targetCard.y.value2d, String(value))
       .setFontSize(layoutConfig.fontSize.large)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(color)

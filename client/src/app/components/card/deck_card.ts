@@ -5,7 +5,6 @@ import ValueIndicator from '../indicators/value_indicator';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { layoutConfig } from 'src/app/config/layout';
-import { perspectiveConfig } from 'src/app/config/perspective';
 
 export default class DeckCard extends CardImage {
   indicator?: ValueIndicator;
@@ -30,8 +29,8 @@ export default class DeckCard extends CardImage {
       this.scene,
       deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
       deckSize - cardsForMission < 10,
-      perspectiveConfig.fromCardX(this.placementConfig.deck.x),
-      perspectiveConfig.fromCardY(this.placementConfig.deck.y),
+      this.placementConfig.deck.x.value2d,
+      this.placementConfig.deck.y.value2d,
       this.ownedByPlayer,
       true
     );

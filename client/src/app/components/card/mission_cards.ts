@@ -16,10 +16,12 @@ export default class MissionCards {
       this.minCards = battle.priceCardIds.map((id, index) => {
         return new CardImage(
           this.scene,
-          layoutConfig.game.cards.placement.mission.x +
-            index * layoutConfig.game.cards.placement.mission.xDistance,
-          layoutConfig.game.cards.placement.mission.y +
-            index * layoutConfig.game.cards.placement.mission.yDistance,
+          layoutConfig.game.cards.placement.mission.x.plus(
+            index * layoutConfig.game.cards.placement.mission.xDistance
+          ),
+          layoutConfig.game.cards.placement.mission.y.plus(
+            index * layoutConfig.game.cards.placement.mission.yDistance
+          ),
           id,
           {
             perspective: layoutConfig.game.cards.perspective.board,

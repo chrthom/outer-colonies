@@ -5,6 +5,7 @@ import { Coordinates, layoutConfig } from '../config/layout';
 import { perspectiveConfig } from '../config/perspective';
 import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
+import { CornerXPosition, CornerYPosition } from './perspective';
 
 export default class Background {
   private scene: Matchmaking | Game;
@@ -68,8 +69,8 @@ export default class Background {
       const corner = this.scene.add
         .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'zone_corner')
         .setTint(tint);
-      corner.modelPosition.x = perspectiveConfig.toCornerX(x);
-      corner.modelPosition.y = perspectiveConfig.toCornerY(y);
+      corner.modelPosition.x = new CornerXPosition(x).value3d;
+      corner.modelPosition.y = new CornerYPosition(y).value3d;
       corner.modelPosition.z = z;
       corner.modelRotation.x = layoutConfig.game.cards.perspective.board;
       corner.modelRotation.z = Phaser.Math.DegToRad(angle);

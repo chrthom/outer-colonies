@@ -1,4 +1,5 @@
-import { Coordinates, layoutConfig } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
+import { CardPosition } from '../../config/layout_game';
 import Game from '../../scenes/game';
 import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
@@ -14,6 +15,7 @@ import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
+import { CardXPosition, CardYPosition } from '../perspective';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -56,8 +58,8 @@ export default class CardStack {
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
-      const x = handCard ? handCard.image.x : c.placementConfig.deck.x;
-      const y = handCard ? handCard.image.y : c.placementConfig.deck.y;
+      const x = handCard ? handCard.x : c.placementConfig.deck.x;
+      const y = handCard ? handCard.y : c.placementConfig.deck.y;
       const angle = handCard ? handCard.image.angle : this.ownedByPlayer ? 0 : 180;
       c.setX(x).setY(y).setAngle(angle);
     });
@@ -111,14 +113,8 @@ export default class CardStack {
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
     });
-    this.damageIndicator?.tween(
-      perspectiveConfig.fromCardX(this.x),
-      perspectiveConfig.fromCardY(this.zoneLayout.y)
-    );
-    this.defenseIndicator?.tween(
-      perspectiveConfig.fromCardX(this.x),
-      perspectiveConfig.fromCardY(this.zoneLayout.y)
-    );
+    this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
+    this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
   }
   private createCards(fromHand?: boolean, origin?: CardImage) {
     this.cards = this.data.cards.map(
@@ -133,8 +129,8 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        perspectiveConfig.fromCardX(this.x),
-        perspectiveConfig.fromCardY(this.zoneLayout.y),
+        this.x.value2d,
+        this.zoneLayout.y.value2d,
         this.ownedByPlayer,
         false
       );
@@ -148,8 +144,8 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        perspectiveConfig.fromCardX(this.x),
-        perspectiveConfig.fromCardY(this.zoneLayout.y),
+        this.x.value2d,
+        this.zoneLayout.y.value2d,
         this.ownedByPlayer
       );
     }
@@ -171,14 +167,12 @@ export default class CardStack {
       }
     }
   }
-  private get x() {
+  private get x(): CardXPosition {
     let zoneWidth =
       this.data.zone == Zone.Neutral
         ? layoutConfig.game.cards.placement.halfZoneWidth
         : layoutConfig.game.cards.placement.zoneWidth;
-    let shrinkZone = perspectiveConfig.toCardXOffset(
-      layoutConfig.game.ui.zones.offset.xTop + layoutConfig.game.ui.zones.offset.xBottom
-    );
+    let shrinkZone = layoutConfig.game.ui.zones.offset.xTop + layoutConfig.game.ui.zones.offset.xBottom;
     if (this.data.zone == Zone.Colony && this.ownedByPlayer) shrinkZone *= 0;
     else if (this.data.zone == Zone.Neutral) shrinkZone *= 2;
     else if (this.data.zone == Zone.Orbital && !this.ownedByPlayer) shrinkZone *= 3;
@@ -188,14 +182,14 @@ export default class CardStack {
     if (this.data.zoneCardsNum <= 2) x /= 2;
     if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
     else if (this.data.zoneCardsNum > 2) x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
-    x += this.zoneLayout.x + shrinkZone;
-    return x;
+    x += shrinkZone;
+    return this.zoneLayout.x.plus(x);
   }
-  private y(index: number) {
+  private y(index: number): CardYPosition {
     const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
-    return this.zoneLayout.y + index * yDistance;
+    return this.zoneLayout.y.plus(index * yDistance);
   }
-  private get zoneLayout(): Coordinates {
+  private get zoneLayout(): CardPosition {
     const zoneLayout = this.ownedByPlayer
       ? layoutConfig.game.cards.placement.player
       : layoutConfig.game.cards.placement.opponent;
