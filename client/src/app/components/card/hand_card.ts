@@ -6,6 +6,7 @@ import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src
 import { animationConfig } from '../../config/animation';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
+import { CardXPosition, CardYPosition } from '../perspective';
 
 export default class HandCard extends CardImage {
   uuid: string;
@@ -68,15 +69,16 @@ export default class HandCard extends CardImage {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
     return handData.hand.length - data.index - 1;
   }
-  private get targetX() {
-    return (
-      this.placementConfig.hand.x + this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
+  private get targetX(): CardXPosition {
+    return new CardXPosition(
+      this.placementConfig.hand.x.value2d +
+        this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private get targetY() {
-    return (
-      this.placementConfig.hand.y +
-      this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+  private get targetY(): CardYPosition {
+    return new CardYPosition(
+      this.placementConfig.hand.y.value2d +
+        this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
   private get targetAngle() {

@@ -1,8 +1,10 @@
 import { designConfig } from 'src/app/config/design';
 import { animationConfig } from '../../config/animation';
-import { Coordinates, layoutConfig } from '../../config/layout';
+import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { perspectiveConfig } from 'src/app/config/perspective';
+import { CardXPosition, CardYPosition, PerspectivePosition } from '../perspective';
+import { CardPosition } from 'src/app/config/layout_game';
 
 export interface CardImageConfig {
   cropped?: boolean;
@@ -13,8 +15,8 @@ export interface CardImageConfig {
 
 export interface CardTweenConfig {
   duration: number;
-  x: number;
-  y: number;
+  x: CardXPosition;
+  y: CardYPosition;
   z?: number;
   xRotation?: number;
   angle?: number;
@@ -28,7 +30,13 @@ export default class CardImage {
   protected scene: Game;
   protected imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
-  constructor(scene: Game, x: number, y: number, cardId: number, config?: CardImageConfig) {
+  constructor(
+    scene: Game,
+    x: PerspectivePosition,
+    y: PerspectivePosition,
+    cardId: number,
+    config?: CardImageConfig
+  ) {
     this.scene = scene;
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
@@ -66,7 +74,7 @@ export default class CardImage {
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
     const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
-    const targetCoordinates: Coordinates = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
+    const targetCoordinates: CardPosition = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.highlightReset();
     this.tween({
       duration: animationConfig.duration.move,
@@ -109,19 +117,19 @@ export default class CardImage {
     if (!visible) this.imageHighlight.setVisible(visible);
     return this;
   }
-  setX(x: number): this {
-    this.forAllImages(i => (i.modelPosition.x = x));
+  setX(x: PerspectivePosition): this {
+    this.forAllImages(i => (i.modelPosition.x = x.value3d));
     return this;
   }
-  get x(): number {
-    return this.image.modelPosition.x;
+  get x(): CardXPosition {
+    return new CardXPosition(this.image.modelPosition.x, true);
   }
-  setY(y: number): this {
-    this.forAllImages(i => (i.modelPosition.y = y));
+  setY(y: PerspectivePosition): this {
+    this.forAllImages(i => (i.modelPosition.y = y.value3d));
     return this;
   }
-  get y(): number {
-    return this.image.modelPosition.y;
+  get y(): CardYPosition {
+    return new CardYPosition(this.image.modelPosition.y, true);
   }
   setZ(z: number): this {
     this.forAllImages(i => (i.modelPosition.z = z));
@@ -176,8 +184,8 @@ export default class CardImage {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
       duration: config.duration
     };
-    if (config.x != undefined) pTweenConfig['x'] = config.x;
-    if (config.y != undefined) pTweenConfig['y'] = config.y;
+    if (config.x != undefined) pTweenConfig['x'] = config.x.value3d;
+    if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
     if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
     this.scene.tweens.add(pTweenConfig);

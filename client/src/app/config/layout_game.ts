@@ -1,4 +1,4 @@
-import { perspectiveConfig } from './perspective';
+import { CardXPosition, CardYPosition, MinCardXPosition, MinCardYPosition } from '../components/perspective';
 
 class LayoutGameConfig {
   readonly cards = {
@@ -12,70 +12,70 @@ class LayoutGameConfig {
       board: Phaser.Math.DegToRad(-30)
     },
     placement: {
-      zoneWidth: perspectiveConfig.toCardXOffset(1530),
-      halfZoneWidth: perspectiveConfig.toCardXOffset(680),
+      zoneWidth: 1530,
+      halfZoneWidth: 680,
       hand: {
         angleStep: 5,
         startAngle: -10,
-        xStep: perspectiveConfig.toCardXOffset(-50),
-        yStep: perspectiveConfig.toCardYOffset(5)
+        xStep: -50,
+        yStep: 5
       },
       mission: {
-        x: perspectiveConfig.toMinCardX(1760),
-        y: perspectiveConfig.toMinCardY(650),
-        xDistance: perspectiveConfig.toMinCardXOffset(20),
-        yDistance: perspectiveConfig.toMinCardYOffset(10)
+        x: new MinCardXPosition(1760),
+        y: new MinCardYPosition(650),
+        xDistance: 20,
+        yDistance: 10
       },
       player: {
         colony: {
-          x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(1205)
+          x: new CardXPosition(120),
+          y: new CardYPosition(1205)
         },
         deck: {
-          x: perspectiveConfig.toCardX(1930),
-          y: perspectiveConfig.toCardY(930)
+          x: new CardXPosition(1930),
+          y: new CardYPosition(930)
         },
         discardPile: {
-          x: perspectiveConfig.toCardX(2190),
-          y: perspectiveConfig.toCardY(930)
+          x: new CardXPosition(2190),
+          y: new CardYPosition(930)
         },
         hand: {
-          x: perspectiveConfig.toCardX(2370),
-          y: perspectiveConfig.toCardY(1220)
+          x: new CardXPosition(2370),
+          y: new CardYPosition(1220)
         },
         orbit: {
-          x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(925)
+          x: new CardXPosition(120),
+          y: new CardYPosition(925)
         },
         neutral: {
-          x: perspectiveConfig.toCardX(1000),
-          y: perspectiveConfig.toCardY(650)
+          x: new CardXPosition(1000),
+          y: new CardYPosition(650)
         }
       },
       opponent: {
         colony: {
-          x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(160)
+          x: new CardXPosition(120),
+          y: new CardYPosition(160)
         },
         deck: {
-          x: perspectiveConfig.toCardX(1930),
-          y: perspectiveConfig.toCardY(345)
+          x: new CardXPosition(1930),
+          y: new CardYPosition(345)
         },
         discardPile: {
-          x: perspectiveConfig.toCardX(2190),
-          y: perspectiveConfig.toCardY(345)
+          x: new CardXPosition(2190),
+          y: new CardYPosition(345)
         },
         hand: {
-          x: perspectiveConfig.toCardX(2370),
-          y: perspectiveConfig.toCardY(65)
+          x: new CardXPosition(2370),
+          y: new CardYPosition(65)
         },
         orbit: {
-          x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(430)
+          x: new CardXPosition(120),
+          y: new CardYPosition(430)
         },
         neutral: {
-          x: perspectiveConfig.toCardX(120),
-          y: perspectiveConfig.toCardY(695)
+          x: new CardXPosition(120),
+          y: new CardYPosition(695)
         }
       }
     },
@@ -83,7 +83,7 @@ class LayoutGameConfig {
       xOffset: -45,
       yOffset: -252
     },
-    stackYDistance: perspectiveConfig.toCardYOffset(31),
+    stackYDistance: 31,
     valueIndicator: {
       xOffsetPlayer: -95,
       yOffsetPlayer: -100,
@@ -135,8 +135,8 @@ class LayoutGameConfig {
       yOffset: -330
     },
     maxedTacticCard: {
-      x: 0,
-      y: 0
+      x: new CardXPosition(1200),
+      y: new CardYPosition(650)
     },
     prompt: {
       box: {
@@ -179,3 +179,8 @@ class LayoutGameConfig {
 }
 
 export const layoutGameConfig = new LayoutGameConfig();
+
+export type CardPosition = {
+  x: CardXPosition;
+  y: CardYPosition;
+};

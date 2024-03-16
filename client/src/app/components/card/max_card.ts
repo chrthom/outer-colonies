@@ -3,10 +3,11 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
+import { MaxCardXPosition, MaxCardYPosition } from '../perspective';
 
 export default class MaxCard extends CardImage {
   constructor(scene: Game) {
-    super(scene, 0, 0, constants.cardBackSideID, {
+    super(scene, new MaxCardXPosition(0), new MaxCardYPosition(0), constants.cardBackSideID, {
       perspective: layoutConfig.game.cards.perspective.none,
       z: perspectiveConfig.distance.near
     });
@@ -30,6 +31,6 @@ export default class MaxCard extends CardImage {
       this.scene.input.mousePointer.y +
       layoutConfig.game.ui.maxCard.yOffset *
         (this.scene.input.mousePointer.y < layoutConfig.scene.height / 2 ? -1 : 1);
-    this.setX(perspectiveConfig.toMaxCardX(x)).setY(perspectiveConfig.toMaxCardY(y));
+    this.setX(new MaxCardXPosition(x)).setY(new MaxCardYPosition(y));
   }
 }
