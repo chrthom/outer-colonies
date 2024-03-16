@@ -28,6 +28,12 @@ export default class CountdownIndicator {
       this.text.setColor(designConfig.color.warn);
     }
   }
+  show() {
+    this.text.setVisible(true);
+  }
+  hide() {
+    this.text.setVisible(false);
+  }
   private formatCountdown(countdown: number): string {
     return `${this.twoDigit(Math.floor(countdown / 60))}:${this.twoDigit(countdown % 60)}`;
   }
