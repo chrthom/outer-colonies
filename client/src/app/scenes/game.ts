@@ -31,6 +31,7 @@ import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
+import { backgroundConfig } from '../config/background';
 
 interface ActiveCards {
   hand?: string;
@@ -92,6 +93,23 @@ export default class Game extends Phaser.Scene {
   preload() {
     this.preloader = new Preloader(this);
     this.load.baseURL = `${environment.urls.api}/assets/`;
+    backgroundConfig.orbs
+      .map(o => o.name)
+      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
+    backgroundConfig.rings.forEach(name =>
+      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
+    );
+    [
+      'asteroid1',
+      'corvette1',
+      'corvette2',
+      'corvette3',
+      'freighter1',
+      'freighter2',
+      'freighter3',
+      'station1',
+      'torpedos1'
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
     this.load.image('zone_corner', 'utils/zone_corner.png');
     [0, 1]
       .concat(this.gameParams.preloadCardIds)

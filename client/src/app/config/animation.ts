@@ -1,5 +1,6 @@
 class AnimationConfig {
   readonly duration = {
+    loaderCycle: 1000,
     attack: 1000,
     draw: 400,
     move: 500,
