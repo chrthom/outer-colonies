@@ -1,4 +1,11 @@
-import { CardXPosition, CardYPosition, MinCardXPosition, MinCardYPosition } from '../components/perspective';
+import {
+  CardXPosition,
+  CardYPosition,
+  MaxCardXPosition,
+  MaxCardYPosition,
+  MinCardXPosition,
+  MinCardYPosition
+} from '../components/perspective';
 
 class LayoutGameConfig {
   readonly cards = {
@@ -135,8 +142,8 @@ class LayoutGameConfig {
       yOffset: -330
     },
     maxedTacticCard: {
-      x: new CardXPosition(1200),
-      y: new CardYPosition(650)
+      x: new MaxCardXPosition(1200),
+      y: new MaxCardYPosition(650)
     },
     prompt: {
       textOffset: {
