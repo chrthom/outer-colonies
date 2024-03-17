@@ -39,11 +39,17 @@ export class CardYPosition extends PerspectivePosition {
 export class MaxCardXPosition extends PerspectivePosition {
   factor = perspectiveConfig.factor.maxCard.x;
   isXAxis = true;
+  plus(x: number): MaxCardXPosition {
+    return new MaxCardXPosition(this.value2d + x);
+  }
 }
 
 export class MaxCardYPosition extends PerspectivePosition {
   factor = perspectiveConfig.factor.maxCard.y;
   isXAxis = false;
+  plus(y: number): MaxCardYPosition {
+    return new MaxCardYPosition(this.value2d + y);
+  }
 }
 
 export class MinCardXPosition extends PerspectivePosition {

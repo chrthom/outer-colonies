@@ -1,5 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -41,11 +42,14 @@ export class Card144 extends ScienceTacticCard {
     return true;
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {
-    let handCard: CardStack | undefined;
-    if (target.type == CardType.Colony) handCard = player.hand.find(cs => cs.card.name == 'Kraftwerk');
-    handCard ??= player.hand.find(cs => cs.card.name == 'Fusionsreaktor');
-    handCard?.attach(cardStack);
-    handCard?.playHandCard(target);
+    let attachCard: CardStack | undefined;
+    if (target.type == CardType.Colony) attachCard = player.hand.find(cs => cs.card.name == 'Kraftwerk');
+    attachCard ??= player.hand.find(cs => cs.card.name == 'Fusionsreaktor');
+    if (attachCard) {
+      spliceCardStackByUUID(player.hand, attachCard.uuid);
+      attachCard.playHandCard(target);
+      attachCard.attach(cardStack);
+    }
   }
   getValidTargets(player: Player): CardStack[] {
     const validTargetsWithDuplicates = player.hand
