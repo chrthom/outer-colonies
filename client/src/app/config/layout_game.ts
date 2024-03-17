@@ -80,8 +80,8 @@ class LayoutGameConfig {
       }
     },
     retractCardButton: {
-      xOffset: -45,
-      yOffset: -252
+      xOffset: 67,
+      yOffset: -88
     },
     stackYDistance: 31,
     valueIndicator: {

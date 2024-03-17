@@ -26,8 +26,8 @@ export default class Card extends CardImage {
     if (data.retractable) {
       this.retractCardButton = new RetractCardButton(
         scene,
-        x.value2d,
-        y.value2d,
+        x,
+        y,
         cardStackUUID,
         data.index,
         data.insufficientEnergy
