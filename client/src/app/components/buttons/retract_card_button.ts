@@ -3,14 +3,15 @@ import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { CardXPosition, CardYPosition } from '../perspective';
 
 export default class RetractCardButton {
   image: Phaser.GameObjects.Image;
   private scene!: Game;
   constructor(
     scene: Game,
-    cardX: number,
-    cardY: number,
+    cardX: CardXPosition,
+    cardY: CardYPosition,
     cardStackUUID: string,
     cardIndex: number,
     crititcal: boolean
@@ -18,11 +19,12 @@ export default class RetractCardButton {
     this.scene = scene;
     this.image = scene.add
       .image(
-        cardX + layoutConfig.game.cards.retractCardButton.xOffset,
-        cardY + layoutConfig.game.cards.retractCardButton.yOffset,
+        cardX.value2d + layoutConfig.game.cards.retractCardButton.xOffset,
+        cardY.value2d + layoutConfig.game.cards.retractCardButton.yOffset,
         'icon_retract_card'
       )
       .setOrigin(0.5)
+      .setScale(0.9)
       .setAlpha(designConfig.alpha.normal)
       .setDepth(layoutConfig.depth.indicators)
       .setInteractive({
