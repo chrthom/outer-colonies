@@ -203,9 +203,6 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
-        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
-          this.discardMaximizedTacticCard()
-        );
       });
     });
   }
@@ -236,6 +233,13 @@ export default class Game extends Phaser.Scene {
 
   getPlayerState(isPlayer: boolean): ClientPlayer {
     return isPlayer ? this.state.player : this.state.opponent;
+  }
+
+  discardMaximizedTacticCard() {
+    if (!this.state.intervention) {
+      this.maximizedTacticCard?.discard();
+      this.maximizedTacticCard = undefined;
+    }
   }
 
   private resetSelection(battleType?: BattleType) {
@@ -301,6 +305,7 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], previousTurnPhase: TurnPhase) {
+    this.discardMaximizedTacticCard();
     this.forBothPlayers((state, ui) =>
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
@@ -326,13 +331,6 @@ export default class Game extends Phaser.Scene {
 
   private forBothPlayers<T>(f: (state: ClientPlayer, ui: PlayerUIElements) => T): T[] {
     return [true, false].map(isPlayer => f(this.getPlayerState(isPlayer), this.getPlayerUI(isPlayer)), this);
-  }
-
-  private discardMaximizedTacticCard() {
-    if (!this.state.intervention) {
-      this.maximizedTacticCard?.discard();
-      this.maximizedTacticCard = undefined;
-    }
   }
 
   private updateHighlighting() {
