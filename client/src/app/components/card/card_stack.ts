@@ -14,7 +14,6 @@ import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
-import { perspectiveConfig } from 'src/app/config/perspective';
 import { CardXPosition, CardYPosition } from '../perspective';
 
 export default class CardStack {
@@ -149,22 +148,15 @@ export default class CardStack {
         this.ownedByPlayer
       );
     }
-    if (fromHand) {
-      if (origin) {
-        this.cards[0]
-          .setX(origin.x)
-          .setY(origin.y)
-          .setZ(origin.z)
-          .setAngle(origin.angle)
-          .setXRotation(origin.xRotation);
-      } else if (!this.ownedByPlayer) {
-        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); // TODO: Fix
-        this.cards[0]
-          .setX(layoutConfig.game.cards.placement.opponent.deck.x)
-          .setY(layoutConfig.game.cards.placement.opponent.deck.y)
-          .setZ(perspectiveConfig.distance.board)
-          .setAngle(180);
-      }
+    if (fromHand && origin) {
+      this.cards[0]
+        .setX(origin.x)
+        .setY(origin.y)
+        .setZ(origin.z)
+        .setAngle(origin.angle)
+        .setXRotation(origin.xRotation);
+    } else if (fromHand && this.cards[0].cardId != constants.colonyID) {
+      console.log('WARN: Hand card tween without origin - THIS SHOULD NOT HAPPEN!');
     }
   }
   private get x(): CardXPosition {

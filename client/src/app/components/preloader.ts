@@ -41,10 +41,7 @@ export default class Preloader {
           layoutConfig.load.preloader.height
         );
     });
-    scene.load.on('complete', () => {
-      console.log('Ready to play');
-      this.text.setText('Warte auf Gegenspieler...');
-    });
+    scene.load.on('complete', () => this.text.setText('Warte auf Gegenspieler...'));
   }
   destroy() {
     this.progressBar.destroy();
