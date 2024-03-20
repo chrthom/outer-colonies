@@ -7,6 +7,10 @@ import Game from '../scenes/game';
 import Matchmaking from '../scenes/matchmaking';
 import { CornerXPosition, CornerYPosition } from './perspective';
 
+interface CoordinatesAndScale extends Coordinates {
+  scale: number
+}
+
 export default class Background {
   private scene: Matchmaking | Game;
   private playerOrb!: string;
@@ -29,14 +33,15 @@ export default class Background {
       .setOrigin(0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(designConfig.alpha.faded);
+    const sunCoordinates = this.sunCoordinatesAndScale(this.currentRing);
     this.sunImage = scene.add
       .image(
-        this.sunCoordinatesAndScale(this.currentRing)[0],
-        this.sunCoordinatesAndScale(this.currentRing)[1],
+        sunCoordinates.x,
+        sunCoordinates.y,
         'background_sun'
       )
       .setDepth(layoutConfig.depth.background + 1)
-      .setScale(this.sunCoordinatesAndScale(this.currentRing)[2]);
+      .setScale(sunCoordinates.scale);
     if (this.isGame) {
       this.playerOrb = this.randomElement(backgroundConfig.defaultBackgroundOrbNames);
       this.opponentOrb = this.randomElement(
@@ -215,14 +220,15 @@ export default class Background {
 
   private tweenSun() {
     if (this.targetRing) {
+      const c = this.sunCoordinatesAndScale(this.targetRing);
       this.scene.tweens.add({
         targets: this.sunImage,
         duration:
           backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
           backgroundConfig.animation.durationObjectTransition,
-        x: this.sunCoordinatesAndScale(this.targetRing)[0],
-        y: this.sunCoordinatesAndScale(this.targetRing)[1],
-        scale: this.sunCoordinatesAndScale(this.targetRing)[2],
+        x: c.x,
+        y: c.y,
+        scale: c.scale,
         ease: 'Quad.inOut'
       });
     }
@@ -239,10 +245,10 @@ export default class Background {
   }
 
   private createRing(ring: number, movingInwards: boolean): Phaser.GameObjects.Image {
-    const [x, y] = movingInwards ? this.inCoordinates : this.outCoordinates;
+    const c = movingInwards ? this.inCoordinates : this.outCoordinates;
     const angle = Math.random() * 360 - 45;
     return this.scene.add
-      .image(x, y, `background_ring_${backgroundConfig.rings[ring]}`)
+      .image(c.x, c.y, `background_ring_${backgroundConfig.rings[ring]}`)
       .setOrigin(0.5)
       .setAngle(angle)
       .setDepth(layoutConfig.depth.background + backgroundConfig.depth.ring + ring)
@@ -252,15 +258,16 @@ export default class Background {
 
   private createOrbAndTweenToPosition(movingInwards: boolean) {
     if (this.targetOrb) {
-      let x: number, y: number;
-      if (movingInwards) [x, y] = this.inCoordinates;
+      let c: Coordinates;
+      if (movingInwards) c = this.inCoordinates;
       else {
-        x = this.outCoordinates[0];
-        if (this.isColonyOrb) y = layoutConfig.scene.height + backgroundConfig.animation.offDistance;
-        else y = -backgroundConfig.animation.offDistance;
+        c = {
+          x: this.outCoordinates.x,
+          y: this.isColonyOrb ? layoutConfig.scene.height + backgroundConfig.animation.offDistance : -backgroundConfig.animation.offDistance
+        }
       }
       this.orbImage = this.scene.add
-        .image(x, y, `background_orb_${this.targetOrb.name}`)
+        .image(c.x, c.y, `background_orb_${this.targetOrb.name}`)
         .setOrigin(0.5)
         .setDepth(layoutConfig.depth.background + backgroundConfig.depth.orb)
         .setScale(movingInwards ? backgroundConfig.animation.smallScale : backgroundConfig.animation.bigScale)
@@ -285,22 +292,23 @@ export default class Background {
   }
 
   private tweenOut(image: Phaser.GameObjects.Image, movingInwards: boolean) {
-    let x: number, y: number;
+    let c: Coordinates;
     if (movingInwards) {
-      x = image.x + (image.x - layoutConfig.scene.width / 2) * 4;
-      y =
-        image.y < layoutConfig.scene.height / 2
+      c = {
+        x: image.x + (image.x - layoutConfig.scene.width / 2) * 4,
+        y: image.y < layoutConfig.scene.height / 2
           ? -backgroundConfig.animation.offDistance
-          : layoutConfig.scene.height + backgroundConfig.animation.offDistance;
+          : layoutConfig.scene.height + backgroundConfig.animation.offDistance
+      };
     } else {
-      [x, y] = this.inCoordinates;
+      c = this.inCoordinates;
     }
     this.scene.tweens.add({
       targets: image,
       duration: backgroundConfig.animation.durationObjectTransition,
       ease: movingInwards ? 'Quad.easeIn' : 'Quint',
-      x: x,
-      y: y,
+      x: c.x,
+      y: c.y,
       scale: movingInwards ? backgroundConfig.animation.bigScale : backgroundConfig.animation.smallScale,
       onComplete: () => image.destroy()
     });
@@ -463,12 +471,12 @@ export default class Background {
     return Math.floor(Math.random() * array.length);
   }
 
-  private sunCoordinatesAndScale(ring: number): [number, number, number] {
-    return [
-      (layoutConfig.scene.width * ring) / backgroundConfig.rings.length / 2,
-      (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
-      2 / (Math.pow(ring, 2) + 1)
-    ];
+  private sunCoordinatesAndScale(ring: number): CoordinatesAndScale {
+    return {
+      x: (layoutConfig.scene.width * ring) / backgroundConfig.rings.length / 2,
+      y: (layoutConfig.scene.height * (1 + ring / backgroundConfig.rings.length)) / 4,
+      scale: 2 / (Math.pow(ring, 2) + 1)
+    };
   }
 
   private starsYCorrdinates(ring: number): number {
@@ -492,8 +500,11 @@ export default class Background {
       });
   }
 
-  private get inCoordinates(): [number, number] {
-    return [layoutConfig.scene.width / 2, layoutConfig.scene.height / 2];
+  private get inCoordinates(): Coordinates {
+    return {
+      x: layoutConfig.scene.width / 2,
+      y: layoutConfig.scene.height / 2
+    };
   }
 
   private get movingInwards(): boolean {
@@ -508,7 +519,7 @@ export default class Background {
       : this.currentRing + 1;
   }
 
-  private get outCoordinates(): [number, number] {
+  private get outCoordinates(): Coordinates {
     const xIsOff = this.randomBoolean();
     let x: number;
     let y: number;
@@ -523,7 +534,10 @@ export default class Background {
         : -backgroundConfig.animation.offDistance;
       x = (Math.random() - 0.25) * 2 * layoutConfig.scene.width;
     }
-    return [x, y];
+    return {
+      x: x,
+      y: y
+    };
   }
 
   private get isGame(): boolean {

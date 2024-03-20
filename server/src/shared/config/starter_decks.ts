@@ -1,4 +1,6 @@
-export const starterDecks: number[][][] = [
+export type MultipleCards = [amount: number, cardId: number]
+
+export const starterDecks: MultipleCards[][] = [
   // Terranische Siedler
   [
     // Hull (16)

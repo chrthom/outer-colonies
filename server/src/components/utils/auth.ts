@@ -5,6 +5,8 @@ import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBDecksDAO from '../persistence/db_decks';
 
+type UsernameAndToken = [username: string, token: string];
+
 export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
     return (await DBCredentialsDAO.getByUsername(username)) != null;
@@ -27,7 +29,7 @@ export default class Auth {
       .forEach(id => DBDecksDAO.create(id, credential.userId, true));
     return credential;
   }
-  static async login(loginData: AuthLoginRequest): Promise<[string, string] | null> {
+  static async login(loginData: AuthLoginRequest): Promise<UsernameAndToken | null> {
     let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
     credential ??= await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
     if (!credential) return null;

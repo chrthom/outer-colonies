@@ -160,7 +160,8 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
       this.updateState(state);
     });
-    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
+    type playerCountdowns = [playerCountdown: number, opponentCountdown: number];
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: playerCountdowns) => {
       this.player?.countdownIndicator.update(countdown[0]);
       this.opponent?.countdownIndicator.update(countdown[1]);
     });
