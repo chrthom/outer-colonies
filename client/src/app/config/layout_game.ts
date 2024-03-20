@@ -186,8 +186,3 @@ class LayoutGameConfig {
 }
 
 export const layoutGameConfig = new LayoutGameConfig();
-
-export type CardPosition = {
-  x: CardXPosition;
-  y: CardYPosition;
-};

@@ -1,5 +1,4 @@
 import { layoutConfig } from '../../config/layout';
-import { CardPosition } from '../../config/layout_game';
 import Game from '../../scenes/game';
 import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
 import {
@@ -15,7 +14,7 @@ import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
-import { CardXPosition, CardYPosition } from '../perspective';
+import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 
 export default class CardStack {
   cards!: Array<Card>;
