@@ -11,7 +11,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
 import ApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
-import { starterDecks } from '../../../../../server/src/shared/config/starter_decks';
+import { MultipleCards, starterDecks } from '../../../../../server/src/shared/config/starter_decks';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
@@ -57,7 +57,7 @@ export class RegisterPage {
   get usernameErrors(): string {
     return JSON.stringify(this.username.errors);
   }
-  get starterDeckCards(): number[][] {
+  get starterDeckCards(): MultipleCards[] {
     return starterDecks[this.starterDeck.value];
   }
   cardIdToUrl(cardId: number): string {

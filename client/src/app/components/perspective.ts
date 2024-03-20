@@ -77,3 +77,8 @@ export class CornerYPosition extends PerspectivePosition {
   factor = perspectiveConfig.factor.corner.y;
   isXAxis = false;
 }
+
+export interface CardPosition {
+  x: CardXPosition;
+  y: CardYPosition;
+}

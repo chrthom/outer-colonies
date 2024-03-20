@@ -12,9 +12,11 @@ import Intervention, {
   InterventionOpponentTurnStart
 } from './intervention';
 
+type Players = [player: Player, opponent: Player];
+
 export default class Match {
   readonly room!: string;
-  players: Player[] = [];
+  players!: Players; // Set in matchmaking.ts on init game
   activePlayerNo: number = 0;
   pendingActionPlayerNo: number = 0;
   turnPhase!: TurnPhase;
