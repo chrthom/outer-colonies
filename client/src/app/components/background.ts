@@ -8,7 +8,7 @@ import Matchmaking from '../scenes/matchmaking';
 import { CornerXPosition, CornerYPosition } from './perspective';
 
 interface CoordinatesAndScale extends Coordinates {
-  scale: number
+  scale: number;
 }
 
 export default class Background {
@@ -35,11 +35,7 @@ export default class Background {
       .setAlpha(designConfig.alpha.faded);
     const sunCoordinates = this.sunCoordinatesAndScale(this.currentRing);
     this.sunImage = scene.add
-      .image(
-        sunCoordinates.x,
-        sunCoordinates.y,
-        'background_sun'
-      )
+      .image(sunCoordinates.x, sunCoordinates.y, 'background_sun')
       .setDepth(layoutConfig.depth.background + 1)
       .setScale(sunCoordinates.scale);
     if (this.isGame) {
@@ -263,8 +259,10 @@ export default class Background {
       else {
         c = {
           x: this.outCoordinates.x,
-          y: this.isColonyOrb ? layoutConfig.scene.height + backgroundConfig.animation.offDistance : -backgroundConfig.animation.offDistance
-        }
+          y: this.isColonyOrb
+            ? layoutConfig.scene.height + backgroundConfig.animation.offDistance
+            : -backgroundConfig.animation.offDistance
+        };
       }
       this.orbImage = this.scene.add
         .image(c.x, c.y, `background_orb_${this.targetOrb.name}`)
@@ -296,9 +294,10 @@ export default class Background {
     if (movingInwards) {
       c = {
         x: image.x + (image.x - layoutConfig.scene.width / 2) * 4,
-        y: image.y < layoutConfig.scene.height / 2
-          ? -backgroundConfig.animation.offDistance
-          : layoutConfig.scene.height + backgroundConfig.animation.offDistance
+        y:
+          image.y < layoutConfig.scene.height / 2
+            ? -backgroundConfig.animation.offDistance
+            : layoutConfig.scene.height + backgroundConfig.animation.offDistance
       };
     } else {
       c = this.inCoordinates;

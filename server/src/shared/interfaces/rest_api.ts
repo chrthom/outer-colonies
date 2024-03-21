@@ -5,6 +5,7 @@ export interface AuthRegisterRequest {
   password: string;
   email: string;
   starterDeck: number;
+  newsletter: boolean;
 }
 
 export interface AuthLoginRequest {

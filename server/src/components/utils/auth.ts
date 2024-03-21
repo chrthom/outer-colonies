@@ -22,7 +22,7 @@ export default class Auth {
     );
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
     if (!credential) throw new Error('ERROR: New user could not be created');
-    DBProfilesDAO.create(credential.userId);
+    DBProfilesDAO.create(credential.userId, registrationData.newsletter);
     DBDailiesDAO.create(credential.userId);
     CardCollection.starterDecks[registrationData.starterDeck]
       .map(c => c.id)
