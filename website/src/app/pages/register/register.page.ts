@@ -15,6 +15,7 @@ import { MultipleCards, starterDecks } from '../../../../../server/src/shared/co
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
+import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 
 @Component({
   selector: 'oc-page-register',
@@ -35,30 +36,38 @@ export class RegisterPage {
       [Validators.required, Validators.email, Validators.maxLength(60)],
       [this.emailExistsValidator]
     ),
-    starterDeck: new FormControl('', [Validators.required])
+    starterDeck: new FormControl('', [Validators.required]),
+    dataPrivacy: new FormControl(false, [Validators.requiredTrue]),
+    newsletter: new FormControl(false)
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   constructor(
     private authAPIService: ApiService,
     private dialog: MatDialog
   ) {}
-  get username(): any {
+  get username(): AbstractControl | null {
     return this.registerForm.get('username');
   }
-  get password(): any {
+  get password(): AbstractControl | null {
     return this.registerForm.get('password');
   }
-  get email(): any {
+  get email(): AbstractControl | null {
     return this.registerForm.get('email');
   }
-  get starterDeck(): any {
+  get starterDeck(): AbstractControl | null {
     return this.registerForm.get('starterDeck');
   }
+  get dataPrivacy(): AbstractControl | null {
+    return this.registerForm.get('dataPrivacy');
+  }
+  get newsletter(): AbstractControl | null {
+    return this.registerForm.get('newsletter');
+  }
   get usernameErrors(): string {
-    return JSON.stringify(this.username.errors);
+    return JSON.stringify(this.username?.errors);
   }
   get starterDeckCards(): MultipleCards[] {
-    return starterDecks[this.starterDeck.value];
+    return starterDecks[this.starterDeck?.value];
   }
   cardIdToUrl(cardId: number): string {
     return `${environment.url.assets}/cards/${cardId}.png`;
@@ -71,14 +80,21 @@ export class RegisterPage {
     });
   }
   submit() {
-    this.authAPIService
-      .register({
-        username: this.registerForm.value.username.trim(),
-        password: this.registerForm.value.password,
-        email: this.registerForm.value.email.trim(),
-        starterDeck: this.registerForm.value.starterDeck
-      })
-      .subscribe(success => (this.registrationSuccessful = success));
+    this.registerForm.markAllAsTouched();
+    if (this.registerForm.valid) {
+      this.authAPIService
+        .register({
+          username: this.registerForm.value.username.trim(),
+          password: this.registerForm.value.password,
+          email: this.registerForm.value.email.trim(),
+          starterDeck: this.registerForm.value.starterDeck,
+          newsletter: !!this.registerForm.value.newsletter
+        })
+        .subscribe(success => (this.registrationSuccessful = success));
+    }
+  }
+  openDataPrivacy() {
+    this.dialog.open(DataPrivacyPage);
   }
   private get usernameExistsValidator(): AsyncValidatorFn {
     return (
