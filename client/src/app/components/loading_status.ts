@@ -1,3 +1,4 @@
+import { animationConfig } from '../config/animation';
 import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 
@@ -41,33 +42,19 @@ export default class LoadingStatus {
       const bar = this.scene.add
         .rectangle(x, y, layoutConfig.load.loadingAnimation.barWidth, height, designConfig.tint.player)
         .setAngle(angle)
-        .setAlpha(designConfig.alpha.normal);
+        .setAlpha(designConfig.alpha.faded);
       this.bars.push(bar);
       angle += 30;
     }
-    let index = 0;
-    const tweens: Phaser.Tweens.Tween[] = [];
-    this.scene.time.addEvent({
-      delay: 70,
-      loop: true,
-      callback: () => {
-        if (index < tweens.length) {
-          const tween = tweens[index];
-          tween.restart();
-        } else {
-          const bar = this.bars[index];
-          const tween = this.scene.tweens.add({
-            repeat: -1,
-            targets: bar,
-            alpha: designConfig.tint.faded,
-            duration: 400,
-            onStart: () => (bar.alpha = designConfig.alpha.normal)
-          });
-          tweens.push(tween);
-        }
-        ++index;
-        if (index >= this.bars.length) index = 0;
-      }
+    this.bars.forEach((bar, index) => {
+      this.scene.tweens.add({
+        targets: bar,
+        alpha: designConfig.alpha.faded,
+        delay: (animationConfig.duration.loaderCycle * index) / (this.bars.length - 1),
+        duration: animationConfig.duration.loaderCycle,
+        repeat: -1,
+        onStart: () => (bar.alpha = designConfig.alpha.normal)
+      });
     });
   }
 }

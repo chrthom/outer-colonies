@@ -34,7 +34,7 @@ export default class Prompt {
   update() {
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
-      this.show();
+      this.show(true);
     } else if (!this.scene.state.playerPendingAction) {
       this.setText('Warte auf Gegenspieler...');
       this.show(true);

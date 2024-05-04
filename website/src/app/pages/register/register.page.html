@@ -1,49 +1,44 @@
 <div id="register-box">
   <oc-content-box title="Registrierung">
-    <form
-      id="register-form"
-      *ngIf="!registrationSuccessful"
-      [formGroup]="registerForm"
-      (ngSubmit)="registerForm.valid ? submit() : {}"
-    >
+    <form id="register-form" *ngIf="!registrationSuccessful" [formGroup]="registerForm" (ngSubmit)="submit()">
       <mat-form-field appearance="outline">
         <mat-label>Nutzername</mat-label>
         <input matInput formControlName="username" [errorStateMatcher]="matcher" />
-        <mat-error *ngIf="username.hasError('exists') && !username.hasError('required')">
+        <mat-error *ngIf="username?.hasError('exists') && !username?.hasError('required')">
           Der gew&auml;hlte Nutzername ist bereits vergeben
         </mat-error>
-        <mat-error *ngIf="username.hasError('maxlength')">
+        <mat-error *ngIf="username?.hasError('maxlength')">
           Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein
         </mat-error>
-        <mat-error *ngIf="username.hasError('minlength') && !username.hasError('required')">
+        <mat-error *ngIf="username?.hasError('minlength') && !username?.hasError('required')">
           Dein Nutzername muss mindestens 3 Zeichen lang sein
         </mat-error>
-        <mat-error *ngIf="username.hasError('required')"> Bitte w&auml;hle einen Nutzernamen </mat-error>
+        <mat-error *ngIf="username?.hasError('required')"> Bitte w&auml;hle einen Nutzernamen </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Passwort</mat-label>
         <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
-        <mat-error *ngIf="password.hasError('maxlength')">
+        <mat-error *ngIf="password?.hasError('maxlength')">
           Dein Passwort kann nicht länger als 40 Zeichen sein
         </mat-error>
-        <mat-error *ngIf="password.hasError('minlength') && !password.hasError('required')">
+        <mat-error *ngIf="password?.hasError('minlength') && !password?.hasError('required')">
           Dein Passwort sollte mindestens 8 Zeichen lang sein
         </mat-error>
-        <mat-error *ngIf="password.hasError('required')"> Bitte w&auml;hle ein Passwort </mat-error>
+        <mat-error *ngIf="password?.hasError('required')"> Bitte w&auml;hle ein Passwort </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>E-Mail</mat-label>
         <input matInput formControlName="email" [errorStateMatcher]="matcher" />
-        <mat-error *ngIf="email.hasError('exists') && !email.hasError('required')">
+        <mat-error *ngIf="email?.hasError('exists') && !email?.hasError('required')">
           Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet
         </mat-error>
-        <mat-error *ngIf="email.hasError('maxlength') && !email.hasError('email')">
+        <mat-error *ngIf="email?.hasError('maxlength') && !email?.hasError('email')">
           Die E-Mail Adresse darf maximal 60 Zeichen lang sein
         </mat-error>
-        <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">
+        <mat-error *ngIf="email?.hasError('email') && !email?.hasError('required')">
           Dies ist keine valide E-Mail Adresse
         </mat-error>
-        <mat-error *ngIf="email.hasError('required')"> Bitte gib eine valide E-Mail Adresse an </mat-error>
+        <mat-error *ngIf="email?.hasError('required')"> Bitte gib eine valide E-Mail Adresse an </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Start-Deck</mat-label>
@@ -52,8 +47,21 @@
           <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
           <mat-option value="2">Trans-Jupiter Expedition</mat-option>
         </mat-select>
-        <mat-error *ngIf="starterDeck.hasError('required')"> Bitte w&auml;hle ein Start-Deck </mat-error>
+        <mat-error *ngIf="starterDeck?.hasError('required')"> Bitte w&auml;hle ein Start-Deck </mat-error>
       </mat-form-field>
+      <mat-checkbox formControlName="dataPrivacy">
+        <mat-label>
+          Ich habe die
+          <a (click)="openDataPrivacy()" tabindex="invalid">Datenschutzbestimmungen</a>
+          zur Kenntnis genommen und stimme diesen zu.
+        </mat-label>
+      </mat-checkbox>
+      <mat-error *ngIf="dataPrivacy?.touched && dataPrivacy?.hasError('required')">
+        Um dich anzumelden musst du den Datenschutzbestimmungen zustimmen
+      </mat-error>
+      <mat-checkbox formControlName="newsletter">
+        <mat-label>Ich möchte Neuigkeiten zu Outer Colonies per E-Mail erhalten.</mat-label>
+      </mat-checkbox>
       <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
         Neuen Nutzer registrieren
       </button>
@@ -61,7 +69,7 @@
         Ein unerwarteter Fehler ist bei der Registrierung aufgetreten. Bitte versuchen sie es sp&auml;ter
         erneut.
       </mat-error>
-      <div id="starter-deck-cards" *ngIf="starterDeck.value !== ''">
+      <div id="starter-deck-cards" *ngIf="starterDeck?.value !== ''">
         <mat-card
           *ngFor="let card of starterDeckCards"
           [matBadge]="card[0] + 'x'"

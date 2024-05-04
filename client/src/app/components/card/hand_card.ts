@@ -24,9 +24,7 @@ export default class HandCard extends CardImage {
     );
     this.uuid = data.uuid;
     this.update(data);
-    if (this.ownedByPlayer) {
-      this.image.on('pointerdown', () => this.onClickAction());
-    }
+    this.image.on('pointerdown', () => this.onClickAction());
     this.setDepth(layoutConfig.depth.handCard);
     if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
   }
@@ -45,6 +43,7 @@ export default class HandCard extends CardImage {
     if (this.data.playable) this.highlightSelectable();
   }
   maximizeTacticCard() {
+    this.disableMaximizeOnMouseover();
     this.scene.maximizedTacticCard?.discard();
     this.scene.maximizedTacticCard = this;
     this.setCardId(this.data.cardId);
@@ -96,7 +95,9 @@ export default class HandCard extends CardImage {
     return this.ownedByPlayer ? 0 : 180;
   }
   private onClickAction() {
-    if (this.scene.state.playerPendingAction) {
+    if (this.scene.maximizedTacticCard == this) {
+      this.scene.discardMaximizedTacticCard();
+    } else if (this.ownedByPlayer && this.scene.state.playerPendingAction) {
       if (
         this.data.playable &&
         (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)

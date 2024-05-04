@@ -3,8 +3,7 @@ import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { perspectiveConfig } from 'src/app/config/perspective';
-import { CardXPosition, CardYPosition, PerspectivePosition } from '../perspective';
-import { CardPosition } from 'src/app/config/layout_game';
+import { CardPosition, CardXPosition, CardYPosition, PerspectivePosition } from '../perspective';
 
 export interface CardImageConfig {
   cropped?: boolean;

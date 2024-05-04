@@ -31,6 +31,7 @@ import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
+import { backgroundConfig } from '../config/background';
 
 interface ActiveCards {
   hand?: string;
@@ -92,6 +93,23 @@ export default class Game extends Phaser.Scene {
   preload() {
     this.preloader = new Preloader(this);
     this.load.baseURL = `${environment.urls.api}/assets/`;
+    backgroundConfig.orbs
+      .map(o => o.name)
+      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
+    backgroundConfig.rings.forEach(name =>
+      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
+    );
+    [
+      'asteroid1',
+      'corvette1',
+      'corvette2',
+      'corvette3',
+      'freighter1',
+      'freighter2',
+      'freighter3',
+      'station1',
+      'torpedos1'
+    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
     this.load.image('zone_corner', 'utils/zone_corner.png');
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
@@ -142,7 +160,8 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
       this.updateState(state);
     });
-    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number[]) => {
+    type playerCountdowns = [playerCountdown: number, opponentCountdown: number];
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: playerCountdowns) => {
       this.player?.countdownIndicator.update(countdown[0]);
       this.opponent?.countdownIndicator.update(countdown[1]);
     });
@@ -185,13 +204,8 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
-        this.time.delayedCall(this.maximizedTacticCard ? animationConfig.duration.waitBeforeDiscard : 0, () => {
-          this.time.delayedCall(this.maximizedTacticCard ? animationConfig.duration.move : 0, () => {
-            this.player.discardPile.update(this.state.player.discardPileIds);
-            this.opponent.discardPile.update(this.state.opponent.discardPileIds);
-          });
-          this.discardMaximizedTacticCard();
-        });
+        this.player.discardPile.update(this.state.player.discardPileIds);
+        this.opponent.discardPile.update(this.state.opponent.discardPileIds);
       });
     });
   }
@@ -222,6 +236,13 @@ export default class Game extends Phaser.Scene {
 
   getPlayerState(isPlayer: boolean): ClientPlayer {
     return isPlayer ? this.state.player : this.state.opponent;
+  }
+
+  discardMaximizedTacticCard() {
+    if (!this.state.intervention) {
+      this.maximizedTacticCard?.discard();
+      this.maximizedTacticCard = undefined;
+    }
   }
 
   private resetSelection(battleType?: BattleType) {
@@ -287,6 +308,7 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateHandCards(newHandCards: ClientHandCard[], previousTurnPhase: TurnPhase) {
+    this.discardMaximizedTacticCard();
     this.forBothPlayers((state, ui) =>
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
@@ -312,13 +334,6 @@ export default class Game extends Phaser.Scene {
 
   private forBothPlayers<T>(f: (state: ClientPlayer, ui: PlayerUIElements) => T): T[] {
     return [true, false].map(isPlayer => f(this.getPlayerState(isPlayer), this.getPlayerUI(isPlayer)), this);
-  }
-
-  private discardMaximizedTacticCard() {
-    if (!this.state.intervention) {
-      this.maximizedTacticCard?.discard();
-      this.maximizedTacticCard = undefined;
-    }
   }
 
   private updateHighlighting() {
