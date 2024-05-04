@@ -1,4 +1,4 @@
-import { InterventionType } from '../../shared/config/enums';
+import { CardDurability, InterventionType } from '../../shared/config/enums';
 import CardStack from '../cards/card_stack';
 import Match from './match';
 
@@ -106,6 +106,9 @@ export class InterventionTacticCard extends Intervention {
   skip() {
     this.switchPendingPlayer();
     this.match.intervention = this.parentIntervention;
+    if (this.src.card.durability != CardDurability.Instant) {
+      this.match.highlightCard = undefined;
+    }
     this.src.playHandCard(this.target);
     this.match.checkToNextPhase();
   }
