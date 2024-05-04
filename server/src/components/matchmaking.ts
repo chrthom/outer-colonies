@@ -1,6 +1,5 @@
 import SocketData from './game_state/socket_data';
 import Match from './game_state/match';
-import Player from './game_state/player';
 import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
@@ -47,25 +46,10 @@ function clientsInMatchMaking(io: Server): Set<string> {
   return io.sockets.adapter.rooms.get(matchmakingRoom) ?? new Set();
 }
 
-function joinGame(socket: Socket, match: Match, playerNo: number): void {
-  socket.leave(matchmakingRoom);
-  socket.join(match.room);
-  const socketData: SocketData = <SocketData>socket.data;
-  socketData.match = match;
-  socketData.playerNo = playerNo;
-  match.players[playerNo] = new Player(
-    socket.id,
-    socketData.user.username,
-    match,
-    playerNo,
-    socketData.activeDeck.slice()
-  );
-}
-
 function initGame(io: Server, socket1: Socket, socket2: Socket): void {
-  const match = new Match(`${gameRoomPrefix}-${uuidv4()}`);
-  joinGame(socket1, match, 0);
-  joinGame(socket2, match, 1);
+  socket1.leave(matchmakingRoom);
+  socket2.leave(matchmakingRoom);
+  const match = new Match(`${gameRoomPrefix}-${uuidv4()}`, socket1, socket2);
   const gameParams: ClientGameParams = {
     preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
