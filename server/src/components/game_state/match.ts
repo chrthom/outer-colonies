@@ -5,18 +5,20 @@ import Battle from './battle';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo } from '../utils/helpers';
+import { Socket } from 'socket.io';
 import GameResult from './game_result';
 import Intervention, {
   InterventionAttack,
   InterventionBattleRoundEnd,
   InterventionOpponentTurnStart
 } from './intervention';
+import SocketData from './socket_data';
 
 type Players = [player: Player, opponent: Player];
 
 export default class Match {
   readonly room!: string;
-  players!: Players; // Set in matchmaking.ts on init game
+  players: Players;
   activePlayerNo: number = 0;
   pendingActionPlayerNo: number = 0;
   turnPhase!: TurnPhase;
@@ -24,10 +26,11 @@ export default class Match {
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
-  constructor(room: string) {
+  constructor(room: string, socket1: Socket, socket2: Socket) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
     this.gameResult = new GameResult(this);
+    this.players = [this.newPlayer(socket1, 0), this.newPlayer(socket2, 1)];
   }
   get activePlayer(): Player {
     return this.players[this.activePlayerNo];
@@ -125,5 +128,12 @@ export default class Match {
   }
   skipIntervention() {
     this.intervention?.skip();
+  }
+  private newPlayer(socket: Socket, playerNo: number): Player {
+    socket.join(this.room);
+    const socketData: SocketData = <SocketData>socket.data;
+    socketData.match = this;
+    socketData.playerNo = playerNo;
+    return new Player(socket.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
   }
 }

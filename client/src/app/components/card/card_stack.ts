@@ -13,7 +13,6 @@ import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
-import { perspectiveConfig } from 'src/app/config/perspective';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 
 export default class CardStack {
@@ -149,12 +148,12 @@ export default class CardStack {
       );
     }
     if (fromHand && origin) {
-        this.cards[0]
-          .setX(origin.x)
-          .setY(origin.y)
-          .setZ(origin.z)
-          .setAngle(origin.angle)
-          .setXRotation(origin.xRotation);
+      this.cards[0]
+        .setX(origin.x)
+        .setY(origin.y)
+        .setZ(origin.z)
+        .setAngle(origin.angle)
+        .setXRotation(origin.xRotation);
     }
   }
   private get x(): CardXPosition {
