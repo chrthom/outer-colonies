@@ -14,7 +14,6 @@ import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
-import { perspectiveConfig } from 'src/app/config/perspective';
 import { CardXPosition, CardYPosition } from '../perspective';
 
 export default class CardStack {
