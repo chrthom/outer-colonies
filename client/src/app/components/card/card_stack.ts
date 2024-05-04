@@ -148,22 +148,13 @@ export default class CardStack {
         this.ownedByPlayer
       );
     }
-    if (fromHand) {
-      if (origin) {
+    if (fromHand && origin) {
         this.cards[0]
           .setX(origin.x)
           .setY(origin.y)
           .setZ(origin.z)
           .setAngle(origin.angle)
           .setXRotation(origin.xRotation);
-      } else if (!this.ownedByPlayer) {
-        console.log('SHOULD NOT HAPPEN: Tween from opponent hand generic function'); // TODO: Fix
-        this.cards[0]
-          .setX(layoutConfig.game.cards.placement.opponent.deck.x)
-          .setY(layoutConfig.game.cards.placement.opponent.deck.y)
-          .setZ(perspectiveConfig.distance.board)
-          .setAngle(180);
-      }
     }
   }
   private get x(): CardXPosition {
