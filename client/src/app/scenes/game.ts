@@ -204,6 +204,8 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
+        this.player.discardPile.update(this.state.player.discardPileIds);
+        this.opponent.discardPile.update(this.state.opponent.discardPileIds);
       });
     });
   }
