@@ -185,9 +185,13 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
-        this.time.delayedCall(animationConfig.duration.waitBeforeDiscard, () =>
-          this.discardMaximizedTacticCard()
-        );
+        this.time.delayedCall(this.maximizedTacticCard ? animationConfig.duration.waitBeforeDiscard : 0, () => {
+          this.time.delayedCall(this.maximizedTacticCard ? animationConfig.duration.move : 0, () => {
+            this.player.discardPile.update(this.state.player.discardPileIds);
+            this.opponent.discardPile.update(this.state.opponent.discardPileIds);
+          });
+          this.discardMaximizedTacticCard();
+        });
       });
     });
   }
