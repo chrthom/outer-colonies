@@ -3,6 +3,18 @@ import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import OrbCard from '../types/orb_card';
 
+export class Card112 extends OrbCard {
+  constructor() {
+    super(112, 'Titan', 4, {
+      armour: 1
+    }, [CardType.Hull, CardType.Infrastructure]);
+  }
+  override onStartTurn(): void {}
+  override get instantRecharge(): boolean {
+    return true;
+  }
+}
+
 export class Card146 extends OrbCard {
   constructor() {
     super(146, 'Europa', 2, {}, [TacticDiscipline.Science]);
