@@ -168,6 +168,21 @@ export class Card219 extends ActionInfrastructureCard {
   }
 }
 
+export class Card320 extends ActionInfrastructureCard {
+  constructor() {
+    super(
+      320,
+      'Legierungsgießerei',
+      2,
+      {
+        energy: -3,
+        psi: -1
+      },
+      [CardType.Equipment, CardType.Hull]
+    );
+  }
+}
+
 export class Card336 extends ActionInfrastructureCard {
   constructor() {
     super(
