@@ -5,13 +5,15 @@ import ActionPool from './action_pool';
 import Player from '../game_state/player';
 import TacticCard from './types/tactic_card';
 
+export type CardRarity = 0 | 1 | 2 | 3 | 4 | 5;
+
 export default abstract class Card {
   readonly id!: number;
   readonly name!: string;
   readonly type!: CardType;
-  readonly rarity!: number;
+  readonly rarity!: CardRarity;
   readonly profile!: CardProfile;
-  constructor(id: number, name: string, type: CardType, rarity: number, profile?: CardProfileConfig) {
+  constructor(id: number, name: string, type: CardType, rarity: CardRarity, profile?: CardProfileConfig) {
     this.id = id;
     this.name = name;
     this.type = type;

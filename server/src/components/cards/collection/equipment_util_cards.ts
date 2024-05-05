@@ -25,6 +25,17 @@ export class Card109 extends EquipmentCard {
   }
 }
 
+export class Card124 extends EquipmentCard {
+  constructor() {
+    super(124, 'Universaladapter', 3, {
+      omega: 1,
+      phi: 1,
+      theta: 1,
+      xi: -1
+    });
+  }
+}
+
 export class Card161 extends EquipmentCard {
   constructor() {
     super(161, 'Ionenschubdüsen', 1, {

@@ -1,4 +1,4 @@
-import Card, { AttackResult } from '../card';
+import Card, { AttackResult, CardRarity } from '../card';
 import CardProfile, { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { AttackProfile } from '../card_profile';
@@ -11,7 +11,7 @@ export default abstract class EquipmentCard extends Card {
   constructor(
     id: number,
     name: string,
-    rarity: number,
+    rarity: CardRarity,
     profile?: CardProfileConfig,
     attackProfile?: AttackProfile
   ) {

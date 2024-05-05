@@ -5,9 +5,15 @@ import OrbCard from '../types/orb_card';
 
 export class Card112 extends OrbCard {
   constructor() {
-    super(112, 'Titan', 4, {
-      armour: 1
-    }, [CardType.Hull, CardType.Infrastructure]);
+    super(
+      112,
+      'Titan',
+      4,
+      {
+        armour: 1
+      },
+      [CardType.Hull, CardType.Infrastructure]
+    );
   }
   override onStartTurn(): void {}
   override get instantRecharge(): boolean {
