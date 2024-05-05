@@ -26,7 +26,7 @@ export default class CardStack {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
-    this.createCards(true, origin);
+    this.createCards(origin);
     this.tween();
   }
   discard(toDeck?: boolean) {
@@ -39,7 +39,6 @@ export default class CardStack {
       this.cards.map(c => c.cardId),
       data.cards.map(c => c.id)
     );
-    this.filterCardsByIdList(data.cards.map(c => c.id)).forEach(c => c.destroy());
     this.filterCardsByIdList(removedCardIds).forEach(c => {
       let toDeck = false;
       if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
@@ -48,10 +47,11 @@ export default class CardStack {
       }
       c.discard(toDeck);
     }, this);
-    this.data.cards = data.cards;
+    const replacedCards = this.filterCardsByIdList(data.cards.map(c => c.id));
     this.data.criticalDamage = data.criticalDamage;
     this.data.damage = data.damage;
     this.data.defenseIcons = data.defenseIcons;
+    this.data.cards = data.cards;
     this.createCards();
     this.data = data;
     this.filterCardsByIdList(newCardIds).forEach(c => {
@@ -62,6 +62,7 @@ export default class CardStack {
       c.setX(x).setY(y).setAngle(angle);
     });
     this.tween();
+    this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
   }
   animateAttack(cardIndex: number) {
     this.cards[cardIndex].animateAttack();
@@ -114,7 +115,7 @@ export default class CardStack {
     this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
   }
-  private createCards(fromHand?: boolean, origin?: CardImage) {
+  private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(
       c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c)
     );
@@ -147,7 +148,7 @@ export default class CardStack {
         this.ownedByPlayer
       );
     }
-    if (fromHand && origin) {
+    if (origin) {
       this.cards[0]
         .setX(origin.x)
         .setY(origin.y)

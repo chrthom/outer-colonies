@@ -277,6 +277,7 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
+    // Update or remove old cards
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
       if (newData) cs.update(newData); // Move existing card stacks
