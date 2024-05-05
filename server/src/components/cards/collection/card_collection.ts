@@ -173,7 +173,7 @@ import { Card230, Card333, Card435 } from './infrastructure_start_cards';
 import { Card114, Card155 } from './infrastructure_end_cards';
 import { Rarity } from '../../../shared/config/enums';
 import { Card302, Card401 } from './equipment_weapon_super_cards';
-import { Card146, Card159, Card301, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
+import { Card112, Card146, Card159, Card301, Card317, Card403, Card410, Card432, Card433 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 import { Card129, Card176, Card231, Card416 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
@@ -191,6 +191,7 @@ export default class CardCollection {
     109: <Card>new Card109(),
     110: <Card>new Card110(),
     111: <Card>new Card111(),
+    112: <Card>new Card112(),
     113: <Card>new Card113(),
     114: <Card>new Card114(),
     115: <Card>new Card115(),
