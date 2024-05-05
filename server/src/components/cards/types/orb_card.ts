@@ -2,7 +2,7 @@ import { CardSubtype, CardType, TacticDiscipline } from '../../../shared/config/
 import { rules } from '../../../shared/config/rules';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
-import Card from '../card';
+import Card, { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import TacticCard from './tactic_card';
@@ -12,7 +12,7 @@ export default abstract class OrbCard extends Card {
   constructor(
     id: number,
     name: string,
-    rarity: number,
+    rarity: CardRarity,
     profile: CardProfileConfig,
     ...actionPool: CardSubtype[][]
   ) {

@@ -1,6 +1,7 @@
 import { CardSubtype, CardType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
+import { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import InfrastructureCard from '../types/infrastructure_card';
 
@@ -9,7 +10,7 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
   constructor(
     id: number,
     name: string,
-    rarity: number,
+    rarity: CardRarity,
     profile: CardProfileConfig,
     ...actionPool: CardSubtype[][]
   ) {

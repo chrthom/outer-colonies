@@ -1,4 +1,4 @@
-import Card from '../card';
+import Card, { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { CardType } from '../../../shared/config/enums';
@@ -9,7 +9,7 @@ export default abstract class HullCard extends Card {
   constructor(
     id: number,
     name: string,
-    rarity: number,
+    rarity: CardRarity,
     multipart: HullMultipart,
     profile?: CardProfileConfig
   ) {

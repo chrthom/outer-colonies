@@ -1,11 +1,11 @@
 import { CardType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import Card from '../card';
+import Card, { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class InfrastructureCard extends Card {
-  constructor(id: number, name: string, rarity: number, profile?: CardProfileConfig) {
+  constructor(id: number, name: string, rarity: CardRarity, profile?: CardProfileConfig) {
     super(id, name, CardType.Infrastructure, rarity, profile);
   }
   getValidTargets(player: Player): CardStack[] {

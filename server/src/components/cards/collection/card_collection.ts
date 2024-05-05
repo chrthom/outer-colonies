@@ -99,7 +99,7 @@ import {
   Card310,
   Card420
 } from './equipment_weapon_kinetic_cards';
-import { Card104, Card109, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
+import { Card104, Card109, Card124, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card203, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
 import {
@@ -202,6 +202,7 @@ export default class CardCollection {
     120: <Card>new Card120(),
     121: <Card>new Card121(),
     122: <Card>new Card122(),
+    124: <Card>new Card124(),
     125: <Card>new Card125(),
     126: <Card>new Card126(),
     127: <Card>new Card127(),
@@ -415,8 +416,6 @@ export default class CardCollection {
             return Array(2).fill(c);
           case 5:
             return [c];
-          default:
-            return [];
         }
       });
     return relevantCards[Math.floor(Math.random() * relevantCards.length)];
