@@ -39,6 +39,17 @@ export class Card159 extends OrbCard {
   }
 }
 
+export class Card225 extends OrbCard {
+  constructor() {
+    super(225, 'Ceres', 2, {
+      handCardLimit: -1
+    }, [TacticDiscipline.Trade]);
+  }
+  override onStartTurn(player: Player): void {
+    this.additionalCardWhenDrawing(TacticDiscipline.Trade, player);
+  }
+}
+
 export class Card301 extends OrbCard {
   constructor() {
     super(301, 'Io', 5, {
