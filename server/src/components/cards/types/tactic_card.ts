@@ -64,4 +64,21 @@ export default abstract class TacticCard extends Card {
     }
     return [];
   }
+  protected drawSpecificCards(player: Player, matchFunction: (card: Card, player: Player) => boolean): Card | undefined {
+    const loop: (otherCards: Card[]) => Card | undefined = (otherCards: Card[]) => {
+      if (player.deck.length == 0) return undefined;
+      const nextCard = player.pickCardFromDeck();
+      if (!nextCard) return undefined;
+      else if (matchFunction(nextCard, player)) {
+        player.deck.push(...otherCards);
+        player.shuffleDeck();
+        return nextCard;
+      } else {
+        return loop(otherCards.concat(nextCard));
+      }
+    };
+    const card = loop([]);
+    if (card) player.takeCards([card]);
+    return card;
+  }
 }

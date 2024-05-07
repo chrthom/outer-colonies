@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { spliceCardStackByUUID } from '../../utils/helpers';
@@ -71,6 +72,19 @@ export class Card162 extends ScienceTacticCard {
   onEnterGame() {}
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profile.shield > 0);
+  }
+}
+
+export class Card229 extends ScienceTacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(229, 'Bodenproben', 2);
+  }
+  onEnterGame(player: Player) {
+    _.times(this.cardsToDraw, () => this.drawSpecificCards(player, (c) => c.type == CardType.Infrastructure));
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }
 
