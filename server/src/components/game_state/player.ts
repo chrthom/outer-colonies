@@ -69,6 +69,10 @@ export default class Player {
   takeCards(cards: Card[]) {
     this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
   }
+  pickCardFromDeck(): Card | undefined {
+    const card = this.pickCardsFromDeck(1);
+    return card.length == 1 ? card[0] : undefined;
+  }
   pickCardsFromDeck(num: number): Card[] {
     if (this.deck.length < num) this.match.gameResult.setWinnerByDeckDepletion(this);
     return this.deck.splice(0, Math.min(num, this.deck.length));
