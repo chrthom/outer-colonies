@@ -28,9 +28,7 @@ export class Card141 extends EconomyTacticCard {
 }
 
 export class Card142 extends EconomyTacticCard {
-  private oneTimeActionPool = new ActionPool(
-    new CardAction(CardType.Hull)
-  );
+  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Hull));
   constructor() {
     super(142, 'Ingenieure von Phobos', 2);
   }

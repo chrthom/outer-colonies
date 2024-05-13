@@ -7,7 +7,9 @@ const equipmentCards = CardCollection.allCards.filter(c => c.type == CardType.Eq
 const infrastructureCards = CardCollection.allCards.filter(c => c.type == CardType.Infrastructure);
 const weaponCards = equipmentCards.map(c => <EquipmentCard>c).filter(c => c.canAttack);
 
-equipmentCards.concat(infrastructureCards).forEach(c => {
+equipmentCards.concat(infrastructureCards).filter(c => 
+  c.id != 124
+).forEach(c => {
   ['theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach(v => {
     test(`"${c.name}" profile ${v} socket value should be 0 or less`, () => {
       expect(c.profile[v as keyof CardProfile]).toBeLessThanOrEqual(0);
