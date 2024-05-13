@@ -64,7 +64,7 @@ export default abstract class TacticCard extends Card {
     }
     return [];
   }
-  protected drawSpecificCards(
+  protected drawSpecificCard(
     player: Player,
     matchFunction: (card: Card, player: Player) => boolean
   ): Card | undefined {
