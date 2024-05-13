@@ -68,7 +68,16 @@ import {
   Card452,
   Card453
 } from './infrastructure_energy_cards';
-import { Card141, Card142, Card165, Card232, Card235, Card236, Card321, Card427 } from './tactic_economy_cards';
+import {
+  Card141,
+  Card142,
+  Card165,
+  Card232,
+  Card235,
+  Card236,
+  Card321,
+  Card427
+} from './tactic_economy_cards';
 import {
   Card102,
   Card111,
@@ -159,6 +168,7 @@ import {
 } from './tactic_military_cards';
 import {
   Card110,
+  Card143,
   Card144,
   Card162,
   Card229,
@@ -235,6 +245,7 @@ export default class CardCollection {
     140: <Card>new Card140(),
     141: <Card>new Card141(),
     142: <Card>new Card142(),
+    143: <Card>new Card143(),
     144: <Card>new Card144(),
     145: <Card>new Card145(),
     146: <Card>new Card146(),

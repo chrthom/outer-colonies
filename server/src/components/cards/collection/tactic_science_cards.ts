@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { spliceCardStackByUUID } from '../../utils/helpers';
@@ -24,6 +23,20 @@ export class Card110 extends ScienceTacticCard {
         const numOfHullCards = cs.cards.filter(c => c.type == CardType.Hull).length;
         cs.damage -= Math.min(this.damageToRepair * numOfHullCards, cs.damage);
       });
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card143 extends ScienceTacticCard {
+  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Equipment));
+  constructor() {
+    super(143, 'Waffenprototyp', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    this.drawSpecificCard(player, c => c.type == CardType.Equipment);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -81,7 +94,9 @@ export class Card229 extends ScienceTacticCard {
     super(229, 'Bodenproben', 2);
   }
   onEnterGame(player: Player) {
-    _.times(this.cardsToDraw, () => this.drawSpecificCard(player, c => c.type == CardType.Infrastructure));
+    for (let i = 0; i < this.cardsToDraw; i++) {
+      this.drawSpecificCard(player, c => c.type == CardType.Infrastructure);
+    }
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
