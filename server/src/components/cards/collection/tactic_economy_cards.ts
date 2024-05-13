@@ -27,6 +27,22 @@ export class Card141 extends EconomyTacticCard {
   }
 }
 
+export class Card142 extends EconomyTacticCard {
+  private oneTimeActionPool = new ActionPool(
+    new CardAction(CardType.Hull)
+  );
+  constructor() {
+    super(142, 'Ingenieure von Phobos', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    this.drawSpecificCard(player, c => c.type == CardType.Hull);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
 export class Card165 extends EconomyTacticCard {
   private readonly cardsToDrawPerPsiSocket = 1;
   constructor() {
