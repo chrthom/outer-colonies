@@ -81,7 +81,7 @@ export class Card229 extends ScienceTacticCard {
     super(229, 'Bodenproben', 2);
   }
   onEnterGame(player: Player) {
-    _.times(this.cardsToDraw, () => this.drawSpecificCards(player, (c) => c.type == CardType.Infrastructure));
+    _.times(this.cardsToDraw, () => this.drawSpecificCards(player, c => c.type == CardType.Infrastructure));
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -171,6 +171,23 @@ export class Card335 extends ScienceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundStart;
+  }
+}
+
+export class Card404 extends ScienceTacticCard {
+  private oneTimeActionPool = new ActionPool(
+    new CardAction(CardType.Tactic),
+    new CardAction(CardType.Tactic)
+  );
+  constructor() {
+    super(404, 'Universelle KI', 5);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }
 
