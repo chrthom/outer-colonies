@@ -1,7 +1,7 @@
 import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
-import { CardAction } from '../action_pool';
+import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
@@ -27,6 +27,20 @@ export class Card129 extends IntelligenceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.Attack;
+  }
+}
+
+export class Card149 extends IntelligenceTacticCard {
+  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Tactic));
+  constructor() {
+    super(149, 'Expertenkonferenz', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }
 
