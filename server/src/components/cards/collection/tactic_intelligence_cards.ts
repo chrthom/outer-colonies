@@ -31,13 +31,14 @@ export class Card129 extends IntelligenceTacticCard {
 }
 
 export class Card149 extends IntelligenceTacticCard {
-  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Tactic));
+  private readonly cardsToDraw = 2;
   constructor() {
     super(149, 'Expertenkonferenz', 2);
   }
   onEnterGame(player: Player) {
-    player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    for (let i = 0; i < this.cardsToDraw; i++) {
+      this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    }
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
