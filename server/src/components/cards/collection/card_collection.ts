@@ -156,6 +156,7 @@ import {
   Card315
 } from './hull_3_part_cards';
 import {
+  Card129,
   Card139,
   Card173,
   Card174,
@@ -199,7 +200,7 @@ import {
   Card433
 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
-import { Card129, Card149, Card176, Card231, Card416 } from './tactic_intelligence_cards';
+import { Card149, Card176, Card231, Card416 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
 
 export default class CardCollection {

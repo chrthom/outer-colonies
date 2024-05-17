@@ -1,4 +1,4 @@
-import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
@@ -7,6 +7,25 @@ import TacticCard from '../types/tactic_card';
 abstract class MilitaryTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
     return TacticDiscipline.Military;
+  }
+}
+
+export class Card129 extends MilitaryTacticCard {
+  constructor() {
+    super(129, 'Planetarer Verteidigungsplan', 3);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.onEnterGameAttackIntervention(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    const targetUUIDs = player.cardStacks.filter(cs => cs.zone == Zone.Colony).map(cs => cs.uuid);
+    return this.getValidTargetsInterventionAttack(player, i => targetUUIDs.includes(i.target.uuid));
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
   }
 }
 

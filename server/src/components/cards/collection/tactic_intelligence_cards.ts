@@ -1,32 +1,13 @@
 import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
-import ActionPool, { CardAction } from '../action_pool';
+import { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
 abstract class IntelligenceTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
     return TacticDiscipline.Intelligence;
-  }
-}
-
-export class Card129 extends IntelligenceTacticCard {
-  constructor() {
-    super(129, 'Frühwarnsystem', 3);
-  }
-  onEnterGame(player: Player, target: CardStack) {
-    this.onEnterGameAttackIntervention(player, target);
-  }
-  getValidTargets(player: Player): CardStack[] {
-    const colony = this.onlyColonyTarget(player.cardStacks);
-    return this.getValidTargetsInterventionAttack(player, i => i.target.uuid == colony[0].uuid);
-  }
-  override adjustedAttackDamageByIntervention(damage: number): number {
-    return Math.round(damage / 2);
-  }
-  protected override get interventionType(): InterventionType | undefined {
-    return InterventionType.Attack;
   }
 }
 
