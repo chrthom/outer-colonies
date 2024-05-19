@@ -137,7 +137,7 @@ export default abstract class CardStack {
     this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
   onStartTurn() {
-    this.card.onStartTurn(this.player);
+    this.card.onStartTurn(this.player, this);
     this.attachedCardStacks.forEach(cs => cs.onStartTurn());
   }
   onEndTurn() {

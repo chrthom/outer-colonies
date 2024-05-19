@@ -1,8 +1,9 @@
-import { CardSubtype, CardType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardSubtype, CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
+import CardStack from '../card_stack';
 import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class ActionInfrastructureCard extends InfrastructureCard {
@@ -23,7 +24,8 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
   onLeaveGame(player: Player) {
     this.removeFromActionPool(player);
   }
-  onStartTurn() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onStartTurn(player: Player, cardStack: CardStack) {}
   onEndTurn() {}
   override get actionPool(): ActionPool {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
@@ -196,5 +198,25 @@ export class Card336 extends ActionInfrastructureCard {
       [TacticDiscipline.Military],
       [TacticDiscipline.Science]
     );
+  }
+}
+
+export class Card413 extends ActionInfrastructureCard {
+  constructor() {
+    super(
+      413,
+      'Logistikknotenpunkt',
+      3,
+      {
+        energy: -2,
+        psi: -1
+      },
+      [TacticDiscipline.Trade]
+    );
+  }
+  override onStartTurn(player: Player, cardStack: CardStack) {
+    if (cardStack.zone != Zone.Colony && cardStack.profile.speed > 0) {
+      this.additionalCardWhenDrawing(player, TacticDiscipline.Military, TacticDiscipline.Trade);
+    }
   }
 }

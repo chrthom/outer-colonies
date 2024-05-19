@@ -15,7 +15,7 @@ export class Card112 extends OrbCard {
       [CardType.Hull, CardType.Infrastructure]
     );
   }
-  override onStartTurn(): void {}
+  override onStartTurn() {}
   override get instantRecharge(): boolean {
     return true;
   }
@@ -25,8 +25,8 @@ export class Card146 extends OrbCard {
   constructor() {
     super(146, 'Europa', 2, {}, [TacticDiscipline.Science]);
   }
-  override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(TacticDiscipline.Intelligence, player);
+  override onStartTurn(player: Player) {
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Intelligence);
   }
 }
 
@@ -34,8 +34,8 @@ export class Card159 extends OrbCard {
   constructor() {
     super(159, 'Ganymed', 2, {}, [TacticDiscipline.Intelligence]);
   }
-  override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(TacticDiscipline.Trade, player);
+  override onStartTurn(player: Player) {
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Trade);
   }
 }
 
@@ -51,8 +51,8 @@ export class Card225 extends OrbCard {
       [TacticDiscipline.Trade]
     );
   }
-  override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(TacticDiscipline.Trade, player);
+  override onStartTurn(player: Player) {
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Trade);
   }
 }
 
@@ -63,7 +63,7 @@ export class Card301 extends OrbCard {
       pointDefense: 1
     });
   }
-  override onStartTurn(): void {}
+  override onStartTurn() {}
   override get instantRecharge(): boolean {
     return true;
   }
@@ -73,8 +73,8 @@ export class Card317 extends OrbCard {
   constructor() {
     super(317, 'Kallisto', 3, {}, [TacticDiscipline.Military]);
   }
-  override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(CardType.Equipment, player);
+  override onStartTurn(player: Player) {
+    this.additionalCardWhenDrawing(player, CardType.Equipment);
   }
 }
 
@@ -85,7 +85,7 @@ export class Card403 extends OrbCard {
   override getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.some(cs => cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
   }
-  override onStartTurn(): void {}
+  override onStartTurn() {}
 }
 
 export class Card410 extends OrbCard {
@@ -94,8 +94,8 @@ export class Card410 extends OrbCard {
       armour: 1
     });
   }
-  override onStartTurn(player: Player): void {
-    this.additionalCardWhenDrawing(TacticDiscipline.Military, player);
+  override onStartTurn(player: Player) {
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Military);
   }
   override get instantRecharge(): boolean {
     return true;
@@ -106,7 +106,7 @@ export class Card432 extends OrbCard {
   constructor() {
     super(432, 'Oberon', 2, {}, [CardType.Equipment]);
   }
-  override onStartTurn(): void {}
+  override onStartTurn() {}
 }
 
 export class Card433 extends OrbCard {
@@ -118,5 +118,5 @@ export class Card433 extends OrbCard {
       ? []
       : super.getValidTargets(player);
   }
-  override onStartTurn(): void {}
+  override onStartTurn() {}
 }

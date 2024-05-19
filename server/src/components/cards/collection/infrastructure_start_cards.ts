@@ -1,16 +1,11 @@
 import { CardType, TacticDiscipline } from '../../../shared/config/enums';
-import { rules } from '../../../shared/config/rules';
 import Player from '../../game_state/player';
 import InfrastructureCard from '../types/infrastructure_card';
-import TacticCard from '../types/tactic_card';
 
 abstract class InfrastructureStartOfTurnCard extends InfrastructureCard {
   onEnterGame() {}
   onLeaveGame() {}
   onEndTurn() {}
-  protected getDrawnCards(player: Player) {
-    return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
-  }
 }
 
 export class Card230 extends InfrastructureStartOfTurnCard {
@@ -21,8 +16,7 @@ export class Card230 extends InfrastructureStartOfTurnCard {
     });
   }
   onStartTurn(player: Player) {
-    const relevantCardDrawn = this.getDrawnCards(player).some(c => c.type == CardType.Infrastructure);
-    if (relevantCardDrawn) player.drawCards(1);
+    this.additionalCardWhenDrawing(player, CardType.Infrastructure);
   }
 }
 
@@ -34,11 +28,7 @@ export class Card333 extends InfrastructureStartOfTurnCard {
     });
   }
   onStartTurn(player: Player) {
-    const relevantCardDrawn = this.getDrawnCards(player)
-      .filter(c => c.type == CardType.Tactic)
-      .map(c => <TacticCard>c)
-      .some(c => c.discipline == TacticDiscipline.Military || c.discipline == TacticDiscipline.Intelligence);
-    if (relevantCardDrawn) player.drawCards(1);
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Intelligence, TacticDiscipline.Military);
   }
 }
 
@@ -50,10 +40,6 @@ export class Card435 extends InfrastructureStartOfTurnCard {
     });
   }
   onStartTurn(player: Player) {
-    const relevantCardDrawn = this.getDrawnCards(player)
-      .filter(c => c.type == CardType.Tactic)
-      .map(c => <TacticCard>c)
-      .some(c => c.discipline == TacticDiscipline.Trade || c.discipline == TacticDiscipline.Science);
-    if (relevantCardDrawn) player.drawCards(1);
+    this.additionalCardWhenDrawing(player, TacticDiscipline.Science, TacticDiscipline.Trade);
   }
 }
