@@ -50,7 +50,8 @@ import {
   Card183,
   Card219,
   Card320,
-  Card336
+  Card336,
+  Card413
 } from './infrastructure_action_cards';
 import {
   Card105,
@@ -374,6 +375,7 @@ export default class CardCollection {
     409: <Card>new Card409(),
     410: <Card>new Card410(),
     412: <Card>new Card412(),
+    413: <Card>new Card413(),
     416: <Card>new Card416(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),

@@ -1,11 +1,9 @@
-import { CardSubtype, CardType, TacticDiscipline } from '../../../shared/config/enums';
-import { rules } from '../../../shared/config/rules';
+import { CardSubtype, CardType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import ActionPool, { CardAction } from '../action_pool';
 import Card, { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
-import TacticCard from './tactic_card';
 
 export default abstract class OrbCard extends Card {
   private actionPoolCardTypes!: CardSubtype[][];
@@ -41,23 +39,5 @@ export default abstract class OrbCard extends Card {
   }
   override get actionPool(): ActionPool {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
-  }
-  protected additionalCardWhenDrawing(cardType: CardSubtype, player: Player) {
-    const relevantCardDrawn = this.getDrawnCards(player).some(
-      c =>
-        c.type == cardType ||
-        (this.isTacticDiscipline(cardType) &&
-          c.type == CardType.Tactic &&
-          (<TacticCard>c).discipline == cardType)
-    );
-    if (relevantCardDrawn) player.drawCards(1);
-  }
-  private isTacticDiscipline(cardType: CardSubtype): boolean {
-    return Object.values(TacticDiscipline)
-      .map(td => <CardSubtype>td)
-      .includes(cardType);
-  }
-  private getDrawnCards(player: Player) {
-    return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
   }
 }

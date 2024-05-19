@@ -1,9 +1,17 @@
 import CardStack from './card_stack';
 import CardProfile, { CardProfileConfig } from './card_profile';
-import { CardType, Zone, CardDurability, InterventionType } from '../../shared/config/enums';
+import {
+  CardType,
+  Zone,
+  CardDurability,
+  InterventionType,
+  CardSubtype,
+  TacticDiscipline
+} from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
 import TacticCard from './types/tactic_card';
+import { rules } from '../../shared/config/rules';
 
 export type CardRarity = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -76,7 +84,7 @@ export default abstract class Card {
   onDestruction(player: Player) {}
   abstract onEnterGame(player: Player, target: CardStack, cardStack: CardStack): void;
   abstract onLeaveGame(player: Player): void;
-  abstract onStartTurn(player: Player): void;
+  abstract onStartTurn(player: Player, cardSTack: CardStack): void;
   abstract onEndTurn(player: Player, source: CardStack): void;
   get actionPool(): ActionPool {
     return new ActionPool();
@@ -86,6 +94,24 @@ export default abstract class Card {
   }
   protected removeFromActionPool(player: Player) {
     player.actionPool.remove(...this.actionPool.pool);
+  }
+  protected additionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
+    const relevantCardDrawn = this.getDrawnCards(player).some(c =>
+      cardTypes.some(
+        ct =>
+          c.type == ct ||
+          (this.isTacticDiscipline(ct) && c.type == CardType.Tactic && (<TacticCard>c).discipline == ct)
+      )
+    );
+    if (relevantCardDrawn) player.drawCards(1);
+  }
+  private isTacticDiscipline(cardType: CardSubtype): boolean {
+    return Object.values(TacticDiscipline)
+      .map(td => <CardSubtype>td)
+      .includes(cardType);
+  }
+  private getDrawnCards(player: Player) {
+    return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
   }
 }
 
