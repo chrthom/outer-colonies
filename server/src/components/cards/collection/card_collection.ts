@@ -200,7 +200,7 @@ import {
   Card433
 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
-import { Card149, Card176, Card231, Card416 } from './tactic_intelligence_cards';
+import { Card149, Card176, Card231, Card330, Card416 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
 
 export default class CardCollection {
@@ -344,6 +344,7 @@ export default class CardCollection {
     327: <Card>new Card327(),
     328: <Card>new Card328(),
     329: <Card>new Card329(),
+    330: <Card>new Card330(),
     331: <Card>new Card331(),
     333: <Card>new Card333(),
     335: <Card>new Card335(),

@@ -16,7 +16,8 @@
     "build:prod": "ng build --configuration production",
     "test": "ng test",
     "lint": "ng lint",
-    "format": "npx prettier . --write"
+    "format": "npx prettier . --write",
+    "check": "npm run format; npm run lint"
   },
   "private": true,
   "author": "Christopher Thomsen",

@@ -8,7 +8,8 @@
     "start": "npx nodemon src/app.ts",
     "test": "npx jest",
     "lint": "npx eslint src/*",
-    "format": "npx prettier . --write"
+    "format": "npx prettier . --write",
+    "check": "npm run format; npm run lint && npm run test"
   },
   "private": true,
   "author": "Christopher Thomsen",

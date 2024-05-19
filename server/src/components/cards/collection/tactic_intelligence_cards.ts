@@ -75,3 +75,18 @@ export class Card416 extends IntelligenceTacticCard {
     return InterventionType.BattleRoundStart;
   }
 }
+
+export class Card330 extends IntelligenceTacticCard {
+  cardsToDiscard = 5;
+  constructor() {
+    super(330, 'Tiefeninfiltration', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).discardCards(
+      ...this.getOpponentPlayer(player).pickCardsFromDeck(this.cardsToDiscard)
+    );
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
