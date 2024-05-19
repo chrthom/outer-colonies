@@ -105,12 +105,12 @@ export default abstract class Card {
     );
     if (relevantCardDrawn) player.drawCards(1);
   }
-  private isTacticDiscipline(cardType: CardSubtype): boolean {
+  protected isTacticDiscipline(cardType: CardSubtype): boolean {
     return Object.values(TacticDiscipline)
       .map(td => <CardSubtype>td)
       .includes(cardType);
   }
-  private getDrawnCards(player: Player) {
+  protected getDrawnCards(player: Player) {
     return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
   }
 }
