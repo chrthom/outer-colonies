@@ -4,6 +4,7 @@
     "test": "for p in server; do cd $p; npm run test; cd ..; done",
     "lint": "for p in server client website; do cd $p; npm run lint; cd ..; done",
     "format": "for p in server client website; do cd $p; npm run format; cd ..; done",
+    "check": "for p in server client website; do cd $p; npm run check; cd ..; done",
     "build:staging": "misc/release.sh",
     "build:prod": "misc/release.sh -p",
     "version": "read -p \"Version number (x.x.x)?: \" V; read -p \"Version name?: \" N; misc/version.sh $V $N"
