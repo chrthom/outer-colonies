@@ -203,6 +203,7 @@ import {
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 import { Card149, Card176, Card231, Card330, Card416 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
+import { Card305 } from './infrastructure_special_cards';
 
 export default class CardCollection {
   static cards = {
@@ -324,6 +325,7 @@ export default class CardCollection {
     302: <Card>new Card302(),
     303: <Card>new Card303(),
     304: <Card>new Card304(),
+    305: <Card>new Card305(),
     306: <Card>new Card306(),
     308: <Card>new Card308(),
     309: <Card>new Card309(),
