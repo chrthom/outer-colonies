@@ -44,7 +44,9 @@ allCards.forEach((c, index, a) => {
       expect(c.rarity).toBe(0);
     });
   } else {
-    test(`"${c.name}" (${c.id}) rarity should be greater than or equal to "${a[index + 1].name}" (${a[index + 1].id}) rarity`, () => {
+    test(`"${c.name}" (${c.id}) rarity should be greater than or equal to "${a[index + 1].name}" (${
+      a[index + 1].id
+    }) rarity`, () => {
       expect(c.rarity).toBeGreaterThanOrEqual(a[index + 1].rarity);
     });
   }

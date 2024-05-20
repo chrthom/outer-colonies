@@ -55,8 +55,14 @@ export default class ActionPool {
         this.removeDepleted();
       });
   }
-  toString(): string {
-    return this.pool.map(ca => ca.toString()).join('__');
+  includesAllOf(actionPool: ActionPool): boolean {
+    const thisActions = this.pool.map(ca => ca.toString());
+    const compareActions = actionPool.pool.map(ca => ca.toString());
+    return compareActions.every(
+      a =>
+        thisActions.includes(a) &&
+        thisActions.filter(e => a == e).length >= compareActions.filter(e => a == e).length
+    );
   }
   private cardSubtypeFromCard(card: Card): CardSubtype {
     return card.type == CardType.Tactic ? (<TacticCard>card).discipline : card.type;
