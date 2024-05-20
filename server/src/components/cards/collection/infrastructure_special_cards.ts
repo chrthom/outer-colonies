@@ -11,7 +11,7 @@ export class Card305 extends InfrastructureCard {
     )
   );
   constructor() {
-    super(305, 'Terraformer', 1, {
+    super(305, 'Terraformer', 5, {
       energy: -4,
       psi: -2
     });
