@@ -189,7 +189,7 @@ export class Card422 extends EquipmentCardColonyKiller {
     super(
       422,
       'Feuersturmtorpedos',
-      3,
+      2,
       {
         phi: -1
       },
