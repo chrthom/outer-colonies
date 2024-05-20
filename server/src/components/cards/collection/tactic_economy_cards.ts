@@ -11,7 +11,7 @@ abstract class EconomyTacticCard extends TacticCard {
 }
 
 export class Card141 extends EconomyTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
     new CardAction(CardType.Hull),
     new CardAction(CardType.Infrastructure)
@@ -28,7 +28,7 @@ export class Card141 extends EconomyTacticCard {
 }
 
 export class Card142 extends EconomyTacticCard {
-  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Hull));
+  private readonly oneTimeActionPool = new ActionPool(new CardAction(CardType.Hull));
   constructor() {
     super(142, 'Ingenieure von Phobos', 2);
   }

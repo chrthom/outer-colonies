@@ -43,7 +43,7 @@ export class Card176 extends IntelligenceTacticCard {
 }
 
 export class Card208 extends IntelligenceTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(TacticDiscipline.Intelligence),
     new CardAction(TacticDiscipline.Science),
     new CardAction(TacticDiscipline.Trade)
@@ -61,7 +61,9 @@ export class Card208 extends IntelligenceTacticCard {
 }
 
 export class Card231 extends IntelligenceTacticCard {
-  removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(ct => new CardAction(ct));
+  private readonly removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(
+    ct => new CardAction(ct)
+  );
   constructor() {
     super(231, 'Unruhen schüren', 2);
   }
@@ -77,7 +79,7 @@ export class Card231 extends IntelligenceTacticCard {
 }
 
 export class Card416 extends IntelligenceTacticCard {
-  private speedLimit = 0;
+  private readonly speedLimit = 0;
   constructor() {
     super(416, 'Lücke im Verteidigungsnetz', 3);
   }
@@ -95,11 +97,28 @@ export class Card416 extends IntelligenceTacticCard {
 }
 
 export class Card330 extends IntelligenceTacticCard {
-  cardsToDiscard = 5;
+  private readonly cardsToDiscard = 5;
   constructor() {
     super(330, 'Tiefeninfiltration', 2);
   }
   onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).discardCards(
+      ...this.getOpponentPlayer(player).pickCardsFromDeck(this.cardsToDiscard)
+    );
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card430 extends IntelligenceTacticCard {
+  private readonly cardsToDiscard = 3;
+  private readonly cardsToDraw = 1;
+  constructor() {
+    super(430, 'Informant auf Ganymed', 2);
+  }
+  onEnterGame(player: Player) {
+    player.drawCards(this.cardsToDraw);
     this.getOpponentPlayer(player).discardCards(
       ...this.getOpponentPlayer(player).pickCardsFromDeck(this.cardsToDiscard)
     );
