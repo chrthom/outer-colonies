@@ -6,9 +6,11 @@ import InfrastructureCard from '../types/infrastructure_card';
 export class Card305 extends InfrastructureCard {
   private multiplicatorFactor = 5;
   private multiplicatorActionPool = new ActionPool(
-    ...new Array(this.multiplicatorFactor).fill(
-      new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic)
-    )
+    new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic),
+    new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic),
+    new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic),
+    new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic),
+    new CardAction(CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic)
   );
   constructor() {
     super(305, 'Terraformer', 5, {
