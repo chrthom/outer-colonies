@@ -8,7 +8,7 @@ export default class VersonIndicator {
       .text(
         layoutConfig.load.version.x,
         layoutConfig.load.version.y,
-        `Janus (v2.1.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Telesto (v2.2.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.caption)
