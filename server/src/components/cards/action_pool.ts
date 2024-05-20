@@ -15,7 +15,7 @@ export class CardAction {
     );
   }
   priority(): number {
-    return this.isTacticDiscipline(this.possibleCardTypes[0]) ? 0 : this.possibleCardTypes.length;
+    return this.isTacticDiscipline(this.possibleCardTypes[0]) ? 10 : this.possibleCardTypes.length;
   }
   toString(): string {
     return this.possibleCardTypes.sort().join('_');
@@ -68,9 +68,11 @@ export default class ActionPool {
     return card.type == CardType.Tactic ? (<TacticCard>card).discipline : card.type;
   }
   private activateCardType(cardType: CardSubtype) {
-    const availablePools = this.getActionsForCardType(cardType);
-    if (availablePools.length > 0) {
-      availablePools.sort((a, b) => a.priority() - b.priority())[0].depleted = true;
+    const usedAction = this.getActionsForCardType(cardType)
+      .sort((a, b) => a.priority() - b.priority())
+      .pop();
+    if (usedAction) {
+      usedAction.depleted = true;
       this.removeDepleted();
     }
   }
