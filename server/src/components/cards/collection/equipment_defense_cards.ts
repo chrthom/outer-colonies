@@ -27,7 +27,7 @@ export class Card140 extends EquipmentCardRechargeable {
   constructor() {
     super(140, 'Deflektorschilde', 2, {
       energy: -2,
-      shield: -2,
+      shield: 2,
       omega: -1
     });
   }
