@@ -30,7 +30,7 @@ export class Card129 extends MilitaryTacticCard {
 }
 
 export class Card139 extends MilitaryTacticCard {
-  private deactivations = 4;
+  private readonly deactivations = 4;
   constructor() {
     super(139, 'ECM-Emitter', 2);
   }
@@ -134,7 +134,7 @@ export class Card331 extends MilitaryTacticCard {
 }
 
 export class Card337 extends MilitaryTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
     new CardAction(CardType.Hull)
   );
@@ -179,7 +179,7 @@ export class Card346 extends MilitaryTacticCard {
 }
 
 export class Card428 extends MilitaryTacticCard {
-  private speedLimit = 2;
+  private readonly speedLimit = 2;
   constructor() {
     super(428, 'Ausmanövriert', 2);
   }

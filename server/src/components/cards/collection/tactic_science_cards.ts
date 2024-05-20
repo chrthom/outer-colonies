@@ -30,7 +30,7 @@ export class Card110 extends ScienceTacticCard {
 }
 
 export class Card143 extends ScienceTacticCard {
-  private oneTimeActionPool = new ActionPool(new CardAction(CardType.Equipment));
+  private readonly oneTimeActionPool = new ActionPool(new CardAction(CardType.Equipment));
   constructor() {
     super(143, 'Waffenprototyp', 2);
   }
@@ -104,7 +104,7 @@ export class Card229 extends ScienceTacticCard {
 }
 
 export class Card233 extends ScienceTacticCard {
-  private activations = 4;
+  private readonly activations = 4;
   constructor() {
     super(233, 'ABM-KI', 1);
   }
@@ -137,7 +137,7 @@ export class Card233 extends ScienceTacticCard {
 }
 
 export class Card316 extends ScienceTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(TacticDiscipline.Military),
     new CardAction(TacticDiscipline.Military),
     new CardAction(TacticDiscipline.Military),
@@ -190,7 +190,7 @@ export class Card335 extends ScienceTacticCard {
 }
 
 export class Card404 extends ScienceTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Tactic),
     new CardAction(CardType.Tactic)
   );
@@ -207,7 +207,7 @@ export class Card404 extends ScienceTacticCard {
 }
 
 export class Card429 extends ScienceTacticCard {
-  private oneTimeActionPool = new ActionPool(
+  private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
     new CardAction(CardType.Infrastructure),
     new CardAction(CardType.Infrastructure)
