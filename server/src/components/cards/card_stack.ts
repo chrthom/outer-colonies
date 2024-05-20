@@ -70,7 +70,7 @@ export default abstract class CardStack {
       this.player.isPendingPlayer &&
       this.match.turnPhase == TurnPhase.Build &&
       this.card.canBeRetracted(this.isRootCard) &&
-      this.player.actionPool.toString() == this.player.originalActions.toString()
+      this.player.actionPool.includesAllOf(this.player.originalActions)
     );
   }
   combatPhaseReset(initial: boolean) {

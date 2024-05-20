@@ -127,7 +127,7 @@ export class Card164 extends ActionInfrastructureCard {
     super(
       164,
       'Rüstungsschmiede',
-      2,
+      1,
       {
         energy: -2,
         psi: -1
