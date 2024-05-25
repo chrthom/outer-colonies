@@ -69,6 +69,7 @@ export default class Background {
     const addCorner = (x: number, y: number, z: number, angle: number, tint: number) => {
       const corner = this.scene.add
         .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'zone_corner')
+        .setAlpha(designConfig.alpha.faded)
         .setTint(tint);
       corner.modelPosition.x = new CornerXPosition(x).value3d;
       corner.modelPosition.y = new CornerYPosition(y).value3d;
