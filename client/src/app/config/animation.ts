@@ -6,7 +6,7 @@ class AnimationConfig {
     move: 500,
     showTacticCard: 600,
     waitBeforeDiscard: 2000,
-    waitBeforeMaximize: 400,
+    waitBeforeMaximize: 170,
     min: 10,
     promptShow: 3000
   };
