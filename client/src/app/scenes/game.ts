@@ -206,8 +206,12 @@ export default class Game extends Phaser.Scene {
         this.updateHandCards(newHandCards, previousTurnPhase);
         this.updateView();
         this.highlightAttackIntervention();
-        this.player.discardPile.update(this.state.player.discardPileIds);
-        this.opponent.discardPile.update(this.state.opponent.discardPileIds);
+        this.time.delayedCall(animationConfig.duration.move, () => {
+          if (this.state == state) {
+            this.player.discardPile.update(this.state.player.discardPileIds);
+            this.opponent.discardPile.update(this.state.opponent.discardPileIds);
+          }
+        });
       });
     });
   }
