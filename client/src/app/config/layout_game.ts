@@ -39,7 +39,7 @@ class LayoutGameConfig {
           y: new CardYPosition(1205)
         },
         deck: {
-          x: new CardXPosition(1930),
+          x: new CardXPosition(1985),
           y: new CardYPosition(930)
         },
         discardPile: {
@@ -65,11 +65,11 @@ class LayoutGameConfig {
           y: new CardYPosition(160)
         },
         deck: {
-          x: new CardXPosition(1930),
+          x: new CardXPosition(1875),
           y: new CardYPosition(345)
         },
         discardPile: {
-          x: new CardXPosition(2190),
+          x: new CardXPosition(2080),
           y: new CardYPosition(345)
         },
         hand: {
