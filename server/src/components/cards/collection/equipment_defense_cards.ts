@@ -111,7 +111,7 @@ export class Card349 extends EquipmentCard {
   constructor() {
     super(349, 'Dura-Stahl', 1, {
       hp: 1,
-      armour: 2,
+      armour: 4,
       omega: -2
     });
   }
@@ -134,7 +134,7 @@ export class Card406 extends EquipmentCard {
   constructor() {
     super(406, 'Kohlenstoffsilikatpanzer', 4, {
       hp: 3,
-      armour: 2,
+      armour: 7,
       omega: -2
     });
   }
