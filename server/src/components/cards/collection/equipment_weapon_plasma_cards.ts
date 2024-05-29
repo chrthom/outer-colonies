@@ -11,7 +11,7 @@ export class Card118 extends EquipmentCardRechargeable {
       },
       {
         range: 1,
-        damage: 5,
+        damage: 6,
         pointDefense: 0,
         shield: 0,
         armour: 0
@@ -71,8 +71,8 @@ export class Card209 extends EquipmentCardRechargeable {
         xi: -1
       },
       {
-        range: 1,
-        damage: 7,
+        range: 2,
+        damage: 4,
         pointDefense: 0,
         shield: 0,
         armour: 0
@@ -92,8 +92,8 @@ export class Card303 extends EquipmentCardRechargeable {
         theta: -2
       },
       {
-        range: 2,
-        damage: 9,
+        range: 3,
+        damage: 6,
         pointDefense: 0,
         shield: 0,
         armour: 0
