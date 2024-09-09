@@ -27,6 +27,8 @@ import { CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import EquipmentCard from './cards/types/equipment_card';
+import nodemailer from 'nodemailer';
+import Mailer from './utils/mailer';
 
 function performWithSessionTokenCheck(
   req: Request,
@@ -42,6 +44,14 @@ function performWithSessionTokenCheck(
 }
 
 export default function restAPI(app: Express) {
+  // A dummy SMTP Test
+  app.post('/api/mail', (req, res) => {
+    Mailer.sendTest().then(
+      info => res.send(info.response),
+      error => res.status(500).send(error.message)
+    );
+  });
+
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
