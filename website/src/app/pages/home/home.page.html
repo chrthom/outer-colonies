@@ -15,28 +15,34 @@
       Stabilisierung des Projektes unterst&uuml;tzen, indem du
       <a href="https://github.com/chrthom/outer-colonies/issues/new/choose" target="_blank"
         >Fehler meldest sowie neue Funktionalit&auml;ten und Verbesserungen vorschl&auml;gst</a
-      >
-      (du benötigst hierfür einen GitHub Account). Alternativ kannst du eine E-Mail an
-      <a href="mailto:feedback@outercolonies.de">feedback@outercolonies.de</a>
-      schreiben.
-    </oc-content-box>
+        >
+        (du benötigst hierfür einen GitHub Account). Alternativ kannst du eine E-Mail an
+        <a href="mailto:feedback@outercolonies.de">feedback&#64;outercolonies.de</a>
+        schreiben.
+      </oc-content-box>
+    </div>
+    <div id="daily-box" class="inner-box">
+      <oc-content-box title="Tägliche Aufgaben">
+        <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedDaily">
+          @for (daily of dailies; track daily) {
+            <mat-tab label="&oplus;">
+              <h3>{{ daily.title }}</h3>
+              <p>{{ daily.description }}</p>
+              @if (daily.achieved) {
+                <span>
+                  <h4 class="daily-done">Erledigt!</h4>
+                  <i> {{ daily.sol }} Sol erhalten</i>
+                </span>
+              }
+              @if (!daily.achieved) {
+                <span>
+                  <i>Belohnung: </i>
+                  <h4 class="daily-open">{{ daily.sol }} Sol</h4>
+                </span>
+              }
+            </mat-tab>
+          }
+        </mat-tab-group>
+      </oc-content-box>
+    </div>
   </div>
-  <div id="daily-box" class="inner-box">
-    <oc-content-box title="Tägliche Aufgaben">
-      <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedDaily">
-        <mat-tab *ngFor="let daily of dailies" label="&oplus;">
-          <h3>{{ daily.title }}</h3>
-          <p>{{ daily.description }}</p>
-          <span *ngIf="daily.achieved">
-            <h4 class="daily-done">Erledigt!</h4>
-            <i> {{ daily.sol }} Sol erhalten</i>
-          </span>
-          <span *ngIf="!daily.achieved">
-            <i>Belohnung: </i>
-            <h4 class="daily-open">{{ daily.sol }} Sol</h4>
-          </span>
-        </mat-tab>
-      </mat-tab-group>
-    </oc-content-box>
-  </div>
-</div>

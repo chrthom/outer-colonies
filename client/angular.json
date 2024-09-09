@@ -99,16 +99,16 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "outercolonies-client:build:production"
+              "buildTarget": "outercolonies-client:build:production"
             },
             "staging": {
-              "browserTarget": "outercolonies-client:build:staging"
+              "buildTarget": "outercolonies-client:build:staging"
             },
             "integration": {
-              "browserTarget": "outercolonies-client:build:integration"
+              "buildTarget": "outercolonies-client:build:integration"
             },
             "development": {
-              "browserTarget": "outercolonies-client:build:development"
+              "buildTarget": "outercolonies-client:build:development"
             }
           },
           "defaultConfiguration": "development",
@@ -119,7 +119,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "outercolonies-client:build"
+            "buildTarget": "outercolonies-client:build"
           }
         },
         "test": {
