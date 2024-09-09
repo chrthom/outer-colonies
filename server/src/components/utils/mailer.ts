@@ -17,16 +17,18 @@ export default class Mailer {
     return this.send(
       'christopher@thomsen.in',
       'Another Test',
-      'Bla Blub'
+      'Bla Blub',
+      '<h1>Hey, what\'s up</h1>Foobar<br /><i>Blub</i>'
     )
   }
 
-  private static send(to: string, subject: string, text: string): Promise<any> {
+  private static send(to: string, subject: string, text: string, html: string): Promise<any> {
     return this.transporter.sendMail({
       from: 'noreply@outercolonies.de',
       to: to,
       subject: subject,
-      text: text
+      text: text,
+      html: html
     });
   }
 }
