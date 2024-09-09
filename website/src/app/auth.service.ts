@@ -8,7 +8,8 @@ import { AuthLoginResponse } from '../../../server/src/shared/interfaces/rest_ap
   providedIn: 'root'
 })
 export default class AuthService {
-  private readonly cookieExpiry = 100;
+  private readonly cookieExpiryRemember = 100;
+  private readonly cookieExpiryDefault = 1;
   private username?: string;
   private sessionToken?: string;
   constructor(
@@ -20,9 +21,9 @@ export default class AuthService {
     this.username = username;
     return this.check(username, password).pipe(
       tap(success => {
-        if (success && remember) {
-          this.cookieService.set('u', username, this.cookieExpiry);
-          this.cookieService.set('p', password, this.cookieExpiry);
+        if (success) {
+          this.cookieService.set('u', username, remember ? this.cookieExpiryRemember : this.cookieExpiryDefault);
+          this.cookieService.set('p', password, remember ? this.cookieExpiryRemember : this.cookieExpiryDefault);
         }
       })
     );
