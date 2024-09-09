@@ -13,9 +13,11 @@
         <mat-label>Zugangsdaten merken</mat-label>
       </mat-slide-toggle>
       <button mat-raised-button type="submit" [color]="loginForm.valid ? 'primary' : 'warn'">Anmelden</button>
-      <mat-error *ngIf="loginFailed">
-        Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
-      </mat-error>
+      @if (loginFailed) {
+        <mat-error>
+          Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
+        </mat-error>
+      }
     </form>
     <p id="register-link">
       <a routerLink="/register">Neuen Nutzer registrieren</a>

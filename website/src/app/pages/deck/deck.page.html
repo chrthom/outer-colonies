@@ -1,137 +1,168 @@
-<ng-container *ngFor="let box of boxes">
+@for (box of boxes; track box) {
   <div class="deck-box">
     <oc-content-box [title]="box.title">
       <div class="scroll">
-        <div *ngIf="viewFormControl.value === 'card'">
-          <mat-card
-            *ngFor="let card of box.cardsFiltered"
-            (click)="box.onClick(card)"
-            [matBadge]="card.numOfCards + 'x'"
-            matBadgeSize="large"
-            matBadgePosition="before"
-            [matBadgeHidden]="card.numOfCards === 1"
-            matBadgeColor="primary"
-          >
-            <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
-          </mat-card>
-        </div>
-        <table *ngIf="viewFormControl.value === 'list'" matSort (matSortChange)="box.setSort($event)">
-          <tr>
-            <th mat-sort-header="amount">Karten</th>
-            <th mat-sort-header="id">ID</th>
-            <th mat-sort-header="name">Name</th>
-            <th mat-sort-header="type">Typ</th>
-            <th mat-sort-header="discipline">Disziplin</th>
-            <th mat-sort-header="attack">Angriff</th>
-            <th mat-sort-header="defense">Verteidigung</th>
-            <th mat-sort-header="rarity">Seltenheit</th>
-            <th mat-sort-header="edition">Edition</th>
-            <th>{{ box.isActiveDeck ? 'Entfernen' : 'Hinzufügen' }}</th>
-          </tr>
-          <tr *ngFor="let card of box.cardsFiltered">
-            <td class="card-col">
-              <h3>{{ card.numOfCards }}x&nbsp;</h3>
-              <img
-                class="large clickable"
-                [src]="cardIdToUrl(card.cardId)"
-                [alt]="card.name"
-                (click)="openImgInModal(card)"
-                tabindex="invalid"
-              />
-            </td>
-            <td class="id-col">{{ card.cardId }}</td>
-            <td class="name-col">{{ card.name }}</td>
-            <td class="type-col">
-              <img [src]="cardTypeToUrl(card.type)" [matTooltip]="typeTooltip(card.type)" />
-            </td>
-            <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
-            <td class="attack-col">
-              <img class="big" *ngIf="card.range" [src]="rangeToUrl(card.range)" matTooltip="Reichweite" />
-              <h3 *ngIf="card.damage">{{ card.damage }}</h3>
-              <img *ngIf="card.damage" [src]="toIconUrl('damage')" matTooltip="Verursachter Schaden" />
-            </td>
-            <td class="defense-col">
-              <img
-                *ngIf="card.defense"
-                [src]="toIconUrl(card.defense)"
-                [matTooltip]="defenseTooltip(card.defense)"
-              />
-              <h3 *ngIf="card.hp && card.defense">+</h3>
-              <h3 *ngIf="card.hp">{{ card.hp }}</h3>
-              <img *ngIf="card.hp" [src]="toIconUrl('hitpoints')" matTooltip="H&uuml;llenintegrit&auml;t" />
-            </td>
-            <td class="rarity-col">
-              <div
-                class="rarity"
-                [class.active]="i <= card.rarity"
-                *ngFor="let i of [ 1, 2, 3, 4, 5 ]"
-                [matTooltip]="rarityTooltip(card.rarity)"
-              ></div>
-            </td>
-            <td class="edition-col">
-              <img [src]="cardIdToEditionUrl(card.cardId)" />
-              {{ cardIdToEditionName(card.cardId) }}
-            </td>
-            <td class="action-col">
-              <button
-                mat-raised-button
+        @if (viewFormControl.value === 'card') {
+          <div>
+            @for (card of box.cardsFiltered; track card) {
+              <mat-card
                 (click)="box.onClick(card)"
-                [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'"
-              >
-                <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
-              </button>
-            </td>
-          </tr>
-        </table>
+                [matBadge]="card.numOfCards + 'x'"
+                matBadgeSize="large"
+                matBadgePosition="before"
+                [matBadgeHidden]="card.numOfCards === 1"
+                matBadgeColor="primary"
+                >
+                <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
+              </mat-card>
+            }
+          </div>
+        }
+        @if (viewFormControl.value === 'list') {
+          <table matSort (matSortChange)="box.setSort($event)">
+            <tr>
+              <th mat-sort-header="amount">Karten</th>
+              <th mat-sort-header="id">ID</th>
+              <th mat-sort-header="name">Name</th>
+              <th mat-sort-header="type">Typ</th>
+              <th mat-sort-header="discipline">Disziplin</th>
+              <th mat-sort-header="attack">Angriff</th>
+              <th mat-sort-header="defense">Verteidigung</th>
+              <th mat-sort-header="rarity">Seltenheit</th>
+              <th mat-sort-header="edition">Edition</th>
+              <th>{{ box.isActiveDeck ? 'Entfernen' : 'Hinzufügen' }}</th>
+            </tr>
+            @for (card of box.cardsFiltered; track card) {
+              <tr>
+                <td class="card-col">
+                  <h3>{{ card.numOfCards }}x&nbsp;</h3>
+                  <img
+                    class="large clickable"
+                    [src]="cardIdToUrl(card.cardId)"
+                    [alt]="card.name"
+                    (click)="openImgInModal(card)"
+                    tabindex="invalid"
+                    />
+                </td>
+                <td class="id-col">{{ card.cardId }}</td>
+                <td class="name-col">{{ card.name }}</td>
+                <td class="type-col">
+                  <img [src]="cardTypeToUrl(card.type)" [matTooltip]="typeTooltip(card.type)" />
+                </td>
+                <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
+                <td class="attack-col">
+                  @if (card.range) {
+                    <img class="big" [src]="rangeToUrl(card.range)" matTooltip="Reichweite" />
+                  }
+                  @if (card.damage) {
+                    <h3>{{ card.damage }}</h3>
+                  }
+                  @if (card.damage) {
+                    <img [src]="toIconUrl('damage')" matTooltip="Verursachter Schaden" />
+                  }
+                </td>
+                <td class="defense-col">
+                  @if (card.defense) {
+                    <img
+                      [src]="toIconUrl(card.defense)"
+                      [matTooltip]="defenseTooltip(card.defense)"
+                      />
+                  }
+                  @if (card.hp && card.defense) {
+                    <h3>+</h3>
+                  }
+                  @if (card.hp) {
+                    <h3>{{ card.hp }}</h3>
+                  }
+                  @if (card.hp) {
+                    <img [src]="toIconUrl('hitpoints')" matTooltip="H&uuml;llenintegrit&auml;t" />
+                  }
+                </td>
+                <td class="rarity-col">
+                  @for (i of [ 1, 2, 3, 4, 5 ]; track i) {
+                    <div
+                      class="rarity"
+                      [class.active]="i <= card.rarity"
+                      [matTooltip]="rarityTooltip(card.rarity)"
+                    ></div>
+                  }
+                </td>
+                <td class="edition-col">
+                  <img [src]="cardIdToEditionUrl(card.cardId)" />
+                  {{ cardIdToEditionName(card.cardId) }}
+                </td>
+                <td class="action-col">
+                  <button
+                    mat-raised-button
+                    (click)="box.onClick(card)"
+                    [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'"
+                    >
+                    <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
+                  </button>
+                </td>
+              </tr>
+            }
+          </table>
+        }
       </div>
     </oc-content-box>
   </div>
-  <div *ngIf="box.isActiveDeck" class="deck-box indent">
-    <mat-form-field appearance="outline">
-      <mat-label>Filtern nach Kartentyp</mat-label>
-      <mat-select [formControl]="filterFormControl">
-        <mat-option value="">Alle</mat-option>
-        <mat-option value="hull">Rumpf</mat-option>
-        <mat-option value="equipment">Ausr&uuml;stung</mat-option>
-        <mat-option value="infrastructure">Infrastruktur</mat-option>
-        <mat-option value="orb">Himmelsk&ouml;rper</mat-option>
-        <mat-option value="tactic">Taktik</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-button-toggle-group [formControl]="viewFormControl">
-      <mat-button-toggle value="list" matTooltip="Listenansicht"
-        ><img src="../../../assets/icons/list-view.png"
-      /></mat-button-toggle>
-      <mat-button-toggle value="card" matTooltip="Kartenansicht"
-        ><img src="../../../assets/icons/card-view.png"
-      /></mat-button-toggle>
-    </mat-button-toggle-group>
-    <mat-accordion>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <h3 class="accent-color">Nutzung</h3>
-            <h3>&nbsp;/&nbsp;</h3>
-            <h3 class="primary-color">Bereitstellung</h3>
-          </mat-panel-title>
-          <mat-panel-description>Sockel- und Energienutzung des Decks</mat-panel-description>
-        </mat-expansion-panel-header>
-        <table>
-          <tr>
-            <th *ngFor="let s of statistics">
-              <h1 *ngIf="s.title" [innerHtml]="s.title"></h1>
-              <img *ngIf="s.energyIcon" [src]="toIconUrl('energy')" class="oc-icon big" />
-            </th>
-          </tr>
-          <tr>
-            <td *ngFor="let s of statistics">
-              <h3 class="accent-color">{{s.used}}</h3>
+  @if (box.isActiveDeck) {
+    <div class="deck-box indent">
+      <mat-form-field appearance="outline">
+        <mat-label>Filtern nach Kartentyp</mat-label>
+        <mat-select [formControl]="filterFormControl">
+          <mat-option value="">Alle</mat-option>
+          <mat-option value="hull">Rumpf</mat-option>
+          <mat-option value="equipment">Ausr&uuml;stung</mat-option>
+          <mat-option value="infrastructure">Infrastruktur</mat-option>
+          <mat-option value="orb">Himmelsk&ouml;rper</mat-option>
+          <mat-option value="tactic">Taktik</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-button-toggle-group [formControl]="viewFormControl">
+        <mat-button-toggle value="list" matTooltip="Listenansicht"
+          ><img src="../../../assets/icons/list-view.png"
+        /></mat-button-toggle>
+        <mat-button-toggle value="card" matTooltip="Kartenansicht"
+          ><img src="../../../assets/icons/card-view.png"
+        /></mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h3 class="accent-color">Nutzung</h3>
               <h3>&nbsp;/&nbsp;</h3>
-              <h3 class="primary-color">{{ s.provided }}</h3>
-            </td>
-          </tr>
-        </table>
-      </mat-expansion-panel>
-    </mat-accordion>
-  </div>
-</ng-container>
+              <h3 class="primary-color">Bereitstellung</h3>
+            </mat-panel-title>
+            <mat-panel-description>Sockel- und Energienutzung des Decks</mat-panel-description>
+          </mat-expansion-panel-header>
+          <table>
+            <tr>
+              @for (s of statistics; track s) {
+                <th>
+                  @if (s.title) {
+                    <h1 [innerHtml]="s.title"></h1>
+                  }
+                  @if (s.energyIcon) {
+                    <img [src]="toIconUrl('energy')" class="oc-icon big" />
+                  }
+                </th>
+              }
+            </tr>
+            <tr>
+              @for (s of statistics; track s) {
+                <td>
+                  <h3 class="accent-color">{{s.used}}</h3>
+                  <h3>&nbsp;/&nbsp;</h3>
+                  <h3 class="primary-color">{{ s.provided }}</h3>
+                </td>
+              }
+            </tr>
+          </table>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  }
+}
