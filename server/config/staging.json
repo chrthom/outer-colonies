@@ -1,6 +1,7 @@
 {
   "stage": "staging",
   "url": {
+    "base": "https://staging.outercolonies.de/",
     "assets": "https://assets.staging.outercolonies.de"
   },
   "database": {

@@ -85,16 +85,12 @@ export default function restAPI(app: Express) {
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
-      if (!usernameAndToken) {
-        res.sendStatus(401);
-      } else {
-        const payload: AuthLoginResponse = {
-          sessionToken: usernameAndToken[1],
-          username: usernameAndToken[0]
-        };
-        res.send(payload);
-      }
-    });
+      const payload: AuthLoginResponse = {
+        sessionToken: usernameAndToken[1],
+        username: usernameAndToken[0]
+      };
+      res.send(payload);
+    }, () => res.sendStatus(401));
   });
 
   // Get user by session token
@@ -128,6 +124,14 @@ export default function restAPI(app: Express) {
       Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
     else if (req.query['email']) Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse);
     else res.sendStatus(400);
+  });
+
+  // Send password reset link
+  app.delete('/api/auth/password/:user', (req, res) => {
+    Auth.sendPasswordReset(String(req.params['user'])).then(
+      () => res.sendStatus(202),
+      () => res.sendStatus(400)
+    );
   });
 
   // List all cards

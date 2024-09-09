@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
-
-type MailCallback = (err: Error | null, info: any) => void;
+import config from 'config';
 
 export default class Mailer {
   static readonly transporter = nodemailer.createTransport({
@@ -19,7 +18,21 @@ export default class Mailer {
       'Another Test',
       'Bla Blub',
       '<h1>Hey, what\'s up</h1>Foobar<br /><i>Blub</i>'
-    )
+    );
+  }
+
+  static sendPasswordReset(email: string, name: string, linkUUID: string) {
+    const link = `${config.get('url.base')}/password_reset/${linkUUID}`;
+    this.send(
+      email,
+      'Outer Colonies: Passwort zurücksetzen',
+      `Hallo ${name}, es wurde angefordert das Passwort für deinen Account zurückzusetzen.`
+      + 'Zur Durchführung des Passwort-Reset öffne bitte folgenden Link in deinem Browser: '
+      + `${link}`,
+      `<h2>Hallo ${name},</h2>es wurde angefordert das Passwort für deinen Account zurückzusetzen.`
+      + `Zur Durchführung des Passwort-Reset klicke <a href="${link}">hier</a> `
+      + `oder öffne folgenden Link in deinem Browser:<br /><a href="${link}">${link}</a>`
+    );
   }
 
   private static send(to: string, subject: string, text: string, html: string): Promise<any> {

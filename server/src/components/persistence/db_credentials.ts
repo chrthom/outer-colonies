@@ -4,12 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 export interface DBCredential {
   userId: number;
   username: string;
+  email: string;
   sessionToken: string | null;
 }
 
 export interface DBCredentialWithSessionToken {
   userId: number;
   username: string;
+  email: string;
   sessionToken: string;
 }
 
@@ -29,6 +31,7 @@ export default class DBCredentialsDAO {
           ? {
               userId: r.userId,
               username: r.username,
+              email: r.email,
               sessionToken: r.sessionToken
             }
           : null
@@ -42,6 +45,7 @@ export default class DBCredentialsDAO {
       ? {
           userId: Number(queryResult[0].user_id),
           username: String(queryResult[0].username),
+          email: String(queryResult[0].email),
           sessionToken: queryResult[0].session_token ? String(queryResult[0].session_token) : null
         }
       : null;
