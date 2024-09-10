@@ -1,127 +1,99 @@
 <div id="register-box">
   <oc-content-box title="Registrierung">
     @if (!registrationSuccessful) {
-      <form id="register-form" [formGroup]="registerForm" (ngSubmit)="submit()">
-        <mat-form-field appearance="outline">
-          <mat-label>Nutzername</mat-label>
-          <input matInput formControlName="username" [errorStateMatcher]="matcher" />
-          @if (username?.hasError('exists') && !username?.hasError('required')) {
-            <mat-error>
-              Der gew&auml;hlte Nutzername ist bereits vergeben
-            </mat-error>
-          }
-          @if (username?.hasError('maxlength')) {
-            <mat-error>
-              Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein
-            </mat-error>
-          }
-          @if (username?.hasError('minlength') && !username?.hasError('required')) {
-            <mat-error>
-              Dein Nutzername muss mindestens 3 Zeichen lang sein
-            </mat-error>
-          }
-          @if (username?.hasError('required')) {
-            <mat-error> Bitte w&auml;hle einen Nutzernamen </mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Passwort</mat-label>
-          <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
-          @if (password?.hasError('maxlength')) {
-            <mat-error>
-              Dein Passwort kann nicht länger als 40 Zeichen sein
-            </mat-error>
-          }
-          @if (password?.hasError('minlength') && !password?.hasError('required')) {
-            <mat-error>
-              Dein Passwort sollte mindestens 8 Zeichen lang sein
-            </mat-error>
-          }
-          @if (password?.hasError('required')) {
-            <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>E-Mail</mat-label>
-          <input matInput formControlName="email" [errorStateMatcher]="matcher" />
-          @if (email?.hasError('exists') && !email?.hasError('required')) {
-            <mat-error>
-              Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet
-            </mat-error>
-          }
-          @if (email?.hasError('maxlength') && !email?.hasError('email')) {
-            <mat-error>
-              Die E-Mail Adresse darf maximal 60 Zeichen lang sein
-            </mat-error>
-          }
-          @if (email?.hasError('email') && !email?.hasError('required')) {
-            <mat-error>
-              Dies ist keine valide E-Mail Adresse
-            </mat-error>
-          }
-          @if (email?.hasError('required')) {
-            <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Start-Deck</mat-label>
-          <mat-select formControlName="starterDeck">
-            <mat-option value="0">Terranische Siedler</mat-option>
-            <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
-            <mat-option value="2">Trans-Jupiter Expedition</mat-option>
-          </mat-select>
-          @if (starterDeck?.hasError('required')) {
-            <mat-error> Bitte w&auml;hle ein Start-Deck </mat-error>
-          }
-        </mat-form-field>
-        <mat-checkbox formControlName="dataPrivacy">
-          <mat-label>
-            Ich habe die
-            <a (click)="openDataPrivacy()" tabindex="invalid">Datenschutzbestimmungen</a>
-            zur Kenntnis genommen und stimme diesen zu.
-          </mat-label>
-        </mat-checkbox>
-        @if (dataPrivacy?.touched && dataPrivacy?.hasError('required')) {
-          <mat-error>
-            Um dich anzumelden musst du den Datenschutzbestimmungen zustimmen
-          </mat-error>
+    <form id="register-form" [formGroup]="registerForm" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Nutzername</mat-label>
+        <input matInput formControlName="username" [errorStateMatcher]="matcher" />
+        @if (username?.hasError('exists') && !username?.hasError('required')) {
+        <mat-error> Der gew&auml;hlte Nutzername ist bereits vergeben </mat-error>
+        } @if (username?.hasError('maxlength')) {
+        <mat-error> Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein </mat-error>
+        } @if (username?.hasError('minlength') && !username?.hasError('required')) {
+        <mat-error> Dein Nutzername muss mindestens 3 Zeichen lang sein </mat-error>
+        } @if (username?.hasError('required')) {
+        <mat-error> Bitte w&auml;hle einen Nutzernamen </mat-error>
         }
-        <mat-checkbox formControlName="newsletter">
-          <mat-label>Ich möchte Neuigkeiten zu Outer Colonies per E-Mail erhalten.</mat-label>
-        </mat-checkbox>
-        <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
-          Neuen Nutzer registrieren
-        </button>
-        @if (registrationSuccessful === false) {
-          <mat-error>
-            Ein unerwarteter Fehler ist bei der Registrierung aufgetreten. Bitte versuchen sie es sp&auml;ter
-            erneut.
-          </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Passwort</mat-label>
+        <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
+        @if (password?.hasError('maxlength')) {
+        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
+        } @if (password?.hasError('minlength') && !password?.hasError('required')) {
+        <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
+        } @if (password?.hasError('required')) {
+        <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
         }
-        @if (starterDeck?.value !== '') {
-          <div id="starter-deck-cards">
-            @for (card of starterDeckCards; track card) {
-              <mat-card
-                [matBadge]="card[0] + 'x'"
-                matBadgePosition="before"
-                [matBadgeHidden]="card[0] === 1"
-                matBadgeColor="primary"
-                >
-                <img
-                  mat-card-image
-                  tabindex="null"
-                  [src]="cardIdToUrl(card[1])"
-                  (click)="openImgInModal(card[1])"
-                  />
-              </mat-card>
-            }
-          </div>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>E-Mail</mat-label>
+        <input matInput formControlName="email" [errorStateMatcher]="matcher" />
+        @if (email?.hasError('exists') && !email?.hasError('required')) {
+        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
+        } @if (email?.hasError('maxlength') && !email?.hasError('email')) {
+        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
+        } @if (email?.hasError('email') && !email?.hasError('required')) {
+        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
+        } @if (email?.hasError('required')) {
+        <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
         }
-        <div id="end-starter-deck-cards"></div>
-      </form>
-    }
-    @if (registrationSuccessful) {
-      <p>Registrierung erfolgreich</p>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Start-Deck</mat-label>
+        <mat-select formControlName="starterDeck">
+          <mat-option value="0">Terranische Siedler</mat-option>
+          <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
+          <mat-option value="2">Trans-Jupiter Expedition</mat-option>
+        </mat-select>
+        @if (starterDeck?.hasError('required')) {
+        <mat-error> Bitte w&auml;hle ein Start-Deck </mat-error>
+        }
+      </mat-form-field>
+      <mat-checkbox formControlName="dataPrivacy">
+        <mat-label>
+          Ich habe die
+          <a (click)="openDataPrivacy()" tabindex="invalid">Datenschutzbestimmungen</a>
+          zur Kenntnis genommen und stimme diesen zu.
+        </mat-label>
+      </mat-checkbox>
+      @if (dataPrivacy?.touched && dataPrivacy?.hasError('required')) {
+      <mat-error> Um dich anzumelden musst du den Datenschutzbestimmungen zustimmen </mat-error>
+      }
+      <mat-checkbox formControlName="newsletter">
+        <mat-label>Ich möchte Neuigkeiten zu Outer Colonies per E-Mail erhalten.</mat-label>
+      </mat-checkbox>
+      <button mat-raised-button type="submit" [color]="registerForm.valid ? 'primary' : 'warn'">
+        Neuen Nutzer registrieren
+      </button>
+      @if (registrationSuccessful === false) {
+      <mat-error>
+        Ein unerwarteter Fehler ist bei der Registrierung aufgetreten. Bitte versuchen sie es sp&auml;ter
+        erneut.
+      </mat-error>
+      } @if (starterDeck?.value !== '') {
+      <div id="starter-deck-cards">
+        @for (card of starterDeckCards; track card) {
+        <mat-card
+          [matBadge]="card[0] + 'x'"
+          matBadgePosition="before"
+          [matBadgeHidden]="card[0] === 1"
+          matBadgeColor="primary"
+        >
+          <img
+            mat-card-image
+            tabindex="null"
+            [src]="cardIdToUrl(card[1])"
+            (click)="openImgInModal(card[1])"
+          />
+        </mat-card>
+        }
+      </div>
+      }
+      <div id="end-starter-deck-cards"></div>
+    </form>
+    } @if (registrationSuccessful) {
+    <p>Registrierung erfolgreich</p>
     }
     <p id="back-link"><a routerLink="/login">&lt; Zur&uuml;ck</a></p>
   </oc-content-box>

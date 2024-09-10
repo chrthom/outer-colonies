@@ -12,13 +12,17 @@ export default class DBMagicLinksDAO {
     return DBConnection.instance.query(`DELETE FROM magic_links WHERE id = '${id}'`);
   }
   static async deleteForUserAndType(userId: number, type: MagicLinkType) {
-    return DBConnection.instance.query(`DELETE FROM magic_links WHERE user_id = ${userId} AND type = '${type}'`);
+    return DBConnection.instance.query(
+      `DELETE FROM magic_links WHERE user_id = ${userId} AND type = '${type}'`
+    );
   }
   private static async create(userId: number, ttlInHours: number, type: MagicLinkType): Promise<string> {
     const uuid = uuidv4();
-    return DBConnection.instance.query(
-      `INSERT INTO magic_links (id, user_id, type, valid_until) VALUES ` +
-        `('${uuid}', ${userId}, '${type}', NOW() + INTERVAL ${ttlInHours} HOUR)`
-    ).then(() => uuid);
+    return DBConnection.instance
+      .query(
+        'INSERT INTO magic_links (id, user_id, type, valid_until) VALUES ' +
+          `('${uuid}', ${userId}, '${type}', NOW() + INTERVAL ${ttlInHours} HOUR)`
+      )
+      .then(() => uuid);
   }
 }

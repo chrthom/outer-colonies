@@ -57,10 +57,12 @@ export default class DBCredentialsDAO {
   }
   static async login(userId: number): Promise<string> {
     const sessionToken = uuidv4();
-    return DBConnection.instance.query(
-      'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, ' +
-        `session_token = '${sessionToken}' WHERE user_id = ${userId}`
-    ).then(() => sessionToken);
+    return DBConnection.instance
+      .query(
+        'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, ' +
+          `session_token = '${sessionToken}' WHERE user_id = ${userId}`
+      )
+      .then(() => sessionToken);
   }
   static async invalidateSessionToken(sessionToken: string): Promise<void> {
     return DBConnection.instance.query(

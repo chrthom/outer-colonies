@@ -12,7 +12,6 @@ import {
   DeckListResponse,
   ItemListResponse,
   ItemListResponseBox,
-  OpenItemResponse,
   ProfileGetResponse
 } from '../shared/interfaces/rest_api';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
@@ -27,8 +26,6 @@ import { CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import EquipmentCard from './cards/types/equipment_card';
-import nodemailer from 'nodemailer';
-import Mailer from './utils/mailer';
 
 function performWithSessionTokenCheck(
   req: Request,
@@ -44,14 +41,6 @@ function performWithSessionTokenCheck(
 }
 
 export default function restAPI(app: Express) {
-  // A dummy SMTP Test
-  app.post('/api/mail', (req, res) => {
-    Mailer.sendTest().then(
-      info => res.send(info.response),
-      error => res.status(500).send(error.message)
-    );
-  });
-
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
@@ -84,13 +73,16 @@ export default function restAPI(app: Express) {
 
   // Login
   app.post('/api/auth/login', (req, res) => {
-    Auth.login(<AuthLoginRequest>req.body).then(usernameAndToken => {
-      const payload: AuthLoginResponse = {
-        sessionToken: usernameAndToken[1],
-        username: usernameAndToken[0]
-      };
-      res.send(payload);
-    }, () => res.sendStatus(401));
+    Auth.login(<AuthLoginRequest>req.body).then(
+      usernameAndToken => {
+        const payload: AuthLoginResponse = {
+          sessionToken: usernameAndToken[1],
+          username: usernameAndToken[0]
+        };
+        res.send(payload);
+      },
+      () => res.sendStatus(401)
+    );
   });
 
   // Get user by session token
@@ -264,7 +256,7 @@ export default function restAPI(app: Express) {
           if (item.type == ItemType.Booster) {
             const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
             cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
-            const response: OpenItemResponse = {
+            const response: ItemListResponseBox = {
               itemId: item.itemId,
               message: item.message,
               sol: [],
@@ -286,7 +278,7 @@ export default function restAPI(app: Express) {
                   DBProfilesDAO.increaseSol(u.userId, e.value);
               }
             });
-            const response: OpenItemResponse = {
+            const response: ItemListResponseBox = {
               itemId: item.itemId,
               message: item.message,
               sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),

@@ -14,9 +14,7 @@
       </mat-slide-toggle>
       <button mat-raised-button type="submit" [color]="loginForm.valid ? 'primary' : 'warn'">Anmelden</button>
       @if (loginFailed) {
-        <mat-error>
-          Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden
-        </mat-error>
+      <mat-error> Die eingegebenen Zugangsdaten sind ungültig oder wurden nicht gefunden </mat-error>
       }
     </form>
     <p id="register-link">
