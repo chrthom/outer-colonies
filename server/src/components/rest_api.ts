@@ -130,7 +130,7 @@ export default function restAPI(app: Express) {
   app.delete('/api/auth/password/:user', (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
       () => res.sendStatus(202),
-      () => res.sendStatus(400)
+      reason => res.sendStatus(reason == 'not found' ? 400 : 500)
     );
   });
 

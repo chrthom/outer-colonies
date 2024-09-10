@@ -39,7 +39,7 @@ export default class DBCredentialsDAO {
   }
   static async getBy(whereClause: string): Promise<DBCredential | null> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT user_id, username, session_token FROM credentials WHERE ${whereClause}`
+      `SELECT user_id, username, email, session_token FROM credentials WHERE ${whereClause}`
     );
     return queryResult.length == 1
       ? {

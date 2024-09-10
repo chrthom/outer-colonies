@@ -19,7 +19,7 @@ export default class Auth {
   static async sendPasswordReset(usernameOrEmail: string): Promise<void> {
     let credential = await DBCredentialsDAO.getByUsername(usernameOrEmail);
     credential ??= await DBCredentialsDAO.getByEmail(usernameOrEmail);
-    if (!credential) return Promise.reject();
+    if (!credential) return Promise.reject('not found');
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }

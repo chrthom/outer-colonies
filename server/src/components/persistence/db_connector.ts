@@ -10,9 +10,7 @@ export default class DBConnection {
       port: config.get<number>('database.port'),
       database: config.get('database.database'),
       user: config.get('database.user'),
-      password: config.has('database.password')
-        ? config.get('database.password')
-        : <string>process.env['DB_PASSWORD'],
+      password: <string>process.env['DB_PASSWORD'],
       connectionLimit: config.get<number>('database.connectionLimit')
     });
   }
