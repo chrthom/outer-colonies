@@ -121,7 +121,7 @@ export default function restAPI(app: Express) {
   // Send password reset link
   app.delete('/api/auth/password/:user', (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
-      () => res.sendStatus(202),
+      () => res.status(202).send({}),
       reason => res.sendStatus(reason == 'not found' ? 400 : 500)
     );
   });

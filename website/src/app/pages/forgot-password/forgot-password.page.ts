@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Router } from '@angular/router';
-import AuthService from 'src/app/auth.service';
+import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 
 @Component({
@@ -11,24 +11,33 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
   styleUrl: './forgot-password.page.scss'
 })
 export class ForgotPasswordPage {
+  passwordResetSuccessful = false;
   passwordResetFailed = false;
+  loading = false;
   forgotPasswordForm: FormGroup = new FormGroup({
     username: new FormControl('', [Validators.required])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authAPIService: AuthApiService, private router: Router) {}
   get username(): any {
     return this.forgotPasswordForm.get('username');
   }
   submit() {
-    // TODO: Continue here
-    /*
-    this.authService
-      .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
-      .subscribe(success => {
-        if (success) this.router.navigate(['/']);
-        else this.loginFailed = true;
-      });
-      */
+    this.forgotPasswordForm.markAllAsTouched();
+    if (this.forgotPasswordForm.valid && !this.loading) {
+      this.loading = true;
+      this.authAPIService
+        .resetPassword(this.forgotPasswordForm.value.username.trim())
+        .subscribe({
+          next: () => {
+            this.passwordResetSuccessful = true;
+            this.loading = false;
+          },
+          error: () => {
+            this.passwordResetFailed = true;
+            this.loading = false
+          }
+        });
+    }
   }
 }
