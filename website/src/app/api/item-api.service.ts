@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ItemListResponse, OpenItemResponse } from '../../../../server/src/shared/interfaces/rest_api';
+import { ItemListResponse, ItemListResponseBox } from '../../../../server/src/shared/interfaces/rest_api';
 import AuthService from '../auth.service';
 import OCApi from './api';
 
@@ -21,7 +21,7 @@ export class ItemApiService extends OCApi {
   buyBooster(boosterNo: number): Observable<any> {
     return this.post(`buy/booster/${boosterNo}`, this.authService.token);
   }
-  open(itemId: number): Observable<OpenItemResponse | undefined> {
-    return this.post<OpenItemResponse>(`item/${itemId}`, this.authService.token);
+  open(itemId: number): Observable<ItemListResponseBox | undefined> {
+    return this.post<ItemListResponseBox>(`item/${itemId}`, this.authService.token);
   }
 }

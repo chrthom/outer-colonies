@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { OpenItemResponse } from '../../../../../server/src/shared/interfaces/rest_api';
+import { ItemListResponseBox } from '../../../../../server/src/shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./open-item.component.scss']
 })
 export class OpenItemComponent {
-  @Input() content?: OpenItemResponse = undefined;
+  @Input() content?: ItemListResponseBox = undefined;
   @Output() done = new EventEmitter<string>();
   readonly assetURL = environment.url.assets;
   constructor() {
