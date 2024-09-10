@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'oc-page-login',
   templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss']
+  styleUrl: './login.page.scss'
 })
 export class LoginPage {
   loginFailed = false;
