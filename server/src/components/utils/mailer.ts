@@ -26,6 +26,20 @@ export default class Mailer {
     );
   }
 
+  static sendAccountActivation(email: string, name: string, linkUUID: string) {
+    const link = `${config.get('url.base')}/activate-account/${linkUUID}`;
+    this.send(
+      email,
+      'Outer Colonies: Passwort zurücksetzen',
+      `Hallo ${name} und willkommen bei Outer Colonies! ` +
+        'Zur Aktivierung deines Accounts öffne bitte folgenden Link in deinem Browser: ' +
+        `${link}`,
+      `<h2>Hallo ${name} und willkommen bei Outer Colonies!</h2>` +
+        `Zur Aktivierung deines Accounts klicke <a href="${link}">hier</a> ` +
+        `oder öffne folgenden Link in deinem Browser:<br /><a href="${link}">${link}</a>`
+    );
+  }
+
   private static send(to: string, subject: string, text: string, html: string): Promise<any> {
     return this.transporter.sendMail({
       from: 'noreply@outercolonies.de',

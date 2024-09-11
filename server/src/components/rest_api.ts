@@ -119,6 +119,14 @@ export default function restAPI(app: Express) {
       );
   });
 
+  // Activate user account
+  app.put('/api/auth/register/:id', (req, res) => {
+    Auth.activateAccount(String(req.params['id'])).then(
+      () => sendStatus(res, 204),
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+    );
+  });
+
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(
@@ -179,6 +187,7 @@ export default function restAPI(app: Express) {
     );
   });
 
+  // Reset password
   app.post('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
       () => sendStatus(res, 201),

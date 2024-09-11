@@ -4,6 +4,10 @@ import DBConnection from './db_connector';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class DBMagicLinksDAO {
+  static async createAccountActivation(userId: number): Promise<string> {
+    await this.deleteForUserAndType(userId, MagicLinkType.AccountActivation);
+    return this.create(userId, constants.magicLinkAccountActivationTTL, MagicLinkType.AccountActivation);
+  }
   static async createPasswordReset(userId: number): Promise<string> {
     await this.deleteForUserAndType(userId, MagicLinkType.PasswordReset);
     return this.create(userId, constants.magicLinkPasswordResetTTL, MagicLinkType.PasswordReset);
