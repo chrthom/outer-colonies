@@ -11,6 +11,7 @@ import {
   DailyGetResponse,
   DeckCard,
   DeckListResponse,
+  GenericResponse,
   ItemListResponse,
   ItemListResponseBox,
   ProfileGetResponse
@@ -35,10 +36,53 @@ function performWithSessionTokenCheck(
 ) {
   const sessionToken = req.header('session-token');
   if (sessionToken) {
-    DBCredentialsDAO.getBySessionToken(sessionToken).then(u => (u ? f(u) : res.sendStatus(403)));
+    DBCredentialsDAO.getBySessionToken(sessionToken).then(u => (u ? f(u) : sendStatus(res, 403)));
   } else {
-    res.sendStatus(400);
+    sendStatus(res, 401, 'No session-token header provided');
   }
+}
+
+function sendStatus(res: Response, status: number, message?: string) {
+  const r: GenericResponse = {
+    status: status
+  };
+  if (message) {
+    r.message = message;
+  } else {
+    switch (status) {
+      case 200:
+        r.message = 'OK';
+        break;
+      case 201:
+        r.message = 'Created';
+        break;
+      case 202:
+        r.message = 'Accepted';
+        break;
+      case 204:
+        r.message = 'No Content';
+        break;
+      case 400:
+        r.message = 'Bad Request';
+        break;
+      case 401:
+        r.message = 'Unauthorized';
+        break;
+      case 403:
+        r.message = 'Forbidden';
+        break;
+      case 404:
+        r.message = 'Not Found';
+        break;
+      case 409:
+        r.message = 'Conflict';
+        break;
+      case 500:
+        r.message = 'Internal Server Error';
+        break;
+    }
+  }
+  res.status(status).send(r);
 }
 
 export default function restAPI(app: Express) {
@@ -53,11 +97,11 @@ export default function restAPI(app: Express) {
     const registerRequest = <AuthRegisterRequest>req.body;
     Auth.checkUsernameExists(registerRequest.username).then(usernameExists => {
       if (usernameExists) {
-        res.sendStatus(409);
+        sendStatus(res, 409, 'Username already exists');
       } else {
         Auth.checkEmailExists(registerRequest.email).then(emailExists => {
           if (emailExists) {
-            res.sendStatus(409);
+            sendStatus(res, 409, 'Email already exists');
           } else {
             Auth.register(registerRequest).then(credential => {
               const payload: AuthRegistrationResponse = {
@@ -80,9 +124,9 @@ export default function restAPI(app: Express) {
           sessionToken: usernameAndToken[1],
           username: usernameAndToken[0]
         };
-        res.send(payload);
+        res.status(200).send(payload);
       },
-      () => res.sendStatus(401)
+      () => sendStatus(res, 401)
     );
   });
 
@@ -93,7 +137,7 @@ export default function restAPI(app: Express) {
         sessionToken: u.sessionToken,
         username: u.username
       };
-      res.send(payload);
+      res.status(200).send(payload);
     });
   });
 
@@ -101,7 +145,7 @@ export default function restAPI(app: Express) {
   app.delete('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       Auth.logout(u.sessionToken);
-      res.sendStatus(204);
+      sendStatus(res, 204);
     });
   });
 
@@ -111,26 +155,26 @@ export default function restAPI(app: Express) {
       const payload: AuthExistsResponse = {
         exists: exists
       };
-      res.send(payload);
+      res.status(200).send(payload);
     };
     if (req.query['username'])
       Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
     else if (req.query['email']) Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse);
-    else res.sendStatus(400);
+    else sendStatus(res, 400, 'No username or email parameter was provided');
   });
 
   // Send password reset link
   app.delete('/api/auth/password/:user', (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
-      () => res.status(202).send({}),
-      reason => res.sendStatus(reason == 'not found' ? 400 : 500)
+      () => sendStatus(res, 202),
+      reason => sendStatus(res, reason == 'not found' ? 400 : 500)
     );
   });
 
   app.post('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
-      () => res.status(204).send({}),
-      reason => res.sendStatus(reason == 'not found' ? 400 : 500)
+      () => sendStatus(res, 201),
+      reason => sendStatus(res, reason == 'not found' ? 400 : 500)
     );
   });
 
@@ -175,7 +219,7 @@ export default function restAPI(app: Express) {
       const payload: DeckListResponse = {
         cards: cards.map(toDeckCard)
       };
-      res.send(payload);
+      res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
       DBDecksDAO.getByUserId(u.userId).then(sendDeckResponse);
@@ -184,12 +228,12 @@ export default function restAPI(app: Express) {
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(() => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(() => sendStatus(res, 204));
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(() => res.sendStatus(204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(() => sendStatus(res, 204));
   });
 
   // Get user profile
@@ -197,9 +241,9 @@ export default function restAPI(app: Express) {
     const sendProfileResponse = (profile: DBProfile | undefined) => {
       if (profile) {
         const payload: ProfileGetResponse = profile;
-        res.send(payload);
+        res.status(200).send(payload);
       } else {
-        res.sendStatus(404);
+        sendStatus(res, 404);
       }
     };
     performWithSessionTokenCheck(req, res, u => {
@@ -212,9 +256,9 @@ export default function restAPI(app: Express) {
     const sendDailyResponse = (daily: DBDaily | undefined) => {
       if (daily) {
         const payload: DailyGetResponse = daily;
-        res.send(payload);
+        res.status(200).send(payload);
       } else {
-        res.sendStatus(404);
+        sendStatus(res, 404);
       }
     };
     performWithSessionTokenCheck(req, res, u => {
@@ -246,7 +290,7 @@ export default function restAPI(app: Express) {
         boxes: items.filter(i => i.type == ItemType.Box).map(toBox),
         boosters: items.filter(i => i.type == ItemType.Booster).map(toBooster)
       };
-      res.send(payload);
+      res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
       DBItemsDAO.getByUserId(u.userId).then(sendItemResponse);
@@ -271,7 +315,7 @@ export default function restAPI(app: Express) {
               cards: cards,
               boosters: []
             };
-            res.send(response);
+            res.status(200).send(response);
           } else if (item.type == ItemType.Box) {
             const content = <DBItemBoxContent[]>JSON.parse(item.content);
             content.forEach(e => {
@@ -293,10 +337,10 @@ export default function restAPI(app: Express) {
               cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
               boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
             };
-            res.send(response);
+            res.status(200).send(response);
           }
         } else {
-          res.sendStatus(404);
+          sendStatus(res, 404);
         }
       });
     });
@@ -308,9 +352,9 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
         if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(() => res.sendStatus(204));
+          DBItemsDAO.createBooster(u.userId, boosterNo).then(() => sendStatus(res, 204));
         } else {
-          res.sendStatus(400);
+          sendStatus(res, 400, 'Insufficient sol');
         }
       });
     });

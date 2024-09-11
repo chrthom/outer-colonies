@@ -17,6 +17,11 @@ export interface AuthPasswordRequest {
   password: string;
 }
 
+export interface GenericResponse {
+  status: number;
+  message?: string;
+}
+
 export interface AuthRegistrationResponse {
   id: number;
   username: string;
