@@ -5,6 +5,7 @@ import {
   AuthExistsResponse,
   AuthLoginRequest,
   AuthLoginResponse,
+  AuthPasswordRequest,
   AuthRegisterRequest,
   AuthRegistrationResponse,
   DailyGetResponse,
@@ -127,7 +128,7 @@ export default function restAPI(app: Express) {
   });
 
   app.post('/api/auth/password/:id', (req, res) => {
-    Auth.resetPassword(String(req.params['id']), <string>req.body).then(
+    Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
       () => res.status(204).send({}),
       reason => res.sendStatus(reason == 'not found' ? 400 : 500)
     );

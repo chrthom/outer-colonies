@@ -33,10 +33,7 @@ export class ResetPasswordPage implements OnInit {
       this.authAPIService
         .resetPassword(this.resetId, this.resetPasswordForm.value.password)
         .subscribe({
-          next: () => {
-            this.passwordResetSuccessful = true;
-            this.loading = false;
-          },
+          next: () => this.passwordResetSuccessful = true,
           error: () => {
             this.passwordResetFailed = true;
             this.loading = false

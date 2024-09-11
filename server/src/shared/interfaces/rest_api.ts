@@ -13,6 +13,10 @@ export interface AuthLoginRequest {
   password: string;
 }
 
+export interface AuthPasswordRequest {
+  password: string;
+}
+
 export interface AuthRegistrationResponse {
   id: number;
   username: string;

@@ -28,10 +28,7 @@ export class ForgotPasswordPage {
       this.authAPIService
         .forgotPassword(this.forgotPasswordForm.value.username.trim())
         .subscribe({
-          next: () => {
-            this.passwordResetSuccessful = true;
-            this.loading = false;
-          },
+          next: () => this.passwordResetSuccessful = true,
           error: () => {
             this.passwordResetFailed = true;
             this.loading = false
