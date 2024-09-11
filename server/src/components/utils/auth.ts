@@ -31,7 +31,7 @@ export default class Auth {
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
   static async activateAccount(resetId: string) {
-    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.PasswordReset);
+    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);
     await DBCredentialsDAO.activate(userId);
     await DBMagicLinksDAO.delete(resetId);
   }

@@ -32,6 +32,9 @@ export default class AuthApiService extends OCApi {
   register(body: AuthRegisterRequest): Observable<void> {
     return this.post<void>('auth/register', undefined, body);
   }
+  activate(activateId: string): Observable<void> {
+    return this.put<void>(`auth/register/${activateId}`);
+  }
   login(body: AuthLoginRequest): Observable<AuthLoginResponse> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body);
   }

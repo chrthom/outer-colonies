@@ -50,7 +50,7 @@ const publicGuardFn: CanActivateFn = () => checkHttps();
 
 const routes: Routes = [
   {
-    path: 'activate-account',
+    path: 'activate-account/:id',
     canActivate: [publicGuardFn],
     component: ActivateAccountPage
   },
