@@ -95,25 +95,25 @@ export default function restAPI(app: Express) {
   // Register new user
   app.post('/api/auth/register', (req, res) => {
     const registerRequest = <AuthRegisterRequest>req.body;
-    Auth.checkUsernameExists(registerRequest.username).then(usernameExists => {
-      if (usernameExists) {
-        sendStatus(res, 409, 'Username already exists');
-      } else {
-        Auth.checkEmailExists(registerRequest.email).then(emailExists => {
-          if (emailExists) {
-            sendStatus(res, 409, 'Email already exists');
-          } else {
-            Auth.register(registerRequest).then(credential => {
-              const payload: AuthRegistrationResponse = {
-                id: credential.userId,
-                username: credential.username
-              };
-              res.status(201).send(payload);
-            });
-          }
-        });
-      }
-    });
+    Auth.checkUsernameExists(registerRequest.username)
+      .then(exists => (exists ? Promise.reject('Username') : Promise.resolve()))
+      .then(() => Auth.checkEmailExists(registerRequest.email))
+      .then(exists => (exists ? Promise.reject('Email') : Promise.resolve()))
+      .then(() => Auth.register(registerRequest))
+      .then(credential => {
+        const payload: AuthRegistrationResponse = {
+          id: credential.userId,
+          username: credential.username
+        };
+        res.status(201).send(payload);
+      })
+      .catch(error =>
+        sendStatus(
+          res,
+          error == 'Username' || error == 'Email' ? 409 : 500,
+          error == 'Username' || error == 'Email' ? `${error} already exists` : undefined
+        )
+      );
   });
 
   // Login
