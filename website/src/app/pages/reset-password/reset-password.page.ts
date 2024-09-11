@@ -19,9 +19,12 @@ export class ResetPasswordPage implements OnInit {
     password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authAPIService: AuthApiService, private route: ActivatedRoute) {}
+  constructor(
+    private authAPIService: AuthApiService,
+    private route: ActivatedRoute
+  ) {}
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => this.resetId = params.get('id')!);
+    this.route.paramMap.subscribe(params => (this.resetId = params.get('id')!));
   }
   get password(): any {
     return this.resetPasswordForm.get('password');
@@ -30,15 +33,13 @@ export class ResetPasswordPage implements OnInit {
     this.resetPasswordForm.markAllAsTouched();
     if (this.resetPasswordForm.valid && !this.loading) {
       this.loading = true;
-      this.authAPIService
-        .resetPassword(this.resetId, this.resetPasswordForm.value.password)
-        .subscribe({
-          next: () => this.passwordResetSuccessful = true,
-          error: () => {
-            this.passwordResetFailed = true;
-            this.loading = false
-          }
-        });
+      this.authAPIService.resetPassword(this.resetId, this.resetPasswordForm.value.password).subscribe({
+        next: () => (this.passwordResetSuccessful = true),
+        error: () => {
+          this.passwordResetFailed = true;
+          this.loading = false;
+        }
+      });
     }
   }
 }
