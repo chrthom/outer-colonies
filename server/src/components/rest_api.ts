@@ -24,7 +24,7 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
-import { CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
+import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import EquipmentCard from './cards/types/equipment_card';
@@ -36,7 +36,10 @@ function performWithSessionTokenCheck(
 ) {
   const sessionToken = req.header('session-token');
   if (sessionToken) {
-    DBCredentialsDAO.getBySessionToken(sessionToken).then(u => (u ? f(u) : sendStatus(res, 403)));
+    DBCredentialsDAO.getBySessionToken(sessionToken).then(
+      credentials => f(credentials),
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 403 : 500)
+    );
   } else {
     sendStatus(res, 401, 'No session-token header provided');
   }
@@ -126,7 +129,7 @@ export default function restAPI(app: Express) {
         };
         res.status(200).send(payload);
       },
-      () => sendStatus(res, 401)
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 401 : 500)
     );
   });
 
@@ -144,8 +147,10 @@ export default function restAPI(app: Express) {
   // Logout
   app.delete('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
-      Auth.logout(u.sessionToken);
-      sendStatus(res, 204);
+      Auth.logout(u.sessionToken).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
     });
   });
 
@@ -158,8 +163,11 @@ export default function restAPI(app: Express) {
       res.status(200).send(payload);
     };
     if (req.query['username'])
-      Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse);
-    else if (req.query['email']) Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse);
+      Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse, () =>
+        sendStatus(res, 500)
+      );
+    else if (req.query['email'])
+      Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse, () => sendStatus(res, 500));
     else sendStatus(res, 400, 'No username or email parameter was provided');
   });
 
@@ -167,14 +175,14 @@ export default function restAPI(app: Express) {
   app.delete('/api/auth/password/:user', (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
       () => sendStatus(res, 202),
-      reason => sendStatus(res, reason == 'not found' ? 400 : 500)
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
   });
 
   app.post('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
       () => sendStatus(res, 201),
-      reason => sendStatus(res, reason == 'not found' ? 400 : 500)
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
   });
 
@@ -222,47 +230,49 @@ export default function restAPI(app: Express) {
       res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
-      DBDecksDAO.getByUserId(u.userId).then(sendDeckResponse);
+      DBDecksDAO.getByUserId(u.userId).then(sendDeckResponse, () => sendStatus(res, 500));
     });
   });
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(() => sendStatus(res, 204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(
+      () => sendStatus(res, 204),
+      () => sendStatus(res, 500)
+    );
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(() => sendStatus(res, 204));
+    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(
+      () => sendStatus(res, 204),
+      () => sendStatus(res, 500)
+    );
   });
 
   // Get user profile
   app.get('/api/profile', (req, res) => {
-    const sendProfileResponse = (profile: DBProfile | undefined) => {
-      if (profile) {
-        const payload: ProfileGetResponse = profile;
-        res.status(200).send(payload);
-      } else {
-        sendStatus(res, 404);
-      }
+    const sendProfileResponse = (profile: DBProfile) => {
+      const payload: ProfileGetResponse = profile;
+      res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
-      DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse);
+      DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse, reason =>
+        sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      );
     });
   });
 
   // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
-    const sendDailyResponse = (daily: DBDaily | undefined) => {
-      if (daily) {
-        const payload: DailyGetResponse = daily;
-        res.status(200).send(payload);
-      } else {
-        sendStatus(res, 404);
-      }
+    const sendDailyResponse = (daily: DBDaily) => {
+      const payload: DailyGetResponse = daily;
+      res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
-      DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse);
+      DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse, reason =>
+        sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      );
     });
   });
 
@@ -293,7 +303,7 @@ export default function restAPI(app: Express) {
       res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
-      DBItemsDAO.getByUserId(u.userId).then(sendItemResponse);
+      DBItemsDAO.getByUserId(u.userId).then(sendItemResponse, () => sendStatus(res, 500));
     });
   });
 
@@ -301,10 +311,13 @@ export default function restAPI(app: Express) {
   app.post('/api/item/:itemId(\\d+)', (req, res) => {
     const itemId = Number(req.params['itemId']);
     performWithSessionTokenCheck(req, res, u => {
-      DBItemsDAO.getByUserId(u.userId).then(items => {
-        const item = items.find(i => i.itemId == itemId);
-        if (item) {
-          DBItemsDAO.delete(itemId);
+      DBItemsDAO.getByUserId(u.userId)
+        .then(items => {
+          const item = items.find(i => i.itemId == itemId);
+          return item ? Promise.resolve(item) : Promise.reject(APIRejectReason.NotFound);
+        })
+        .then(item => DBItemsDAO.delete(itemId).then(() => item))
+        .then(item => {
           if (item.type == ItemType.Booster) {
             const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
             cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
@@ -338,11 +351,11 @@ export default function restAPI(app: Express) {
               boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
             };
             res.status(200).send(response);
+          } else {
+            sendStatus(res, 400, 'Invalid item type');
           }
-        } else {
-          sendStatus(res, 404);
-        }
-      });
+        })
+        .catch(reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500));
     });
   });
 
@@ -350,13 +363,21 @@ export default function restAPI(app: Express) {
   app.post('/api/buy/booster/:boosterNo([1-4])', (req, res) => {
     const boosterNo = Number(req.params['boosterNo']);
     performWithSessionTokenCheck(req, res, u => {
-      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo]).then(sufficientSol => {
-        if (sufficientSol) {
-          DBItemsDAO.createBooster(u.userId, boosterNo).then(() => sendStatus(res, 204));
-        } else {
-          sendStatus(res, 400, 'Insufficient sol');
-        }
-      });
+      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo])
+        .then(() => DBItemsDAO.createBooster(u.userId, boosterNo))
+        .then(() => sendStatus(res, 201))
+        .catch(reason => {
+          switch (reason) {
+            case APIRejectReason.ConditionNotMet:
+              sendStatus(res, 400, 'Insufficient sol');
+              break;
+            case APIRejectReason.NotFound:
+              sendStatus(res, 404, 'User not found');
+              break;
+            default:
+              sendStatus(res, 500);
+          }
+        });
     });
   });
 }

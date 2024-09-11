@@ -23,17 +23,17 @@ export default class Auth {
       reason => (reason == APIRejectReason.NotFound ? false : Promise.reject())
     );
   }
-  static async sendPasswordReset(usernameOrEmail: string): Promise<void> {
+  static async sendPasswordReset(usernameOrEmail: string) {
     let credential = await DBCredentialsDAO.getByUsername(usernameOrEmail);
     credential ??= await DBCredentialsDAO.getByEmail(usernameOrEmail);
-    if (!credential) return Promise.reject('not found');
+    if (!credential) return Promise.reject(APIRejectReason.NotFound);
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
-  static async resetPassword(resetId: string, password: string): Promise<void> {
+  static async resetPassword(resetId: string, password: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.PasswordReset);
     await DBCredentialsDAO.setPassword(userId, password);
-    DBMagicLinksDAO.delete(resetId);
+    await DBMagicLinksDAO.delete(resetId);
   }
   static async register(registrationData: AuthRegisterRequest): Promise<DBCredential> {
     await DBCredentialsDAO.create(
@@ -53,13 +53,12 @@ export default class Auth {
   static async login(loginData: AuthLoginRequest): Promise<UsernameAndToken> {
     let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
     credential ??= await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
-    if (!credential) return Promise.reject();
+    if (!credential) return Promise.reject(APIRejectReason.NotFound);
     DBDailiesDAO.achieveLogin(credential.userId);
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
     return [credential.username, sessionToken];
   }
-  static async logout(sessionToken: string): Promise<boolean> {
+  static async logout(sessionToken: string) {
     await DBCredentialsDAO.invalidateSessionToken(sessionToken);
-    return true;
   }
 }

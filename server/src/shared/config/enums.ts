@@ -113,5 +113,6 @@ export enum MagicLinkType {
 }
 
 export enum APIRejectReason {
-  NotFound = 'not_found'
+  NotFound = 'not_found',
+  ConditionNotMet = 'condition_not_met'
 }

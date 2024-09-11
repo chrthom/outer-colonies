@@ -31,13 +31,13 @@ export default class DBItemsDAO {
     });
   }
   static async delete(itemId: number) {
-    return DBConnection.instance.query(`DELETE FROM items WHERE item_id = ${itemId}`);
+    await DBConnection.instance.query(`DELETE FROM items WHERE item_id = ${itemId}`);
   }
   static async createBooster(userId: number, boosterNo: number) {
-    return this.create(userId, ItemType.Booster, String(boosterNo));
+    await this.create(userId, ItemType.Booster, String(boosterNo));
   }
   private static async create(userId: number, type: ItemType, content: string, message?: string) {
-    DBConnection.instance.query(
+    await DBConnection.instance.query(
       `INSERT INTO items (user_id, type, content${message ? ', message' : ''}) VALUES ` +
         `(${userId}, '${type}', '${content}'${message ? `, '${message}'` : ''})`
     );

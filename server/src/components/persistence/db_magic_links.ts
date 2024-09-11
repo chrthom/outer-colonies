@@ -1,5 +1,5 @@
 import { constants } from '../../shared/config/constants';
-import { MagicLinkType } from '../../shared/config/enums';
+import { APIRejectReason, MagicLinkType } from '../../shared/config/enums';
 import DBConnection from './db_connector';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,7 +20,7 @@ export default class DBMagicLinksDAO {
     const queryResult: any[] = await DBConnection.instance.query(
       `SELECT user_id FROM magic_links WHERE id = '${id}' AND type = '${type}' AND valid_until >= NOW()`
     );
-    return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject('not found');
+    return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject(APIRejectReason.NotFound);
   }
   private static async create(userId: number, ttlInHours: number, type: MagicLinkType): Promise<string> {
     const uuid = uuidv4();
