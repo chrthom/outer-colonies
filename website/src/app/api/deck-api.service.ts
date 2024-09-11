@@ -15,7 +15,7 @@ export class DeckApiService extends OCApi {
   ) {
     super(http);
   }
-  listDeck(): Observable<DeckListResponse | undefined> {
+  listDeck(): Observable<DeckListResponse> {
     return this.get<DeckListResponse>('deck', this.authService.token);
   }
   activateCard(cardInstanceId: number): Observable<void> {

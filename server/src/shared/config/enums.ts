@@ -111,3 +111,8 @@ export enum Zone {
 export enum MagicLinkType {
   PasswordReset = 'password_reset'
 }
+
+export enum APIRejectReason {
+  NotFound = 'not_found',
+  ConditionNotMet = 'condition_not_met'
+}

@@ -54,12 +54,10 @@ export class HomePage implements OnInit {
   }
   reload() {
     this.dailyApiService.dailies.subscribe(res => {
-      if (res) {
-        this.dailies = this.dailies.map(daily => {
-          daily.achieved = daily.matcher(res);
-          return daily;
-        });
-      }
+      this.dailies = this.dailies.map(daily => {
+        daily.achieved = daily.matcher(res);
+        return daily;
+      });
     });
   }
   get gameUrl(): string {

@@ -1,3 +1,4 @@
+import { APIRejectReason } from '../../shared/config/enums';
 import DBConnection from './db_connector';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,28 +17,25 @@ export interface DBCredentialWithSessionToken {
 }
 
 export default class DBCredentialsDAO {
-  static async getByUsername(username: string, password?: string): Promise<DBCredential | null> {
+  static async getByUsername(username: string, password?: string): Promise<DBCredential> {
     const passwordQuery = password ? ` AND password = '${password}'` : '';
     return this.getBy(`username = '${username}'${passwordQuery}`);
   }
-  static async getByEmail(email: string, password?: string): Promise<DBCredential | null> {
+  static async getByEmail(email: string, password?: string): Promise<DBCredential> {
     const passwordQuery = password ? ` AND password = '${password}'` : '';
     return this.getBy(`email = '${email}'${passwordQuery}`);
   }
-  static async getBySessionToken(sessionToken: string): Promise<DBCredentialWithSessionToken | null> {
+  static async getBySessionToken(sessionToken: string): Promise<DBCredentialWithSessionToken> {
     return this.getBy(`session_token = '${sessionToken}' AND session_valid_until > current_timestamp()`).then(
-      r =>
-        r && r.sessionToken
-          ? {
-              userId: r.userId,
-              username: r.username,
-              email: r.email,
-              sessionToken: r.sessionToken
-            }
-          : null
+      r => ({
+        userId: r.userId,
+        username: r.username,
+        email: r.email,
+        sessionToken: r.sessionToken!
+      })
     );
   }
-  static async getBy(whereClause: string): Promise<DBCredential | null> {
+  private static async getBy(whereClause: string): Promise<DBCredential> {
     const queryResult: any[] = await DBConnection.instance.query(
       `SELECT user_id, username, email, session_token FROM credentials WHERE ${whereClause}`
     );
@@ -48,15 +46,15 @@ export default class DBCredentialsDAO {
           email: String(queryResult[0].email),
           sessionToken: queryResult[0].session_token ? String(queryResult[0].session_token) : null
         }
-      : null;
+      : Promise.reject(APIRejectReason.NotFound);
   }
-  static async setPassword(userId: number, password: string): Promise<void> {
-    return DBConnection.instance.query(
+  static async setPassword(userId: number, password: string) {
+    await DBConnection.instance.query(
       `UPDATE credentials SET password = '${password}' WHERE user_id = '${userId}'`
     );
   }
   static async create(username: string, password: string, email: string) {
-    return DBConnection.instance.query(
+    await DBConnection.instance.query(
       `INSERT INTO credentials (username, password, email) VALUES ('${username}', '${password}', '${email}')`
     );
   }
@@ -69,8 +67,8 @@ export default class DBCredentialsDAO {
       )
       .then(() => sessionToken);
   }
-  static async invalidateSessionToken(sessionToken: string): Promise<void> {
-    return DBConnection.instance.query(
+  static async invalidateSessionToken(sessionToken: string) {
+    await DBConnection.instance.query(
       `UPDATE credentials SET session_token = NULL, session_valid_until = NULL WHERE session_token = '${sessionToken}'`
     );
   }

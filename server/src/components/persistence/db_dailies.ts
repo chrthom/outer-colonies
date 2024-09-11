@@ -1,3 +1,4 @@
+import { APIRejectReason } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import DBConnection from './db_connector';
 import DBProfilesDAO from './db_profiles';
@@ -12,9 +13,9 @@ export interface DBDaily {
 }
 
 export default class DBDailiesDAO {
-  static async getByUserId(userId: number): Promise<DBDaily | undefined> {
+  static async getByUserId(userId: number): Promise<DBDaily> {
     const result = await this.getBy(`user_id = '${userId}'`);
-    return result.length ? result[0] : undefined;
+    return result.length ? result[0] : Promise.reject(APIRejectReason.NotFound);
   }
   private static async getBy(whereClause: string): Promise<DBDaily[]> {
     const queryResult: any[] = await DBConnection.instance.query(
@@ -38,25 +39,25 @@ export default class DBDailiesDAO {
     });
   }
   static async create(userId: number) {
-    return DBConnection.instance.query(`INSERT INTO dailies (user_id) VALUES (${userId})`);
+    await DBConnection.instance.query(`INSERT INTO dailies (user_id) VALUES (${userId})`);
   }
   static async achieveLogin(userId: number) {
-    return this.achieve(userId, 'login', rules.dailyEarnings.login);
+    await this.achieve(userId, 'login', rules.dailyEarnings.login);
   }
   static async achieveVictory(userId: number) {
-    return this.achieve(userId, 'victory', rules.dailyEarnings.victory);
+    await this.achieve(userId, 'victory', rules.dailyEarnings.victory);
   }
   static async achieveGame(userId: number) {
-    return this.achieve(userId, 'game', rules.dailyEarnings.game);
+    await this.achieve(userId, 'game', rules.dailyEarnings.game);
   }
   static async achieveEnergy(userId: number) {
-    return this.achieve(userId, 'energy', rules.dailyEarnings.energy);
+    await this.achieve(userId, 'energy', rules.dailyEarnings.energy);
   }
   static async achieveShips(userId: number) {
-    return this.achieve(userId, 'ships', rules.dailyEarnings.ships);
+    await this.achieve(userId, 'ships', rules.dailyEarnings.ships);
   }
   private static async achieve(userId: number, daily: string, sol: number) {
-    return this.getBy(`user_id = ${userId} AND (${daily} < current_date() OR ${daily} IS NULL)`).then(b => {
+    await this.getBy(`user_id = ${userId} AND (${daily} < current_date() OR ${daily} IS NULL)`).then(b => {
       if (b.length) {
         DBConnection.instance.query(`UPDATE dailies SET ${daily} = current_date() WHERE user_id = ${userId}`);
         DBProfilesDAO.increaseSol(userId, sol);

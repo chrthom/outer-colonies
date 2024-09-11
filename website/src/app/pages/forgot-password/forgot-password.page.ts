@@ -25,15 +25,13 @@ export class ForgotPasswordPage {
     this.forgotPasswordForm.markAllAsTouched();
     if (this.forgotPasswordForm.valid && !this.loading) {
       this.loading = true;
-      this.authAPIService
-        .forgotPassword(this.forgotPasswordForm.value.username.trim())
-        .subscribe({
-          next: () => this.passwordResetSuccessful = true,
-          error: () => {
-            this.passwordResetFailed = true;
-            this.loading = false
-          }
-        });
+      this.authAPIService.forgotPassword(this.forgotPasswordForm.value.username.trim()).subscribe({
+        next: () => (this.passwordResetSuccessful = true),
+        error: () => {
+          this.passwordResetFailed = true;
+          this.loading = false;
+        }
+      });
     }
   }
 }

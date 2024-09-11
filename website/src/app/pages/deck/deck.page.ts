@@ -67,10 +67,8 @@ export class DeckPage implements OnInit {
   }
   update() {
     this.deckApiService.listDeck().subscribe(res => {
-      if (res) {
-        this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
-        this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
-      }
+      this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
+      this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
     });
   }
   activateCard(card: DeckCard) {
