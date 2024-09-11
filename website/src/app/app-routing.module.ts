@@ -20,6 +20,7 @@ import { TradePage } from './pages/trade/trade.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
 import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
+import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
 
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -49,19 +50,9 @@ const publicGuardFn: CanActivateFn = () => checkHttps();
 
 const routes: Routes = [
   {
-    path: 'login',
+    path: 'activate-account',
     canActivate: [publicGuardFn],
-    component: LoginPage
-  },
-  {
-    path: 'register',
-    canActivate: [publicGuardFn],
-    component: RegisterPage
-  },
-  {
-    path: 'forgot-password',
-    canActivate: [publicGuardFn],
-    component: ForgotPasswordPage
+    component: ActivateAccountPage
   },
   {
     path: 'deck',
@@ -69,9 +60,29 @@ const routes: Routes = [
     component: DeckPage
   },
   {
-    path: 'trade',
-    canActivate: [privateGuardFn],
-    component: TradePage
+    path: 'forgot-password',
+    canActivate: [publicGuardFn],
+    component: ForgotPasswordPage
+  },
+  {
+    path: 'imprint',
+    canActivate: [publicGuardFn],
+    component: ImprintPage
+  },
+  {
+    path: 'login',
+    canActivate: [publicGuardFn],
+    component: LoginPage
+  },
+  {
+    path: 'privacy',
+    canActivate: [publicGuardFn],
+    component: DataPrivacyPage
+  },
+  {
+    path: 'register',
+    canActivate: [publicGuardFn],
+    component: RegisterPage
   },
   {
     path: 'reset-password/:id',
@@ -84,14 +95,9 @@ const routes: Routes = [
     component: RulesPage
   },
   {
-    path: 'imprint',
-    canActivate: [publicGuardFn],
-    component: ImprintPage
-  },
-  {
-    path: 'privacy',
-    canActivate: [publicGuardFn],
-    component: DataPrivacyPage
+    path: 'trade',
+    canActivate: [privateGuardFn],
+    component: TradePage
   },
   {
     path: '',

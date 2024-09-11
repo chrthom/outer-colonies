@@ -93,7 +93,12 @@
       <div id="end-starter-deck-cards"></div>
     </form>
     } @if (registrationSuccessful) {
-    <p>Registrierung erfolgreich</p>
+    <h3>Registrierung erfolgreich</h3>
+    <p>
+      Eine E-Mail mit einem Aktivierungslink wurde an dich versandt.
+      Bitte prüfe dein Postfach und folge dem darin enthaltenen Link.
+      Danach kannst du dich <a routerLink="/login">hier</a> einloggen.
+    </p>
     }
     <p id="back-link"><a routerLink="/login">&lt; Zur&uuml;ck</a></p>
   </oc-content-box>
