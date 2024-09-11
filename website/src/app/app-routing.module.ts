@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 import { TradePage } from './pages/trade/trade.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
+import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -71,6 +72,11 @@ const routes: Routes = [
     path: 'trade',
     canActivate: [privateGuardFn],
     component: TradePage
+  },
+  {
+    path: 'reset-password/:id',
+    canActivate: [publicGuardFn],
+    component: ResetPasswordPage
   },
   {
     path: 'rules',

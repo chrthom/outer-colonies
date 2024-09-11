@@ -6,6 +6,7 @@ import DBDailiesDAO from '../persistence/db_dailies';
 import DBDecksDAO from '../persistence/db_decks';
 import DBMagicLinksDAO from '../persistence/db_magic_links';
 import Mailer from './mailer';
+import { MagicLinkType } from '../../shared/config/enums';
 
 type UsernameAndToken = [username: string, token: string];
 
@@ -22,6 +23,11 @@ export default class Auth {
     if (!credential) return Promise.reject('not found');
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
+  }
+  static async resetPassword(resetId: string, password: string): Promise<void> {
+    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.PasswordReset);
+    await DBCredentialsDAO.setPassword(userId, password);
+    DBMagicLinksDAO.delete(resetId);
   }
   static async register(registrationData: AuthRegisterRequest): Promise<DBCredential> {
     await DBCredentialsDAO.create(

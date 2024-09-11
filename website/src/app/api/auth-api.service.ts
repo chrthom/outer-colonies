@@ -38,7 +38,10 @@ export default class AuthApiService extends OCApi {
   logout(sessionToken: string): Observable<void> {
     return this.delete<void>('auth/login', sessionToken);
   }
-  resetPassword(user: string): Observable<string> {
+  forgotPassword(user: string): Observable<string> {
     return this.delete<string>(`auth/password/${user}`);
+  }
+  resetPassword(resetId: string, password: string): Observable<void> {
+    return this.post<void>(`auth/password/${resetId}`, undefined, password);
   }
 }

@@ -13,7 +13,7 @@ export default class Mailer {
   });
 
   static sendPasswordReset(email: string, name: string, linkUUID: string) {
-    const link = `${config.get('url.base')}/password_reset/${linkUUID}`;
+    const link = `${config.get('url.base')}/reset-password/${linkUUID}`;
     this.send(
       email,
       'Outer Colonies: Passwort zurücksetzen',

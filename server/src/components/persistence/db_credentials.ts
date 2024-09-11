@@ -50,6 +50,11 @@ export default class DBCredentialsDAO {
         }
       : null;
   }
+  static async setPassword(userId: number, password: string): Promise<void> {
+    return DBConnection.instance.query(
+      `UPDATE credentials SET password = '${password}' WHERE user_id = '${userId}'`
+    );
+  }
   static async create(username: string, password: string, email: string) {
     return DBConnection.instance.query(
       `INSERT INTO credentials (username, password, email) VALUES ('${username}', '${password}', '${email}')`

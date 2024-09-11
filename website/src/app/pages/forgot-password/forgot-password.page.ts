@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { Router } from '@angular/router';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 
@@ -18,7 +17,7 @@ export class ForgotPasswordPage {
     username: new FormControl('', [Validators.required])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authAPIService: AuthApiService, private router: Router) {}
+  constructor(private authAPIService: AuthApiService) {}
   get username(): any {
     return this.forgotPasswordForm.get('username');
   }
@@ -27,7 +26,7 @@ export class ForgotPasswordPage {
     if (this.forgotPasswordForm.valid && !this.loading) {
       this.loading = true;
       this.authAPIService
-        .resetPassword(this.forgotPasswordForm.value.username.trim())
+        .forgotPassword(this.forgotPasswordForm.value.username.trim())
         .subscribe({
           next: () => {
             this.passwordResetSuccessful = true;

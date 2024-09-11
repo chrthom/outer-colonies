@@ -35,6 +35,7 @@ import { HomePage } from './pages/home/home.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
+import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { TradePage } from './pages/trade/trade.page';
 
@@ -53,6 +54,7 @@ import { TradePage } from './pages/trade/trade.page';
     ImprintPage,
     LoginPage,
     RegisterPage,
+    ResetPasswordPage,
     RulesPage,
     TradePage
   ],

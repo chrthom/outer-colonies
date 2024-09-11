@@ -126,6 +126,13 @@ export default function restAPI(app: Express) {
     );
   });
 
+  app.post('/api/auth/password/:id', (req, res) => {
+    Auth.resetPassword(String(req.params['id']), <string>req.body).then(
+      () => res.status(204).send({}),
+      reason => res.sendStatus(reason == 'not found' ? 400 : 500)
+    );
+  });
+
   // List all cards
   app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {
