@@ -13,6 +13,10 @@ export interface AuthLoginRequest {
   password: string;
 }
 
+export interface AuthPasswordRequest {
+  password: string;
+}
+
 export interface AuthRegistrationResponse {
   id: number;
   username: string;
@@ -88,5 +92,3 @@ export interface ItemListResponseBox extends ItemListResponseElement {
 export interface ItemListResponseBooster extends ItemListResponseElement {
   no: number;
 }
-
-export interface OpenItemResponse extends ItemListResponseBox {}

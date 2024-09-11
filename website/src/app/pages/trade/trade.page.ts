@@ -3,8 +3,7 @@ import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import {
   ItemListResponseBooster,
-  ItemListResponseBox,
-  OpenItemResponse
+  ItemListResponseBox
 } from '../../../../../server/src/shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { rules } from '../../../../../server/src/shared/config/rules';
@@ -19,7 +18,7 @@ export class TradePage implements OnInit {
   sol = 0;
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
-  openedBoxContent?: OpenItemResponse;
+  openedBoxContent?: ItemListResponseBox;
   readonly assetURL = environment.url.assets;
   readonly availableBoosters = [
     {

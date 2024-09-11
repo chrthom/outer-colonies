@@ -30,10 +30,12 @@ import { OpenItemComponent } from './components/open-item/open-item.component';
 
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { DeckPage } from './pages/deck/deck.page';
+import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
 import { HomePage } from './pages/home/home.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
+import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { TradePage } from './pages/trade/trade.page';
 
@@ -47,10 +49,12 @@ import { TradePage } from './pages/trade/trade.page';
     OpenItemComponent,
     DataPrivacyPage,
     DeckPage,
+    ForgotPasswordPage,
     HomePage,
     ImprintPage,
     LoginPage,
     RegisterPage,
+    ResetPasswordPage,
     RulesPage,
     TradePage
   ],

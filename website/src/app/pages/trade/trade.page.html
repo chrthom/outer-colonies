@@ -3,24 +3,19 @@
     <oc-content-box title="Inventar">
       <div class="scroll">
         @if (sol > 0) {
-          <oc-inventory-item
-            [img]="assetURL + '/items/sol.png'"
-            [text]="sol + ' Sol'"
-          ></oc-inventory-item>
-        }
-        @for (box of boxes; track box) {
-          <oc-inventory-item
-            (click)="open(box.itemId)"
-            [img]="assetURL + '/items/box.png'"
-            text="Geschenk"
-          ></oc-inventory-item>
-        }
-        @for (booster of boosters; track booster) {
-          <oc-inventory-item
-            (click)="open(booster.itemId)"
-            [img]="assetURL + '/items/booster' + booster.no + '.png'"
-            text="Booster"
-          ></oc-inventory-item>
+        <oc-inventory-item [img]="assetURL + '/items/sol.png'" [text]="sol + ' Sol'"></oc-inventory-item>
+        } @for (box of boxes; track box) {
+        <oc-inventory-item
+          (click)="open(box.itemId)"
+          [img]="assetURL + '/items/box.png'"
+          text="Geschenk"
+        ></oc-inventory-item>
+        } @for (booster of boosters; track booster) {
+        <oc-inventory-item
+          (click)="open(booster.itemId)"
+          [img]="assetURL + '/items/booster' + booster.no + '.png'"
+          text="Booster"
+        ></oc-inventory-item>
         }
       </div>
     </oc-content-box>
@@ -29,34 +24,27 @@
     <oc-content-box title="Booster kaufen">
       <div class="scroll">
         @for (booster of availableBoosters; track booster) {
-          <mat-card class="card">
-            <mat-card-header>
-              <mat-card-title>{{ booster.title }}</mat-card-title>
-              <mat-card-subtitle><h5>{{ booster.price }} Sol</h5></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <img [src]="assetURL + '/items/booster' + booster.no + '.png'" />
-            </mat-card-content>
-            <mat-card-actions>
-              @if (sol >= booster.price) {
-                <button
-                  mat-raised-button
-                  (click)="buyBooster(booster.no)"
-                  color="primary"
-                  >
-                  Kaufen
-                </button>
-              }
-              @if (sol < booster.price) {
-                <button mat-raised-button color="warn">Ungen&uuml;gend Sol</button>
-              }
-            </mat-card-actions>
-          </mat-card>
+        <mat-card class="card">
+          <mat-card-header>
+            <mat-card-title>{{ booster.title }}</mat-card-title>
+            <mat-card-subtitle><h5>{{ booster.price }} Sol</h5></mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <img [src]="assetURL + '/items/booster' + booster.no + '.png'" />
+          </mat-card-content>
+          <mat-card-actions>
+            @if (sol >= booster.price) {
+            <button mat-raised-button (click)="buyBooster(booster.no)" color="primary">Kaufen</button>
+            } @if (sol < booster.price) {
+            <button mat-raised-button color="warn">Ungen&uuml;gend Sol</button>
+            }
+          </mat-card-actions>
+        </mat-card>
         }
       </div>
     </oc-content-box>
   </div>
 </div>
 @if (openedBoxContent) {
-  <oc-open-item [content]="openedBoxContent" (done)="boxClosed()"></oc-open-item>
+<oc-open-item [content]="openedBoxContent" (done)="boxClosed()"></oc-open-item>
 }

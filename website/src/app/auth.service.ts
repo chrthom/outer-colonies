@@ -22,8 +22,16 @@ export default class AuthService {
     return this.check(username, password).pipe(
       tap(success => {
         if (success) {
-          this.cookieService.set('u', username, remember ? this.cookieExpiryRemember : this.cookieExpiryDefault);
-          this.cookieService.set('p', password, remember ? this.cookieExpiryRemember : this.cookieExpiryDefault);
+          this.cookieService.set(
+            'u',
+            username,
+            remember ? this.cookieExpiryRemember : this.cookieExpiryDefault
+          );
+          this.cookieService.set(
+            'p',
+            password,
+            remember ? this.cookieExpiryRemember : this.cookieExpiryDefault
+          );
         }
       })
     );

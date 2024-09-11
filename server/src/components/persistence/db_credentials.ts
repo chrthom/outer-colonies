@@ -4,12 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 export interface DBCredential {
   userId: number;
   username: string;
+  email: string;
   sessionToken: string | null;
 }
 
 export interface DBCredentialWithSessionToken {
   userId: number;
   username: string;
+  email: string;
   sessionToken: string;
 }
 
@@ -29,6 +31,7 @@ export default class DBCredentialsDAO {
           ? {
               userId: r.userId,
               username: r.username,
+              email: r.email,
               sessionToken: r.sessionToken
             }
           : null
@@ -36,15 +39,21 @@ export default class DBCredentialsDAO {
   }
   static async getBy(whereClause: string): Promise<DBCredential | null> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT user_id, username, session_token FROM credentials WHERE ${whereClause}`
+      `SELECT user_id, username, email, session_token FROM credentials WHERE ${whereClause}`
     );
     return queryResult.length == 1
       ? {
           userId: Number(queryResult[0].user_id),
           username: String(queryResult[0].username),
+          email: String(queryResult[0].email),
           sessionToken: queryResult[0].session_token ? String(queryResult[0].session_token) : null
         }
       : null;
+  }
+  static async setPassword(userId: number, password: string): Promise<void> {
+    return DBConnection.instance.query(
+      `UPDATE credentials SET password = '${password}' WHERE user_id = '${userId}'`
+    );
   }
   static async create(username: string, password: string, email: string) {
     return DBConnection.instance.query(
@@ -53,11 +62,12 @@ export default class DBCredentialsDAO {
   }
   static async login(userId: number): Promise<string> {
     const sessionToken = uuidv4();
-    await DBConnection.instance.query(
-      'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, ' +
-        `session_token = '${sessionToken}' WHERE user_id = ${userId}`
-    );
-    return sessionToken;
+    return DBConnection.instance
+      .query(
+        'UPDATE credentials SET last_login = current_timestamp(), session_valid_until = current_timestamp() + INTERVAL 10 HOUR, ' +
+          `session_token = '${sessionToken}' WHERE user_id = ${userId}`
+      )
+      .then(() => sessionToken);
   }
   static async invalidateSessionToken(sessionToken: string): Promise<void> {
     return DBConnection.instance.query(

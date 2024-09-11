@@ -1,20 +1,18 @@
 <div id="overlay">
   <div class="outer-box" [class]="outerBoxClasses">
     @for (sol of content?.sol; track sol) {
-      <div class="item">
-        <img [src]="assetURL + '/items/sol.png'" />
-        <h2>{{ sol }} Sol</h2>
-      </div>
-    }
-    @for (card of content?.cards; track card) {
-      <div class="item">
-        <img [src]="assetURL + '/cards/' + card + '.png'" />
-      </div>
-    }
-    @for (booster of content?.boosters; track booster) {
-      <div class="item">
-        <img [src]="assetURL + '/items/booster' + booster + '.png'" />
-      </div>
+    <div class="item">
+      <img [src]="assetURL + '/items/sol.png'" />
+      <h2>{{ sol }} Sol</h2>
+    </div>
+    } @for (card of content?.cards; track card) {
+    <div class="item">
+      <img [src]="assetURL + '/cards/' + card + '.png'" />
+    </div>
+    } @for (booster of content?.boosters; track booster) {
+    <div class="item">
+      <img [src]="assetURL + '/items/booster' + booster + '.png'" />
+    </div>
     }
   </div>
   <h5 id="box-message">{{ content?.message }}</h5>

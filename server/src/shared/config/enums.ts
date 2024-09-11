@@ -107,3 +107,7 @@ export enum Zone {
   Orbital = 'orbital',
   Neutral = 'neutral'
 }
+
+export enum MagicLinkType {
+  PasswordReset = 'password_reset'
+}

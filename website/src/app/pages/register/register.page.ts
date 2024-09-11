@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
-import ApiService from 'src/app/api/auth-api.service';
+import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '../../../../../server/src/shared/config/starter_decks';
 import { environment } from 'src/environments/environment';
@@ -42,7 +42,7 @@ export class RegisterPage {
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   constructor(
-    private authAPIService: ApiService,
+    private authAPIService: AuthApiService,
     private dialog: MatDialog
   ) {}
   get username(): AbstractControl | null {
