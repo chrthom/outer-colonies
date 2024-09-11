@@ -109,6 +109,7 @@ export enum Zone {
 }
 
 export enum MagicLinkType {
+  AccountActivation = 'account_activation',
   PasswordReset = 'password_reset'
 }
 

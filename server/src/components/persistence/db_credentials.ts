@@ -18,11 +18,11 @@ export interface DBCredentialWithSessionToken {
 
 export default class DBCredentialsDAO {
   static async getByUsername(username: string, password?: string): Promise<DBCredential> {
-    const passwordQuery = password ? ` AND password = '${password}'` : '';
+    const passwordQuery = password ? ` AND password = '${password}' AND activated = TRUE` : '';
     return this.getBy(`username = '${username}'${passwordQuery}`);
   }
   static async getByEmail(email: string, password?: string): Promise<DBCredential> {
-    const passwordQuery = password ? ` AND password = '${password}'` : '';
+    const passwordQuery = password ? ` AND password = '${password}' AND activated = TRUE` : '';
     return this.getBy(`email = '${email}'${passwordQuery}`);
   }
   static async getBySessionToken(sessionToken: string): Promise<DBCredentialWithSessionToken> {
@@ -52,6 +52,9 @@ export default class DBCredentialsDAO {
     await DBConnection.instance.query(
       `UPDATE credentials SET password = '${password}' WHERE user_id = '${userId}'`
     );
+  }
+  static async activate(userId: number) {
+    await DBConnection.instance.query(`UPDATE credentials SET activated = TRUE WHERE user_id = '${userId}'`);
   }
   static async create(username: string, password: string, email: string) {
     await DBConnection.instance.query(

@@ -28,6 +28,7 @@ import { InventoryItemComponent } from './components/inventory-item/inventory-it
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { OpenItemComponent } from './components/open-item/open-item.component';
 
+import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { DeckPage } from './pages/deck/deck.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
@@ -47,6 +48,7 @@ import { TradePage } from './pages/trade/trade.page';
     InventoryItemComponent,
     NavbarComponent,
     OpenItemComponent,
+    ActivateAccountPage,
     DataPrivacyPage,
     DeckPage,
     ForgotPasswordPage,

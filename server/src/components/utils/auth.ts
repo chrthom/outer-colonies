@@ -30,6 +30,11 @@ export default class Auth {
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
+  static async activateAccount(resetId: string) {
+    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);
+    await DBCredentialsDAO.activate(userId);
+    await DBMagicLinksDAO.delete(resetId);
+  }
   static async resetPassword(resetId: string, password: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.PasswordReset);
     await DBCredentialsDAO.setPassword(userId, password);
@@ -42,12 +47,14 @@ export default class Auth {
       registrationData.email
     );
     const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
-    if (!credential) throw new Error('ERROR: New user could not be created');
+    if (!credential) return Promise.reject();
     DBProfilesDAO.create(credential.userId, registrationData.newsletter);
     DBDailiesDAO.create(credential.userId);
     CardCollection.starterDecks[registrationData.starterDeck]
       .map(c => c.id)
       .forEach(id => DBDecksDAO.create(id, credential.userId, true));
+    const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
+    Mailer.sendAccountActivation(credential.email, credential.username, uuid);
     return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<UsernameAndToken> {

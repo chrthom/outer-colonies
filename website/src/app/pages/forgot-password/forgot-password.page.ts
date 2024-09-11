@@ -7,7 +7,7 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 @Component({
   selector: 'oc-page-forgot-password',
   templateUrl: './forgot-password.page.html',
-  styleUrl: './forgot-password.page.scss'
+  styleUrls: ['./forgot-password.page.scss']
 })
 export class ForgotPasswordPage {
   passwordResetSuccessful = false;
