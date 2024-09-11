@@ -52,15 +52,11 @@ export class TradePage implements OnInit {
   }
   reload() {
     this.profileApiService.profile.subscribe(p => {
-      if (p) {
-        this.sol = p.sol;
-      }
+      this.sol = p.sol;
     });
     this.itemApiService.items.subscribe(i => {
-      if (i) {
-        this.boosters = i.boosters;
-        this.boxes = i.boxes;
-      }
+      this.boosters = i.boosters;
+      this.boxes = i.boxes;
     });
   }
   buyBooster(boosterNo: number) {

@@ -50,7 +50,7 @@ export default class AuthService {
   }
 
   check(username?: string, password?: string): Observable<boolean> {
-    let res: Observable<AuthLoginResponse | undefined>;
+    let res: Observable<AuthLoginResponse>;
     if (username && password) {
       res = this.authAPIService.login({
         username: username,
@@ -68,8 +68,8 @@ export default class AuthService {
     }
     return res.pipe(
       map(r => {
-        this.sessionToken = r?.sessionToken;
-        this.username = r?.username;
+        this.sessionToken = r.sessionToken;
+        this.username = r.username;
         return true;
       }),
       catchError(res => {

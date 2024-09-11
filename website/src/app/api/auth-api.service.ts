@@ -26,13 +26,13 @@ export default class AuthApiService extends OCApi {
       map(res => (res ? res.exists : false))
     );
   }
-  checkSessionToken(sessionToken: string): Observable<AuthLoginResponse | undefined> {
+  checkSessionToken(sessionToken: string): Observable<AuthLoginResponse> {
     return this.get<AuthLoginResponse>('auth/login', sessionToken);
   }
-  register(body: AuthRegisterRequest): Observable<boolean> {
-    return this.post('auth/register', undefined, body).pipe(map(r => r != undefined));
+  register(body: AuthRegisterRequest): Observable<void> {
+    return this.post<void>('auth/register', undefined, body);
   }
-  login(body: AuthLoginRequest): Observable<AuthLoginResponse | undefined> {
+  login(body: AuthLoginRequest): Observable<AuthLoginResponse> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body);
   }
   logout(sessionToken: string): Observable<void> {

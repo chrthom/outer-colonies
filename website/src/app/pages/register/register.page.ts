@@ -90,7 +90,10 @@ export class RegisterPage {
           starterDeck: this.registerForm.value.starterDeck,
           newsletter: !!this.registerForm.value.newsletter
         })
-        .subscribe(success => (this.registrationSuccessful = success));
+        .subscribe({
+          next: () => (this.registrationSuccessful = true),
+          error: () => (this.registrationSuccessful = false)
+        });
     }
   }
   openDataPrivacy() {

@@ -15,13 +15,13 @@ export class ItemApiService extends OCApi {
   ) {
     super(http);
   }
-  get items(): Observable<ItemListResponse | undefined> {
+  get items(): Observable<ItemListResponse> {
     return this.get<ItemListResponse>('item', this.authService.token);
   }
-  buyBooster(boosterNo: number): Observable<any> {
+  buyBooster(boosterNo: number): Observable<void> {
     return this.post(`buy/booster/${boosterNo}`, this.authService.token);
   }
-  open(itemId: number): Observable<ItemListResponseBox | undefined> {
+  open(itemId: number): Observable<ItemListResponseBox> {
     return this.post<ItemListResponseBox>(`item/${itemId}`, this.authService.token);
   }
 }
