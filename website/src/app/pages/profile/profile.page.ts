@@ -21,6 +21,8 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 })
 export class ProfilePage implements OnInit {
   newsletterSubscription!: boolean;
+  passwordResetSuccessful = false;
+  passwordResetFailed = false;
   emailForm: FormGroup = new FormGroup({
     email: new FormControl(
       '',
@@ -58,7 +60,7 @@ export class ProfilePage implements OnInit {
   changePassword() {
     this.passwordForm.markAllAsTouched();
     if (this.passwordForm.valid) {
-      // TODO
+      this.authAPIService.resetPassword(this.authService.token, this.passwordForm.value.password).subscribe(() => (this.passwordResetSuccessful = true));
     }
   }
   changeNewsletter() {

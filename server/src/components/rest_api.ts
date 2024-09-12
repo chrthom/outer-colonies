@@ -189,10 +189,20 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Reset password
-  app.post('/api/auth/password/:id', (req, res) => {
+  // Reset password with active session
+  app.put('/api/auth/password', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      DBCredentialsDAO.setPassword(u.userId, (<AuthPasswordRequest>req.body).password).then(
+        () => sendStatus(res, 204),
+        reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      );
+    });
+  });
+
+  // Reset password via magic link
+  app.put('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
-      () => sendStatus(res, 201),
+      () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
   });
@@ -274,6 +284,7 @@ export default function restAPI(app: Express) {
     });
   });
 
+  // Activate newsletter subscription
   app.put('/api/profile/newsletter', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.setNewsletter(u.userId, true).then(
@@ -283,6 +294,7 @@ export default function restAPI(app: Express) {
     });
   });
 
+  // Remove newsletter subscription
   app.delete('/api/profile/newsletter', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.setNewsletter(u.userId, false).then(

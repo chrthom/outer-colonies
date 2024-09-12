@@ -5,38 +5,38 @@
       <mat-form-field appearance="outline">
         <mat-label>Nutzername</mat-label>
         <input matInput formControlName="username" [errorStateMatcher]="matcher" />
-        @if (username?.hasError('exists') && !username?.hasError('required')) {
-        <mat-error> Der gew&auml;hlte Nutzername ist bereits vergeben </mat-error>
-        } @if (username?.hasError('maxlength')) {
-        <mat-error> Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein </mat-error>
-        } @if (username?.hasError('minlength') && !username?.hasError('required')) {
-        <mat-error> Dein Nutzername muss mindestens 3 Zeichen lang sein </mat-error>
-        } @if (username?.hasError('required')) {
+        @if (username?.hasError('required')) {
         <mat-error> Bitte w&auml;hle einen Nutzernamen </mat-error>
+        } @else if (username?.hasError('minlength')) {
+        <mat-error> Dein Nutzername muss mindestens 3 Zeichen lang sein </mat-error>
+        } @else if (username?.hasError('maxlength')) {
+        <mat-error> Dein Nutzername kann nicht l&auml;nger als 20 Zeichen sein </mat-error>
+        } @else if (username?.hasError('exists')) {
+        <mat-error> Der gew&auml;hlte Nutzername ist bereits vergeben </mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Passwort</mat-label>
         <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
-        @if (password?.hasError('maxlength')) {
-        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
-        } @if (password?.hasError('minlength') && !password?.hasError('required')) {
-        <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
-        } @if (password?.hasError('required')) {
+        @if (password?.hasError('required')) {
         <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
+        } @else if (password?.hasError('maxlength')) {
+        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
+        } @else if (password?.hasError('minlength')) {
+        <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>E-Mail</mat-label>
         <input matInput formControlName="email" [errorStateMatcher]="matcher" />
-        @if (email?.hasError('exists') && !email?.hasError('required')) {
-        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
-        } @if (email?.hasError('maxlength') && !email?.hasError('email')) {
-        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
-        } @if (email?.hasError('email') && !email?.hasError('required')) {
-        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
-        } @if (email?.hasError('required')) {
+        @if (email?.hasError('required')) {
         <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
+        } @else if (email?.hasError('email')) {
+        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
+        } @else if (email?.hasError('maxlength')) {
+        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
+        } @else if (email?.hasError('exists')) {
+        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline">

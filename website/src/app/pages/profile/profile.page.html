@@ -8,17 +8,17 @@
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neue E-Mail</mat-label>
         <input matInput formControlName="email" [errorStateMatcher]="matcher" />
-        @if (email?.hasError('exists') && !email?.hasError('required')) {
-        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
-        } @if (email?.hasError('maxlength') && !email?.hasError('email')) {
-        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
-        } @if (email?.hasError('email') && !email?.hasError('required')) {
-        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
-        } @if (email?.hasError('required')) {
+        @if (email?.hasError('required')) {
         <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
+        } @else if (email?.hasError('email')) {
+        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
+        } @else if (email?.hasError('maxlength')) {
+        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
+        } @else if (email?.hasError('exists')) {
+        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
         }
       </mat-form-field>
-      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
+      <button mat-raised-button type="submit" [color]="emailForm.valid ? 'primary' : 'warn'">
         E-Mail ändern
       </button>
     </form>
@@ -30,12 +30,15 @@
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neues Passwort</mat-label>
         <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
-        @if (password?.hasError('maxlength')) {
+        @if (password?.hasError('required')) {
+        <mat-error> Bitte w&auml;hle ein neues Passwort </mat-error>
+        } @else if (password?.hasError('maxlength')) {
         <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
-        } @if (password?.hasError('minlength') && !password?.hasError('required')) {
+        } @else if (password?.hasError('minlength')) {
         <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
-        } @if (password?.hasError('required')) {
-        <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
+        }
+        @if (passwordResetSuccessful) {
+        <mat-hint> Dein Passwort wurde erfolgreich geändert </mat-hint>
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
