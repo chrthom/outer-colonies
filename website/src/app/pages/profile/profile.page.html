@@ -19,7 +19,7 @@
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="emailForm.valid ? 'primary' : 'warn'">
-        E-Mail ändern
+        E-Mail &auml;ndern
       </button>
     </form>
     <form
@@ -33,16 +33,16 @@
         @if (password?.hasError('required')) {
         <mat-error> Bitte w&auml;hle ein neues Passwort </mat-error>
         } @else if (password?.hasError('maxlength')) {
-        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
+        <mat-error> Dein Passwort kann nicht l&auml;nger als 40 Zeichen sein </mat-error>
         } @else if (password?.hasError('minlength')) {
         <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
         }
         @if (passwordResetSuccessful) {
-        <mat-hint> Dein Passwort wurde erfolgreich geändert </mat-hint>
+        <mat-hint> Dein Passwort wurde erfolgreich ge&auml;ndert </mat-hint>
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
-        Passwort ändern
+        Passwort &auml;ndern
       </button>
     </form>
     <mat-slide-toggle

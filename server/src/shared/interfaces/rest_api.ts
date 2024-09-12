@@ -17,6 +17,10 @@ export interface AuthPasswordRequest {
   password: string;
 }
 
+export interface AuthEmailRequest {
+  email: string;
+}
+
 export interface GenericResponse {
   status: number;
   message?: string;

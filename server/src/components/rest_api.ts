@@ -2,6 +2,7 @@ import { Express, Request, Response } from 'express';
 import fetch from 'node-fetch';
 import Auth from './utils/auth';
 import {
+  AuthEmailRequest,
   AuthExistsResponse,
   AuthLoginRequest,
   AuthLoginResponse,
@@ -205,6 +206,16 @@ export default function restAPI(app: Express) {
       () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
+  });
+
+  // Send email confirmation link
+  app.post('/api/auth/email', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      Auth.sendEmailConfirmation(u.userId, (<AuthEmailRequest>req.body).email).then(
+        () => sendStatus(res, 202),
+        () => sendStatus(res, 500)
+      );
+    });
   });
 
   // List all cards
