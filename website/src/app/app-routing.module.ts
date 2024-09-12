@@ -21,6 +21,7 @@ import { RulesPage } from './pages/rules/rules.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
 import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
+import { ProfilePage } from './pages/profile/profile.page';
 
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -78,6 +79,11 @@ const routes: Routes = [
     path: 'privacy',
     canActivate: [publicGuardFn],
     component: DataPrivacyPage
+  },
+  {
+    path: 'profile',
+    canActivate: [privateGuardFn],
+    component: ProfilePage
   },
   {
     path: 'register',

@@ -35,11 +35,14 @@
   >
     <img src="../../../assets/icons/trade.png" />
   </div>
-  <!--
-  <div class="navbar-element" matTooltip="Verwalte dein Profil" [class.active]="active == 'profile'" routerLink="/profile">
-    <img src="../../../assets/icons/profile.png">
+  <div
+    class="navbar-element navbar-center"
+    matTooltip="Verwalte dein Profil"
+    [class.active]="active == 'profile'"
+    routerLink="/profile"
+  >
+    <img src="../../../assets/icons/profile.png" />
   </div>
-  -->
   <h2 class="user-name navbar-right">{{ username }}</h2>
   <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()" tabindex="invalid">
     <img src="../../../assets/icons/logout.png" />
