@@ -1,8 +1,16 @@
-import { Component } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { map, Observable } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
+import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 
@@ -11,7 +19,8 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss'
 })
-export class ProfilePage {
+export class ProfilePage implements OnInit {
+  newsletterSubscription!: boolean;
   emailForm: FormGroup = new FormGroup({
     email: new FormControl(
       '',
@@ -23,7 +32,14 @@ export class ProfilePage {
     password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authService: AuthService, private authAPIService: AuthApiService) {}
+  constructor(
+    private authService: AuthService,
+    private authAPIService: AuthApiService,
+    private profileAPIService: ProfileApiService
+  ) {}
+  ngOnInit(): void {
+    this.profileAPIService.profile.subscribe(profile => (this.newsletterSubscription = profile.newsletter));
+  }
   get email(): AbstractControl | null {
     return this.emailForm.get('email');
   }
@@ -33,11 +49,22 @@ export class ProfilePage {
   get username(): string | undefined {
     return this.authService.displayname;
   }
-  submit() {
+  changeEmail() {
+    this.emailForm.markAllAsTouched();
+    if (this.emailForm.valid) {
+      // TODO
+    }
+  }
+  changePassword() {
     this.passwordForm.markAllAsTouched();
     if (this.passwordForm.valid) {
       // TODO
     }
+  }
+  changeNewsletter() {
+    this.profileAPIService.setNewsletter(this.newsletterSubscription).subscribe(() => {
+      /* Do nothing */
+    });
   }
   private get emailExistsValidator(): AsyncValidatorFn {
     return (

@@ -4,7 +4,7 @@
       <mat-label>Nutzername</mat-label>
       <input matInput readonly="readonly" [value]="username" />
     </mat-form-field>
-    <form id="email-form" [formGroup]="emailForm" (ngSubmit)="emailForm.valid ? submit() : {}">
+    <form id="email-form" [formGroup]="emailForm" (ngSubmit)="emailForm.valid ? changeEmail() : {}">
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neue E-Mail</mat-label>
         <input matInput formControlName="email" [errorStateMatcher]="matcher" />
@@ -18,9 +18,15 @@
         <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
         }
       </mat-form-field>
-      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">E-Mail ändern</button>
+      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
+        E-Mail ändern
+      </button>
     </form>
-    <form id="password-form" [formGroup]="passwordForm" (ngSubmit)="passwordForm.valid ? submit() : {}">
+    <form
+      id="password-form"
+      [formGroup]="passwordForm"
+      (ngSubmit)="passwordForm.valid ? changePassword() : {}"
+    >
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neues Passwort</mat-label>
         <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
@@ -32,9 +38,16 @@
         <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
         }
       </mat-form-field>
-      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">Passwort ändern</button>
+      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
+        Passwort ändern
+      </button>
     </form>
-    <mat-slide-toggle color="primary">
+    <mat-slide-toggle
+      color="primary"
+      [checked]="newsletterSubscription"
+      [(ngModel)]="newsletterSubscription"
+      (click)="changeNewsletter()"
+    >
       <mat-label>Newsletter per Mail erhalten</mat-label>
     </mat-slide-toggle>
   </oc-content-box>

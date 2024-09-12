@@ -18,4 +18,9 @@ export class ProfileApiService extends OCApi {
   get profile(): Observable<ProfileGetResponse> {
     return this.get<ProfileGetResponse>('profile', this.authService.token);
   }
+  setNewsletter(subscribed: boolean): Observable<void> {
+    return subscribed
+      ? this.put('profile/newsletter', this.authService.token)
+      : this.delete('profile/newsletter', this.authService.token);
+  }
 }

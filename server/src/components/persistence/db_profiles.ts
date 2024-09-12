@@ -4,6 +4,7 @@ import DBConnection from './db_connector';
 export interface DBProfile {
   userId: number;
   sol: number;
+  newsletter: boolean;
 }
 
 export default class DBProfilesDAO {
@@ -13,14 +14,20 @@ export default class DBProfilesDAO {
   }
   private static async getBy(whereClause: string): Promise<DBProfile[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT user_id, sol FROM profiles WHERE ${whereClause}`
+      `SELECT user_id, sol, newsletter FROM profiles WHERE ${whereClause}`
     );
     return queryResult.map(r => {
       return {
         userId: Number(r.user_id),
-        sol: Number(r.sol)
+        sol: Number(r.sol),
+        newsletter: Boolean(r.newsletter)
       };
     });
+  }
+  static async setNewsletter(userId: number, newsletter: boolean) {
+    await DBConnection.instance.query(
+      `UPDATE profiles SET newsletter = ${newsletter ? 1 : 0} WHERE user_id = ${userId}`
+    );
   }
   static async create(userId: number, newsletter: boolean) {
     await DBConnection.instance.query(
