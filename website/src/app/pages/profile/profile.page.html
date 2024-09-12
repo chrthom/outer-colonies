@@ -1,3 +1,41 @@
 <div id="profile-box">
-  <oc-content-box title="Profilverwaltung"> TBD </oc-content-box>
+  <oc-content-box title="Profilverwaltung">
+    <mat-form-field class="wide" appearance="outline">
+      <mat-label>Nutzername</mat-label>
+      <input matInput readonly="readonly" [value]="username" />
+    </mat-form-field>
+    <form id="email-form" [formGroup]="emailForm" (ngSubmit)="emailForm.valid ? submit() : {}">
+      <mat-form-field class="wide" appearance="outline">
+        <mat-label>Neue E-Mail</mat-label>
+        <input matInput formControlName="email" [errorStateMatcher]="matcher" />
+        @if (email?.hasError('exists') && !email?.hasError('required')) {
+        <mat-error> Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet </mat-error>
+        } @if (email?.hasError('maxlength') && !email?.hasError('email')) {
+        <mat-error> Die E-Mail Adresse darf maximal 60 Zeichen lang sein </mat-error>
+        } @if (email?.hasError('email') && !email?.hasError('required')) {
+        <mat-error> Dies ist keine valide E-Mail Adresse </mat-error>
+        } @if (email?.hasError('required')) {
+        <mat-error> Bitte gib eine valide E-Mail Adresse an </mat-error>
+        }
+      </mat-form-field>
+      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">E-Mail ändern</button>
+    </form>
+    <form id="password-form" [formGroup]="passwordForm" (ngSubmit)="passwordForm.valid ? submit() : {}">
+      <mat-form-field class="wide" appearance="outline">
+        <mat-label>Neues Passwort</mat-label>
+        <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
+        @if (password?.hasError('maxlength')) {
+        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
+        } @if (password?.hasError('minlength') && !password?.hasError('required')) {
+        <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
+        } @if (password?.hasError('required')) {
+        <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
+        }
+      </mat-form-field>
+      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">Passwort ändern</button>
+    </form>
+    <mat-slide-toggle color="primary">
+      <mat-label>Newsletter per Mail erhalten</mat-label>
+    </mat-slide-toggle>
+  </oc-content-box>
 </div>
