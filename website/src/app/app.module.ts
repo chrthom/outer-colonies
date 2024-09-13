@@ -29,6 +29,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { OpenItemComponent } from './components/open-item/open-item.component';
 
 import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
+import { ConfirmEmailPage } from './pages/confirm-email/confirm-email.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { DeckPage } from './pages/deck/deck.page';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
@@ -50,6 +51,7 @@ import { TradePage } from './pages/trade/trade.page';
     NavbarComponent,
     OpenItemComponent,
     ActivateAccountPage,
+    ConfirmEmailPage,
     DataPrivacyPage,
     DeckPage,
     ForgotPasswordPage,

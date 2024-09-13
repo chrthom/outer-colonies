@@ -22,7 +22,7 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 export class ProfilePage implements OnInit {
   newsletterSubscription!: boolean;
   passwordResetSuccessful = false;
-  passwordResetFailed = false;
+  emailResetSuccessful = false;
   emailForm: FormGroup = new FormGroup({
     email: new FormControl(
       '',
@@ -54,13 +54,17 @@ export class ProfilePage implements OnInit {
   changeEmail() {
     this.emailForm.markAllAsTouched();
     if (this.emailForm.valid) {
-      // TODO
+      this.authAPIService
+        .resetEmail(this.authService.token, this.emailForm.value.email)
+        .subscribe(() => (this.emailResetSuccessful = true));
     }
   }
   changePassword() {
     this.passwordForm.markAllAsTouched();
     if (this.passwordForm.valid) {
-      this.authAPIService.resetPassword(this.authService.token, this.passwordForm.value.password).subscribe(() => (this.passwordResetSuccessful = true));
+      this.authAPIService
+        .resetPassword(this.authService.token, this.passwordForm.value.password)
+        .subscribe(() => (this.passwordResetSuccessful = true));
     }
   }
   changeNewsletter() {

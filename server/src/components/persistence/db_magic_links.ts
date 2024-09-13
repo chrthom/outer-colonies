@@ -41,7 +41,9 @@ export default class DBMagicLinksDAO {
     return DBConnection.instance
       .query(
         'INSERT INTO magic_links (id, user_id, type, value, valid_until) VALUES ' +
-          `('${uuid}', ${userId}, '${type}', ${value ? `'${value}'` : null}, NOW() + INTERVAL ${constants.magicLinkTTL} HOUR)`
+          `('${uuid}', ${userId}, '${type}', ${value ? `'${value}'` : null}, NOW() + INTERVAL ${
+            constants.magicLinkTTL
+          } HOUR)`
       )
       .then(() => uuid);
   }

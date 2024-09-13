@@ -22,6 +22,7 @@ import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page
 import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
 import { ProfilePage } from './pages/profile/profile.page';
+import { ConfirmEmailPage } from './pages/confirm-email/confirm-email.page';
 
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
@@ -54,6 +55,11 @@ const routes: Routes = [
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
     component: ActivateAccountPage
+  },
+  {
+    path: 'confirm-email/:id',
+    canActivate: [publicGuardFn],
+    component: ConfirmEmailPage
   },
   {
     path: 'deck',
