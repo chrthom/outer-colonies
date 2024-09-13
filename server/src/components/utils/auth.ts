@@ -22,9 +22,12 @@ export default class Auth {
     );
   }
   static async sendPasswordReset(usernameOrEmail: string) {
-    let credential = await DBCredentialsDAO.getByUsername(usernameOrEmail);
-    credential ??= await DBCredentialsDAO.getByEmail(usernameOrEmail);
-    if (!credential) return Promise.reject(APIRejectReason.NotFound);
+    const credential = await DBCredentialsDAO.getByUsername(usernameOrEmail).catch(
+      reason =>
+        reason == APIRejectReason.NotFound
+          ? DBCredentialsDAO.getByEmail(usernameOrEmail)
+          : Promise.reject(APIRejectReason.NotFound)
+    );
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
@@ -67,9 +70,12 @@ export default class Auth {
     return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
-    let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
-    credential ??= await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
-    if (!credential) return Promise.reject(APIRejectReason.NotFound);
+    const credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password).catch(
+      reason =>
+        reason == APIRejectReason.NotFound
+          ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
+          : Promise.reject(APIRejectReason.NotFound)
+    );
     DBDailiesDAO.achieveLogin(credential.userId);
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
     credential.sessionToken = sessionToken;
