@@ -30,6 +30,12 @@ export default class DBMagicLinksDAO {
     );
     return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject(APIRejectReason.NotFound);
   }
+  static async getValue(id: string, type: MagicLinkType): Promise<string | null> {
+    const queryResult: any[] = await DBConnection.instance.query(
+      `SELECT value FROM magic_links WHERE id = '${id}' AND type = '${type}' AND valid_until >= NOW()`
+    );
+    return queryResult.length == 1 ? queryResult[0].value : Promise.reject(APIRejectReason.NotFound);
+  }
   private static async create(userId: number, type: MagicLinkType, value?: any): Promise<string> {
     const uuid = uuidv4();
     return DBConnection.instance

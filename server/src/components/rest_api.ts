@@ -218,6 +218,14 @@ export default function restAPI(app: Express) {
     });
   });
 
+  // Confirm new email address via magic link
+  app.put('/api/auth/email/:id', (req, res) => {
+    Auth.resetEmail(String(req.params['id'])).then(
+      () => sendStatus(res, 204),
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+    );
+  });
+
   // List all cards
   app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {

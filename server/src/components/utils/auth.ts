@@ -37,6 +37,13 @@ export default class Auth {
     await DBCredentialsDAO.activate(userId);
     await DBMagicLinksDAO.delete(resetId);
   }
+  static async resetEmail(resetId: string) {
+    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.EmailConfirmation);
+    const value = await DBMagicLinksDAO.getValue(resetId, MagicLinkType.EmailConfirmation);
+    if (!value) return Promise.reject();
+    await DBCredentialsDAO.setEmail(userId, String(value));
+    await DBMagicLinksDAO.delete(resetId);
+  }
   static async resetPassword(resetId: string, password: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.PasswordReset);
     await DBCredentialsDAO.setPassword(userId, password);
