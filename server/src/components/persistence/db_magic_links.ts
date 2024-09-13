@@ -17,22 +17,25 @@ export default class DBMagicLinksDAO {
     return this.create(userId, MagicLinkType.PasswordReset);
   }
   static async delete(id: string) {
-    return DBConnection.instance.query(`DELETE FROM magic_links WHERE id = '${id}'`);
+    return DBConnection.instance.query('DELETE FROM magic_links WHERE id = ?', [id]);
   }
   static async deleteForUserAndType(userId: number, type: MagicLinkType) {
-    return DBConnection.instance.query(
-      `DELETE FROM magic_links WHERE user_id = ${userId} AND type = '${type}'`
-    );
+    return DBConnection.instance.query('DELETE FROM magic_links WHERE user_id = ? AND type = ?', [
+      userId,
+      type
+    ]);
   }
   static async getUserId(id: string, type: MagicLinkType): Promise<number> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT user_id FROM magic_links WHERE id = '${id}' AND type = '${type}' AND valid_until >= NOW()`
+      'SELECT user_id FROM magic_links WHERE id = ? AND type = ? AND valid_until >= NOW()',
+      [id, type]
     );
     return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject(APIRejectReason.NotFound);
   }
   static async getValue(id: string, type: MagicLinkType): Promise<string | null> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT value FROM magic_links WHERE id = '${id}' AND type = '${type}' AND valid_until >= NOW()`
+      'SELECT value FROM magic_links WHERE id = ? AND type = ? AND valid_until >= NOW()',
+      [id, type]
     );
     return queryResult.length == 1 ? queryResult[0].value : Promise.reject(APIRejectReason.NotFound);
   }
@@ -41,9 +44,8 @@ export default class DBMagicLinksDAO {
     return DBConnection.instance
       .query(
         'INSERT INTO magic_links (id, user_id, type, value, valid_until) VALUES ' +
-          `('${uuid}', ${userId}, '${type}', ${value ? `'${value}'` : null}, NOW() + INTERVAL ${
-            constants.magicLinkTTL
-          } HOUR)`
+          `(?, ?, ?, ?, NOW() + INTERVAL ${constants.magicLinkTTL} HOUR)`,
+        [uuid, userId, type, value]
       )
       .then(() => uuid);
   }
