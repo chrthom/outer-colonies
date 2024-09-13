@@ -27,7 +27,7 @@ export default class Mailer {
   }
 
   static sendEmailConfirmation(email: string, name: string, linkUUID: string) {
-    const link = `${config.get('url.base')}/email-confirmation/${linkUUID}`;
+    const link = `${config.get('url.base')}/confirm-email/${linkUUID}`;
     this.send(
       email,
       'Outer Colonies: Neue E-Mail-Adresse bestätigen',

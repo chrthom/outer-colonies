@@ -51,7 +51,7 @@ export default class AuthApiService extends OCApi {
     return this.put(`auth/password/${resetId}`, undefined, { password: password });
   }
   resetEmail(sessionToken: string, email: string): Observable<void> {
-    return this.put('auth/email', sessionToken, { email: email });
+    return this.post('auth/email', sessionToken, { email: email });
   }
   confirmEmail(confirmId: string): Observable<void> {
     return this.put(`auth/email/${confirmId}`);

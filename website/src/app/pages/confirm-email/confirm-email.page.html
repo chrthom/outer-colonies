@@ -2,7 +2,7 @@
   <oc-content-box title="E-Mail ge&auml;ndert">
     @if (confirmationSuccessful) {
     <h3>Deine E-Mail-Adresse wurde ge&auml;ndert</h3>
-    <p>Du kannst dich jetzt wieder <a routerLink="/login">einloggen</a>.</p>
+    <p>Du kannst jetzt zu <a routerLink="/profile">deinem Profil</a> zur&uuml;ckkehren.</p>
     } @else if (confirmationFailed) {
     <h3>Fehler</h3>
     <p>
@@ -10,7 +10,7 @@
     </p>
     }
     <p id="back-link">
-      <a routerLink="/login">&lt; Zur&uuml;ck</a>
+      <a routerLink="/">&lt; Zur&uuml;ck</a>
     </p>
   </oc-content-box>
 </div>
