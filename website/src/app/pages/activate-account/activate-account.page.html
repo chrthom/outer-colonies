@@ -1,12 +1,16 @@
 <div id="activate-account-box">
   <oc-content-box title="Nutzerkonto aktivieren">
     @if (activationSuccessful) {
-    <p>Dein Benutzerkonto wurde aktiviert. Du kannst dich jetzt <a routerLink="/login">einloggen</a>.</p>
+    <h3>Dein Benutzerkonto wurde aktiviert</h3>
+    <p>Du kannst dich jetzt <a routerLink="/login">einloggen</a>.</p>
     } @else if (activationFailed) {
-    <p>Die &uuml;bertragene Aktivierungscode ist ungültig oder abgelaufen. Bitte registriere dich erneut.</p>
+    <h3>Fehler</h3>
+    <p>
+      Die &uuml;bertragene Aktivierungscode ist ung&uuml;ltig oder abgelaufen. Bitte registriere dich erneut.
+    </p>
     }
     <p id="back-link">
-      <a routerLink="/login">&lt; Zur&uuml;ck</a>
+      <a routerLink="/">&lt; Zur&uuml;ck</a>
     </p>
   </oc-content-box>
 </div>

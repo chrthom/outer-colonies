@@ -17,6 +17,10 @@ export interface AuthPasswordRequest {
   password: string;
 }
 
+export interface AuthEmailRequest {
+  email: string;
+}
+
 export interface GenericResponse {
   status: number;
   message?: string;
@@ -30,6 +34,7 @@ export interface AuthRegistrationResponse {
 export interface AuthLoginResponse {
   sessionToken: string;
   username: string;
+  email: string;
 }
 
 export interface AuthExistsResponse {
@@ -68,6 +73,7 @@ export interface DeckListResponse {
 
 export interface ProfileGetResponse {
   sol: number;
+  newsletter: boolean;
 }
 
 export interface DailyGetResponse {

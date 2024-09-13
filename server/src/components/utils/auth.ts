@@ -1,14 +1,12 @@
 import CardCollection from '../cards/collection/card_collection';
 import { AuthLoginRequest, AuthRegisterRequest } from '../../shared/interfaces/rest_api';
-import DBCredentialsDAO, { DBCredential } from '../persistence/db_credentials';
+import DBCredentialsDAO, { DBCredential, DBCredentialWithSessionToken } from '../persistence/db_credentials';
 import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBDecksDAO from '../persistence/db_decks';
 import DBMagicLinksDAO from '../persistence/db_magic_links';
 import Mailer from './mailer';
 import { APIRejectReason, MagicLinkType } from '../../shared/config/enums';
-
-type UsernameAndToken = [username: string, token: string];
 
 export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
@@ -24,15 +22,29 @@ export default class Auth {
     );
   }
   static async sendPasswordReset(usernameOrEmail: string) {
-    let credential = await DBCredentialsDAO.getByUsername(usernameOrEmail);
-    credential ??= await DBCredentialsDAO.getByEmail(usernameOrEmail);
-    if (!credential) return Promise.reject(APIRejectReason.NotFound);
+    const credential = await DBCredentialsDAO.getByUsername(usernameOrEmail).catch(
+      reason =>
+        reason == APIRejectReason.NotFound
+          ? DBCredentialsDAO.getByEmail(usernameOrEmail)
+          : Promise.reject(APIRejectReason.NotFound)
+    );
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
+  }
+  static async sendEmailConfirmation(userId: number, username: string, newEmail: string) {
+    const uuid = await DBMagicLinksDAO.createEmailConfirmation(userId, newEmail);
+    Mailer.sendEmailConfirmation(newEmail, username, uuid);
   }
   static async activateAccount(resetId: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);
     await DBCredentialsDAO.activate(userId);
+    await DBMagicLinksDAO.delete(resetId);
+  }
+  static async resetEmail(resetId: string) {
+    const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.EmailConfirmation);
+    const value = await DBMagicLinksDAO.getValue(resetId, MagicLinkType.EmailConfirmation);
+    if (!value) return Promise.reject();
+    await DBCredentialsDAO.setEmail(userId, String(value));
     await DBMagicLinksDAO.delete(resetId);
   }
   static async resetPassword(resetId: string, password: string) {
@@ -57,13 +69,17 @@ export default class Auth {
     Mailer.sendAccountActivation(credential.email, credential.username, uuid);
     return credential;
   }
-  static async login(loginData: AuthLoginRequest): Promise<UsernameAndToken> {
-    let credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password);
-    credential ??= await DBCredentialsDAO.getByEmail(loginData.username, loginData.password);
-    if (!credential) return Promise.reject(APIRejectReason.NotFound);
+  static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
+    const credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password).catch(
+      reason =>
+        reason == APIRejectReason.NotFound
+          ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
+          : Promise.reject(APIRejectReason.NotFound)
+    );
     DBDailiesDAO.achieveLogin(credential.userId);
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
-    return [credential.username, sessionToken];
+    credential.sessionToken = sessionToken;
+    return <DBCredentialWithSessionToken>credential;
   }
   static async logout(sessionToken: string) {
     await DBCredentialsDAO.invalidateSessionToken(sessionToken);

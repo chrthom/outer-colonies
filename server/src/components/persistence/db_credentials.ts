@@ -48,6 +48,11 @@ export default class DBCredentialsDAO {
         }
       : Promise.reject(APIRejectReason.NotFound);
   }
+  static async setEmail(userId: number, email: string) {
+    await DBConnection.instance.query(
+      `UPDATE credentials SET email = '${email}' WHERE user_id = '${userId}'`
+    );
+  }
   static async setPassword(userId: number, password: string) {
     await DBConnection.instance.query(
       `UPDATE credentials SET password = '${password}' WHERE user_id = '${userId}'`

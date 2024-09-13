@@ -33,13 +33,15 @@ export class ResetPasswordPage implements OnInit {
     this.resetPasswordForm.markAllAsTouched();
     if (this.resetPasswordForm.valid && !this.loading) {
       this.loading = true;
-      this.authAPIService.resetPassword(this.resetId, this.resetPasswordForm.value.password).subscribe({
-        next: () => (this.passwordResetSuccessful = true),
-        error: () => {
-          this.passwordResetFailed = true;
-          this.loading = false;
-        }
-      });
+      this.authAPIService
+        .resetPasswordViaMagicLink(this.resetId, this.resetPasswordForm.value.password)
+        .subscribe({
+          next: () => (this.passwordResetSuccessful = true),
+          error: () => {
+            this.passwordResetFailed = true;
+            this.loading = false;
+          }
+        });
     }
   }
 }

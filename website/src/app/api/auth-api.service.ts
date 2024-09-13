@@ -30,21 +30,30 @@ export default class AuthApiService extends OCApi {
     return this.get<AuthLoginResponse>('auth/login', sessionToken);
   }
   register(body: AuthRegisterRequest): Observable<void> {
-    return this.post<void>('auth/register', undefined, body);
+    return this.post('auth/register', undefined, body);
   }
   activate(activateId: string): Observable<void> {
-    return this.put<void>(`auth/register/${activateId}`);
+    return this.put(`auth/register/${activateId}`);
   }
   login(body: AuthLoginRequest): Observable<AuthLoginResponse> {
     return this.post<AuthLoginResponse>('auth/login', undefined, body);
   }
   logout(sessionToken: string): Observable<void> {
-    return this.delete<void>('auth/login', sessionToken);
+    return this.delete('auth/login', sessionToken);
   }
-  forgotPassword(user: string): Observable<string> {
-    return this.delete<string>(`auth/password/${user}`);
+  forgotPassword(user: string): Observable<void> {
+    return this.delete(`auth/password/${user}`);
   }
-  resetPassword(resetId: string, password: string): Observable<void> {
-    return this.post<void>(`auth/password/${resetId}`, undefined, { password: password });
+  resetPassword(sessionToken: string, password: string): Observable<void> {
+    return this.put('auth/password', sessionToken, { password: password });
+  }
+  resetPasswordViaMagicLink(resetId: string, password: string): Observable<void> {
+    return this.put(`auth/password/${resetId}`, undefined, { password: password });
+  }
+  resetEmail(sessionToken: string, email: string): Observable<void> {
+    return this.post('auth/email', sessionToken, { email: email });
+  }
+  confirmEmail(confirmId: string): Observable<void> {
+    return this.put(`auth/email/${confirmId}`);
   }
 }

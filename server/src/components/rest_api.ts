@@ -2,6 +2,7 @@ import { Express, Request, Response } from 'express';
 import fetch from 'node-fetch';
 import Auth from './utils/auth';
 import {
+  AuthEmailRequest,
   AuthExistsResponse,
   AuthLoginRequest,
   AuthLoginResponse,
@@ -130,10 +131,11 @@ export default function restAPI(app: Express) {
   // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(
-      usernameAndToken => {
+      u => {
         const payload: AuthLoginResponse = {
-          sessionToken: usernameAndToken[1],
-          username: usernameAndToken[0]
+          sessionToken: u.sessionToken,
+          username: u.username,
+          email: u.email
         };
         res.status(200).send(payload);
       },
@@ -146,7 +148,8 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       const payload: AuthLoginResponse = {
         sessionToken: u.sessionToken,
-        username: u.username
+        username: u.username,
+        email: u.email
       };
       res.status(200).send(payload);
     });
@@ -187,10 +190,38 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Reset password
-  app.post('/api/auth/password/:id', (req, res) => {
+  // Reset password with active session
+  app.put('/api/auth/password', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      DBCredentialsDAO.setPassword(u.userId, (<AuthPasswordRequest>req.body).password).then(
+        () => sendStatus(res, 204),
+        reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      );
+    });
+  });
+
+  // Reset password via magic link
+  app.put('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
-      () => sendStatus(res, 201),
+      () => sendStatus(res, 204),
+      reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+    );
+  });
+
+  // Send email confirmation link
+  app.post('/api/auth/email', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      Auth.sendEmailConfirmation(u.userId, u.username, (<AuthEmailRequest>req.body).email).then(
+        () => sendStatus(res, 202),
+        () => sendStatus(res, 500)
+      );
+    });
+  });
+
+  // Confirm new email address via magic link
+  app.put('/api/auth/email/:id', (req, res) => {
+    Auth.resetEmail(String(req.params['id'])).then(
+      () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
   });
@@ -268,6 +299,26 @@ export default function restAPI(app: Express) {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.getByUserId(u.userId).then(sendProfileResponse, reason =>
         sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      );
+    });
+  });
+
+  // Activate newsletter subscription
+  app.put('/api/profile/newsletter', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      DBProfilesDAO.setNewsletter(u.userId, true).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
+    });
+  });
+
+  // Remove newsletter subscription
+  app.delete('/api/profile/newsletter', (req, res) => {
+    performWithSessionTokenCheck(req, res, u => {
+      DBProfilesDAO.setNewsletter(u.userId, false).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
       );
     });
   });
