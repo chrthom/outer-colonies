@@ -8,16 +8,18 @@ export interface DBDeck {
 
 export default class DBDecksDAO {
   static async getByUserId(userId: number): Promise<DBDeck[]> {
-    return this.getBy(`user_id = '${userId}'`);
+    return this.getBy('user_id = ?', [userId]);
   }
   static async setInUse(cardInstanceId: number, inUse: boolean) {
-    await DBConnection.instance.query(
-      `UPDATE decks SET in_use = ${inUse ? 1 : 0} WHERE card_instance_id = ${cardInstanceId}`
-    );
+    await DBConnection.instance.query('UPDATE decks SET in_use = ? WHERE card_instance_id = ?', [
+      inUse,
+      cardInstanceId
+    ]);
   }
-  private static async getBy(whereClause: string): Promise<DBDeck[]> {
+  private static async getBy(whereClause: string, params: any[]): Promise<DBDeck[]> {
     const queryResult: any[] = await DBConnection.instance.query(
-      `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`
+      `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`,
+      params
     );
     return queryResult.map(r => {
       return {
@@ -29,8 +31,8 @@ export default class DBDecksDAO {
   }
   static async create(cardId: number, userId: number, inUse?: boolean, tradeable?: boolean) {
     await DBConnection.instance.query(
-      'INSERT INTO decks (card_id, user_id, in_use, tradeable) VALUES ' +
-        `(${cardId}, ${userId}, ${inUse ? 1 : 0}, ${tradeable ? 1 : 0})`
+      'INSERT INTO decks (card_id, user_id, in_use, tradeable) VALUES (?, ?, ?, ?)',
+      [cardId, userId, inUse, tradeable]
     );
   }
 }

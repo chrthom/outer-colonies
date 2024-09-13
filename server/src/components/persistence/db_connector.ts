@@ -3,7 +3,7 @@ import config from 'config';
 
 export default class DBConnection {
   private static con: DBConnection;
-  pool!: mariadb.Pool;
+  pool: mariadb.Pool;
   private constructor() {
     this.pool = mariadb.createPool({
       host: config.get('database.host'),
@@ -14,19 +14,19 @@ export default class DBConnection {
       connectionLimit: config.get<number>('database.connectionLimit')
     });
   }
-  async query<T>(query: string, noRetry?: boolean): Promise<T> {
-    let conn: mariadb.PoolConnection | undefined = undefined;
+  async query(query: string, params: any[], noRetry?: boolean): Promise<any> {
+    let conn: mariadb.PoolConnection | undefined;
     try {
       conn = await this.pool.getConnection();
-      return conn.query(query);
+      return conn.prepare(query).then(q => q.execute(params));
     } catch (err) {
       console.log(`WARN: DB error ${err}`);
       if (err instanceof SqlError && err.code == 'ER_GET_CONNECTION_TIMEOUT') {
-        return this.query<T>(query);
+        return this.query(query, params);
       } else if (!noRetry) {
-        return this.query(query, true);
+        return this.query(query, params, true);
       } else {
-        throw err;
+        return Promise.reject(err);
       }
     } finally {
       if (conn) conn.end();
