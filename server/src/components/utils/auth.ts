@@ -28,10 +28,9 @@ export default class Auth {
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
-  static async sendEmailConfirmation(userId: number, newEmail: string) {
-    /////////////// TODO
-    //const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
-    //Mailer.sendPasswordReset(credential.email, credential.username, uuid);
+  static async sendEmailConfirmation(userId: number, username: string, newEmail: string) {
+    const uuid = await DBMagicLinksDAO.createEmailConfirmation(userId, newEmail);
+    Mailer.sendEmailConfirmation(newEmail, username, uuid);
   }
   static async activateAccount(resetId: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);

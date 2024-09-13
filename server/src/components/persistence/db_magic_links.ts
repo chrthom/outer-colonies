@@ -6,11 +6,15 @@ import { v4 as uuidv4 } from 'uuid';
 export default class DBMagicLinksDAO {
   static async createAccountActivation(userId: number): Promise<string> {
     await this.deleteForUserAndType(userId, MagicLinkType.AccountActivation);
-    return this.create(userId, constants.magicLinkAccountActivationTTL, MagicLinkType.AccountActivation);
+    return this.create(userId, MagicLinkType.AccountActivation);
+  }
+  static async createEmailConfirmation(userId: number, email: string): Promise<string> {
+    await this.deleteForUserAndType(userId, MagicLinkType.EmailConfirmation);
+    return this.create(userId, MagicLinkType.EmailConfirmation, email);
   }
   static async createPasswordReset(userId: number): Promise<string> {
     await this.deleteForUserAndType(userId, MagicLinkType.PasswordReset);
-    return this.create(userId, constants.magicLinkPasswordResetTTL, MagicLinkType.PasswordReset);
+    return this.create(userId, MagicLinkType.PasswordReset);
   }
   static async delete(id: string) {
     return DBConnection.instance.query(`DELETE FROM magic_links WHERE id = '${id}'`);
@@ -26,12 +30,12 @@ export default class DBMagicLinksDAO {
     );
     return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject(APIRejectReason.NotFound);
   }
-  private static async create(userId: number, ttlInHours: number, type: MagicLinkType): Promise<string> {
+  private static async create(userId: number, type: MagicLinkType, value?: any): Promise<string> {
     const uuid = uuidv4();
     return DBConnection.instance
       .query(
-        'INSERT INTO magic_links (id, user_id, type, valid_until) VALUES ' +
-          `('${uuid}', ${userId}, '${type}', NOW() + INTERVAL ${ttlInHours} HOUR)`
+        'INSERT INTO magic_links (id, user_id, type, value, valid_until) VALUES ' +
+          `('${uuid}', ${userId}, '${type}', ${value ? `'${value}'` : null}, NOW() + INTERVAL ${constants.magicLinkTTL} HOUR)`
       )
       .then(() => uuid);
   }

@@ -211,7 +211,7 @@ export default function restAPI(app: Express) {
   // Send email confirmation link
   app.post('/api/auth/email', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
-      Auth.sendEmailConfirmation(u.userId, (<AuthEmailRequest>req.body).email).then(
+      Auth.sendEmailConfirmation(u.userId, u.username, (<AuthEmailRequest>req.body).email).then(
         () => sendStatus(res, 202),
         () => sendStatus(res, 500)
       );
