@@ -53,7 +53,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
             };
           })
           .sort();
-        const cards = cs.cardStacks.map((cs, index) => {
+        const toClientCardStack = (cs: CardStack, index: number) => {
           return {
             id: cs.card.id,
             index: index,
@@ -61,7 +61,14 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
             retractable: ownedByPlayer && cs.canBeRetracted,
             insufficientEnergy: cs.hasInsufficientEnergy
           };
-        });
+        };
+        const otherCardStacks = cs.cardStacks
+          .filter(cs => zone == Zone.Colony || cs.type != CardType.Hull)
+          .map(toClientCardStack);
+        const hullCardStacks = cs.cardStacks
+          .filter(cs => zone != Zone.Colony && cs.type == CardType.Hull)
+          .map(cs => toClientCardStack(cs, otherCardStacks.length));
+        const cards = otherCardStacks.concat(hullCardStacks);
         return {
           uuid: cs.uuid,
           cards: cards,
