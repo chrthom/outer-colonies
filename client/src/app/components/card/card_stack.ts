@@ -117,8 +117,8 @@ export default class CardStack {
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
   }
   private createCards(origin?: CardImage) {
-    this.cards = this.data.cards.map(
-      c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth)
+    this.cards = this.data.cards.map(c =>
+      new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth)
     );
     this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -177,7 +177,11 @@ export default class CardStack {
     return this.zoneLayout.x.plus(x);
   }
   private y(index: number): CardYPosition {
-    const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
+    const maxIndex = Math.max(...this.data.cards.map(c => c.index));
+    const orientation = this.ownedByPlayer ? 1 : -1;
+    const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
+    const yStep = layoutConfig.game.cards.stackYDistance;
+    const yDistance = orientation * (maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / maxIndex);
     return this.zoneLayout.y.plus(index * yDistance);
   }
   private get depth(): number {

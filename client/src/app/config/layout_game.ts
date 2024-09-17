@@ -13,6 +13,7 @@ class LayoutGameConfig {
       xOffset: -85,
       yDistance: 50
     },
+    cardsBreakpointYCompression: 5,
     perspective: {
       none: Phaser.Math.DegToRad(0),
       neutral: Phaser.Math.DegToRad(-5),
