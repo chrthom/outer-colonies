@@ -26,7 +26,7 @@ export default class RetractCardButton {
       .setOrigin(0.5)
       .setScale(0.9)
       .setAlpha(designConfig.alpha.normal)
-      .setDepth(layoutConfig.depth.indicators)
+      .setDepth(layoutConfig.depth.indicator)
       .setInteractive({
         useHandCursor: true
       })

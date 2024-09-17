@@ -30,7 +30,7 @@ export default class ValueIndicator {
           designConfig.alpha.normal
         )
         .setOrigin(0.5)
-        .setDepth(layoutConfig.depth.indicators);
+        .setDepth(layoutConfig.depth.indicator);
     } else {
       this.shape = scene.add
         .star(
@@ -43,7 +43,7 @@ export default class ValueIndicator {
           designConfig.alpha.normal
         )
         .setOrigin(0.5)
-        .setDepth(layoutConfig.depth.indicators);
+        .setDepth(layoutConfig.depth.indicator);
     }
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
@@ -52,7 +52,7 @@ export default class ValueIndicator {
       .setColor(designConfig.color.hover)
       .setAlign('center')
       .setOrigin(0.5)
-      .setDepth(layoutConfig.depth.indicators);
+      .setDepth(layoutConfig.depth.indicator);
   }
   destroy() {
     this.shape.destroy();
