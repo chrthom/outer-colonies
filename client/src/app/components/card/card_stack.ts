@@ -59,7 +59,7 @@ export default class CardStack {
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
       const angle = handCard ? handCard.image.angle : this.ownedByPlayer ? 0 : 180;
-      c.setX(x).setY(y).setAngle(angle);
+      c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
     });
     this.tween();
     this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
@@ -104,20 +104,21 @@ export default class CardStack {
     });
   }
   private tween() {
-    this.cards.forEach((c, index) => {
+    this.cards.forEach(c => {
       c.tween({
         duration: animationConfig.duration.move,
         x: this.x,
-        y: this.y(index),
+        y: this.y(c.data.index),
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
+      c.setDepth(this.depth);
     });
     this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(
-      c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c)
+      c => new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth)
     );
     this.cards.forEach(c => {
       c.image.on('pointerdown', () => this.onClickAction(c.data));
@@ -178,6 +179,14 @@ export default class CardStack {
   private y(index: number): CardYPosition {
     const yDistance = layoutConfig.game.cards.stackYDistance * (this.ownedByPlayer ? 1 : -1);
     return this.zoneLayout.y.plus(index * yDistance);
+  }
+  private get depth(): number {
+    let depth = layoutConfig.depth.cardStack;
+    if (this.ownedByPlayer && this.data.zone == Zone.Colony) depth += 8;
+    else if (this.ownedByPlayer && this.data.zone == Zone.Orbital) depth += 6;
+    else if (this.data.zone == Zone.Neutral) depth += 4;
+    else if (this.data.zone == Zone.Orbital) depth += 2;
+    return depth;
   }
   private get zoneLayout(): CardPosition {
     const zoneLayout = this.ownedByPlayer

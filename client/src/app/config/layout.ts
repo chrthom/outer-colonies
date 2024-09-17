@@ -18,10 +18,11 @@ class LayoutConfig {
   readonly game = layoutGameConfig;
   readonly depth = {
     background: -1000,
-    indicators: 20,
+    cardStack: 0,
+    indicator: 30,
     discardCard: 50,
     handCard: 70,
-    battleEffects: 85,
+    battleEffect: 85,
     prompt: 90,
     maxCard: 95,
     maxedTacticCard: 100
