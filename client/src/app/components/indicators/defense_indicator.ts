@@ -24,7 +24,7 @@ export default class DefenseIndicator {
         .setOrigin(0.5)
         .setTint(color, designConfig.tint.neutral, color, color)
         .setAlpha(designConfig.alpha.normal)
-        .setDepth(layoutConfig.depth.indicators);
+        .setDepth(layoutConfig.depth.indicator);
     });
   }
   destroy() {

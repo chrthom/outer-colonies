@@ -50,7 +50,7 @@ export default class AttackDamageIndicator {
         blendMode: 'ADD',
         emitting: false
       })
-      .setDepth(layoutConfig.depth.battleEffects);
+      .setDepth(layoutConfig.depth.battleEffect);
   }
   private createIndicator(value: number, color: string) {
     return this.scene.add
@@ -60,7 +60,7 @@ export default class AttackDamageIndicator {
       .setColor(color)
       .setAlign('center')
       .setOrigin(0.5, 1)
-      .setDepth(layoutConfig.depth.battleEffects);
+      .setDepth(layoutConfig.depth.battleEffect);
   }
   private tween(target: Phaser.GameObjects.Text) {
     this.scene.tweens.add({
