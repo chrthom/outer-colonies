@@ -14,6 +14,11 @@ class LayoutGameConfig {
       yDistance: 50
     },
     cardsBreakpointYCompression: 5,
+    maxed: {
+      xFactorMoveToCenter: 0.2,
+      xOffset: 90,
+      yFactorMoveToCenter: 0.13
+    },
     perspective: {
       none: Phaser.Math.DegToRad(0),
       neutral: Phaser.Math.DegToRad(-5),

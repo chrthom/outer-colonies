@@ -159,14 +159,16 @@ export default class CardImage {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
   enableMaximizeOnMouseover() {
+    /*
     this.disableMaximizeOnMouseover();
     this.image
       .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
       .on('pointerout', () => this.scene.obj.maxCard.hide())
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
+    */
   }
   disableMaximizeOnMouseover() {
-    this.image.off('pointerover').off('pointerout').off('pointermove');
+    //this.image.off('pointerover').off('pointerout').off('pointermove');
   }
   tween(config: CardTweenConfig) {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
