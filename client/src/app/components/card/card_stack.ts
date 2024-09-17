@@ -104,11 +104,11 @@ export default class CardStack {
     });
   }
   private tween() {
-    this.cards.forEach((c, index) => {
+    this.cards.forEach(c => {
       c.tween({
         duration: animationConfig.duration.move,
         x: this.x,
-        y: this.y(index),
+        y: this.y(c.data.index),
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
       c.setDepth(this.depth);
