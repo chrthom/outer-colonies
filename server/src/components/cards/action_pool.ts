@@ -69,7 +69,7 @@ export default class ActionPool {
   }
   private activateCardType(cardType: CardSubtype) {
     const usedAction = this.getActionsForCardType(cardType)
-      .sort((a, b) => a.priority() - b.priority())
+      .sort((a, b) => b.priority() - a.priority())
       .pop();
     if (usedAction) {
       usedAction.depleted = true;
