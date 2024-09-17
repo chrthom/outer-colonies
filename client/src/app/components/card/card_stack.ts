@@ -23,6 +23,7 @@ export default class CardStack {
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
   private scene!: Game;
+  private maxedTimerEvent?: Phaser.Time.TimerEvent;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
@@ -104,6 +105,15 @@ export default class CardStack {
       }
     });
   }
+  private pointerover() {
+    this.maxedTimerEvent = this.scene.time.delayedCall(animationConfig.duration.waitBeforeMaximize, () =>
+      this.tween(true)
+    );
+  }
+  private pointerout() {
+    this.maxedTimerEvent?.destroy();
+    this.tween();
+  }
   private tween(maxed?: boolean) {
     this.cards.forEach(c => {
       c.tween({
@@ -129,9 +139,9 @@ export default class CardStack {
       c.enableMaximizeOnMouseover();
       c.image
         .on('pointerdown', () => this.onClickAction(c.data))
-        .on('pointerover', () => this.tween(true))
-        .on('pointerout', () => this.tween())
-        .on('gameout', () => this.tween());
+        .on('pointerover', () => this.pointerover())
+        .on('pointerout', () => this.pointerout())
+        .on('gameout', () => this.pointerout());
     });
     if (this.data.damage > 0) {
       this.damageIndicator = new ValueIndicator(
