@@ -159,16 +159,18 @@ export default class CardImage {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
   enableMaximizeOnMouseover() {
+    /*
     this.disableMaximizeOnMouseover();
     this.image
       .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
       .on('pointerout', () => this.scene.obj.maxCard.hide())
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
+    */
   }
   disableMaximizeOnMouseover() {
-    this.image.off('pointerover').off('pointerout').off('pointermove');
+    //this.image.off('pointerover').off('pointerout').off('pointermove');
   }
-  tween(config: CardTweenConfig) {
+  tween(config: CardTweenConfig): Phaser.Tweens.Tween {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
       duration: config.duration
@@ -184,7 +186,7 @@ export default class CardImage {
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
     if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    this.scene.tweens.add(rTweenConfig);
+    return this.scene.tweens.add(rTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);
