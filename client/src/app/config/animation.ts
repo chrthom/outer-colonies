@@ -2,12 +2,12 @@ class AnimationConfig {
   readonly duration = {
     loaderCycle: 1000,
     attack: 1000,
-    fadeMaxedCard: 150,
     draw: 400,
     move: 500,
     showTacticCard: 600,
     min: 10,
-    promptShow: 3000
+    promptShow: 3000,
+    zoomCard: 150
   };
   readonly attack = {
     indicator: {

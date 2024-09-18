@@ -163,12 +163,12 @@ export default class CardImage {
     this.image
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.rightButtonDown()) {
-          const maxCard = this.scene.obj.maxCard;
-          maxCard.image.visible ? this.scene.obj.maxCard.hide() : this.scene.obj.maxCard.show(this.cardId);
+          const maxCard = this.scene.obj.zoomCard;
+          maxCard.image.visible ? this.scene.obj.zoomCard.hide() : this.scene.obj.zoomCard.show(this.cardId);
         }
       })
-      .on('pointerout', () => this.scene.obj.maxCard.hide())
-      .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
+      .on('pointerout', () => this.scene.obj.zoomCard.hide())
+      .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
   }
   disableMaximizeOnMouseover() {
     //this.image.off('pointerover').off('pointerout').off('pointermove');

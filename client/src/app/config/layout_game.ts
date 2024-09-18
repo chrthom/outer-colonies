@@ -1,8 +1,8 @@
 import {
   CardXPosition,
   CardYPosition,
-  MaxCardXPosition,
-  MaxCardYPosition,
+  ZoomCardXPosition,
+  ZoomCardYPosition,
   MinCardXPosition,
   MinCardYPosition
 } from '../components/perspective';
@@ -148,8 +148,8 @@ class LayoutGameConfig {
       yOffset: -330
     },
     maxedTacticCard: {
-      x: new MaxCardXPosition(1200),
-      y: new MaxCardYPosition(650)
+      x: new ZoomCardXPosition(1200),
+      y: new ZoomCardYPosition(650)
     },
     prompt: {
       textOffset: {
