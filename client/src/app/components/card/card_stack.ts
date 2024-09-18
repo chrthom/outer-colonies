@@ -60,7 +60,7 @@ export default class CardStack {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
-      const angle = handCard ? handCard.image.angle : this.ownedByPlayer ? 0 : 180;
+      const angle = handCard ? handCard.image.angle : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(c.data.index);
       c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
     });
     this.tween();
@@ -119,22 +119,25 @@ export default class CardStack {
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
+      const index = c.data.index;
       return c.tween({
         duration: animationConfig.duration.move,
-        x: expand ? this.xExpanded(c.data.index) : this.x,
-        y: this.y(c.data.index, expand),
+        x: expand ? this.xExpanded(index) : this.x,
+        y: this.y(index, expand),
         z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
         xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(index))
       });
     });
   }
   private createCards(origin?: CardImage) {
-    this.cards = this.data.cards.map(c =>
-      new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth)
-    );
+    this.cards = this.data.cards.map(c => {
+      const newCard = new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth);
+      newCard.setAngle(newCard.shortestAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(c.index)))
+      return newCard;
+    });
     this.cards.forEach(c => {
       c.enableMaximizeOnMouseover();
       c.image
@@ -215,6 +218,9 @@ export default class CardStack {
       (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
       layoutConfig.game.cards.expanded.yFactorMoveToCenter;
     return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
+  }
+  private randomAngle(index: number): number {
+    return (this.x.value2d + this.y(index).value2d) % 10 - 5; // TODO: Adjust this value, use global params
   }
   private get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
