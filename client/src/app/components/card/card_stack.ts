@@ -22,8 +22,8 @@ export default class CardStack {
   data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
+  maxedTween?: Phaser.Tweens.Tween[];
   private scene!: Game;
-  private maxedTimerEvent?: Phaser.Time.TimerEvent;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
@@ -106,17 +106,18 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    this.maxedTimerEvent = this.scene.time.delayedCall(animationConfig.duration.waitBeforeMaximize, () =>
-      this.tween(true)
-    );
+    this.maxedTween = this.tween(true)
   }
   private pointerout() {
-    this.maxedTimerEvent?.destroy();
+    this.maxedTween?.forEach(t => t.stop());
     this.tween();
   }
-  private tween(maxed?: boolean) {
-    this.cards.forEach(c => {
-      c.tween({
+  private tween(maxed?: boolean): Phaser.Tweens.Tween[] {
+    this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
+    this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
+    return this.cards.map(c => {
+      c.setDepth(maxed ? layoutConfig.depth.maxedCard : this.depth);
+      return c.tween({
         duration: animationConfig.duration.move,
         x: maxed ? this.xMaxed(c.data.index) : this.x,
         y: this.y(c.data.index, maxed),
@@ -126,10 +127,7 @@ export default class CardStack {
           : layoutConfig.game.cards.perspective.board,
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
       });
-      c.setDepth(maxed ? layoutConfig.depth.maxCard : this.depth);
     });
-    this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
-    this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c =>

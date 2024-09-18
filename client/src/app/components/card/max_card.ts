@@ -13,7 +13,7 @@ export default class MaxCard extends CardImage {
       perspective: layoutConfig.game.cards.perspective.none,
       z: perspectiveConfig.distance.near
     });
-    this.image.setDepth(layoutConfig.depth.maxCard);
+    this.image.setDepth(layoutConfig.depth.maxCardLegacy);
     this.hide();
   }
   hide() {
