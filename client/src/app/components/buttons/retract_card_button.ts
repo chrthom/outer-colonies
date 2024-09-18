@@ -32,7 +32,9 @@ export default class RetractCardButton {
       })
       .on('pointerover', () => this.setTintHover())
       .on('pointerout', () => (crititcal ? this.setTintCritical() : this.setTintNormal()))
-      .on('pointerdown', () => scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex));
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex);
+      });
     if (crititcal) this.setTintCritical();
     else this.setTintNormal();
   }

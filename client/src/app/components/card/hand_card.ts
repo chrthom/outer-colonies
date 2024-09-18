@@ -24,7 +24,9 @@ export default class HandCard extends CardImage {
     );
     this.uuid = data.uuid;
     this.update(data);
-    this.image.on('pointerdown', () => this.onClickAction());
+    this.image.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (p.leftButtonDown()) this.onClickAction();
+    });
     this.setDepth(layoutConfig.depth.handCard);
     if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
   }

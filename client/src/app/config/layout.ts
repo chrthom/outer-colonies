@@ -19,13 +19,13 @@ class LayoutConfig {
   readonly depth = {
     background: -1000,
     cardStack: 0,
-    maxedCard: 15,
+    cardStackZoomed: 15,
     indicator: 30,
     discardCard: 50,
     handCard: 70,
     battleEffect: 85,
     prompt: 90,
-    maxCardLegacy: 95,
+    maxCard: 95,
     maxedTacticCard: 100
   };
   readonly fontSize = new FontSizeConfig();

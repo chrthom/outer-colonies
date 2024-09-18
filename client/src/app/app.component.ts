@@ -20,7 +20,8 @@ export class AppComponent {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: layoutConfig.scene.width,
       height: layoutConfig.scene.height
-    }
+    },
+    disableContextMenu: true
   };
   phaserGame: Phaser.Game = new Phaser.Game(this.config);
 

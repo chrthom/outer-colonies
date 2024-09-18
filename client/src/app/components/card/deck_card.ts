@@ -19,7 +19,10 @@ export default class DeckCard extends CardImage {
         perspective: layoutConfig.game.cards.perspective.board
       }
     );
-    if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());
+    if (ownedByPlayer)
+      this.image.on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction();
+      });
   }
   update() {
     if (this.indicator) this.indicator.destroy();

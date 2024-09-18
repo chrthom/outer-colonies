@@ -22,7 +22,7 @@ export default class CardStack {
   data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
-  maxedTween?: Phaser.Tweens.Tween[];
+  zoomTween?: Phaser.Tweens.Tween[];
   private scene!: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
@@ -107,24 +107,24 @@ export default class CardStack {
   }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
-      this.maxedTween = this.tween(true)
+      this.zoomTween = this.tween(true);
     }
   }
   private pointerout() {
-    this.maxedTween?.forEach(t => t.stop());
+    this.zoomTween?.forEach(t => t.stop());
     this.tween();
   }
-  private tween(maxed?: boolean): Phaser.Tweens.Tween[] {
+  private tween(zoom?: boolean): Phaser.Tweens.Tween[] {
     this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
-      c.setDepth(maxed ? layoutConfig.depth.maxedCard : this.depth);
+      c.setDepth(zoom ? layoutConfig.depth.cardStackZoomed : this.depth);
       return c.tween({
         duration: animationConfig.duration.move,
-        x: maxed ? this.xMaxed(c.data.index) : this.x,
-        y: this.y(c.data.index, maxed),
-        z: maxed ? perspectiveConfig.distance.maxed : perspectiveConfig.distance.board,
-        xRotation: maxed
+        x: zoom ? this.xZoomed(c.data.index) : this.x,
+        y: this.y(c.data.index, zoom),
+        z: zoom ? perspectiveConfig.distance.zoomed : perspectiveConfig.distance.board,
+        xRotation: zoom
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
@@ -138,7 +138,9 @@ export default class CardStack {
     this.cards.forEach(c => {
       c.enableMaximizeOnMouseover();
       c.image
-        .on('pointerdown', () => this.onClickAction(c.data))
+        .on('pointerdown', (p: Phaser.Input.Pointer) => {
+          if (p.leftButtonDown()) this.onClickAction(c.data);
+        })
         .on('pointerover', () => this.pointerover())
         .on('pointerout', () => this.pointerout())
         .on('gameout', () => this.pointerout());
@@ -195,24 +197,24 @@ export default class CardStack {
     x += shrinkZone;
     return this.zoneLayout.x.plus(x);
   }
-  private xMaxed(index: number): CardXPosition {
-    const offset = layoutConfig.game.cards.maxed.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
+  private xZoomed(index: number): CardXPosition {
+    const offset = layoutConfig.game.cards.zoomed.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
     const moveToCenter =
       (layoutConfig.game.cards.placement.zoneWidth / 2 - this.x.value2d) *
-      layoutConfig.game.cards.maxed.xFactorMoveToCenter;
+      layoutConfig.game.cards.zoomed.xFactorMoveToCenter;
     return this.x.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
   }
-  private y(index: number, maxed?: boolean): CardYPosition {
+  private y(index: number, zoom?: boolean): CardYPosition {
     const orientation = this.ownedByPlayer ? 1 : -1;
     const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
-    const yStep = layoutConfig.game.cards.stackYDistance * (maxed ? 2 : 1);
+    const yStep = layoutConfig.game.cards.stackYDistance * (zoom ? 2 : 1);
     const yDistance =
       orientation * (this.maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / this.maxIndex);
-    const modIndex = maxed && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
+    const modIndex = zoom && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
     const moveToCenter =
       (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
-      layoutConfig.game.cards.maxed.yFactorMoveToCenter;
-    return this.zoneLayout.y.plus(modIndex * yDistance).plus(maxed ? moveToCenter : 0);
+      layoutConfig.game.cards.zoomed.yFactorMoveToCenter;
+    return this.zoneLayout.y.plus(modIndex * yDistance).plus(zoom ? moveToCenter : 0);
   }
   private get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));

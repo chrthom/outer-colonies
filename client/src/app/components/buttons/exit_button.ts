@@ -52,31 +52,19 @@ export default class ExitButton {
     (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(
       o =>
         o
-          .on('pointerdown', () => {
-            this.onClickAction();
+          .on('pointerdown', (p: Phaser.Input.Pointer) => {
+            if (p.leftButtonDown()) this.onClickAction();
           })
-          .on('pointerover', () => {
-            this.text.setColor(designConfig.color.warn);
-          })
-          .on('pointerout', () => {
-            this.text.setColor(designConfig.color.neutral);
-          }),
+          .on('pointerover', () => this.text.setColor(designConfig.color.warn))
+          .on('pointerout', () => this.text.setColor(designConfig.color.neutral)),
       this
     );
     this.confirmText
-      .on('pointerdown', () => {
-        this.onClickAction(true);
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction(true);
       })
-      .on('pointerover', () => {
-        this.confirmText.setColor(designConfig.color.warn);
-      })
-      .on(
-        'pointerout',
-        () => {
-          this.confirmText.setColor(designConfig.color.neutral);
-        },
-        this
-      );
+      .on('pointerover', () => this.confirmText.setColor(designConfig.color.warn))
+      .on('pointerout', () => this.confirmText.setColor(designConfig.color.neutral));
     this.update();
   }
   show() {
