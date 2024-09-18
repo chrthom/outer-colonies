@@ -19,7 +19,7 @@ export default class MaxCard extends CardImage {
     this.activeTween?.stop();
     this.activeTween = this.scene.tweens.add({
       duration: animationConfig.duration.fadeMaxedCard,
-      targets: [ this.image ],
+      targets: [this.image],
       alpha: 0,
       onComplete: () => this.image.setVisible(false)
     });
@@ -27,12 +27,10 @@ export default class MaxCard extends CardImage {
   show(cardId: number) {
     this.activeTween?.stop();
     this.setCardId(cardId);
-    this.image
-      .setVisible(true)
-      .setAlpha(0);
+    this.image.setVisible(true).setAlpha(0);
     this.activeTween = this.scene.tweens.add({
       duration: animationConfig.duration.fadeMaxedCard,
-      targets: [ this.image ],
+      targets: [this.image],
       alpha: 1
     });
   }
@@ -40,13 +38,17 @@ export default class MaxCard extends CardImage {
     return this.setX(this.xMaxed).setY(this.yMaxed);
   }
   private get xMaxed(): MaxCardXPosition {
-    return new MaxCardXPosition(this.scene.input.mousePointer.x +
-    layoutConfig.game.ui.maxCard.xOffset *
-      (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1));
+    return new MaxCardXPosition(
+      this.scene.input.mousePointer.x +
+        layoutConfig.game.ui.maxCard.xOffset *
+          (this.scene.input.mousePointer.x > layoutConfig.scene.width / 2 ? -1 : 1)
+    );
   }
   private get yMaxed(): MaxCardYPosition {
-    return new MaxCardYPosition(this.scene.input.mousePointer.y +
-    layoutConfig.game.ui.maxCard.yOffset *
-      (this.scene.input.mousePointer.y < layoutConfig.scene.height / 2 ? -1 : 1));
+    return new MaxCardYPosition(
+      this.scene.input.mousePointer.y +
+        layoutConfig.game.ui.maxCard.yOffset *
+          (this.scene.input.mousePointer.y < layoutConfig.scene.height / 2 ? -1 : 1)
+    );
   }
 }

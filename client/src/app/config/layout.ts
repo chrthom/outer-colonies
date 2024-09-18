@@ -19,7 +19,7 @@ class LayoutConfig {
   readonly depth = {
     background: -1000,
     cardStack: 0,
-    cardStackZoomed: 15,
+    cardStackExpanded: 15,
     indicator: 30,
     discardCard: 50,
     handCard: 70,

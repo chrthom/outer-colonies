@@ -14,7 +14,7 @@ class LayoutGameConfig {
       yDistance: 50
     },
     cardsBreakpointYCompression: 5,
-    zoomed: {
+    expanded: {
       xFactorMoveToCenter: 0.2,
       xOffset: 90,
       yFactorMoveToCenter: 0.13

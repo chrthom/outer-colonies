@@ -22,7 +22,7 @@ export default class CardStack {
   data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
-  zoomTween?: Phaser.Tweens.Tween[];
+  expandTween?: Phaser.Tweens.Tween[];
   private scene!: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
@@ -107,24 +107,24 @@ export default class CardStack {
   }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
-      this.zoomTween = this.tween(true);
+      this.expandTween = this.tween(true);
     }
   }
   private pointerout() {
-    this.zoomTween?.forEach(t => t.stop());
+    this.expandTween?.forEach(t => t.stop());
     this.tween();
   }
-  private tween(zoom?: boolean): Phaser.Tweens.Tween[] {
+  private tween(expand?: boolean): Phaser.Tweens.Tween[] {
     this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
-      c.setDepth(zoom ? layoutConfig.depth.cardStackZoomed : this.depth);
+      c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       return c.tween({
         duration: animationConfig.duration.move,
-        x: zoom ? this.xZoomed(c.data.index) : this.x,
-        y: this.y(c.data.index, zoom),
-        z: zoom ? perspectiveConfig.distance.zoomed : perspectiveConfig.distance.board,
-        xRotation: zoom
+        x: expand ? this.xExpanded(c.data.index) : this.x,
+        y: this.y(c.data.index, expand),
+        z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
+        xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
         angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
@@ -197,24 +197,24 @@ export default class CardStack {
     x += shrinkZone;
     return this.zoneLayout.x.plus(x);
   }
-  private xZoomed(index: number): CardXPosition {
-    const offset = layoutConfig.game.cards.zoomed.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
+  private xExpanded(index: number): CardXPosition {
+    const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
     const moveToCenter =
       (layoutConfig.game.cards.placement.zoneWidth / 2 - this.x.value2d) *
-      layoutConfig.game.cards.zoomed.xFactorMoveToCenter;
+      layoutConfig.game.cards.expanded.xFactorMoveToCenter;
     return this.x.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
   }
-  private y(index: number, zoom?: boolean): CardYPosition {
+  private y(index: number, expand?: boolean): CardYPosition {
     const orientation = this.ownedByPlayer ? 1 : -1;
     const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
-    const yStep = layoutConfig.game.cards.stackYDistance * (zoom ? 2 : 1);
+    const yStep = layoutConfig.game.cards.stackYDistance * (expand ? 2 : 1);
     const yDistance =
       orientation * (this.maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / this.maxIndex);
-    const modIndex = zoom && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
+    const modIndex = expand && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
     const moveToCenter =
       (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
-      layoutConfig.game.cards.zoomed.yFactorMoveToCenter;
-    return this.zoneLayout.y.plus(modIndex * yDistance).plus(zoom ? moveToCenter : 0);
+      layoutConfig.game.cards.expanded.yFactorMoveToCenter;
+    return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
   }
   private get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
