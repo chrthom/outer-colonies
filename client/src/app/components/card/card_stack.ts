@@ -106,7 +106,9 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    this.maxedTween = this.tween(true)
+    if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
+      this.maxedTween = this.tween(true)
+    }
   }
   private pointerout() {
     this.maxedTween?.forEach(t => t.stop());
