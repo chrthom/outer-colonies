@@ -159,13 +159,16 @@ export default class CardImage {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
   enableMaximizeOnMouseover() {
-    /*
     this.disableMaximizeOnMouseover();
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.rightButtonDown()) {
+          const maxCard = this.scene.obj.maxCard;
+          maxCard.image.visible ? this.scene.obj.maxCard.hide() : this.scene.obj.maxCard.show(this.cardId);
+        }
+      })
       .on('pointerout', () => this.scene.obj.maxCard.hide())
       .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
-    */
   }
   disableMaximizeOnMouseover() {
     //this.image.off('pointerover').off('pointerout').off('pointermove');

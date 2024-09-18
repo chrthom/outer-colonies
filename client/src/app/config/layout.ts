@@ -25,8 +25,8 @@ class LayoutConfig {
     handCard: 70,
     battleEffect: 85,
     prompt: 90,
-    maxCard: 95,
-    maxedTacticCard: 100
+    maxedTacticCard: 95,
+    maxCard: 100
   };
   readonly fontSize = new FontSizeConfig();
   readonly scene = {
