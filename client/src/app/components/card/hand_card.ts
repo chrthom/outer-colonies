@@ -28,14 +28,17 @@ export default class HandCard extends CardImage {
       if (p.leftButtonDown()) this.onClickAction();
     });
     this.setDepth(layoutConfig.depth.handCard);
-    if (data.ownedByPlayer) this.enableMaximizeOnRightclick();
+    if (data.ownedByPlayer) {
+      this.enableMaximizeOnRightclick();
+      this.enableExpandOnPointerover();
+    }
   }
   update(data: ClientHandCard) {
     this.data = data;
     this.tween({
       duration: animationConfig.duration.draw,
-      x: this.targetX,
-      y: this.targetY,
+      x: this.targetX(),
+      y: this.targetY(),
       xRotation: layoutConfig.game.cards.perspective.neutral,
       angle: this.shortestAngle(this.targetAngle)
     });
@@ -65,20 +68,20 @@ export default class HandCard extends CardImage {
     }
     return super.discard(toDeck);
   }
-  private invIndex(data: ClientHandCard) {
+  private invIndex(index: number) {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
-    return handData.hand.length - data.index - 1;
+    return handData.hand.length - index - 1;
   }
-  private get targetX(): CardXPosition {
+  private targetX(index?: number): CardXPosition {
     return new CardXPosition(
       this.placementConfig.hand.x.value2d +
-        this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
+        this.invIndex(index ?? this.data.index) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private get targetY(): CardYPosition {
+  private targetY(index?: number): CardYPosition {
     return new CardYPosition(
       this.placementConfig.hand.y.value2d +
-        this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+        this.factor * this.invIndex(index ?? this.data.index) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
   private get targetAngle() {
@@ -86,7 +89,7 @@ export default class HandCard extends CardImage {
       this.orientation +
       this.factor *
         (layoutConfig.game.cards.placement.hand.startAngle +
-          this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep)
+          this.invIndex(this.data.index) * layoutConfig.game.cards.placement.hand.angleStep)
     );
   }
   private get factor() {
@@ -112,5 +115,28 @@ export default class HandCard extends CardImage {
         this.scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
       }
     }
+  }
+  private enableExpandOnPointerover() {
+    this.image
+      .on('pointerover', () => {
+        this.scene.animations.handCardExpand?.forEach(t => t.stop());
+        this.scene.animations.handCardExpand = this.scene.player.hand.map(hc =>
+          hc.tween({
+            duration: animationConfig.duration.handExpand,
+            x: hc.targetX(hc.data.index + (hc.data.index > this.data.index ? 1 : -1)),
+            y: hc.targetY().plus(hc.data.index == this.data.index ? -65 : 0) // TODO
+          })
+        );
+      })
+      .on('pointerout', () => {
+        this.scene.animations.handCardExpand?.forEach(t => t.stop());
+        this.scene.animations.handCardExpand = this.scene.player.hand.map(hc =>
+          hc.tween({
+            duration: animationConfig.duration.handExpand,
+            x: hc.targetX(),
+            y: hc.targetY()
+          })
+        );
+      });
   }
 }
