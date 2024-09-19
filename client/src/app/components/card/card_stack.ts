@@ -149,7 +149,7 @@ export default class CardStack {
       return newCard;
     });
     this.cards.forEach(c => {
-      c.enableMaximizeOnMouseover();
+      c.enableMaximizeOnRightclick();
       c.image
         .on('pointerdown', (p: Phaser.Input.Pointer) => {
           if (p.leftButtonDown()) this.onClickAction(c.data);

@@ -25,10 +25,8 @@ export default class DiscardPile extends CardImage {
   update(cardIds?: number[]) {
     if (cardIds) this.cardIds = cardIds;
     if (this.indicator) this.indicator.destroy();
-    if (this.topCard == constants.cardBackSideID) {
-      this.setVisible(false).disableMaximizeOnMouseover();
-    } else {
-      this.setCardId(this.topCard).setVisible(true).enableMaximizeOnMouseover();
+    if (this.topCard != constants.cardBackSideID) {
+      this.setCardId(this.topCard).setVisible(true).enableMaximizeOnRightclick();
       this.image.off('pointerdown').on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown()) this.onClickAction();
       });
@@ -44,9 +42,9 @@ export default class DiscardPile extends CardImage {
       );
     }
   }
-  override destroy() {
-    super.destroy();
+  override destroy(): this {
     if (this.indicator) this.indicator.destroy();
+    return super.destroy();
   }
   private get topCard() {
     if (this.cardIds.length == 0) return constants.cardBackSideID;
