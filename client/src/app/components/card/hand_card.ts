@@ -28,7 +28,7 @@ export default class HandCard extends CardImage {
       if (p.leftButtonDown()) this.onClickAction();
     });
     this.setDepth(layoutConfig.depth.handCard);
-    if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
+    if (data.ownedByPlayer) this.enableMaximizeOnRightclick();
   }
   update(data: ClientHandCard) {
     this.data = data;
@@ -45,7 +45,6 @@ export default class HandCard extends CardImage {
     if (this.data.playable) this.highlightSelectable();
   }
   maximizeTacticCard() {
-    this.disableMaximizeOnMouseover();
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this;
     this.setCardId(this.data.cardId); // To display if card's origin is opponent's hand

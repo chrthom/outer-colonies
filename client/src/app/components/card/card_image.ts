@@ -158,8 +158,7 @@ export default class CardImage {
   get angle(): number {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
-  enableMaximizeOnMouseover() {
-    this.disableMaximizeOnMouseover();
+  enableMaximizeOnRightclick() {
     this.image
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.rightButtonDown()) {
@@ -170,9 +169,6 @@ export default class CardImage {
       })
       .on('pointerout', () => this.scene.obj.zoomCard.hide())
       .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
-  }
-  disableMaximizeOnMouseover() {
-    //this.image.off('pointerover').off('pointerout').off('pointermove');
   }
   tween(config: CardTweenConfig): Phaser.Tweens.Tween {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
