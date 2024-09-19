@@ -31,6 +31,7 @@ class LayoutGameConfig {
         angleStep: 5,
         startAngle: -10,
         xStep: -50,
+        yExpand: -65,
         yStep: 5
       },
       mission: {
