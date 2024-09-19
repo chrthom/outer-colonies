@@ -39,6 +39,32 @@ class LayoutGameConfig {
         xDistance: 20,
         yDistance: 10
       },
+      opponent: {
+        colony: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(160)
+        },
+        deck: {
+          x: new CardXPosition(1875),
+          y: new CardYPosition(345)
+        },
+        discardPile: {
+          x: new CardXPosition(2080),
+          y: new CardYPosition(345)
+        },
+        hand: {
+          x: new CardXPosition(2370),
+          y: new CardYPosition(65)
+        },
+        orbit: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(430)
+        },
+        neutral: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(695)
+        }
+      },
       player: {
         colony: {
           x: new CardXPosition(120),
@@ -65,32 +91,7 @@ class LayoutGameConfig {
           y: new CardYPosition(650)
         }
       },
-      opponent: {
-        colony: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(160)
-        },
-        deck: {
-          x: new CardXPosition(1875),
-          y: new CardYPosition(345)
-        },
-        discardPile: {
-          x: new CardXPosition(2080),
-          y: new CardYPosition(345)
-        },
-        hand: {
-          x: new CardXPosition(2370),
-          y: new CardYPosition(65)
-        },
-        orbit: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(430)
-        },
-        neutral: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(695)
-        }
-      }
+      randomAngle: 4
     },
     retractCardButton: {
       xOffset: 67,

@@ -60,7 +60,9 @@ export default class CardStack {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
-      const angle = handCard ? handCard.image.angle : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(c.data.index);
+      const angle = handCard
+        ? handCard.image.angle
+        : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
       c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
     });
     this.tween();
@@ -120,22 +122,30 @@ export default class CardStack {
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const index = c.data.index;
+      const x = expand ? this.xExpanded(index) : this.x;
+      const y = this.y(index, expand);
+      const randomAngle = expand
+        ? layoutConfig.game.cards.placement.randomAngle * (index > this.maxIndex / 2 ? -1 : 1)
+        : this.randomAngle(x.value2d + y.value2d);
       return c.tween({
         duration: animationConfig.duration.move,
-        x: expand ? this.xExpanded(index) : this.x,
-        y: this.y(index, expand),
+        x: x,
+        y: y,
         z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
         xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(index))
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
       });
     });
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c => {
-      const newCard = new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth);
-      newCard.setAngle(newCard.shortestAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(c.index)))
+      const x = this.x;
+      const y = this.y(c.index);
+      const newCard = new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, c)
+        .setDepth(this.depth)
+        .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
       return newCard;
     });
     this.cards.forEach(c => {
@@ -219,8 +229,9 @@ export default class CardStack {
       layoutConfig.game.cards.expanded.yFactorMoveToCenter;
     return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
   }
-  private randomAngle(index: number): number {
-    return (this.x.value2d + this.y(index).value2d) % 10 - 5; // TODO: Adjust this value, use global params
+  private randomAngle(referenceValue: number): number {
+    const randomAngle = layoutConfig.game.cards.placement.randomAngle;
+    return (referenceValue % (randomAngle * 2)) - randomAngle;
   }
   private get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
