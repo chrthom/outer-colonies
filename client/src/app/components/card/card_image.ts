@@ -164,7 +164,8 @@ export default class CardImage {
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.rightButtonDown()) {
           const maxCard = this.scene.obj.zoomCard;
-          maxCard.image.visible ? this.scene.obj.zoomCard.hide() : this.scene.obj.zoomCard.show(this.cardId);
+          if (maxCard.image.visible) this.scene.obj.zoomCard.hide();
+          else this.scene.obj.zoomCard.show(this.cardId);
         }
       })
       .on('pointerout', () => this.scene.obj.zoomCard.hide())
