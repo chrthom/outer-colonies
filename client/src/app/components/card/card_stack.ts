@@ -117,13 +117,13 @@ export default class CardStack {
     this.tween();
   }
   private tween(expand?: boolean): Phaser.Tweens.Tween[] {
-    this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
-    this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
+    this.damageIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
+    this.defenseIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const index = c.data.index;
-      const x = expand ? this.xExpanded(index) : this.x;
-      const y = this.y(index, expand);
+      const x = expand ? this.targetXExpanded(index) : this.targetX;
+      const y = this.targetY(index, expand);
       const randomAngle = expand
         ? layoutConfig.game.cards.placement.randomAngle * (index > this.maxIndex / 2 ? -1 : 1)
         : this.randomAngle(x.value2d + y.value2d);
@@ -141,8 +141,8 @@ export default class CardStack {
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c => {
-      const x = this.x;
-      const y = this.y(c.index);
+      const x = this.targetX;
+      const y = this.targetY(c.index);
       const newCard = new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, c)
         .setDepth(this.depth)
         .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
@@ -163,7 +163,7 @@ export default class CardStack {
         this.scene,
         String(this.data.damage),
         this.data.criticalDamage,
-        this.x.value2d,
+        this.targetX.value2d,
         this.zoneLayout.y.value2d,
         this.ownedByPlayer,
         false
@@ -178,7 +178,7 @@ export default class CardStack {
       this.defenseIndicator = new DefenseIndicator(
         this.scene,
         this.data.defenseIcons,
-        this.x.value2d,
+        this.targetX.value2d,
         this.zoneLayout.y.value2d,
         this.ownedByPlayer
       );
@@ -192,7 +192,7 @@ export default class CardStack {
         .setXRotation(origin.xRotation);
     }
   }
-  private get x(): CardXPosition {
+  private get targetX(): CardXPosition {
     let zoneWidth =
       this.data.zone == Zone.Neutral
         ? layoutConfig.game.cards.placement.halfZoneWidth
@@ -210,14 +210,14 @@ export default class CardStack {
     x += shrinkZone;
     return this.zoneLayout.x.plus(x);
   }
-  private xExpanded(index: number): CardXPosition {
+  private targetXExpanded(index: number): CardXPosition {
     const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
     const moveToCenter =
-      (layoutConfig.game.cards.placement.zoneWidth / 2 - this.x.value2d) *
+      (layoutConfig.game.cards.placement.zoneWidth / 2 - this.targetX.value2d) *
       layoutConfig.game.cards.expanded.xFactorMoveToCenter;
-    return this.x.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
+    return this.targetX.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
   }
-  private y(index: number, expand?: boolean): CardYPosition {
+  private targetY(index: number, expand?: boolean): CardYPosition {
     const orientation = this.ownedByPlayer ? 1 : -1;
     const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
     const yStep = layoutConfig.game.cards.stackYDistance * (expand ? 2 : 1);

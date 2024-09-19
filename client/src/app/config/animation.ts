@@ -2,6 +2,7 @@ class AnimationConfig {
   readonly duration = {
     loaderCycle: 1000,
     attack: 1000,
+    handExpand: 350,
     draw: 400,
     move: 500,
     showTacticCard: 600,
