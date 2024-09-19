@@ -22,7 +22,7 @@ export default class CardStack {
   data: ClientCardStack;
   damageIndicator?: ValueIndicator;
   defenseIndicator?: DefenseIndicator;
-  maxedTween?: Phaser.Tweens.Tween[];
+  expandTween?: Phaser.Tweens.Tween[];
   private scene!: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
@@ -60,7 +60,9 @@ export default class CardStack {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
-      const angle = handCard ? handCard.image.angle : this.ownedByPlayer ? 0 : 180;
+      const angle = handCard
+        ? handCard.image.angle
+        : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
       c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
     });
     this.tween();
@@ -107,38 +109,51 @@ export default class CardStack {
   }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
-      this.maxedTween = this.tween(true)
+      this.expandTween = this.tween(true);
     }
   }
   private pointerout() {
-    this.maxedTween?.forEach(t => t.stop());
+    this.expandTween?.forEach(t => t.stop());
     this.tween();
   }
-  private tween(maxed?: boolean): Phaser.Tweens.Tween[] {
+  private tween(expand?: boolean): Phaser.Tweens.Tween[] {
     this.damageIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     this.defenseIndicator?.tween(this.x.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
-      c.setDepth(maxed ? layoutConfig.depth.maxedCard : this.depth);
+      c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
+      const index = c.data.index;
+      const x = expand ? this.xExpanded(index) : this.x;
+      const y = this.y(index, expand);
+      const randomAngle = expand
+        ? layoutConfig.game.cards.placement.randomAngle * (index > this.maxIndex / 2 ? -1 : 1)
+        : this.randomAngle(x.value2d + y.value2d);
       return c.tween({
         duration: animationConfig.duration.move,
-        x: maxed ? this.xMaxed(c.data.index) : this.x,
-        y: this.y(c.data.index, maxed),
-        z: maxed ? perspectiveConfig.distance.maxed : perspectiveConfig.distance.board,
-        xRotation: maxed
+        x: x,
+        y: y,
+        z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
+        xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle(this.ownedByPlayer ? 0 : 180)
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
       });
     });
   }
   private createCards(origin?: CardImage) {
-    this.cards = this.data.cards.map(c =>
-      new Card(this.scene, this.x, this.y(c.index), !this.ownedByPlayer, this.uuid, c).setDepth(this.depth)
-    );
+    this.cards = this.data.cards.map(c => {
+      const x = this.x;
+      const y = this.y(c.index);
+      const newCard = new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, c)
+        .setDepth(this.depth)
+        .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
+      return newCard;
+    });
     this.cards.forEach(c => {
       c.enableMaximizeOnMouseover();
       c.image
-        .on('pointerdown', () => this.onClickAction(c.data))
+        .on('pointerdown', (p: Phaser.Input.Pointer) => {
+          if (p.leftButtonDown()) this.onClickAction(c.data);
+        })
         .on('pointerover', () => this.pointerover())
         .on('pointerout', () => this.pointerout())
         .on('gameout', () => this.pointerout());
@@ -195,24 +210,28 @@ export default class CardStack {
     x += shrinkZone;
     return this.zoneLayout.x.plus(x);
   }
-  private xMaxed(index: number): CardXPosition {
-    const offset = layoutConfig.game.cards.maxed.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
+  private xExpanded(index: number): CardXPosition {
+    const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
     const moveToCenter =
       (layoutConfig.game.cards.placement.zoneWidth / 2 - this.x.value2d) *
-      layoutConfig.game.cards.maxed.xFactorMoveToCenter;
+      layoutConfig.game.cards.expanded.xFactorMoveToCenter;
     return this.x.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
   }
-  private y(index: number, maxed?: boolean): CardYPosition {
+  private y(index: number, expand?: boolean): CardYPosition {
     const orientation = this.ownedByPlayer ? 1 : -1;
     const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
-    const yStep = layoutConfig.game.cards.stackYDistance * (maxed ? 2 : 1);
+    const yStep = layoutConfig.game.cards.stackYDistance * (expand ? 2 : 1);
     const yDistance =
       orientation * (this.maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / this.maxIndex);
-    const modIndex = maxed && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
+    const modIndex = expand && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
     const moveToCenter =
       (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
-      layoutConfig.game.cards.maxed.yFactorMoveToCenter;
-    return this.zoneLayout.y.plus(modIndex * yDistance).plus(maxed ? moveToCenter : 0);
+      layoutConfig.game.cards.expanded.yFactorMoveToCenter;
+    return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
+  }
+  private randomAngle(referenceValue: number): number {
+    const randomAngle = layoutConfig.game.cards.placement.randomAngle;
+    return (referenceValue % (randomAngle * 2)) - randomAngle;
   }
   private get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));

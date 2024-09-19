@@ -64,7 +64,9 @@ export default class ContinueButton {
     (<Phaser.GameObjects.GameObject[]>Object.values(this.buttonImages)).concat([this.text]).forEach(
       o =>
         o
-          .on('pointerdown', () => this.onClickAction())
+          .on('pointerdown', (p: Phaser.Input.Pointer) => {
+            if (p.leftButtonDown()) this.onClickAction();
+          })
           .on('pointerover', () => {
             this.text.setColor(designConfig.color.hover);
             this.prompt.show();

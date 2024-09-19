@@ -15,7 +15,7 @@ import {
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
-import MaxCard from '../components/card/max_card';
+import ZoomCard from '../components/card/zoom_card';
 import ClientPlannedBattle, {
   ClientPlannedBattleHelper
 } from '../../../../server/src/shared/interfaces/client_planned_battle';
@@ -43,7 +43,7 @@ interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
   exitButton: ExitButton;
-  maxCard: MaxCard;
+  zoomCard: ZoomCard;
   missionCards: MissionCards;
 }
 
@@ -186,7 +186,7 @@ export default class Game extends Phaser.Scene {
       combatRangeIndicator: new CombatRangeIndicator(this),
       continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
-      maxCard: new MaxCard(this),
+      zoomCard: new ZoomCard(this),
       missionCards: new MissionCards(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
@@ -232,7 +232,7 @@ export default class Game extends Phaser.Scene {
     this.obj.combatRangeIndicator.update();
     this.obj.exitButton.update();
     this.obj.missionCards.update();
-    this.obj.maxCard.hide();
+    this.obj.zoomCard.hide();
     this.updateHighlighting();
   }
 

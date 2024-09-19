@@ -29,7 +29,9 @@ export default class DiscardPile extends CardImage {
       this.setVisible(false).disableMaximizeOnMouseover();
     } else {
       this.setCardId(this.topCard).setVisible(true).enableMaximizeOnMouseover();
-      this.image.off('pointerdown').on('pointerdown', () => this.onClickAction());
+      this.image.off('pointerdown').on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction();
+      });
       const cardsForMission = this.scene.plannedBattle.upsideCardsNum;
       this.indicator = new ValueIndicator(
         this.scene,

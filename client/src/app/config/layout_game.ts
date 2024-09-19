@@ -1,8 +1,8 @@
 import {
   CardXPosition,
   CardYPosition,
-  MaxCardXPosition,
-  MaxCardYPosition,
+  ZoomCardXPosition,
+  ZoomCardYPosition,
   MinCardXPosition,
   MinCardYPosition
 } from '../components/perspective';
@@ -14,7 +14,7 @@ class LayoutGameConfig {
       yDistance: 50
     },
     cardsBreakpointYCompression: 5,
-    maxed: {
+    expanded: {
       xFactorMoveToCenter: 0.2,
       xOffset: 90,
       yFactorMoveToCenter: 0.13
@@ -38,6 +38,32 @@ class LayoutGameConfig {
         y: new MinCardYPosition(650),
         xDistance: 20,
         yDistance: 10
+      },
+      opponent: {
+        colony: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(160)
+        },
+        deck: {
+          x: new CardXPosition(1875),
+          y: new CardYPosition(345)
+        },
+        discardPile: {
+          x: new CardXPosition(2080),
+          y: new CardYPosition(345)
+        },
+        hand: {
+          x: new CardXPosition(2370),
+          y: new CardYPosition(65)
+        },
+        orbit: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(430)
+        },
+        neutral: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(695)
+        }
       },
       player: {
         colony: {
@@ -65,32 +91,7 @@ class LayoutGameConfig {
           y: new CardYPosition(650)
         }
       },
-      opponent: {
-        colony: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(160)
-        },
-        deck: {
-          x: new CardXPosition(1875),
-          y: new CardYPosition(345)
-        },
-        discardPile: {
-          x: new CardXPosition(2080),
-          y: new CardYPosition(345)
-        },
-        hand: {
-          x: new CardXPosition(2370),
-          y: new CardYPosition(65)
-        },
-        orbit: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(430)
-        },
-        neutral: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(695)
-        }
-      }
+      randomAngle: 4
     },
     retractCardButton: {
       xOffset: 67,
@@ -148,8 +149,8 @@ class LayoutGameConfig {
       yOffset: -330
     },
     maxedTacticCard: {
-      x: new MaxCardXPosition(1200),
-      y: new MaxCardYPosition(650)
+      x: new ZoomCardXPosition(1200),
+      y: new ZoomCardYPosition(650)
     },
     prompt: {
       textOffset: {

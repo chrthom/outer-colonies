@@ -1,7 +1,7 @@
 class PerspectiveConfig {
   readonly distance = {
     near: -0.7,
-    maxed: -9,
+    expanded: -9,
     board: -10,
     far: -25
   };
