@@ -34,9 +34,9 @@ export default class Card extends CardImage {
       );
     }
   }
-  override destroy() {
-    super.destroy();
+  override destroy(): this {
     this.destroyButton();
+    return super.destroy();
   }
   destroyButton() {
     this.retractCardButton?.destroy();

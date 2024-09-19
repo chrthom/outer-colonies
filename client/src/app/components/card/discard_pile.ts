@@ -42,9 +42,9 @@ export default class DiscardPile extends CardImage {
       );
     }
   }
-  override destroy() {
-    super.destroy();
+  override destroy(): this {
     if (this.indicator) this.indicator.destroy();
+    return super.destroy();
   }
   private get topCard() {
     if (this.cardIds.length == 0) return constants.cardBackSideID;

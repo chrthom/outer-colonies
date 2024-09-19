@@ -63,12 +63,13 @@ export default class CardImage {
       .setZ(config?.z ?? perspectiveConfig.distance.board)
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
-  destroy() {
+  destroy(): this {
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
+    return this;
   }
-  discard(toDeck?: boolean) {
+  discard(toDeck?: boolean): this {
     const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
@@ -89,22 +90,27 @@ export default class CardImage {
         this.destroy();
       }
     });
+    return this;
   }
-  highlightDisabled() {
+  highlightDisabled(): this {
     this.highlightReset();
     this.image.setTint(designConfig.tint.faded);
+    return this;
   }
-  highlightSelectable() {
+  highlightSelectable(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.neutral);
+    return this;
   }
-  highlightSelected() {
+  highlightSelected(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.opponent);
+    return this;
   }
-  highlightReset() {
+  highlightReset(): this {
     this.imageHighlight.setVisible(false);
     this.image.setTint(designConfig.tint.neutral);
+    return this;
   }
   setCardId(cardId: number): this {
     this.cardId = cardId;
@@ -158,7 +164,7 @@ export default class CardImage {
   get angle(): number {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
-  enableMaximizeOnRightclick() {
+  enableMaximizeOnRightclick(): this {
     this.image
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.rightButtonDown()) {
@@ -169,6 +175,7 @@ export default class CardImage {
       })
       .on('pointerout', () => this.scene.obj.zoomCard.hide())
       .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
+    return this;
   }
   tween(config: CardTweenConfig): Phaser.Tweens.Tween {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
