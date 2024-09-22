@@ -32,13 +32,14 @@ export default class CardStackSummary {
     this.forAllObjects(o => this.tweenGameObject(o, 1));
   }
   toDefaultAlpha() {
-    this.forAllObjects(o => this.tweenGameObject(o, 0.3));
+    this.forAllObjects(o => this.tweenGameObject(o, designConfig.alpha.faded));
   }
   private createInfoBoxes(attributes: ClientCardStackAttribute[]) {
+    const config = layoutConfig.game.cards.summaryBox;
     this.infoBoxes = attributes.map((a, index) =>
       this.createInfoBox(
-        this.cardStack.targetX.value2d + ((index % 4) - 1.5) * 44,
-        this.cardStack.targetY(this.cardStack.maxIndex).value2d - Math.floor(index / 4) * 47,
+        this.cardStack.targetX.value2d + ((index % config.boxesPerRow) - (config.boxesPerRow - 1) / 2) * config.xStep,
+        this.cardStack.targetY(this.cardStack.maxIndex).value2d - Math.floor(index / config.boxesPerRow) * config.yStep,
         a.warning ? 'red' : 'blue',
         a.icon,
         a.value
@@ -46,6 +47,7 @@ export default class CardStackSummary {
     );
   }
   private createInfoBox(x: number, y: number, color: string, icon: string, value?: number): InfoBox {
+    const config = layoutConfig.game.cards.summaryBox;
     return {
       box: this.scene.add
         .image(x, y, `card_stack_info_box_${color}`)
@@ -53,12 +55,12 @@ export default class CardStackSummary {
         .setDepth(layoutConfig.depth.indicator)
         .setAlpha(0),
       icon: this.scene.add
-        .image(x - 3, y - 10, `attribute_${icon}`)
+        .image(x - config.xOffset, y - config.yOffset, `attribute_${icon}`)
         .setOrigin(0.5)
         .setDepth(layoutConfig.depth.indicator)
         .setAlpha(0),
       value: this.scene.add
-        .text(x + 3, y + 10, value ? String(value) : '')
+        .text(x + config.xOffset, y + config.yOffset, value ? String(value) : '')
         .setFontSize(layoutConfig.fontSize.small)
         .setFontFamily(designConfig.fontFamily.caption)
         .setColor(designConfig.color.neutral)

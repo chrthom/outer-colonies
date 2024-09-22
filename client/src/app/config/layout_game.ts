@@ -95,6 +95,13 @@ class LayoutGameConfig {
       yOffset: -88
     },
     stackYDistance: 31,
+    summaryBox: {
+      boxesPerRow: 4,
+      xOffset: -3,
+      xStep: 44,
+      yOffset: -10,
+      yStep: 47
+    },
     valueIndicator: {
       xOffsetPlayer: -95,
       yOffsetPlayer: -100,
