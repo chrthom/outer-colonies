@@ -100,7 +100,7 @@ class LayoutGameConfig {
       xOffset: -3,
       xStep: 44,
       yOffset: -10,
-      yStep: 47
+      yStep: 49
     },
     valueIndicator: {
       xOffsetPlayer: -95,
