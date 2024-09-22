@@ -20,9 +20,7 @@ export default class CardStackSummary {
     this.cardStack = cardStack;
     this.scene = scene;
     this.combatView = combatView ?? false;
-    this.createInfoBoxes(
-      combatView ? this.cardStack.data.combatAttributes : this.cardStack.data.buildAttributes
-    );
+    this.createInfoBoxes();
     this.toDefaultAlpha();
   }
   destroy() {
@@ -34,7 +32,8 @@ export default class CardStackSummary {
   toDefaultAlpha() {
     this.forAllObjects(o => this.tweenGameObject(o, designConfig.alpha.faded));
   }
-  private createInfoBoxes(attributes: ClientCardStackAttribute[]) {
+  private createInfoBoxes() {
+    const attributes = this.combatView ? this.cardStack.data.combatAttributes : this.cardStack.data.buildAttributes;
     const config = layoutConfig.game.cards.summaryBox;
     this.infoBoxes = attributes.map((a, index) =>
       this.createInfoBox(

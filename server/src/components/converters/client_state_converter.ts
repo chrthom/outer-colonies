@@ -85,6 +85,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           })
           .sort()
           .concat(
+            { icon: 'speed', value: profile.speed },
             { icon: 'damage', value: cs.damage, warning: true },
             ...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : [])
           );
