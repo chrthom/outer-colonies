@@ -84,15 +84,25 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
             ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.warning))
           );
         } else if (cs.card.type == CardType.Colony) {
-          attributes.push({ icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp });
+          attributes.push(...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : []), {
+            icon: 'hp',
+            value: profile.hp,
+            warning: cs.damage >= profile.hp
+          });
         } else if (
           match.turnPhase == TurnPhase.Combat &&
           battle.playerShipIds.concat(battle.opponentShipIds).includes(cs.uuid)
         ) {
           attributes.push(
             ...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : []),
-            { icon: 'hp', value: profile.hp > 0 ? profile.hp : 1, warning: cs.damage >= (profile.hp > 0 ? profile.hp : 1) },
-            { icon: 'speed', value: profile.speed }, // TODO Do not display for colony zone
+            {
+              icon: 'hp',
+              value: profile.hp > 0 ? profile.hp : 1,
+              warning: cs.damage >= (profile.hp > 0 ? profile.hp : 1)
+            },
+            ...(cs.zone == Zone.Orbital || cs.zone == Zone.Neutral
+              ? [{ icon: 'speed', value: profile.speed }]
+              : []),
             ...cs.cardStacks
               .filter(c => c.card.canDefend)
               .map(c => {
