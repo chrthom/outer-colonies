@@ -151,9 +151,25 @@ export default class Game extends Phaser.Scene {
     ['blue', 'red'].forEach(color =>
       this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
     );
-    ['damage', 'hp', 'speed', 'energy', 'theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach(attribute =>
-      this.load.image(`attribute_${attribute}`, `icons/attribute_${attribute}.png`)
-    );
+    [
+      'damage',
+      'hp',
+      'speed',
+      'energy',
+      'theta',
+      'xi',
+      'phi',
+      'omega',
+      'delta',
+      'psi',
+      'armour_1',
+      'armour_2',
+      'armour_3',
+      'shield_1',
+      'shield_2',
+      'point_defense_1',
+      'point_defense_2'
+    ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
       'active_build',

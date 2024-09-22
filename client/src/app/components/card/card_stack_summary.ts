@@ -20,7 +20,9 @@ export default class CardStackSummary {
     this.cardStack = cardStack;
     this.scene = scene;
     this.combatView = combatView ?? false;
-    this.createInfoBoxes(combatView ? this.cardStack.data.combatAttributes : this.cardStack.data.buildAttributes);
+    this.createInfoBoxes(
+      combatView ? this.cardStack.data.combatAttributes : this.cardStack.data.buildAttributes
+    );
     this.toDefaultAlpha();
   }
   destroy() {
