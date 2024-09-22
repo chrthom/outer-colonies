@@ -6,8 +6,6 @@ import {
   ClientCard,
   ClientCardStack
 } from '../../../../../server/src/shared/interfaces/client_state';
-import ValueIndicator from '../indicators/value_indicator';
-import DefenseIndicator from '../indicators/defense_indicator';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
@@ -22,8 +20,6 @@ export default class CardStack {
   uuid: string;
   data: ClientCardStack;
   summaryBox: CardStackSummary;
-  damageIndicator?: ValueIndicator;
-  defenseIndicator?: DefenseIndicator;
   expandTween?: Phaser.Tweens.Tween[];
   private scene: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
@@ -167,8 +163,6 @@ export default class CardStack {
     this.summaryBox.toDefaultAlpha();
   }
   private tween(expand?: boolean): Phaser.Tweens.Tween[] {
-    this.damageIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
-    this.defenseIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const index = c.data.index;
@@ -208,31 +202,6 @@ export default class CardStack {
         .on('pointerout', () => this.pointerout())
         .on('gameout', () => this.pointerout());
     });
-    if (this.data.damage > 0) {
-      this.damageIndicator = new ValueIndicator(
-        this.scene,
-        String(this.data.damage),
-        this.data.criticalDamage,
-        this.targetX.value2d,
-        this.zoneLayout.y.value2d,
-        this.ownedByPlayer,
-        false
-      );
-    }
-    if (
-      this.scene.state.turnPhase == TurnPhase.Combat &&
-      this.scene.state.battle?.playerShipIds
-        .concat(this.scene.state.battle.opponentShipIds)
-        .includes(this.uuid)
-    ) {
-      this.defenseIndicator = new DefenseIndicator(
-        this.scene,
-        this.data.defenseIcons,
-        this.targetX.value2d,
-        this.zoneLayout.y.value2d,
-        this.ownedByPlayer
-      );
-    }
     if (origin) {
       this.cards[0]
         .setX(origin.x)
@@ -270,8 +239,6 @@ export default class CardStack {
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {
-    this.damageIndicator?.destroy();
-    this.defenseIndicator?.destroy();
     this.summaryBox?.destroy();
     this.cards.forEach(c => c.destroyButton());
   }
