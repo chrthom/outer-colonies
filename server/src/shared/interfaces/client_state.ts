@@ -54,19 +54,13 @@ export interface ClientCardStack {
   ownedByPlayer: boolean;
   missionReady: boolean;
   interceptionReady: boolean;
-  buildAttributes: ClientCardStackAttribute[];
-  combatAttributes: ClientCardStackAttribute[];
-}
-
-export interface ClientDefenseIcon {
-  icon: string;
-  depleted: boolean;
+  attributes: ClientCardStackAttribute[];
 }
 
 export interface ClientCardStackAttribute {
   icon: string;
+  value: number;
   warning?: boolean;
-  value?: number;
 }
 
 export interface ClientHandCard {

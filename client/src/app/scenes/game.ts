@@ -132,13 +132,6 @@ export default class Game extends Phaser.Scene {
       'equipment_hull',
       'equipment_hull_infrastructure',
       'equipment_hull_infrastructure_tactic',
-      'armour_1',
-      'armour_2',
-      'armour_3',
-      'shield_1',
-      'shield_2',
-      'point_defense_1',
-      'point_defense_2',
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
@@ -162,13 +155,9 @@ export default class Game extends Phaser.Scene {
       'omega',
       'delta',
       'psi',
-      'armour_1',
-      'armour_2',
-      'armour_3',
-      'shield_1',
-      'shield_2',
-      'point_defense_1',
-      'point_defense_2'
+      'armour',
+      'shield',
+      'point_defense'
     ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
