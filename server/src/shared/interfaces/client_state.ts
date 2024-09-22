@@ -52,16 +52,24 @@ export interface ClientCardStack {
   index: number;
   zoneCardsNum: number;
   ownedByPlayer: boolean;
+  hp: number;
   damage: number;
   criticalDamage: boolean;
+  speed: number;
   missionReady: boolean;
   interceptionReady: boolean;
   defenseIcons: ClientDefenseIcon[];
+  attributes: ClientCardStackAttribute[];
 }
 
 export interface ClientDefenseIcon {
   icon: string;
   depleted: boolean;
+}
+
+export interface ClientCardStackAttribute {
+  icon: string;
+  value: number;
 }
 
 export interface ClientHandCard {

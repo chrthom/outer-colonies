@@ -5,6 +5,7 @@ import { opponentPlayerNo } from '../utils/helpers';
 import {
   ClientBattle,
   ClientCardStack,
+  ClientCardStackAttribute,
   ClientDefenseIcon,
   ClientGameResult,
   ClientHandCard,
@@ -44,9 +45,10 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           .filter(c => c.card.canDefend)
           .map(c => {
             let icon: string;
-            if (c.profile.armour > 0) icon = `armour_${c.profile.armour}`;
-            else if (c.profile.shield > 0) icon = `shield_${c.profile.shield}`;
-            else icon = `point_defense_${c.profile.pointDefense}`;
+            const profile = c.profile;
+            if (profile.armour > 0) icon = `armour_${profile.armour}`;
+            else if (profile.shield > 0) icon = `shield_${profile.shield}`;
+            else icon = `point_defense_${profile.pointDefense}`;
             return {
               icon: icon,
               depleted: !c.defenseAvailable
@@ -69,6 +71,17 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           .filter(cs => zone != Zone.Colony && cs.type == CardType.Hull)
           .map(cs => toClientCardStack(cs, otherCardStacks.length));
         const cards = otherCardStacks.concat(hullCardStacks);
+        const profile = cs.profile;
+        const attributes: ClientCardStackAttribute[] = [
+          { icon: 'speed', value: profile.speed },
+          { icon: 'energy', value: profile.energy },
+          { icon: 'theta', value: profile.theta },
+          { icon: 'xi', value: profile.xi },
+          { icon: 'phi', value: profile.phi },
+          { icon: 'omega', value: profile.omega },
+          { icon: 'delta', value: profile.delta },
+          { icon: 'psi', value: profile.psi }
+        ];
         return {
           uuid: cs.uuid,
           cards: cards,
@@ -76,11 +89,14 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           index: index,
           zoneCardsNum: zoneCardStacks.length,
           ownedByPlayer: ownedByPlayer,
+          hp: profile.hp,
           damage: cs.damage,
-          criticalDamage: cs.damage >= cs.profile.hp,
+          criticalDamage: cs.damage >= profile.hp,
+          speed: profile.speed,
           missionReady: ownedByPlayer && cs.isMissionReady,
           interceptionReady: interceptionReady,
-          defenseIcons: defenseIcons
+          defenseIcons: defenseIcons,
+          attributes: attributes
         };
       });
     });
