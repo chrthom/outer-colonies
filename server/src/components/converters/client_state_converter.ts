@@ -41,20 +41,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           ownedByPlayer &&
           match.inactivePlayerNo == playerNo &&
           match.battle.canInterceptMission(playerNo, cs);
-        const defenseIcons: ClientDefenseIcon[] = cs.cardStacks
-          .filter(c => c.card.canDefend)
-          .map(c => {
-            let icon: string;
-            const profile = c.profile;
-            if (profile.armour > 0) icon = `armour_${profile.armour}`;
-            else if (profile.shield > 0) icon = `shield_${profile.shield}`;
-            else icon = `point_defense_${profile.pointDefense}`;
-            return {
-              icon: icon,
-              depleted: !c.defenseAvailable
-            };
-          })
-          .sort();
         const toClientCardStack = (cs: CardStack, index: number) => {
           return {
             id: cs.card.id,
@@ -84,17 +70,24 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           { icon: 'delta', value: profile.delta },
           { icon: 'psi', value: profile.psi }
         ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.warning));
-        const combatAttributes: ClientCardStackAttribute[] = [];
-        if (cs.damage > 0) combatAttributes.push({ icon: 'damage', value: cs.damage, warning: true });
-        combatAttributes.push(
-          { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp },
-          ...defenseIcons.map(d => {
-            return {
-              icon: d.icon,
-              warning: d.depleted
+        const combatAttributes = cs.cardStacks
+          .filter(c => c.card.canDefend)
+          .map(c => {
+            let icon: string;
+            const profile = c.profile;
+            if (profile.armour > 0) icon = `armour_${profile.armour}`;
+            else if (profile.shield > 0) icon = `shield_${profile.shield}`;
+            else icon = `point_defense_${profile.pointDefense}`;
+            return <ClientCardStackAttribute>{
+              icon: icon,
+              warning: !c.defenseAvailable
             };
           })
-        );
+          .sort()
+          .concat(
+            { icon: 'damage', value: cs.damage, warning: true },
+            ...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : [])
+          );
         return {
           uuid: cs.uuid,
           cards: cards,
@@ -102,12 +95,8 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           index: index,
           zoneCardsNum: zoneCardStacks.length,
           ownedByPlayer: ownedByPlayer,
-          damage: cs.damage,
-          criticalDamage: cs.damage >= profile.hp,
-          speed: profile.speed,
           missionReady: ownedByPlayer && cs.isMissionReady,
           interceptionReady: interceptionReady,
-          defenseIcons: defenseIcons,
           buildAttributes: buildAttributes,
           combatAttributes: combatAttributes
         };

@@ -49,9 +49,6 @@ export default class CardStack {
       c.discard(toDeck);
     }, this);
     const replacedCards = this.filterCardsByIdList(data.cards.map(c => c.id));
-    this.data.criticalDamage = data.criticalDamage;
-    this.data.damage = data.damage;
-    this.data.defenseIcons = data.defenseIcons;
     this.data.cards = data.cards;
     this.createCards();
     this.data = data;
