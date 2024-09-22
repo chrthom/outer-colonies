@@ -58,7 +58,8 @@ export interface ClientCardStack {
   missionReady: boolean;
   interceptionReady: boolean;
   defenseIcons: ClientDefenseIcon[];
-  attributes: ClientCardStackAttribute[];
+  buildAttributes: ClientCardStackAttribute[];
+  combatAttributes: ClientCardStackAttribute[];
 }
 
 export interface ClientDefenseIcon {
@@ -68,8 +69,8 @@ export interface ClientDefenseIcon {
 
 export interface ClientCardStackAttribute {
   icon: string;
-  value: number;
-  color: string;
+  warning?: boolean;
+  value?: number;
 }
 
 export interface ClientHandCard {

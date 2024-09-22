@@ -72,18 +72,29 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           .map(cs => toClientCardStack(cs, otherCardStacks.length));
         const cards = otherCardStacks.concat(hullCardStacks);
         const profile = cs.profile;
-        const attributes: ClientCardStackAttribute[] = [
-          { icon: 'damage', value: cs.damage, color: 'red' },
-          { icon: 'hp', value: profile.hp, color: cs.damage >= profile.hp ? 'red' : 'blue' },
-          { icon: 'speed', value: profile.speed, color: 'blue' },
-          { icon: 'energy', value: profile.energy, color: profile.energy > 0 ? 'blue' : 'red' },
-          { icon: 'theta', value: profile.theta, color: 'blue' },
-          { icon: 'xi', value: profile.xi, color: 'blue' },
-          { icon: 'phi', value: profile.phi, color: 'blue' },
-          { icon: 'omega', value: profile.omega, color: 'blue' },
-          { icon: 'delta', value: profile.delta, color: 'blue' },
-          { icon: 'psi', value: profile.psi, color: 'blue' }
-        ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.color != 'blue'));
+        const buildAttributes: ClientCardStackAttribute[] = [
+          { icon: 'damage', value: cs.damage, warning: true },
+          { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp },
+          { icon: 'speed', value: profile.speed },
+          { icon: 'energy', value: profile.energy, warning: profile.energy < 0 },
+          { icon: 'theta', value: profile.theta },
+          { icon: 'xi', value: profile.xi },
+          { icon: 'phi', value: profile.phi },
+          { icon: 'omega', value: profile.omega },
+          { icon: 'delta', value: profile.delta },
+          { icon: 'psi', value: profile.psi }
+        ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.warning));
+        const combatAttributes: ClientCardStackAttribute[] = [];
+        if (cs.damage > 0) combatAttributes.push({ icon: 'damage', value: cs.damage, warning: true });
+        combatAttributes.push(
+          { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp },
+          ...defenseIcons.map(d => {
+            return {
+              icon: d.icon,
+              warning: d.depleted
+            };
+          })
+        );
         return {
           uuid: cs.uuid,
           cards: cards,
@@ -97,7 +108,8 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           missionReady: ownedByPlayer && cs.isMissionReady,
           interceptionReady: interceptionReady,
           defenseIcons: defenseIcons,
-          attributes: attributes
+          buildAttributes: buildAttributes,
+          combatAttributes: combatAttributes
         };
       });
     });

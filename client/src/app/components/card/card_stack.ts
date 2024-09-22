@@ -59,7 +59,7 @@ export default class CardStack {
     this.data.cards = data.cards;
     this.createCards();
     this.data = data;
-    this.summaryBox = new CardStackSummary(this.scene, this);
+    this.createSummaryBox();
     this.filterCardsByIdList(newCardIds).forEach(c => {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
@@ -132,6 +132,17 @@ export default class CardStack {
   }
   get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
+  }
+  private createSummaryBox() {
+    const showInBuildPhase = this.scene.state.turnPhase == TurnPhase.Build && this.ownedByPlayer;
+    const showInCombatPhase =
+      this.scene.state.turnPhase == TurnPhase.Combat &&
+      this.scene.state.battle.playerShipIds
+        .concat(this.scene.state.battle.opponentShipIds)
+        .includes(this.data.uuid);
+    if (showInBuildPhase || showInCombatPhase) {
+      this.summaryBox = new CardStackSummary(this.scene, this, showInCombatPhase);
+    }
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
