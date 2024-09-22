@@ -52,7 +52,6 @@ export interface ClientCardStack {
   index: number;
   zoneCardsNum: number;
   ownedByPlayer: boolean;
-  hp: number;
   damage: number;
   criticalDamage: boolean;
   speed: number;
@@ -70,6 +69,7 @@ export interface ClientDefenseIcon {
 export interface ClientCardStackAttribute {
   icon: string;
   value: number;
+  color: string;
 }
 
 export interface ClientHandCard {

@@ -124,7 +124,9 @@ export default class HandCard extends CardImage {
           hc.tween({
             duration: animationConfig.duration.handExpand,
             x: hc.targetX(hc.data.index + (hc.data.index > this.data.index ? 1 : -1)),
-            y: hc.targetY().plus(hc.data.index == this.data.index ? layoutConfig.game.cards.placement.hand.yExpand : 0)
+            y: hc
+              .targetY()
+              .plus(hc.data.index == this.data.index ? layoutConfig.game.cards.placement.hand.yExpand : 0)
           })
         );
       })

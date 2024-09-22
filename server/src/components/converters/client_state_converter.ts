@@ -73,15 +73,17 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         const cards = otherCardStacks.concat(hullCardStacks);
         const profile = cs.profile;
         const attributes: ClientCardStackAttribute[] = [
-          { icon: 'speed', value: profile.speed },
-          { icon: 'energy', value: profile.energy },
-          { icon: 'theta', value: profile.theta },
-          { icon: 'xi', value: profile.xi },
-          { icon: 'phi', value: profile.phi },
-          { icon: 'omega', value: profile.omega },
-          { icon: 'delta', value: profile.delta },
-          { icon: 'psi', value: profile.psi }
-        ];
+          { icon: 'damage', value: cs.damage, color: 'red' },
+          { icon: 'hp', value: profile.hp, color: cs.damage >= profile.hp ? 'red' : 'blue' },
+          { icon: 'speed', value: profile.speed, color: 'blue' },
+          { icon: 'energy', value: profile.energy, color: profile.energy > 0 ? 'blue' : 'red' },
+          { icon: 'theta', value: profile.theta, color: 'blue' },
+          { icon: 'xi', value: profile.xi, color: 'blue' },
+          { icon: 'phi', value: profile.phi, color: 'blue' },
+          { icon: 'omega', value: profile.omega, color: 'blue' },
+          { icon: 'delta', value: profile.delta, color: 'blue' },
+          { icon: 'psi', value: profile.psi, color: 'blue' }
+        ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.color != 'blue'));
         return {
           uuid: cs.uuid,
           cards: cards,
@@ -89,7 +91,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           index: index,
           zoneCardsNum: zoneCardStacks.length,
           ownedByPlayer: ownedByPlayer,
-          hp: profile.hp,
           damage: cs.damage,
           criticalDamage: cs.damage >= profile.hp,
           speed: profile.speed,
