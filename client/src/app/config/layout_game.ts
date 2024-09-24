@@ -9,10 +9,6 @@ import {
 
 class LayoutGameConfig {
   readonly cards = {
-    defenseIndicator: {
-      xOffset: -85,
-      yDistance: 50
-    },
     cardsBreakpointYCompression: 5,
     expanded: {
       xFactorMoveToCenter: 0.2,
@@ -99,6 +95,13 @@ class LayoutGameConfig {
       yOffset: -88
     },
     stackYDistance: 31,
+    summaryBox: {
+      boxesPerRow: 4,
+      xOffset: 3,
+      xStep: 44,
+      yOffset: 10,
+      yStep: 49
+    },
     valueIndicator: {
       xOffsetPlayer: -95,
       yOffsetPlayer: -100,

@@ -6,8 +6,6 @@ import {
   ClientCard,
   ClientCardStack
 } from '../../../../../server/src/shared/interfaces/client_state';
-import ValueIndicator from '../indicators/value_indicator';
-import DefenseIndicator from '../indicators/defense_indicator';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
@@ -15,20 +13,21 @@ import CardImage from './card_image';
 import { constants } from '../../../../../server/src/shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
+import CardStackSummary from './card_stack_summary';
 
 export default class CardStack {
   cards!: Array<Card>;
   uuid: string;
   data: ClientCardStack;
-  damageIndicator?: ValueIndicator;
-  defenseIndicator?: DefenseIndicator;
+  summaryBox: CardStackSummary;
   expandTween?: Phaser.Tweens.Tween[];
-  private scene!: Game;
+  private scene: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
     this.createCards(origin);
+    this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
   }
   discard(toDeck?: boolean) {
@@ -50,12 +49,10 @@ export default class CardStack {
       c.discard(toDeck);
     }, this);
     const replacedCards = this.filterCardsByIdList(data.cards.map(c => c.id));
-    this.data.criticalDamage = data.criticalDamage;
-    this.data.damage = data.damage;
-    this.data.defenseIcons = data.defenseIcons;
     this.data.cards = data.cards;
     this.createCards();
     this.data = data;
+    this.summaryBox = new CardStackSummary(this.scene, this);
     this.filterCardsByIdList(newCardIds).forEach(c => {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
@@ -96,6 +93,39 @@ export default class CardStack {
   get isOpponentColony(): boolean {
     return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == constants.colonyID;
   }
+  get targetX(): CardXPosition {
+    let zoneWidth =
+      this.data.zone == Zone.Neutral
+        ? layoutConfig.game.cards.placement.halfZoneWidth
+        : layoutConfig.game.cards.placement.zoneWidth;
+    let shrinkZone = layoutConfig.game.ui.zones.offset.xTop + layoutConfig.game.ui.zones.offset.xBottom;
+    if (this.data.zone == Zone.Colony && this.ownedByPlayer) shrinkZone *= 0;
+    else if (this.data.zone == Zone.Neutral) shrinkZone *= 2;
+    else if (this.data.zone == Zone.Orbital && !this.ownedByPlayer) shrinkZone *= 3;
+    else if (this.data.zone == Zone.Colony) shrinkZone *= 4;
+    zoneWidth -= shrinkZone * 2;
+    let x = zoneWidth;
+    if (this.data.zoneCardsNum <= 2) x /= 2;
+    if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
+    else if (this.data.zoneCardsNum > 2) x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
+    x += shrinkZone;
+    return this.zoneLayout.x.plus(x);
+  }
+  targetY(index: number, expand?: boolean): CardYPosition {
+    const orientation = this.ownedByPlayer ? 1 : -1;
+    const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
+    const yStep = layoutConfig.game.cards.stackYDistance * (expand ? 2 : 1);
+    const yDistance =
+      orientation * (this.maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / this.maxIndex);
+    const modIndex = expand && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
+    const moveToCenter =
+      (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
+      layoutConfig.game.cards.expanded.yFactorMoveToCenter;
+    return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
+  }
+  get maxIndex(): number {
+    return Math.max(...this.data.cards.map(c => c.index));
+  }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
     return this.cards.filter(c => {
@@ -111,14 +141,14 @@ export default class CardStack {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
       this.expandTween = this.tween(true);
     }
+    this.summaryBox.highlight();
   }
   private pointerout() {
     this.expandTween?.forEach(t => t.stop());
     this.tween();
+    this.summaryBox.toDefaultAlpha();
   }
   private tween(expand?: boolean): Phaser.Tweens.Tween[] {
-    this.damageIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
-    this.defenseIndicator?.tween(this.targetX.value2d, this.zoneLayout.y.value2d);
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const index = c.data.index;
@@ -158,31 +188,6 @@ export default class CardStack {
         .on('pointerout', () => this.pointerout())
         .on('gameout', () => this.pointerout());
     });
-    if (this.data.damage > 0) {
-      this.damageIndicator = new ValueIndicator(
-        this.scene,
-        String(this.data.damage),
-        this.data.criticalDamage,
-        this.targetX.value2d,
-        this.zoneLayout.y.value2d,
-        this.ownedByPlayer,
-        false
-      );
-    }
-    if (
-      this.scene.state.turnPhase == TurnPhase.Combat &&
-      this.scene.state.battle?.playerShipIds
-        .concat(this.scene.state.battle.opponentShipIds)
-        .includes(this.uuid)
-    ) {
-      this.defenseIndicator = new DefenseIndicator(
-        this.scene,
-        this.data.defenseIcons,
-        this.targetX.value2d,
-        this.zoneLayout.y.value2d,
-        this.ownedByPlayer
-      );
-    }
     if (origin) {
       this.cards[0]
         .setX(origin.x)
@@ -192,24 +197,6 @@ export default class CardStack {
         .setXRotation(origin.xRotation);
     }
   }
-  private get targetX(): CardXPosition {
-    let zoneWidth =
-      this.data.zone == Zone.Neutral
-        ? layoutConfig.game.cards.placement.halfZoneWidth
-        : layoutConfig.game.cards.placement.zoneWidth;
-    let shrinkZone = layoutConfig.game.ui.zones.offset.xTop + layoutConfig.game.ui.zones.offset.xBottom;
-    if (this.data.zone == Zone.Colony && this.ownedByPlayer) shrinkZone *= 0;
-    else if (this.data.zone == Zone.Neutral) shrinkZone *= 2;
-    else if (this.data.zone == Zone.Orbital && !this.ownedByPlayer) shrinkZone *= 3;
-    else if (this.data.zone == Zone.Colony) shrinkZone *= 4;
-    zoneWidth -= shrinkZone * 2;
-    let x = zoneWidth;
-    if (this.data.zoneCardsNum <= 2) x /= 2;
-    if (this.data.zoneCardsNum == 2) x += zoneWidth / 4 - (this.data.index * zoneWidth) / 2;
-    else if (this.data.zoneCardsNum > 2) x -= (this.data.index * zoneWidth) / (this.data.zoneCardsNum - 1);
-    x += shrinkZone;
-    return this.zoneLayout.x.plus(x);
-  }
   private targetXExpanded(index: number): CardXPosition {
     const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
     const moveToCenter =
@@ -217,24 +204,9 @@ export default class CardStack {
       layoutConfig.game.cards.expanded.xFactorMoveToCenter;
     return this.targetX.plus(this.maxIndex == 0 ? 0 : offset).plus(moveToCenter);
   }
-  private targetY(index: number, expand?: boolean): CardYPosition {
-    const orientation = this.ownedByPlayer ? 1 : -1;
-    const breakpoint = layoutConfig.game.cards.cardsBreakpointYCompression;
-    const yStep = layoutConfig.game.cards.stackYDistance * (expand ? 2 : 1);
-    const yDistance =
-      orientation * (this.maxIndex < breakpoint ? yStep : (yStep * (breakpoint - 1)) / this.maxIndex);
-    const modIndex = expand && index > this.maxIndex / 2 ? index - Math.round(this.maxIndex / 2) : index;
-    const moveToCenter =
-      (layoutConfig.scene.height / 2 - this.zoneLayout.y.value2d) *
-      layoutConfig.game.cards.expanded.yFactorMoveToCenter;
-    return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
-  }
   private randomAngle(referenceValue: number): number {
     const randomAngle = layoutConfig.game.cards.placement.randomAngle;
     return (referenceValue % (randomAngle * 2)) - randomAngle;
-  }
-  private get maxIndex(): number {
-    return Math.max(...this.data.cards.map(c => c.index));
   }
   private get depth(): number {
     let depth = layoutConfig.depth.cardStack;
@@ -253,8 +225,7 @@ export default class CardStack {
     else return zoneLayout.neutral;
   }
   private destroyIndicators() {
-    if (this.damageIndicator) this.damageIndicator.destroy();
-    if (this.defenseIndicator) this.defenseIndicator.destroy();
+    this.summaryBox?.destroy();
     this.cards.forEach(c => c.destroyButton());
   }
   private onClickAction(cardData: ClientCard) {
