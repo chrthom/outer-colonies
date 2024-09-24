@@ -9,7 +9,6 @@ class AnimationConfig {
     showTacticCard: 600,
     min: 10,
     promptShow: 3000,
-    waitBeforeTween: 150,
     zoomCard: 150
   };
   readonly attack = {

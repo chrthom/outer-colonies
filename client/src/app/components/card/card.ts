@@ -38,8 +38,8 @@ export default class Card extends CardImage {
     this.highlightSelected();
     this.scene.time.delayedCall(animationConfig.duration.attack, () => this.highlightReset());
   }
-  override tween(config: CardTweenConfig): Phaser.Tweens.Tween[] {
+  override tween(config: CardTweenConfig) {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
-    return super.tween(config);
+    super.tween(config);
   }
 }

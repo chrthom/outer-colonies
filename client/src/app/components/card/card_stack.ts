@@ -20,7 +20,6 @@ export default class CardStack {
   uuid: string;
   data: ClientCardStack;
   summaryBox: CardStackSummary;
-  private expandTween?: Phaser.Tweens.Tween[];
   private scene: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
@@ -148,25 +147,24 @@ export default class CardStack {
             () => this.pointerout()
           )
       );
-      this.expandTween = this.tween(true, true);
+      this.tween(true);
     }
     this.summaryBox.highlight();
   }
   private pointerout() {
-    this.expandTween?.forEach(t => t.stop());
-    this.tween(true, false);
+    this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
-  private tween(delay?: boolean, expand?: boolean): Phaser.Tweens.Tween[] {
-    return this.cards.flatMap(c => {
+  private tween(expand?: boolean) {
+    this.cards.forEach(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
       const y = this.targetY(c.data.index, expand);
       const randomAngle = expand
         ? layoutConfig.game.cards.placement.randomAngle * (c.data.index > this.maxIndex / 2 ? -1 : 1)
         : this.randomAngle(x.value2d + y.value2d);
-      return c.tween({
+      c.tween({
         duration: animationConfig.duration.move,
         x: x,
         y: y,
@@ -174,8 +172,7 @@ export default class CardStack {
         xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle),
-        delay: delay ? animationConfig.duration.waitBeforeTween : 0
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
       });
     });
   }
