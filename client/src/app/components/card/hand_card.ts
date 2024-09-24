@@ -119,8 +119,7 @@ export default class HandCard extends CardImage {
   private enableExpandOnPointerover() {
     this.image
       .on('pointerover', () => {
-        this.scene.animations.handCardExpand?.forEach(t => t.stop());
-        this.scene.animations.handCardExpand = this.scene.player.hand.map(hc =>
+        this.scene.player.hand.flatMap(hc =>
           hc.tween({
             duration: animationConfig.duration.handExpand,
             x: hc.targetX(hc.data.index + (hc.data.index > this.data.index ? 1 : -1)),
@@ -131,8 +130,7 @@ export default class HandCard extends CardImage {
         );
       })
       .on('pointerout', () => {
-        this.scene.animations.handCardExpand?.forEach(t => t.stop());
-        this.scene.animations.handCardExpand = this.scene.player.hand.map(hc =>
+        this.scene.player.hand.flatMap(hc =>
           hc.tween({
             duration: animationConfig.duration.handExpand,
             x: hc.targetX(),

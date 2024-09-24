@@ -91,8 +91,8 @@ class LayoutGameConfig {
       randomAngle: 4
     },
     retractCardButton: {
-      xOffset: 67,
-      yOffset: -88
+      xOffset: 66,
+      yOffset: -87
     },
     stackYDistance: 31,
     summaryBox: {

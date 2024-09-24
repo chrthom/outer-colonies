@@ -3,6 +3,7 @@ class AnimationConfig {
     loaderCycle: 1000,
     attack: 1000,
     handExpand: 200,
+    displayIndicator: 200,
     draw: 400,
     move: 500,
     showTacticCard: 600,

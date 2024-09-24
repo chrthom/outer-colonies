@@ -3,45 +3,65 @@ import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { CardXPosition, CardYPosition } from '../perspective';
+import Card from '../card/card';
 
 export default class RetractCardButton {
   image: Phaser.GameObjects.Image;
+  card: Card;
+  private tween?: Phaser.Tweens.Tween;
   private scene!: Game;
-  constructor(
-    scene: Game,
-    cardX: CardXPosition,
-    cardY: CardYPosition,
-    cardStackUUID: string,
-    cardIndex: number,
-    crititcal: boolean
-  ) {
+  constructor(scene: Game, card: Card) {
     this.scene = scene;
+    this.card = card;
     this.image = scene.add
-      .image(
-        cardX.value2d + layoutConfig.game.cards.retractCardButton.xOffset,
-        cardY.value2d + layoutConfig.game.cards.retractCardButton.yOffset,
-        'icon_retract_card'
-      )
+      .image(card.x.value2d, card.y.value2d, 'icon_retract_card')
       .setOrigin(0.5)
-      .setScale(0.9)
-      .setAlpha(designConfig.alpha.normal)
+      .setAlpha(0)
       .setDepth(layoutConfig.depth.indicator)
       .setInteractive({
         useHandCursor: true
-      })
-      .on('pointerover', () => this.setTintHover())
-      .on('pointerout', () => (crititcal ? this.setTintCritical() : this.setTintNormal()))
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) scene.socket.emit(MsgTypeInbound.Retract, cardStackUUID, cardIndex);
       });
-    if (crititcal) this.setTintCritical();
+    if (card.data.insufficientEnergy) this.setTintCritical();
     else this.setTintNormal();
+  }
+  show(x: number, y: number, onPointerOver: () => void, onPointerOut: () => void): this {
+    this.image
+      .setX(x + layoutConfig.game.cards.retractCardButton.xOffset)
+      .setY(y + layoutConfig.game.cards.retractCardButton.yOffset)
+      .off('pointerover')
+      .off('pointerout')
+      .off('pointerdown')
+      .on('pointerover', () => {
+        this.setTintHover();
+        onPointerOver();
+      })
+      .on('pointerout', () => {
+        this.card.data.insufficientEnergy ? this.setTintCritical() : this.setTintNormal();
+        onPointerOut();
+      })
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown())
+          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.index);
+      });
+    this.tweenAlpha(true);
+    return this;
+  }
+  hide(): this {
+    this.tweenAlpha(false);
+    return this;
   }
   destroy() {
     this.image.destroy();
   }
-  setTintNormal() {
+  private tweenAlpha(show: boolean) {
+    this.tween?.stop();
+    this.tween = this.scene.tweens.add({
+      targets: this.image,
+      duration: animationConfig.duration.displayIndicator,
+      alpha: show ? designConfig.alpha.normal : 0
+    });
+  }
+  private setTintNormal() {
     this.image.setTint(
       designConfig.tint.player,
       designConfig.tint.neutral,
@@ -49,7 +69,7 @@ export default class RetractCardButton {
       designConfig.tint.player
     );
   }
-  setTintCritical() {
+  private setTintCritical() {
     this.image.setTint(
       designConfig.tint.opponent,
       designConfig.tint.neutral,
@@ -57,15 +77,7 @@ export default class RetractCardButton {
       designConfig.tint.opponent
     );
   }
-  setTintHover() {
+  private setTintHover() {
     this.image.setTint(designConfig.tint.neutral);
-  }
-  tween(cardX: number, cardY: number) {
-    this.scene.tweens.add({
-      targets: this.image,
-      duration: animationConfig.duration.move,
-      x: cardX + layoutConfig.game.cards.retractCardButton.xOffset,
-      y: cardY + layoutConfig.game.cards.retractCardButton.yOffset
-    });
   }
 }

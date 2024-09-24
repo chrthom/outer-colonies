@@ -60,10 +60,6 @@ interface PlayerUIElements {
   hand: Array<HandCard>;
 }
 
-interface Animations {
-  handCardExpand?: Phaser.Tweens.Tween[];
-}
-
 export default class Game extends Phaser.Scene {
   socket!: Socket;
   gameParams!: ClientGameParams;
@@ -81,7 +77,6 @@ export default class Game extends Phaser.Scene {
   obj!: FixedUIElements;
   player!: PlayerUIElements;
   opponent!: PlayerUIElements;
-  animations: Animations = {};
 
   constructor() {
     super({
