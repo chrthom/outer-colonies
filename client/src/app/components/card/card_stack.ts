@@ -20,7 +20,7 @@ export default class CardStack {
   uuid: string;
   data: ClientCardStack;
   summaryBox: CardStackSummary;
-  expandTween?: Phaser.Tweens.Tween[];
+  private expandTween?: Phaser.Tweens.Tween[];
   private scene: Game;
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
@@ -139,6 +139,15 @@ export default class CardStack {
   }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
+      this.cards.forEach(
+        c =>
+          c.retractCardButton?.show(
+            this.targetXExpanded(c.data.index).value2d,
+            this.targetY(c.data.index, true).value2d,
+            () => this.pointerover(),
+            () => this.pointerout()
+          )
+      );
       this.expandTween = this.tween(true);
     }
     this.summaryBox.highlight();
@@ -146,16 +155,16 @@ export default class CardStack {
   private pointerout() {
     this.expandTween?.forEach(t => t.stop());
     this.tween();
+    this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
   private tween(expand?: boolean): Phaser.Tweens.Tween[] {
     return this.cards.map(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
-      const index = c.data.index;
-      const x = expand ? this.targetXExpanded(index) : this.targetX;
-      const y = this.targetY(index, expand);
+      const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
+      const y = this.targetY(c.data.index, expand);
       const randomAngle = expand
-        ? layoutConfig.game.cards.placement.randomAngle * (index > this.maxIndex / 2 ? -1 : 1)
+        ? layoutConfig.game.cards.placement.randomAngle * (c.data.index > this.maxIndex / 2 ? -1 : 1)
         : this.randomAngle(x.value2d + y.value2d);
       return c.tween({
         duration: animationConfig.duration.move,
@@ -226,7 +235,7 @@ export default class CardStack {
   }
   private destroyIndicators() {
     this.summaryBox?.destroy();
-    this.cards.forEach(c => c.destroyButton());
+    this.cards.forEach(c => c.destroyRetractButton());
   }
   private onClickAction(cardData: ClientCard) {
     const state = this.scene.state;

@@ -9,6 +9,7 @@ import { CardXPosition, CardYPosition } from '../perspective';
 export default class Card extends CardImage {
   data: ClientCard;
   retractCardButton?: RetractCardButton;
+  cardStackUUID: string;
   constructor(
     scene: Game,
     x: CardXPosition,
@@ -23,22 +24,14 @@ export default class Card extends CardImage {
       perspective: layoutConfig.game.cards.perspective.board
     });
     this.data = data;
-    if (data.retractable) {
-      this.retractCardButton = new RetractCardButton(
-        scene,
-        x,
-        y,
-        cardStackUUID,
-        data.index,
-        data.insufficientEnergy
-      );
-    }
+    this.cardStackUUID = cardStackUUID;
+    this.retractCardButton = data.retractable ? new RetractCardButton(this.scene, this) : undefined;
   }
   override destroy(): this {
-    this.destroyButton();
+    this.destroyRetractButton();
     return super.destroy();
   }
-  destroyButton() {
+  destroyRetractButton() {
     this.retractCardButton?.destroy();
   }
   animateAttack() {
@@ -47,7 +40,6 @@ export default class Card extends CardImage {
   }
   override tween(config: CardTweenConfig): Phaser.Tweens.Tween {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
-    this.retractCardButton?.tween(config.x.value2d, config.y.value2d);
     return super.tween(config);
   }
 }
