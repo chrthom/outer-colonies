@@ -148,18 +148,18 @@ export default class CardStack {
             () => this.pointerout()
           )
       );
-      this.expandTween = this.tween(true);
+      this.expandTween = this.tween(true, true);
     }
     this.summaryBox.highlight();
   }
   private pointerout() {
     this.expandTween?.forEach(t => t.stop());
-    this.tween();
+    this.tween(true, false);
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
-  private tween(expand?: boolean): Phaser.Tweens.Tween[] {
-    return this.cards.map(c => {
+  private tween(delay?: boolean, expand?: boolean): Phaser.Tweens.Tween[] {
+    return this.cards.flatMap(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
       const y = this.targetY(c.data.index, expand);
@@ -174,7 +174,8 @@ export default class CardStack {
         xRotation: expand
           ? layoutConfig.game.cards.perspective.neutral
           : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle),
+        delay: delay ? animationConfig.duration.waitBeforeTween : 0
       });
     });
   }

@@ -58,7 +58,8 @@ export default class RetractCardButton {
     this.tween = this.scene.tweens.add({
       targets: this.image,
       duration: animationConfig.duration.displayIndicator,
-      alpha: show ? designConfig.alpha.normal : 0
+      alpha: show ? designConfig.alpha.normal : 0,
+      delay: animationConfig.duration.waitBeforeTween
     });
   }
   private setTintNormal() {

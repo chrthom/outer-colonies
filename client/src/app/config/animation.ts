@@ -3,12 +3,13 @@ class AnimationConfig {
     loaderCycle: 1000,
     attack: 1000,
     handExpand: 200,
-    displayIndicator: 250,
+    displayIndicator: 200,
     draw: 400,
     move: 500,
     showTacticCard: 600,
     min: 10,
     promptShow: 3000,
+    waitBeforeTween: 150,
     zoomCard: 150
   };
   readonly attack = {
