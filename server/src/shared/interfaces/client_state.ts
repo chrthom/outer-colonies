@@ -52,16 +52,15 @@ export interface ClientCardStack {
   index: number;
   zoneCardsNum: number;
   ownedByPlayer: boolean;
-  damage: number;
-  criticalDamage: boolean;
   missionReady: boolean;
   interceptionReady: boolean;
-  defenseIcons: ClientDefenseIcon[];
+  attributes: ClientCardStackAttribute[];
 }
 
-export interface ClientDefenseIcon {
+export interface ClientCardStackAttribute {
   icon: string;
-  depleted: boolean;
+  value: number;
+  warning?: boolean;
 }
 
 export interface ClientHandCard {

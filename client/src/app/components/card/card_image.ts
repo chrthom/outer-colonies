@@ -63,12 +63,13 @@ export default class CardImage {
       .setZ(config?.z ?? perspectiveConfig.distance.board)
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
-  destroy() {
+  destroy(): this {
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
+    return this;
   }
-  discard(toDeck?: boolean) {
+  discard(toDeck?: boolean): this {
     const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
@@ -89,22 +90,27 @@ export default class CardImage {
         this.destroy();
       }
     });
+    return this;
   }
-  highlightDisabled() {
+  highlightDisabled(): this {
     this.highlightReset();
     this.image.setTint(designConfig.tint.faded);
+    return this;
   }
-  highlightSelectable() {
+  highlightSelectable(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.neutral);
+    return this;
   }
-  highlightSelected() {
+  highlightSelected(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.opponent);
+    return this;
   }
-  highlightReset() {
+  highlightReset(): this {
     this.imageHighlight.setVisible(false);
     this.image.setTint(designConfig.tint.neutral);
+    return this;
   }
   setCardId(cardId: number): this {
     this.cardId = cardId;
@@ -158,15 +164,18 @@ export default class CardImage {
   get angle(): number {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
-  enableMaximizeOnMouseover() {
-    this.disableMaximizeOnMouseover();
+  enableMaximizeOnRightclick(): this {
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
-      .on('pointerout', () => this.scene.obj.maxCard.hide())
-      .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
-  }
-  disableMaximizeOnMouseover() {
-    this.image.off('pointerover').off('pointerout').off('pointermove');
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.rightButtonDown()) {
+          const maxCard = this.scene.obj.zoomCard;
+          if (maxCard.image.visible) this.scene.obj.zoomCard.hide();
+          else this.scene.obj.zoomCard.show(this.cardId);
+        }
+      })
+      .on('pointerout', () => this.scene.obj.zoomCard.hide())
+      .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
+    return this;
   }
   tween(config: CardTweenConfig) {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
@@ -177,14 +186,14 @@ export default class CardImage {
     if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
     if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
-    this.scene.tweens.add(pTweenConfig);
     const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
       duration: config.duration
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
     if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    this.scene.tweens.add(rTweenConfig);
+    const t1 = this.scene.tweens.add(rTweenConfig);
+    const t2 = this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);

@@ -29,7 +29,7 @@ export default class MissionCards {
           }
         );
       });
-      this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnMouseover());
+      this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnRightclick());
     }
   }
 }

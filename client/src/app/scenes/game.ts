@@ -15,7 +15,7 @@ import {
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
-import MaxCard from '../components/card/max_card';
+import ZoomCard from '../components/card/zoom_card';
 import ClientPlannedBattle, {
   ClientPlannedBattleHelper
 } from '../../../../server/src/shared/interfaces/client_planned_battle';
@@ -43,7 +43,7 @@ interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
   exitButton: ExitButton;
-  maxCard: MaxCard;
+  zoomCard: ZoomCard;
   missionCards: MissionCards;
 }
 
@@ -127,13 +127,6 @@ export default class Game extends Phaser.Scene {
       'equipment_hull',
       'equipment_hull_infrastructure',
       'equipment_hull_infrastructure_tactic',
-      'armour_1',
-      'armour_2',
-      'armour_3',
-      'shield_1',
-      'shield_2',
-      'point_defense_1',
-      'point_defense_2',
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
@@ -143,6 +136,24 @@ export default class Game extends Phaser.Scene {
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
     );
+    ['blue', 'red'].forEach(color =>
+      this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
+    );
+    [
+      'damage',
+      'hp',
+      'speed',
+      'energy',
+      'theta',
+      'xi',
+      'phi',
+      'omega',
+      'delta',
+      'psi',
+      'armour',
+      'shield',
+      'point_defense'
+    ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
     [
       'active_build',
@@ -186,7 +197,7 @@ export default class Game extends Phaser.Scene {
       combatRangeIndicator: new CombatRangeIndicator(this),
       continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
-      maxCard: new MaxCard(this),
+      zoomCard: new ZoomCard(this),
       missionCards: new MissionCards(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
@@ -232,7 +243,7 @@ export default class Game extends Phaser.Scene {
     this.obj.combatRangeIndicator.update();
     this.obj.exitButton.update();
     this.obj.missionCards.update();
-    this.obj.maxCard.hide();
+    this.obj.zoomCard.hide();
     this.updateHighlighting();
   }
 

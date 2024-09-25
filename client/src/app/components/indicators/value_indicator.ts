@@ -6,7 +6,6 @@ import Game from '../../scenes/game';
 export default class ValueIndicator {
   private shape: Phaser.GameObjects.Shape;
   private text: Phaser.GameObjects.Text;
-  private scene: Game;
   private ownedByPlayer: boolean;
   constructor(
     scene: Game,
@@ -17,7 +16,6 @@ export default class ValueIndicator {
     ownedByPlayer: boolean,
     hasEllipseShape: boolean
   ) {
-    this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
     if (hasEllipseShape) {
       this.shape = scene.add
@@ -57,14 +55,6 @@ export default class ValueIndicator {
   destroy() {
     this.shape.destroy();
     this.text.destroy();
-  }
-  tween(cardX: number, cardY: number) {
-    this.scene.tweens.add({
-      targets: [this.text, this.shape],
-      duration: animationConfig.duration.move,
-      x: this.x(cardX),
-      y: this.y(cardY)
-    });
   }
   private x(cardX: number) {
     return (

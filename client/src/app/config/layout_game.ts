@@ -1,17 +1,19 @@
 import {
   CardXPosition,
   CardYPosition,
-  MaxCardXPosition,
-  MaxCardYPosition,
+  ZoomCardXPosition,
+  ZoomCardYPosition,
   MinCardXPosition,
   MinCardYPosition
 } from '../components/perspective';
 
 class LayoutGameConfig {
   readonly cards = {
-    defenseIndicator: {
-      xOffset: -85,
-      yDistance: 50
+    cardsBreakpointYCompression: 5,
+    expanded: {
+      xFactorMoveToCenter: 0.2,
+      xOffset: 90,
+      yFactorMoveToCenter: 0.13
     },
     perspective: {
       none: Phaser.Math.DegToRad(0),
@@ -25,6 +27,7 @@ class LayoutGameConfig {
         angleStep: 5,
         startAngle: -10,
         xStep: -50,
+        yExpand: -65,
         yStep: 5
       },
       mission: {
@@ -32,6 +35,32 @@ class LayoutGameConfig {
         y: new MinCardYPosition(650),
         xDistance: 20,
         yDistance: 10
+      },
+      opponent: {
+        colony: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(160)
+        },
+        deck: {
+          x: new CardXPosition(1875),
+          y: new CardYPosition(345)
+        },
+        discardPile: {
+          x: new CardXPosition(2080),
+          y: new CardYPosition(345)
+        },
+        hand: {
+          x: new CardXPosition(2370),
+          y: new CardYPosition(65)
+        },
+        orbit: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(430)
+        },
+        neutral: {
+          x: new CardXPosition(120),
+          y: new CardYPosition(695)
+        }
       },
       player: {
         colony: {
@@ -59,38 +88,20 @@ class LayoutGameConfig {
           y: new CardYPosition(650)
         }
       },
-      opponent: {
-        colony: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(160)
-        },
-        deck: {
-          x: new CardXPosition(1875),
-          y: new CardYPosition(345)
-        },
-        discardPile: {
-          x: new CardXPosition(2080),
-          y: new CardYPosition(345)
-        },
-        hand: {
-          x: new CardXPosition(2370),
-          y: new CardYPosition(65)
-        },
-        orbit: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(430)
-        },
-        neutral: {
-          x: new CardXPosition(120),
-          y: new CardYPosition(695)
-        }
-      }
+      randomAngle: 4
     },
     retractCardButton: {
-      xOffset: 67,
-      yOffset: -88
+      xOffset: 66,
+      yOffset: -87
     },
     stackYDistance: 31,
+    summaryBox: {
+      boxesPerRow: 4,
+      xOffset: 3,
+      xStep: 44,
+      yOffset: 10,
+      yStep: 49
+    },
     valueIndicator: {
       xOffsetPlayer: -95,
       yOffsetPlayer: -100,
@@ -142,8 +153,8 @@ class LayoutGameConfig {
       yOffset: -330
     },
     maxedTacticCard: {
-      x: new MaxCardXPosition(1200),
-      y: new MaxCardYPosition(650)
+      x: new ZoomCardXPosition(1200),
+      y: new ZoomCardYPosition(650)
     },
     prompt: {
       textOffset: {
