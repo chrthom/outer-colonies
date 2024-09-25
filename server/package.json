@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-server",
-  "version": "Calypso",
+  "version": "2.2.2",
   "description": "Outer Colonies Server",
   "main": "dist/app.js",
   "scripts": {

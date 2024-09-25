@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-client",
-  "version": "Calypso",
+  "version": "2.2.2",
   "description": "Outer Colonies Game Client",
   "scripts": {
     "ng": "ng",
