@@ -75,13 +75,13 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
               { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp },
               { icon: 'speed', value: profile.speed },
               { icon: 'energy', value: profile.energy, warning: profile.energy < 0 },
-              { icon: 'theta', value: profile.theta },
-              { icon: 'xi', value: profile.xi },
-              { icon: 'phi', value: profile.phi },
-              { icon: 'omega', value: profile.omega },
-              { icon: 'delta', value: profile.delta },
-              { icon: 'psi', value: profile.psi }
-            ].filter(i => (i.value > 0 && i.value < 100) || (i.value != 0 && i.warning))
+              { icon: 'theta', value: profile.theta, warning: profile.theta < 0 },
+              { icon: 'xi', value: profile.xi, warning: profile.xi < 0 },
+              { icon: 'phi', value: profile.phi, warning: profile.phi < 0 },
+              { icon: 'omega', value: profile.omega, warning: profile.omega < 0 },
+              { icon: 'delta', value: profile.delta, warning: profile.delta < 0 },
+              { icon: 'psi', value: profile.psi, warning: profile.psi < 0 }
+            ].filter(i => i.value != 0 && i.value < 100)
           );
         } else if (cs.card.type == CardType.Colony) {
           attributes.push(...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : []), {
