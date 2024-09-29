@@ -113,7 +113,7 @@ export default class Game extends Phaser.Scene {
     this.load.image('zone_corner', 'utils/zone_corner.png');
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
-      .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
+      .forEach(id => this.load.image(`card_${id}`, `cards_migration/${id}.png`));
     [
       'equipment',
       'hull',
@@ -131,7 +131,7 @@ export default class Game extends Phaser.Scene {
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
     ['mask', 'mask_small', 'glow', 'glow_small'].forEach(name =>
-      this.load.image(`card_${name}`, `utils/card_${name}.png`)
+      this.load.image(`card_${name}`, `utils_migration/card_${name}.png`)
     );
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
       this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
