@@ -180,7 +180,8 @@ export default class CardImage {
   tween(config: CardTweenConfig) {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
-      duration: config.duration
+      duration: config.duration,
+      ease: 'Cubic.easeInOut'
     };
     if (config.x != undefined) pTweenConfig['x'] = config.x.value3d;
     if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
@@ -188,12 +189,13 @@ export default class CardImage {
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
     const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
-      duration: config.duration
+      duration: config.duration,
+      ease: 'Quad.easeInOut'
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
     if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    const t1 = this.scene.tweens.add(rTweenConfig);
-    const t2 = this.scene.tweens.add(pTweenConfig);
+    this.scene.tweens.add(rTweenConfig);
+    this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);

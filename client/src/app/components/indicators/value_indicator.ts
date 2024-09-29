@@ -1,5 +1,4 @@
 import { designConfig } from 'src/app/config/design';
-import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 

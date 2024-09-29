@@ -36,7 +36,8 @@ export default class RetractCardButton {
         onPointerOver();
       })
       .on('pointerout', () => {
-        this.card.data.insufficientEnergy ? this.setTintCritical() : this.setTintNormal();
+        if (this.card.data.insufficientEnergy) this.setTintCritical();
+        else this.setTintNormal();
         onPointerOut();
       })
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
