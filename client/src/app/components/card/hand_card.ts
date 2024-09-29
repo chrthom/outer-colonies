@@ -122,7 +122,7 @@ export default class HandCard extends CardImage {
         this.scene.player.hand.flatMap(hc =>
           hc.tween({
             duration: animationConfig.duration.handExpand,
-            x: hc.targetX(hc.data.index + (hc.data.index > this.data.index ? 1 : -1)),
+            x: hc.targetX(hc.data.index + (hc.data.index > this.data.index ? 1 : hc.data.index < this.data.index ? -1 : -0.5)),
             y: hc
               .targetY()
               .plus(hc.data.index == this.data.index ? layoutConfig.game.cards.placement.hand.yExpand : 0)
