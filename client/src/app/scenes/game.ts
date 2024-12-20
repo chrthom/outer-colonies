@@ -130,7 +130,7 @@ export default class Game extends Phaser.Scene {
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
-    ['mask', 'mask_small', 'glow', 'glow_small'].forEach(name =>
+    ['mask', 'mask_small', 'glow', 'glow_small', 'pile_1', 'pile_2', 'pile_3', 'pile_4'].forEach(name =>
       this.load.image(`card_${name}`, `utils_migration/card_${name}.png`)
     );
     ['red', 'yellow', 'blue', 'white'].forEach(color =>
