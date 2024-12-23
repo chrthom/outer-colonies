@@ -41,11 +41,7 @@ export default class CardImage {
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
     this.imagePile = scene.add
-      .plane(
-        perspectiveConfig.origin.x,
-        perspectiveConfig.origin.y,
-        'card_pile_1'
-      )
+      .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'card_pile_1')
       .setVisible(false);
     this.imageHighlight = scene.add
       .plane(
@@ -128,8 +124,8 @@ export default class CardImage {
   setPileSize(size: number) {
     let imageNum = 0;
     if (size > 55) imageNum = 4;
-    else if (size > 30) imageNum =  3;
-    else if (size > 15) imageNum =  2;
+    else if (size > 30) imageNum = 3;
+    else if (size > 15) imageNum = 2;
     else if (size > 5) imageNum = 1;
     this.imagePile.setVisible(imageNum > 0);
     this.imagePile.setTexture(`card_pile_${imageNum}`);
