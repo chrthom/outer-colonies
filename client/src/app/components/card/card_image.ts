@@ -27,8 +27,9 @@ export default class CardImage {
   cardId: number;
   ownedByPlayer: boolean;
   protected scene: Game;
-  protected imageHighlight: Phaser.GameObjects.Plane;
+  private imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
+  private imagePile: Phaser.GameObjects.Plane;
   constructor(
     scene: Game,
     x: PerspectivePosition,
@@ -39,6 +40,13 @@ export default class CardImage {
     this.scene = scene;
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
+    this.imagePile = scene.add
+      .plane(
+        perspectiveConfig.origin.x,
+        perspectiveConfig.origin.y,
+        'card_pile_1'
+      )
+      .setVisible(false);
     this.imageHighlight = scene.add
       .plane(
         perspectiveConfig.origin.x,
@@ -116,6 +124,15 @@ export default class CardImage {
     this.cardId = cardId;
     this.image.setTexture(`card_${cardId}`);
     return this;
+  }
+  setPileSize(size: number) {
+    let imageNum = 0;
+    if (size > 55) imageNum = 4;
+    else if (size > 30) imageNum =  3;
+    else if (size > 15) imageNum =  2;
+    else if (size > 5) imageNum = 1;
+    this.imagePile.setVisible(imageNum > 0);
+    this.imagePile.setTexture(`card_pile_${imageNum}`);
   }
   setVisible(visible: boolean): this {
     this.image.setVisible(visible);
@@ -205,7 +222,7 @@ export default class CardImage {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
   private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
-    [this.image, this.imageHighlight, this.imageMask].forEach(f);
+    [this.image, this.imageHighlight, this.imageMask, this.imagePile].forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer
