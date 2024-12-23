@@ -27,8 +27,9 @@ export default class CardImage {
   cardId: number;
   ownedByPlayer: boolean;
   protected scene: Game;
-  protected imageHighlight: Phaser.GameObjects.Plane;
+  private imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
+  private imagePile: Phaser.GameObjects.Plane;
   constructor(
     scene: Game,
     x: PerspectivePosition,
@@ -39,6 +40,9 @@ export default class CardImage {
     this.scene = scene;
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
+    this.imagePile = scene.add
+      .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'card_pile_1')
+      .setVisible(false);
     this.imageHighlight = scene.add
       .plane(
         perspectiveConfig.origin.x,
@@ -117,6 +121,15 @@ export default class CardImage {
     this.image.setTexture(`card_${cardId}`);
     return this;
   }
+  setPileSize(size: number) {
+    let imageNum = 0;
+    if (size > 55) imageNum = 4;
+    else if (size > 30) imageNum = 3;
+    else if (size > 15) imageNum = 2;
+    else if (size > 5) imageNum = 1;
+    this.imagePile.setVisible(imageNum > 0);
+    this.imagePile.setTexture(`card_pile_${imageNum}`);
+  }
   setVisible(visible: boolean): this {
     this.image.setVisible(visible);
     if (!visible) this.imageHighlight.setVisible(visible);
@@ -158,7 +171,7 @@ export default class CardImage {
     return this.image.modelRotation.x;
   }
   setAngle(angle: number): this {
-    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)));
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)), true);
     return this;
   }
   get angle(): number {
@@ -204,8 +217,8 @@ export default class CardImage {
   get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
-  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
-    [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void, excludePile?: boolean) {
+    [this.image, this.imageHighlight, this.imageMask].concat(excludePile ? [] : [this.imagePile]).forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer
