@@ -40,6 +40,9 @@ export default class DiscardPile extends CardImage {
         true,
         true
       );
+      this.setPileSize(this.cardIds.length);
+    } else {
+      this.setVisible(false);
     }
   }
   override destroy(): this {
