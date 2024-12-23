@@ -175,7 +175,7 @@ export default class CardImage {
     return this.image.modelRotation.x;
   }
   setAngle(angle: number): this {
-    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)));
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)), true);
     return this;
   }
   get angle(): number {
@@ -221,8 +221,8 @@ export default class CardImage {
   get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
-  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
-    [this.image, this.imageHighlight, this.imageMask, this.imagePile].forEach(f);
+  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void, excludePile?: boolean) {
+    [this.image, this.imageHighlight, this.imageMask].concat(excludePile ? [] : [this.imagePile]).forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer
