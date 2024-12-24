@@ -10,9 +10,10 @@ import { rules } from '../../../../../server/src/shared/config/rules';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'oc-page-trade',
-  templateUrl: './trade.page.html',
-  styleUrls: ['./trade.page.scss']
+    selector: 'oc-page-trade',
+    templateUrl: './trade.page.html',
+    styleUrls: ['./trade.page.scss'],
+    standalone: false
 })
 export class TradePage implements OnInit {
   sol = 0;

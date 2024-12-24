@@ -6,9 +6,10 @@ import AuthService from 'src/app/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'oc-page-login',
-  templateUrl: './login.page.html',
-  styleUrl: './login.page.scss'
+    selector: 'oc-page-login',
+    templateUrl: './login.page.html',
+    styleUrl: './login.page.scss',
+    standalone: false
 })
 export class LoginPage {
   loginFailed = false;

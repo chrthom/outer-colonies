@@ -6,9 +6,10 @@ import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 
 @Component({
-  selector: 'oc-page-reset-password',
-  templateUrl: './reset-password.page.html',
-  styleUrls: ['./reset-password.page.scss']
+    selector: 'oc-page-reset-password',
+    templateUrl: './reset-password.page.html',
+    styleUrls: ['./reset-password.page.scss'],
+    standalone: false
 })
 export class ResetPasswordPage implements OnInit {
   passwordResetSuccessful = false;
