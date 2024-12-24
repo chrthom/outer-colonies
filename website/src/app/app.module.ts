@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -42,52 +42,45 @@ import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { TradePage } from './pages/trade/trade.page';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    ContentBoxComponent,
-    ImageModalComponent,
-    InventoryItemComponent,
-    NavbarComponent,
-    OpenItemComponent,
-    ActivateAccountPage,
-    ConfirmEmailPage,
-    DataPrivacyPage,
-    DeckPage,
-    ForgotPasswordPage,
-    HomePage,
-    ImprintPage,
-    LoginPage,
-    ProfilePage,
-    RegisterPage,
-    ResetPasswordPage,
-    RulesPage,
-    TradePage
-  ],
-  imports: [
-    AppRoutingModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatButtonToggleModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatInputModule,
-    MatListModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    MatSnackBarModule,
-    MatSortModule,
-    MatTabsModule,
-    MatTooltipModule,
-    ReactiveFormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        ContentBoxComponent,
+        ImageModalComponent,
+        InventoryItemComponent,
+        NavbarComponent,
+        OpenItemComponent,
+        ActivateAccountPage,
+        ConfirmEmailPage,
+        DataPrivacyPage,
+        DeckPage,
+        ForgotPasswordPage,
+        HomePage,
+        ImprintPage,
+        LoginPage,
+        ProfilePage,
+        RegisterPage,
+        ResetPasswordPage,
+        RulesPage,
+        TradePage
+    ],
+    bootstrap: [AppComponent], imports: [AppRoutingModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        MatButtonModule,
+        MatBadgeModule,
+        MatButtonToggleModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatInputModule,
+        MatListModule,
+        MatSelectModule,
+        MatSlideToggleModule,
+        MatSnackBarModule,
+        MatSortModule,
+        MatTabsModule,
+        MatTooltipModule,
+        ReactiveFormsModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}
