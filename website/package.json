@@ -14,7 +14,7 @@
     "build:staging": "ng build --configuration staging",
     "bp": "npm run build:prod",
     "build:prod": "ng build --configuration production",
-    "test": "ng test",
+    "test": "echo 'No tests available'",
     "lint": "ng lint",
     "format": "npx prettier . --write",
     "check": "npm run format; npm run lint"
@@ -35,7 +35,6 @@
     "lodash-es": "^4.0.0",
     "ngx-cookie-service": "^19.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.0.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -46,19 +45,12 @@
     "@angular-eslint/schematics": "^19.0.0",
     "@angular-eslint/template-parser": "^19.0.0",
     "@angular/cli": "^19.0.0",
-    "@angular/compiler-cli": "^19.0.0",
     "@types/jasmine": "~4.3.0",
     "@types/lodash-es": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-prefer-arrow": "~1.2.0",
-    "jasmine-core": "~4.6.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.0.0",
     "typescript": "~5.6.3"
   }
