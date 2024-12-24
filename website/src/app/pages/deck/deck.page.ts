@@ -11,9 +11,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 
 @Component({
-  selector: 'oc-page-deck',
-  templateUrl: './deck.page.html',
-  styleUrls: ['./deck.page.scss']
+    selector: 'oc-page-deck',
+    templateUrl: './deck.page.html',
+    styleUrls: ['./deck.page.scss'],
+    standalone: false
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;

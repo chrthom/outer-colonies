@@ -3,9 +3,10 @@ import { ItemListResponseBox } from '../../../../../server/src/shared/interfaces
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'oc-open-item',
-  templateUrl: './open-item.component.html',
-  styleUrls: ['./open-item.component.scss']
+    selector: 'oc-open-item',
+    templateUrl: './open-item.component.html',
+    styleUrls: ['./open-item.component.scss'],
+    standalone: false
 })
 export class OpenItemComponent {
   @Input() content?: ItemListResponseBox = undefined;

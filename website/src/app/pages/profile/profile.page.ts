@@ -15,9 +15,10 @@ import AuthService from 'src/app/auth.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 
 @Component({
-  selector: 'oc-page-profile',
-  templateUrl: './profile.page.html',
-  styleUrl: './profile.page.scss'
+    selector: 'oc-page-profile',
+    templateUrl: './profile.page.html',
+    styleUrl: './profile.page.scss',
+    standalone: false
 })
 export class ProfilePage implements OnInit {
   newsletterSubscription!: boolean;
