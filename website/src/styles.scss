@@ -1,6 +1,6 @@
 @use "@angular/material" as mat;
 @use "./style/material-theme.scss" as oc;
-@import "./style/fonts.scss";
+@use "./style/fonts.scss";
 @include mat.elevation-classes();
 @include mat.app-background();
 @include mat.all-component-themes(oc.$theme);
