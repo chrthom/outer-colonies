@@ -5,13 +5,13 @@
 @include mat.all-component-themes(oc.$theme);
 
 :root {
-  --color-primary: #{mat.get-color-from-palette(oc.$theme-primary, 500)};
-  --color-primary-dark: #{mat.get-color-from-palette(oc.$theme-primary, 800)};
-  --color-primary-light: #{mat.get-color-from-palette(oc.$theme-primary, 200)};
-  --color-accent: #{mat.get-color-from-palette(oc.$theme-accent, 500)};
-  --color-accent-dark: #{mat.get-color-from-palette(oc.$theme-accent, 700)};
-  --color-accent-light: #{mat.get-color-from-palette(oc.$theme-accent, 100)};
-  --color-warn: #{mat.get-color-from-palette(oc.$theme-accent, A400)};
+  --color-primary: #{mat.m2-get-color-from-palette(oc.$theme-primary, 500)};
+  --color-primary-dark: #{mat.m2-get-color-from-palette(oc.$theme-primary, 800)};
+  --color-primary-light: #{mat.m2-get-color-from-palette(oc.$theme-primary, 200)};
+  --color-accent: #{mat.m2-get-color-from-palette(oc.$theme-accent, 500)};
+  --color-accent-dark: #{mat.m2-get-color-from-palette(oc.$theme-accent, 700)};
+  --color-accent-light: #{mat.m2-get-color-from-palette(oc.$theme-accent, 100)};
+  --color-warn: #{mat.m2-get-color-from-palette(oc.$theme-accent, A400)};
   --color-light: white;
   --color-dark: black;
 }
