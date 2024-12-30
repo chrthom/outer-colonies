@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-client",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Outer Colonies Game Client",
   "scripts": {
     "ng": "ng",
