@@ -6,9 +6,10 @@ import { environment } from 'src/environments/environment';
 import { layoutConfig } from './config/layout';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
   config: Phaser.Types.Core.GameConfig = {
@@ -20,7 +21,8 @@ export class AppComponent {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: layoutConfig.scene.width,
       height: layoutConfig.scene.height
-    }
+    },
+    disableContextMenu: true
   };
   phaserGame: Phaser.Game = new Phaser.Game(this.config);
 

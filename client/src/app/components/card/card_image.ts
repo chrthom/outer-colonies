@@ -27,8 +27,9 @@ export default class CardImage {
   cardId: number;
   ownedByPlayer: boolean;
   protected scene: Game;
-  protected imageHighlight: Phaser.GameObjects.Plane;
+  private imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
+  private imagePile: Phaser.GameObjects.Plane;
   constructor(
     scene: Game,
     x: PerspectivePosition,
@@ -39,6 +40,9 @@ export default class CardImage {
     this.scene = scene;
     this.cardId = cardId;
     this.ownedByPlayer = !config?.isOpponentCard;
+    this.imagePile = scene.add
+      .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, 'card_pile_1')
+      .setVisible(false);
     this.imageHighlight = scene.add
       .plane(
         perspectiveConfig.origin.x,
@@ -63,12 +67,13 @@ export default class CardImage {
       .setZ(config?.z ?? perspectiveConfig.distance.board)
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
-  destroy() {
+  destroy(): this {
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
+    return this;
   }
-  discard(toDeck?: boolean) {
+  discard(toDeck?: boolean): this {
     const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
@@ -89,27 +94,41 @@ export default class CardImage {
         this.destroy();
       }
     });
+    return this;
   }
-  highlightDisabled() {
+  highlightDisabled(): this {
     this.highlightReset();
     this.image.setTint(designConfig.tint.faded);
+    return this;
   }
-  highlightSelectable() {
+  highlightSelectable(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.neutral);
+    return this;
   }
-  highlightSelected() {
+  highlightSelected(): this {
     this.highlightReset();
     this.imageHighlight.setVisible(true).setTint(designConfig.tint.opponent);
+    return this;
   }
-  highlightReset() {
+  highlightReset(): this {
     this.imageHighlight.setVisible(false);
     this.image.setTint(designConfig.tint.neutral);
+    return this;
   }
   setCardId(cardId: number): this {
     this.cardId = cardId;
     this.image.setTexture(`card_${cardId}`);
     return this;
+  }
+  setPileSize(size: number) {
+    let imageNum = 0;
+    if (size > 55) imageNum = 4;
+    else if (size > 30) imageNum = 3;
+    else if (size > 15) imageNum = 2;
+    else if (size > 5) imageNum = 1;
+    this.imagePile.setVisible(imageNum > 0);
+    this.imagePile.setTexture(`card_pile_${imageNum}`);
   }
   setVisible(visible: boolean): this {
     this.image.setVisible(visible);
@@ -152,39 +171,44 @@ export default class CardImage {
     return this.image.modelRotation.x;
   }
   setAngle(angle: number): this {
-    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)));
+    this.forAllImages(i => (i.modelRotation.z = Phaser.Math.DegToRad(angle)), true);
     return this;
   }
   get angle(): number {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
-  enableMaximizeOnMouseover() {
-    this.disableMaximizeOnMouseover();
+  enableMaximizeOnRightclick(): this {
     this.image
-      .on('pointerover', () => this.scene.obj.maxCard.show(this.cardId))
-      .on('pointerout', () => this.scene.obj.maxCard.hide())
-      .on('pointermove', () => this.scene.obj.maxCard.updatePosition());
-  }
-  disableMaximizeOnMouseover() {
-    this.image.off('pointerover').off('pointerout').off('pointermove');
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.rightButtonDown()) {
+          const maxCard = this.scene.obj.zoomCard;
+          if (maxCard.image.visible) this.scene.obj.zoomCard.hide();
+          else this.scene.obj.zoomCard.show(this.cardId);
+        }
+      })
+      .on('pointerout', () => this.scene.obj.zoomCard.hide())
+      .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
+    return this;
   }
   tween(config: CardTweenConfig) {
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
-      duration: config.duration
+      duration: config.duration,
+      ease: 'Cubic.easeInOut'
     };
     if (config.x != undefined) pTweenConfig['x'] = config.x.value3d;
     if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
     if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
-    this.scene.tweens.add(pTweenConfig);
     const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
-      duration: config.duration
+      duration: config.duration,
+      ease: 'Quad.easeInOut'
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
     if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
     this.scene.tweens.add(rTweenConfig);
+    this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);
@@ -193,8 +217,8 @@ export default class CardImage {
   get placementConfig() {
     return CardImage.getPlacementConfig(this.ownedByPlayer);
   }
-  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void) {
-    [this.image, this.imageHighlight, this.imageMask].forEach(f);
+  private forAllImages(f: (i: Phaser.GameObjects.Plane) => void, excludePile?: boolean) {
+    [this.image, this.imageHighlight, this.imageMask].concat(excludePile ? [] : [this.imagePile]).forEach(f);
   }
   protected static getPlacementConfig(ownedByPlayer: boolean) {
     return ownedByPlayer

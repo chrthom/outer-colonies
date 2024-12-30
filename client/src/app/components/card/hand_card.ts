@@ -24,16 +24,21 @@ export default class HandCard extends CardImage {
     );
     this.uuid = data.uuid;
     this.update(data);
-    this.image.on('pointerdown', () => this.onClickAction());
+    this.image.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (p.leftButtonDown()) this.onClickAction();
+    });
     this.setDepth(layoutConfig.depth.handCard);
-    if (data.ownedByPlayer) this.enableMaximizeOnMouseover();
+    if (data.ownedByPlayer) {
+      this.enableMaximizeOnRightclick();
+      this.enableExpandOnPointerover();
+    }
   }
   update(data: ClientHandCard) {
     this.data = data;
     this.tween({
       duration: animationConfig.duration.draw,
-      x: this.targetX,
-      y: this.targetY,
+      x: this.targetX(),
+      y: this.targetY(),
       xRotation: layoutConfig.game.cards.perspective.neutral,
       angle: this.shortestAngle(this.targetAngle)
     });
@@ -43,12 +48,11 @@ export default class HandCard extends CardImage {
     if (this.data.playable) this.highlightSelectable();
   }
   maximizeTacticCard() {
-    this.disableMaximizeOnMouseover();
     this.scene.maximizedTacticCard?.destroy();
-    this.scene.maximizedTacticCard = this;
-    this.setCardId(this.data.cardId); // To display if card's origin is opponent's hand
-    this.setDepth(layoutConfig.depth.maxedTacticCard);
-    this.highlightReset();
+    this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)
+      .setCardId(this.data.cardId) // To display if card's origin is opponent's hand
+      .highlightReset();
+    if (!this.data.ownedByPlayer) this.setAngle(this.angle + 180);
     this.tween({
       duration: animationConfig.duration.showTacticCard,
       x: layoutConfig.game.ui.maxedTacticCard.x,
@@ -58,26 +62,26 @@ export default class HandCard extends CardImage {
       angle: this.shortestAngle(0)
     });
   }
-  override discard(toDeck?: boolean) {
+  override discard(toDeck?: boolean): this {
     if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
       this.setCardId(this.data.cardId);
     }
-    super.discard(toDeck);
+    return super.discard(toDeck);
   }
-  private invIndex(data: ClientHandCard) {
+  private invIndex(index: number) {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
-    return handData.hand.length - data.index - 1;
+    return handData.hand.length - index - 1;
   }
-  private get targetX(): CardXPosition {
+  private targetX(index?: number): CardXPosition {
     return new CardXPosition(
       this.placementConfig.hand.x.value2d +
-        this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.xStep
+        this.invIndex(index ?? this.data.index) * layoutConfig.game.cards.placement.hand.xStep
     );
   }
-  private get targetY(): CardYPosition {
+  private targetY(index?: number): CardYPosition {
     return new CardYPosition(
       this.placementConfig.hand.y.value2d +
-        this.factor * this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.yStep
+        this.factor * this.invIndex(index ?? this.data.index) * layoutConfig.game.cards.placement.hand.yStep
     );
   }
   private get targetAngle() {
@@ -85,7 +89,7 @@ export default class HandCard extends CardImage {
       this.orientation +
       this.factor *
         (layoutConfig.game.cards.placement.hand.startAngle +
-          this.invIndex(this.data) * layoutConfig.game.cards.placement.hand.angleStep)
+          this.invIndex(this.data.index) * layoutConfig.game.cards.placement.hand.angleStep)
     );
   }
   private get factor() {
@@ -111,5 +115,31 @@ export default class HandCard extends CardImage {
         this.scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
       }
     }
+  }
+  private enableExpandOnPointerover() {
+    this.image
+      .on('pointerover', () => {
+        this.scene.player.hand.flatMap(hc =>
+          hc.tween({
+            duration: animationConfig.duration.handExpand,
+            x: hc.targetX(
+              hc.data.index +
+                (hc.data.index > this.data.index ? 1 : hc.data.index < this.data.index ? -1 : -0.5)
+            ),
+            y: hc
+              .targetY()
+              .plus(hc.data.index == this.data.index ? layoutConfig.game.cards.placement.hand.yExpand : 0)
+          })
+        );
+      })
+      .on('pointerout', () => {
+        this.scene.player.hand.flatMap(hc =>
+          hc.tween({
+            duration: animationConfig.duration.handExpand,
+            x: hc.targetX(),
+            y: hc.targetY()
+          })
+        );
+      });
   }
 }

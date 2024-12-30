@@ -19,21 +19,25 @@ export default class DeckCard extends CardImage {
         perspective: layoutConfig.game.cards.perspective.board
       }
     );
-    if (ownedByPlayer) this.image.on('pointerdown', () => this.onClickAction());
+    if (ownedByPlayer)
+      this.image.on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction();
+      });
+    this.update();
   }
   update() {
     if (this.indicator) this.indicator.destroy();
     const cardsForMission = this.scene.plannedBattle.downsideCardsNum;
-    const deckSize = this.scene.getPlayerState(this.ownedByPlayer).deckSize;
     this.indicator = new ValueIndicator(
       this.scene,
-      deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
-      deckSize - cardsForMission < 10,
+      this.deckSize + (cardsForMission ? `/-${cardsForMission}` : ''),
+      this.deckSize - cardsForMission < 10,
       this.placementConfig.deck.x.value2d,
       this.placementConfig.deck.y.value2d,
       this.ownedByPlayer,
       true
     );
+    this.setPileSize(this.deckSize);
   }
   private onClickAction() {
     if (
@@ -55,5 +59,8 @@ export default class DeckCard extends CardImage {
         }
       }
     }
+  }
+  private get deckSize(): number {
+    return this.scene.getPlayerState(this.ownedByPlayer).deckSize;
   }
 }
