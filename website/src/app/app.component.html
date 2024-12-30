@@ -3,7 +3,7 @@
 </div>
 
 @if (authService.isLoggedIn) {
-<oc-navbar></oc-navbar>
+  <oc-navbar></oc-navbar>
 }
 
 <div id="root-content">
@@ -16,8 +16,8 @@
       </ul>
     </div>
     <a id="version" href="https://github.com/chrthom/outer-colonies/releases" target="_blank">
-      @if (env.stage !== 'production') {
-      <h4>{{ env.stage }} environment<br /></h4>
+      @if (env.stage !== "production") {
+        <h4>{{ env.stage }} environment<br /></h4>
       }
       <h3>Outer Colonies - Telesto (v2.2.3)</h3>
     </a>

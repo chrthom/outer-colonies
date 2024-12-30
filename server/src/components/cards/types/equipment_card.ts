@@ -27,7 +27,8 @@ export default abstract class EquipmentCard extends Card {
   override isInRange(range: number): boolean {
     return !!this.attackProfile && this.attackProfile.range >= range;
   }
-  onEnterGame() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {}
   onLeaveGame() {}
   onStartTurn() {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

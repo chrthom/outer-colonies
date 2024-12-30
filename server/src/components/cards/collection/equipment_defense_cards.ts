@@ -4,8 +4,7 @@ import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_car
 
 abstract class ShieldDefenseCard extends EquipmentCardRechargeable {
   override getValidTargets(player: Player): CardStack[] {
-    return super.getValidTargets(player)
-      .filter(cs => !cs.cards.find(c => c.id == 312)); // Cannot be attached if "Refraktorfeld" is already attached
+    return super.getValidTargets(player).filter(cs => !cs.cards.find(c => c.id == 312)); // Cannot be attached if "Refraktorfeld" is already attached
   }
 }
 
@@ -134,6 +133,12 @@ export class Card426 extends ShieldDefenseCard {
   }
   override getValidTargets(player: Player): CardStack[] {
     return super.getValidTargets(player).filter(cs => cs.profile.shield > 0);
+  }
+  override get isAttachSelfManaging(): boolean {
+    return true;
+  }
+  override onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {
+    target.cardStacks.find(cs => cs.card.profile.shield > 0)?.attach(cardStack);
   }
 }
 
