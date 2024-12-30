@@ -62,7 +62,7 @@ export class Card224 extends EquipmentCardColonyKillerRechargeable {
     );
   }
   protected override attackDamageBeforeReductions(target: CardStack) {
-    return target.profile.speed < 3 ? this.attackProfile?.damage ?? 0 : 0;
+    return target.profile.speed < 3 ? (this.attackProfile?.damage ?? 0) : 0;
   }
 }
 

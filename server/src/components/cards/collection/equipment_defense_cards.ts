@@ -2,6 +2,12 @@ import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
 
+abstract class ShieldDefenseCard extends EquipmentCardRechargeable {
+  override getValidTargets(player: Player): CardStack[] {
+    return super.getValidTargets(player).filter(cs => !cs.cards.find(c => c.id == 312)); // Cannot be attached if "Refraktorfeld" is already attached
+  }
+}
+
 export class Card103 extends EquipmentCard {
   constructor() {
     super(103, 'Adamantiumpanzer', 5, {
@@ -23,7 +29,7 @@ export class Card115 extends EquipmentCard {
   }
 }
 
-export class Card140 extends EquipmentCardRechargeable {
+export class Card140 extends ShieldDefenseCard {
   constructor() {
     super(140, 'Deflektorschilde', 2, {
       energy: -2,
@@ -43,7 +49,7 @@ export class Card163 extends EquipmentCard {
   }
 }
 
-export class Card170 extends EquipmentCardRechargeable {
+export class Card170 extends ShieldDefenseCard {
   constructor() {
     super(170, 'Strahlenschilde', 1, {
       shield: 1,
@@ -117,7 +123,7 @@ export class Card349 extends EquipmentCard {
   }
 }
 
-export class Card426 extends EquipmentCardRechargeable {
+export class Card426 extends ShieldDefenseCard {
   constructor() {
     super(426, 'Schildbooster', 2, {
       energy: -1,
@@ -127,6 +133,12 @@ export class Card426 extends EquipmentCardRechargeable {
   }
   override getValidTargets(player: Player): CardStack[] {
     return super.getValidTargets(player).filter(cs => cs.profile.shield > 0);
+  }
+  override get isAttachSelfManaging(): boolean {
+    return true;
+  }
+  override onEnterGame(player: Player, target: CardStack, cardStack: CardStack) {
+    target.cardStacks.find(cs => cs.card.profile.shield > 0)?.attach(cardStack);
   }
 }
 
@@ -140,7 +152,7 @@ export class Card406 extends EquipmentCard {
   }
 }
 
-export class Card447 extends EquipmentCardRechargeable {
+export class Card447 extends ShieldDefenseCard {
   constructor() {
     super(447, 'Schildgondel', 1, {
       hp: 2,

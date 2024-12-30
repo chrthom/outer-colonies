@@ -297,7 +297,8 @@ export default class Game extends Phaser.Scene {
     // Update or remove old cards
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-      if (newData) cs.update(newData); // Move existing card stacks
+      if (newData)
+        cs.update(newData); // Move existing card stacks
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
         // Retract card stack (to deck first)
         cs.discard(true);
@@ -331,7 +332,8 @@ export default class Game extends Phaser.Scene {
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
         if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
-        else if (newData) h.update(newData); // Move existing hand card to new position
+        else if (newData)
+          h.update(newData); // Move existing hand card to new position
         else if (previousTurnPhase != TurnPhase.Build) h.discard();
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
       }, this)
