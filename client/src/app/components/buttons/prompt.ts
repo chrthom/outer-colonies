@@ -1,7 +1,6 @@
 import { designConfig } from 'src/app/config/design';
-import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
-import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { animationConfig } from 'src/app/config/animation';
