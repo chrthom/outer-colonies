@@ -1,7 +1,6 @@
 import { designConfig } from 'src/app/config/design';
-import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
-import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { animationConfig } from 'src/app/config/animation';
@@ -32,10 +31,8 @@ export default class Prompt {
     this.hide();
   }
   update() {
-    if (this.scene.state.gameResult) {
-      this.showGameOver(this.scene.state.gameResult);
-      this.show(true);
-    } else if (!this.scene.state.playerPendingAction) {
+    this.hide();
+    if (!this.scene.state.playerPendingAction) {
       this.setText('Warte auf Gegenspieler...');
       this.show(true);
     } else if (this.scene.state.intervention) {
@@ -60,21 +57,24 @@ export default class Prompt {
     }
   }
   show(withCountdown?: boolean) {
-    this.setVisible(true);
-    if (withCountdown) {
-      this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
+    if (!this.scene.state.gameResult) {
+      this.setVisible(true);
+      if (withCountdown) {
+        this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
+      }
+      this.scene.obj?.exitButton.hide();
+      this.scene.player?.countdownIndicator.hide();
     }
-    this.scene.obj?.exitButton.hide();
-    this.scene.player?.countdownIndicator.hide();
   }
   hide() {
-    this.setVisible(false);
+    this.setVisible(false).setText('');
     this.scene.obj?.exitButton.show();
     this.scene.player?.countdownIndicator.show();
   }
-  private setVisible(visible: boolean) {
+  private setVisible(visible: boolean): this {
     this.text.setVisible(visible);
     this.image.setVisible(visible);
+    return this;
   }
   private showBuildPhase() {
     let text: string;
@@ -123,40 +123,8 @@ export default class Prompt {
         'Eigenschaft "Intervention"!'
     );
   }
-  private showGameOver(gameResult: ClientGameResult) {
-    let gameOverText = '';
-    if (gameResult.won) {
-      switch (gameResult.type) {
-        case GameResultType.Countdown:
-          gameOverText = 'Zeit des Gegners ist abgelaufen';
-          break;
-        case GameResultType.Depletion:
-          gameOverText = 'Gegnerisches Deck aufgebraucht';
-          break;
-        case GameResultType.Destruction:
-          gameOverText = 'Gegnerische Kolonie zerstört';
-          break;
-        case GameResultType.Surrender:
-          gameOverText = 'Gegner hat kapituliert';
-      }
-    } else {
-      switch (gameResult.type) {
-        case GameResultType.Countdown:
-          gameOverText = 'Eigene Zeit ist abgelaufen';
-          break;
-        case GameResultType.Depletion:
-          gameOverText = 'Eigenes Deck aufgebraucht';
-          break;
-        case GameResultType.Destruction:
-          gameOverText = 'Eigene Kolonie zerstört';
-      }
-    }
-    this.setText(
-      `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
-    );
-    this.text.setFontSize(layoutConfig.fontSize.normal);
-  }
-  private setText(text: string) {
+  private setText(text: string): this {
     this.text.setText(text);
+    return this;
   }
 }

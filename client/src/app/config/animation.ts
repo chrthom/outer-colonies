@@ -1,4 +1,14 @@
 class AnimationConfig {
+  readonly attack = {
+    indicator: {
+      yTween: -150,
+      spawnInterval: 200,
+      duration: 2300
+    },
+    flare: {
+      lifetime: 1600
+    }
+  };
   readonly duration = {
     loaderCycle: 1000,
     attack: 1000,
@@ -11,15 +21,9 @@ class AnimationConfig {
     promptShow: 3000,
     zoomCard: 150
   };
-  readonly attack = {
-    indicator: {
-      yTween: -150,
-      spawnInterval: 200,
-      duration: 2300
-    },
-    flare: {
-      lifetime: 1600
-    }
+  readonly gameOver = {
+    appear: 2500,
+    timeOffset: 1200
   };
 }
 

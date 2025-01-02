@@ -22,11 +22,12 @@ class LayoutConfig {
     cardStackExpanded: 15,
     indicator: 30,
     discardCard: 50,
-    handCard: 70,
-    battleEffect: 85,
-    prompt: 90,
-    maxedTacticCard: 95,
-    zoomCard: 100
+    handCard: 60,
+    prompt: 70,
+    battleEffect: 80,
+    maxedTacticCard: 90,
+    zoomCard: 95,
+    gameOver: 100
   };
   readonly fontSize = new FontSizeConfig();
   readonly scene = {

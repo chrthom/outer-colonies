@@ -110,10 +110,36 @@ export default class Game extends Phaser.Scene {
       'station1',
       'torpedos1'
     ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
-    this.load.image('zone_corner', 'utils/zone_corner.png');
+    [
+      'damage',
+      'hp',
+      'speed',
+      'energy',
+      'theta',
+      'xi',
+      'phi',
+      'omega',
+      'delta',
+      'psi',
+      'armour',
+      'shield',
+      'point_defense'
+    ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
       .forEach(id => this.load.image(`card_${id}`, `cards_migration/${id}.png`));
+    ['mask', 'mask_small', 'glow', 'glow_small', 'pile_1', 'pile_2', 'pile_3', 'pile_4'].forEach(name =>
+      this.load.image(`card_${name}`, `utils_migration/card_${name}.png`)
+    );
+    ['blue', 'red'].forEach(color =>
+      this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
+    );
+    ['red', 'yellow', 'blue', 'white'].forEach(color =>
+      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
+    );
+    ['defeat', 'victory'].forEach(gameOver =>
+      this.load.image(`game_over_${gameOver}`, `utils/game_over_${gameOver}.png`)
+    );
     [
       'equipment',
       'hull',
@@ -130,31 +156,9 @@ export default class Game extends Phaser.Scene {
       'retract_card',
       'exit'
     ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
-    ['mask', 'mask_small', 'glow', 'glow_small', 'pile_1', 'pile_2', 'pile_3', 'pile_4'].forEach(name =>
-      this.load.image(`card_${name}`, `utils_migration/card_${name}.png`)
-    );
-    ['red', 'yellow', 'blue', 'white'].forEach(color =>
-      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
-    );
-    ['blue', 'red'].forEach(color =>
-      this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
-    );
-    [
-      'damage',
-      'hp',
-      'speed',
-      'energy',
-      'theta',
-      'xi',
-      'phi',
-      'omega',
-      'delta',
-      'psi',
-      'armour',
-      'shield',
-      'point_defense'
-    ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
+    this.load.image('prompt_box', 'utils/prompt_box.png');
     [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
+    this.load.image('zone_corner', 'utils/zone_corner.png');
     [
       'active_build',
       'active_combat',
@@ -166,7 +170,6 @@ export default class Game extends Phaser.Scene {
       'inactive_wait',
       'lost'
     ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
-    this.load.image('prompt_box', 'utils/prompt_box.png');
   }
 
   create() {
