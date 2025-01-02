@@ -58,21 +58,24 @@ export default class Prompt {
     }
   }
   show(withCountdown?: boolean) {
-    this.setVisible(true);
-    if (withCountdown) {
-      this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
+    if (!this.scene.state.gameResult) {
+      this.setVisible(true);
+      if (withCountdown) {
+        this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
+      }
+      this.scene.obj?.exitButton.hide();
+      this.scene.player?.countdownIndicator.hide();
     }
-    this.scene.obj?.exitButton.hide();
-    this.scene.player?.countdownIndicator.hide();
   }
   hide() {
-    this.setVisible(false);
+    this.setVisible(false).setText('');
     this.scene.obj?.exitButton.show();
     this.scene.player?.countdownIndicator.show();
   }
-  private setVisible(visible: boolean) {
+  private setVisible(visible: boolean): this {
     this.text.setVisible(visible);
     this.image.setVisible(visible);
+    return this;
   }
   private showBuildPhase() {
     let text: string;
@@ -121,7 +124,8 @@ export default class Prompt {
         'Eigenschaft "Intervention"!'
     );
   }
-  private setText(text: string) {
+  private setText(text: string): this {
     this.text.setText(text);
+    return this;
   }
 }

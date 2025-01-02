@@ -152,7 +152,7 @@ class LayoutGameConfig {
       yOffsets: {
         title: -100,
         subtitle: -20,
-        extra: 70
+        extra: 20
       }
     },
     maxCard: {

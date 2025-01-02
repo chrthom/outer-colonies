@@ -57,7 +57,7 @@ export default class GameOverIndicator {
       )
       .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.text)
-      .setColor(designConfig.color.warn)
+      .setColor(designConfig.color.player)
       .setDepth(layoutConfig.depth.gameOver)
       .setOrigin(0.5)
       .setAlpha(0);
@@ -82,7 +82,7 @@ export default class GameOverIndicator {
         if (this.gameResult.sol > 0) {
           this.extraText.setAlpha(1);
           this.scene.add
-            .particles(this.extraText.x, this.extraText.y, 'flare_yellow', {
+            .particles(this.extraText.x, this.extraText.y, 'flare_blue', {
               lifespan: animationConfig.attack.flare.lifetime,
               speed: { min: 200, max: 500 },
               scale: { start: 0.8, end: 0 },
