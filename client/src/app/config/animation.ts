@@ -23,7 +23,7 @@ class AnimationConfig {
   };
   readonly gameOver = {
     appear: 2500,
-    timeOffset: 1200
+    timeOffset: 1000
   };
 }
 

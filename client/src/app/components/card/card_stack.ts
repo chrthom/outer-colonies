@@ -146,7 +146,7 @@ export default class CardStack {
           () => this.pointerout()
         )
       );
-      this.tween(true);
+      this.tween(this.cards.length > 1);
     }
     this.summaryBox.highlight();
   }
