@@ -32,10 +32,8 @@ export default class Prompt {
     this.hide();
   }
   update() {
-    if (this.scene.state.gameResult) {
-      this.showGameOver(this.scene.state.gameResult);
-      this.show(true);
-    } else if (!this.scene.state.playerPendingAction) {
+    this.hide();
+    if (!this.scene.state.playerPendingAction) {
       this.setText('Warte auf Gegenspieler...');
       this.show(true);
     } else if (this.scene.state.intervention) {
@@ -122,39 +120,6 @@ export default class Prompt {
         'Spielen einer Taktikkarte mit der\n' +
         'Eigenschaft "Intervention"!'
     );
-  }
-  private showGameOver(gameResult: ClientGameResult) {
-    let gameOverText = '';
-    if (gameResult.won) {
-      switch (gameResult.type) {
-        case GameResultType.Countdown:
-          gameOverText = 'Zeit des Gegners ist abgelaufen';
-          break;
-        case GameResultType.Depletion:
-          gameOverText = 'Gegnerisches Deck aufgebraucht';
-          break;
-        case GameResultType.Destruction:
-          gameOverText = 'Gegnerische Kolonie zerstört';
-          break;
-        case GameResultType.Surrender:
-          gameOverText = 'Gegner hat kapituliert';
-      }
-    } else {
-      switch (gameResult.type) {
-        case GameResultType.Countdown:
-          gameOverText = 'Eigene Zeit ist abgelaufen';
-          break;
-        case GameResultType.Depletion:
-          gameOverText = 'Eigenes Deck aufgebraucht';
-          break;
-        case GameResultType.Destruction:
-          gameOverText = 'Eigene Kolonie zerstört';
-      }
-    }
-    this.setText(
-      `${gameResult.won ? 'SIEG' : 'NIEDERLAGE'}\n${gameOverText}\n\nBelohnung: ${gameResult.sol} Sol`
-    );
-    this.text.setFontSize(layoutConfig.fontSize.normal);
   }
   private setText(text: string) {
     this.text.setText(text);
