@@ -167,7 +167,7 @@ export default class ContinueButton {
     );
   }
   private showGameOver(gameResult: ClientGameResult) {
-    new GameOverIndicator(this.scene, gameResult.won);
+    new GameOverIndicator(this.scene, gameResult);
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
       this.scene.socket.off(MsgTypeOutbound.State);
       this.scene.scene.start('Matchmaking');

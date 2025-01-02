@@ -138,14 +138,13 @@ export default class CardStack {
   }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
-      this.cards.forEach(
-        c =>
-          c.retractCardButton?.show(
-            this.targetXExpanded(c.data.index).value2d,
-            this.targetY(c.data.index, true).value2d,
-            () => this.pointerover(),
-            () => this.pointerout()
-          )
+      this.cards.forEach(c =>
+        c.retractCardButton?.show(
+          this.targetXExpanded(c.data.index).value2d,
+          this.targetY(c.data.index, true).value2d,
+          () => this.pointerover(),
+          () => this.pointerout()
+        )
       );
       this.tween(true);
     }

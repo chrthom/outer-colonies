@@ -148,6 +148,13 @@ class LayoutGameConfig {
       yTextOffset: -4,
       yConfirmOffset: 35
     },
+    gameOver: {
+      yOffsets: {
+        title: -100,
+        subtitle: -20,
+        extra: 70
+      }
+    },
     maxCard: {
       xOffset: 400,
       yOffset: -330
