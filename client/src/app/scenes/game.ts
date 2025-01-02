@@ -127,9 +127,9 @@ export default class Game extends Phaser.Scene {
     ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
     [0, 1]
       .concat(this.gameParams.preloadCardIds)
-      .forEach(id => this.load.image(`card_${id}`, `cards_migration/${id}.png`));
+      .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
     ['mask', 'mask_small', 'glow', 'glow_small', 'pile_1', 'pile_2', 'pile_3', 'pile_4'].forEach(name =>
-      this.load.image(`card_${name}`, `utils_migration/card_${name}.png`)
+      this.load.image(`card_${name}`, `utils/card_${name}.png`)
     );
     ['blue', 'red'].forEach(color =>
       this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
