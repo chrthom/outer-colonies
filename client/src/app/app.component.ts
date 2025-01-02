@@ -8,8 +8,7 @@ import { layoutConfig } from './config/layout';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: false
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   config: Phaser.Types.Core.GameConfig = {
