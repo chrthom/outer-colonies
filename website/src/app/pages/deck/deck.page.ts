@@ -4,17 +4,27 @@ import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/shared/config/enums';
-import { Sort } from '@angular/material/sort';
+import { Sort, MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
+import { ContentBoxComponent } from '../../components/content-box/content-box.component';
+import { MatCard, MatCardImage } from '@angular/material/card';
+import { MatBadge } from '@angular/material/badge';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
 
 @Component({
     selector: 'oc-page-deck',
     templateUrl: './deck.page.html',
     styleUrls: ['./deck.page.scss'],
-    standalone: false
+    imports: [ContentBoxComponent, MatCard, MatBadge, MatCardImage, MatSort, MatSortHeader, MatTooltip, MatButton, MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatButtonToggleGroup, MatButtonToggle, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription]
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;

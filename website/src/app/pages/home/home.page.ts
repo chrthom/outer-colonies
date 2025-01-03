@@ -4,12 +4,15 @@ import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
 import { DailyGetResponse } from '../../../../../server/src/shared/interfaces/rest_api';
 import { rules } from '../../../../../server/src/shared/config/rules';
+import { ContentBoxComponent } from '../../components/content-box/content-box.component';
+import { MatAnchor } from '@angular/material/button';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
 
 @Component({
     selector: 'oc-page-home',
     templateUrl: './home.page.html',
     styleUrls: ['./home.page.scss'],
-    standalone: false
+    imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
 })
 export class HomePage implements OnInit {
   dailies: Daily[] = [

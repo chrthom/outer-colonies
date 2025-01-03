@@ -1,24 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  FormControl,
-  FormGroup,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { map, Observable } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
+import { ContentBoxComponent } from '../../components/content-box/content-box.component';
+import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
     selector: 'oc-page-profile',
     templateUrl: './profile.page.html',
     styleUrl: './profile.page.scss',
-    standalone: false
+    imports: [ContentBoxComponent, MatFormField, MatLabel, MatInput, FormsModule, ReactiveFormsModule, MatError, MatHint, MatButton, MatSlideToggle]
 })
 export class ProfilePage implements OnInit {
   newsletterSubscription!: boolean;

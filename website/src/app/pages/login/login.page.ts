@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import AuthService from 'src/app/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ContentBoxComponent } from '../../components/content-box/content-box.component';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'oc-page-login',
     templateUrl: './login.page.html',
     styleUrl: './login.page.scss',
-    standalone: false
+    imports: [ContentBoxComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSlideToggle, MatButton, MatError, RouterLink]
 })
 export class LoginPage {
   loginFailed = false;

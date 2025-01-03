@@ -42,27 +42,7 @@ import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { RulesPage } from './pages/rules/rules.page';
 import { TradePage } from './pages/trade/trade.page';
 
-@NgModule({ declarations: [
-        AppComponent,
-        ContentBoxComponent,
-        ImageModalComponent,
-        InventoryItemComponent,
-        NavbarComponent,
-        OpenItemComponent,
-        ActivateAccountPage,
-        ConfirmEmailPage,
-        DataPrivacyPage,
-        DeckPage,
-        ForgotPasswordPage,
-        HomePage,
-        ImprintPage,
-        LoginPage,
-        ProfilePage,
-        RegisterPage,
-        ResetPasswordPage,
-        RulesPage,
-        TradePage
-    ],
+@NgModule({ declarations: [AppComponent],
     bootstrap: [AppComponent], imports: [AppRoutingModule,
         BrowserModule,
         BrowserAnimationsModule,
@@ -82,5 +62,22 @@ import { TradePage } from './pages/trade/trade.page';
         MatSortModule,
         MatTabsModule,
         MatTooltipModule,
-        ReactiveFormsModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        ReactiveFormsModule, ContentBoxComponent,
+        ImageModalComponent,
+        InventoryItemComponent,
+        NavbarComponent,
+        OpenItemComponent,
+        ActivateAccountPage,
+        ConfirmEmailPage,
+        DataPrivacyPage,
+        DeckPage,
+        ForgotPasswordPage,
+        HomePage,
+        ImprintPage,
+        LoginPage,
+        ProfilePage,
+        RegisterPage,
+        ResetPasswordPage,
+        RulesPage,
+        TradePage], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}
