@@ -1,3 +1,4 @@
+import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 
 export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
@@ -27,8 +28,13 @@ export function shuffle<T>(array: T[]): T[] {
 }
 
 export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack {
-  return cardStacks.splice(
-    cardStacks.findIndex(cs => cs.uuid == uuid),
-    1
-  )[0];
+  return spliceFrom(cardStacks, e => e.uuid == uuid);
+}
+
+export function spliceCardById(cards: Card[], id: number): Card {
+  return spliceFrom(cards, e => e.id == id);
+}
+
+export function spliceFrom<T>(l: T[], find: (e: T) => boolean): T {
+  return l.splice(l.findIndex(find), 1)[0];
 }

@@ -65,6 +65,32 @@ export class Card165 extends EconomyTacticCard {
   }
 }
 
+export class Card217 extends EconomyTacticCard {
+  private readonly cardsToRestore = 3;
+  constructor() {
+    super(217, 'Schrottsammler', 1);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    optionalParameters?.forEach(cardId => {
+      player.discardPile // TODO: Continue here
+      //
+      return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
+    });
+
+    player.drawCards(this.cardsToRestore); // TODO
+    player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.discardPile.length > 0 ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.discardPile.map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+    return this.cardsToRestore;
+  }
+}
+
 export class Card232 extends EconomyTacticCard {
   private readonly cardsToDraw = 2;
   constructor() {

@@ -82,7 +82,15 @@ export default abstract class Card {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onDestruction(player: Player) {}
-  abstract onEnterGame(player: Player, target: CardStack, cardStack: CardStack): void;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return undefined;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+    return 0;
+  }
+  abstract onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]): void;
   abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player, cardSTack: CardStack): void;
   abstract onEndTurn(player: Player, source: CardStack): void;
