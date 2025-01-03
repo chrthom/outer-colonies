@@ -106,6 +106,7 @@ export default abstract class CardStack {
       !this.player.hasInsufficientEnergyCard;
     return this.player.isPendingPlayer &&
       this.zone == Zone.Hand &&
+      !this.match.gameResult.gameOver &&
       (canIntervene || canPlayInBuildPhase) &&
       this.player.actionPool.hasActionFor(this.card)
       ? this.card.getValidTargets(this.player)
