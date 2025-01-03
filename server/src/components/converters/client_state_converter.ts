@@ -46,10 +46,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     return [Zone.Colony, Zone.Orbital, Zone.Neutral].flatMap(zone => {
       const zoneCardStacks = playerCardStacks.filter(cs => cs.zone == zone);
       return zoneCardStacks.map((cs, index) => {
-        const interceptionReady =
-          ownedByPlayer &&
-          match.inactivePlayerNo == playerNo &&
-          match.battle.canInterceptMission(playerNo, cs);
         const toClientCardStack = (cs: CardStack, index: number) => {
           return {
             id: cs.card.id,
@@ -128,7 +124,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           zoneCardsNum: zoneCardStacks.length,
           ownedByPlayer: ownedByPlayer,
           missionReady: ownedByPlayer && cs.isMissionReady,
-          interceptionReady: interceptionReady,
+          interceptionReady: ownedByPlayer && cs.isInterceptionReady,
           attributes: attributes
         };
       });

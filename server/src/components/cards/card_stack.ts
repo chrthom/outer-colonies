@@ -1,6 +1,6 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { CardDurability, CardType, TurnPhase, Zone } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, TurnPhase, Zone } from '../../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -128,6 +128,14 @@ export default abstract class CardStack {
   }
   get isMissionReady(): boolean {
     return this.zone == Zone.Orbital && this.type == CardType.Hull && this.profile.speed > 0;
+  }
+  get isInterceptionReady(): boolean {
+    return (
+      !this.player.isActivePlayer &&
+      this.isMissionReady &&
+      this.player.match.battle.type != BattleType.None &&
+      this.player.match.battle.missionSpeedRequirement <= this.profile.speed
+    );
   }
   get hasValidTargets(): boolean {
     return this.validTargets.length > 0;
