@@ -98,7 +98,10 @@ export class Card217 extends EconomyTacticCard {
     super(217, 'Schrottsammler', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters?.map(cardId => spliceCardById(player.discardPile, cardId))?.filter(c => !!c)?.forEach(c => player.deck.push(c));
+    optionalParameters
+      ?.map(cardId => spliceCardById(player.discardPile, cardId))
+      ?.filter(c => !!c)
+      ?.forEach(c => player.deck.push(c));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {

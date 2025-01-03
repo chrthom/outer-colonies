@@ -90,7 +90,12 @@ export default abstract class Card {
   onEnterGameNumberOfSelectableCardOptions(player: Player): number {
     return 0;
   }
-  abstract onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]): void;
+  abstract onEnterGame(
+    player: Player,
+    target: CardStack,
+    cardStack: CardStack,
+    optionalParameters?: number[]
+  ): void;
   abstract onLeaveGame(player: Player): void;
   abstract onStartTurn(player: Player, cardSTack: CardStack): void;
   abstract onEndTurn(player: Player, source: CardStack): void;

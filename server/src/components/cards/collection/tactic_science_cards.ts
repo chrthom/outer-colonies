@@ -210,7 +210,10 @@ export class Card423 extends ScienceTacticCard {
     super(423, 'Wissenschaftlicher Durchbruch', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters?.map(cardId => spliceCardById(player.deck, cardId))?.filter(c => !!c)?.forEach(player.takeCard);
+    optionalParameters
+      ?.map(cardId => spliceCardById(player.deck, cardId))
+      ?.filter(c => !!c)
+      ?.forEach(player.takeCard);
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {

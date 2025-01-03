@@ -30,7 +30,9 @@ export class Card175 extends IntelligenceTacticCard {
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     if (optionalParameters && optionalParameters[0]) {
-      const handCardUUID = this.getOpponentPlayer(player).hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
+      const handCardUUID = this.getOpponentPlayer(player).hand.find(
+        cs => cs.card.id == optionalParameters[0]
+      )?.uuid;
       if (handCardUUID) this.getOpponentPlayer(player).discardHandCards(handCardUUID);
     }
   }

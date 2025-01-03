@@ -204,7 +204,16 @@ import {
   Card433
 } from './orb_cards';
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
-import { Card149, Card175, Card176, Card208, Card231, Card330, Card416, Card430 } from './tactic_intelligence_cards';
+import {
+  Card149,
+  Card175,
+  Card176,
+  Card208,
+  Card231,
+  Card330,
+  Card416,
+  Card430
+} from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
 import { Card305 } from './infrastructure_special_cards';
 
