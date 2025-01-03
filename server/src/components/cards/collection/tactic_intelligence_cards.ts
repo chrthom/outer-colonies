@@ -17,9 +17,7 @@ export class Card149 extends IntelligenceTacticCard {
     super(149, 'Expertenkonferenz', 2);
   }
   onEnterGame(player: Player) {
-    for (let i = 0; i < this.cardsToDraw; i++) {
-      this.drawSpecificCard(player, c => c.type == CardType.Tactic);
-    }
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -53,7 +51,7 @@ export class Card208 extends IntelligenceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);

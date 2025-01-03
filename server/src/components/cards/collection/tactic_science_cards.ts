@@ -36,7 +36,7 @@ export class Card143 extends ScienceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Equipment);
+    this.drawSpecificCards(player, c => c.type == CardType.Equipment, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -94,9 +94,7 @@ export class Card229 extends ScienceTacticCard {
     super(229, 'Bodenproben', 2);
   }
   onEnterGame(player: Player) {
-    for (let i = 0; i < this.cardsToDraw; i++) {
-      this.drawSpecificCard(player, c => c.type == CardType.Infrastructure);
-    }
+    this.drawSpecificCards(player, c => c.type == CardType.Infrastructure, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -199,7 +197,7 @@ export class Card404 extends ScienceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -207,13 +205,12 @@ export class Card404 extends ScienceTacticCard {
 }
 
 export class Card423 extends ScienceTacticCard {
-  private readonly cardsToDraw = 1;
   private readonly cardsToChooseFrom = 7;
   constructor() {
     super(423, 'Wissenschaftlicher Durchbruch', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters?.map(cardId => spliceCardById(player.deck, cardId)).forEach(player.takeCard);
+    optionalParameters?.map(cardId => spliceCardById(player.deck, cardId))?.filter(c => !!c)?.forEach(player.takeCard);
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {
@@ -223,7 +220,7 @@ export class Card423 extends ScienceTacticCard {
     return player.deck.slice(0, this.cardsToChooseFrom).map(c => c.id);
   }
   override onEnterGameNumberOfSelectableCardOptions(): number {
-    return this.cardsToDraw;
+    return 1;
   }
 }
 

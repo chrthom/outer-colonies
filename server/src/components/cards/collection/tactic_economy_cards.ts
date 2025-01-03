@@ -35,7 +35,7 @@ export class Card142 extends EconomyTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Hull);
+    this.drawSpecificCards(player, c => c.type == CardType.Hull, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -72,7 +72,7 @@ export class Card217 extends EconomyTacticCard {
     super(217, 'Schrottsammler', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters?.map(cardId => spliceCardById(player.discardPile, cardId)).forEach(c => player.deck.push(c));
+    optionalParameters?.map(cardId => spliceCardById(player.discardPile, cardId))?.filter(c => !!c)?.forEach(c => player.deck.push(c));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {
@@ -152,14 +152,7 @@ export class Card427 extends EconomyTacticCard {
     super(427, 'Immigranten von der Erde', 2);
   }
   onEnterGame(player: Player) {
-    let foundCards = 0;
-    for (let i = 0; i < player.deck.length; i++) {
-      if (player.deck[i].type == CardType.Infrastructure) {
-        player.takeCards(player.deck.splice(i, 1));
-        if (++foundCards == this.cardsToDraw) break;
-      }
-    }
-    player.shuffleDeck();
+    this.drawSpecificCards(player, c => c.type == CardType.Infrastructure, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
