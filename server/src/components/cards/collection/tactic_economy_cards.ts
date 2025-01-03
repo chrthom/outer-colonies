@@ -81,7 +81,7 @@ export class Card217 extends EconomyTacticCard {
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
     return player.discardPile.map(c => c.id);
   }
-  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+  override onEnterGameNumberOfSelectableCardOptions(): number {
     return this.cardsToRestore;
   }
 }

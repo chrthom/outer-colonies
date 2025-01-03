@@ -81,7 +81,6 @@ export default abstract class TacticCard extends Card {
       }
     };
     const card = loop([]);
-    if (card) player.takeCards([card]);
-    return card;
+    return card ? player.takeCard(card) : undefined;
   }
 }

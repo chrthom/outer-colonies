@@ -1,6 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { spliceCardStackByUUID } from '../../utils/helpers';
+import { spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -203,6 +203,27 @@ export class Card404 extends ScienceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card423 extends ScienceTacticCard {
+  private readonly cardsToDraw = 1;
+  private readonly cardsToChooseFrom = 7;
+  constructor() {
+    super(423, 'Wissenschaftlicher Durchbruch', 2);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    optionalParameters?.map(cardId => spliceCardById(player.deck, cardId)).forEach(player.takeCard);
+    player.shuffleDeck();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.slice(0, this.cardsToChooseFrom).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return this.cardsToDraw;
   }
 }
 
