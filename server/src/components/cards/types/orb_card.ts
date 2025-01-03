@@ -18,8 +18,7 @@ export default abstract class OrbCard extends Card {
     this.actionPoolCardTypes = actionPool;
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.colonyCardStack.cardStacks.some(c => c.card.id == this.id) ||
-      player.actionPool.includesAllOf(player.originalActions)
+    return player.actionPool.includesAllOf(player.originalActions)
       ? player.cardStacks.filter(cs => cs.type == CardType.Colony)
       : [];
   }
