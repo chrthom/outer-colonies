@@ -1,5 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { spliceCardById } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -68,17 +69,11 @@ export class Card165 extends EconomyTacticCard {
 export class Card217 extends EconomyTacticCard {
   private readonly cardsToRestore = 3;
   constructor() {
-    super(217, 'Schrottsammler', 1);
+    super(217, 'Schrottsammler', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters?.forEach(cardId => {
-      player.discardPile // TODO: Continue here
-      //
-      return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
-    });
-
-    player.drawCards(this.cardsToRestore); // TODO
-    player.deck.push(...player.pickCardsFromTopOfDiscardPile(this.cardsToRestore));
+    optionalParameters?.map(cardId => spliceCardById(player.discardPile, cardId)).forEach(c => player.deck.push(c));
+    player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {
     return player.discardPile.length > 0 ? this.onlyColonyTarget(player.cardStacks) : [];
