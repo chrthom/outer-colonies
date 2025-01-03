@@ -50,10 +50,10 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).cards));
+    uuids.map(uuid => spliceCardStackByUUID(this.hand, uuid)?.cards).filter(c => !!c).forEach(c => this.discardPile.push(...c));
   }
   discardCardStacks(...uuids: string[]) {
-    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
+    uuids.map(uuid => spliceCardStackByUUID(this.cardStacks, uuid)?.cards).filter(c => !!c).forEach(c => this.discardPile.push(...c));
   }
   get colonyCardStack(): CardStack {
     const colonyCard = this.cardStacks.find(c => c.card.type == CardType.Colony);

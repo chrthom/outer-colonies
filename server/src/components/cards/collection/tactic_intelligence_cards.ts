@@ -24,6 +24,27 @@ export class Card149 extends IntelligenceTacticCard {
   }
 }
 
+export class Card175 extends IntelligenceTacticCard {
+  constructor() {
+    super(175, 'Spionagenetzwerk', 1);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      const handCardUUID = this.getOpponentPlayer(player).hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
+      if (handCardUUID) this.getOpponentPlayer(player).discardHandCards(handCardUUID);
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return this.getOpponentPlayer(player).hand.map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
 export class Card176 extends IntelligenceTacticCard {
   private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Military];
   constructor() {
