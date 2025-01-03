@@ -5,8 +5,7 @@ import AuthApiService from 'src/app/api/auth-api.service';
 @Component({
     selector: 'oc-page-confirm-email',
     templateUrl: './confirm-email.page.html',
-    styleUrls: ['./confirm-email.page.scss'],
-    standalone: false
+    styleUrls: ['./confirm-email.page.scss']
 })
 export class ConfirmEmailPage implements OnInit {
   confirmationSuccessful = false;

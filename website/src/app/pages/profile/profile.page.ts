@@ -17,8 +17,7 @@ import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 @Component({
     selector: 'oc-page-profile',
     templateUrl: './profile.page.html',
-    styleUrl: './profile.page.scss',
-    standalone: false
+    styleUrl: './profile.page.scss'
 })
 export class ProfilePage implements OnInit {
   newsletterSubscription!: boolean;

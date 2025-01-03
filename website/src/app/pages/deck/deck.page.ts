@@ -13,8 +13,7 @@ import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.
 @Component({
     selector: 'oc-page-deck',
     templateUrl: './deck.page.html',
-    styleUrls: ['./deck.page.scss'],
-    standalone: false
+    styleUrls: ['./deck.page.scss']
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;
