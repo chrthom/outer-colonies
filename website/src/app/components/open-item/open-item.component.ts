@@ -12,15 +12,7 @@ export class OpenItemComponent {
   @Input() content?: ItemListResponseBox = undefined;
   @Output() done = new EventEmitter<string>();
   readonly assetURL = environment.url.assets;
-  constructor() {
-    this.content = {
-      itemId: 0,
-      message: 'Test 12313 13 1 312 31 312 312 3',
-      sol: [1034],
-      cards: [102, 215],
-      boosters: [1, 1, 1]
-    };
-  }
+  constructor() {}
   get outerBoxClasses(): string {
     if (this.content) {
       const numberOfElements =
