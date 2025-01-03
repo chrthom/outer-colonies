@@ -32,6 +32,7 @@ import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { backgroundConfig } from '../config/background';
+import { loadCardResources, loadPreloadableResources } from './resource-loader';
 
 interface ActiveCards {
   hand?: string;
@@ -92,84 +93,8 @@ export default class Game extends Phaser.Scene {
 
   preload() {
     this.preloader = new Preloader(this);
-    this.load.baseURL = `${environment.urls.api}/assets/`;
-    backgroundConfig.orbs
-      .map(o => o.name)
-      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
-    backgroundConfig.rings.forEach(name =>
-      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
-    );
-    [
-      'asteroid1',
-      'corvette1',
-      'corvette2',
-      'corvette3',
-      'freighter1',
-      'freighter2',
-      'freighter3',
-      'station1',
-      'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
-    [
-      'damage',
-      'hp',
-      'speed',
-      'energy',
-      'theta',
-      'xi',
-      'phi',
-      'omega',
-      'delta',
-      'psi',
-      'armour',
-      'shield',
-      'point_defense'
-    ].forEach(attribute => this.load.image(`attribute_${attribute}`, `attribute/${attribute}.png`));
-    [0, 1]
-      .concat(this.gameParams.preloadCardIds)
-      .forEach(id => this.load.image(`card_${id}`, `cards/${id}.png`));
-    ['mask', 'mask_small', 'glow', 'glow_small', 'pile_1', 'pile_2', 'pile_3', 'pile_4'].forEach(name =>
-      this.load.image(`card_${name}`, `utils/card_${name}.png`)
-    );
-    ['blue', 'red'].forEach(color =>
-      this.load.image(`card_stack_info_box_${color}`, `utils/card_stack_info_box_${color}.png`)
-    );
-    ['red', 'yellow', 'blue', 'white'].forEach(color =>
-      this.load.image(`flare_${color}`, `utils/flare_${color}.png`)
-    );
-    ['defeat', 'victory'].forEach(gameOver =>
-      this.load.image(`game_over_${gameOver}`, `utils/game_over_${gameOver}.png`)
-    );
-    [
-      'equipment',
-      'hull',
-      'infrastructure',
-      'tactic',
-      'intelligence',
-      'military',
-      'science',
-      'trade',
-      'hull_infrastructure',
-      'equipment_hull',
-      'equipment_hull_infrastructure',
-      'equipment_hull_infrastructure_tactic',
-      'retract_card',
-      'exit'
-    ].forEach(name => this.load.image(`icon_${name}`, `icons/${name}.png`));
-    this.load.image('prompt_box', 'utils/prompt_box.png');
-    [1, 2, 3, 4].forEach(r => this.load.image(`range_${r}`, `utils/range${r}.png`));
-    this.load.image('zone_corner', 'utils/zone_corner.png');
-    [
-      'active_build',
-      'active_combat',
-      'active_select',
-      'active_wait',
-      'won',
-      'inactive_combat',
-      'inactive_select',
-      'inactive_wait',
-      'lost'
-    ].forEach(name => this.load.image(`button_${name}`, `utils/button_${name}.png`));
+    loadPreloadableResources(environment.urls.api, this.load);
+    loadCardResources(environment.urls.api, this.load, this.gameParams.preloadCardIds);
   }
 
   create() {
