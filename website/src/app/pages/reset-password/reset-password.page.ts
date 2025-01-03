@@ -10,10 +10,20 @@ import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'oc-page-reset-password',
-    templateUrl: './reset-password.page.html',
-    styleUrls: ['./reset-password.page.scss'],
-    imports: [ContentBoxComponent, RouterLink, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatButton]
+  selector: 'oc-page-reset-password',
+  templateUrl: './reset-password.page.html',
+  styleUrls: ['./reset-password.page.scss'],
+  imports: [
+    ContentBoxComponent,
+    RouterLink,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatError,
+    MatButton
+  ]
 })
 export class ResetPasswordPage implements OnInit {
   passwordResetSuccessful = false;

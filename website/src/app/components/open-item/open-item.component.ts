@@ -4,10 +4,10 @@ import { environment } from 'src/environments/environment';
 import { MatFabButton } from '@angular/material/button';
 
 @Component({
-    selector: 'oc-open-item',
-    templateUrl: './open-item.component.html',
-    styleUrls: ['./open-item.component.scss'],
-    imports: [MatFabButton]
+  selector: 'oc-open-item',
+  templateUrl: './open-item.component.html',
+  styleUrls: ['./open-item.component.scss'],
+  imports: [MatFabButton]
 })
 export class OpenItemComponent {
   @Input() content?: ItemListResponseBox = undefined;

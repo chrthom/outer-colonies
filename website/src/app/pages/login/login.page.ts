@@ -11,10 +11,21 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'oc-page-login',
-    templateUrl: './login.page.html',
-    styleUrl: './login.page.scss',
-    imports: [ContentBoxComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSlideToggle, MatButton, MatError, RouterLink]
+  selector: 'oc-page-login',
+  templateUrl: './login.page.html',
+  styleUrl: './login.page.scss',
+  imports: [
+    ContentBoxComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatSlideToggle,
+    MatButton,
+    MatError,
+    RouterLink
+  ]
 })
 export class LoginPage {
   loginFailed = false;

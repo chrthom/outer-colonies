@@ -4,10 +4,10 @@ import { ContentBoxComponent } from '../../components/content-box/content-box.co
 import { MatSelectionList, MatListOption } from '@angular/material/list';
 
 @Component({
-    selector: 'oc-page-rules',
-    templateUrl: './rules.page.html',
-    styleUrls: ['./rules.page.scss'],
-    imports: [ContentBoxComponent, MatSelectionList, MatListOption]
+  selector: 'oc-page-rules',
+  templateUrl: './rules.page.html',
+  styleUrls: ['./rules.page.scss'],
+  imports: [ContentBoxComponent, MatSelectionList, MatListOption]
 })
 export class RulesPage {
   activeChapter = 'intro';

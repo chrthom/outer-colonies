@@ -6,10 +6,10 @@ import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 
 @Component({
-    selector: 'oc-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    standalone: false
+  selector: 'oc-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  standalone: false
 })
 export class AppComponent {
   bgNo: number;

@@ -9,10 +9,10 @@ import { MatAnchor } from '@angular/material/button';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 
 @Component({
-    selector: 'oc-page-home',
-    templateUrl: './home.page.html',
-    styleUrls: ['./home.page.scss'],
-    imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
+  selector: 'oc-page-home',
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
+  imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
 })
 export class HomePage implements OnInit {
   dailies: Daily[] = [

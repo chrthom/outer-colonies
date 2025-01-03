@@ -4,9 +4,9 @@ import { MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/mat
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'oc-page-data-privacy',
-    templateUrl: './data-privacy.page.html',
-    styleUrls: ['./data-privacy.page.scss'],
-    imports: [CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose]
+  selector: 'oc-page-data-privacy',
+  templateUrl: './data-privacy.page.html',
+  styleUrls: ['./data-privacy.page.scss'],
+  imports: [CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose]
 })
 export class DataPrivacyPage {}

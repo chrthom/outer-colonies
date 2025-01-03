@@ -10,10 +10,20 @@ import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'oc-page-forgot-password',
-    templateUrl: './forgot-password.page.html',
-    styleUrls: ['./forgot-password.page.scss'],
-    imports: [ContentBoxComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton, MatError, RouterLink]
+  selector: 'oc-page-forgot-password',
+  templateUrl: './forgot-password.page.html',
+  styleUrls: ['./forgot-password.page.scss'],
+  imports: [
+    ContentBoxComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatButton,
+    MatError,
+    RouterLink
+  ]
 })
 export class ForgotPasswordPage {
   passwordResetSuccessful = false;

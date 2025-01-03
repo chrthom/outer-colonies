@@ -1,5 +1,14 @@
 import { Component } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
@@ -20,10 +29,26 @@ import { MatBadge } from '@angular/material/badge';
 import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'oc-page-register',
-    templateUrl: './register.page.html',
-    styleUrls: ['./register.page.scss'],
-    imports: [ContentBoxComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, MatCheckbox, MatButton, MatCard, MatBadge, MatCardImage, RouterLink]
+  selector: 'oc-page-register',
+  templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
+  imports: [
+    ContentBoxComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatError,
+    MatSelect,
+    MatOption,
+    MatCheckbox,
+    MatButton,
+    MatCard,
+    MatBadge,
+    MatCardImage,
+    RouterLink
+  ]
 })
 export class RegisterPage {
   registrationSuccessful: boolean | undefined = undefined;

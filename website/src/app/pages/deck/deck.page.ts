@@ -18,13 +18,41 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+  MatExpansionPanelDescription
+} from '@angular/material/expansion';
 
 @Component({
-    selector: 'oc-page-deck',
-    templateUrl: './deck.page.html',
-    styleUrls: ['./deck.page.scss'],
-    imports: [ContentBoxComponent, MatCard, MatBadge, MatCardImage, MatSort, MatSortHeader, MatTooltip, MatButton, MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatButtonToggleGroup, MatButtonToggle, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription]
+  selector: 'oc-page-deck',
+  templateUrl: './deck.page.html',
+  styleUrls: ['./deck.page.scss'],
+  imports: [
+    ContentBoxComponent,
+    MatCard,
+    MatBadge,
+    MatCardImage,
+    MatSort,
+    MatSortHeader,
+    MatTooltip,
+    MatButton,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    FormsModule,
+    ReactiveFormsModule,
+    MatOption,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription
+  ]
 })
 export class DeckPage implements OnInit {
   readonly minCards = 60;
