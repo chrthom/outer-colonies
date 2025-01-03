@@ -66,6 +66,32 @@ export class Card165 extends EconomyTacticCard {
   }
 }
 
+export class Card210 extends EconomyTacticCard {
+  private readonly cardsToDraw = 4;
+  constructor() {
+    super(210, 'Schwarzmarkthandel', 4);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
+      if (handCardUUID) {
+        player.discardHandCards(handCardUUID);
+        this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
+        player.shuffleDeck();
+      }
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.hand.map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
 export class Card217 extends EconomyTacticCard {
   private readonly cardsToRestore = 3;
   constructor() {
