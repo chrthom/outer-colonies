@@ -8,7 +8,8 @@ import { rules } from '../../../../../server/src/shared/config/rules';
 @Component({
     selector: 'oc-page-home',
     templateUrl: './home.page.html',
-    styleUrls: ['./home.page.scss']
+    styleUrls: ['./home.page.scss'],
+    standalone: false
 })
 export class HomePage implements OnInit {
   dailies: Daily[] = [

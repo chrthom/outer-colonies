@@ -8,7 +8,8 @@ import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 @Component({
     selector: 'oc-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss']
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
   bgNo: number;

@@ -20,7 +20,8 @@ import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 @Component({
     selector: 'oc-page-register',
     templateUrl: './register.page.html',
-    styleUrls: ['./register.page.scss']
+    styleUrls: ['./register.page.scss'],
+    standalone: false
 })
 export class RegisterPage {
   registrationSuccessful: boolean | undefined = undefined;

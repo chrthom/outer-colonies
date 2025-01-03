@@ -12,7 +12,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
     selector: 'oc-page-trade',
     templateUrl: './trade.page.html',
-    styleUrls: ['./trade.page.scss']
+    styleUrls: ['./trade.page.scss'],
+    standalone: false
 })
 export class TradePage implements OnInit {
   sol = 0;

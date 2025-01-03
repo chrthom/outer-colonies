@@ -5,7 +5,8 @@ import AuthApiService from 'src/app/api/auth-api.service';
 @Component({
     selector: 'oc-page-activate-account',
     templateUrl: './activate-account.page.html',
-    styleUrls: ['./activate-account.page.scss']
+    styleUrls: ['./activate-account.page.scss'],
+    standalone: false
 })
 export class ActivateAccountPage implements OnInit {
   activationSuccessful = false;

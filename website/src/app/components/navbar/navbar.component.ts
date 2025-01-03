@@ -5,7 +5,8 @@ import AuthService from 'src/app/auth.service';
 @Component({
     selector: 'oc-navbar',
     templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.scss']
+    styleUrls: ['./navbar.component.scss'],
+    standalone: false
 })
 export class NavbarComponent {
   constructor(
