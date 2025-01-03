@@ -28,13 +28,13 @@ cd $BASE_DIR/server && \
 echo_header "Building client package"
 cd $BASE_DIR/client && \
     npm run $BUILD_FLAG && \
-    cd dist/outercolonies-client && \
+    cd dist/outercolonies-client/browser && \
     zip -r $INIT_DIR/client.zip *
 
 echo_header "Building website package"
 cd $BASE_DIR/website && \
     npm run $BUILD_FLAG && \
-    cd dist/outercolonies-website && \
+    cd dist/outercolonies-website/browser && \
     zip -r $INIT_DIR/website.zip *
 
 cd $INIT_DIR
