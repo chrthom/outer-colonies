@@ -70,6 +70,8 @@ export interface ClientHandCard {
   playable: boolean;
   validTargets: string[];
   ownedByPlayer: boolean;
+  optionsToChoose: number;
+  options?: number[];
 }
 
 export interface ClientEvent {
