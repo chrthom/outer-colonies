@@ -49,6 +49,6 @@ export default class Matchmaking extends Phaser.Scene {
       }
     });
     new Background(this);
-    loadPreloadableResources(environment.urls.api, this.load) // Continue preloading
+    loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
   }
 }

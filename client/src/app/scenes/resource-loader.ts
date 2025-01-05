@@ -1,4 +1,4 @@
-import { backgroundConfig } from "../config/background";
+import { backgroundConfig } from '../config/background';
 
 export function loadRequiredResources(apiURL: string, load: Phaser.Loader.LoaderPlugin) {
   load.baseURL = `${apiURL}/assets/`;
@@ -87,7 +87,5 @@ export function loadPreloadableResources(apiURL: string, load: Phaser.Loader.Loa
 
 export function loadCardResources(apiURL: string, load: Phaser.Loader.LoaderPlugin, cardIds: number[]) {
   load.baseURL = `${apiURL}/assets/`;
-  [0, 1]
-    .concat(cardIds)
-    .forEach(id => load.image(`card_${id}`, `cards/${id}.png`));
+  [0, 1].concat(cardIds).forEach(id => load.image(`card_${id}`, `cards/${id}.png`));
 }
