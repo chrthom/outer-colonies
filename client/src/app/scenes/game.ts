@@ -31,7 +31,6 @@ import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
-import { backgroundConfig } from '../config/background';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 
 interface ActiveCards {
