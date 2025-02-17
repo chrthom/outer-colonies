@@ -4,12 +4,14 @@ import AuthService from './auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-    selector: 'oc-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    standalone: false
+  selector: 'oc-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  imports: [NavbarComponent, RouterOutlet]
 })
 export class AppComponent {
   bgNo: number;
