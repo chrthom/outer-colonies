@@ -137,7 +137,6 @@ export class DeckPage implements OnInit {
   openImgInModal(card: DeckCard) {
     this.dialog.open(ImageModalComponent, {
       data: this.cardIdToUrl(card.cardId),
-      height: '95vh',
       maxHeight: '95vh'
     });
   }
