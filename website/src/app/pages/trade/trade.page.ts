@@ -8,12 +8,35 @@ import {
 import { environment } from 'src/environments/environment';
 import { rules } from '../../../../../server/src/shared/config/rules';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ContentBoxComponent } from '../../components/content-box/content-box.component';
+import { InventoryItemComponent } from '../../components/inventory-item/inventory-item.component';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+  MatCardActions
+} from '@angular/material/card';
+import { MatButton } from '@angular/material/button';
+import { OpenItemComponent } from '../../components/open-item/open-item.component';
 
 @Component({
-    selector: 'oc-page-trade',
-    templateUrl: './trade.page.html',
-    styleUrls: ['./trade.page.scss'],
-    standalone: false
+  selector: 'oc-page-trade',
+  templateUrl: './trade.page.html',
+  styleUrls: ['./trade.page.scss'],
+  imports: [
+    ContentBoxComponent,
+    InventoryItemComponent,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardActions,
+    MatButton,
+    OpenItemComponent
+  ]
 })
 export class TradePage implements OnInit {
   sol = 0;
