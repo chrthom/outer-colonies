@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-website",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Outer Colonies Website",
   "scripts": {
     "ng": "ng",
@@ -46,10 +46,12 @@
     "@angular-eslint/template-parser": "^19.0.0",
     "@angular/cli": "^19.0.0",
     "@angular/compiler-cli": "^19.0.0",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
     "@types/lodash-es": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^8.0.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-prefer-arrow": "~1.2.0",
     "prettier": "^3.0.0",
     "typescript": "~5.6.3"

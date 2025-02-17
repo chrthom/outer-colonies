@@ -6,7 +6,7 @@ import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
-import { backgroundConfig } from '../config/background';
+import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;
@@ -20,10 +20,7 @@ export default class Matchmaking extends Phaser.Scene {
   }
 
   preload() {
-    this.load.baseURL = `${environment.urls.api}/assets/`;
-    this.load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
-    this.load.image('icon_exit', 'icons/exit.png');
-    this.load.image('background_sun', 'background/sun.png');
+    loadRequiredResources(environment.urls.api, this.load);
   }
 
   create() {
@@ -52,22 +49,6 @@ export default class Matchmaking extends Phaser.Scene {
       }
     });
     new Background(this);
-    backgroundConfig.orbs
-      .map(o => o.name)
-      .forEach(name => this.load.image(`background_orb_${name}`, `background/orb_${name}.png`));
-    backgroundConfig.rings.forEach(name =>
-      this.load.image(`background_ring_${name}`, `background/ring_${name}.png`)
-    );
-    [
-      'asteroid1',
-      'corvette1',
-      'corvette2',
-      'corvette3',
-      'freighter1',
-      'freighter2',
-      'freighter3',
-      'station1',
-      'torpedos1'
-    ].forEach(name => this.load.image(`background_vessel_${name}`, `background/vessel_${name}.png`));
+    loadPreloadableResources(environment.urls.api, this.load) // Continue preloading
   }
 }

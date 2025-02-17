@@ -5,7 +5,7 @@ import { BattleType, CardType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
-import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
+import { getCardStackByUUID, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';
 import Player from './player';
 import { AttackProfile } from '../cards/card_profile';
@@ -26,9 +26,11 @@ export default class Battle {
   downsidePriceCards: Card[] = [];
   upsidePriceCards: Card[] = [];
   range: number = rules.maxRange + 1;
+  activePlayerNo: number;
   recentAttack?: Attack;
-  constructor(type: BattleType) {
+  constructor(type: BattleType, activePlayerNo: number) {
     this.type = type;
+    this.activePlayerNo = activePlayerNo;
   }
   static fromClientPlannedBattle(match: Match, plannedBattle: ClientPlannedBattle): Battle {
     const battle = toBattle(match, plannedBattle);
@@ -49,17 +51,6 @@ export default class Battle {
         .forEach(cs => (cs.zone = Zone.Neutral));
       this.ships[player.no] = player.cardStacks.filter(cs => cs.zone == Zone.Orbital);
     }
-  }
-  canInterceptMission(interceptingPlayerNo: number, cardStack: CardStack): boolean {
-    return (
-      cardStack.isMissionReady &&
-      (this.type == BattleType.Raid ||
-        (this.type == BattleType.Mission &&
-          cardStack.profile.speed >=
-            this.ships[opponentPlayerNo(interceptingPlayerNo)]
-              .map(cs => cs.profile.speed)
-              .reduce((a, b) => Math.min(a, b))))
-    );
   }
   processBattleRound(match: Match) {
     match.pendingActionPlayerNo = match.waitingPlayerNo;
@@ -99,6 +90,11 @@ export default class Battle {
   }
   resetRecentAttack() {
     this.recentAttack = undefined;
+  }
+  get missionSpeedRequirement(): number {
+    return this.type == BattleType.Mission
+      ? this.ships[this.activePlayerNo].map(cs => cs.profile.speed).reduce((a, b) => Math.min(a, b))
+      : 0;
   }
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;

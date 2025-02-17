@@ -22,7 +22,7 @@ export default class Match {
   activePlayerNo: number = 0;
   pendingActionPlayerNo: number = 0;
   turnPhase!: TurnPhase;
-  battle: Battle = new Battle(BattleType.None);
+  battle: Battle = new Battle(BattleType.None, 0);
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
@@ -73,7 +73,7 @@ export default class Match {
     this.activePlayerNo = opponentPlayerNo(this.activePlayerNo);
     this.pendingActionPlayerNo = this.activePlayerNo;
     this.turnPhase = TurnPhase.Start;
-    this.battle = new Battle(BattleType.None);
+    this.battle = new Battle(BattleType.None, this.activePlayerNo);
     this.activePlayer.resetRemainingActions();
     this.activePlayer.callBackShipsFromNeutralZone();
     this.activePlayer.drawCards(rules.cardsToDrawPerTurn);
@@ -104,7 +104,7 @@ export default class Match {
   prepareEndPhase() {
     this.turnPhase = TurnPhase.End;
     this.pendingActionPlayerNo = this.activePlayerNo;
-    this.battle = new Battle(BattleType.None);
+    this.battle = new Battle(BattleType.None, this.activePlayerNo);
     this.activePlayer.moveFlightReadyShipsToOrbit();
     if (this.activePlayer.hand.length <= this.activePlayer.handCardLimit && !this.gameResult.gameOver) {
       this.activePlayer.cardStacks.forEach(cs => cs.onEndTurn());
