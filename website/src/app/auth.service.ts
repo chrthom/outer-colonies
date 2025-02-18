@@ -83,7 +83,7 @@ export default class AuthService {
   }
 
   get isLoggedIn(): boolean {
-    return this.username != undefined;
+    return !!this.sessionToken;
   }
 
   get displayname(): string {
