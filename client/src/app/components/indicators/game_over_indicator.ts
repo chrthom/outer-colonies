@@ -77,7 +77,6 @@ export default class GameOverIndicator {
       delay: animationConfig.gameOver.timeOffset * 2,
       duration: animationConfig.gameOver.appear,
       alpha: 1,
-      completeDelay: animationConfig.gameOver.timeOffset,
       onComplete: () => {
         if (this.gameResult.sol > 0) {
           this.extraText.setAlpha(1);
