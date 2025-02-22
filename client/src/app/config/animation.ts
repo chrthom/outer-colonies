@@ -22,8 +22,8 @@ class AnimationConfig {
     zoomCard: 150
   };
   readonly gameOver = {
-    appear: 2500,
-    timeOffset: 1000
+    appear: 1500,
+    timeOffset: 800
   };
 }
 
