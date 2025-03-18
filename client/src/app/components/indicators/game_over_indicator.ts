@@ -10,7 +10,7 @@ export default class GameOverIndicator {
   private scene: Game;
   private gameResult: ClientGameResult;
   private image: Phaser.GameObjects.Image;
-  private imageFX?: Phaser.FX.Vignette;
+  private imageFXVignette?: Phaser.FX.Vignette;
   private titleText: Phaser.GameObjects.Text;
   private subtitleText: Phaser.GameObjects.Text;
   private extraText: Phaser.GameObjects.Text;
@@ -26,7 +26,7 @@ export default class GameOverIndicator {
       .setOrigin(0.5)
       .setDepth(layoutConfig.depth.gameOver)
       .setAlpha(0);
-    this.imageFX = this.image.preFX?.addVignette(0.5, 0.5, 0, 0.4);
+    this.imageFXVignette = this.image.preFX?.addVignette(0.5, 0.5, 0, 0.4);
     this.titleText = scene.add
       .text(
         layoutConfig.scene.width / 2,
@@ -69,9 +69,12 @@ export default class GameOverIndicator {
       alpha: 1
     });
     this.scene.tweens.add({
-      targets: [this.imageFX],
+      targets: [this.imageFXVignette],
       duration: animationConfig.gameOver.appear,
-      radius: 1
+      radius: 1,
+      onComplete: () => {
+        this.image.postFX.addShine();
+      }
     });
     this.scene.tweens.add({
       targets: [this.titleText],
