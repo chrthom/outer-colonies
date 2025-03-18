@@ -110,21 +110,33 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     if (match && player) {
-      const playerShips = match.battle.ships[match.pendingActionPlayerNo];
-      const srcShip = playerShips.find(cs => cs.uuid == srcId);
-      const srcWeapon = srcShip?.cardStacks[srcIndex];
       const opponentShips = match.battle.ships[match.waitingPlayerNo];
       const target = opponentShips.find(cs => cs.uuid == targetId);
-      if (!srcWeapon) {
-        console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
-      } else if (!target) {
+      if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
-      } else if (!srcWeapon.canAttack) {
-        console.log(
-          `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
-        );
+      } else if (srcId == '*') { // Attack with all available weapons
+        const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
+          .flatMap(ship => ship.cardStacks)
+          .filter(cs => cs.canAttack);
+        for (const srcWeapon of srcWeapons) {
+          match.planAttack(srcWeapon, target);
+          // TODO: Aggregate attack results
+          if (!!match.intervention) break; // Do not perform any more attacks if an intervention is possible
+        }
       } else {
-        match.planAttack(srcWeapon, target);
+        const playerShips = match.battle.ships[match.pendingActionPlayerNo];
+        const srcShip = playerShips.find(cs => cs.uuid == srcId);
+        const srcWeapon = srcShip?.cardStacks[srcIndex];
+        if (!srcWeapon) {
+          console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
+        } else if (!srcWeapon.canAttack) {
+          console.log(
+            `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
+          );
+        } else {
+          match.planAttack(srcWeapon, target);
+        }
+
       }
       emitState(io, match);
     }
