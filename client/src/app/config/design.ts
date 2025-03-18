@@ -5,6 +5,7 @@ class DesignConfig {
     transparent: 0.1
   };
   readonly tint = {
+    dark: 0x000000,
     faded: 0x666666,
     neutral: 0xffffff,
     player: 0x119999,
