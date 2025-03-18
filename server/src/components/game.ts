@@ -2,12 +2,13 @@ import Match from './game_state/match';
 import toClientState from './converters/client_state_converter';
 import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
+import { combineAttackResults, getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { matchmakingRoom } from './matchmaking';
+import { Attack } from './game_state/battle';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
@@ -118,9 +119,11 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
           .flatMap(ship => ship.cardStacks)
           .filter(cs => cs.canAttack);
+        var previousAttack: Attack | undefined;
         for (const srcWeapon of srcWeapons) {
           match.planAttack(srcWeapon, target);
-          // TODO: Aggregate attack results
+          match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
+          previousAttack = match.battle.recentAttack;
           if (!!match.intervention) break; // Do not perform any more attacks if an intervention is possible
         }
       } else {

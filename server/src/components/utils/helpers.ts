@@ -1,4 +1,5 @@
 import CardStack from '../cards/card_stack';
+import { Attack } from '../game_state/battle';
 
 export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
   const a1 = array1.slice();
@@ -31,4 +32,18 @@ export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): Ca
     cardStacks.findIndex(cs => cs.uuid == uuid),
     1
   )[0];
+}
+
+export function combineAttackResults(a1: Attack | undefined, a2: Attack | undefined): Attack | undefined {
+  if (!a1) return a2;
+  else if (!a2) return a1;
+  else return {
+    sourceUUID: a1.sourceUUID,
+    sourceIndex: a1.sourceIndex,
+    targetUUID: a1.targetUUID,
+    pointDefense: a1.pointDefense + a2.pointDefense,
+    shield: a1.shield + a2.shield,
+    armour: a1.armour + a2.armour,
+    damage: a1.damage + a2.damage
+  };
 }
