@@ -46,6 +46,6 @@
     "typescript": "~5.7.0"
   },
   "overrides": {
-    "glob": "^10.0.0" 
+    "glob": "^10.0.0"
   }
 }

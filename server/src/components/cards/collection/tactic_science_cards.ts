@@ -2,7 +2,6 @@ import { CardType, TacticDiscipline, CardDurability, InterventionType } from '..
 import Player from '../../game_state/player';
 import { spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
-import { AttackProfile } from '../card_profile';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
@@ -13,18 +12,23 @@ abstract class ScienceTacticCard extends TacticCard {
 }
 
 export class Card108 extends ScienceTacticCard {
-  private readonly attackProfile: AttackProfile = {
-    range: 99,
-    damage: 15,
-    pointDefense: 3,
-    shield: 0,
-    armour: 3
-  }
   constructor() {
-    super(108, 'Asteroideneinschlag', 4);
+    super(
+      108,
+      'Asteroideneinschlag',
+      4,
+      {},
+      {
+        range: 0,
+        damage: 15,
+        pointDefense: -3,
+        shield: 0,
+        armour: -3
+      }
+    );
   }
-  onEnterGame(player: Player) {
-    // TODO
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
