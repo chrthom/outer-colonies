@@ -8,7 +8,6 @@
         <mat-card
           (click)="box.onClick(card)"
           [matBadge]="card.numOfCards + 'x'"
-          matBadgeSize="large"
           matBadgePosition="before"
           [matBadgeHidden]="card.numOfCards === 1"
           matBadgeColor="primary"
@@ -130,26 +129,28 @@
         <mat-panel-description>Sockel- und Energienutzung des Decks</mat-panel-description>
       </mat-expansion-panel-header>
       <table>
-        <tr>
-          @for (s of statistics; track s) {
-          <th>
-            @if (s.title) {
-            <h1 [innerHtml]="s.title"></h1>
-            } @if (s.energyIcon) {
-            <img [src]="toIconUrl('energy')" class="oc-icon big" />
+        @if(statistics$ | async; as statistics) {
+          <tr>
+            @for (s of statistics; track s) {
+            <th>
+              @if (s.title) {
+              <h1 [innerHtml]="s.title"></h1>
+              } @if (s.energyIcon) {
+              <img [src]="toIconUrl('energy')" class="oc-icon big" />
+              }
+            </th>
             }
-          </th>
-          }
-        </tr>
-        <tr>
-          @for (s of statistics; track s) {
-          <td>
-            <h3 class="accent-color">{{s.used}}</h3>
-            <h3>&nbsp;/&nbsp;</h3>
-            <h3 class="primary-color">{{ s.provided }}</h3>
-          </td>
-          }
-        </tr>
+          </tr>
+          <tr>
+            @for (s of statistics; track s) {
+            <td>
+              <h3 class="accent-color">{{s.used}}</h3>
+              <h3>&nbsp;/&nbsp;</h3>
+              <h3 class="primary-color">{{ s.provided }}</h3>
+            </td>
+            }
+          </tr>
+        }
       </table>
     </mat-expansion-panel>
   </mat-accordion>
