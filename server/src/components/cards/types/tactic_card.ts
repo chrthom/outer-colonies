@@ -116,6 +116,7 @@ export default abstract class TacticCard extends Card {
         armour: attackResult.armour,
         damage: attackResult.damage
       };
+      player.match.removeDestroyedCardStacks();
     }
   }
 }
