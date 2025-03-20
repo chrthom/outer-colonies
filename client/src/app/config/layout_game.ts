@@ -152,7 +152,10 @@ class LayoutGameConfig {
       yOffsets: {
         title: -100,
         subtitle: -20,
-        extra: 250
+        solGain: {
+          winner: 250,
+          looser: 200
+        }
       }
     },
     maxCard: {
