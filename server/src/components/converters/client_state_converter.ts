@@ -48,6 +48,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       return zoneCardStacks.map((cs, index) => {
         const toClientCardStack = (cs: CardStack, index: number) => {
           return {
+            uuid: cs.uuid,
             id: cs.card.id,
             index: index,
             battleReady: cs.canAttack,
