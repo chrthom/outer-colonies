@@ -335,10 +335,7 @@ export default class Game extends Phaser.Scene {
               if (!allShips?.includes(cs.uuid)) {
                 cs.highlightDisabled();
               }
-              if (
-                this.activeCards.stackUUID == cs.uuid &&
-                this.activeCards.cardUUID != undefined
-              ) {
+              if (this.activeCards.stackUUID == cs.uuid && this.activeCards.cardUUID != undefined) {
                 cs.cards.find(c => c.data.uuid == this.activeCards.cardUUID)?.highlightSelected();
               } else if (this.state.battle?.playerShipIds.includes(cs.uuid)) {
                 cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
