@@ -126,10 +126,8 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         attack:
           match.intervention.type == InterventionType.Attack
             ? {
-                sourceUUID: (<InterventionAttack>match.intervention).src.rootCardStack.uuid,
-                sourceIndex: (<InterventionAttack>match.intervention).src.rootCardStack.cardStacks.findIndex(
-                  cs => cs.uuid == (<InterventionAttack>match.intervention).src.uuid
-                ),
+                sourceRootUUID: (<InterventionAttack>match.intervention).src.rootCardStack.uuid,
+                sourceSubUUID: (<InterventionAttack>match.intervention).src.uuid,
                 targetUUID: (<InterventionAttack>match.intervention).target.uuid
               }
             : undefined

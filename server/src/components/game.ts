@@ -72,18 +72,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Retract, (rootCardStackUUID: string, subCardStackUUID: string) => {
     doWithMatchAndPlayer(socket, (match, player) => {
       const rootCardStack = getCardStackByUUID(player.cardStacks, rootCardStackUUID);
-      const subCardStack =
-        rootCardStack && getCardStackByUUID(rootCardStack.cardStacks, subCardStackUUID);
+      const subCardStack = rootCardStack && getCardStackByUUID(rootCardStack.cardStacks, subCardStackUUID);
       if (!rootCardStack) {
-        console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${rootCardStackUUID}`);
+        console.log(
+          `WARN: ${player.name} tried to retract from non-existing card stack ${rootCardStackUUID}`
+        );
       } else if (!subCardStack) {
         console.log(
           `WARN: ${player.name} tried to retract non-existing card ${subCardStackUUID} from card stack ${rootCardStackUUID}`
         );
       } else if (!subCardStack.canBeRetracted) {
-        console.log(
-          `WARN: ${player.name} tried to retract non-retractable card ${subCardStack.card.name}`
-        );
+        console.log(`WARN: ${player.name} tried to retract non-retractable card ${subCardStack.card.name}`);
       } else {
         subCardStack.retract();
       }
