@@ -107,7 +107,7 @@ export default class HandCard extends CardImage {
         (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)
       ) {
         const reset = this.scene.activeCards.hand == this.uuid;
-        this.scene.activeCards.stack = undefined;
+        this.scene.activeCards.stackUUID = undefined;
         this.scene.activeCards.hand = undefined;
         if (!reset) this.scene.activeCards.hand = this.uuid;
         this.scene.updateView();

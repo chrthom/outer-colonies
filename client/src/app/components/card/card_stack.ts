@@ -137,7 +137,7 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
+    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
           this.targetXExpanded(c.data.index).value2d,
@@ -272,24 +272,24 @@ export default class CardStack {
             break;
           case TurnPhase.Combat:
             if (
-              this.scene.activeCards.stack == this.uuid &&
-              this.scene.activeCards.stackIndex == cardData.index
+              this.scene.activeCards.stackUUID == this.uuid &&
+              this.scene.activeCards.cardUUID == cardData.uuid
             ) {
-              this.scene.activeCards.stack = undefined;
-              this.scene.activeCards.stackIndex = undefined;
+              this.scene.activeCards.stackUUID = undefined;
+              this.scene.activeCards.cardUUID = undefined;
               this.scene.activeCards.hand = undefined;
             } else if (cardData.battleReady) {
-              this.scene.activeCards.stack = this.uuid;
-              this.scene.activeCards.stackIndex = cardData.index;
+              this.scene.activeCards.stackUUID = this.uuid;
+              this.scene.activeCards.cardUUID = cardData.uuid;
               this.scene.activeCards.hand = undefined;
             } else if (
-              this.scene.activeCards.stack &&
+              this.scene.activeCards.stackUUID &&
               this.scene.state.battle?.opponentShipIds.includes(this.uuid)
             ) {
               this.scene.socket.emit(
                 MsgTypeInbound.Attack,
-                this.scene.activeCards.stack,
-                this.scene.activeCards.stackIndex,
+                this.scene.activeCards.stackUUID,
+                this.scene.activeCards.cardUUID,
                 this.uuid
               );
             }

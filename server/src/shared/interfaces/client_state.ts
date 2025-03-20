@@ -38,6 +38,7 @@ export interface ClientBattle {
 }
 
 export interface ClientCard {
+  uuid: string;
   id: number;
   index: number;
   battleReady: boolean;
