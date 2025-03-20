@@ -42,7 +42,7 @@ export default class RetractCardButton {
       })
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown())
-          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.index);
+          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
       });
     this.tweenAlpha(true);
     return this;
