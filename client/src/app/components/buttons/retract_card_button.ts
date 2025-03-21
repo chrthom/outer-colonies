@@ -8,7 +8,7 @@ import Card from '../card/card';
 export default class RetractCardButton {
   image: Phaser.GameObjects.Image;
   card: Card;
-  private tween?: Phaser.Tweens.Tween;
+  private tweenAnimation?: Phaser.Tweens.Tween;
   private scene!: Game;
   constructor(scene: Game, card: Card) {
     this.scene = scene;
@@ -21,13 +21,18 @@ export default class RetractCardButton {
       .setInteractive({
         useHandCursor: true
       });
-    if (card.data.insufficientEnergy) this.setTintCritical();
-    else this.setTintNormal();
+    if (this.isCritical) {
+      this.setTintCritical();
+      this.show(
+        this.card.x.value2d,
+        this.card.y.value2d,
+        () => {},
+        () => {}
+      );
+    } else this.setTintNormal();
   }
   show(x: number, y: number, onPointerOver: () => void, onPointerOut: () => void): this {
     this.image
-      .setX(x + layoutConfig.game.cards.retractCardButton.xOffset)
-      .setY(y + layoutConfig.game.cards.retractCardButton.yOffset)
       .off('pointerover')
       .off('pointerout')
       .off('pointerdown')
@@ -42,24 +47,26 @@ export default class RetractCardButton {
       })
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown())
-          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.index);
+          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
       });
-    this.tweenAlpha(true);
+    this.tween(true, x, y);
     return this;
   }
   hide(): this {
-    this.tweenAlpha(false);
+    this.tween(false, this.card.x.value2d, this.card.y.value2d);
     return this;
   }
   destroy() {
     this.image.destroy();
   }
-  private tweenAlpha(show: boolean) {
-    this.tween?.stop();
-    this.tween = this.scene.tweens.add({
+  private tween(show: boolean, x: number, y: number) {
+    this.tweenAnimation?.stop();
+    this.tweenAnimation = this.scene.tweens.add({
       targets: this.image,
       duration: animationConfig.duration.displayIndicator,
-      alpha: show ? designConfig.alpha.normal : 0
+      alpha: show || this.isCritical ? designConfig.alpha.normal : 0,
+      x: x + layoutConfig.game.cards.retractCardButton.xOffset,
+      y: y + layoutConfig.game.cards.retractCardButton.yOffset
     });
   }
   private setTintNormal() {
@@ -80,5 +87,8 @@ export default class RetractCardButton {
   }
   private setTintHover() {
     this.image.setTint(designConfig.tint.neutral);
+  }
+  private get isCritical() {
+    return this.card.data.insufficientEnergy;
   }
 }

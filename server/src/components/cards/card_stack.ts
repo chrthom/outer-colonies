@@ -33,8 +33,8 @@ export default abstract class CardStack {
   attack(target: CardStack, interventionCard?: TacticCard) {
     const attackResult = this.card.attack(this, target, interventionCard);
     this.match.battle.recentAttack = {
-      sourceUUID: this.rootCardStack.uuid,
-      sourceIndex: this.rootCardStack.cardStacks.findIndex(cs => cs.uuid == this.uuid),
+      sourceRootUUID: this.rootCardStack.uuid,
+      sourceSubUUID: this.uuid,
       targetUUID: target.uuid,
       pointDefense: attackResult.pointDefense,
       shield: attackResult.shield,

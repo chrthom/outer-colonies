@@ -69,25 +69,22 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     });
   });
-  socket.on(MsgTypeInbound.Retract, (cardStackUUID: string, cardIndex: number) => {
+  socket.on(MsgTypeInbound.Retract, (rootCardStackUUID: string, subCardStackUUID: string) => {
     doWithMatchAndPlayer(socket, (match, player) => {
-      const rootCardStack = getCardStackByUUID(player.cardStacks, cardStackUUID);
-      const targetCardStack =
-        rootCardStack && rootCardStack.cardStacks.length > cardIndex
-          ? rootCardStack.cardStacks[cardIndex]
-          : undefined;
+      const rootCardStack = getCardStackByUUID(player.cardStacks, rootCardStackUUID);
+      const subCardStack = rootCardStack && getCardStackByUUID(rootCardStack.cardStacks, subCardStackUUID);
       if (!rootCardStack) {
-        console.log(`WARN: ${player.name} tried to retract from non-existing card stack ${cardStackUUID}`);
-      } else if (!targetCardStack) {
         console.log(
-          `WARN: ${player.name} tried to retract non-existing card with index ${cardIndex} from card stack ${cardStackUUID}`
+          `WARN: ${player.name} tried to retract from non-existing card stack ${rootCardStackUUID}`
         );
-      } else if (!targetCardStack.canBeRetracted) {
+      } else if (!subCardStack) {
         console.log(
-          `WARN: ${player.name} tried to retract non-retractable card ${targetCardStack.card.name}`
+          `WARN: ${player.name} tried to retract non-existing card ${subCardStackUUID} from card stack ${rootCardStackUUID}`
         );
+      } else if (!subCardStack.canBeRetracted) {
+        console.log(`WARN: ${player.name} tried to retract non-retractable card ${subCardStack.card.name}`);
       } else {
-        targetCardStack.retract();
+        subCardStack.retract();
       }
       emitState(io, match);
     });
@@ -106,17 +103,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     });
   });
-  socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
+  socket.on(MsgTypeInbound.Attack, (shipUUID: string, weaponUUID: string, targetId: string) => {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     if (match && player) {
       const playerShips = match.battle.ships[match.pendingActionPlayerNo];
-      const srcShip = playerShips.find(cs => cs.uuid == srcId);
-      const srcWeapon = srcShip?.cardStacks[srcIndex];
+      const srcShip = playerShips.find(cs => cs.uuid == shipUUID);
+      const srcWeapon = getCardStackByUUID(srcShip?.cardStacks ?? [], weaponUUID);
       const opponentShips = match.battle.ships[match.waitingPlayerNo];
       const target = opponentShips.find(cs => cs.uuid == targetId);
       if (!srcWeapon) {
-        console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
+        console.log(`WARN: ${player.name} tried to attack from invalid weapon UUID`);
       } else if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
       } else if (!srcWeapon.canAttack) {
