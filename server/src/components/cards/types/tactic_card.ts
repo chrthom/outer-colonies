@@ -1,14 +1,28 @@
-import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
+import {
+  CardType,
+  TacticDiscipline,
+  CardDurability,
+  InterventionType,
+  Zone
+} from '../../../shared/config/enums';
 import { InterventionAttack, InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
 import { opponentPlayerNo } from '../../utils/helpers';
-import Card, { CardRarity } from '../card';
-import { CardProfileConfig } from '../card_profile';
+import Card, { AttackResult, CardRarity } from '../card';
+import { AttackProfile, CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class TacticCard extends Card {
-  constructor(id: number, name: string, rarity: CardRarity, profile?: CardProfileConfig) {
+  readonly attackProfile?: AttackProfile;
+  constructor(
+    id: number,
+    name: string,
+    rarity: CardRarity,
+    profile?: CardProfileConfig,
+    attackProfile?: AttackProfile
+  ) {
     super(id, name, CardType.Tactic, rarity, profile);
+    this.attackProfile = attackProfile;
   }
   onLeaveGame() {}
   onStartTurn() {}
@@ -83,5 +97,26 @@ export default abstract class TacticCard extends Card {
     const card = loop([]);
     if (card) player.takeCards([card]);
     return card;
+  }
+  protected attackByTactic(player: Player, target: CardStack) {
+    if (this.attackProfile) {
+      const attackResult = this.attackStep(
+        target,
+        this.attackProfile,
+        target.player.cardStacks.filter(cs => cs.zone != Zone.Neutral),
+        new AttackResult(this.attackProfile.damage)
+      );
+      target.damage += attackResult.damage;
+      player.match.battle.recentAttack = {
+        sourceRootUUID: player.colonyCardStack.uuid,
+        sourceSubUUID: player.colonyCardStack.uuid,
+        targetUUID: target.uuid,
+        pointDefense: attackResult.pointDefense,
+        shield: attackResult.shield,
+        armour: attackResult.armour,
+        damage: attackResult.damage
+      };
+      player.match.removeDestroyedCardStacks();
+    }
   }
 }

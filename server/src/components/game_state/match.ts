@@ -1,10 +1,10 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
-import { BattleType, CardDurability, TurnPhase } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, TurnPhase } from '../../shared/config/enums';
 import Battle from './battle';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
-import { opponentPlayerNo } from '../utils/helpers';
+import { opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import { Socket } from 'socket.io';
 import GameResult from './game_result';
 import Intervention, {
@@ -82,6 +82,7 @@ export default class Match {
       .flatMap(cs => cs.cardStacks)
       .filter(cs => cs.card.durability == CardDurability.Turn)
       .forEach(cs2 => cs2.discard());
+    this.reactivateAllCardStacks();
     new InterventionOpponentTurnStart(this).init();
   }
   prepareBuildPhase() {
@@ -96,9 +97,7 @@ export default class Match {
   prepareCombatPhase(interceptingShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
     this.battle.assignInterceptingShips(this.inactivePlayer, interceptingShipIds);
-    this.players.forEach(player => {
-      player.cardStacks.forEach(cs => cs.combatPhaseReset(true));
-    });
+    this.reactivateAllCardStacks();
     this.processBattleRound();
   }
   prepareEndPhase() {
@@ -129,11 +128,34 @@ export default class Match {
   skipIntervention() {
     this.intervention?.skip();
   }
+  removeDestroyedCardStacks(): CardStack[] {
+    this.players.forEach(player => {
+      this.getDestroyedCardStacks(player).forEach(cs => cs.onDestruction());
+    });
+    return this.players
+      .map(player => {
+        const destroyedCardStacks = this.getDestroyedCardStacks(player).filter(
+          cs => cs.type != CardType.Colony
+        );
+        destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
+        player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
+        return destroyedCardStacks;
+      })
+      .flat();
+  }
+  reactivateAllCardStacks(rechargingAttribtuesOnly: boolean = false) {
+    this.players.forEach(player => {
+      player.cardStacks.forEach(cs => cs.combatPhaseReset(!rechargingAttribtuesOnly));
+    });
+  }
   private newPlayer(socket: Socket, playerNo: number): Player {
     socket.join(this.room);
     const socketData: SocketData = <SocketData>socket.data;
     socketData.match = this;
     socketData.playerNo = playerNo;
     return new Player(socket.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
+  }
+  private getDestroyedCardStacks(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
   }
 }

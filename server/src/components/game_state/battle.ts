@@ -1,7 +1,7 @@
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
-import { BattleType, CardType, Zone } from '../../shared/config/enums';
+import { BattleType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
@@ -70,18 +70,14 @@ export default class Battle {
   }
   processEndOfBattlePhase(match: Match) {
     this.range--;
-    match.players.forEach(player => {
-      this.getDestroyedCardStacks(player.no).forEach(cs => cs.onDestruction());
+    match.removeDestroyedCardStacks().forEach(cs => {
+      match.players.forEach(player => {
+        if (getCardStackByUUID(player.cardStacks, cs.uuid)) {
+          spliceCardStackByUUID(player.cardStacks, cs.uuid);
+        }
+      });
     });
-    match.players.forEach(player => {
-      const destroyedCardStacks = this.getDestroyedCardStacks(player.no).filter(
-        cs => cs.type != CardType.Colony
-      );
-      destroyedCardStacks.forEach(cs => spliceCardStackByUUID(this.ships[player.no], cs.uuid));
-      destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
-      player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
-      player.cardStacks.forEach(cs => cs.combatPhaseReset(false));
-    });
+    match.reactivateAllCardStacks(true);
     if (this.range == 1 && this.type == BattleType.Raid) {
       this.ships[match.pendingActionPlayerNo].push(
         ...match.players[match.pendingActionPlayerNo].cardStacks.filter(cs => cs.zone == Zone.Colony)
