@@ -11,8 +11,8 @@ export interface ClientPlayer {
 }
 
 export interface ClientPlannedAttack {
-  sourceUUID: string;
-  sourceIndex: number;
+  sourceRootUUID: string;
+  sourceSubUUID: string;
   targetUUID: string;
 }
 

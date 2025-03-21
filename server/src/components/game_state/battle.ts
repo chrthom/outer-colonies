@@ -11,8 +11,8 @@ import Player from './player';
 import { AttackProfile } from '../cards/card_profile';
 
 export interface Attack {
-  sourceUUID: string;
-  sourceIndex: number;
+  sourceRootUUID: string;
+  sourceSubUUID: string;
   targetUUID: string;
   pointDefense: number;
   shield: number;
