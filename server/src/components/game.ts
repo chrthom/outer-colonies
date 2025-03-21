@@ -106,17 +106,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     });
   });
-  socket.on(MsgTypeInbound.Attack, (srcId: string, srcIndex: number, targetId: string) => {
+  socket.on(MsgTypeInbound.Attack, (shipUUID: string, weaponUUID: string, targetId: string) => {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     if (match && player) {
       const playerShips = match.battle.ships[match.pendingActionPlayerNo];
-      const srcShip = playerShips.find(cs => cs.uuid == srcId);
-      const srcWeapon = srcShip?.cardStacks[srcIndex];
+      const srcShip = playerShips.find(cs => cs.uuid == shipUUID);
+      const srcWeapon = srcShip?.cardStacks.find(cs => cs.uuid == weaponUUID);
       const opponentShips = match.battle.ships[match.waitingPlayerNo];
       const target = opponentShips.find(cs => cs.uuid == targetId);
       if (!srcWeapon) {
-        console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
+        console.log(`WARN: ${player.name} tried to attack from invalid weapon UUID`);
       } else if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
       } else if (!srcWeapon.canAttack) {
