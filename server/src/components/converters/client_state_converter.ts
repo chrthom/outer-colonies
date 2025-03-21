@@ -63,12 +63,13 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           .map(cs => toClientCardStack(cs, otherCardStacks.length));
         const cards = otherCardStacks.concat(hullCardStacks);
         const profile = cs.profile;
-        const attributes: ClientCardStackAttribute[] = [];
+        const attributes: ClientCardStackAttribute[] = [
+          { icon: 'damage', value: cs.damage, warning: true },
+          { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp }
+        ].filter(i => i.value != 0 && i.value < 100);
         if (match.turnPhase == TurnPhase.Build && ownedByPlayer && cs.card.type != CardType.Infrastructure) {
           attributes.push(
             ...[
-              { icon: 'damage', value: cs.damage, warning: true },
-              { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp },
               { icon: 'speed', value: profile.speed },
               { icon: 'energy', value: profile.energy, warning: profile.energy < 0 },
               { icon: 'theta', value: profile.theta, warning: profile.theta < 0 },
@@ -79,23 +80,11 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
               { icon: 'psi', value: profile.psi, warning: profile.psi < 0 }
             ].filter(i => i.value != 0 && i.value < 100)
           );
-        } else if (cs.card.type == CardType.Colony) {
-          attributes.push(...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : []), {
-            icon: 'hp',
-            value: profile.hp,
-            warning: cs.damage >= profile.hp
-          });
         } else if (
           match.turnPhase == TurnPhase.Combat &&
           battle.playerShipIds.concat(battle.opponentShipIds).includes(cs.uuid)
         ) {
           attributes.push(
-            ...(cs.damage > 0 ? [{ icon: 'damage', value: cs.damage, warning: true }] : []),
-            {
-              icon: 'hp',
-              value: profile.hp > 0 ? profile.hp : 1,
-              warning: cs.damage >= (profile.hp > 0 ? profile.hp : 1)
-            },
             ...(cs.zone == Zone.Orbital || cs.zone == Zone.Neutral
               ? [{ icon: 'speed', value: profile.speed }]
               : []),

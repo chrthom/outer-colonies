@@ -32,7 +32,7 @@ export default class DBDecksDAO {
   static async create(cardId: number, userId: number, inUse?: boolean, tradeable?: boolean) {
     await DBConnection.instance.query(
       'INSERT INTO decks (card_id, user_id, in_use, tradeable) VALUES (?, ?, ?, ?)',
-      [cardId, userId, inUse, tradeable]
+      [cardId, userId, inUse ?? false, tradeable ?? false]
     );
   }
 }
