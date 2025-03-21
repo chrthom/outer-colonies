@@ -16,12 +16,12 @@ export default class RetractCardButton {
     this.image = scene.add
       .image(card.x.value2d, card.y.value2d, 'icon_retract_card')
       .setOrigin(0.5)
-      .setAlpha(0)
+      .setAlpha(this.isCritical ? designConfig.alpha.normal : 0)
       .setDepth(layoutConfig.depth.indicator)
       .setInteractive({
         useHandCursor: true
       });
-    if (card.data.insufficientEnergy) this.setTintCritical();
+    if (this.isCritical) this.setTintCritical();
     else this.setTintNormal();
   }
   show(x: number, y: number, onPointerOver: () => void, onPointerOut: () => void): this {
@@ -59,7 +59,7 @@ export default class RetractCardButton {
     this.tween = this.scene.tweens.add({
       targets: this.image,
       duration: animationConfig.duration.displayIndicator,
-      alpha: show ? designConfig.alpha.normal : 0
+      alpha: show || this.isCritical ? designConfig.alpha.normal : 0
     });
   }
   private setTintNormal() {
@@ -80,5 +80,8 @@ export default class RetractCardButton {
   }
   private setTintHover() {
     this.image.setTint(designConfig.tint.neutral);
+  }
+  private get isCritical() {
+    return this.card.data.insufficientEnergy;
   }
 }
