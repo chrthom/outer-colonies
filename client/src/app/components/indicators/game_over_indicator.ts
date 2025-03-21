@@ -12,7 +12,7 @@ export default class GameOverIndicator {
   private image: Phaser.GameObjects.Image;
   private titleText: Phaser.GameObjects.Text;
   private subtitleText: Phaser.GameObjects.Text;
-  private extraText: Phaser.GameObjects.Text;
+  private solGainText: Phaser.GameObjects.Text;
   constructor(scene: Game, gameResult: ClientGameResult) {
     this.scene = scene;
     this.gameResult = gameResult;
@@ -25,10 +25,11 @@ export default class GameOverIndicator {
       .setOrigin(0.5)
       .setDepth(layoutConfig.depth.gameOver)
       .setAlpha(0);
+    const confYOffset = layoutGameConfig.ui.gameOver.yOffsets;
     this.titleText = scene.add
       .text(
         layoutConfig.scene.width / 2,
-        layoutConfig.scene.height / 2 + layoutGameConfig.ui.gameOver.yOffsets.title,
+        layoutConfig.scene.height / 2 + confYOffset.title,
         gameResult.won ? 'Sieg' : 'Niederlage'
       )
       .setFontSize(layoutConfig.fontSize.giant)
@@ -40,7 +41,7 @@ export default class GameOverIndicator {
     this.subtitleText = scene.add
       .text(
         layoutConfig.scene.width / 2,
-        layoutConfig.scene.height / 2 + layoutGameConfig.ui.gameOver.yOffsets.subtitle,
+        layoutConfig.scene.height / 2 + confYOffset.subtitle,
         this.gameOverText
       )
       .setFontSize(layoutConfig.fontSize.large)
@@ -49,10 +50,10 @@ export default class GameOverIndicator {
       .setDepth(layoutConfig.depth.gameOver)
       .setOrigin(0.5)
       .setAlpha(0);
-    this.extraText = scene.add
+    this.solGainText = scene.add
       .text(
         layoutConfig.scene.width / 2,
-        layoutConfig.scene.height / 2 + layoutGameConfig.ui.gameOver.yOffsets.extra,
+        layoutConfig.scene.height / 2 + (gameResult.won ? confYOffset.solGain.winner : confYOffset.solGain.looser),
         `${this.gameResult.sol} Sol erhalten`
       )
       .setFontSize(layoutConfig.fontSize.normal)
@@ -79,9 +80,9 @@ export default class GameOverIndicator {
       alpha: 1,
       onComplete: () => {
         if (this.gameResult.sol > 0) {
-          this.extraText.setAlpha(1);
+          this.solGainText.setAlpha(1);
           this.scene.add
-            .particles(this.extraText.x, this.extraText.y, 'flare_blue', {
+            .particles(this.solGainText.x, this.solGainText.y, 'flare_blue', {
               lifespan: animationConfig.attack.flare.lifetime,
               speed: { min: 200, max: 500 },
               scale: { start: 0.8, end: 0 },
