@@ -108,8 +108,8 @@ export default abstract class TacticCard extends Card {
       );
       target.damage += attackResult.damage;
       player.match.battle.recentAttack = {
-        sourceUUID: player.colonyCardStack.uuid,
-        sourceIndex: 0,
+        sourceRootUUID: player.colonyCardStack.uuid,
+        sourceSubUUID: player.colonyCardStack.uuid,
         targetUUID: target.uuid,
         pointDefense: attackResult.pointDefense,
         shield: attackResult.shield,
