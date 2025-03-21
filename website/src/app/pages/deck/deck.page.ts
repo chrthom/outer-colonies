@@ -66,7 +66,7 @@ export class DeckPage implements OnInit {
   boxes = [
     new DeckBox(this.activeCards$, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
     new DeckBox(this.reserveCards$, 'Reserve', (card, page) => page.activateCard(card), this)
-  ]
+  ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
       title: '&Delta;',
