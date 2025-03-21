@@ -64,8 +64,8 @@ export default class CardStack {
     this.tween();
     this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
   }
-  animateAttack(cardIndex: number) {
-    this.cards[cardIndex].animateAttack();
+  animateAttack(cardUUID: string) {
+    this.cards.find(c => c.data.uuid == cardUUID)?.animateAttack();
   }
   animateDamage(attack: ClientAttack) {
     new AttackDamageIndicator(this.scene, this, attack);
