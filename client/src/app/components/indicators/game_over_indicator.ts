@@ -63,10 +63,14 @@ export default class GameOverIndicator {
       .setDepth(layoutConfig.depth.gameOver)
       .setOrigin(0.5)
       .setAlpha(0);
+    [this.titleText, this.subtitleText, this.solGainText].forEach(t => t.postFX.addShadow(0, 0, 0.02));
     this.scene.tweens.add({
       targets: [this.image],
       duration: animationConfig.gameOver.appear,
-      alpha: 1
+      alpha: 1,
+      onComplete: () => {
+        this.image.postFX.addShine();
+      }
     });
     this.scene.tweens.add({
       targets: [this.titleText],
