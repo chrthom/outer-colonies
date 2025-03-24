@@ -171,6 +171,7 @@ import {
   Card428
 } from './tactic_military_cards';
 import {
+  Card108,
   Card110,
   Card143,
   Card144,
@@ -209,7 +210,9 @@ import {
   Card175,
   Card176,
   Card208,
+  Card214,
   Card231,
+  Card323,
   Card330,
   Card416,
   Card430
@@ -227,6 +230,7 @@ export default class CardCollection {
     105: <Card>new Card105(),
     106: <Card>new Card106(),
     107: <Card>new Card107(),
+    108: <Card>new Card108(),
     109: <Card>new Card109(),
     110: <Card>new Card110(),
     111: <Card>new Card111(),
@@ -312,6 +316,7 @@ export default class CardCollection {
     209: <Card>new Card209(),
     210: <Card>new Card210(),
     213: <Card>new Card213(),
+    214: <Card>new Card214(),
     216: <Card>new Card216(),
     217: <Card>new Card217(),
     219: <Card>new Card219(),
@@ -357,6 +362,7 @@ export default class CardCollection {
     319: <Card>new Card319(),
     320: <Card>new Card320(),
     321: <Card>new Card321(),
+    323: <Card>new Card323(),
     324: <Card>new Card324(),
     325: <Card>new Card325(),
     326: <Card>new Card326(),

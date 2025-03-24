@@ -67,7 +67,7 @@ export default class Prompt {
     }
   }
   hide() {
-    this.setVisible(false).setText('');
+    this.setVisible(false);
     this.scene.obj?.exitButton.show();
     this.scene.player?.countdownIndicator.show();
   }

@@ -3,7 +3,7 @@ import { DeckCard } from '../../../../../server/src/shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/shared/config/enums';
 import { Sort, MatSort, MatSortHeader } from '@angular/material/sort';
@@ -25,12 +25,14 @@ import {
   MatExpansionPanelTitle,
   MatExpansionPanelDescription
 } from '@angular/material/expansion';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'oc-page-deck',
   templateUrl: './deck.page.html',
   styleUrls: ['./deck.page.scss'],
   imports: [
+    CommonModule,
     ContentBoxComponent,
     MatCard,
     MatBadge,
@@ -57,11 +59,14 @@ import {
 export class DeckPage implements OnInit {
   readonly minCards = 60;
   readonly maxCards = 100;
-  boxes!: DeckBox[];
   filterFormControl = new FormControl('');
   viewFormControl = new FormControl('list');
-  private $activeCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
-  private $reserveCards: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
+  private activeCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
+  private reserveCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
+  boxes = [
+    new DeckBox(this.activeCards$, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
+    new DeckBox(this.reserveCards$, 'Reserve', (card, page) => page.activateCard(card), this)
+  ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
       title: '&Delta;',
@@ -92,22 +97,31 @@ export class DeckPage implements OnInit {
       get: (card: DeckCard) => card.profile.energy
     }
   ];
+  statistics$: Observable<DeckStatistics[]> = this.activeCards$.pipe(
+    map(_ => {
+      return this.statisticsTemplate.map(st => {
+        const profileValues = this.activeCards$.value.map(dcs => st.get(dcs) * dcs.numOfCards);
+        return {
+          title: st.title,
+          energyIcon: st.energyIcon,
+          used: -profileValues.filter(v => v < 0).reduce((a, b) => a + b, 0),
+          provided: profileValues.filter(v => v > 0).reduce((a, b) => a + b, 0)
+        };
+      });
+    })
+  );
 
   constructor(
     private deckApiService: DeckApiService,
     private dialog: MatDialog
   ) {}
   ngOnInit() {
-    this.boxes = [
-      new DeckBox(this.$activeCards, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
-      new DeckBox(this.$reserveCards, 'Reserve', (card, page) => page.activateCard(card), this)
-    ];
     this.update();
   }
   update() {
     this.deckApiService.listDeck().subscribe(res => {
-      this.$activeCards.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
-      this.$reserveCards.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
+      this.activeCards$.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
+      this.reserveCards$.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
     });
   }
   activateCard(card: DeckCard) {
@@ -123,7 +137,6 @@ export class DeckPage implements OnInit {
   openImgInModal(card: DeckCard) {
     this.dialog.open(ImageModalComponent, {
       data: this.cardIdToUrl(card.cardId),
-      height: '95vh',
       maxHeight: '95vh'
     });
   }
@@ -223,17 +236,6 @@ export class DeckPage implements OnInit {
       default:
         return '';
     }
-  }
-  get statistics(): DeckStatistics[] {
-    return this.statisticsTemplate.map(st => {
-      const profileValues = this.$activeCards.value.map(dcs => st.get(dcs) * dcs.numOfCards);
-      return {
-        title: st.title,
-        energyIcon: st.energyIcon,
-        used: -profileValues.filter(v => v < 0).reduce((a, b) => a + b, 0),
-        provided: profileValues.filter(v => v > 0).reduce((a, b) => a + b, 0)
-      };
-    });
   }
   get canActivateDeckCard() {
     return cardsNum(this.boxes[0].cards) < this.maxCards;

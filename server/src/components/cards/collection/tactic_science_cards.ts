@@ -11,6 +11,30 @@ abstract class ScienceTacticCard extends TacticCard {
   }
 }
 
+export class Card108 extends ScienceTacticCard {
+  constructor() {
+    super(
+      108,
+      'Asteroideneinschlag',
+      4,
+      {},
+      {
+        range: 0,
+        damage: 15,
+        pointDefense: -3,
+        shield: 0,
+        armour: -3
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
 export class Card110 extends ScienceTacticCard {
   private readonly damageToRepair = 3;
   constructor() {

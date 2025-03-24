@@ -8,7 +8,6 @@
         <mat-card
           (click)="box.onClick(card)"
           [matBadge]="card.numOfCards + 'x'"
-          matBadgeSize="large"
           matBadgePosition="before"
           [matBadgeHidden]="card.numOfCards === 1"
           matBadgeColor="primary"
@@ -130,6 +129,7 @@
         <mat-panel-description>Sockel- und Energienutzung des Decks</mat-panel-description>
       </mat-expansion-panel-header>
       <table>
+        @if(statistics$ | async; as statistics) {
         <tr>
           @for (s of statistics; track s) {
           <th>
@@ -150,6 +150,7 @@
           </td>
           }
         </tr>
+        }
       </table>
     </mat-expansion-panel>
   </mat-accordion>

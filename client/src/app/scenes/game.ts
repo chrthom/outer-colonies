@@ -35,8 +35,8 @@ import { loadCardResources, loadPreloadableResources } from './resource-loader';
 
 interface ActiveCards {
   hand?: string;
-  stack?: string;
-  stackIndex?: number;
+  stackUUID?: string;
+  cardUUID?: string;
 }
 
 interface FixedUIElements {
@@ -191,8 +191,8 @@ export default class Game extends Phaser.Scene {
 
   private resetSelection(battleType?: BattleType) {
     this.activeCards.hand = undefined;
-    this.activeCards.stack = undefined;
-    this.activeCards.stackIndex = undefined;
+    this.activeCards.stackUUID = undefined;
+    this.activeCards.cardUUID = undefined;
     this.interceptShipIds = [];
     this.plannedBattle = ClientPlannedBattleHelper.empty;
     this.plannedBattle.type = battleType ?? this.plannedBattle.type;
@@ -201,9 +201,9 @@ export default class Game extends Phaser.Scene {
   private animateAttack(): boolean {
     const attack = this.state.battle?.recentAttack;
     if (attack) {
-      const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceUUID);
+      const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceRootUUID);
       if (!attacker?.data.ownedByPlayer) {
-        attacker?.animateAttack(attack.sourceIndex);
+        attacker?.animateAttack(attack.sourceSubUUID);
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
     }
@@ -214,8 +214,9 @@ export default class Game extends Phaser.Scene {
     const intervention = this.state.intervention?.attack;
     if (intervention) {
       this.cardStacks
-        .find(cs => cs.uuid == intervention.sourceUUID)
-        ?.cards[intervention.sourceIndex].highlightSelected();
+        .find(cs => cs.uuid == intervention.sourceRootUUID)
+        ?.cards.find(c => c.data.uuid == intervention.sourceSubUUID)
+        ?.highlightSelected();
       this.cardStacks.find(cs => cs.uuid == intervention.targetUUID)?.highlightSelected();
     }
   }
@@ -335,16 +336,12 @@ export default class Game extends Phaser.Scene {
               if (!allShips?.includes(cs.uuid)) {
                 cs.highlightDisabled();
               }
-              if (
-                this.activeCards.stack == cs.uuid &&
-                this.activeCards.stackIndex != undefined &&
-                this.activeCards.stackIndex >= 0
-              ) {
-                cs.cards[this.activeCards.stackIndex].highlightSelected();
+              if (this.activeCards.stackUUID == cs.uuid && this.activeCards.cardUUID != undefined) {
+                cs.cards.find(c => c.data.uuid == this.activeCards.cardUUID)?.highlightSelected();
               } else if (this.state.battle?.playerShipIds.includes(cs.uuid)) {
                 cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
               }
-              if (this.activeCards.stack && this.state.battle?.opponentShipIds.includes(cs.uuid)) {
+              if (this.activeCards.stackUUID && this.state.battle?.opponentShipIds.includes(cs.uuid)) {
                 cs.highlightSelectable();
               }
               break;

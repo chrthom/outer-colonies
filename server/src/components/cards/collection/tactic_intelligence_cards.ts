@@ -1,4 +1,4 @@
-import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
@@ -81,6 +81,30 @@ export class Card208 extends IntelligenceTacticCard {
   }
 }
 
+export class Card214 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      214,
+      'Bombenanschlag',
+      3,
+      {},
+      {
+        range: 0,
+        damage: 3,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Colony);
+  }
+}
+
 export class Card231 extends IntelligenceTacticCard {
   private readonly removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(
     ct => new CardAction(ct)
@@ -96,6 +120,30 @@ export class Card231 extends IntelligenceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;
+  }
+}
+
+export class Card323 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      323,
+      'Sabotage',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 2,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks;
   }
 }
 
