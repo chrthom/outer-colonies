@@ -7,7 +7,7 @@ import {
 } from '../../../shared/config/enums';
 import { InterventionAttack, InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
-import { opponentPlayerNo } from '../../utils/helpers';
+import { opponentPlayerNo, spliceFrom } from '../../utils/helpers';
 import Card, { AttackResult, CardRarity } from '../card';
 import { AttackProfile, CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
@@ -78,25 +78,16 @@ export default abstract class TacticCard extends Card {
     }
     return [];
   }
-  protected drawSpecificCard(
+  protected drawSpecificCards(
     player: Player,
-    matchFunction: (card: Card, player: Player) => boolean
-  ): Card | undefined {
-    const loop: (otherCards: Card[]) => Card | undefined = (otherCards: Card[]) => {
-      if (player.deck.length == 0) return undefined;
-      const nextCard = player.pickCardFromDeck();
-      if (!nextCard) return undefined;
-      else if (matchFunction(nextCard, player)) {
-        player.deck.push(...otherCards);
-        player.shuffleDeck();
-        return nextCard;
-      } else {
-        return loop(otherCards.concat(nextCard));
-      }
-    };
-    const card = loop([]);
-    if (card) player.takeCards([card]);
-    return card;
+    matchFunction: (card: Card, player: Player) => boolean,
+    cardsToDraw: number
+  ) {
+    for (let i = 0; i < cardsToDraw; i++) {
+      const card = spliceFrom(player.deck, (c: Card) => matchFunction(c, player));
+      if (card) player.takeCard(card);
+    }
+    player.shuffleDeck();
   }
   protected attackByTactic(player: Player, target: CardStack) {
     if (this.attackProfile) {
