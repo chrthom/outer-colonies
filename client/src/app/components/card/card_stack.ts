@@ -251,6 +251,7 @@ export default class CardStack {
                 if (handcard?.data?.options) {
                   this.scene.obj.optionPicker = new OptionPicker(
                     this.scene,
+                    this.uuid,
                     handcard?.data?.options,
                     handcard?.data?.optionsToSelect
                   );

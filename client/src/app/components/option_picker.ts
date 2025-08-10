@@ -1,3 +1,4 @@
+import { MsgTypeInbound } from '../../../../server/src/shared/config/enums';
 import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import { perspectiveConfig } from '../config/perspective';
@@ -7,6 +8,7 @@ import { ZoomCardXPosition, ZoomCardYPosition } from './perspective';
 
 export default class OptionPicker {
   private scene: Game;
+  private targetUUID: string;
   private backgroundOverlay: Phaser.GameObjects.Rectangle;
   private cards: CardImage[] = [];
   private text: Phaser.GameObjects.Text;
@@ -18,8 +20,9 @@ export default class OptionPicker {
   private selectedIndexes: number[] = [];
   private currentPage: number = 1;
   private readonly uiConfig = layoutConfig.game.ui.optionPicker;
-  constructor(scene: Game, options: number[], optionsToSelect: number) {
+  constructor(scene: Game, targetUUID: string, options: number[], optionsToSelect: number) {
     this.scene = scene;
+    this.targetUUID = targetUUID;
     this.options = options;
     this.optionsToSelect = optionsToSelect;
     this.backgroundOverlay = this.scene.add
@@ -65,8 +68,12 @@ export default class OptionPicker {
         if (p.leftButtonDown()) this.movePageBy(1);
       });
     this.nextPageButton
-      .on('pointerover', () => this.nextPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal))
-      .on('pointerout', () => this.nextPageButton.setFillStyle(designConfig.tint.player, designConfig.alpha.normal))
+      .on('pointerover', () =>
+        this.nextPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal)
+      )
+      .on('pointerout', () =>
+        this.nextPageButton.setFillStyle(designConfig.tint.player, designConfig.alpha.normal)
+      );
     this.previousPageButton = this.scene.add
       .triangle(
         this.uiConfig.margin.x,
@@ -90,14 +97,14 @@ export default class OptionPicker {
         if (p.leftButtonDown()) this.movePageBy(-1);
       });
     this.previousPageButton
-      .on('pointerover', () => this.previousPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal))
-      .on('pointerout', () => this.previousPageButton.setFillStyle(designConfig.tint.player, designConfig.alpha.normal))
-    this.confirmButton = this.scene.add
-      .text(
-        layoutConfig.scene.width / 2,
-        layoutConfig.scene.height - this.uiConfig.margin.y,
-        'OK'
+      .on('pointerover', () =>
+        this.previousPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal)
       )
+      .on('pointerout', () =>
+        this.previousPageButton.setFillStyle(designConfig.tint.player, designConfig.alpha.normal)
+      );
+    this.confirmButton = this.scene.add
+      .text(layoutConfig.scene.width / 2, layoutConfig.scene.height - this.uiConfig.margin.y, 'OK')
       .setFontSize(layoutConfig.fontSize.giant)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.player)
@@ -109,10 +116,10 @@ export default class OptionPicker {
       .setVisible(false)
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown()) this.confirm();
-      })
-      this.confirmButton
-        .on('pointerover', () => this.confirmButton.setColor(designConfig.color.warn))
-        .on('pointerout', () => this.confirmButton.setColor(designConfig.color.player));
+      });
+    this.confirmButton
+      .on('pointerover', () => this.confirmButton.setColor(designConfig.color.warn))
+      .on('pointerout', () => this.confirmButton.setColor(designConfig.color.player));
   }
   destroy() {
     [this.backgroundOverlay, this.text, this.confirmButton, this.nextPageButton, this.previousPageButton].map(
@@ -127,9 +134,7 @@ export default class OptionPicker {
       .map((cardId, index) =>
         new CardImage(
           this.scene,
-          new ZoomCardXPosition(
-            layoutConfig.scene.width / 2 + (index - 1) * this.uiConfig.cardsXOffset
-          ),
+          new ZoomCardXPosition(layoutConfig.scene.width / 2 + (index - 1) * this.uiConfig.cardsXOffset),
           new ZoomCardYPosition(layoutConfig.scene.height / 2),
           cardId,
           {
@@ -143,14 +148,24 @@ export default class OptionPicker {
         if (p.leftButtonDown()) this.onCardClick(this.absoluteCardIndex(index));
       })
     );
-    this.cards.filter((_, index) => this.selectedIndexes.includes(this.absoluteCardIndex(index))).forEach(c => c.highlightSelected());
+    this.cards
+      .filter((_, index) => this.selectedIndexes.includes(this.absoluteCardIndex(index)))
+      .forEach(c => c.highlightSelected());
   }
   private absoluteCardIndex(relativeIndex: number): number {
     return relativeIndex + this.currentPage * 3;
   }
   private confirm() {
     if (this.allOptionsSelected) {
-      // TODO
+      this.destroy();
+      this.scene.obj.optionPicker = undefined;
+      const selectedCardIds = this.selectedIndexes.map(i => this.options[i]);
+      this.scene.socket.emit(
+        MsgTypeInbound.Handcard,
+        this.scene.activeCards.hand,
+        this.targetUUID,
+        selectedCardIds
+      );
     }
   }
   private movePageBy(pageModificator: number) {

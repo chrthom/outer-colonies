@@ -73,6 +73,7 @@ export class Card210 extends EconomyTacticCard {
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     if (optionalParameters && optionalParameters[0]) {
+      // TODO: Unify in tribute method
       const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
       if (handCardUUID) {
         player.discardHandCards(handCardUUID);
@@ -85,7 +86,8 @@ export class Card210 extends EconomyTacticCard {
     return this.onlyColonyTarget(player.cardStacks);
   }
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
-    return player.hand.map(c => c.card.id);
+    // TODO: Unprecise if multiple instances of this card on hand
+    return player.hand.filter(c => c.card.id != this.id).map(c => c.card.id);
   }
   override onEnterGameNumberOfSelectableCardOptions(): number {
     return 1;

@@ -49,9 +49,9 @@ export default abstract class CardStack {
   canBeAttachedTo(cardStack: CardStack): boolean {
     return this.validTargets.map(cs => cs.uuid).includes(cardStack.uuid);
   }
-  playHandCard(target: CardStack) {
+  playHandCard(target: CardStack, optionalParameters?: number[]) {
     if (this.zone == Zone.Hand) {
-      this.performImmediateEffect(target);
+      this.card.onEnterGame(this.player, target, this, optionalParameters);
       if (!this.card.isAttachSelfManaging) {
         if (this.card.durability == CardDurability.Instant) {
           this.player.discardCards(this.card);
@@ -152,9 +152,6 @@ export default abstract class CardStack {
   onEndTurn() {
     this.card.onEndTurn(this.player, this);
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
-  }
-  performImmediateEffect(target: CardStack) {
-    this.card.onEnterGame(this.player, target, this);
   }
   get profile(): CardProfile {
     const profile = this.cards.map(c => c.profile).reduce((a, b) => a.combine(b));

@@ -47,28 +47,31 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     });
   });
-  socket.on(MsgTypeInbound.Handcard, (handCardUUID: string, targetUUID: string) => {
-    doWithMatchAndPlayer(socket, (match, player) => {
-      const handCard = getCardStackByUUID(player.hand, handCardUUID);
-      const target = getCardStackByUUID(match.allCardStacks, targetUUID);
-      if (!handCard) {
-        console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
-      } else if (!target) {
-        console.log(
-          `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
-        );
-      } else if (!handCard.hasValidTargets) {
-        console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
-      } else if (!handCard.canBeAttachedTo(target)) {
-        console.log(
-          `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
-        );
-      } else {
-        player.playHandCard(handCard, target);
-      }
-      emitState(io, match);
-    });
-  });
+  socket.on(
+    MsgTypeInbound.Handcard,
+    (handCardUUID: string, targetUUID: string, optionalParameters?: number[]) => {
+      doWithMatchAndPlayer(socket, (match, player) => {
+        const handCard = getCardStackByUUID(player.hand, handCardUUID);
+        const target = getCardStackByUUID(match.allCardStacks, targetUUID);
+        if (!handCard) {
+          console.log(`WARN: ${player.name} tried to play non-existing card ${handCardUUID}`);
+        } else if (!target) {
+          console.log(
+            `WARN: ${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
+          );
+        } else if (!handCard.hasValidTargets) {
+          console.log(`WARN: ${player.name} tried to play non-playable card ${handCard.card.name}`);
+        } else if (!handCard.canBeAttachedTo(target)) {
+          console.log(
+            `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
+          );
+        } else {
+          player.playHandCard(handCard, target, optionalParameters);
+        }
+        emitState(io, match);
+      });
+    }
+  );
   socket.on(MsgTypeInbound.Retract, (rootCardStackUUID: string, subCardStackUUID: string) => {
     doWithMatchAndPlayer(socket, (match, player) => {
       const rootCardStack = getCardStackByUUID(player.cardStacks, rootCardStackUUID);

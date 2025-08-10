@@ -90,14 +90,14 @@ export default class Player {
   pickCardsFromTopOfDiscardPile(num: number): Card[] {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
-  playHandCard(handCard: CardStack, target: CardStack) {
+  playHandCard(handCard: CardStack, target: CardStack, optionalParameters?: number[]) {
     this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     if (handCard.type == CardType.Tactic) {
       this.match.highlightCard = handCard;
-      new InterventionTacticCard(this.match, handCard, target).init();
+      new InterventionTacticCard(this.match, handCard, target, optionalParameters).init();
     } else {
-      handCard.playHandCard(target);
+      handCard.playHandCard(target, optionalParameters);
       this.match.checkToNextPhase();
     }
   }

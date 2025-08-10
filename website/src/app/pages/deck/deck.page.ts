@@ -98,7 +98,7 @@ export class DeckPage implements OnInit {
     }
   ];
   statistics$: Observable<DeckStatistics[]> = this.activeCards$.pipe(
-    map(_ => {
+    map(() => {
       return this.statisticsTemplate.map(st => {
         const profileValues = this.activeCards$.value.map(dcs => st.get(dcs) * dcs.numOfCards);
         return {
