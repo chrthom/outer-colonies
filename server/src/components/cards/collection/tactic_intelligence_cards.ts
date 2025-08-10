@@ -34,6 +34,7 @@ export class Card175 extends IntelligenceTacticCard {
         cs => cs.card.id == optionalParameters[0]
       )?.uuid;
       if (handCardUUID) this.getOpponentPlayer(player).discardHandCards(handCardUUID);
+      else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
     }
   }
   getValidTargets(player: Player): CardStack[] {

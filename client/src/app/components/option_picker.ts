@@ -153,7 +153,7 @@ export default class OptionPicker {
       .forEach(c => c.highlightSelected());
   }
   private absoluteCardIndex(relativeIndex: number): number {
-    return relativeIndex + this.currentPage * 3;
+    return relativeIndex + (this.currentPage - 1) * 3;
   }
   private confirm() {
     if (this.allOptionsSelected) {

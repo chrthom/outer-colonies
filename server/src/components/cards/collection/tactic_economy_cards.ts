@@ -72,14 +72,15 @@ export class Card210 extends EconomyTacticCard {
     super(210, 'Schwarzmarkthandel', 4);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    console.log(`Optional Parameters at ${this.name}: ${optionalParameters}`); ////
     if (optionalParameters && optionalParameters[0]) {
-      // TODO: Unify in tribute method
+      // TODO: Unify in tribute method - Make sure to limit number of cards, print warning if no card found
       const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
       if (handCardUUID) {
         player.discardHandCards(handCardUUID);
         this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
         player.shuffleDeck();
-      }
+      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
     }
   }
   getValidTargets(player: Player): CardStack[] {
@@ -100,6 +101,7 @@ export class Card217 extends EconomyTacticCard {
     super(217, 'Schrottsammler', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    // TODO: Make sure to limit number of cards, print warning if no card found
     optionalParameters
       ?.map(cardId => spliceCardById(player.discardPile, cardId))
       ?.filter(c => !!c)

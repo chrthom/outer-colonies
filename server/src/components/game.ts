@@ -66,6 +66,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
             `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
           );
         } else {
+          console.log(`Optional Parameters at game.ts: ${optionalParameters}`); ////
           player.playHandCard(handCard, target, optionalParameters);
         }
         emitState(io, match);
