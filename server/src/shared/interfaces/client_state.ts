@@ -71,7 +71,7 @@ export interface ClientHandCard {
   playable: boolean;
   validTargets: string[];
   ownedByPlayer: boolean;
-  optionsToChoose: number;
+  optionsToSelect: number;
   options?: number[];
 }
 

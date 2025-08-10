@@ -28,7 +28,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         playable: c.hasValidTargets,
         validTargets: c.validTargets.map(cs => cs.uuid),
         ownedByPlayer: c.player.no == playerNo,
-        optionsToChoose: c.card.onEnterGameNumberOfSelectableCardOptions(player),
+        optionsToSelect: c.card.onEnterGameNumberOfSelectableCardOptions(player),
         options: c.card.onEnterGameSelectableCardOptions(player)
       };
     });
