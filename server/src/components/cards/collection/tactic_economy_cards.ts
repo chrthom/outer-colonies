@@ -1,5 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { spliceCardById } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -34,7 +35,7 @@ export class Card142 extends EconomyTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Hull);
+    this.drawSpecificCards(player, c => c.type == CardType.Hull, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -62,6 +63,59 @@ export class Card165 extends EconomyTacticCard {
       .filter(p => p.speed >= 2 && p.psi > 0)
       .map(p => p.psi)
       .reduce((psi1, psi2) => psi1 + psi2, 0);
+  }
+}
+
+export class Card210 extends EconomyTacticCard {
+  private readonly cardsToDraw = 4;
+  constructor() {
+    super(210, 'Schwarzmarkthandel', 4);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    console.log(`Optional Parameters at ${this.name}: ${optionalParameters}`); ////
+    if (optionalParameters && optionalParameters[0]) {
+      // TODO: Unify in tribute method - Make sure to limit number of cards, print warning if no card found
+      const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
+      if (handCardUUID) {
+        player.discardHandCards(handCardUUID);
+        this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
+        player.shuffleDeck();
+      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    // TODO: Unprecise if multiple instances of this card on hand
+    return player.hand.filter(c => c.card.id != this.id).map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
+export class Card217 extends EconomyTacticCard {
+  private readonly cardsToRestore = 3;
+  constructor() {
+    super(217, 'Schrottsammler', 2);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    // TODO: Make sure to limit number of cards, print warning if no card found
+    optionalParameters
+      ?.map(cardId => spliceCardById(player.discardPile, cardId))
+      ?.filter(c => !!c)
+      ?.forEach(c => player.deck.push(c));
+    player.shuffleDeck();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.discardPile.length > 0 ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.discardPile.map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return this.cardsToRestore;
   }
 }
 
@@ -131,14 +185,7 @@ export class Card427 extends EconomyTacticCard {
     super(427, 'Immigranten von der Erde', 2);
   }
   onEnterGame(player: Player) {
-    let foundCards = 0;
-    for (let i = 0; i < player.deck.length; i++) {
-      if (player.deck[i].type == CardType.Infrastructure) {
-        player.takeCards(player.deck.splice(i, 1));
-        if (++foundCards == this.cardsToDraw) break;
-      }
-    }
-    player.shuffleDeck();
+    this.drawSpecificCards(player, c => c.type == CardType.Infrastructure, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);

@@ -14,6 +14,7 @@ import { constants } from '../../../../../server/src/shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
+import OptionPicker from '../option_picker';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -64,8 +65,8 @@ export default class CardStack {
     this.tween();
     this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
   }
-  animateAttack(cardIndex: number) {
-    this.cards[cardIndex].animateAttack();
+  animateAttack(cardUUID: string) {
+    this.cards.find(c => c.data.uuid == cardUUID)?.animateAttack();
   }
   animateDamage(attack: ClientAttack) {
     new AttackDamageIndicator(this.scene, this, attack);
@@ -137,7 +138,7 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    if (!this.scene.activeCards.hand && !this.scene.activeCards.stack) {
+    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
           this.targetXExpanded(c.data.index).value2d,
@@ -246,7 +247,17 @@ export default class CardStack {
           case TurnPhase.Build:
             if (state.playerIsActive) {
               if (this.scene.activeCards.hand) {
-                this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+                const handcard = this.scene.player.hand.find(h => h.uuid == this.scene.activeCards.hand);
+                if (handcard?.data?.options) {
+                  this.scene.obj.optionPicker = new OptionPicker(
+                    this.scene,
+                    this.uuid,
+                    handcard?.data?.options,
+                    handcard?.data?.optionsToSelect
+                  );
+                } else {
+                  this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+                }
               } else if (this.isOpponentColony) {
                 this.scene.resetView(
                   this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
@@ -272,24 +283,24 @@ export default class CardStack {
             break;
           case TurnPhase.Combat:
             if (
-              this.scene.activeCards.stack == this.uuid &&
-              this.scene.activeCards.stackIndex == cardData.index
+              this.scene.activeCards.stackUUID == this.uuid &&
+              this.scene.activeCards.cardUUID == cardData.uuid
             ) {
-              this.scene.activeCards.stack = undefined;
-              this.scene.activeCards.stackIndex = undefined;
+              this.scene.activeCards.stackUUID = undefined;
+              this.scene.activeCards.cardUUID = undefined;
               this.scene.activeCards.hand = undefined;
             } else if (cardData.battleReady) {
-              this.scene.activeCards.stack = this.uuid;
-              this.scene.activeCards.stackIndex = cardData.index;
+              this.scene.activeCards.stackUUID = this.uuid;
+              this.scene.activeCards.cardUUID = cardData.uuid;
               this.scene.activeCards.hand = undefined;
             } else if (
-              this.scene.activeCards.stack &&
+              this.scene.activeCards.stackUUID &&
               this.scene.state.battle?.opponentShipIds.includes(this.uuid)
             ) {
               this.scene.socket.emit(
                 MsgTypeInbound.Attack,
-                this.scene.activeCards.stack,
-                this.scene.activeCards.stackIndex,
+                this.scene.activeCards.stackUUID,
+                this.scene.activeCards.cardUUID,
                 this.uuid
               );
             }

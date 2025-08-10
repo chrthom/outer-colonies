@@ -11,8 +11,8 @@ export interface ClientPlayer {
 }
 
 export interface ClientPlannedAttack {
-  sourceUUID: string;
-  sourceIndex: number;
+  sourceRootUUID: string;
+  sourceSubUUID: string;
   targetUUID: string;
 }
 
@@ -38,6 +38,7 @@ export interface ClientBattle {
 }
 
 export interface ClientCard {
+  uuid: string;
   id: number;
   index: number;
   battleReady: boolean;
@@ -70,6 +71,8 @@ export interface ClientHandCard {
   playable: boolean;
   validTargets: string[];
   ownedByPlayer: boolean;
+  optionsToSelect: number;
+  options?: number[];
 }
 
 export interface ClientEvent {

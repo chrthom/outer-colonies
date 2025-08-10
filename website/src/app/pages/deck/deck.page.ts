@@ -66,7 +66,7 @@ export class DeckPage implements OnInit {
   boxes = [
     new DeckBox(this.activeCards$, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
     new DeckBox(this.reserveCards$, 'Reserve', (card, page) => page.activateCard(card), this)
-  ]
+  ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
       title: '&Delta;',
@@ -98,7 +98,7 @@ export class DeckPage implements OnInit {
     }
   ];
   statistics$: Observable<DeckStatistics[]> = this.activeCards$.pipe(
-    map(_ => {
+    map(() => {
       return this.statisticsTemplate.map(st => {
         const profileValues = this.activeCards$.value.map(dcs => st.get(dcs) * dcs.numOfCards);
         return {

@@ -50,10 +50,16 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.hand, uuid).cards));
+    uuids
+      .map(uuid => spliceCardStackByUUID(this.hand, uuid)?.cards)
+      .filter(c => !!c)
+      .forEach(c => this.discardPile.push(...c));
   }
   discardCardStacks(...uuids: string[]) {
-    uuids.forEach(uuid => this.discardPile.push(...spliceCardStackByUUID(this.cardStacks, uuid).cards));
+    uuids
+      .map(uuid => spliceCardStackByUUID(this.cardStacks, uuid)?.cards)
+      .filter(c => !!c)
+      .forEach(c => this.discardPile.push(...c));
   }
   get colonyCardStack(): CardStack {
     const colonyCard = this.cardStacks.find(c => c.card.type == CardType.Colony);
@@ -65,6 +71,10 @@ export default class Player {
   }
   get isPendingPlayer(): boolean {
     return this.no == this.match.pendingActionPlayerNo;
+  }
+  takeCard(card: Card): Card {
+    this.takeCards([card]);
+    return card;
   }
   takeCards(cards: Card[]) {
     this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
@@ -80,14 +90,14 @@ export default class Player {
   pickCardsFromTopOfDiscardPile(num: number): Card[] {
     return num == 0 ? [] : this.discardPile.splice(-Math.min(num, this.discardPile.length));
   }
-  playHandCard(handCard: CardStack, target: CardStack) {
+  playHandCard(handCard: CardStack, target: CardStack, optionalParameters?: number[]) {
     this.actionPool.activate(handCard.card);
     spliceCardStackByUUID(this.hand, handCard.uuid);
     if (handCard.type == CardType.Tactic) {
       this.match.highlightCard = handCard;
-      new InterventionTacticCard(this.match, handCard, target).init();
+      new InterventionTacticCard(this.match, handCard, target, optionalParameters).init();
     } else {
-      handCard.playHandCard(target);
+      handCard.playHandCard(target, optionalParameters);
       this.match.checkToNextPhase();
     }
   }

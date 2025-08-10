@@ -59,7 +59,9 @@ export default class CardImage {
       .setVisible(false);
     this.image = scene.add
       .plane(perspectiveConfig.origin.x, perspectiveConfig.origin.y, `card_${cardId}`)
-      .setInteractive();
+      .setInteractive({
+        useHandCursor: true
+      });
     this.image.setMask(this.imageMask.createBitmapMask());
     this.setAngle(config?.isOpponentCard ? 180 : 0)
       .setX(x)

@@ -1,3 +1,4 @@
+import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { Attack } from '../game_state/battle';
 
@@ -27,11 +28,17 @@ export function shuffle<T>(array: T[]): T[] {
   return array.sort(() => Math.random() - 0.5);
 }
 
-export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack {
-  return cardStacks.splice(
-    cardStacks.findIndex(cs => cs.uuid == uuid),
-    1
-  )[0];
+export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack | undefined {
+  return spliceFrom(cardStacks, e => e.uuid == uuid);
+}
+
+export function spliceCardById(cards: Card[], id: number): Card | undefined {
+  return spliceFrom(cards, e => e.id == id);
+}
+
+export function spliceFrom<T>(l: T[], find: (e: T) => boolean): T | undefined {
+  const i = l.findIndex(find);
+  return i == -1 ? undefined : l.splice(i, 1)[0];
 }
 
 export function combineAttackResults(a1: Attack | undefined, a2: Attack | undefined): Attack | undefined {

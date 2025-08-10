@@ -94,13 +94,15 @@ export class InterventionAttack extends Intervention {
 }
 
 export class InterventionTacticCard extends Intervention {
-  src!: CardStack;
-  target!: CardStack;
+  src: CardStack;
+  target: CardStack;
+  optionalParameters?: number[];
   parentIntervention?: Intervention;
-  constructor(match: Match, src: CardStack, target: CardStack) {
+  constructor(match: Match, src: CardStack, target: CardStack, optionalParameters?: number[]) {
     super(InterventionType.TacticCard, match);
     this.src = src;
     this.target = target;
+    this.optionalParameters = optionalParameters;
     this.parentIntervention = this.match.intervention;
   }
   skip() {
@@ -109,7 +111,7 @@ export class InterventionTacticCard extends Intervention {
     if (this.src.card.durability != CardDurability.Instant) {
       this.match.highlightCard = undefined;
     }
-    this.src.playHandCard(this.target);
+    this.src.playHandCard(this.target, this.optionalParameters);
     this.match.checkToNextPhase();
   }
 }

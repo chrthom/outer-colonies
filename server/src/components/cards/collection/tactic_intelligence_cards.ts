@@ -1,4 +1,4 @@
-import { CardType, InterventionType, TacticDiscipline } from '../../../shared/config/enums';
+import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
@@ -17,12 +17,34 @@ export class Card149 extends IntelligenceTacticCard {
     super(149, 'Expertenkonferenz', 2);
   }
   onEnterGame(player: Player) {
-    for (let i = 0; i < this.cardsToDraw; i++) {
-      this.drawSpecificCard(player, c => c.type == CardType.Tactic);
-    }
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card175 extends IntelligenceTacticCard {
+  constructor() {
+    super(175, 'Spionagenetzwerk', 1);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      const handCardUUID = this.getOpponentPlayer(player).hand.find(
+        cs => cs.card.id == optionalParameters[0]
+      )?.uuid;
+      if (handCardUUID) this.getOpponentPlayer(player).discardHandCards(handCardUUID);
+      else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return this.getOpponentPlayer(player).hand.map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }
 
@@ -53,10 +75,34 @@ export class Card208 extends IntelligenceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card214 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      214,
+      'Bombenanschlag',
+      3,
+      {},
+      {
+        range: 0,
+        damage: 3,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Colony);
   }
 }
 
@@ -75,6 +121,30 @@ export class Card231 extends IntelligenceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;
+  }
+}
+
+export class Card323 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      323,
+      'Sabotage',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 2,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks;
   }
 }
 

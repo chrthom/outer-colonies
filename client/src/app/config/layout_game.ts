@@ -152,7 +152,10 @@ class LayoutGameConfig {
       yOffsets: {
         title: -100,
         subtitle: -20,
-        extra: 250
+        solGain: {
+          winner: 250,
+          looser: 200
+        }
       }
     },
     maxCard: {
@@ -162,6 +165,14 @@ class LayoutGameConfig {
     maxedTacticCard: {
       x: new ZoomCardXPosition(1200),
       y: new ZoomCardYPosition(650)
+    },
+    optionPicker: {
+      arrowSize: 80,
+      cardsXOffset: 750,
+      margin: {
+        x: 20,
+        y: 150
+      }
     },
     prompt: {
       textOffset: {

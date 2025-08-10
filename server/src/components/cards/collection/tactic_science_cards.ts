@@ -1,6 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { spliceCardStackByUUID } from '../../utils/helpers';
+import { spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -8,6 +8,30 @@ import TacticCard from '../types/tactic_card';
 abstract class ScienceTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
     return TacticDiscipline.Science;
+  }
+}
+
+export class Card108 extends ScienceTacticCard {
+  constructor() {
+    super(
+      108,
+      'Asteroideneinschlag',
+      4,
+      {},
+      {
+        range: 0,
+        damage: 15,
+        pointDefense: -3,
+        shield: 0,
+        armour: -3
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
 }
 
@@ -36,7 +60,7 @@ export class Card143 extends ScienceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Equipment);
+    this.drawSpecificCards(player, c => c.type == CardType.Equipment, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -94,9 +118,7 @@ export class Card229 extends ScienceTacticCard {
     super(229, 'Bodenproben', 2);
   }
   onEnterGame(player: Player) {
-    for (let i = 0; i < this.cardsToDraw; i++) {
-      this.drawSpecificCard(player, c => c.type == CardType.Infrastructure);
-    }
+    this.drawSpecificCards(player, c => c.type == CardType.Infrastructure, this.cardsToDraw);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -199,10 +221,34 @@ export class Card404 extends ScienceTacticCard {
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
-    this.drawSpecificCard(player, c => c.type == CardType.Tactic);
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, 1);
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card423 extends ScienceTacticCard {
+  private readonly cardsToChooseFrom = 7;
+  constructor() {
+    super(423, 'Wissenschaftlicher Durchbruch', 2);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    // TODO: Unifiy in one method - make sure to limit number of cards, print warning if no card found
+    optionalParameters
+      ?.map(cardId => spliceCardById(player.deck, cardId))
+      ?.filter(c => !!c)
+      ?.forEach(c => player.takeCard(c));
+    player.shuffleDeck();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.slice(0, this.cardsToChooseFrom).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }
 
