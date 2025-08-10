@@ -73,6 +73,8 @@ import {
   Card141,
   Card142,
   Card165,
+  Card210,
+  Card217,
   Card232,
   Card235,
   Card236,
@@ -180,6 +182,7 @@ import {
   Card324,
   Card335,
   Card404,
+  Card423,
   Card429,
   Card443
 } from './tactic_science_cards';
@@ -204,6 +207,7 @@ import {
 import { Card156, Card169, Card238, Card345, Card448 } from './infrastructure_defense_cards';
 import {
   Card149,
+  Card175,
   Card176,
   Card208,
   Card214,
@@ -292,6 +296,7 @@ export default class CardCollection {
     172: <Card>new Card172(),
     173: <Card>new Card173(),
     174: <Card>new Card174(),
+    175: <Card>new Card175(),
     176: <Card>new Card176(),
     177: <Card>new Card177(),
     178: <Card>new Card178(),
@@ -309,9 +314,11 @@ export default class CardCollection {
     207: <Card>new Card207(),
     208: <Card>new Card208(),
     209: <Card>new Card209(),
+    210: <Card>new Card210(),
     213: <Card>new Card213(),
     214: <Card>new Card214(),
     216: <Card>new Card216(),
+    217: <Card>new Card217(),
     219: <Card>new Card219(),
     220: <Card>new Card220(),
     221: <Card>new Card221(),
@@ -398,6 +405,7 @@ export default class CardCollection {
     420: <Card>new Card420(),
     421: <Card>new Card421(),
     422: <Card>new Card422(),
+    423: <Card>new Card423(),
     424: <Card>new Card424(),
     426: <Card>new Card426(),
     427: <Card>new Card427(),

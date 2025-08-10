@@ -166,6 +166,14 @@ class LayoutGameConfig {
       x: new ZoomCardXPosition(1200),
       y: new ZoomCardYPosition(650)
     },
+    optionPicker: {
+      arrowSize: 80,
+      cardsXOffset: 750,
+      margin: {
+        x: 20,
+        y: 150
+      }
+    },
     prompt: {
       textOffset: {
         x: 25,

@@ -14,6 +14,7 @@ import { constants } from '../../../../../server/src/shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
+import OptionPicker from '../option_picker';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -246,7 +247,17 @@ export default class CardStack {
           case TurnPhase.Build:
             if (state.playerIsActive) {
               if (this.scene.activeCards.hand) {
-                this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+                const handcard = this.scene.player.hand.find(h => h.uuid == this.scene.activeCards.hand);
+                if (handcard?.data?.options) {
+                  this.scene.obj.optionPicker = new OptionPicker(
+                    this.scene,
+                    this.uuid,
+                    handcard?.data?.options,
+                    handcard?.data?.optionsToSelect
+                  );
+                } else {
+                  this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
+                }
               } else if (this.isOpponentColony) {
                 this.scene.resetView(
                   this.scene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid

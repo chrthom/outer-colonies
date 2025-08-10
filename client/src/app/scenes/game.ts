@@ -32,6 +32,7 @@ import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
+import OptionPicker from '../components/option_picker';
 
 interface ActiveCards {
   hand?: string;
@@ -43,13 +44,14 @@ interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
   exitButton: ExitButton;
-  zoomCard: ZoomCard;
   missionCards: MissionCards;
+  optionPicker?: OptionPicker;
+  zoomCard: ZoomCard;
 }
 
 interface InitData {
-  socket: Socket;
   gameParams: ClientGameParams;
+  socket: Socket;
 }
 
 interface PlayerUIElements {

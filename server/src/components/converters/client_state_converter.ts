@@ -17,6 +17,8 @@ import CardStack from '../cards/card_stack';
 import { constants } from '../../shared/config/constants';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
+  const player = match.players[playerNo];
+  const opponent = match.players[opponentPlayerNo(playerNo)];
   const toHand: (hand: CardStack[]) => ClientHandCard[] = (hand: CardStack[]) => {
     return hand.map((c, index) => {
       return {
@@ -25,12 +27,12 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         index: index,
         playable: c.hasValidTargets,
         validTargets: c.validTargets.map(cs => cs.uuid),
-        ownedByPlayer: c.player.no == playerNo
+        ownedByPlayer: c.player.no == playerNo,
+        optionsToSelect: c.card.onEnterGameNumberOfSelectableCardOptions(player),
+        options: c.card.onEnterGameSelectableCardOptions(player)
       };
     });
   };
-  const player = match.players[playerNo];
-  const opponent = match.players[opponentPlayerNo(playerNo)];
   const battle: ClientBattle = {
     type: match.battle.type,
     playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
