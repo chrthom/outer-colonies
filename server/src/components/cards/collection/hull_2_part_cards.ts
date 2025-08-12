@@ -136,7 +136,7 @@ export class Card329 extends HullCard {
 export class Card418 extends HullCard {
   constructor() {
     super(418, 'Fregatte (Bug)', 3, frigateMultipart, {
-      hp: 5,
+      hp: 6,
       omega: 3
     });
   }
