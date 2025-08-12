@@ -15,7 +15,7 @@ const frigateMultipart = toMultipart(131, 132, 213, 328, 329, 418);
 export class Card131 extends HullCard {
   constructor() {
     super(131, 'Fregatte (Bug)', 2, frigateMultipart, {
-      hp: 6,
+      hp: 7,
       omega: 2
     });
   }
@@ -24,7 +24,7 @@ export class Card131 extends HullCard {
 export class Card132 extends HullCard {
   constructor() {
     super(132, 'Fregatte (Heck)', 2, frigateMultipart, {
-      hp: 6,
+      hp: 7,
       speed: 3,
       phi: 2,
       delta: 1
@@ -57,7 +57,7 @@ export class Card178 extends HullCard {
 export class Card213 extends HullCard {
   constructor() {
     super(213, 'Fregatte (Heck)', 3, frigateMultipart, {
-      hp: 6,
+      hp: 7,
       speed: 3,
       theta: 3,
       delta: 1
@@ -68,7 +68,7 @@ export class Card213 extends HullCard {
 export class Card221 extends HullCard {
   constructor() {
     super(221, 'Schwerer Frachter (Bug)', 2, freighterMultipart, {
-      hp: 7,
+      hp: 8,
       theta: 1,
       omega: 1,
       psi: 1
@@ -79,7 +79,7 @@ export class Card221 extends HullCard {
 export class Card226 extends HullCard {
   constructor() {
     super(226, 'Schwerer Frachter (Heck)', 2, freighterMultipart, {
-      hp: 5,
+      hp: 7,
       speed: 3,
       omega: 1,
       psi: 1
@@ -90,7 +90,7 @@ export class Card226 extends HullCard {
 export class Card326 extends HullCard {
   constructor() {
     super(326, 'Schwerer Frachter (Bug)', 2, freighterMultipart, {
-      hp: 10,
+      hp: 12,
       speed: -1,
       theta: 1,
       omega: 1,
@@ -102,7 +102,7 @@ export class Card326 extends HullCard {
 export class Card327 extends HullCard {
   constructor() {
     super(327, 'Schwerer Frachter (Heck)', 2, freighterMultipart, {
-      hp: 7,
+      hp: 8,
       speed: 2,
       omega: 1,
       delta: 1,
@@ -114,7 +114,7 @@ export class Card327 extends HullCard {
 export class Card328 extends HullCard {
   constructor() {
     super(328, 'Fregatte (Bug)', 2, frigateMultipart, {
-      hp: 9,
+      hp: 11,
       speed: -1,
       omega: 2
     });
@@ -124,7 +124,7 @@ export class Card328 extends HullCard {
 export class Card329 extends HullCard {
   constructor() {
     super(329, 'Fregatte (Heck)', 2, frigateMultipart, {
-      hp: 6,
+      hp: 7,
       speed: 2,
       xi: 2,
       omega: 1,
