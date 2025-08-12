@@ -70,6 +70,7 @@ import {
   Card453
 } from './infrastructure_energy_cards';
 import {
+  Card123,
   Card141,
   Card142,
   Card165,
@@ -182,6 +183,7 @@ import {
   Card324,
   Card335,
   Card404,
+  Card414,
   Card423,
   Card429,
   Card443
@@ -245,6 +247,7 @@ export default class CardCollection {
     120: <Card>new Card120(),
     121: <Card>new Card121(),
     122: <Card>new Card122(),
+    123: <Card>new Card123(),
     124: <Card>new Card124(),
     125: <Card>new Card125(),
     126: <Card>new Card126(),
@@ -400,6 +403,7 @@ export default class CardCollection {
     410: <Card>new Card410(),
     412: <Card>new Card412(),
     413: <Card>new Card413(),
+    414: <Card>new Card414(),
     416: <Card>new Card416(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),

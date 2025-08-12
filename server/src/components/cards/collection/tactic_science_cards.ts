@@ -228,6 +228,30 @@ export class Card404 extends ScienceTacticCard {
   }
 }
 
+export class Card414 extends ScienceTacticCard {
+  private readonly requiredAttachedEquipmentCards = 2;
+  constructor() {
+    super(414, 'Fehlfunktion', 3);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.onEnterGameAttackIntervention(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getValidTargetsInterventionAttack(
+      player,
+      i =>
+        i.src.rootCardStack.cards.filter(c => c.type == CardType.Equipment).length >=
+        this.requiredAttachedEquipmentCards
+    );
+  }
+  override adjustedAttackDamageByIntervention(): number {
+    return 0;
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.Attack;
+  }
+}
+
 export class Card423 extends ScienceTacticCard {
   private readonly cardsToChooseFrom = 7;
   constructor() {

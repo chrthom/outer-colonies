@@ -20,6 +20,12 @@ export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardS
   return cardStacks.find(cs => cs.uuid == uuid);
 }
 
+export function removeFirstMatchingElement<T>(array: T[], f: (o: T) => boolean): T[] {
+  const index = array.findIndex(f);
+  if (index !== -1) array.splice(index);
+  return array;
+}
+
 export function opponentPlayerNo(playerNo: number): number {
   return playerNo == 0 ? 1 : 0;
 }
