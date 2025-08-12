@@ -81,7 +81,7 @@ export default abstract class TacticCard extends Card {
   protected drawSpecificCards(
     player: Player,
     matchFunction: (card: Card, player: Player) => boolean,
-    cardsToDraw: number
+    cardsToDraw: number = 1
   ) {
     for (let i = 0; i < cardsToDraw; i++) {
       const card = spliceFrom(player.deck, (c: Card) => matchFunction(c, player));
