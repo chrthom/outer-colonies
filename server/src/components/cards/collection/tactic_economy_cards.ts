@@ -1,6 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { spliceCardById } from '../../utils/helpers';
+import { removeFirstMatchingElement, spliceCardById, spliceFrom } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -8,6 +8,31 @@ import TacticCard from '../types/tactic_card';
 abstract class EconomyTacticCard extends TacticCard {
   get discipline(): TacticDiscipline {
     return TacticDiscipline.Trade;
+  }
+}
+
+export class Card123 extends EconomyTacticCard {
+  private readonly cardsToDiscard = 2;
+  constructor() {
+    super(123, 'Handelsabkommen', 3);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
+      const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
+      if (card) player.deck.unshift(card);
+      else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+      player.shuffleDeck();
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.filter(c => c.type != CardType.Orb).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }
 
@@ -72,7 +97,6 @@ export class Card210 extends EconomyTacticCard {
     super(210, 'Schwarzmarkthandel', 4);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    console.log(`Optional Parameters at ${this.name}: ${optionalParameters}`); ////
     if (optionalParameters && optionalParameters[0]) {
       // TODO: Unify in tribute method - Make sure to limit number of cards, print warning if no card found
       const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
@@ -84,11 +108,10 @@ export class Card210 extends EconomyTacticCard {
     }
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(player.cardStacks);
+    return player.hand.length > 1 ? this.onlyColonyTarget(player.cardStacks) : [];
   }
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
-    // TODO: Unprecise if multiple instances of this card on hand
-    return player.hand.filter(c => c.card.id != this.id).map(c => c.card.id);
+    return removeFirstMatchingElement(player.hand.slice(), cs => cs.card.id == this.id).map(c => c.card.id);
   }
   override onEnterGameNumberOfSelectableCardOptions(): number {
     return 1;
