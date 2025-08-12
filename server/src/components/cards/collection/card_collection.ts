@@ -183,6 +183,7 @@ import {
   Card324,
   Card335,
   Card404,
+  Card414,
   Card423,
   Card429,
   Card443
@@ -402,6 +403,7 @@ export default class CardCollection {
     410: <Card>new Card410(),
     412: <Card>new Card412(),
     413: <Card>new Card413(),
+    414: <Card>new Card414(),
     416: <Card>new Card416(),
     418: <Card>new Card418(),
     420: <Card>new Card420(),
