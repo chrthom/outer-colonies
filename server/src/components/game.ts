@@ -144,17 +144,14 @@ export function gameCron(io: Server) {
     .filter((match): match is Match => !!match)
     .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
     .forEach(match => {
-      if (--match.pendingActionPlayer.countdown <= 0) {
+      if (--match.countdown <= 0) {
         match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
         const socket = getSocket(io, match, playerNo);
         if (socket)
-          socket.emit(MsgTypeOutbound.Countdown, [
-            match.players[playerNo].countdown,
-            match.players[opponentPlayerNo(playerNo)].countdown
-          ]);
+          socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
         else console.log('WARN: Could not find socket to emit countdown');
       });
     });
