@@ -21,8 +21,8 @@ export class Card123 extends EconomyTacticCard {
       const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
       if (card) {
         player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
-        player.deck.unshift(card);
         player.shuffleDeck();
+        player.deck.unshift(card);
       } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
     }
   }
