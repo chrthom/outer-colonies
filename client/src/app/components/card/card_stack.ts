@@ -126,6 +126,9 @@ export default class CardStack {
   get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
   }
+  get canPerformAllAttackOnBase(): boolean {
+    return this.isOpponentColony && this.scene.state.battle.range == 1 && !this.scene.activeCards.stackUUID && !this.scene.activeCards.hand;
+  }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
     return this.cards.filter(c => {
@@ -293,6 +296,13 @@ export default class CardStack {
               this.scene.activeCards.stackUUID = this.uuid;
               this.scene.activeCards.cardUUID = cardData.uuid;
               this.scene.activeCards.hand = undefined;
+            } else if (this.canPerformAllAttackOnBase) {
+              this.scene.socket.emit(
+                MsgTypeInbound.Attack,
+                '*',
+                '*',
+                this.uuid
+              );
             } else if (
               this.scene.activeCards.stackUUID &&
               this.scene.state.battle?.opponentShipIds.includes(this.uuid)

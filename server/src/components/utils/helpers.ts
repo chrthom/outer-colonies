@@ -52,8 +52,8 @@ export function combineAttackResults(a1: Attack | undefined, a2: Attack | undefi
   else if (!a2) return a1;
   else
     return {
-      sourceUUID: a1.sourceUUID,
-      sourceIndex: a1.sourceIndex,
+      sourceRootUUID: a1.sourceRootUUID,
+      sourceSubUUID: a1.sourceSubUUID,
       targetUUID: a1.targetUUID,
       pointDefense: a1.pointDefense + a2.pointDefense,
       shield: a1.shield + a2.shield,

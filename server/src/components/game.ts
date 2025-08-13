@@ -67,7 +67,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
             `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
           );
         } else {
-          console.log(`Optional Parameters at game.ts: ${optionalParameters}`); ////
           player.playHandCard(handCard, target, optionalParameters);
         }
         emitState(io, match);
@@ -117,16 +116,20 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
       } else if (shipUUID == '*') {
-        // Attack with all available weapons
-        const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
-          .flatMap(ship => ship.cardStacks)
-          .filter(cs => cs.canAttack);
-        let previousAttack: Attack | undefined;
-        for (const srcWeapon of srcWeapons) {
-          match.planAttack(srcWeapon, target);
-          match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
-          previousAttack = match.battle.recentAttack;
-          if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
+        if (match.battle.range == 1) {
+          // Attack with all available weapons
+          const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
+            .flatMap(ship => ship.cardStacks)
+            .filter(cs => cs.canAttack);
+          let previousAttack: Attack | undefined;
+          for (const srcWeapon of srcWeapons) {
+            match.planAttack(srcWeapon, target);
+            match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
+            previousAttack = match.battle.recentAttack;
+            if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
+          }
+        } else {
+          console.log('WARN: Tried to attack with all weapons on base before range 1');
         }
       } else {
         const playerShips = match.battle.ships[match.pendingActionPlayerNo];

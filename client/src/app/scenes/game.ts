@@ -344,6 +344,8 @@ export default class Game extends Phaser.Scene {
               }
               if (this.activeCards.stackUUID && this.state.battle?.opponentShipIds.includes(cs.uuid)) {
                 cs.highlightSelectable();
+              } else if (cs.canPerformAllAttackOnBase) {
+                cs.highlightSelected();
               }
               break;
           }
