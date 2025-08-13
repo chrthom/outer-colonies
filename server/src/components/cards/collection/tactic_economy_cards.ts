@@ -18,11 +18,12 @@ export class Card123 extends EconomyTacticCard {
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     if (optionalParameters && optionalParameters[0]) {
-      player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
       const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
-      if (card) player.deck.unshift(card);
-      else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
-      player.shuffleDeck();
+      if (card) {
+        player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
+        player.deck.unshift(card);
+        player.shuffleDeck();
+      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
     }
   }
   getValidTargets(player: Player): CardStack[] {

@@ -2,12 +2,13 @@ import Match from './game_state/match';
 import toClientState from './converters/client_state_converter';
 import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
+import { combineAttackResults, getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { matchmakingRoom } from './matchmaking';
+import { Attack } from './game_state/battle';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
@@ -66,7 +67,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
             `WARN: ${player.name} tried to play card ${handCard.card.name} on invalid target ${target.card.name}`
           );
         } else {
-          console.log(`Optional Parameters at game.ts: ${optionalParameters}`); ////
           player.playHandCard(handCard, target, optionalParameters);
         }
         emitState(io, match);
@@ -111,21 +111,39 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
     if (match && player) {
-      const playerShips = match.battle.ships[match.pendingActionPlayerNo];
-      const srcShip = playerShips.find(cs => cs.uuid == shipUUID);
-      const srcWeapon = getCardStackByUUID(srcShip?.cardStacks ?? [], weaponUUID);
       const opponentShips = match.battle.ships[match.waitingPlayerNo];
       const target = opponentShips.find(cs => cs.uuid == targetId);
-      if (!srcWeapon) {
-        console.log(`WARN: ${player.name} tried to attack from invalid weapon UUID`);
-      } else if (!target) {
+      if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
-      } else if (!srcWeapon.canAttack) {
-        console.log(
-          `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
-        );
+      } else if (shipUUID == '*') {
+        if (match.battle.range == 1) {
+          // Attack with all available weapons
+          const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
+            .flatMap(ship => ship.cardStacks)
+            .filter(cs => cs.canAttack);
+          let previousAttack: Attack | undefined;
+          for (const srcWeapon of srcWeapons) {
+            match.planAttack(srcWeapon, target);
+            match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
+            previousAttack = match.battle.recentAttack;
+            if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
+          }
+        } else {
+          console.log('WARN: Tried to attack with all weapons on base before range 1');
+        }
       } else {
-        match.planAttack(srcWeapon, target);
+        const playerShips = match.battle.ships[match.pendingActionPlayerNo];
+        const srcShip = playerShips.find(cs => cs.uuid == shipUUID);
+        const srcWeapon = getCardStackByUUID(srcShip?.cardStacks ?? [], weaponUUID);
+        if (!srcWeapon) {
+          console.log(`WARN: ${player.name} tried to attack from invalid weapon`);
+        } else if (!srcWeapon.canAttack) {
+          console.log(
+            `WARN: ${player.name} tried to attack with a card ${srcWeapon.card.name} which cannot attack`
+          );
+        } else {
+          match.planAttack(srcWeapon, target);
+        }
       }
       emitState(io, match);
     }
