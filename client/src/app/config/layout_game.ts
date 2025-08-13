@@ -134,16 +134,16 @@ class LayoutGameConfig {
     countdownIndicator: {
       player: {
         x: 2325,
-        y: 675
+        y: 525
       },
       opponent: {
         x: 2325,
-        y: 525
+        y: 475
       }
     },
     exitButton: {
       x: 2330,
-      y: 735,
+      y: 675,
       xTextOffset: -30,
       yTextOffset: -4,
       yConfirmOffset: 35

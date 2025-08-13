@@ -14,7 +14,6 @@ export default class Player {
   match!: Match;
   no!: number;
   ready: boolean = false;
-  countdown: number = rules.countdownTimer;
   deck!: Card[];
   discardPile: Card[] = [];
   hand: CardStack[] = [];

@@ -23,6 +23,7 @@ export default class Match {
   pendingActionPlayerNo: number = 0;
   turnPhase!: TurnPhase;
   battle: Battle = new Battle(BattleType.None, 0);
+  countdown: number = rules.countdownTimer;
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
@@ -61,6 +62,7 @@ export default class Match {
     return this.players.flatMap(p => p.cardStacks);
   }
   resetTempStates() {
+    this.countdown = rules.countdownTimer;
     this.battle.resetRecentAttack();
     this.highlightCard = undefined;
   }

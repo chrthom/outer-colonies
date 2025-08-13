@@ -63,13 +63,11 @@ export default class Prompt {
         this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
       }
       this.scene.obj?.exitButton.hide();
-      this.scene.player?.countdownIndicator.hide();
     }
   }
   hide() {
     this.setVisible(false);
     this.scene.obj?.exitButton.show();
-    this.scene.player?.countdownIndicator.show();
   }
   private setVisible(visible: boolean): this {
     this.text.setVisible(visible);
