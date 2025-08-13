@@ -35,8 +35,7 @@ export default class DeckCard extends CardImage {
       this.deckSize - cardsForMission < 10,
       this.placementConfig.deck.x.value2d,
       this.placementConfig.deck.y.value2d,
-      this.ownedByPlayer,
-      true
+      this.ownedByPlayer
     );
     this.setPileSize(this.deckSize);
   }

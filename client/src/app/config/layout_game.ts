@@ -103,10 +103,10 @@ class LayoutGameConfig {
       yStep: 49
     },
     valueIndicator: {
-      xOffsetPlayer: -95,
-      yOffsetPlayer: -100,
-      xOffsetOpponent: -65,
-      yOffsetOpponent: 95
+      xOffsetPlayer: -115,
+      yOffsetPlayer: -108,
+      xOffsetOpponent: -80,
+      yOffsetOpponent: 107
     }
   };
   readonly ui = {

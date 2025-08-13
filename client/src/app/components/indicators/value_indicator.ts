@@ -12,36 +12,20 @@ export default class ValueIndicator {
     critical: boolean,
     cardX: number,
     cardY: number,
-    ownedByPlayer: boolean,
-    hasEllipseShape: boolean
+    ownedByPlayer: boolean
   ) {
     this.ownedByPlayer = ownedByPlayer;
-    if (hasEllipseShape) {
-      this.shape = scene.add
-        .ellipse(
-          this.x(cardX),
-          this.y(cardY),
-          64,
-          32,
-          critical ? designConfig.tint.opponent : designConfig.tint.player,
-          designConfig.alpha.normal
-        )
-        .setOrigin(0.5)
-        .setDepth(layoutConfig.depth.indicator);
-    } else {
-      this.shape = scene.add
-        .star(
-          this.x(cardX),
-          this.y(cardY),
-          12,
-          16,
-          22,
-          critical ? designConfig.tint.opponent : designConfig.tint.player,
-          designConfig.alpha.normal
-        )
-        .setOrigin(0.5)
-        .setDepth(layoutConfig.depth.indicator);
-    }
+    this.shape = scene.add
+      .ellipse(
+        this.x(cardX),
+        this.y(cardY),
+        64,
+        32,
+        critical ? designConfig.tint.opponent : designConfig.tint.player,
+        designConfig.alpha.normal
+      )
+      .setOrigin(0.5)
+      .setDepth(layoutConfig.depth.indicator);
     this.text = scene.add
       .text(this.x(cardX), this.y(cardY), value)
       .setFontSize(layoutConfig.fontSize.small)

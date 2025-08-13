@@ -37,8 +37,7 @@ export default class DiscardPile extends CardImage {
         false,
         this.placementConfig.discardPile.x.value2d,
         this.placementConfig.discardPile.y.value2d,
-        true,
-        true
+        this.ownedByPlayer
       );
       this.setPileSize(this.cardIds.length);
     } else {
