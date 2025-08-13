@@ -261,8 +261,7 @@ export class Card423 extends ScienceTacticCard {
     // TODO: Unifiy in one method - make sure to limit number of cards, print warning if no card found
     optionalParameters
       ?.map(cardId => spliceCardById(player.deck, cardId))
-      ?.filter(c => !!c)
-      ?.forEach(c => player.takeCard(c));
+      .forEach(c => c ? player.takeCard(c) : {});
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {
