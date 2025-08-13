@@ -116,16 +116,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       const target = opponentShips.find(cs => cs.uuid == targetId);
       if (!target) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
-      } else if (shipUUID == '*') { // Attack with all available weapons
+      } else if (shipUUID == '*') {
+        // Attack with all available weapons
         const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
           .flatMap(ship => ship.cardStacks)
           .filter(cs => cs.canAttack);
-        var previousAttack: Attack | undefined;
+        let previousAttack: Attack | undefined;
         for (const srcWeapon of srcWeapons) {
           match.planAttack(srcWeapon, target);
           match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
           previousAttack = match.battle.recentAttack;
-          if (!!match.intervention) break; // Do not perform any more attacks if an intervention is possible
+          if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
         }
       } else {
         const playerShips = match.battle.ships[match.pendingActionPlayerNo];
@@ -140,7 +141,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         } else {
           match.planAttack(srcWeapon, target);
         }
-
       }
       emitState(io, match);
     }
