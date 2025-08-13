@@ -104,11 +104,8 @@ export default class Game extends Phaser.Scene {
     });
     type playerCountdowns = [playerCountdown: number, opponentCountdown: number];
     this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
-      const activeCountdown = (isPlayerActive ? this.player : this.opponent).countdownIndicator;
-      const inactiveCountdown = (isPlayerActive ? this.opponent : this.player).countdownIndicator;
-      activeCountdown.update(countdown);
-      activeCountdown.show();
-      inactiveCountdown.hide();
+      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
+      const inactiveCountdown = (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
     });
     this.background.initInterface();
     this.opponent = {

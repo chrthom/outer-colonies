@@ -19,23 +19,13 @@ export default class CountdownIndicator {
       .setAlign('right')
       .setOrigin(1, 0.5);
   }
-  update(playerCountdown: number) {
+  update(countdown?: number) {
     const playerData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
-    this.text.setText(`
-      ${playerData.name} ${this.formatCountdown(playerCountdown)}
-    `);
-    if (playerCountdown < 120) {
-      this.text.setColor(designConfig.color.warn);
-    }
-  }
-  show() {
-    this.text.setVisible(true);
-  }
-  hide() {
-    this.text.setVisible(false);
+    this.text.setText(`${countdown ? this.formatCountdown(countdown) : ''}  ${playerData.name}`);
+    this.text.setColor(countdown && countdown < 60 ? designConfig.color.warn : designConfig.color.neutral);
   }
   private formatCountdown(countdown: number): string {
-    return `${this.twoDigit(Math.floor(countdown / 60))}:${this.twoDigit(countdown % 60)}`;
+    return `[${this.twoDigit(Math.floor(countdown / 60))}:${this.twoDigit(countdown % 60)}]`;
   }
   private twoDigit(n: number): string {
     return `0${n}`.slice(-2);

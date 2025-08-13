@@ -1,7 +1,6 @@
 class OCConstants {
   colonyID = 0;
   cardBackSideID = 1;
-
   magicLinkTTL = 24;
 }
 
