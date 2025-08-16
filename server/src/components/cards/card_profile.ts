@@ -1,22 +1,24 @@
 export default class CardProfile implements CardProfileConfig {
-  pointDefense!: number;
-  shield!: number;
-  armour!: number;
-  hp!: number;
-  speed!: number;
-  energy!: number;
-  theta!: number;
-  xi!: number;
-  phi!: number;
-  omega!: number;
-  delta!: number;
-  psi!: number;
-  handCardLimit!: number;
+  pointDefense: number;
+  shield: number;
+  armour: number;
+  hp: number;
+  speed: number;
+  control: number;
+  energy: number;
+  theta: number;
+  xi: number;
+  phi: number;
+  omega: number;
+  delta: number;
+  psi: number;
+  handCardLimit: number;
   constructor(profile: CardProfileConfig = {}) {
     this.pointDefense = profile.pointDefense ?? 0;
     this.shield = profile.shield ?? 0;
     this.armour = profile.armour ?? 0;
     this.hp = profile.hp ?? 0;
+    this.control = profile.control ?? 0;
     this.speed = profile.speed ?? 0;
     this.energy = profile.energy ?? 0;
     this.theta = profile.theta ?? 0;
@@ -30,6 +32,7 @@ export default class CardProfile implements CardProfileConfig {
   combine(c: CardProfile): CardProfile {
     return new CardProfile({
       hp: this.hp + c.hp,
+      control: this.control + c.control,
       speed: this.speed + c.speed,
       energy: this.energy + c.energy,
       theta: this.theta + c.theta,
@@ -54,6 +57,7 @@ export interface CardProfileConfig {
   shield?: number;
   armour?: number;
   hp?: number;
+  control?: number;
   speed?: number;
   energy?: number;
   theta?: number;

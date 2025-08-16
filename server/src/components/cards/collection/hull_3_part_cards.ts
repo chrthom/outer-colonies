@@ -15,6 +15,7 @@ export class Card116 extends HullCard {
   constructor() {
     super(116, 'Kreuzer (Kern)', 3, cruiserMultipart, {
       hp: 9,
+      control: 4,
       theta: 1,
       xi: 1,
       omega: 1
@@ -26,6 +27,7 @@ export class Card117 extends HullCard {
   constructor() {
     super(117, 'Kreuzer (Kern)', 3, cruiserMultipart, {
       hp: 9,
+      control: 4,
       phi: 2,
       omega: 1
     });
@@ -48,6 +50,7 @@ export class Card121 extends HullCard {
   constructor() {
     super(121, 'Kreuzer (Kern)', 3, cruiserMultipart, {
       hp: 9,
+      control: 4,
       xi: 2,
       omega: 1
     });
@@ -103,6 +106,7 @@ export class Card308 extends HullCard {
   constructor() {
     super(308, 'Schlachtschiff (Kern)', 4, battleshipMultipart, {
       hp: 10,
+      control: 4,
       theta: 2,
       xi: 2,
       omega: 1
@@ -136,6 +140,7 @@ export class Card314 extends HullCard {
   constructor() {
     super(314, 'Schlachtschiff (Kern)', 3, battleshipMultipart, {
       hp: 11,
+      control: 4,
       xi: 3,
       omega: 1
     });
