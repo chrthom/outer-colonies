@@ -80,7 +80,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         }
         if (match.turnPhase == TurnPhase.Build && ownedByPlayer && cs.card.type != CardType.Infrastructure) {
           attributes.push(
-            ...[{ icon: 'control', value: cs.type != CardType.Colony ? profile.control : [] }],
+            ...(cs.type != CardType.Colony ? [{ icon: 'control', value: profile.control }] : []),
             ...[
               { icon: 'speed', value: profile.speed },
               { icon: 'energy', value: profile.energy, warning: profile.energy < 0 },
