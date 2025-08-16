@@ -8,15 +8,15 @@ import Match from './match';
 import { InterventionTacticCard } from './intervention';
 
 export default class Player {
-  socketId!: string;
-  name!: string;
-  match!: Match;
-  no!: number;
+  socketId: string;
+  name: string;
+  match: Match;
+  no: number;
   ready: boolean = false;
-  deck!: Card[];
+  deck: Card[];
   discardPile: Card[] = [];
   hand: CardStack[] = [];
-  cardStacks!: CardStack[];
+  cardStacks: CardStack[];
   actionPool!: ActionPool;
   constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
     this.socketId = socketd;
@@ -50,12 +50,12 @@ export default class Player {
   discardHandCards(...uuids: string[]) {
     uuids
       .map(uuid => spliceCardStackByUUID(this.hand, uuid)?.cards)
-      .forEach(c => c ? this.discardPile.push(...c) : {});
+      .forEach(c => (c ? this.discardPile.push(...c) : {}));
   }
   discardCardStacks(...uuids: string[]) {
     uuids
       .map(uuid => spliceCardStackByUUID(this.cardStacks, uuid)?.cards)
-      .forEach(c => c ? this.discardPile.push(...c) : {});
+      .forEach(c => (c ? this.discardPile.push(...c) : {}));
   }
   get colonyCardStack(): CardStack {
     const colonyCard = this.cardStacks.find(c => c.card.type == CardType.Colony);
@@ -67,6 +67,11 @@ export default class Player {
   }
   get isPendingPlayer(): boolean {
     return this.no == this.match.pendingActionPlayerNo;
+  }
+  get control(): number {
+    return (this.no == 0 && this.match.control > 0) || (this.no == 1 && this.match.control < 0)
+      ? Math.abs(this.match.control)
+      : 0;
   }
   takeCard(card: Card): Card {
     this.takeCards([card]);

@@ -128,7 +128,7 @@ export class Card217 extends EconomyTacticCard {
     // TODO: Make sure to limit number of cards, print warning if no card found
     optionalParameters
       ?.map(cardId => spliceCardById(player.discardPile, cardId))
-      .forEach(c => c ? player.deck.push(c) : {});
+      .forEach(c => (c ? player.deck.push(c) : {}));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {

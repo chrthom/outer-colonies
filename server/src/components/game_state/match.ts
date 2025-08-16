@@ -24,6 +24,7 @@ export default class Match {
   turnPhase!: TurnPhase;
   battle: Battle = new Battle(BattleType.None, 0);
   countdown: number = rules.countdownTimer;
+  control: number = 0;
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
