@@ -31,21 +31,36 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 │   ┌─────────────┐    ┌─────────────┐    ┌─────────────────────────────────┐   │
 │   │             │    │             │    │                                 │   │
 │   │   Website   │    │   Client    │    │             Server              │   │
-│   │ (Angular)   │    │ (Phaser 3) │    │                                 │   │
+│   │  (Angular)  │    │ (Phaser 3)  │    │  (Express + Socket.IO)        │   │
 │   │             │    │             │    │                                 │   │
 │   └──────┬──────┘    └──────┬──────┘    │                                 │   │
-│          │                  │           │                                 │   │
 │          │ REST API         │ WebSocket  │                                 │   │
 │          │                  │           │                                 │   │
 │          ▼                  ▼           │                                 │   │
-│   ┌─────────────┐    ┌─────────────┐    │                                 │   │
-│   │             │    │             │    │                                 │   │
-│   │  User       │    │  Game       │    │  ┌─────────────────────────────┐  │   │
-│   │ Management │    │  Logic      │    │  │                             │  │   │
-│   │             │    │             │    │  │  Matchmaking & Game State    │  │   │
-│   └─────────────┘    └─────────────┘    │  │                             │  │   │
-│                                          │  └─────────────────────────────┘  │   │
-│                                          └─────────────────────────────────┘   │
+│   ┌───────────────────────────────────────┴───────────────────────────────┐   │
+│   │                                                                           │   │
+│   │  ┌─────────────────────────┐    ┌─────────────────────────────────┐  │   │
+│   │  │                         │    │                                 │  │   │
+│   │  │   WebSocket Listeners   │    │           REST API             │  │   │
+│   │  │                         │    │                                 │  │   │
+│   │  └─────────────────────────┘    └─────────────────────────────────┘  │   │
+│   │                                                                           │   │
+│   │  ┌─────────────────────────┐    ┌─────────────────────────────────┐  │   │
+│   │  │                         │    │                                 │  │   │
+│   │  │      Game Logic         │    │    Matchmaking (Cron)         │  │   │
+│   │  │                         │    │                                 │  │   │
+│   │  └─────────────────────────┘    └─────────────────────────────────┘  │   │
+│   │                                                                           │   │
+│   └───────────────────────────────────────┬───────────────────────────────┘   │
+│                                           │                               │   │
+│                                           │                               │   │
+│                                           ▼                               ▼   │
+│   ┌─────────────────────────────────────┐ ┌─────────────────────────────┐   │
+│   │                                 │ │                             │   │
+│   │           Database                │ │   Mail SMTP Relay Server    │   │
+│   │          (Maria DB)              │ │                             │   │
+│   │                                 │ │                             │   │
+│   └─────────────────────────────────────┘ └─────────────────────────────┘   │
 │                                                                               │
 └───────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -57,7 +72,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Key Components**:
   - `app.component.ts`: Main application component
   - `auth.service.ts`: Authentication service
-  - `pages/`: Various pages for user management and settings
+  - `pages/`: Various pages for deck management, user management and settings
     - `activate-account/`: Account activation page
     - `confirm-email/`: Email confirmation page
     - `data-privacy/`: Data privacy information page
@@ -72,12 +87,18 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `rules/`: Game rules page
     - `trade/`: Trade page
   - `components/`: Reusable UI components
-    - `content-box/`: Content box component
-    - `error-state-matcher.ts`: Error state matcher utility
-    - `image-modal/`: Image modal component
-    - `inventory-item/`: Inventory item component
-    - `navbar/`: Navigation bar component
-    - `open-item/`: Open item component
+    - `content-box/`: Content box component - A styled container with a title and content area. Used in various pages to display information in a boxed layout.
+      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck
+    - `error-state-matcher.ts`: Error state matcher utility - A utility class for handling form error states in Angular Material forms.
+      - **Used in pages**: reset-password, forgot-password, profile, register, login
+    - `image-modal/`: Image modal component - A modal dialog for displaying images. Used to show larger versions of images when clicked.
+      - **Used in pages**: register, deck
+    - `inventory-item/`: Inventory item component - A component for displaying inventory items with an image and text.
+      - **Used in pages**: trade
+    - `navbar/`: Navigation bar component - The main navigation bar for the website, providing links to different sections of the site and user information.
+      - **Used in**: app.component.html (global navigation)
+    - `open-item/`: Open item component - A component for displaying the contents of opened items (e.g., booster packs).
+      - **Used in pages**: trade
 - **Communication**: Uses REST API to communicate with the server
 
 #### Client (Phaser 3)
@@ -119,10 +140,10 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `action_pool.ts`: Action pool logic
     - `action_pool.test.ts`: Action pool tests
     - `card_profile.ts`: Card profile logic
-    - `card_stack.ts`: Card stack logic
-    - `card.ts`: Card logic
-    - `collection/`: Card collection logic
-    - `types/`: Card type logic
+    - `card_stack.ts`: General logic for stacks of cards
+    - `card.ts`: General card logic
+    - `collection/`: Implementation of all the actual cards
+    - `types/`: Abstract classes with common logic for types of cards
   - `components/persistence/`: Data persistence
     - `db_connector.ts`: Database connector
     - `db_credentials.ts`: Database credentials management
@@ -138,29 +159,6 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Communication**:
   - REST API for website communication
   - WebSocket for real-time game communication with the client
-
-### Data Flow and Communication
-
-```
-┌─────────────┐        ┌─────────────┐        ┌─────────────────────────────────┐
-│             │        │             │        │                                 │
-│   Website   │        │   Client    │        │             Server              │
-│ (Angular)   │        │ (Phaser 3) │        │                                 │
-│             │        │             │        │                                 │
-└──────┬──────┘        └──────┬──────┘        └─────────────┬─────────────────┘
-       │                      │                              │
-       │ REST API             │ WebSocket                   │
-       │                      │                              │
-       ▼                      ▼                              ▼
-┌─────────────┐        ┌─────────────┐        ┌─────────────────────────────────┐
-│             │        │             │        │                                 │
-│  User       │        │  Game       │        │  ┌─────────────────────────────┐  │
-│ Management │        │  Logic      │        │  │                             │  │
-│             │        │             │        │  │  Matchmaking & Game State    │  │
-└─────────────┘        └─────────────┘        │  │                             │  │
-                                               │  └─────────────────────────────┘  │
-                                               └─────────────────────────────────┘
-```
 
 #### REST Endpoints
 
@@ -213,12 +211,6 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeInbound.Discard`: Discard a card
   - `MsgTypeInbound.Attack`: Attack with a card
   - `MsgTypeOutbound.Matchmaking`: Matchmaking updates
-
-1. **Website to Server**: The website communicates with the server using REST API endpoints for user management, deck configuration, and opponent search.
-
-2. **Client to Server**: The game client communicates with the server using WebSockets for real-time game updates, including game state synchronization and matchmaking.
-
-3. **Server Internal**: The server handles both REST API requests and WebSocket connections, managing game state, matchmaking, and data persistence.
 
 ## Developer Documentation
 
@@ -301,7 +293,7 @@ The server provides the following WebSocket events for the game client:
    npm run format
    ```
 
-3. **Check**:
+3. **Running all of the checks above**:
    ```bash
    npm run check
    ```
@@ -384,7 +376,3 @@ The server provides the following WebSocket events for the game client:
 ### Database
 
 - **MariaDB**: Used for data persistence (as seen in `misc/outercolonies.sql`).
-
-## Conclusion
-
-This documentation provides a comprehensive overview of the Outer Colonies project, including its software architecture and developer documentation. For more detailed information, refer to the individual README files in each subproject directory.
