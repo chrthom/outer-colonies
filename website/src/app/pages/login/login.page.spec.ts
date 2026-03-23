@@ -29,9 +29,7 @@ describe('LoginPage', () => {
         BrowserAnimationsModule
       ],
       declarations: [],
-      providers: [
-        { provide: AuthService, useValue: authSpy }
-      ]
+      providers: [{ provide: AuthService, useValue: authSpy }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPage);

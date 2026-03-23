@@ -27,7 +27,9 @@ describe('ProfilePage', () => {
     authApiSpy.checkEmailExists.and.returnValue(of(false));
     authApiSpy.resetEmail.and.returnValue(of(undefined));
     authApiSpy.resetPassword.and.returnValue(of(undefined));
-    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(of({ newsletter: false, username: 'testuser', sol: 100 }));
+    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(
+      of({ newsletter: false, username: 'testuser', sol: 100 })
+    );
     profileApiSpy.setNewsletter.and.returnValue(of(undefined));
 
     await TestBed.configureTestingModule({
@@ -67,11 +69,11 @@ describe('ProfilePage', () => {
     const email = component.emailForm.get('email');
     email?.setValue('');
     expect(email?.valid).toBeFalse();
-    
+
     email?.setValue('invalid-email');
     tick(500);
     expect(email?.valid).toBeFalse();
-    
+
     email?.setValue('valid@example.com');
     tick(500);
     expect(email?.valid).toBeTrue();
@@ -81,10 +83,10 @@ describe('ProfilePage', () => {
     const password = component.passwordForm.get('password');
     password?.setValue('');
     expect(password?.valid).toBeFalse();
-    
+
     password?.setValue('short'); // Too short
     expect(password?.valid).toBeFalse();
-    
+
     password?.setValue('validpassword123');
     expect(password?.valid).toBeTrue();
   });

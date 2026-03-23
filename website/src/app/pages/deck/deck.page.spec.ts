@@ -26,16 +26,45 @@ describe('DeckPage', () => {
     deckApiSpy = jasmine.createSpyObj('DeckApiService', ['listDeck', 'activateCard', 'deactivateCard']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
-    deckApiSpy.listDeck.and.returnValue(of({
-      cards: [
-        { id: 1, cardId: 101, inUse: true, name: 'Card 1', type: 'hull' as any, discipline: 0 as any, rarity: 1, canAttack: true,
-          profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 } },
-        { id: 2, cardId: 102, inUse: false, name: 'Card 2', type: 'equipment' as any, discipline: 1 as any, rarity: 2, canAttack: false,
-          profile: { delta: 0, theta: 1, xi: 0, phi: 0, psi: 0, omega: 0, energy: 1 } },
-        { id: 3, cardId: 103, inUse: true, name: 'Card 3', type: 'hull' as any, discipline: 0 as any, rarity: 1, canAttack: true,
-          profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 } }
-      ]
-    }));
+    deckApiSpy.listDeck.and.returnValue(
+      of({
+        cards: [
+          {
+            id: 1,
+            cardId: 101,
+            inUse: true,
+            name: 'Card 1',
+            type: 'hull' as any,
+            discipline: 0 as any,
+            rarity: 1,
+            canAttack: true,
+            profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+          },
+          {
+            id: 2,
+            cardId: 102,
+            inUse: false,
+            name: 'Card 2',
+            type: 'equipment' as any,
+            discipline: 1 as any,
+            rarity: 2,
+            canAttack: false,
+            profile: { delta: 0, theta: 1, xi: 0, phi: 0, psi: 0, omega: 0, energy: 1 }
+          },
+          {
+            id: 3,
+            cardId: 103,
+            inUse: true,
+            name: 'Card 3',
+            type: 'hull' as any,
+            discipline: 0 as any,
+            rarity: 1,
+            canAttack: true,
+            profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+          }
+        ]
+      })
+    );
 
     deckApiSpy.activateCard.and.returnValue(of(undefined));
     deckApiSpy.deactivateCard.and.returnValue(of(undefined));
@@ -131,7 +160,10 @@ describe('DeckPage', () => {
   it('should calculate statistics correctly', () => {
     component['activeCards$'].next([
       {
-        id: 1, cardId: 101, inUse: true, numOfCards: 2,
+        id: 1,
+        cardId: 101,
+        inUse: true,
+        numOfCards: 2,
         profile: { delta: 1, theta: -1, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
       } as any
     ]);
@@ -141,7 +173,7 @@ describe('DeckPage', () => {
       // Delta: 1 * 2 = 2 (provided), 0 (used)
       expect(stats[0].provided).toBe(2);
       expect(stats[0].used).toBe(0);
-      // Theta: -1 * 2 = -2 (used), 0 (provided) 
+      // Theta: -1 * 2 = -2 (used), 0 (provided)
       expect(stats[1].provided).toBe(0);
       expect(stats[1].used).toBe(2);
     });

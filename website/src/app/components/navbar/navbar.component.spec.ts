@@ -15,9 +15,7 @@ describe('NavbarComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule, MatTooltipModule],
-      providers: [
-        { provide: AuthService, useValue: authSpy }
-      ]
+      providers: [{ provide: AuthService, useValue: authSpy }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(NavbarComponent);

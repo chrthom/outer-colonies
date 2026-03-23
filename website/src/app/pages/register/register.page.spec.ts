@@ -21,7 +21,11 @@ describe('RegisterPage', () => {
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   beforeEach(async () => {
-    authApiSpy = jasmine.createSpyObj('AuthApiService', ['checkUsernameExists', 'checkEmailExists', 'register']);
+    authApiSpy = jasmine.createSpyObj('AuthApiService', [
+      'checkUsernameExists',
+      'checkEmailExists',
+      'register'
+    ]);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     authApiSpy.checkUsernameExists.and.returnValue(of(false));
@@ -73,11 +77,11 @@ describe('RegisterPage', () => {
     const username = component.registerForm.get('username');
     username?.setValue('');
     expect(username?.valid).toBeFalse();
-    
+
     username?.setValue('ab'); // Too short
     tick(500);
     expect(username?.valid).toBeFalse();
-    
+
     username?.setValue('validusername');
     tick(500);
     expect(username?.valid).toBeTrue();
@@ -87,10 +91,10 @@ describe('RegisterPage', () => {
     const password = component.registerForm.get('password');
     password?.setValue('');
     expect(password?.valid).toBeFalse();
-    
+
     password?.setValue('short'); // Too short
     expect(password?.valid).toBeFalse();
-    
+
     password?.setValue('validpassword123');
     expect(password?.valid).toBeTrue();
   });
@@ -99,11 +103,11 @@ describe('RegisterPage', () => {
     const email = component.registerForm.get('email');
     email?.setValue('');
     expect(email?.valid).toBeFalse();
-    
+
     email?.setValue('invalid-email');
     tick(500);
     expect(email?.valid).toBeFalse();
-    
+
     email?.setValue('valid@example.com');
     tick(500);
     expect(email?.valid).toBeTrue();
@@ -113,7 +117,7 @@ describe('RegisterPage', () => {
     const dataPrivacy = component.registerForm.get('dataPrivacy');
     dataPrivacy?.setValue(false);
     expect(dataPrivacy?.valid).toBeFalse();
-    
+
     dataPrivacy?.setValue(true);
     expect(dataPrivacy?.valid).toBeTrue();
   });
@@ -122,7 +126,7 @@ describe('RegisterPage', () => {
     const starterDeck = component.registerForm.get('starterDeck');
     starterDeck?.setValue('');
     expect(starterDeck?.valid).toBeFalse();
-    
+
     starterDeck?.setValue('deck1');
     expect(starterDeck?.valid).toBeTrue();
   });

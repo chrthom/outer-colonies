@@ -28,14 +28,26 @@ describe('DeckApiService', () => {
     const testToken = 'test-token';
     const mockDeck = {
       cards: [
-        { 
-          id: 1, cardId: 101, inUse: true, name: 'Test Card 1', type: 'hull' as any, 
-          discipline: 0 as any, rarity: 1, canAttack: true,
+        {
+          id: 1,
+          cardId: 101,
+          inUse: true,
+          name: 'Test Card 1',
+          type: 'hull' as any,
+          discipline: 0 as any,
+          rarity: 1,
+          canAttack: true,
           profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
         },
-        { 
-          id: 2, cardId: 102, inUse: false, name: 'Test Card 2', type: 'equipment' as any,
-          discipline: 1 as any, rarity: 2, canAttack: false,
+        {
+          id: 2,
+          cardId: 102,
+          inUse: false,
+          name: 'Test Card 2',
+          type: 'equipment' as any,
+          discipline: 1 as any,
+          rarity: 2,
+          canAttack: false,
           profile: { delta: 0, theta: 1, xi: 0, phi: 0, psi: 0, omega: 0, energy: 1 }
         }
       ]

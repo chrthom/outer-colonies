@@ -19,30 +19,36 @@ describe('TradePage', () => {
     itemApiSpy = jasmine.createSpyObj('ItemApiService', ['items', 'buyBooster', 'open']);
     profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['profile']);
 
-    spyOnProperty(itemApiSpy, 'items', 'get').and.returnValue(of({
-      boosters: [
-        { itemId: 1, no: 1, amount: 5 },
-        { itemId: 2, no: 2, amount: 3 }
-      ],
-      boxes: [
-        { itemId: 1, sol: [100], cards: [101, 102], boosters: [], type: 'box', amount: 2 },
-        { itemId: 2, sol: [200], cards: [103], boosters: [], type: 'box', amount: 1 }
-      ]
-    }));
+    spyOnProperty(itemApiSpy, 'items', 'get').and.returnValue(
+      of({
+        boosters: [
+          { itemId: 1, no: 1, amount: 5 },
+          { itemId: 2, no: 2, amount: 3 }
+        ],
+        boxes: [
+          { itemId: 1, sol: [100], cards: [101, 102], boosters: [], type: 'box', amount: 2 },
+          { itemId: 2, sol: [200], cards: [103], boosters: [], type: 'box', amount: 1 }
+        ]
+      })
+    );
 
-    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(of({
-      username: 'testuser',
-      sol: 1000,
-      newsletter: false
-    }));
+    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(
+      of({
+        username: 'testuser',
+        sol: 1000,
+        newsletter: false
+      })
+    );
 
     itemApiSpy.buyBooster.and.returnValue(of(undefined));
-    itemApiSpy.open.and.returnValue(of({
-      itemId: 1,
-      sol: [100, 200],
-      boosters: [1],
-      cards: [101]
-    }));
+    itemApiSpy.open.and.returnValue(
+      of({
+        itemId: 1,
+        sol: [100, 200],
+        boosters: [1],
+        cards: [101]
+      })
+    );
 
     await TestBed.configureTestingModule({
       imports: [

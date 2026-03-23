@@ -76,7 +76,9 @@ describe('AuthService', () => {
 
   it('should handle failed session check', () => {
     service['sessionToken'] = 'invalid-token';
-    authApiSpy.checkSessionToken.and.returnValue(throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' })));
+    authApiSpy.checkSessionToken.and.returnValue(
+      throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' }))
+    );
 
     service.check().subscribe(success => {
       expect(success).toBeFalse();
