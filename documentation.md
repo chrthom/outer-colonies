@@ -1,4 +1,4 @@
-# Outer Colonies - Software Architecture and Developer Documentation
+# Outer Colonies
 
 ## Table of Contents
 
@@ -58,7 +58,26 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `app.component.ts`: Main application component
   - `auth.service.ts`: Authentication service
   - `pages/`: Various pages for user management and settings
+    - `activate-account/`: Account activation page
+    - `confirm-email/`: Email confirmation page
+    - `data-privacy/`: Data privacy information page
+    - `deck/`: Deck management page
+    - `forgot-password/`: Forgot password page
+    - `home/`: Home page
+    - `imprint/`: Imprint page
+    - `login/`: Login page
+    - `profile/`: User profile page
+    - `register/`: Registration page
+    - `reset-password/`: Reset password page
+    - `rules/`: Game rules page
+    - `trade/`: Trade page
   - `components/`: Reusable UI components
+    - `content-box/`: Content box component
+    - `error-state-matcher.ts`: Error state matcher utility
+    - `image-modal/`: Image modal component
+    - `inventory-item/`: Inventory item component
+    - `navbar/`: Navigation bar component
+    - `open-item/`: Open item component
 - **Communication**: Uses REST API to communicate with the server
 
 #### Client (Phaser 3)
@@ -66,8 +85,27 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Key Components**:
   - `app.component.ts`: Main game component
   - `scenes/`: Different game scenes (menus, gameplay, etc.)
+    - `game.ts`: Main game scene
+    - `matchmaking.ts`: Matchmaking scene
+    - `resource-loader.ts`: Resource loader scene
   - `components/`: Game-specific components
+    - `action_pool.ts`: Action pool component
+    - `background.ts`: Background component
+    - `buttons/`: Button components
+    - `card/`: Card components
+    - `indicators/`: Indicator components
+    - `loading_status.ts`: Loading status component
+    - `option_picker.ts`: Option picker component
+    - `perspective.ts`: Perspective component
+    - `preloader.ts`: Preloader component
   - `config/`: Game configuration
+    - `animation.ts`: Animation configuration
+    - `background.ts`: Background configuration
+    - `design.ts`: Design configuration
+    - `layout_game.ts`: Game layout configuration
+    - `layout_load.ts`: Load layout configuration
+    - `layout.ts`: General layout configuration
+    - `perspective.ts`: Perspective configuration
 - **Communication**: Uses WebSockets to communicate with the server for real-time game updates
 
 #### Server (Express + Socket.IO)
@@ -78,7 +116,25 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
   - `components/cards/`: Card-related logic and data
+    - `action_pool.ts`: Action pool logic
+    - `action_pool.test.ts`: Action pool tests
+    - `card_profile.ts`: Card profile logic
+    - `card_stack.ts`: Card stack logic
+    - `card.ts`: Card logic
+    - `collection/`: Card collection logic
+    - `types/`: Card type logic
   - `components/persistence/`: Data persistence
+    - `db_connector.ts`: Database connector
+    - `db_credentials.ts`: Database credentials management
+    - `db_dailies.ts`: Database dailies management
+    - `db_decks.ts`: Database decks management
+    - `db_items.ts`: Database items management
+    - `db_magic_links.ts`: Database magic links management
+    - `db_profiles.ts`: Database profiles management
+  - `components/utils/`: Utility functions
+    - `auth.ts`: Authentication utility
+    - `helpers.ts`: Helper functions
+    - `mailer.ts`: Mailer utility
 - **Communication**:
   - REST API for website communication
   - WebSocket for real-time game communication with the client
@@ -105,6 +161,58 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
                                                │  └─────────────────────────────┘  │
                                                └─────────────────────────────────┘
 ```
+
+#### REST Endpoints
+
+The server provides the following REST endpoints for the website:
+
+- **Authentication**:
+  - `POST /api/auth/register`: Register a new user
+  - `PUT /api/auth/register/:id`: Activate a user account
+  - `POST /api/auth/login`: Login a user
+  - `GET /api/auth/login`: Check login status
+  - `DELETE /api/auth/login`: Logout a user
+  - `GET /api/auth/exists`: Check if a user exists
+  - `DELETE /api/auth/password/:user`: Request password reset
+  - `PUT /api/auth/password`: Reset password
+  - `PUT /api/auth/password/:id`: Change password
+  - `POST /api/auth/email`: Request email change
+  - `PUT /api/auth/email/:id`: Change email
+
+- **Deck Management**:
+  - `GET /api/deck`: Get user's deck
+  - `POST /api/deck/:cardInstanceId`: Add a card to the deck
+  - `DELETE /api/deck/:cardInstanceId`: Remove a card from the deck
+
+- **Profile Management**:
+  - `GET /api/profile`: Get user profile
+  - `PUT /api/profile/newsletter`: Subscribe to newsletter
+  - `DELETE /api/profile/newsletter`: Unsubscribe from newsletter
+
+- **Daily Rewards**:
+  - `GET /api/daily`: Get daily rewards
+
+- **Item Management**:
+  - `GET /api/item`: Get user's items
+  - `POST /api/item/:itemId`: Use an item
+  - `POST /api/buy/booster/:boosterNo`: Buy a booster pack
+
+#### WebSocket Events
+
+The server provides the following WebSocket events for the game client:
+
+- **Matchmaking**:
+  - `MsgTypeInbound.Login`: Login to matchmaking
+  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates
+
+- **Game**:
+  - `MsgTypeInbound.Ready`: Player ready for game phase
+  - `MsgTypeInbound.Disconnect`: Player disconnected
+  - `MsgTypeInbound.Handcard`: Play a hand card
+  - `MsgTypeInbound.Retract`: Retract a card
+  - `MsgTypeInbound.Discard`: Discard a card
+  - `MsgTypeInbound.Attack`: Attack with a card
+  - `MsgTypeOutbound.Matchmaking`: Matchmaking updates
 
 1. **Website to Server**: The website communicates with the server using REST API endpoints for user management, deck configuration, and opponent search.
 
@@ -143,6 +251,9 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 3. **Configuration**:
    - Copy the configuration files from `server/config/` and adjust as needed.
    - Ensure the database connection settings are correctly configured.
+   - Set the environment variables for the database and mail service:
+     - `DB_PASSWORD`: Database password
+     - `MAIL_PASSWORD`: Mail service password (optional for development)
 
 ### Development Workflow
 
@@ -151,19 +262,19 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 1. **Start the Server**:
    ```bash
    cd server
-   npm start
+   npm run s
    ```
 
 2. **Start the Website**:
    ```bash
    cd website
-   ng serve
+   npm run s
    ```
 
 3. **Start the Client**:
    ```bash
    cd client
-   ng serve
+   npm run s
    ```
 
 #### Building the Projects
@@ -190,7 +301,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
    npm run format
    ```
 
-3. **Type Checking**:
+3. **Check**:
    ```bash
    npm run check
    ```
@@ -201,24 +312,29 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 
 1. **Run Tests**:
    ```bash
-   npm test
+   cd server
+   npm run test
    ```
 
 #### Deployment
 
-1. **Deploy Server**:
-   - Delete all files and directories on the target environment under `server`.
+1. **Build the Projects**:
+   ```bash
+   npm run build:staging
+   # or for production
+   npm run build:prod
+   ```
+
+2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
    - Unzip the archive on the target environment.
    - Restart the `outercolonies_server` container.
 
-2. **Deploy Client**:
-   - Delete all files and directories on the target environment under `client`.
+3. **Deploy Client**:
    - Upload the built zip file to the target environment under `client`.
    - Unzip the archive on the target environment.
 
-3. **Deploy Website**:
-   - Delete all files and directories on the target environment under `website`.
+4. **Deploy Website**:
    - Upload the built zip file to the target environment under `website`.
    - Unzip the archive on the target environment.
 
@@ -267,7 +383,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 
 ### Database
 
-- **SQL**: Used for data persistence (as seen in `misc/outercolonies.sql`).
+- **MariaDB**: Used for data persistence (as seen in `misc/outercolonies.sql`).
 
 ## Conclusion
 
