@@ -14,10 +14,12 @@
     "build:staging": "ng build --configuration staging",
     "bp": "npm run build:prod",
     "build:prod": "ng build --configuration production",
-    "test": "echo 'No tests available'",
+    "test": "ng test --watch=false --code-coverage --browsers=Chromium",
+    "test:watch": "ng test --browsers=Chromium",
+    "test:verify": "./verify-tests.sh",
     "lint": "ng lint",
     "format": "npx prettier . --write",
-    "check": "npm run format; npm run lint"
+    "check": "npm run format; npm run lint; npm run test:verify"
   },
   "private": true,
   "author": "Christopher Thomsen",
@@ -55,6 +57,9 @@
     "eslint": "^9.0.0",
     "eslint-plugin-prefer-arrow": "~1.2.0",
     "jasmine-core": "^6.1.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jest-preset-angular": "^16.1.1",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
@@ -62,6 +67,7 @@
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.2.0",
     "prettier": "^3.0.0",
+    "puppeteer": "^24.40.0",
     "typescript": "^5.9.3"
   }
 }
