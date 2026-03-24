@@ -35,6 +35,12 @@ module.exports = function (karmaConfig) {
     logLevel: config.LOG_INFO,
     autoWatch: false,
     browsers: ["Chromium"],
+    customLaunchers: {
+      ChromeHeadless: {
+        base: "Chrome",
+        flags: ["--no-sandbox", "--disable-gpu", "--headless", "--disable-dev-shm-usage"]
+      }
+    },
     singleRun: true,
     restartOnFileChange: false
   });

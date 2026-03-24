@@ -3,30 +3,20 @@
 [git]
 main_branch = "main"
 conventional_commits = true
-commit_types = ["enhancement", "feature", "bugfix", "docs", "style", "refactor", "test", "chore"]
+commit_types = ["feat", "fix", "chore", "docs", "style", "refactor", "test"]
 
 [github]
 repository = "https://github.com/chrthom/outer-colonies"
 use_issues = true
 manage_subtasks = true
-subtask_marker = "[ ]"
-subtask_done_marker = "[x]"
-issue_query_method = "web_fetch"
 
-[github.issue_labels]
-bug = ["bug"]
-feature = ["enhancement", "feature", "internal"]
-
-[branch]
-feature_prefix = "feature/"
-bugfix_prefix = "bugfix/"
-branch_format = "<prefix><issue_number>_<branch_description>"
-link_to_issue = true
-
-[pr]
-create_on_feature_complete = true
-pr_name_format = "<issue_id>: <description>"
-review_checks = ["missing_tests", "missing_documentation"]
+[skills.github_workflow]
+enabled = true
+auto_branch_creation = true
+auto_commit_push = true
+auto_pr_creation = true
+auto_issue_update = true
+default_commit_type = "feat"
 
 [project]
 subprojects = ["client/", "server/", "website/"]
