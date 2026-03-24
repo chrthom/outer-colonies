@@ -20,12 +20,24 @@ export default class CardStack {
   cards!: Array<Card>;
   uuid: string;
   data: ClientCardStack;
-  summaryBox: CardStackSummary;
+  summaryBox!: CardStackSummary;
   private scene: Game;
+  private initialized = false;
+
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
+    // Initialize immediately to maintain original behavior
+    this.createCards(origin);
+    this.summaryBox = new CardStackSummary(this.scene, this);
+    this.tween();
+  }
+
+  // Separate init method for testing purposes
+  init(origin?: CardImage) {
+    if (this.initialized) return;
+    this.initialized = true;
     this.createCards(origin);
     this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();

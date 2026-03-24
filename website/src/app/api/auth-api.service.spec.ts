@@ -11,13 +11,10 @@ describe('AuthApiService', () => {
 
   beforeEach(() => {
     authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
-    
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        AuthApiService,
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [AuthApiService, { provide: AuthService, useValue: authServiceSpy }]
     });
     service = TestBed.inject(AuthApiService);
     httpMock = TestBed.inject(HttpTestingController);

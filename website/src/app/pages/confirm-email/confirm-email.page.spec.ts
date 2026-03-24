@@ -14,18 +14,16 @@ describe('ConfirmEmailPage', () => {
   beforeEach(async () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['confirmEmail']);
     authApiSpy.confirmEmail.and.returnValue(of(undefined));
-    
+
     // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
-        get: (param: string) => 'test-confirmation-id'
+        get: () => 'test-confirmation-id'
       })
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
+      imports: [RouterTestingModule],
       declarations: [],
       providers: [
         { provide: AuthApiService, useValue: authApiSpy },
@@ -58,7 +56,7 @@ describe('ConfirmEmailPage', () => {
   it('should set success state on successful confirmation', () => {
     authApiSpy.confirmEmail.and.returnValue(of(undefined));
     component.ngOnInit();
-    
+
     expect(component.confirmationSuccessful).toBeTrue();
     expect(component.confirmationFailed).toBeFalse();
   });
@@ -67,25 +65,25 @@ describe('ConfirmEmailPage', () => {
     // Reset the spy to clear any previous calls
     authApiSpy.confirmEmail.calls.reset();
     authApiSpy.confirmEmail.and.returnValue(throwError(() => new Error('Confirmation failed')));
-    
+
     // Create a new component instance to test the error case
     const newFixture = TestBed.createComponent(ConfirmEmailPage);
     const newComponent = newFixture.componentInstance;
     newFixture.detectChanges(); // This triggers ngOnInit
-    
+
     expect(newComponent.confirmationSuccessful).toBeFalse();
     expect(newComponent.confirmationFailed).toBeTrue();
   });
 
   it('should handle null confirmation ID gracefully', () => {
     routeSpy.paramMap = of({
-      get: (param: string) => null
+      get: () => null
     });
-    
+
     // Recreate component to pick up new route spy
     fixture = TestBed.createComponent(ConfirmEmailPage);
     component = fixture.componentInstance;
-    
+
     expect(() => component.ngOnInit()).not.toThrow();
   });
 });

@@ -27,16 +27,16 @@ describe('ProfilePage', () => {
     authApiSpy.checkEmailExists.and.returnValue(of(false));
     authApiSpy.resetEmail.and.returnValue(of(undefined));
     authApiSpy.resetPassword.and.returnValue(of(undefined));
-    
+
     // Create a getter property for profile
     Object.defineProperty(profileApiSpy, 'profile', {
-      get: jasmine.createSpy('profile getter').and.returnValue(
-        of({ newsletter: false, username: 'testuser', sol: 100 })
-      ),
+      get: jasmine
+        .createSpy('profile getter')
+        .and.returnValue(of({ newsletter: false, username: 'testuser', sol: 100 })),
       enumerable: true,
       configurable: true
     });
-    
+
     profileApiSpy.setNewsletter.and.returnValue(of(undefined));
 
     await TestBed.configureTestingModule({

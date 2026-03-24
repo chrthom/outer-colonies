@@ -29,9 +29,7 @@ describe('ForgotPasswordPage', () => {
         BrowserAnimationsModule
       ],
       declarations: [],
-      providers: [
-        { provide: AuthApiService, useValue: authApiSpy }
-      ]
+      providers: [{ provide: AuthApiService, useValue: authApiSpy }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ForgotPasswordPage);
@@ -53,7 +51,7 @@ describe('ForgotPasswordPage', () => {
     const username = component.username;
     username.setValue('');
     expect(username.valid).toBeFalse();
-    
+
     username.setValue('testuser');
     expect(username.valid).toBeTrue();
   });
@@ -69,7 +67,7 @@ describe('ForgotPasswordPage', () => {
     authApiSpy.forgotPassword.and.returnValue(of(undefined));
     component.forgotPasswordForm.setValue({ username: '  testuser  ' });
     component.submit();
-    
+
     expect(authApiSpy.forgotPassword).toHaveBeenCalledWith('testuser');
   });
 
@@ -77,7 +75,7 @@ describe('ForgotPasswordPage', () => {
     authApiSpy.forgotPassword.and.returnValue(of(undefined));
     component.forgotPasswordForm.setValue({ username: 'testuser' });
     component.submit();
-    
+
     expect(authApiSpy.forgotPassword).toHaveBeenCalledWith('testuser');
     expect(component.loading).toBeTrue();
   });
@@ -86,12 +84,12 @@ describe('ForgotPasswordPage', () => {
     // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ForgotPasswordPage);
     const freshComponent = freshFixture.componentInstance;
-    
+
     authApiSpy.forgotPassword.and.returnValue(of(undefined));
-    
+
     freshComponent.forgotPasswordForm.setValue({ username: 'testuser' });
     freshComponent.submit();
-    
+
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
     // Note: Component doesn't set loading=false in success case, only in error case
@@ -102,7 +100,7 @@ describe('ForgotPasswordPage', () => {
     authApiSpy.forgotPassword.and.returnValue(throwError(() => new Error('Request failed')));
     component.forgotPasswordForm.setValue({ username: 'testuser' });
     component.submit();
-    
+
     expect(component.passwordResetSuccessful).toBeFalse();
     expect(component.passwordResetFailed).toBeTrue();
     expect(component.loading).toBeFalse();
@@ -113,7 +111,7 @@ describe('ForgotPasswordPage', () => {
     authApiSpy.forgotPassword.and.returnValue(of(undefined));
     component.forgotPasswordForm.setValue({ username: 'testuser' });
     component.submit();
-    
+
     expect(authApiSpy.forgotPassword).not.toHaveBeenCalled();
   });
 });

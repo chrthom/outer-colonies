@@ -14,18 +14,16 @@ describe('ActivateAccountPage', () => {
   beforeEach(async () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['activate']);
     authApiSpy.activate.and.returnValue(of(undefined));
-    
+
     // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
-        get: (param: string) => 'test-activation-id'
+        get: () => 'test-activation-id'
       })
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
+      imports: [RouterTestingModule],
       declarations: [],
       providers: [
         { provide: AuthApiService, useValue: authApiSpy },
@@ -58,7 +56,7 @@ describe('ActivateAccountPage', () => {
   it('should set success state on successful activation', () => {
     authApiSpy.activate.and.returnValue(of(undefined));
     component.ngOnInit();
-    
+
     expect(component.activationSuccessful).toBeTrue();
     expect(component.activationFailed).toBeFalse();
   });
@@ -67,25 +65,25 @@ describe('ActivateAccountPage', () => {
     // Reset the spy to clear any previous calls
     authApiSpy.activate.calls.reset();
     authApiSpy.activate.and.returnValue(throwError(() => new Error('Activation failed')));
-    
+
     // Create a new component instance to test the error case
     const newFixture = TestBed.createComponent(ActivateAccountPage);
     const newComponent = newFixture.componentInstance;
     newFixture.detectChanges(); // This triggers ngOnInit
-    
+
     expect(newComponent.activationSuccessful).toBeFalse();
     expect(newComponent.activationFailed).toBeTrue();
   });
 
   it('should handle null activation ID gracefully', () => {
     routeSpy.paramMap = of({
-      get: (param: string) => null
+      get: () => null
     });
-    
+
     // Recreate component to pick up new route spy
     fixture = TestBed.createComponent(ActivateAccountPage);
     component = fixture.componentInstance;
-    
+
     expect(() => component.ngOnInit()).not.toThrow();
   });
 });
