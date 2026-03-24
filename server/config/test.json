@@ -1,0 +1,18 @@
+{
+  "stage": "test",
+  "server": {
+    "port": 3000
+  },
+  "url": {
+    "base": "https://test.outercolonies.de",
+    "assets": "https://assets.test.outercolonies.de"
+  },
+  "database": {
+    "host": "192.168.0.2",
+    "port": 3307,
+    "database": "outercolonies_test",
+    "user": "outercolonies_test",
+    "connectionLimit": 3
+  },
+  "terminate_on_error": true
+}

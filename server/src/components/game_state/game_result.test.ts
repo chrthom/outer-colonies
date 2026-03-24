@@ -99,35 +99,6 @@ describe('GameResult', () => {
     });
   });
 
-  describe('colony HP tracking', () => {
-    test('should track surviving colony HP', () => {
-      const result = new GameResult(match as any);
-      
-    });
-
-    test('should handle zero colony HP', () => {
-      const result = new GameResult(match as any);
-      
-    });
-
-    test('should handle maximum colony HP', () => {
-      const result = new GameResult(match as any);
-      
-      // Assuming max colony HP is 50 based on rules
-    });
-  });
-
-  describe('player association', () => {
-    test('should correctly associate players', () => {
-      const result = new GameResult(match as any);
-      
-    });
-
-    test('should maintain player references', () => {
-      const result = new GameResult(match as any);
-      
-    });
-  });
 
   describe('match association', () => {
     test('should be associated with a match', () => {

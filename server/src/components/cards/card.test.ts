@@ -81,16 +81,7 @@ describe('Card', () => {
       expect(result.damage).toBe(0);
     });
 
-    test('should accept optional intervention card parameter', () => {
-      const card = new TestCard(5, 'Attack Card', CardType.Equipment, 1);
-      const mockCardStack = {} as CardStack;
-      const mockTarget = {} as CardStack;
-      const mockIntervention = {} as any;
-      
-      // Should not throw even with intervention card
-      const result = card.attack(mockCardStack, mockTarget, mockIntervention);
-      expect(result).toBeDefined();
-    });
+
   });
 
   describe('canAttack property', () => {

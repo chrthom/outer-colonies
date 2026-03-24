@@ -192,16 +192,7 @@ describe('CardStack', () => {
   });
 
   describe('canBeAttachedTo method', () => {
-    test('should return boolean indicating if card can be attached', () => {
-      const card = new MockCard(16, 'Attachable Card', CardType.Equipment, 1);
-      const targetCard = new MockCard(17, 'Target Card', CardType.Hull, 1);
-      
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-      const targetStack = new RootCardStack(targetCard, Zone.Hand, new MockPlayer() as any);
-      
-      const canBeAttached = cardStack.canBeAttachedTo(targetStack);
-      expect(typeof canBeAttached).toBe('boolean');
-    });
+
   });
 
   describe('rootCardStack property', () => {

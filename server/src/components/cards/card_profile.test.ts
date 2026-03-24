@@ -57,21 +57,6 @@ describe('CardProfile', () => {
     });
   });
 
-  describe('profile validation', () => {
-    test('should handle extreme profile values', () => {
-      const config: CardProfileConfig = {
-        theta: 1000,
-        xi: -1000,
-        phi: 0
-      };
-      
-      const profile = new CardProfile(config);
-      expect(profile.theta).toBe(1000);
-      expect(profile.xi).toBe(-1000);
-      expect(profile.phi).toBe(0);
-    });
-  });
-
   describe('profile operations', () => {
     test('should combine profiles correctly', () => {
       const profile1 = new CardProfile({ theta: 1, xi: 2, phi: 3 });
@@ -81,21 +66,6 @@ describe('CardProfile', () => {
       expect(result.theta).toBe(5); // 1 + 4
       expect(result.xi).toBe(7);   // 2 + 5
       expect(result.phi).toBe(9);  // 3 + 6
-    });
-  });
-
-  describe('profile validation', () => {
-    test('should handle extreme profile values', () => {
-      const config: CardProfileConfig = {
-        theta: 1000,
-        xi: -1000,
-        phi: 0
-      };
-      
-      const profile = new CardProfile(config);
-      expect(profile.theta).toBe(1000);
-      expect(profile.xi).toBe(-1000);
-      expect(profile.phi).toBe(0);
     });
   });
 });

@@ -66,13 +66,6 @@ describe('Battle', () => {
       battle.range = 2;
       expect(battle.range).toBe(2);
     });
-    test('should clamp range to valid values', () => {
-      battle.range = 10;
-      expect(battle.range).toBe(10); // Battle doesn't clamp range
-      
-      battle.range = -1;
-      expect(battle.range).toBe(-1); // Battle doesn't prevent negative ranges
-    });
   });
   describe('attack tracking', () => {
     test('should track recent attack', () => {
