@@ -42,7 +42,7 @@ describe('InventoryItemComponent', () => {
     component.img = 'test.png';
     component.text = 'Test Item';
     fixture.detectChanges();
-    
+
     // Test component state instead of template rendering
     expect(component.img).toBe('test.png');
     expect(component.text).toBe('Test Item');

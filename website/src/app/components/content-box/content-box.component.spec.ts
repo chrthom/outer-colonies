@@ -34,7 +34,7 @@ describe('ContentBoxComponent', () => {
     const title = 'Test Content Box';
     component.title = title;
     fixture.detectChanges();
-    
+
     // Test component state instead of template rendering
     expect(component.title).toBe(title);
   });

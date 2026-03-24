@@ -2,20 +2,19 @@ import Battle from './battle';
 import CardStack from '../cards/card_stack';
 import { RootCardStack } from '../cards/card_stack';
 import Card from '../cards/card';
-import { CardType, Zone, DefenseType, BattleType } from '../../shared/config/enums';
 import Player from './player';
 import Match from './match';
-import { AttackResult } from '../cards/card';
+import { CardType, Zone, DefenseType, BattleType } from '../../shared/config/enums';
 // Mock classes for testing
 class MockCard extends Card {
-  getValidTargets(player: Player): CardStack[] {
+  getValidTargets(): CardStack[] {
     return [];
   }
-  
-  onEnterGame(player: Player, cardStack: CardStack): void {}
-  onLeaveGame(player: Player): void {}
-  onStartTurn(player: Player, cardStack: CardStack): void {}
-  onEndTurn(player: Player, source: CardStack): void {}
+
+  onEnterGame(): void {}
+  onLeaveGame(): void {}
+  onStartTurn(): void {}
+  onEndTurn(): void {}
 }
 class MockPlayer extends Player {
   constructor() {
@@ -33,7 +32,7 @@ class MockMatch {
   activePlayerNo = 1;
   inactivePlayerNo = 2;
   pendingActionPlayerNo = 1;
-  
+
   constructor() {
     // Simple mock that doesn't extend Match
   }
@@ -42,12 +41,10 @@ describe('Battle', () => {
   let battle: Battle;
   let player1: MockPlayer;
   let player2: MockPlayer;
-  let match: MockMatch;
   beforeEach(() => {
     player1 = new MockPlayer();
     player2 = new MockPlayer();
-    match = new MockMatch();
-    
+
     // Initialize battle with mock match
     battle = new Battle(BattleType.Mission, 1);
   });
@@ -78,7 +75,7 @@ describe('Battle', () => {
         armour: 3,
         damage: 4
       };
-      
+
       battle.recentAttack = mockAttack;
       expect(battle.recentAttack).toBe(mockAttack);
     });
@@ -92,7 +89,7 @@ describe('Battle', () => {
         armour: 3,
         damage: 4
       };
-      
+
       battle.recentAttack = undefined;
       expect(battle.recentAttack).toBeUndefined();
     });
@@ -105,7 +102,7 @@ describe('Battle', () => {
       // Battle tracks ships in its ships array
       battle.ships[0] = [attacker];
       battle.ships[1] = [defender];
-      
+
       expect(battle.ships[0]).toContain(attacker);
       expect(battle.ships[1]).toContain(defender);
     });
@@ -115,10 +112,10 @@ describe('Battle', () => {
 
       battle.ships[0] = [attacker];
       battle.ships[1] = [defender];
-      
+
       // Clear ships
       battle.ships = [[], []];
-      
+
       expect(battle.ships[0]).toEqual([]);
       expect(battle.ships[1]).toEqual([]);
     });
@@ -126,10 +123,7 @@ describe('Battle', () => {
   describe('battle state management', () => {
     test('should maintain battle state between turns', () => {
       battle.range = 2;
-      
-      const attacker = new RootCardStack(new MockCard(1, 'Attacker', CardType.Hull, 1), Zone.Hand, player1);
-      const defender = new RootCardStack(new MockCard(2, 'Defender', CardType.Hull, 1), Zone.Hand, player2);
-      
+
       // State should be maintained
       expect(battle.range).toBe(2);
     });
@@ -144,11 +138,11 @@ describe('Battle', () => {
         armour: 3,
         damage: 4
       };
-      
+
       // Reset to default state
       battle.range = 1;
       battle.recentAttack = undefined;
-      
+
       expect(battle.range).toBe(1);
       expect(battle.recentAttack).toBeUndefined();
     });

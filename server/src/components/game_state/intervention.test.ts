@@ -1,21 +1,26 @@
-import Intervention, { InterventionAttack, InterventionBattleRoundStart, InterventionBattleRoundEnd, InterventionOpponentTurnStart, InterventionTacticCard } from './intervention';
-import Player from './player';
-import Match from './match';
+import {
+  InterventionAttack,
+  InterventionBattleRoundStart,
+  InterventionBattleRoundEnd,
+  InterventionOpponentTurnStart,
+  InterventionTacticCard
+} from './intervention';
 import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
+import Player from './player';
 import { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, InterventionType, CardDurability } from '../../shared/config/enums';
+import { CardType, Zone, InterventionType } from '../../shared/config/enums';
 
 // Mock classes for testing
 class MockCard extends Card {
-  getValidTargets(player: Player): CardStack[] {
+  getValidTargets(): CardStack[] {
     return [];
   }
-  
-  onEnterGame(player: Player, cardStack: CardStack): void {}
-  onLeaveGame(player: Player): void {}
-  onStartTurn(player: Player, cardStack: CardStack): void {}
-  onEndTurn(player: Player, source: CardStack): void {}
+
+  onEnterGame(): void {}
+  onLeaveGame(): void {}
+  onStartTurn(): void {}
+  onEndTurn(): void {}
 }
 
 class MockPlayer extends Player {
@@ -42,11 +47,11 @@ class MockMatch {
   pendingActionPlayer: any = null;
   intervention: any = null;
   highlightCard: any = null;
-  
+
   constructor() {
     // Simple mock that doesn't extend Match
   }
-  
+
   switchPendingPlayer() {}
   prepareBuildPhase() {}
   checkToNextPhase() {}
@@ -67,9 +72,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const attackIntervention = new InterventionAttack(match as any, srcStack, targetStack);
-      
+
       expect(attackIntervention).toBeDefined();
       expect(attackIntervention.match).toBe(match);
       expect(attackIntervention.type).toBe(InterventionType.Attack);
@@ -82,9 +87,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const attackIntervention = new InterventionAttack(match as any, srcStack, targetStack);
-      
+
       expect(attackIntervention.type).toBe(InterventionType.Attack);
     });
   });
@@ -92,7 +97,7 @@ describe('Intervention', () => {
   describe('InterventionBattleRoundStart', () => {
     test('should create battle round start intervention', () => {
       const roundStartIntervention = new InterventionBattleRoundStart(match as any);
-      
+
       expect(roundStartIntervention).toBeDefined();
       expect(roundStartIntervention.match).toBe(match);
       expect(roundStartIntervention.type).toBe(InterventionType.BattleRoundStart);
@@ -100,7 +105,7 @@ describe('Intervention', () => {
 
     test('should have battle round start intervention type', () => {
       const roundStartIntervention = new InterventionBattleRoundStart(match as any);
-      
+
       expect(roundStartIntervention.type).toBe(InterventionType.BattleRoundStart);
     });
   });
@@ -108,7 +113,7 @@ describe('Intervention', () => {
   describe('InterventionBattleRoundEnd', () => {
     test('should create battle round end intervention', () => {
       const roundEndIntervention = new InterventionBattleRoundEnd(match as any);
-      
+
       expect(roundEndIntervention).toBeDefined();
       expect(roundEndIntervention.match).toBe(match);
       expect(roundEndIntervention.type).toBe(InterventionType.BattleRoundEnd);
@@ -116,7 +121,7 @@ describe('Intervention', () => {
 
     test('should have battle round end intervention type', () => {
       const roundEndIntervention = new InterventionBattleRoundEnd(match as any);
-      
+
       expect(roundEndIntervention.type).toBe(InterventionType.BattleRoundEnd);
     });
   });
@@ -124,7 +129,7 @@ describe('Intervention', () => {
   describe('InterventionOpponentTurnStart', () => {
     test('should create opponent turn start intervention', () => {
       const turnStartIntervention = new InterventionOpponentTurnStart(match as any);
-      
+
       expect(turnStartIntervention).toBeDefined();
       expect(turnStartIntervention.match).toBe(match);
       expect(turnStartIntervention.type).toBe(InterventionType.OpponentTurnStart);
@@ -132,7 +137,7 @@ describe('Intervention', () => {
 
     test('should have opponent turn start intervention type', () => {
       const turnStartIntervention = new InterventionOpponentTurnStart(match as any);
-      
+
       expect(turnStartIntervention.type).toBe(InterventionType.OpponentTurnStart);
     });
   });
@@ -143,9 +148,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const tacticIntervention = new InterventionTacticCard(match as any, srcStack, targetStack);
-      
+
       expect(tacticIntervention).toBeDefined();
       expect(tacticIntervention.match).toBe(match);
       expect(tacticIntervention.type).toBe(InterventionType.TacticCard);
@@ -159,9 +164,14 @@ describe('Intervention', () => {
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
       const optionalParams = [1, 2, 3];
-      
-      const tacticIntervention = new InterventionTacticCard(match as any, srcStack, targetStack, optionalParams);
-      
+
+      const tacticIntervention = new InterventionTacticCard(
+        match as any,
+        srcStack,
+        targetStack,
+        optionalParams
+      );
+
       expect(tacticIntervention.optionalParameters).toBe(optionalParams);
     });
 
@@ -170,9 +180,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const tacticIntervention = new InterventionTacticCard(match as any, srcStack, targetStack);
-      
+
       expect(tacticIntervention.type).toBe(InterventionType.TacticCard);
     });
   });
@@ -195,9 +205,9 @@ describe('Intervention', () => {
         new RootCardStack(new MockCard(1, 'Src', CardType.Hull, 1), Zone.Hand, player),
         new RootCardStack(new MockCard(2, 'Tgt', CardType.Hull, 1), Zone.Hand, player)
       );
-      
+
       const roundStartIntervention = new InterventionBattleRoundStart(match as any);
-      
+
       expect(attackIntervention.match).toBe(roundStartIntervention.match);
     });
   });
@@ -211,7 +221,7 @@ describe('Intervention', () => {
         InterventionType.OpponentTurnStart,
         InterventionType.TacticCard
       ];
-      
+
       // Create appropriate intervention for each type
       const interventions = [
         new InterventionAttack(
@@ -228,7 +238,7 @@ describe('Intervention', () => {
           new RootCardStack(new MockCard(4, 'Tgt', CardType.Hull, 1), Zone.Hand, player)
         )
       ];
-      
+
       interventions.forEach((intervention, index) => {
         expect(intervention.type).toBe(types[index]);
       });
@@ -241,9 +251,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const attackIntervention = new InterventionAttack(match as any, srcStack, targetStack);
-      
+
       expect(attackIntervention.src).toBe(srcStack);
       expect(attackIntervention.target).toBe(targetStack);
     });
@@ -253,9 +263,9 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const tacticIntervention = new InterventionTacticCard(match as any, srcStack, targetStack);
-      
+
       expect(tacticIntervention.src).toBe(srcStack);
       expect(tacticIntervention.target).toBe(targetStack);
     });
@@ -265,9 +275,9 @@ describe('Intervention', () => {
       const tacticCard = new MockCard(2, 'Tactic', CardType.Tactic, 1);
       const hullStack = new RootCardStack(hullCard, Zone.Hand, player);
       const tacticStack = new RootCardStack(tacticCard, Zone.Hand, player);
-      
+
       const attackIntervention = new InterventionAttack(match as any, hullStack, tacticStack);
-      
+
       expect(attackIntervention.src.card.type).toBe(CardType.Hull);
       expect(attackIntervention.target.card.type).toBe(CardType.Tactic);
     });
@@ -280,9 +290,9 @@ describe('Intervention', () => {
         new RootCardStack(new MockCard(1, 'Src', CardType.Hull, 1), Zone.Hand, player),
         new RootCardStack(new MockCard(2, 'Tgt', CardType.Hull, 1), Zone.Hand, player)
       );
-      
+
       const roundIntervention = new InterventionBattleRoundStart(match as any);
-      
+
       expect(attackIntervention.match).toBe(roundIntervention.match);
       expect(attackIntervention.match).toBe(match);
     });
@@ -292,10 +302,10 @@ describe('Intervention', () => {
       const targetCard = new MockCard(2, 'Target', CardType.Hull, 1);
       const srcStack = new RootCardStack(srcCard, Zone.Hand, player);
       const targetStack = new RootCardStack(targetCard, Zone.Hand, player);
-      
+
       const intervention = new InterventionAttack(match as any, srcStack, targetStack);
       const originalMatch = intervention.match;
-      
+
       expect(intervention.match).toBe(originalMatch);
     });
   });

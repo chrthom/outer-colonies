@@ -1,6 +1,5 @@
 import CardStack from './card_stack';
 import { ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
-import Game from '../../scenes/game';
 
 describe('CardStack', () => {
   let cardStack: CardStack;
@@ -47,15 +46,17 @@ describe('CardStack', () => {
       data: mockData,
       cards: [],
       scene: mockScene,
-      get ownedByPlayer() { return mockData.ownedByPlayer; },
-      discard: jasmine.createSpy('discard').and.callFake(function(this: any, toDeck?: boolean) {
+      get ownedByPlayer() {
+        return mockData.ownedByPlayer;
+      },
+      discard: jasmine.createSpy('discard').and.callFake(function (this: any, toDeck?: boolean) {
         this.cards.forEach((card: any) => {
           if (card.discard) {
             card.discard(toDeck);
           }
         });
       }),
-      update: jasmine.createSpy('update').and.callFake(function(this: any, data: any) {
+      update: jasmine.createSpy('update').and.callFake(function (this: any, data: any) {
         // Mock the update behavior
         this.destroyIndicators();
         this.data = data;
@@ -63,41 +64,39 @@ describe('CardStack', () => {
         const oldCardIds = this.cards.map((c: any) => c.cardId);
         const newCardIds = data.cards.map((c: any) => c.id);
         const removedCardIds = oldCardIds.filter((id: any) => !newCardIds.includes(id));
-        
+
         // Call discard on removed cards before filtering them out
         this.cards.forEach((c: any) => {
           if (removedCardIds.includes(c.cardId) && c.discard) {
             // Check if card should be discarded to deck
-            const inDiscardPile = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() == c.cardId;
+            const inDiscardPile =
+              this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() == c.cardId;
             const toDeck = !inDiscardPile; // discard(toDeck) - true means to deck
             c.discard(toDeck);
-            
+
             // Set retractCardsExist flag if discarding to deck
             if (toDeck) {
               this.scene.retractCardsExist = true;
             }
           }
         });
-        
+
         this.cards = this.cards.filter((c: any) => !removedCardIds.includes(c.cardId));
-        
+
         // For this test, we won't actually create new cards to avoid Phaser dependencies
       }),
       tween: jasmine.createSpy('tween'),
       destroyIndicators: jasmine.createSpy('destroyIndicators'),
-      filterCardsByIdList: function(cards: any[]) { return this.cards.filter((c: any) => cards.includes(c.cardId)); },
-      arrayDiff: function(oldArray: any[], newArray: any[]) {
+      filterCardsByIdList: function (cards: any[]) {
+        return this.cards.filter((c: any) => cards.includes(c.cardId));
+      },
+      arrayDiff: function (oldArray: any[], newArray: any[]) {
         const removed = oldArray.filter(item => !newArray.includes(item));
         const added = newArray.filter(item => !oldArray.includes(item));
         return [removed, added];
       }
     } as any as CardStack;
 
-    // Mock game object for testing
-    const game = {
-      cardStacks: [],
-      state: {} as any
-    } as any as Game;
   });
 
   it('should create card stack with correct UUID', () => {
@@ -296,8 +295,9 @@ describe('CardStack', () => {
 
       // Our mock already has filterCardsByIdList implemented
       // Mock filterCardsByIdList to return the card to remove
-      const originalFilter = (cardStack as any).filterCardsByIdList;
-      (cardStack as any).filterCardsByIdList = jasmine.createSpy('filterCardsByIdList').and.returnValue([mockCardToRemove]);
+      (cardStack as any).filterCardsByIdList = jasmine
+        .createSpy('filterCardsByIdList')
+        .and.returnValue([mockCardToRemove]);
 
       const newData: ClientCardStack = {
         uuid: 'test-uuid',
@@ -360,10 +360,10 @@ describe('CardStack', () => {
       (cardStack as any).cards = [mockCard1, mockCard];
 
       // Our mock already has filterCardsByIdList implemented
-      const originalFilter = (cardStack as any).filterCardsByIdList;
-      (cardStack as any).filterCardsByIdList = jasmine.createSpy('filterCardsByIdList').and.returnValue([mockCard]);
+      (cardStack as any).filterCardsByIdList = jasmine
+        .createSpy('filterCardsByIdList')
+        .and.returnValue([mockCard]);
       // Our mock already has tween implemented, replace it for this test
-      const originalTween = (cardStack as any).tween;
       (cardStack as any).tween = jasmine.createSpy('tween');
 
       const newData: ClientCardStack = {
@@ -419,7 +419,7 @@ describe('CardStack', () => {
       cardStack.cards = [mockCard1, mockCard2];
 
       // Implement tween behavior for testing
-      (cardStack as any).tween = jasmine.createSpy('tween').and.callFake(function(this: any) {
+      (cardStack as any).tween = jasmine.createSpy('tween').and.callFake(function (this: any) {
         this.cards.forEach((card: any) => {
           if (card.tween) {
             card.tween();

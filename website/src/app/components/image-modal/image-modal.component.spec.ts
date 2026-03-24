@@ -9,9 +9,7 @@ describe('ImageModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ImageModalComponent, MatDialogModule],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: 'test-image-url' }
-      ]
+      providers: [{ provide: MAT_DIALOG_DATA, useValue: 'test-image-url' }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ImageModalComponent);

@@ -1,28 +1,27 @@
 import Card from './card';
 import CardProfile from './card_profile';
 import { CardType, InterventionType } from '../../shared/config/enums';
-import Player from '../game_state/player';
 import CardStack from './card_stack';
 
 // Mock abstract methods for testing
 class TestCard extends Card {
-  getValidTargets(player: Player): CardStack[] {
+  getValidTargets(): CardStack[] {
     return [];
   }
-  
-  onEnterGame(player: Player, cardStack: CardStack): void {
+
+  onEnterGame(): void {
     // Mock implementation
   }
-  
-  onLeaveGame(player: Player): void {
+
+  onLeaveGame(): void {
     // Mock implementation
   }
-  
-  onStartTurn(player: Player, cardStack: CardStack): void {
+
+  onStartTurn(): void {
     // Mock implementation
   }
-  
-  onEndTurn(player: Player, source: CardStack): void {
+
+  onEndTurn(): void {
     // Mock implementation
   }
 }
@@ -31,7 +30,7 @@ describe('Card', () => {
   describe('constructor and basic properties', () => {
     test('should create card with required properties', () => {
       const card = new TestCard(1, 'Test Card', CardType.Equipment, 1);
-      
+
       expect(card.id).toBe(1);
       expect(card.name).toBe('Test Card');
       expect(card.type).toBe(CardType.Equipment);
@@ -48,9 +47,9 @@ describe('Card', () => {
         shield: 5,
         pointDefense: 3
       };
-      
+
       const card = new TestCard(2, 'Custom Profile Card', CardType.Hull, 2, profileConfig);
-      
+
       expect(card.profile.theta).toBe(2);
       expect(card.profile.xi).toBe(-1);
       expect(card.profile.phi).toBe(3);
@@ -59,7 +58,7 @@ describe('Card', () => {
 
     test('should use default profile when no profile provided', () => {
       const card = new TestCard(3, 'Default Profile Card', CardType.Infrastructure, 3);
-      
+
       expect(card.profile.theta).toBe(0);
       expect(card.profile.xi).toBe(0);
       expect(card.profile.phi).toBe(0);
@@ -74,14 +73,12 @@ describe('Card', () => {
       const card = new TestCard(4, 'Non-Attack Card', CardType.Infrastructure, 1);
       const mockCardStack = {} as CardStack;
       const mockTarget = {} as CardStack;
-      
+
       const result = card.attack(mockCardStack, mockTarget);
-      
+
       expect(result).toBeDefined();
       expect(result.damage).toBe(0);
     });
-
-
   });
 
   describe('canAttack property', () => {
@@ -138,7 +135,7 @@ describe('Card', () => {
 
     test('should accept different intervention types', () => {
       const card = new TestCard(12, 'Test Card', CardType.Tactic, 1);
-      
+
       // Should not throw for any intervention type
       expect(card.canIntervene(InterventionType.Attack)).toBeDefined();
       expect(card.canIntervene(InterventionType.BattleRoundEnd)).toBeDefined();
@@ -150,7 +147,7 @@ describe('Card', () => {
     test('should return a number for deactivation priority', () => {
       const card = new TestCard(13, 'Priority Card', CardType.Equipment, 1);
       const mockCardStack = {} as CardStack;
-      
+
       const priority = card.deactivationPriority(mockCardStack);
       expect(typeof priority).toBe('number');
     });
@@ -158,10 +155,10 @@ describe('Card', () => {
     test('should return same priority for same card stack', () => {
       const card = new TestCard(14, 'Consistent Priority Card', CardType.Hull, 1);
       const mockCardStack = { uuid: 'test-uuid' } as CardStack;
-      
+
       const priority1 = card.deactivationPriority(mockCardStack);
       const priority2 = card.deactivationPriority(mockCardStack);
-      
+
       expect(priority1).toBe(priority2);
     });
   });
@@ -178,7 +175,7 @@ describe('Card', () => {
       const originalName = card.name;
       const originalType = card.type;
       const originalRarity = card.rarity;
-      
+
       // Properties should not change
       expect(card.id).toBe(originalId);
       expect(card.name).toBe(originalName);

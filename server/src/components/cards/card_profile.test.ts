@@ -1,5 +1,4 @@
-import CardProfile, { AttackProfile, CardProfileConfig } from './card_profile';
-import { rules } from '../../shared/config/rules';
+import CardProfile, { CardProfileConfig } from './card_profile';
 
 describe('CardProfile', () => {
   describe('constructor and basic properties', () => {
@@ -45,13 +44,11 @@ describe('CardProfile', () => {
     });
   });
 
-
-
   describe('profile calculations', () => {
     test('should calculate isValid correctly', () => {
       const profile1 = new CardProfile({ theta: 1, xi: 2, phi: 3 });
       const profile2 = new CardProfile({ theta: -1, xi: 2, phi: 3 });
-      
+
       expect(profile1.isValid).toBe(true);
       expect(profile2.isValid).toBe(false); // has negative value
     });
@@ -61,11 +58,11 @@ describe('CardProfile', () => {
     test('should combine profiles correctly', () => {
       const profile1 = new CardProfile({ theta: 1, xi: 2, phi: 3 });
       const profile2 = new CardProfile({ theta: 4, xi: 5, phi: 6 });
-      
+
       const result = profile1.combine(profile2);
       expect(result.theta).toBe(5); // 1 + 4
-      expect(result.xi).toBe(7);   // 2 + 5
-      expect(result.phi).toBe(9);  // 3 + 6
+      expect(result.xi).toBe(7); // 2 + 5
+      expect(result.phi).toBe(9); // 3 + 6
     });
   });
 });

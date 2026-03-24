@@ -17,10 +17,7 @@ describe('HomePage', () => {
 
     await TestBed.configureTestingModule({
       imports: [HomePage, HttpClientTestingModule],
-      providers: [
-        DailyApiService,
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [DailyApiService, { provide: AuthService, useValue: authServiceSpy }]
     }).compileComponents();
 
     authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -56,14 +53,14 @@ describe('HomePage', () => {
       energy: false,
       ships: true
     };
-    
+
     spyOn(component, 'reload').and.callThrough();
     fixture.detectChanges();
-    
+
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
-    
+
     expect(component.reload).toHaveBeenCalled();
     expect(component.dailies[0].achieved).toBeTrue();
     expect(component.dailies[1].achieved).toBeFalse();
@@ -77,19 +74,19 @@ describe('HomePage', () => {
       energy: false,
       ships: true
     };
-    
+
     fixture.detectChanges();
-    
+
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
     req.flush(mockResponse);
-    
+
     expect(component.selectedDaily).toBe(1);
-    
+
     // Manually trigger the interval callback
     const callback = (component as any).showNextDaily(component.dailies.length);
     callback();
     expect(component.selectedDaily).toBe(2);
-    
+
     callback();
     expect(component.selectedDaily).toBe(3);
   });
@@ -106,11 +103,11 @@ describe('HomePage', () => {
       energy: false,
       ships: true
     };
-    
+
     fixture.detectChanges();
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
     req.flush(mockResponse);
-    
+
     // Component logic test instead of template test
     expect(component.dailies.length).toBeGreaterThan(0);
   });
