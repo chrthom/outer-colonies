@@ -24,16 +24,26 @@ Outer Colonies is a web-based multiplayer card game with three subprojects:
 - Verify documentation is updated for code changes
 
 ### Pull Requests
-- Create a PR when feature development is complete
+- **Automatic PR Creation**: PRs are automatically created when feature development is complete
 - PR name format: `<issue_id>: <description>`
 - Ensure PRs include tests and documentation updates
 - Review PRs for missing tests or documentation
+- **Automatic Workflow**: Branch creation, commits, pushes, PR creation, and issue updates are handled automatically
 
 ### Issue Management
 - Bug issues are labeled with `bug`
 - Feature issues are labeled with `enhancement`, `feature`, or `internal`
-- Update GitHub issues with progress comments when working on them
-- For issues with subtasks (marked with `[ ]`), check them off as completed with `[x]` when done
+- **Automatic Issue Updates**: GitHub issues are automatically updated with progress comments
+- For issues with subtasks (marked with `[ ]`), they are automatically checked off as completed with `[x]` when done
+- **Automatic Subtask Management**: Subtasks are automatically marked based on implementation progress
+
+### GitHub Workflow Automation
+- **Automatic GitHub Workflow**: The system automatically handles the complete GitHub workflow:
+  - Branch creation following `feature/<issue_number>_<description>` format
+  - Automatic commits with conventional commit messages
+  - Automatic pushing to remote repository
+  - Automatic Pull Request creation with proper naming and issue linking
+  - Automatic GitHub issue updates with progress and subtask completion
 
 ### GitHub Issue Queries
 - Use `web_fetch` to query GitHub issues directly from the repository

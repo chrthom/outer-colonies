@@ -25,6 +25,9 @@ link_to_issue = true
 
 [pr]
 create_on_feature_complete = true
+auto_create_branch = true
+auto_commit_push = true
+auto_update_issue = true
 pr_name_format = "<issue_id>: <description>"
 review_checks = ["missing_tests", "missing_documentation"]
 
