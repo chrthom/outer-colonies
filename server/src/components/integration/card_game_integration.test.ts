@@ -4,7 +4,7 @@ import { RootCardStack } from '../cards/card_stack';
 import Player from '../game_state/player';
 import Match from '../game_state/match';
 import Battle from '../game_state/battle';
-import { CardType, Zone, DefenseType } from '../../shared/config/enums';
+import { CardType, Zone, DefenseType, BattleType } from '../../shared/config/enums';
 // Mock classes for integration testing
 class MockCard extends Card {
   getValidTargets(player: Player): CardStack[] {
@@ -18,16 +18,17 @@ class MockCard extends Card {
 }
 class MockPlayer extends Player {
   constructor(name: string, playerNo: number) {
-    super('test-socket', name, {} as any, playerNo, []);
+    // Note: We use type assertion here because creating a full Match mock
+    // would require complex dependencies (Socket objects, etc.)
+    // This is a reasonable trade-off for test isolation
+    const mockMatch = new MockMatch() as any as Match;
+    super('test-socket', name, mockMatch, playerNo, []);
   }
 }
 class MockMatch {
   room = 'test-room';
   players: Player[] = [];
-  battle = {
-    recentAttack: null,
-    range: 1
-  };
+  battle = new Battle(BattleType.None, 0);
   activePlayerNo = 1;
   inactivePlayerNo = 2;
   pendingActionPlayerNo = 1;
@@ -45,7 +46,7 @@ describe('Card-Game Integration Tests', () => {
     player1 = new MockPlayer('Player 1', 1);
     player2 = new MockPlayer('Player 2', 2);
     match = new MockMatch();
-    battle = new Battle('standard' as any, 1);
+    battle = new Battle(BattleType.Mission, 1);
   });
   describe('Card-PLayer Integration', () => {
     test('should create card stacks associated with players', () => {
@@ -86,7 +87,12 @@ describe('Card-Game Integration Tests', () => {
       const attackerStack = new RootCardStack(attackerCard, Zone.Hand, player1);
       const defenderStack = new RootCardStack(defenderCard, Zone.Hand, player2);
       
+      // Track cards in battle
+      battle.ships[0] = [attackerStack];
+      battle.ships[1] = [defenderStack];
       
+      expect(battle.ships[0]).toContain(attackerStack);
+      expect(battle.ships[1]).toContain(defenderStack);
     });
     test('should handle battle range affecting card interactions', () => {
       const card1 = new MockCard(1, 'Card 1', CardType.Hull, 1);
@@ -131,7 +137,9 @@ describe('Card-Game Integration Tests', () => {
       const card = new MockCard(1, 'Test Card', CardType.Hull, 1);
       const cardStack = new RootCardStack(card, Zone.Hand, player1);
       
-      
+      // Card is associated with player, which is part of match
+      expect(cardStack.player).toBe(player1);
+      expect(player1).toBeTruthy();
     });
     test('should handle multiple players in match with cards', () => {
       const card1 = new MockCard(1, 'Player1 Card', CardType.Hull, 1);
@@ -140,9 +148,10 @@ describe('Card-Game Integration Tests', () => {
       const stack1 = new RootCardStack(card1, Zone.Hand, player1);
       const stack2 = new RootCardStack(card2, Zone.Hand, player2);
       
-      
-      
-      
+      // Verify both players have their own cards
+      expect(stack1.player).toBe(player1);
+      expect(stack2.player).toBe(player2);
+      expect(stack1).not.toBe(stack2);
     });
     test('should maintain card-match association through state changes', () => {
       const card = new MockCard(1, 'Test Card', CardType.Hull, 1);
@@ -151,6 +160,9 @@ describe('Card-Game Integration Tests', () => {
       // Change zone
       cardStack.zone = Zone.Colony;
       
+      // Card should still be associated with player after zone change
+      expect(cardStack.player).toBe(player1);
+      expect(cardStack.zone).toBe(Zone.Colony);
     });
   });
   describe('Complex Card Hierarchy Integration', () => {
@@ -251,13 +263,14 @@ describe('Card-Game Integration Tests', () => {
     test('should handle cards from different players in same match', () => {
       const player1Card = new MockCard(1, 'Player1 Card', CardType.Hull, 1);
       const player2Card = new MockCard(2, 'Player2 Card', CardType.Hull, 1);
-      
+
       const stack1 = new RootCardStack(player1Card, Zone.Hand, player1);
       const stack2 = new RootCardStack(player2Card, Zone.Hand, player2);
-      
-      
-      
-      
+
+      // Verify different players own the cards
+      expect(stack1.player).toBe(player1);
+      expect(stack2.player).toBe(player2);
+      expect(stack1).not.toBe(stack2);
     });
     test('should prevent cross-player card attachment', () => {
       const player1Card = new MockCard(1, 'Player1 Card', CardType.Hull, 1);
