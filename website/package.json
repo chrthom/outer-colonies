@@ -34,6 +34,7 @@
     "@angular/platform-browser": "^20.3.18",
     "@angular/platform-browser-dynamic": "^20.3.18",
     "@angular/router": "^20.3.18",
+    "@typescript-eslint/utils": "^8.57.2",
     "lodash-es": "^4.0.0",
     "ngx-cookie-service": "^20.1.1",
     "rxjs": "~7.8.0",

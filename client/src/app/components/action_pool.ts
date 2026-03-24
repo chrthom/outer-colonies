@@ -12,6 +12,7 @@ export default class ActionPool {
   }
   destroy() {
     this.images.forEach(s => s.destroy());
+    this.images = [];
   }
   update() {
     this.destroy();

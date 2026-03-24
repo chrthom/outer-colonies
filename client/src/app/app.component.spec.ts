@@ -6,14 +6,13 @@ import Phaser from 'phaser';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AppComponent],
+      imports: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
+    const app = TestBed.createComponent(AppComponent).componentInstance;
     expect(app).toBeTruthy();
   });
 
@@ -36,7 +35,7 @@ describe('AppComponent', () => {
   it('should log startup message in constructor', () => {
     // Spy on console.log
     spyOn(console, 'log');
-    const fixture = TestBed.createComponent(AppComponent);
+    TestBed.createComponent(AppComponent);
     expect(console.log).toHaveBeenCalledWith(jasmine.stringContaining('Outer Colonies client started'));
   });
 });

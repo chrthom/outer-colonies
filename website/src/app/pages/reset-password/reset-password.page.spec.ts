@@ -18,11 +18,11 @@ describe('ResetPasswordPage', () => {
 
   beforeEach(async () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['resetPasswordViaMagicLink']);
-    
+
     // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
-        get: (param: string) => 'test-reset-id'
+        get: () => 'test-reset-id'
       })
     };
 
@@ -66,13 +66,13 @@ describe('ResetPasswordPage', () => {
     const password = component.password;
     password.setValue('');
     expect(password.valid).toBeFalse();
-    
+
     password.setValue('short'); // Too short
     expect(password.valid).toBeFalse();
-    
+
     password.setValue('validpassword123'); // Valid
     expect(password.valid).toBeTrue();
-    
+
     password.setValue('a'.repeat(41)); // Too long
     expect(password.valid).toBeFalse();
   });
@@ -88,7 +88,7 @@ describe('ResetPasswordPage', () => {
     authApiSpy.resetPasswordViaMagicLink.and.returnValue(of(undefined));
     component.resetPasswordForm.setValue({ password: 'validpassword123' });
     component.submit();
-    
+
     expect(authApiSpy.resetPasswordViaMagicLink).toHaveBeenCalledWith('test-reset-id', 'validpassword123');
     expect(component.loading).toBeTrue();
   });
@@ -97,12 +97,12 @@ describe('ResetPasswordPage', () => {
     // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
-    
+
     authApiSpy.resetPasswordViaMagicLink.and.returnValue(of(undefined));
-    
+
     freshComponent.resetPasswordForm.setValue({ password: 'validpassword123' });
     freshComponent.submit();
-    
+
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
     // Note: Component doesn't set loading=false in success case, only in error case
@@ -113,12 +113,12 @@ describe('ResetPasswordPage', () => {
     // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
-    
+
     authApiSpy.resetPasswordViaMagicLink.and.returnValue(throwError(() => new Error('Reset failed')));
-    
+
     freshComponent.resetPasswordForm.setValue({ password: 'validpassword123' });
     freshComponent.submit();
-    
+
     expect(freshComponent.passwordResetSuccessful).toBeFalse();
     expect(freshComponent.passwordResetFailed).toBeTrue();
     expect(freshComponent.loading).toBeFalse();
@@ -129,7 +129,7 @@ describe('ResetPasswordPage', () => {
     authApiSpy.resetPasswordViaMagicLink.and.returnValue(of(undefined));
     component.resetPasswordForm.setValue({ password: 'validpassword123' });
     component.submit();
-    
+
     expect(authApiSpy.resetPasswordViaMagicLink).not.toHaveBeenCalled();
   });
 });

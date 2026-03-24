@@ -6,14 +6,10 @@ describe('ActionPool', () => {
   let mockScene: any;
   let actionPool: ActionPool;
   let mockImages: any[];
-  let mockDestroySpy: jasmine.Spy;
 
   beforeEach(() => {
     // Mock Phaser scene with necessary methods
-    mockImages = [
-      { destroy: jasmine.createSpy('destroy') },
-      { destroy: jasmine.createSpy('destroy') }
-    ];
+    mockImages = [{ destroy: jasmine.createSpy('destroy') }, { destroy: jasmine.createSpy('destroy') }];
 
     // Mock the scene methods
     mockScene = {
@@ -21,13 +17,16 @@ describe('ActionPool', () => {
         actionPool: ['attack', 'defend']
       }),
       add: {
-        image: jasmine.createSpy('image').and.callFake((x: number, y: number, texture: string) => {
-          const mockImage = {
-            setOrigin: jasmine.createSpy().and.returnValue(mockImage),
-            setTint: jasmine.createSpy().and.returnValue(mockImage),
-            setAlpha: jasmine.createSpy().and.returnValue(mockImage),
-            destroy: jasmine.createSpy('destroy')
-          };
+        image: jasmine.createSpy('image').and.callFake(() => {
+          // Create mock image with proper typing - use a class to avoid circular references
+          class MockImage {
+            setOrigin = jasmine.createSpy().and.returnValue(this);
+            setTint = jasmine.createSpy().and.returnValue(this);
+            setAlpha = jasmine.createSpy().and.returnValue(this);
+            destroy = jasmine.createSpy('destroy');
+          }
+
+          const mockImage = new MockImage();
           mockImages.push(mockImage);
           return mockImage;
         })
@@ -43,16 +42,16 @@ describe('ActionPool', () => {
   });
 
   it('should destroy existing images when destroyed', () => {
-    // Add some mock images
-    actionPool.images = [
-      { destroy: jasmine.createSpy('destroy1') },
-      { destroy: jasmine.createSpy('destroy2') }
-    ];
+    // Add some mock images - use type assertion since we're testing behavior, not Phaser types
+    const mockImage1 = { destroy: jasmine.createSpy('destroy1') } as any;
+    const mockImage2 = { destroy: jasmine.createSpy('destroy2') } as any;
+
+    actionPool.images = [mockImage1, mockImage2];
 
     actionPool.destroy();
 
-    expect(actionPool.images[0].destroy).toHaveBeenCalled();
-    expect(actionPool.images[1].destroy).toHaveBeenCalled();
+    expect(mockImage1.destroy).toHaveBeenCalled();
+    expect(mockImage2.destroy).toHaveBeenCalled();
     expect(actionPool.images).toEqual([]);
   });
 
@@ -74,7 +73,9 @@ describe('ActionPool', () => {
     // Verify second action (defend)
     const secondCall = mockScene.add.image.calls.mostRecent();
     expect(secondCall.args[0]).toBe(layoutConfig.game.ui.actionPool.player.x);
-    expect(secondCall.args[1]).toBe(layoutConfig.game.ui.actionPool.player.y + layoutConfig.game.ui.actionPool.player.yDistance);
+    expect(secondCall.args[1]).toBe(
+      layoutConfig.game.ui.actionPool.player.y + layoutConfig.game.ui.actionPool.player.yDistance
+    );
     expect(secondCall.args[2]).toBe('icon_defend');
   });
 
@@ -86,9 +87,9 @@ describe('ActionPool', () => {
     expect(mockScene.getPlayerState).toHaveBeenCalledWith(false);
 
     // Verify opponent placement config is used
-    const call = mockScene.add.image.calls.mostRecent();
-    expect(call.args[0]).toBe(layoutConfig.game.ui.actionPool.opponent.x);
-    expect(call.args[1]).toBe(layoutConfig.game.ui.actionPool.opponent.y);
+    const firstCall = mockScene.add.image.calls.first();
+    expect(firstCall.args[0]).toBe(layoutConfig.game.ui.actionPool.opponent.x);
+    expect(firstCall.args[1]).toBe(layoutConfig.game.ui.actionPool.opponent.y);
   });
 
   it('should apply correct tint based on player ownership', () => {

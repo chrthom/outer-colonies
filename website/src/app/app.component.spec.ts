@@ -3,7 +3,6 @@ import { AppComponent } from './app.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { of } from 'rxjs';
 
 describe('AppComponent', () => {
@@ -14,14 +13,11 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj('AuthService', ['check'], { isLoggedIn: false, displayname: '' });
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    
+
     authSpy.check.and.returnValue(of(false));
 
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        MatDialogModule
-      ],
+      imports: [RouterTestingModule, MatDialogModule],
       declarations: [],
       providers: [
         { provide: AuthService, useValue: authSpy },

@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
 import OCErrorStateMatcher from './error-state-matcher';
 
 describe('OCErrorStateMatcher', () => {
