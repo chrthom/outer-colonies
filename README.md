@@ -345,6 +345,10 @@ cd ..
    npm run test
    ```
 
+   **Website Test Requirements**:
+   - Chromium browser must be installed for Angular tests to run
+   - In Docker containers, install Chromium with: `apt update && apt install -y chromium`
+
 4. **Running all of the checks above**:
    ```bash
    npm run check
@@ -402,6 +406,7 @@ cd ..
 - **Angular**: Used for both the website and client applications.
 - **Phaser 3**: Game framework used for the client to implement the card game logic and rendering.
 - **TypeScript**: Primary language for frontend development.
+- **Jasmine + Karma + Angular TestBed**: For testing.
 
 ### Backend
 

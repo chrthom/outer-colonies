@@ -124,6 +124,8 @@ describe('DeckPage', () => {
   });
 
   it('should deactivate card when called', () => {
+    // Mock the canDeactivateDeckCard to return true
+    spyOnProperty(component, 'canDeactivateDeckCard', 'get').and.returnValue(true);
     component.deactivateCard({ id: 1, cardId: 101, inUse: true } as any);
     expect(deckApiSpy.deactivateCard).toHaveBeenCalledWith(1);
   });
@@ -142,11 +144,11 @@ describe('DeckPage', () => {
   });
 
   it('should calculate card URL correctly', () => {
-    expect(component.cardIdToUrl(101)).toBe('http://localhost:3000/assets/cards/101.png');
+    expect(component.cardIdToUrl(101)).toBe('https://assets.outercolonies.de/cards/101.png');
   });
 
   it('should calculate edition URL correctly', () => {
-    expect(component.cardIdToEditionUrl(101)).toBe('http://localhost:3000/assets/icons/edition1.png');
+    expect(component.cardIdToEditionUrl(101)).toBe('https://assets.outercolonies.de/icons/edition1.png');
   });
 
   it('should get edition name correctly', () => {

@@ -38,7 +38,8 @@ describe('OCErrorStateMatcher', () => {
     const formGroup = new FormGroup({ test: control });
     const formDirective = new FormGroupDirective([], []);
     formDirective.form = formGroup;
-    formDirective.submitted = true;
+    // Use reflection to access private submitted property for testing
+    (formDirective as any).submitted = true;
     expect(matcher.isErrorState(control, formDirective)).toBeTrue();
   });
 
