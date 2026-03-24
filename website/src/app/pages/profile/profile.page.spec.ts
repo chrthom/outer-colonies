@@ -22,14 +22,21 @@ describe('ProfilePage', () => {
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj('AuthService', [], { displayname: 'testuser', token: 'test-token' });
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['checkEmailExists', 'resetEmail', 'resetPassword']);
-    profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['profile', 'setNewsletter']);
+    profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['setNewsletter']);
 
     authApiSpy.checkEmailExists.and.returnValue(of(false));
     authApiSpy.resetEmail.and.returnValue(of(undefined));
     authApiSpy.resetPassword.and.returnValue(of(undefined));
-    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(
-      of({ newsletter: false, username: 'testuser', sol: 100 })
-    );
+    
+    // Create a getter property for profile
+    Object.defineProperty(profileApiSpy, 'profile', {
+      get: jasmine.createSpy('profile getter').and.returnValue(
+        of({ newsletter: false, username: 'testuser', sol: 100 })
+      ),
+      enumerable: true,
+      configurable: true
+    });
+    
     profileApiSpy.setNewsletter.and.returnValue(of(undefined));
 
     await TestBed.configureTestingModule({

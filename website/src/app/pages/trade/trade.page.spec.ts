@@ -16,29 +16,38 @@ describe('TradePage', () => {
   let profileApiSpy: jasmine.SpyObj<ProfileApiService>;
 
   beforeEach(async () => {
-    itemApiSpy = jasmine.createSpyObj('ItemApiService', ['items', 'buyBooster', 'open']);
-    profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['profile']);
+    itemApiSpy = jasmine.createSpyObj('ItemApiService', ['buyBooster', 'open']);
+    profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['setNewsletter']);
 
-    spyOnProperty(itemApiSpy, 'items', 'get').and.returnValue(
-      of({
-        boosters: [
-          { itemId: 1, no: 1, amount: 5 },
-          { itemId: 2, no: 2, amount: 3 }
-        ],
-        boxes: [
-          { itemId: 1, sol: [100], cards: [101, 102], boosters: [], type: 'box', amount: 2 },
-          { itemId: 2, sol: [200], cards: [103], boosters: [], type: 'box', amount: 1 }
-        ]
-      })
-    );
+    // Create getters for the properties
+    Object.defineProperty(itemApiSpy, 'items', {
+      get: jasmine.createSpy('items getter').and.returnValue(
+        of({
+          boosters: [
+            { itemId: 1, no: 1, amount: 5 },
+            { itemId: 2, no: 2, amount: 3 }
+          ],
+          boxes: [
+            { itemId: 1, sol: [100], cards: [101, 102], boosters: [], type: 'box', amount: 2 },
+            { itemId: 2, sol: [200], cards: [103], boosters: [], type: 'box', amount: 1 }
+          ]
+        })
+      ),
+      enumerable: true,
+      configurable: true
+    });
 
-    spyOnProperty(profileApiSpy, 'profile', 'get').and.returnValue(
-      of({
-        username: 'testuser',
-        sol: 1000,
-        newsletter: false
-      })
-    );
+    Object.defineProperty(profileApiSpy, 'profile', {
+      get: jasmine.createSpy('profile getter').and.returnValue(
+        of({
+          username: 'testuser',
+          sol: 1000,
+          newsletter: false
+        })
+      ),
+      enumerable: true,
+      configurable: true
+    });
 
     itemApiSpy.buyBooster.and.returnValue(of(undefined));
     itemApiSpy.open.and.returnValue(

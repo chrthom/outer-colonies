@@ -2,15 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ItemApiService } from './item-api.service';
 import { environment } from 'src/environments/environment';
+import AuthService from '../auth.service';
 
 describe('ItemApiService', () => {
   let service: ItemApiService;
   let httpMock: HttpTestingController;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
+    authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
+    
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ItemApiService]
+      providers: [
+        ItemApiService,
+        { provide: AuthService, useValue: authServiceSpy }
+      ]
     });
     service = TestBed.inject(ItemApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -35,9 +42,9 @@ describe('ItemApiService', () => {
       expect(items).toEqual(mockItems);
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/item`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/item`);
     expect(req.request.method).toBe('GET');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush(mockItems);
   });
 
@@ -49,9 +56,9 @@ describe('ItemApiService', () => {
       // Booster bought successfully
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/buy/booster/${boosterNo}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/buy/booster/${boosterNo}`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 
@@ -69,9 +76,9 @@ describe('ItemApiService', () => {
       expect(content).toEqual(mockContent);
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/item/${itemId}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/item/${itemId}`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush(mockContent);
   });
 });

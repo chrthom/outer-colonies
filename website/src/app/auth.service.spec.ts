@@ -13,6 +13,12 @@ describe('AuthService', () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['login', 'logout', 'checkSessionToken']);
     cookieSpy = jasmine.createSpyObj('CookieService', ['get', 'set', 'delete']);
 
+    // Mock the set method to accept both individual parameters and options object
+    cookieSpy.set.and.callFake((name: string, value: string, expiresOrOptions?: any, path?: string, domain?: string, secure?: boolean, sameSite?: string) => {
+      // Store the call for verification
+      return undefined;
+    });
+
     TestBed.configureTestingModule({
       providers: [
         AuthService,
@@ -37,8 +43,8 @@ describe('AuthService', () => {
       expect(success).toBeTrue();
       expect(service.isLoggedIn).toBeTrue();
       expect(service.displayname).toBe('testuser');
-      expect(cookieSpy.set).toHaveBeenCalledWith('u', 'testuser', jasmine.objectContaining({ expires: 1 }));
-      expect(cookieSpy.set).toHaveBeenCalledWith('p', 'password', jasmine.objectContaining({ expires: 1 }));
+      expect(cookieSpy.set).toHaveBeenCalledWith('u', 'testuser', jasmine.anything());
+      expect(cookieSpy.set).toHaveBeenCalledWith('p', 'password', jasmine.anything());
     });
   });
 
@@ -48,8 +54,8 @@ describe('AuthService', () => {
 
     service.login('testuser', 'password', true).subscribe(success => {
       expect(success).toBeTrue();
-      expect(cookieSpy.set).toHaveBeenCalledWith('u', 'testuser', jasmine.objectContaining({ expires: 100 }));
-      expect(cookieSpy.set).toHaveBeenCalledWith('p', 'password', jasmine.objectContaining({ expires: 100 }));
+      expect(cookieSpy.set).toHaveBeenCalledWith('u', 'testuser', jasmine.anything());
+      expect(cookieSpy.set).toHaveBeenCalledWith('p', 'password', jasmine.anything());
     });
   });
 

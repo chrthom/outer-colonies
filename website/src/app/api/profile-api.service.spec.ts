@@ -2,15 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ProfileApiService } from './profile-api.service';
 import { environment } from 'src/environments/environment';
+import AuthService from '../auth.service';
 
 describe('ProfileApiService', () => {
   let service: ProfileApiService;
   let httpMock: HttpTestingController;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
+    authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
+    
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProfileApiService]
+      providers: [
+        ProfileApiService,
+        { provide: AuthService, useValue: authServiceSpy }
+      ]
     });
     service = TestBed.inject(ProfileApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -32,9 +39,9 @@ describe('ProfileApiService', () => {
       expect(profile).toEqual(mockProfile);
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/profile`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/profile`);
     expect(req.request.method).toBe('GET');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush(mockProfile);
   });
 
@@ -45,9 +52,9 @@ describe('ProfileApiService', () => {
       // Newsletter set successfully
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/profile/newsletter`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/profile/newsletter`);
     expect(req.request.method).toBe('PUT');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 
@@ -58,9 +65,9 @@ describe('ProfileApiService', () => {
       // Newsletter unset successfully
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/profile/newsletter`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/profile/newsletter`);
     expect(req.request.method).toBe('DELETE');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 });

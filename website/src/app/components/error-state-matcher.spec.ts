@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
+import { FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import OCErrorStateMatcher from './error-state-matcher';
 
 describe('OCErrorStateMatcher', () => {
@@ -22,28 +22,28 @@ describe('OCErrorStateMatcher', () => {
   });
 
   it('should return true when control is invalid and dirty', () => {
-    const control = new FormControl('', { validators: [] });
+    const control = new FormControl('', { validators: [Validators.required] });
     control.markAsDirty();
     expect(matcher.isErrorState(control, null)).toBeTrue();
   });
 
   it('should return true when control is invalid and touched', () => {
-    const control = new FormControl('', { validators: [] });
+    const control = new FormControl('', { validators: [Validators.required] });
     control.markAsTouched();
     expect(matcher.isErrorState(control, null)).toBeTrue();
   });
 
   it('should return true when form is submitted and control is invalid', () => {
-    const control = new FormControl('', { validators: [] });
+    const control = new FormControl('', { validators: [Validators.required] });
     const formGroup = new FormGroup({ test: control });
     const formDirective = new FormGroupDirective([], []);
     formDirective.form = formGroup;
-    (formGroup as any).submitted = true;
+    formDirective.submitted = true;
     expect(matcher.isErrorState(control, formDirective)).toBeTrue();
   });
 
   it('should return false when control is invalid but pristine and untouched', () => {
-    const control = new FormControl('', { validators: [] });
+    const control = new FormControl('', { validators: [Validators.required] });
     expect(matcher.isErrorState(control, null)).toBeFalse();
   });
 });

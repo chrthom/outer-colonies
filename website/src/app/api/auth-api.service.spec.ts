@@ -2,15 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import AuthApiService from './auth-api.service';
 import { environment } from 'src/environments/environment';
+import AuthService from '../auth.service';
 
 describe('AuthApiService', () => {
   let service: AuthApiService;
   let httpMock: HttpTestingController;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
+    authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
+    
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AuthApiService]
+      providers: [
+        AuthApiService,
+        { provide: AuthService, useValue: authServiceSpy }
+      ]
     });
     service = TestBed.inject(AuthApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -30,7 +37,7 @@ describe('AuthApiService', () => {
       expect(result).toBeFalse();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/auth/exists?username=${testUsername}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?username=${testUsername}`);
     expect(req.request.method).toBe('GET');
     req.flush({ exists: false });
   });
@@ -41,7 +48,7 @@ describe('AuthApiService', () => {
       expect(result).toBeTrue();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/auth/exists?email=${testEmail}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=${testEmail}`);
     expect(req.request.method).toBe('GET');
     req.flush({ exists: true });
   });
@@ -59,7 +66,7 @@ describe('AuthApiService', () => {
       // Registration successful
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/auth/register`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/register`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(testUser);
     req.flush({});
@@ -73,7 +80,7 @@ describe('AuthApiService', () => {
       expect(response).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/auth/login`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(testCredentials);
     req.flush(mockResponse);
@@ -86,9 +93,9 @@ describe('AuthApiService', () => {
       // Logout successful
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/auth/login`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
     expect(req.request.method).toBe('DELETE');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${testToken}`);
+    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 });
