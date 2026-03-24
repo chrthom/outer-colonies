@@ -1,0 +1,44 @@
+# Mistral Vibe Configuration for Outer Colonies
+
+[git]
+main_branch = "main"
+conventional_commits = true
+commit_types = ["enhancement", "feature", "bugfix", "docs", "style", "refactor", "test", "chore"]
+
+[github]
+repository = "https://github.com/chrthom/outer-colonies"
+use_issues = true
+manage_subtasks = true
+subtask_marker = "[ ]"
+subtask_done_marker = "[x]"
+issue_query_method = "web_fetch"
+
+[github.issue_labels]
+bug = ["bug"]
+feature = ["enhancement", "feature", "internal"]
+
+[branch]
+feature_prefix = "feature/"
+bugfix_prefix = "bugfix/"
+branch_format = "<prefix><issue_number>_<branch_description>"
+link_to_issue = true
+
+[pr]
+create_on_feature_complete = true
+pr_name_format = "<issue_id>: <description>"
+review_checks = ["missing_tests", "missing_documentation"]
+
+[project]
+subprojects = ["client/", "server/", "website/"]
+readme_path = "README.md"
+
+[documentation]
+update_readme = true
+check_on_code_changes = true
+
+[pre_commit]
+run_format = true
+run_lint = true
+fix_lint_issues = true
+run_tests = true
+fix_test_failures = true
