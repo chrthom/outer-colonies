@@ -23,7 +23,8 @@ import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZoneChangeDetection(),importProvidersFrom(
+    provideZoneChangeDetection(),
+    importProvidersFrom(
       AppRoutingModule,
       BrowserModule,
       FormsModule,

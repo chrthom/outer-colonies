@@ -158,9 +158,15 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `auth.ts`: Authentication utility
     - `helpers.ts`: Helper functions
     - `mailer.ts`: Mailer utility
+  - `shared/`: Shared TypeScript interfaces and types used by both website and client
+    - `interfaces/rest_api.ts`: REST API interfaces
+    - `config/enums.ts`: Game enums
+    - `config/rules.ts`: Game rules configuration
+    - `config/starter_decks.ts`: Starter deck configurations
 - **Communication**:
   - REST API for website communication
   - WebSocket for real-time game communication with the client
+- **Type Declarations**: The server project generates TypeScript declaration files (`.d.ts`) that are required by the website and client projects for type safety and compilation.
 
 #### REST Endpoints
 
@@ -242,7 +248,15 @@ The server provides the following WebSocket events for the game client:
    cd server && npm install && cd ..
    ```
 
-3. **Configuration**:
+3. **Build Server Type Declarations**:
+   ```bash
+   # Generate TypeScript declarations required by website and client projects
+   cd server
+   npx tsc --declaration --emitDeclarationOnly
+   cd ..
+   ```
+
+4. **Configuration**:
    - Copy the configuration files from `server/config/` and adjust as needed.
    - Ensure the database connection settings are correctly configured.
    - Set the environment variables for the database and mail service:
@@ -283,15 +297,34 @@ The server provides the following WebSocket events for the game client:
    npm run si
    ```
 
+**Note**: If you make changes to the server's TypeScript interfaces or types that are used by the website or client projects, you need to rebuild the type declarations:
+```bash
+cd server
+npx tsc --declaration --emitDeclarationOnly
+cd ..
+```
+
 #### Building the Projects
 
 1. **Build for Staging**:
    ```bash
+   # Ensure server type declarations are up to date
+   cd server
+   npx tsc --declaration --emitDeclarationOnly
+   cd ..
+   
+   # Build the projects
    npm run build:staging
    ```
 
 2. **Build for Production**:
    ```bash
+   # Ensure server type declarations are up to date
+   cd server
+   npx tsc --declaration --emitDeclarationOnly
+   cd ..
+   
+   # Build the projects
    npm run build:prod
    ```
 
@@ -311,6 +344,10 @@ The server provides the following WebSocket events for the game client:
    ```bash
    npm run test
    ```
+
+   **Website Test Requirements**:
+   - Chromium browser must be installed for Angular tests to run
+   - In Docker containers, install Chromium with: `apt update && apt install -y chromium`
 
 4. **Running all of the checks above**:
    ```bash
@@ -369,6 +406,7 @@ The server provides the following WebSocket events for the game client:
 - **Angular**: Used for both the website and client applications.
 - **Phaser 3**: Game framework used for the client to implement the card game logic and rendering.
 - **TypeScript**: Primary language for frontend development.
+- **Jasmine + Karma + Angular TestBed**: For testing.
 
 ### Backend
 
