@@ -25,7 +25,13 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ["Chromium"],
+    browsers: ["ChromeHeadless"],
+    customLaunchers: {
+      ChromeHeadless: {
+        base: "Chrome",
+        flags: ["--no-sandbox", "--disable-gpu", "--headless", "--disable-dev-shm-usage"]
+      }
+    },
     singleRun: false,
     restartOnFileChange: true
   });
