@@ -2,9 +2,6 @@ import GameResult from './game_result';
 
 // Mock classes for testing
 
-
-
-
 describe('GameResult', () => {
   let match: any;
 
