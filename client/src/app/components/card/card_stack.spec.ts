@@ -96,7 +96,6 @@ describe('CardStack', () => {
         return [removed, added];
       }
     } as any as CardStack;
-
   });
 
   it('should create card stack with correct UUID', () => {
