@@ -21,6 +21,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        fetch-depth: 0  # Fetch full history for proper git operations
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -45,15 +46,22 @@ jobs:
     - name: Commit format changes if any
       if: steps.format-changes.outputs.changes_detected == 'true'
       run: |
+        # Store current branch name
+        BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+        
+        # Navigate to project directory and stage changes
         cd ./${{ matrix.project }}
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
         git add .
+        
+        # Go back to root for git operations
+        cd ..
         git commit -m "chore: auto-format ${{ matrix.project }}"
-        git fetch origin ${{ github.head_ref || github.ref_name }}
-        git checkout ${{ github.head_ref || github.ref_name }}
-        git pull origin ${{ github.head_ref || github.ref_name }}
-        git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.head_ref || github.ref_name }}
+        git fetch origin "$BRANCH_NAME"
+        git checkout "$BRANCH_NAME"
+        git pull origin "$BRANCH_NAME"
+        git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git "$BRANCH_NAME"
 
     - name: Run lint
       working-directory: ./${{ matrix.project }}
