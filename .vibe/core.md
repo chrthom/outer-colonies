@@ -15,25 +15,46 @@ Outer Colonies is a web-based multiplayer card game with three subprojects:
 
 ## Development Workflow
 
-### GitHub Workflow Automation (Primary)
-The **GitHub Workflow Skill** handles all Git operations automatically:
-- **Branch Creation**: `feature/<issue_number>_<description>` or `bugfix/<issue_number>_<description>`
-- **Commits**: Conventional commits using `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`
-- **Push**: Automatic push to remote repository
-- **PR Creation**: Pull Requests with format `<issue_id>: <description>`
-- **Issue Updates**: Progress tracking and subtask completion (`[x]`)
+### MANDATORY GitHub Workflow
 
-### Manual Operations (When Needed)
+**ALL GitHub issue implementations MUST follow this workflow:**
+
+1. **Create feature branch**: `git checkout -b feature/<issue_number>_<description>`
+2. **Implement changes** on the feature branch
+3. **Commit** with conventional commit messages: `git commit -m "<type>: <description>"`
+4. **Push** to remote: `git push origin feature/<issue_number>_<description>`
+5. **Create Pull Request** on GitHub
+6. **Return to main**: `git checkout main`
+
+### Branch Naming Convention
+- Features: `feature/<issue_number>_<slugified_description>`
+- Bugfixes: `bugfix/<issue_number>_<slugified_description>`
+
+Examples:
+- `feature/568_surrender_menu`
+- `bugfix/451_card_validation`
+
+### Commit Types
+- `feat`: New feature
+- `fix`: Bug fix
+- `chore`: Maintenance tasks
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Test additions/updates
+
+### Helper Script
 ```bash
-# Create and switch to branch
-git checkout -b feature/123_description
-
-# Commit changes
-git commit -m "feat: implement feature"
-
-# Push to remote
-git push origin feature/123_description
+# Start workflow for issue #123
+.vibe/scripts/start_github_workflow.sh 123 "description"
 ```
+
+### Enforcement
+- **Pre-commit hook**: Prevents GitHub issue commits on main branch
+- **Configuration**: `.vibe/config.toml`
+- **Documentation**: `.vibe/skills/github_workflow.md`
+
+**Failure to follow this workflow will result in implementation rejection.**
 
 ## Code Quality Standards
 
