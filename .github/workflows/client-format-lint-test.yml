@@ -1,11 +1,6 @@
 name: Client - Format, Lint and Test
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'client/**'
-      - '.github/workflows/client-format-lint-test.yml'
   pull_request:
     branches: [ main ]
     paths:
@@ -13,62 +8,10 @@ on:
       - '.github/workflows/client-format-lint-test.yml'
 
 jobs:
-  detect-changes:
-    name: Detect Changes
-    runs-on: ubuntu-latest
-    outputs:
-      client-changed: ${{ steps.detect.outputs.client-changed }}
-      server-changed: ${{ steps.detect.outputs.server-changed }}
-      website-changed: ${{ steps.detect.outputs.website-changed }}
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        fetch-depth: 0  # Fetch full history for proper git operations
-
-    - name: Detect changed files
-      id: detect
-      run: |
-        # For pull requests, compare with base branch
-        # For pushes, compare with previous commit
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          BASE_COMMIT="origin/${{ github.event.pull_request.base.ref }}"
-        else
-          BASE_COMMIT="HEAD~1"
-        fi
-        
-        echo "Base commit: $BASE_COMMIT"
-        echo "Current commit: $(git rev-parse HEAD)"
-        
-        # Get all changed files
-        CHANGED_FILES=$(git diff --name-only "$BASE_COMMIT" HEAD)
-        echo "Changed files: $CHANGED_FILES"
-        
-        # Check each project directory for changes
-        if echo "$CHANGED_FILES" | grep -q ^client/; then
-          echo "client-changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "client-changed=false" >> $GITHUB_OUTPUT
-        fi
-        
-        if echo "$CHANGED_FILES" | grep -q ^server/; then
-          echo "server-changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "server-changed=false" >> $GITHUB_OUTPUT
-        fi
-        
-        if echo "$CHANGED_FILES" | grep -q ^website/; then
-          echo "website-changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "website-changed=false" >> $GITHUB_OUTPUT
-        fi
-
   format-lint-test:
     name: Format, Lint and Test Client
     runs-on: ubuntu-latest
-    needs: detect-changes
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
