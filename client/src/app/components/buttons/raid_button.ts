@@ -72,3 +72,4 @@ export default class RaidButton {
   }
 }
 // Test comment
+// Another test comment
