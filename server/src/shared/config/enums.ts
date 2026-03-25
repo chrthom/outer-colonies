@@ -69,7 +69,8 @@ export enum MsgTypeInbound {
   Handcard = 'handcard',
   Login = 'login',
   Ready = 'ready',
-  Retract = 'retract'
+  Retract = 'retract',
+  Surrender = 'surrender'
 }
 
 export enum MsgTypeOutbound {
