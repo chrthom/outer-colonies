@@ -2,9 +2,7 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  transformIgnorePatterns: [
-    "node_modules/(?!mariadb/)"
-  ],
+  transformIgnorePatterns: ["node_modules/(?!mariadb/)"],
   moduleNameMapper: {
     "^mariadb$": "<rootDir>/__mocks__/mariadb.js"
   }

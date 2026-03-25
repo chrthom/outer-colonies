@@ -16,6 +16,9 @@ jobs:
         project: [client, server, website]
       fail-fast: false  # Continue even if one project fails
     
+    # Only run this job if files in the specific project directory were changed
+    if: contains(github.event.pull_request.changed_files, format('./{0}/', matrix.project))
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
