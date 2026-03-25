@@ -15,46 +15,9 @@ Outer Colonies is a web-based multiplayer card game with three subprojects:
 
 ## Development Workflow
 
-### MANDATORY GitHub Workflow
+**Use the GitHub Workflow Skill for all Git operations** - see `.vibe/skills/github-workflow/SKILL.md` for complete workflow documentation.
 
-**ALL GitHub issue implementations MUST follow this workflow:**
-
-1. **Create feature branch**: `git checkout -b feature/<issue_number>_<description>`
-2. **Implement changes** on the feature branch
-3. **Commit** with conventional commit messages: `git commit -m "<type>: <description>"`
-4. **Push** to remote: `git push origin feature/<issue_number>_<description>`
-5. **Create Pull Request** on GitHub
-6. **Return to main**: `git checkout main`
-
-### Branch Naming Convention
-- Features: `feature/<issue_number>_<slugified_description>`
-- Bugfixes: `bugfix/<issue_number>_<slugified_description>`
-
-Examples:
-- `feature/568_surrender_menu`
-- `bugfix/451_card_validation`
-
-### Commit Types
-- `feat`: New feature
-- `fix`: Bug fix
-- `chore`: Maintenance tasks
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Test additions/updates
-
-### Helper Script
-```bash
-# Start workflow for issue #123
-.vibe/scripts/start_github_workflow.sh 123 "description"
-```
-
-### Enforcement
-- **Pre-commit hook**: Prevents GitHub issue commits on main branch
-- **Configuration**: `.vibe/config.toml`
-- **Documentation**: `.vibe/skills/github_workflow.md`
-
-**Failure to follow this workflow will result in implementation rejection.**
+**Failure to follow the GitHub Workflow Skill will result in implementation rejection.**
 
 ## Code Quality Standards
 
@@ -86,16 +49,7 @@ cd ..
 
 ## GitHub Operations
 
-### Issue Management
-- **Labels**: `bug`, `enhancement`, `feature`, `internal`
-- **Subtasks**: Mark with `[ ]`, completed with `[x]`
-- **Milestones**: Track progress in GitHub milestones
-
-### Issue Queries
-```bash
-# Query via web_fetch
-https://github.com/chrthom/outer-colonies/issues?q=is%3Aopen+label%3A%22size+-+L%22
-```
+See GitHub Workflow Skill for complete issue management and operations documentation.
 
 ## Decision Making Guidelines
 

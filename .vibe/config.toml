@@ -1,5 +1,7 @@
 # Mistral Vibe Configuration for Outer Colonies
 
+enabled_skills = ["github-workflow"]
+
 [git]
 main_branch = "main"
 conventional_commits = true
@@ -12,11 +14,6 @@ manage_subtasks = true
 
 [skills.github_workflow]
 enabled = true
-auto_branch_creation = true
-auto_commit_push = true
-auto_pr_creation = true
-auto_issue_update = true
-default_commit_type = "feat"
 
 [project]
 subprojects = ["client/", "server/", "website/"]
