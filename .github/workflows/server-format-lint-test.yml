@@ -1,4 +1,4 @@
-name: Server - Format, Lint and Test
+name: Server Check
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   format-lint-test:
-    name: Format, Lint and Test Server
+    name: Format, Lint and Test
     runs-on: ubuntu-latest
     
     steps:

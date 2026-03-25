@@ -1,4 +1,4 @@
-name: Client - Format, Lint and Test
+name: Client Check
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   format-lint-test:
-    name: Format, Lint and Test Client
+    name: Format, Lint and Test
     runs-on: ubuntu-latest
     
     steps:
