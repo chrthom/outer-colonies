@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import AuthService from 'src/app/auth.service';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -10,10 +10,9 @@ import { MatTooltip } from '@angular/material/tooltip';
   imports: [RouterLink, MatTooltip]
 })
 export class NavbarComponent {
-  constructor(
-    public router: Router,
-    private authService: AuthService
-  ) {}
+  router = inject(Router);
+  private authService = inject(AuthService);
+
   get active(): string {
     return this.router.url.replace('/', '');
   }

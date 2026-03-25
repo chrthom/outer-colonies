@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import AuthService from '../auth.service';
 import { Observable } from 'rxjs';
 import { DailyGetResponse } from '../../../../server/src/shared/interfaces/rest_api';
@@ -9,10 +9,11 @@ import OCApi from './api';
   providedIn: 'root'
 })
 export class DailyApiService extends OCApi {
-  constructor(
-    private authService: AuthService,
-    http: HttpClient
-  ) {
+  private authService = inject(AuthService);
+
+  constructor() {
+    const http = inject(HttpClient);
+
     super(http);
   }
   get dailies(): Observable<DailyGetResponse> {

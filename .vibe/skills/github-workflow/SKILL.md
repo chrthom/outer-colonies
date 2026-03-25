@@ -49,9 +49,6 @@ cd /path/to/repo && git remote -v
 - **Subtask Management**: Use `[ ]` and `[x]` markers to manage subtasks.
 - **Commenting**: Comment on the issue if necessary to provide updates or clarifications.
 
-### 5. Completion
-- **Switch Back to Main**: Once everything is done, switch back to the main branch.
-
 ## Notes
 - Ensure all changes are reviewed and tested before merging.
 - Keep the issue updated with progress and any blockers encountered.
