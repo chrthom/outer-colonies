@@ -17,7 +17,10 @@ This skill provides instructions for working on GitHub issues in a structured ma
 
 ## Systematic Workflow
 
-### 1. Fetch GitHub issue
+### 1. Start from main branch
+- Checkout the main branch, if currently on any other branch
+
+### 2. Fetch GitHub issue
 
 To fetch issue details using the GitHub API, use the following `curl` command:
 
@@ -33,14 +36,14 @@ Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
 cd /path/to/repo && git remote -v
 ```
 
-### 2. Create a branch
+### 3. Create a branch
 - **Format**: 
   - For features: `feature/<issue_number>_<description>`
   - For bugfixes: `bugfix/<issue_number>_<description>`
 - **Check for Existing Branch**: If a branch with the same name exists, create a new one with a slightly different name.
 - **No main branch**: Never work directly on the main branch.
 
-### 3. Perform implementation
+### 4. Perform implementation
 
 Breakdown the issue into todos and implement them one by one.
 For each successfully implemented implemented ToDo:
@@ -54,10 +57,10 @@ For each successfully implemented implemented ToDo:
 - **Link to Issue**: Ensure the PR is linked to the issue.
 
 ### Issue Management
-- Update the issue you are working on.
+- Update the GitHub issue you are working on via GitHub API.
 - **Subtask Management**: Update `[ ]` to `[x]` markers for completed subtasks.
-- **Commenting**: Comment on the issue if necessary to provide updates or clarifications.
+- **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
 
-### 4. Check GitHub Actions checks
+### 5. Check GitHub Actions checks
 - Wait for the GitHub Actions checks of the PR to be completed
 - If checks failed, create todos to fix them and start over at step "3. Perform implementation"
