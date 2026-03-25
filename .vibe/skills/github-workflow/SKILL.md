@@ -22,6 +22,11 @@ curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.gith
 
 Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
 
+**Note**: First determine the correct repository owner and name by checking the git remote:
+```bash
+cd /path/to/repo && git remote -v
+```
+
 ## Steps to Follow
 
 ### 1. Branch Creation
