@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -26,6 +26,9 @@ import { MatButton } from '@angular/material/button';
   ]
 })
 export class ResetPasswordPage implements OnInit {
+  private authAPIService = inject(AuthApiService);
+  private route = inject(ActivatedRoute);
+
   passwordResetSuccessful = false;
   passwordResetFailed = false;
   loading = false;
@@ -34,10 +37,6 @@ export class ResetPasswordPage implements OnInit {
     password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(
-    private authAPIService: AuthApiService,
-    private route: ActivatedRoute
-  ) {}
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => (this.resetId = params.get('id')!));
   }

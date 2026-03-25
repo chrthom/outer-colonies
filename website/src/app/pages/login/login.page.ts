@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
@@ -28,6 +28,9 @@ import { MatButton } from '@angular/material/button';
   ]
 })
 export class LoginPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   loginFailed = false;
   loginForm: FormGroup = new FormGroup({
     username: new FormControl('', [Validators.required]),
@@ -35,10 +38,6 @@ export class LoginPage {
     remember: new FormControl(false, [])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
   get username(): any {
     return this.loginForm.get('username');
   }
@@ -46,11 +45,13 @@ export class LoginPage {
     return this.loginForm.get('password');
   }
   submit() {
-    this.authService
-      .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
-      .subscribe(success => {
-        if (success) this.router.navigate(['/']);
-        else this.loginFailed = true;
-      });
+    if (this.loginForm.valid) {
+      this.authService
+        .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
+        .subscribe(success => {
+          if (success) this.router.navigate(['/']);
+          else this.loginFailed = true;
+        });
+    }
   }
 }

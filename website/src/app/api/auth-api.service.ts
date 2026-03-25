@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import {
   AuthRegisterRequest,
@@ -13,7 +13,9 @@ import OCApi from './api';
   providedIn: 'root'
 })
 export default class AuthApiService extends OCApi {
-  constructor(http: HttpClient) {
+  constructor() {
+    const http = inject(HttpClient);
+
     super(http);
   }
   checkUsernameExists(username: string): Observable<boolean> {

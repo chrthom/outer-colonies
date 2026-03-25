@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { DeckCard } from '../../../../../server/src/shared/interfaces/rest_api';
+import { Component, OnInit, inject } from '@angular/core';
+import { DeckCard, DeckCardProfile } from '../../../../../server/src/shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
@@ -57,6 +57,9 @@ import { CommonModule } from '@angular/common';
   ]
 })
 export class DeckPage implements OnInit {
+  private deckApiService = inject(DeckApiService);
+  private dialog = inject(MatDialog);
+
   readonly minCards = 60;
   readonly maxCards = 100;
   filterFormControl = new FormControl('');
@@ -110,11 +113,6 @@ export class DeckPage implements OnInit {
       });
     })
   );
-
-  constructor(
-    private deckApiService: DeckApiService,
-    private dialog: MatDialog
-  ) {}
   ngOnInit() {
     this.update();
   }
@@ -244,8 +242,8 @@ export class DeckPage implements OnInit {
     return cardsNum(this.boxes[0].cards) > this.minCards;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
-    return Object.values(_.groupBy(deckCards, dc => dc.cardId)).map(dc => {
-      const stack = <DeckCardStack>dc[0];
+    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map((dc: DeckCard[]) => {
+      const stack = dc[0] as DeckCardStack;
       stack.numOfCards = dc.length;
       return stack;
     });
@@ -341,6 +339,20 @@ function cardsNum(cards: DeckCardStack[]): number {
 
 interface DeckCardStack extends DeckCard {
   numOfCards: number;
+  // Ensure all DeckCard properties are explicitly available
+  id: number;
+  inUse: boolean;
+  cardId: number;
+  name: string;
+  rarity: number;
+  type: CardType;
+  canAttack: boolean;
+  discipline?: TacticDiscipline;
+  hp?: number;
+  damage?: number;
+  range?: number;
+  defense?: string;
+  profile: DeckCardProfile;
 }
 
 interface DeckStatisticsTemplate {

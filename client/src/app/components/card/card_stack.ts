@@ -20,12 +20,24 @@ export default class CardStack {
   cards!: Array<Card>;
   uuid: string;
   data: ClientCardStack;
-  summaryBox: CardStackSummary;
+  summaryBox!: CardStackSummary;
   private scene: Game;
+  private initialized = false;
+
   constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
+    // Initialize immediately to maintain original behavior
+    this.createCards(origin);
+    this.summaryBox = new CardStackSummary(this.scene, this);
+    this.tween();
+  }
+
+  // Separate init method for testing purposes
+  init(origin?: CardImage) {
+    if (this.initialized) return;
+    this.initialized = true;
     this.createCards(origin);
     this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
@@ -127,7 +139,12 @@ export default class CardStack {
     return Math.max(...this.data.cards.map(c => c.index));
   }
   get canPerformAllAttackOnBase(): boolean {
-    return this.isOpponentColony && this.scene.state.battle.range == 1 && !this.scene.activeCards.stackUUID && !this.scene.activeCards.hand;
+    return (
+      this.isOpponentColony &&
+      this.scene.state.battle.range == 1 &&
+      !this.scene.activeCards.stackUUID &&
+      !this.scene.activeCards.hand
+    );
   }
   private filterCardsByIdList(list: number[]) {
     const l = list.slice();
@@ -297,12 +314,7 @@ export default class CardStack {
               this.scene.activeCards.cardUUID = cardData.uuid;
               this.scene.activeCards.hand = undefined;
             } else if (this.canPerformAllAttackOnBase) {
-              this.scene.socket.emit(
-                MsgTypeInbound.Attack,
-                '*',
-                '*',
-                this.uuid
-              );
+              this.scene.socket.emit(MsgTypeInbound.Attack, '*', '*', this.uuid);
             } else if (
               this.scene.activeCards.stackUUID &&
               this.scene.state.battle?.opponentShipIds.includes(this.uuid)

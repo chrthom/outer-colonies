@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
@@ -10,12 +10,11 @@ import { ContentBoxComponent } from '../../components/content-box/content-box.co
   imports: [ContentBoxComponent, RouterLink]
 })
 export class ActivateAccountPage implements OnInit {
+  private authAPIService = inject(AuthApiService);
+  private route = inject(ActivatedRoute);
+
   activationSuccessful = false;
   activationFailed = false;
-  constructor(
-    private authAPIService: AuthApiService,
-    private route: ActivatedRoute
-  ) {}
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.authAPIService.activate(params.get('id')!).subscribe({

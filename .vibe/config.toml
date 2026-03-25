@@ -1,0 +1,28 @@
+# Mistral Vibe Configuration for Outer Colonies
+
+enabled_skills = ["github-workflow"]
+
+[git]
+main_branch = "main"
+conventional_commits = true
+commit_types = ["feat", "fix", "chore", "docs", "style", "refactor", "test"]
+
+[github]
+repository = "https://github.com/chrthom/outer-colonies"
+use_issues = true
+manage_subtasks = true
+
+[project]
+subprojects = ["client/", "server/", "website/"]
+readme_path = "README.md"
+
+[documentation]
+update_readme = true
+check_on_code_changes = true
+
+[pre_commit]
+run_format = true
+run_lint = true
+fix_lint_issues = true
+run_tests = true
+fix_test_failures = true

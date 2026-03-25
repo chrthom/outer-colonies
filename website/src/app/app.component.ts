@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import AuthService from './auth.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,11 +14,11 @@ import { RouterOutlet } from '@angular/router';
   imports: [NavbarComponent, RouterOutlet]
 })
 export class AppComponent {
+  authService = inject(AuthService);
+  private dialog = inject(MatDialog);
+
   bgNo: number;
-  constructor(
-    public authService: AuthService,
-    private dialog: MatDialog
-  ) {
+  constructor() {
     this.bgNo = Math.floor(Math.random() * 7);
   }
   get env() {

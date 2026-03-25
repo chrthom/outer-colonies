@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -39,6 +39,10 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
   ]
 })
 export class ProfilePage implements OnInit {
+  private authService = inject(AuthService);
+  private authAPIService = inject(AuthApiService);
+  private profileAPIService = inject(ProfileApiService);
+
   newsletterSubscription!: boolean;
   passwordResetSuccessful = false;
   emailResetSuccessful = false;
@@ -53,11 +57,6 @@ export class ProfilePage implements OnInit {
     password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(
-    private authService: AuthService,
-    private authAPIService: AuthApiService,
-    private profileAPIService: ProfileApiService
-  ) {}
   ngOnInit(): void {
     this.profileAPIService.profile.subscribe(profile => (this.newsletterSubscription = profile.newsletter));
   }

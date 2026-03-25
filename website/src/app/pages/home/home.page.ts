@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
@@ -15,6 +15,9 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
   imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
 })
 export class HomePage implements OnInit {
+  authService = inject(AuthService);
+  private dailyApiService = inject(DailyApiService);
+
   dailies: Daily[] = [
     {
       matcher: r => r.login,
@@ -48,10 +51,6 @@ export class HomePage implements OnInit {
     }
   ];
   selectedDaily = 1;
-  constructor(
-    public authService: AuthService,
-    private dailyApiService: DailyApiService
-  ) {}
   ngOnInit() {
     this.reload();
     setInterval(this.showNextDaily(this.dailies.length), 3000);
