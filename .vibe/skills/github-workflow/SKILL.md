@@ -9,6 +9,19 @@ user-invocable: true
 ## Overview
 This skill provides instructions for working on GitHub issues in a structured manner, ensuring consistency and traceability.
 
+## Environment
+- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
+
+## GitHub API Interaction
+To fetch issue details using the GitHub API, use the following `curl` command:
+
+```bash
+curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/<owner>/<repo>/issues/<issue_number>
+```
+
+Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
+
 ## Steps to Follow
 
 ### 1. Branch Creation
@@ -16,7 +29,7 @@ This skill provides instructions for working on GitHub issues in a structured ma
   - For features: `feature/<issue_number>_<description>`
   - For bugfixes: `bugfix/<issue_number>_<description>`
 - **Check for Existing Branch**: If a branch with the same name exists, create a new one with a slightly different name.
-- **Current Branch Check**: If already on a feature or bugfix branch, continue working on the current branch.
+- **No main branch**: Never work directly on the main branch.
 
 ### 2. Development
 - **Conventional Commits**: Use conventional commit messages (e.g., `feat: add new feature`, `fix: resolve bug`).
@@ -33,9 +46,6 @@ This skill provides instructions for working on GitHub issues in a structured ma
 
 ### 5. Completion
 - **Switch Back to Main**: Once everything is done, switch back to the main branch.
-
-## Environment
-- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
 
 ## Notes
 - Ensure all changes are reviewed and tested before merging.
