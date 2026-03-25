@@ -148,6 +148,14 @@ class LayoutGameConfig {
       yTextOffset: -4,
       yConfirmOffset: 35
     },
+    raidButton: {
+      x: 100,
+      y: 600
+    },
+    missionButton: {
+      x: 100,
+      y: 700
+    },
     gameOver: {
       yOffsets: {
         title: -100,

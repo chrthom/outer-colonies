@@ -1,5 +1,7 @@
 import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
+import RaidButton from '../components/buttons/raid_button';
+import MissionButton from '../components/buttons/mission_button';
 import {
   ClientHandCard,
   ClientPlayer,
@@ -47,6 +49,8 @@ interface FixedUIElements {
   missionCards: MissionCards;
   optionPicker?: OptionPicker;
   zoomCard: ZoomCard;
+  raidButton: RaidButton;
+  missionButton: MissionButton;
 }
 
 interface InitData {
@@ -126,7 +130,9 @@ export default class Game extends Phaser.Scene {
       continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
       zoomCard: new ZoomCard(this),
-      missionCards: new MissionCards(this)
+      missionCards: new MissionCards(this),
+      raidButton: new RaidButton(this),
+      missionButton: new MissionButton(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
