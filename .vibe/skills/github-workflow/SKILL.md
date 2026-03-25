@@ -51,7 +51,7 @@ cd /path/to/repo && git remote -v
 ### 5. Create Pull Request (PR)
 - **First Push**: Only create, if it does not exist yet.
 - **Title Format**: `#<issue_id> : <description>`
-- **Link to Issue**: Ensure the PR is linked to the issue.
+- **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
 
 ### 6. Issue Management
 - Update the GitHub issue you are working on via GitHub API.
