@@ -1,0 +1,75 @@
+name: Client - Format, Lint and Test
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/client-format-lint-test.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/client-format-lint-test.yml'
+
+jobs:
+  format-lint-test:
+    name: Format, Lint and Test Client
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        fetch-depth: 0  # Fetch full history for proper git operations
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install dependencies
+      working-directory: ./client
+      run: npm install
+
+    - name: Run format with auto-fix
+      working-directory: ./client
+      run: npm run format
+      continue-on-error: false
+
+    - name: Check for format changes
+      id: format-changes
+      working-directory: ./client
+      run: |
+        git diff --exit-code || echo "changes_detected=true" >> $GITHUB_OUTPUT
+
+    - name: Commit format changes if any
+      if: steps.format-changes.outputs.changes_detected == 'true'
+      run: |
+        # Store current branch name
+        BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+        
+        # Navigate to project directory and stage changes
+        cd ./client
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add .
+        
+        # Go back to root for git operations
+        cd ..
+        git commit -m "chore: auto-format client"
+        git fetch origin "$BRANCH_NAME"
+        git checkout "$BRANCH_NAME"
+        git pull origin "$BRANCH_NAME"
+        git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git "$BRANCH_NAME"
+
+    - name: Run lint
+      working-directory: ./client
+      run: npm run lint
+      continue-on-error: false
+
+    - name: Run tests
+      if: success()  # Only run tests if lint passed
+      working-directory: ./client
+      run: npm run test
