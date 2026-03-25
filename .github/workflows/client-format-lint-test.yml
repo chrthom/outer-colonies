@@ -1,11 +1,6 @@
-name: Client - Format, Lint and Test
+name: Client Check
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'client/**'
-      - '.github/workflows/client-format-lint-test.yml'
   pull_request:
     branches: [ main ]
     paths:
@@ -14,7 +9,7 @@ on:
 
 jobs:
   format-lint-test:
-    name: Format, Lint and Test Client
+    name: Format, Lint and Test
     runs-on: ubuntu-latest
     
     steps:

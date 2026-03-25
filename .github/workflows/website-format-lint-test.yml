@@ -1,11 +1,6 @@
-name: Website - Format, Lint and Test
+name: Website Check
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'website/**'
-      - '.github/workflows/website-format-lint-test.yml'
   pull_request:
     branches: [ main ]
     paths:
@@ -14,7 +9,7 @@ on:
 
 jobs:
   format-lint-test:
-    name: Format, Lint and Test Website
+    name: Format, Lint and Test
     runs-on: ubuntu-latest
     
     steps:
