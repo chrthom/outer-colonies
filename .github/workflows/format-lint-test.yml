@@ -24,11 +24,13 @@ jobs:
     - name: Detect changed files
       id: detect
       run: |
-        # Get the base commit for comparison
+        # For pull requests, compare with base branch
+        # For pushes, compare with previous commit
         if [ "${{ github.event_name }}" = "pull_request" ]; then
-          BASE_COMMIT="${{ github.event.pull_request.base.sha }}"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          BASE_COMMIT="origin/${{ github.event.pull_request.base.ref }}"
         else
-          BASE_COMMIT="${{ github.event.before }}"
+          BASE_COMMIT="HEAD~1"
         fi
         
         echo "Base commit: $BASE_COMMIT"
