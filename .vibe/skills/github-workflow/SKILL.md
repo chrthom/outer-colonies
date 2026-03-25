@@ -45,23 +45,19 @@ cd /path/to/repo && git remote -v
 - **No main branch**: Never work directly on the main branch.
 
 ### 4. Perform implementation
+- Breakdown the issue into todos and implement them one by one.
+- Run format, lint and test before git commit and git push
 
-Breakdown the issue into todos and implement them one by one.
-For each successfully implemented implemented ToDo:
-
-#### Commit and push
-- Run format, lint and test before git committ and git push
-
-#### Create Pull Request (PR)
+### 5. Create Pull Request (PR)
 - **First Push**: Only create, if it does not exist yet.
 - **Title Format**: `#<issue_id> : <description>`
 - **Link to Issue**: Ensure the PR is linked to the issue.
 
-### Issue Management
+### 6. Issue Management
 - Update the GitHub issue you are working on via GitHub API.
 - **Subtask Management**: Update `[ ]` to `[x]` markers for completed subtasks.
 - **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
 
-### 5. Check GitHub Actions checks
+### 7. Check GitHub Actions checks
 - Wait for the GitHub Actions checks of the PR to be completed
 - If checks failed, create todos to fix them and start over at step "3. Perform implementation"
