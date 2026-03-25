@@ -1,11 +1,6 @@
 name: Website - Format, Lint and Test
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'website/**'
-      - '.github/workflows/website-format-lint-test.yml'
   pull_request:
     branches: [ main ]
     paths:

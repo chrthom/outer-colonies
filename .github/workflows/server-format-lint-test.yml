@@ -1,11 +1,6 @@
 name: Server - Format, Lint and Test
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'server/**'
-      - '.github/workflows/server-format-lint-test.yml'
   pull_request:
     branches: [ main ]
     paths:
