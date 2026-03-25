@@ -12,10 +12,11 @@ Outer Colonies is a web-based multiplayer card game with three subprojects:
 - **website**: Angular 20 frontend for user management and deck configuration
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Express + Socket.IO backend with TypeScript
+README.md contains further information on project structure.
 
 ## Development Workflow
 
-**Use the GitHub Workflow Skill for all Git operations** - see `.vibe/skills/github-workflow/SKILL.md` for complete workflow documentation.
+**Use the GitHub Workflow Skill when working on an GitHub issue** - see `.vibe/skills/github-workflow/SKILL.md` for complete workflow documentation.
 
 **Failure to follow the GitHub Workflow Skill will result in implementation rejection.**
 
@@ -29,7 +30,7 @@ Outer Colonies is a web-based multiplayer card game with three subprojects:
 
 ### Documentation Requirements
 - Update `README.md` for significant changes
-- Add JSDoc comments for new functions
+- Add JSDoc comments for new public or protected functions
 - Update TypeScript declarations when server interfaces change
 
 ## Subproject Coordination
@@ -42,28 +43,17 @@ npx tsc --declaration --emitDeclarationOnly
 cd ..
 ```
 
-### Dependency Management
-- **website**: Angular 20, Material UI
-- **client**: Phaser 3, Socket.IO
-- **server**: Express, Socket.IO, MariaDB
-
-## GitHub Operations
-
-See GitHub Workflow Skill for complete issue management and operations documentation.
-
 ## Decision Making Guidelines
 
 ### Priority System
 1. **Bug Fixes**: Immediate attention for critical issues
 2. **Feature Implementation**: Follow issue priorities
 3. **Refactoring**: Only when improving maintainability
-4. **Documentation**: Essential for all changes
 
 ### Code Style Preferences
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks
-- **Logging**: Use appropriate log levels
 
 ## Emergency Procedures
 
@@ -72,12 +62,6 @@ See GitHub Workflow Skill for complete issue management and operations documenta
 2. Verify TypeScript compilation
 3. Review recent changes
 4. Consult GitHub Actions logs
-
-### Deployment Issues
-1. Verify all subprojects build successfully
-2. Check database migrations
-3. Test API endpoints
-4. Validate frontend functionality
 
 ## Performance Considerations
 - **Token Usage**: Optimize responses for efficiency

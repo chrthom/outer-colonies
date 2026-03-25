@@ -1,16 +1,16 @@
---- 
-name: github-workflow
-description: Instruction to follow, when instructed to work on GitHub issue
+---
+name: github_issue
+description: Instructions for fetching GitHub issues and managing branches
 user-invocable: true
 ---
 
-# GitHub Workflow Skill
+# GitHub Issue Skill
 
 ## Overview
-This skill provides instructions for working on GitHub issues in a structured manner, ensuring consistency and traceability.
+This skill provides instructions for fetching GitHub issues and managing branches for issue resolution.
 
 ## Environment
-- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
+- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API. Ensure this token is set before using the skill.
 
 ## GitHub API Interaction
 To fetch issue details using the GitHub API, use the following `curl` command:
@@ -36,20 +36,11 @@ cd /path/to/repo && git remote -v
 - **Check for Existing Branch**: If a branch with the same name exists, create a new one with a slightly different name.
 - **No main branch**: Never work directly on the main branch.
 
-### 2. Development
-- **Conventional Commits**: Use conventional commit messages (e.g., `feat: add new feature`, `fix: resolve bug`).
-- **Stable State**: Push changes when a stable state is achieved.
-
-### 3. Pull Request (PR) Creation
-- **First Push**: After the first push, create a Pull Request.
-- **Title Format**: `#<issue_id> : <description>`
-- **Link to Issue**: Ensure the PR is linked to the issue.
-
-### 4. Issue Management
+### 2. Issue Management
 - **Subtask Management**: Use `[ ]` and `[x]` markers to manage subtasks.
 - **Commenting**: Comment on the issue if necessary to provide updates or clarifications.
 
-### 5. Completion
+### 3. Completion
 - **Switch Back to Main**: Once everything is done, switch back to the main branch.
 
 ## Notes
