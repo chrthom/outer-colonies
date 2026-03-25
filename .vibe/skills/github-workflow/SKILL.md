@@ -19,6 +19,7 @@ This skill provides instructions for working on GitHub issues in a structured ma
 
 ### 1. Start from main branch
 - Checkout the main branch, if currently on any other branch
+- `git pull` on main branch
 
 ### 2. Fetch GitHub issue
 
