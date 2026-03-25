@@ -1,6 +1,6 @@
 # Mistral Vibe Configuration for Outer Colonies
 
-enabled_skills = ["github_issue", "git_commit", "github_pr"]
+enabled_skills = ["github-workflow"]
 
 [git]
 main_branch = "main"
@@ -12,13 +12,7 @@ repository = "https://github.com/chrthom/outer-colonies"
 use_issues = true
 manage_subtasks = true
 
-[skills.github_issue]
-enabled = true
-
-[skills.git_commit]
-enabled = true
-
-[skills.github_pr]
+[skills.github_workflow]
 enabled = true
 
 [project]
