@@ -46,7 +46,7 @@ cd /path/to/repo && git remote -v
 - **Link to Issue**: Ensure the PR is linked to the issue.
 
 ### 4. Issue Management
-- **Subtask Management**: Use `[ ]` and `[x]` markers to manage subtasks.
+- **Subtask Management**: Update `[ ]` to `[x]` markers in the issue description to manage subtasks.
 - **Commenting**: Comment on the issue if necessary to provide updates or clarifications.
 
 ## Notes
