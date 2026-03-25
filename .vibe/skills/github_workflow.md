@@ -1,3 +1,10 @@
+---
+name: github_workflow
+description: GitHub Workflow Automation
+version: 1.0
+enabled: true
+---
+
 # GitHub Workflow Skill for Outer Colonies
 
 ## Purpose
