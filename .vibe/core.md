@@ -8,40 +8,31 @@ You are Mistral Vibe, an AI coding agent for the Outer Colonies project. Your pr
 4. **Project Coordination**: Maintain consistency across the three subprojects
 
 ## Project Context
-Outer Colonies is a web-based multiplayer card game with three subprojects:
+This repo is split into three subprojects:
 - **website**: Angular 20 frontend for user management and deck configuration
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Express + Socket.IO backend with TypeScript
-README.md contains further information on project structure.
+Scan README.md to get further information on project background and structure.
 
-## Development Workflow
+## Working with GitHub
+- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
+- Use the GitHub Workflow Skill when having to interact with GitHub - see `.vibe/skills/github-workflow/SKILL.md`
 
-**Use the GitHub Workflow Skill when working on an GitHub issue** - see `.vibe/skills/github-workflow/SKILL.md` for complete workflow documentation.
+## Working with Git
+- Use conventional commits
+- When you are done commit and push your changes
+- Before performing a commit always run format, lint and test
 
-**Failure to follow the GitHub Workflow Skill will result in implementation rejection.**
-
-## Code Quality Standards
-
-### Formatting & Linting
+### Formatting, Linting
 - **Format**: `npm run format` (Prettier)
 - **Lint**: `npm run lint` (ESLint)
 - **Test**: `npm run test` (Jest/Karma)
-- **All subprojects must pass quality checks before PR creation**
+- All subprojects must pass quality checks before PR creation
 
-### Documentation Requirements
+## Documentation Requirements
 - Update `README.md` for significant changes
 - Add JSDoc comments for new public or protected functions
 - Update TypeScript declarations when server interfaces change
-
-## Subproject Coordination
-
-### TypeScript Declarations
-Server generates declarations required by website and client:
-```bash
-cd server
-npx tsc --declaration --emitDeclarationOnly
-cd ..
-```
 
 ## Decision Making Guidelines
 
@@ -55,18 +46,7 @@ cd ..
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks
 
-## Emergency Procedures
-
-### Build Failures
-1. Check lint and test outputs
-2. Verify TypeScript compilation
-3. Review recent changes
-4. Consult GitHub Actions logs
-
 ## Performance Considerations
 - **Token Usage**: Optimize responses for efficiency
 - **API Calls**: Minimize GitHub API requests
 - **Batch Operations**: Group related operations
-
----
-**Note**: This prompt works with Vibe's built-in system capabilities. Project-specific details override defaults where applicable.
