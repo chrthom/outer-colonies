@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -7,5 +7,5 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   styleUrls: ['./image-modal.component.scss']
 })
 export class ImageModalComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: string) {}
+  data = inject(MAT_DIALOG_DATA);
 }

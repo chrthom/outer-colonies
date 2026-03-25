@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
 import { Observable, catchError, map, of, tap } from 'rxjs';
@@ -8,14 +8,13 @@ import { AuthLoginResponse } from '../../../server/src/shared/interfaces/rest_ap
   providedIn: 'root'
 })
 export default class AuthService {
+  private cookieService = inject(CookieService);
+  private authAPIService = inject(AuthApiService);
+
   private readonly cookieExpiryRemember = 100;
   private readonly cookieExpiryDefault = 1;
   private username?: string;
   private sessionToken?: string;
-  constructor(
-    private cookieService: CookieService,
-    private authAPIService: AuthApiService
-  ) {}
 
   login(username: string, password: string, remember: boolean): Observable<boolean> {
     this.username = username;

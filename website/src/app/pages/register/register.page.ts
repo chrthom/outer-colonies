@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -51,6 +51,9 @@ import { RouterLink } from '@angular/router';
   ]
 })
 export class RegisterPage {
+  private authAPIService = inject(AuthApiService);
+  private dialog = inject(MatDialog);
+
   registrationSuccessful: boolean | undefined = undefined;
   registerForm: FormGroup = new FormGroup({
     username: new FormControl(
@@ -69,10 +72,6 @@ export class RegisterPage {
     newsletter: new FormControl(false)
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(
-    private authAPIService: AuthApiService,
-    private dialog: MatDialog
-  ) {}
   get username(): AbstractControl | null {
     return this.registerForm.get('username');
   }

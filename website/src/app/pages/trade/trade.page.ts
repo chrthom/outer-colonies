@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import {
@@ -39,6 +39,10 @@ import { OpenItemComponent } from '../../components/open-item/open-item.componen
   ]
 })
 export class TradePage implements OnInit {
+  private profileApiService = inject(ProfileApiService);
+  private itemApiService = inject(ItemApiService);
+  private snackBar = inject(MatSnackBar);
+
   sol = 0;
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
@@ -66,11 +70,6 @@ export class TradePage implements OnInit {
       price: rules.boosterCosts[3]
     }
   ];
-  constructor(
-    private profileApiService: ProfileApiService,
-    private itemApiService: ItemApiService,
-    private snackBar: MatSnackBar
-  ) {}
   ngOnInit() {
     this.reload();
   }

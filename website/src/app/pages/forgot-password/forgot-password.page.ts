@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import AuthApiService from 'src/app/api/auth-api.service';
@@ -26,6 +26,8 @@ import { RouterLink } from '@angular/router';
   ]
 })
 export class ForgotPasswordPage {
+  private authAPIService = inject(AuthApiService);
+
   passwordResetSuccessful = false;
   passwordResetFailed = false;
   loading = false;
@@ -33,7 +35,6 @@ export class ForgotPasswordPage {
     username: new FormControl('', [Validators.required])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  constructor(private authAPIService: AuthApiService) {}
   get username(): any {
     return this.forgotPasswordForm.get('username');
   }

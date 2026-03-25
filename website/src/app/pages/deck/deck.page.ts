@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DeckCard, DeckCardProfile } from '../../../../../server/src/shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { environment } from 'src/environments/environment';
@@ -57,6 +57,9 @@ import { CommonModule } from '@angular/common';
   ]
 })
 export class DeckPage implements OnInit {
+  private deckApiService = inject(DeckApiService);
+  private dialog = inject(MatDialog);
+
   readonly minCards = 60;
   readonly maxCards = 100;
   filterFormControl = new FormControl('');
@@ -110,11 +113,6 @@ export class DeckPage implements OnInit {
       });
     })
   );
-
-  constructor(
-    private deckApiService: DeckApiService,
-    private dialog: MatDialog
-  ) {}
   ngOnInit() {
     this.update();
   }
