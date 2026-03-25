@@ -16,8 +16,10 @@ jobs:
         project: [client, server, website]
       fail-fast: false  # Continue even if one project fails
     
-    # Only run this job if files in the specific project directory were changed
-    if: contains(github.event.pull_request.changed_files, format('./{0}/', matrix.project))
+    # Run for all projects on push to main or pull requests to main
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
     
     steps:
     - name: Checkout repository
