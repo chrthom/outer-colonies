@@ -16,9 +16,9 @@ README.md contains further information on project structure.
 
 ## Development Workflow
 
-**Use the GitHub Workflow Skill when working on an GitHub issue** - see `.vibe/skills/github-workflow/SKILL.md` for complete workflow documentation.
-
-**Failure to follow the GitHub Workflow Skill will result in implementation rejection.**
+**Use the GitHub Issue Skills when working on an GitHub issue** - see `.vibe/skills/github_issue/SKILL.md`
+**Use the Git Commit Skill when changes should be commited** - see `.vibe/skills/git_commit/SKILL.md`
+**Use the GitHub PR skill when instructed to create a PR for an issue** - see `.vibe/skills/github_pr/SKILL.md`
 
 ## Code Quality Standards
 
