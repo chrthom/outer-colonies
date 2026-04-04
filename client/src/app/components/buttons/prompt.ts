@@ -1,6 +1,5 @@
 import { designConfig } from 'src/app/config/design';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { animationConfig } from 'src/app/config/animation';
@@ -85,12 +84,6 @@ export default class Prompt {
         'Klicke die gegnerische Kolonie für\n' +
         'einen Überfall bzw. dein Deck oder\n' +
         'Ablagestapel für eine Mission.';
-    } else if (
-      this.scene.plannedBattle.type == BattleType.Mission &&
-      !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)
-    ) {
-      const missingCards = ClientPlannedBattleHelper.missingCards(this.scene.plannedBattle);
-      text = `Wähle ${missingCards} weitere Missionskarte${missingCards == 1 ? '' : 'n'}!`;
     } else {
       text = `Wähle Schiffe für ${
         this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
