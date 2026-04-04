@@ -12,7 +12,7 @@ export default class MissionButton extends BaseButton {
       scene,
       layoutConfig.game.ui.missionButton.x,
       layoutConfig.game.ui.missionButton.y,
-      'exit',
+      'mission',
       'Mission'
     );
     this.gameScene = scene;

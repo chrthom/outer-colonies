@@ -67,6 +67,8 @@ export function loadPreloadableResources(apiURL: string, load: Phaser.Loader.Loa
     'equipment_hull_infrastructure',
     'equipment_hull_infrastructure_tactic',
     'retract_card',
+    'mission',
+    'raid',
     'exit'
   ].forEach(name => load.image(`icon_${name}`, `icons/${name}.png`));
   load.image('prompt_box', 'utils/prompt_box.png');
