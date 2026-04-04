@@ -183,7 +183,7 @@ export function gameCron(io: Server) {
       }
       match.forAllPlayers((playerNo: number) => {
         const socket = getSocket(io, match, playerNo);
-        if (socket) socket.emit('countdown', match.countdown, match.pendingActionPlayerNo == playerNo);
+        if (socket) socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
         else console.log('WARN: Could not find socket to emit countdown');
       });
     });
