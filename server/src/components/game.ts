@@ -228,7 +228,7 @@ function initMatch(io: Server, match: Match) {
   emitState(io, match);
 }
 
-function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
   // Check hand card limit (only during end of phase)
   if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
     return false;
