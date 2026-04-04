@@ -1,58 +1,32 @@
 import Game from '../../scenes/game';
 import { layoutConfig } from '../../config/layout';
-import { designConfig } from 'src/app/config/design';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
+import { BaseButton } from './base_button';
 
-export default class MissionButton {
-  private scene: Game;
-  private text!: Phaser.GameObjects.Text;
-  private isVisible: boolean = false;
+export default class MissionButton extends BaseButton {
+  private gameScene: Game;
 
   constructor(scene: Game) {
-    this.scene = scene;
-
-    // Create button text
-    this.text = scene.add
-      .text(layoutConfig.game.ui.missionButton.x, layoutConfig.game.ui.missionButton.y, 'Mission durchführen')
-      .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.fontFamily.caption)
-      .setColor(designConfig.color.neutral)
-      .setAlign('left')
-      .setOrigin(0, 0.5)
-      .setInteractive({
-        useHandCursor: true
-      });
-
-    // Add event listeners
-    this.text
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.onClickAction();
-      })
-      .on('pointerover', () => this.text.setColor(designConfig.color.warn))
-      .on('pointerout', () => this.text.setColor(designConfig.color.neutral));
-
+    super(
+      scene,
+      layoutConfig.game.ui.missionButton.x,
+      layoutConfig.game.ui.missionButton.y,
+      'icon_intelligence',
+      'Mission durchführen'
+    );
+    this.gameScene = scene;
     this.updateVisibility();
-  }
-
-  show() {
-    this.isVisible = true;
-    this.text.setVisible(true);
-  }
-
-  hide() {
-    this.isVisible = false;
-    this.text.setVisible(false);
   }
 
   updateVisibility() {
     // Only show button when it would have an effect
     const canShow =
-      this.scene.state &&
-      this.scene.state.playerPendingAction &&
-      this.scene.state.playerIsActive &&
-      this.scene.state.turnPhase === TurnPhase.Build &&
-      !this.scene.activeCards.hand;
+      this.gameScene.state &&
+      this.gameScene.state.playerPendingAction &&
+      this.gameScene.state.playerIsActive &&
+      this.gameScene.state.turnPhase === TurnPhase.Build &&
+      !this.gameScene.activeCards.hand;
 
     if (canShow) {
       this.show();
@@ -61,23 +35,23 @@ export default class MissionButton {
     }
   }
 
-  private onClickAction() {
+  protected onClickAction() {
     if (
-      this.scene.state &&
-      this.scene.state.playerPendingAction &&
-      this.scene.state.playerIsActive &&
-      this.scene.state.turnPhase == TurnPhase.Build &&
-      !this.scene.activeCards.hand
+      this.gameScene.state &&
+      this.gameScene.state.playerPendingAction &&
+      this.gameScene.state.playerIsActive &&
+      this.gameScene.state.turnPhase == TurnPhase.Build &&
+      !this.gameScene.activeCards.hand
     ) {
-      if (ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
-        this.scene.resetView(BattleType.None);
+      if (ClientPlannedBattleHelper.cardLimitReached(this.gameScene.plannedBattle)) {
+        this.gameScene.resetView(BattleType.None);
       } else {
-        if (this.scene.plannedBattle.type != BattleType.Mission) {
-          this.scene.resetView(BattleType.Mission);
+        if (this.gameScene.plannedBattle.type != BattleType.Mission) {
+          this.gameScene.resetView(BattleType.Mission);
         }
-        if (!ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle)) {
-          this.scene.plannedBattle.downsideCardsNum++;
-          this.scene.updateView();
+        if (!ClientPlannedBattleHelper.cardLimitReached(this.gameScene.plannedBattle)) {
+          this.gameScene.plannedBattle.downsideCardsNum++;
+          this.gameScene.updateView();
         }
       }
     }

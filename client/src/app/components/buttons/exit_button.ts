@@ -4,30 +4,26 @@ import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { designConfig } from 'src/app/config/design';
 import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
+import { BaseButton } from './base_button';
 
-export default class ExitButton {
+export default class ExitButton extends BaseButton {
   private isMatchmaking!: boolean;
-  private scene!: Matchmaking | Game;
-  private image!: Phaser.GameObjects.Image;
-  private text!: Phaser.GameObjects.Text;
   private confirmText!: Phaser.GameObjects.Text;
+  
   constructor(scene: Matchmaking | Game) {
-    this.scene = scene;
+    super(
+      scene,
+      layoutConfig.game.ui.exitButton.x,
+      layoutConfig.game.ui.exitButton.y,
+      'icon_exit',
+      '',
+      layoutConfig.game.ui.exitButton.xTextOffset,
+      layoutConfig.game.ui.exitButton.yTextOffset
+    );
     this.isMatchmaking = !(scene instanceof Game);
-    this.text = scene.add
-      .text(
-        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
-        layoutConfig.game.ui.exitButton.y + layoutConfig.game.ui.exitButton.yTextOffset,
-        ''
-      )
-      .setFontSize(layoutConfig.fontSize.normal)
-      .setFontFamily(designConfig.fontFamily.caption)
-      .setColor(designConfig.color.neutral)
-      .setAlign('right')
-      .setOrigin(1, 0.5)
-      .setInteractive({
-        useHandCursor: true
-      });
+    this.text.setAlign('right').setOrigin(1, 0.5);
+    
+    // Create confirmation text
     this.confirmText = scene.add
       .text(
         layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
@@ -44,52 +40,41 @@ export default class ExitButton {
       .setInteractive({
         useHandCursor: true
       });
-    this.image = this.scene.add
-      .image(layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'icon_exit')
-      .setOrigin(0.5)
-      .setInteractive({
-        useHandCursor: true
-      });
-    (<Phaser.GameObjects.GameObject[]>[this.text, this.image]).forEach(
-      o =>
-        o
-          .on('pointerdown', (p: Phaser.Input.Pointer) => {
-            if (p.leftButtonDown()) this.onClickAction();
-          })
-          .on('pointerover', () => this.text.setColor(designConfig.color.warn))
-          .on('pointerout', () => this.text.setColor(designConfig.color.neutral)),
-      this
-    );
+    
+    // Add confirmation text event listeners
     this.confirmText
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown()) this.onClickAction(true);
       })
       .on('pointerover', () => this.confirmText.setColor(designConfig.color.warn))
       .on('pointerout', () => this.confirmText.setColor(designConfig.color.neutral));
+    
     this.update();
   }
-  show() {
-    this.image.setVisible(true);
-    this.text.setVisible(true);
+  
+  override show() {
+    super.show();
   }
-  hide() {
-    this.image.setVisible(false);
-    this.text.setVisible(false);
+  
+  override hide() {
+    super.hide();
     this.confirmText.setVisible(false);
   }
+  
   update() {
     this.confirmText.setVisible(false);
-    if (this.isMatchmaking) this.text.setText('Spielersuche abbrechen');
-    else if (this.scene instanceof Game && !this.scene.state?.gameResult) this.text.setText('Aufgeben');
-    else this.text.setText('Spiel beenden');
+    if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
+    else if (this.scene instanceof Game && !this.scene.state?.gameResult) this.updateText('Aufgeben');
+    else this.updateText('Spiel beenden');
   }
-  private onClickAction(confirmed?: boolean) {
+  
+  protected onClickAction(confirmed?: boolean) {
     if (this.isMatchmaking || (this.scene instanceof Game && this.scene.state.gameResult)) {
-      this.scene.socket.disconnect();
+      (this.scene as any).socket.disconnect();
       window.location.href = environment.urls.website;
     } else if (confirmed) {
       // Surrender - send surrender message to server
-      this.scene.socket.emit(MsgTypeInbound.Surrender);
+      (this.scene as Game).socket.emit(MsgTypeInbound.Surrender);
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
     }

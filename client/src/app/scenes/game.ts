@@ -178,6 +178,8 @@ export default class Game extends Phaser.Scene {
     this.obj.exitButton.update();
     this.obj.missionCards.update();
     this.obj.zoomCard.hide();
+    this.obj.raidButton.updateVisibility();
+    this.obj.missionButton.updateVisibility();
     this.updateHighlighting();
   }
 
