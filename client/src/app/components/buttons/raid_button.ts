@@ -8,7 +8,7 @@ export default class RaidButton extends BaseButton {
   private gameScene: Game;
 
   constructor(scene: Game) {
-    super(scene, layoutConfig.game.ui.raidButton.x, layoutConfig.game.ui.raidButton.y, 'exit', 'Überfall');
+    super(scene, layoutConfig.game.ui.raidButton.x, layoutConfig.game.ui.raidButton.y, 'raid', 'Überfall');
     this.gameScene = scene;
     this.updateVisibility();
   }
