@@ -44,22 +44,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     });
   });
-
-  function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
-    // Check hand card limit (only during end of phase)
-    if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
-      return false;
-    }
-
-    // Check if player has to retract cards
-    const hasToRetractCards = player.cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy);
-
-    if (hasToRetractCards) {
-      return false;
-    }
-
-    return true;
-  }
   socket.on(MsgTypeInbound.Disconnect, () => {
     doWithMatchAndPlayer(socket, (match, player) => {
       if (!match.gameResult.gameOver) {
@@ -194,67 +178,10 @@ export function gameCron(io: Server) {
     .forEach(match => {
       if (--match.countdown <= 0) {
         // Trigger automatic ready event instead of timeout victory
-        handleAutomaticReady(io, match);
+        match.pendingActionPlayer.handleAutomaticReady();
+        emitState(io, match);
       }
-      match.forAllPlayers((playerNo: number) => {
-        const socket = getSocket(io, match, playerNo);
-        if (socket)
-          socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
-        else console.log('WARN: Could not find socket to emit countdown');
-      });
     });
-}
-
-function handleAutomaticReady(io: Server, match: Match) {
-  const player = match.pendingActionPlayer;
-
-  // Check if player needs to drop cards
-  if (player.hand.length > player.handCardLimit) {
-    dropExcessCards(player);
-  }
-
-  // Check if player needs to retract cards
-  const hasToRetractCards = player.cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy);
-
-  if (hasToRetractCards) {
-    retractInsufficientEnergyCards(player);
-  }
-
-  // Process the ready event based on current turn phase
-  if (match.turnPhase == TurnPhase.Build) {
-    if (match.pendingActionPlayerNo == match.activePlayerNo) {
-      match.prepareBuildPhaseReaction(undefined);
-    } else {
-      match.prepareCombatPhase(undefined);
-    }
-  } else if (match.turnPhase == TurnPhase.Combat) {
-    match.processBattleRound();
-  }
-
-  emitState(io, match);
-  match.countdown = rules.countdownTimer; // Reset countdown
-}
-
-function dropExcessCards(player: Player) {
-  const cardsToDrop = player.hand.length - player.handCardLimit;
-  if (cardsToDrop > 0) {
-    // Drop the first excess cards (simple implementation)
-    const handCardUUIDs = player.hand.map(cs => cs.uuid).slice(0, cardsToDrop);
-    player.discardHandCards(...handCardUUIDs);
-  }
-}
-
-function retractInsufficientEnergyCards(player: Player) {
-  // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
-  const cardStacksToRetract = player.cardStacks
-    .filter(cs => cs.hasInsufficientEnergy)
-    .sort((a, b) => a.profile.energy - b.profile.energy);
-
-  for (const cardStack of cardStacksToRetract) {
-    if (cardStack.canBeRetracted) {
-      cardStack.retract();
-    }
-  }
 }
 
 function doWithMatchAndPlayer(socket: Socket, f: (m: Match, p: Player) => void) {
@@ -294,4 +221,16 @@ function initMatch(io: Server, match: Match) {
   });
   match.prepareStartPhase();
   emitState(io, match);
+}
+
+function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+  // Check hand card limit (only during end of phase)
+  if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
+    return false;
+  }
+  // Check if player has to retract cards
+  if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
+    return false;
+  }
+  return true;
 }

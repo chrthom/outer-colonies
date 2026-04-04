@@ -55,7 +55,6 @@ export enum ItemBoxContentType {
 }
 
 export enum GameResultType {
-  Countdown = 'countdown',
   Depletion = 'depletion',
   Destruction = 'destruction',
   Domination = 'domination',
@@ -77,7 +76,6 @@ export enum MsgTypeInbound {
 export enum MsgTypeOutbound {
   CardRequest = 'card_request',
   Connect = 'connect',
-  Countdown = 'countdown',
   Matchmaking = 'matchmaking',
   State = 'state'
 }

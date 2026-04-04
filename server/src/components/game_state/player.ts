@@ -1,11 +1,12 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, TurnPhase } from '../../shared/config/enums';
+import { CardType, Zone, TurnPhase, BattleType } from '../../shared/config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
 import { InterventionTacticCard } from './intervention';
+import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId: string;
@@ -117,5 +118,69 @@ export default class Player {
       this.match.turnPhase == TurnPhase.Build &&
       this.cardStacks.some(cs => cs.hasInsufficientEnergy)
     );
+  }
+
+  /**
+   * Handle automatic ready when timeout reaches 0
+   * This method is called by the game cron when a player's timeout expires
+   */
+  handleAutomaticReady() {
+    // Check if player needs to drop cards
+    if (this.hand.length > this.handCardLimit) {
+      this.dropExcessCards();
+    }
+
+    // Check if player needs to retract cards
+    if (this.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
+      this.retractInsufficientEnergyCards();
+    }
+
+    // Process the ready event based on current turn phase
+    const match = this.match;
+    if (match.turnPhase == TurnPhase.Build) {
+      if (match.pendingActionPlayerNo == this.no) {
+        if (match.pendingActionPlayerNo == match.activePlayerNo) {
+          // For automatic ready, create an empty battle plan
+          match.prepareBuildPhaseReaction({ type: BattleType.None, shipIds: [] });
+        } else {
+          // For automatic ready, provide empty array for intercepting ships
+          match.prepareCombatPhase([]);
+        }
+      }
+    } else if (match.turnPhase == TurnPhase.Combat) {
+      if (match.pendingActionPlayerNo == this.no) {
+        match.processBattleRound();
+      }
+    }
+
+    match.countdown = rules.countdownTimer; // Reset countdown
+  }
+
+  /**
+   * Drop excess cards from hand when hand limit is exceeded
+   */
+  private dropExcessCards() {
+    const cardsToDrop = this.hand.length - this.handCardLimit;
+    if (cardsToDrop > 0) {
+      // Drop the first excess cards (simple implementation)
+      const handCardUUIDs = this.hand.map(cs => cs.uuid).slice(0, cardsToDrop);
+      this.discardHandCards(...handCardUUIDs);
+    }
+  }
+
+  /**
+   * Retract cards with insufficient energy
+   */
+  private retractInsufficientEnergyCards() {
+    // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
+    const cardStacksToRetract = this.cardStacks
+      .filter(cs => cs.hasInsufficientEnergy)
+      .sort((a, b) => a.profile.energy - b.profile.energy);
+
+    for (const cardStack of cardStacksToRetract) {
+      if (cardStack.canBeRetracted) {
+        cardStack.retract();
+      }
+    }
   }
 }
