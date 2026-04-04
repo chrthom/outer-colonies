@@ -18,27 +18,48 @@ export function gameSocketListeners(io: Server, socket: Socket) {
           match.players[player.no].ready = true;
           if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
-          if (match.intervention) {
-            match.skipIntervention();
-          } else {
-            switch (turnPhase) {
-              case TurnPhase.Build:
-                if (getSocketData(socket).playerNo == match.activePlayerNo) {
-                  match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
-                } else {
-                  match.prepareCombatPhase(<string[]>data);
-                }
-                break;
-              case TurnPhase.Combat:
-                match.processBattleRound();
-                break;
+          // Verify conditions before processing ready event
+          if (verifyReadyConditions(player, turnPhase)) {
+            if (match.intervention) {
+              match.skipIntervention();
+            } else {
+              switch (turnPhase) {
+                case TurnPhase.Build:
+                  if (getSocketData(socket).playerNo == match.activePlayerNo) {
+                    match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
+                  } else {
+                    match.prepareCombatPhase(<string[]>data);
+                  }
+                  break;
+                case TurnPhase.Combat:
+                  match.processBattleRound();
+                  break;
+              }
             }
+          } else {
+            console.log(`WARN: ${player.name} tried to ready but conditions not met`);
           }
         }
       }
       emitState(io, match);
     });
   });
+
+  function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+    // Check hand card limit (only during end of phase)
+    if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
+      return false;
+    }
+
+    // Check if player has to retract cards
+    const hasToRetractCards = player.cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy);
+
+    if (hasToRetractCards) {
+      return false;
+    }
+
+    return true;
+  }
   socket.on(MsgTypeInbound.Disconnect, () => {
     doWithMatchAndPlayer(socket, (match, player) => {
       if (!match.gameResult.gameOver) {
@@ -172,8 +193,8 @@ export function gameCron(io: Server) {
     .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
     .forEach(match => {
       if (--match.countdown <= 0) {
-        match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
-        emitState(io, match);
+        // Trigger automatic ready event instead of timeout victory
+        handleAutomaticReady(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
         const socket = getSocket(io, match, playerNo);
@@ -182,6 +203,58 @@ export function gameCron(io: Server) {
         else console.log('WARN: Could not find socket to emit countdown');
       });
     });
+}
+
+function handleAutomaticReady(io: Server, match: Match) {
+  const player = match.pendingActionPlayer;
+
+  // Check if player needs to drop cards
+  if (player.hand.length > player.handCardLimit) {
+    dropExcessCards(player);
+  }
+
+  // Check if player needs to retract cards
+  const hasToRetractCards = player.cardStacks.flatMap(cs => cs.cards).some(c => c.insufficientEnergy);
+
+  if (hasToRetractCards) {
+    retractInsufficientEnergyCards(player);
+  }
+
+  // Process the ready event based on current turn phase
+  if (match.turnPhase == TurnPhase.Build) {
+    if (match.pendingActionPlayerNo == match.activePlayerNo) {
+      match.prepareBuildPhaseReaction(undefined);
+    } else {
+      match.prepareCombatPhase(undefined);
+    }
+  } else if (match.turnPhase == TurnPhase.Combat) {
+    match.processBattleRound();
+  }
+
+  emitState(io, match);
+  match.countdown = rules.countdownTimer; // Reset countdown
+}
+
+function dropExcessCards(player: Player) {
+  const cardsToDrop = player.hand.length - player.handCardLimit;
+  if (cardsToDrop > 0) {
+    // Drop the first excess cards (simple implementation)
+    const handCardUUIDs = player.hand.map(cs => cs.uuid).slice(0, cardsToDrop);
+    player.discardHandCards(...handCardUUIDs);
+  }
+}
+
+function retractInsufficientEnergyCards(player: Player) {
+  // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
+  const cardStacksToRetract = player.cardStacks
+    .filter(cs => cs.hasInsufficientEnergy)
+    .sort((a, b) => a.profile.energy - b.profile.energy);
+
+  for (const cardStack of cardStacksToRetract) {
+    if (cardStack.canBeRetracted) {
+      cardStack.retract();
+    }
+  }
 }
 
 function doWithMatchAndPlayer(socket: Socket, f: (m: Match, p: Player) => void) {
