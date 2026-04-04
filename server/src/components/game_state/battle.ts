@@ -1,4 +1,3 @@
-import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import EquipmentCard from '../cards/types/equipment_card';
 import { BattleType, Zone } from '../../shared/config/enums';
@@ -23,8 +22,6 @@ export interface Attack {
 export default class Battle {
   type!: BattleType;
   ships: CardStack[][] = [[], []];
-  downsidePriceCards: Card[] = [];
-  upsidePriceCards: Card[] = [];
   range: number = rules.maxRange + 1;
   activePlayerNo: number;
   recentAttack?: Attack;
@@ -95,10 +92,8 @@ export default class Battle {
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;
     if (this.ships[match.activePlayerNo].length > 0) {
-      player.takeCards(this.downsidePriceCards);
-      player.deck.push(...this.upsidePriceCards);
-    } else {
-      player.discardCards(...this.downsidePriceCards.concat(this.upsidePriceCards));
+      player.drawCards(1);
+      player.deck.push(...match.activePlayer.pickCardsFromTopOfDiscardPile(1));
     }
   }
   private getDestroyedCardStacks(playerNo: number): CardStack[] {
