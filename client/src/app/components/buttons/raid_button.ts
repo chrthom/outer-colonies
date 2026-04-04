@@ -12,17 +12,14 @@ export default class RaidButton extends BaseButton {
       layoutConfig.game.ui.raidButton.x,
       layoutConfig.game.ui.raidButton.y,
       'icon_military',
-      'Kolonie angreifen'
+      'Überfall'
     );
     this.gameScene = scene;
     this.updateVisibility();
   }
 
   updateVisibility() {
-    // Only show button when it would have an effect
-    const canShow = this.canShowActionButtons();
-
-    if (canShow) {
+    if (this.canShowActionButtons()) {
       this.show();
     } else {
       this.hide();
@@ -30,13 +27,8 @@ export default class RaidButton extends BaseButton {
   }
 
   protected onClickAction() {
-    // Find opponent colony stack
-    const opponentColony = this.gameScene.cardStacks.find(stack => stack.isOpponentColony);
-
-    if (opponentColony) {
-      this.gameScene.resetView(
-        this.gameScene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
-      );
-    }
+    this.gameScene.resetView(
+      this.gameScene.plannedBattle.type == BattleType.Raid ? BattleType.None : BattleType.Raid
+    );
   }
 }

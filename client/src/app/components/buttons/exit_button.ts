@@ -9,7 +9,7 @@ import { BaseButton } from './base_button';
 export default class ExitButton extends BaseButton {
   private isMatchmaking!: boolean;
   private confirmText!: Phaser.GameObjects.Text;
-  
+
   constructor(scene: Matchmaking | Game) {
     super(
       scene,
@@ -22,7 +22,7 @@ export default class ExitButton extends BaseButton {
     );
     this.isMatchmaking = !(scene instanceof Game);
     this.text.setAlign('right').setOrigin(1, 0.5);
-    
+
     // Create confirmation text
     this.confirmText = scene.add
       .text(
@@ -40,7 +40,7 @@ export default class ExitButton extends BaseButton {
       .setInteractive({
         useHandCursor: true
       });
-    
+
     // Add confirmation text event listeners
     this.confirmText
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
@@ -48,26 +48,26 @@ export default class ExitButton extends BaseButton {
       })
       .on('pointerover', () => this.confirmText.setColor(designConfig.color.warn))
       .on('pointerout', () => this.confirmText.setColor(designConfig.color.neutral));
-    
+
     this.update();
   }
-  
+
   override show() {
     super.show();
   }
-  
+
   override hide() {
     super.hide();
     this.confirmText.setVisible(false);
   }
-  
+
   update() {
     this.confirmText.setVisible(false);
     if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
     else if (this.scene instanceof Game && !this.scene.state?.gameResult) this.updateText('Aufgeben');
     else this.updateText('Spiel beenden');
   }
-  
+
   protected onClickAction(confirmed?: boolean) {
     if (this.isMatchmaking || (this.scene instanceof Game && this.scene.state.gameResult)) {
       (this.scene as any).socket.disconnect();

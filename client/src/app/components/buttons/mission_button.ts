@@ -12,17 +12,14 @@ export default class MissionButton extends BaseButton {
       layoutConfig.game.ui.missionButton.x,
       layoutConfig.game.ui.missionButton.y,
       'icon_intelligence',
-      'Mission durchführen'
+      'Mission'
     );
     this.gameScene = scene;
     this.updateVisibility();
   }
 
   updateVisibility() {
-    // Only show button when it would have an effect
-    const canShow = this.canShowActionButtons();
-
-    if (canShow) {
+    if (this.canShowActionButtons()) {
       this.show();
     } else {
       this.hide();
@@ -30,17 +27,8 @@ export default class MissionButton extends BaseButton {
   }
 
   protected onClickAction() {
-    // Toggle mission type - backend will always use 1 downside and 1 upside card
-    if (
-      this.gameScene.state &&
-      this.gameScene.state.playerPendingAction &&
-      this.gameScene.state.playerIsActive &&
-      this.gameScene.state.turnPhase == TurnPhase.Build &&
-      !this.gameScene.activeCards.hand
-    ) {
-      this.gameScene.resetView(
-        this.gameScene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission
-      );
-    }
+    this.gameScene.resetView(
+      this.gameScene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission
+    );
   }
 }

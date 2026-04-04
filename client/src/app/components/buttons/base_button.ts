@@ -26,12 +26,9 @@ export abstract class BaseButton {
     this.yTextOffset = yTextOffset;
 
     // Create button icon
-    this.image = scene.add
-      .image(x, y, iconKey)
-      .setOrigin(0.5)
-      .setInteractive({
-        useHandCursor: true
-      });
+    this.image = scene.add.image(x, y, iconKey).setOrigin(0.5).setInteractive({
+      useHandCursor: true
+    });
 
     // Create button text
     this.text = scene.add
@@ -51,9 +48,10 @@ export abstract class BaseButton {
 
   protected setupEventListeners() {
     [this.text, this.image].forEach(o =>
-      o.on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.onClickAction();
-      })
+      o
+        .on('pointerdown', (p: Phaser.Input.Pointer) => {
+          if (p.leftButtonDown()) this.onClickAction();
+        })
         .on('pointerover', () => this.text.setColor(designConfig.color.warn))
         .on('pointerout', () => this.text.setColor(designConfig.color.neutral))
     );
@@ -84,7 +82,7 @@ export abstract class BaseButton {
   protected canShowActionButtons(): boolean {
     // Only applicable for Game scenes
     if (!(this.scene instanceof Game)) return false;
-    
+
     const gameScene = this.scene as Game;
     return (
       gameScene.state &&
