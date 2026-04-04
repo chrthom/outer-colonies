@@ -181,6 +181,11 @@ export function gameCron(io: Server) {
         match.pendingActionPlayer.handleAutomaticReady();
         emitState(io, match);
       }
+      match.forAllPlayers((playerNo: number) => {
+        const socket = getSocket(io, match, playerNo);
+        if (socket) socket.emit('countdown', match.countdown, match.pendingActionPlayerNo == playerNo);
+        else console.log('WARN: Could not find socket to emit countdown');
+      });
     });
 }
 
