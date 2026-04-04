@@ -146,8 +146,8 @@ class LayoutGameConfig {
       }
     },
     exitButton: {
-      x: 2330,
-      y: 675,
+      x: 2300,
+      y: 700,
       yConfirmOffset: 35
     },
     gameOver: {
@@ -169,8 +169,8 @@ class LayoutGameConfig {
       y: new ZoomCardYPosition(650)
     },
     missionButton: {
-      x: 2330,
-      y: 745
+      x: 2300,
+      y: 350
     },
     optionPicker: {
       arrowSize: 80,
@@ -189,8 +189,8 @@ class LayoutGameConfig {
       y: 630
     },
     raidButton: {
-      x: 2330,
-      y: 780
+      x: 2300,
+      y: 400
     },
     zones: {
       height: 240,
