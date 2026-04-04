@@ -1,6 +1,6 @@
 import Game from '../../scenes/game';
 import { layoutConfig } from '../../config/layout';
-import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType } from '../../../../../server/src/shared/config/enums';
 import { BaseButton } from './base_button';
 
 export default class MissionButton extends BaseButton {
@@ -20,12 +20,7 @@ export default class MissionButton extends BaseButton {
 
   updateVisibility() {
     // Only show button when it would have an effect
-    const canShow =
-      this.gameScene.state &&
-      this.gameScene.state.playerPendingAction &&
-      this.gameScene.state.playerIsActive &&
-      this.gameScene.state.turnPhase === TurnPhase.Build &&
-      !this.gameScene.activeCards.hand;
+    const canShow = this.canShowActionButtons();
 
     if (canShow) {
       this.show();

@@ -1,5 +1,6 @@
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from 'src/app/config/design';
+import { TurnPhase } from '../../../../../server/src/shared/config/enums';
 import Game from '../../scenes/game';
 import Matchmaking from '../../scenes/matchmaking';
 
@@ -75,4 +76,24 @@ export abstract class BaseButton {
   }
 
   protected abstract onClickAction(): void;
+
+  /**
+   * Check if action buttons (mission/raid) should be shown
+   * Only applicable for Game scenes, returns false for Matchmaking scenes
+   */
+  protected canShowActionButtons(): boolean {
+    // Only applicable for Game scenes
+    if (!(this.scene instanceof Game)) return false;
+    
+    const gameScene = this.scene as Game;
+    return (
+      gameScene.state &&
+      gameScene.state.playerPendingAction &&
+      gameScene.state.playerIsActive &&
+      gameScene.state.turnPhase === TurnPhase.Build &&
+      !gameScene.activeCards.hand &&
+      // Check if player has at least one stack with missionReady = true
+      gameScene.cardStacks.some(stack => stack.ownedByPlayer && stack.data.missionReady)
+    );
+  }
 }
