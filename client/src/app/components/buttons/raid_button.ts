@@ -11,7 +11,7 @@ export default class RaidButton extends BaseButton {
       scene,
       layoutConfig.game.ui.raidButton.x,
       layoutConfig.game.ui.raidButton.y,
-      'icon_military',
+      'exit',
       'Überfall'
     );
     this.gameScene = scene;

@@ -15,20 +15,17 @@ export default class ExitButton extends BaseButton {
       scene,
       layoutConfig.game.ui.exitButton.x,
       layoutConfig.game.ui.exitButton.y,
-      'icon_exit',
-      '',
-      layoutConfig.game.ui.exitButton.xTextOffset,
-      layoutConfig.game.ui.exitButton.yTextOffset
+      'exit',
+      ''
     );
     this.isMatchmaking = !(scene instanceof Game);
-    this.text.setAlign('right').setOrigin(1, 0.5);
 
     // Create confirmation text
     this.confirmText = scene.add
       .text(
-        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.exitButton.xTextOffset,
+        layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.baseButtons.xTextOffset,
         layoutConfig.game.ui.exitButton.y +
-          layoutConfig.game.ui.exitButton.yTextOffset +
+          layoutConfig.game.ui.baseButtons.yTextOffset +
           layoutConfig.game.ui.exitButton.yConfirmOffset,
         'Kapitulation bestätigen'
       )

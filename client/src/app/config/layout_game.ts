@@ -122,6 +122,10 @@ class LayoutGameConfig {
         yDistance: 55
       }
     },
+    baseButtons: {
+      xTextOffset: -30,
+      yTextOffset: -4,
+    },
     combatRange: {
       x: 1855,
       y: 600
@@ -144,17 +148,7 @@ class LayoutGameConfig {
     exitButton: {
       x: 2330,
       y: 675,
-      xTextOffset: -30,
-      yTextOffset: -4,
       yConfirmOffset: 35
-    },
-    raidButton: {
-      x: 100,
-      y: 600
-    },
-    missionButton: {
-      x: 100,
-      y: 700
     },
     gameOver: {
       yOffsets: {
@@ -174,6 +168,10 @@ class LayoutGameConfig {
       x: new ZoomCardXPosition(1200),
       y: new ZoomCardYPosition(650)
     },
+    missionButton: {
+      x: 2330,
+      y: 745
+    },
     optionPicker: {
       arrowSize: 80,
       cardsXOffset: 750,
@@ -189,6 +187,10 @@ class LayoutGameConfig {
       },
       x: 1840,
       y: 630
+    },
+    raidButton: {
+      x: 2330,
+      y: 780
     },
     zones: {
       height: 240,
