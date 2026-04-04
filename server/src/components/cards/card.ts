@@ -17,11 +17,11 @@ import { rules } from '../../shared/config/rules';
 export type CardRarity = 0 | 1 | 2 | 3 | 4 | 5;
 
 export default abstract class Card {
-  readonly id!: number;
-  readonly name!: string;
-  readonly type!: CardType;
-  readonly rarity!: CardRarity;
-  readonly profile!: CardProfile;
+  readonly id: number;
+  readonly name: string;
+  readonly type: CardType;
+  readonly rarity: CardRarity;
+  readonly profile: CardProfile;
   constructor(id: number, name: string, type: CardType, rarity: CardRarity, profile?: CardProfileConfig) {
     this.id = id;
     this.name = name;

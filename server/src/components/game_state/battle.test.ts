@@ -170,4 +170,75 @@ describe('Battle', () => {
       expect(defenseTypes.length).toBe(3); // Should have exactly 3 defense types
     });
   });
+
+  describe('control mechanics', () => {
+    test('should calculate control from ships', () => {
+      // Create mock card stacks with control values
+      const mockCard1 = new MockCard(1, 'Ship1', CardType.Hull, 1);
+      mockCard1.profile.control = 3;
+      const mockCard2 = new MockCard(2, 'Ship2', CardType.Hull, 1);
+      mockCard2.profile.control = 2;
+
+      const ship1 = new RootCardStack(mockCard1, Zone.Hand, player1);
+      const ship2 = new RootCardStack(mockCard2, Zone.Hand, player1);
+
+      battle.ships[0] = [ship1, ship2];
+      battle.ships[1] = [];
+
+      // Access private method through any casting
+      const sumControl = (battle as any).sumControl(battle.ships[0]);
+      expect(sumControl).toBe(5);
+    });
+
+    test('should handle empty ship arrays', () => {
+      battle.ships[0] = [];
+      battle.ships[1] = [];
+
+      const sumControl = (battle as any).sumControl(battle.ships[0]);
+      expect(sumControl).toBe(0);
+    });
+
+    test('should apply mission results with control', () => {
+      // Setup battle with mission type
+      battle = new Battle(BattleType.Mission, 1);
+
+      // Create mock match with gameResult
+      const mockGameResult = {
+        setWinnerByDeckDepletion: jest.fn()
+      };
+      const mockMatch = {
+        activePlayer: player1,
+        activePlayerNo: 1,
+        players: [player1, player2],
+        gameResult: mockGameResult
+      } as any as Match;
+
+      // Create ships with control values
+      const mockCard1 = new MockCard(1, 'Ship1', CardType.Hull, 1);
+      mockCard1.profile.control = 3;
+      const mockCard2 = new MockCard(2, 'Ship2', CardType.Hull, 1);
+      mockCard2.profile.control = 2;
+
+      const ship1 = new RootCardStack(mockCard1, Zone.Hand, player1);
+      const ship2 = new RootCardStack(mockCard2, Zone.Hand, player1);
+
+      battle.ships[0] = [ship1];
+      battle.ships[1] = [ship2];
+
+      // Mock player's methods
+      const gainControlSpy = jest.fn();
+      const drawCardsSpy = jest.fn();
+      const pickCardsFromTopOfDiscardPileSpy = jest.fn().mockReturnValue([]);
+      player1.gainControl = gainControlSpy;
+      player1.drawCards = drawCardsSpy;
+      player1.pickCardsFromTopOfDiscardPile = pickCardsFromTopOfDiscardPileSpy;
+
+      // Access private method through any casting
+      (battle as any).applyMissionResult(mockMatch);
+
+      // Verify control was calculated and applied
+      expect(gainControlSpy).toHaveBeenCalledWith(1); // 3 - 2 = 1 surplus
+      expect(drawCardsSpy).toHaveBeenCalledWith(1);
+    });
+  });
 });

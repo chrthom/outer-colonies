@@ -1,5 +1,5 @@
 import Match from '../game_state/match';
-import { CardType, InterventionType, TurnPhase, Zone } from '../../shared/config/enums';
+import { BattleType, CardType, InterventionType, TurnPhase, Zone } from '../../shared/config/enums';
 import ActionPool from '../cards/action_pool';
 import { opponentPlayerNo } from '../utils/helpers';
 import {
@@ -14,6 +14,7 @@ import {
 } from '../../shared/interfaces/client_state';
 import { InterventionAttack } from '../game_state/intervention';
 import CardStack from '../cards/card_stack';
+import { rules } from '../../shared/config/rules';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];
@@ -66,8 +67,16 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           { icon: 'damage', value: cs.damage, warning: true },
           { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp }
         ].filter(i => i.value != 0 && i.value < 100);
+        if (cs.type == CardType.Colony) {
+          attributes.push({
+            icon: 'control',
+            value: cs.player.control,
+            warning: cs.player.control > (rules.controlLimit * 2) / 3
+          });
+        }
         if (match.turnPhase == TurnPhase.Build && ownedByPlayer && cs.card.type != CardType.Infrastructure) {
           attributes.push(
+            ...(cs.type != CardType.Colony ? [{ icon: 'control', value: profile.control }] : []),
             ...[
               { icon: 'speed', value: profile.speed },
               { icon: 'energy', value: profile.energy, warning: profile.energy < 0 },
@@ -83,10 +92,13 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           match.turnPhase == TurnPhase.Combat &&
           battle.playerShipIds.concat(battle.opponentShipIds).includes(cs.uuid)
         ) {
+          if (battle.type == BattleType.Mission) {
+            attributes.push({ icon: 'control', value: profile.control });
+          }
+          if (cs.zone == Zone.Orbital || cs.zone == Zone.Neutral) {
+            attributes.push({ icon: 'speed', value: profile.speed });
+          }
           attributes.push(
-            ...(cs.zone == Zone.Orbital || cs.zone == Zone.Neutral
-              ? [{ icon: 'speed', value: profile.speed }]
-              : []),
             ...cs.cardStacks
               .filter(c => c.card.canDefend)
               .map(c => {

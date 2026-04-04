@@ -29,6 +29,7 @@ export function loadPreloadableResources(apiURL: string, load: Phaser.Loader.Loa
   [
     'damage',
     'hp',
+    'control',
     'speed',
     'energy',
     'theta',

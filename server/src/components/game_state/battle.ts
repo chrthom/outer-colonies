@@ -94,9 +94,11 @@ export default class Battle {
     if (this.ships[match.activePlayerNo].length > 0) {
       player.drawCards(1);
       player.deck.push(...match.activePlayer.pickCardsFromTopOfDiscardPile(1));
+      const controlSurplus = this.sumControl(this.ships[0]) - this.sumControl(this.ships[1]);
+      player.gainControl(Math.max(controlSurplus, 0));
     }
   }
-  private getDestroyedCardStacks(playerNo: number): CardStack[] {
-    return this.ships[playerNo].filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
+  private sumControl(ships: CardStack[]): number {
+    return ships.map(ship => ship.profile.control).reduce((a, b) => a + b, 0);
   }
 }

@@ -8,15 +8,15 @@ import Match from './match';
 import { InterventionTacticCard } from './intervention';
 
 export default class Player {
-  socketId!: string;
-  name!: string;
-  match!: Match;
-  no!: number;
+  socketId: string;
+  name: string;
+  match: Match;
+  no: number;
   ready: boolean = false;
-  deck!: Card[];
+  deck: Card[];
   discardPile: Card[] = [];
   hand: CardStack[] = [];
-  cardStacks!: CardStack[];
+  cardStacks: CardStack[];
   actionPool!: ActionPool;
   constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
     this.socketId = socketd;
@@ -67,6 +67,14 @@ export default class Player {
   }
   get isPendingPlayer(): boolean {
     return this.no == this.match.pendingActionPlayerNo;
+  }
+  get control(): number {
+    return (this.no == 0 && this.match.control > 0) || (this.no == 1 && this.match.control < 0)
+      ? Math.abs(this.match.control)
+      : 0;
+  }
+  gainControl(control: number) {
+    this.match.adjustControl(control * (this.no == 0 ? 1 : -1));
   }
   takeCard(card: Card): Card {
     this.takeCards([card]);

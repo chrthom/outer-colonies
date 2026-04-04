@@ -16,6 +16,7 @@ export class Card131 extends HullCard {
   constructor() {
     super(131, 'Fregatte (Bug)', 2, frigateMultipart, {
       hp: 7,
+      control: 2,
       omega: 2
     });
   }
@@ -36,6 +37,7 @@ export class Card177 extends HullCard {
   constructor() {
     super(177, 'Zerstörer (Bug)', 1, destroyerMultipart, {
       hp: 5,
+      control: 2,
       theta: 1,
       xi: 1
     });
@@ -69,6 +71,7 @@ export class Card221 extends HullCard {
   constructor() {
     super(221, 'Schwerer Frachter (Bug)', 2, freighterMultipart, {
       hp: 8,
+      control: 3,
       theta: 1,
       omega: 1,
       psi: 1
@@ -91,6 +94,7 @@ export class Card326 extends HullCard {
   constructor() {
     super(326, 'Schwerer Frachter (Bug)', 2, freighterMultipart, {
       hp: 12,
+      control: 3,
       speed: -1,
       theta: 1,
       omega: 1,
@@ -115,6 +119,7 @@ export class Card328 extends HullCard {
   constructor() {
     super(328, 'Fregatte (Bug)', 2, frigateMultipart, {
       hp: 11,
+      control: 2,
       speed: -1,
       omega: 2
     });
@@ -137,6 +142,7 @@ export class Card418 extends HullCard {
   constructor() {
     super(418, 'Fregatte (Bug)', 3, frigateMultipart, {
       hp: 6,
+      control: 2,
       omega: 3
     });
   }
@@ -146,6 +152,7 @@ export class Card444 extends HullCard {
   constructor() {
     super(444, 'Zerstörer (Bug)', 1, destroyerMultipart, {
       hp: 5,
+      control: 2,
       theta: 1,
       phi: 1
     });
