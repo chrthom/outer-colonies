@@ -6,6 +6,7 @@ import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
 import { InterventionTacticCard } from './intervention';
+import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId: string;
@@ -72,6 +73,9 @@ export default class Player {
     return (this.no == 0 && this.match.control > 0) || (this.no == 1 && this.match.control < 0)
       ? Math.abs(this.match.control)
       : 0;
+  }
+  gainControl(control: number) {
+    this.match.adjustControl(control * (this.no == 0 ? 1 : -1));
   }
   takeCard(card: Card): Card {
     this.takeCards([card]);

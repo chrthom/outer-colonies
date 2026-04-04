@@ -58,6 +58,7 @@ export enum GameResultType {
   Countdown = 'countdown',
   Depletion = 'depletion',
   Destruction = 'destruction',
+  Domination = 'domination',
   Surrender = 'surrender'
 }
 

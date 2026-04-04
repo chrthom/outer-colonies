@@ -14,7 +14,7 @@ import Intervention, {
 } from './intervention';
 import SocketData from './socket_data';
 
-type Players = [player: Player, opponent: Player];
+type Players = [player1: Player, player2: Player];
 
 export default class Match {
   readonly room!: string;
@@ -150,6 +150,11 @@ export default class Match {
     this.players.forEach(player => {
       player.cardStacks.forEach(cs => cs.combatPhaseReset(!rechargingAttribtuesOnly));
     });
+  }
+  adjustControl(control: number) {
+    this.control += control;
+    if (this.control >= rules.controlLimit) this.gameResult.setWinnerByDeckDepletion(this.players[1]);
+    else if (this.control <= -rules.controlLimit) this.gameResult.setWinnerByDeckDepletion(this.players[0]);
   }
   private newPlayer(socket: Socket, playerNo: number): Player {
     socket.join(this.room);

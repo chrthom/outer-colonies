@@ -29,6 +29,10 @@ export default class GameResult {
     this.type = GameResultType.Destruction;
     this.setGameOver(destroyedPlayer);
   }
+  setWinnerByDomination(dominatedPlayer: Player) {
+    this.type = GameResultType.Domination;
+    this.setGameOver(dominatedPlayer);
+  }
   setWinnerBySurrender(surrenderingPlayer: Player) {
     this.type = GameResultType.Surrender;
     this.setGameOver(surrenderingPlayer);
