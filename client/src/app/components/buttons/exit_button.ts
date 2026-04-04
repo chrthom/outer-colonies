@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { designConfig } from 'src/app/config/design';
+import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
 
 export default class ExitButton {
   private isMatchmaking!: boolean;
@@ -83,9 +84,12 @@ export default class ExitButton {
     else this.text.setText('Spiel beenden');
   }
   private onClickAction(confirmed?: boolean) {
-    if (this.isMatchmaking || confirmed || (this.scene instanceof Game && this.scene.state.gameResult)) {
+    if (this.isMatchmaking || (this.scene instanceof Game && this.scene.state.gameResult)) {
       this.scene.socket.disconnect();
       window.location.href = environment.urls.website;
+    } else if (confirmed) {
+      // Surrender - send surrender message to server
+      this.scene.socket.emit(MsgTypeInbound.Surrender);
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
     }
