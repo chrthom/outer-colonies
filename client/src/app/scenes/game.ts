@@ -301,12 +301,6 @@ export default class Game extends Phaser.Scene {
     });
     this.cardStacks.forEach(c => c.highlightReset());
     if (this.state.playerPendingAction) {
-      if (this.plannedBattle.type == BattleType.Mission) {
-        this.player.deck.highlightSelected();
-        if (this.player.discardPile.cardIds.length > 0) {
-          this.player.discardPile.highlightSelected();
-        }
-      }
       this.player.hand.forEach(c => {
         if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
         else if (this.activeCards.hand == c.uuid) c.highlightSelected();
@@ -324,10 +318,7 @@ export default class Game extends Phaser.Scene {
             case TurnPhase.Build:
               if (this.plannedBattle.type != BattleType.None) {
                 // Assign ships for battle
-                if (
-                  (cs.isOpponentColony && this.plannedBattle.type == BattleType.Raid) ||
-                  this.plannedBattle.shipIds.includes(cs.uuid)
-                ) {
+                if (this.plannedBattle.shipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
                 } else if (cs.data.missionReady) {
                   cs.highlightSelectable();
