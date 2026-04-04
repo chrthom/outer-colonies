@@ -71,7 +71,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
           attributes.push({
             icon: 'control',
             value: cs.player.control,
-            warning: cs.player.control > rules.controlLimit * 2 / 3
+            warning: cs.player.control > (rules.controlLimit * 2) / 3
           });
         }
         if (match.turnPhase == TurnPhase.Build && ownedByPlayer && cs.card.type != CardType.Infrastructure) {

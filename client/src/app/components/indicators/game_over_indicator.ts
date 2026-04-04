@@ -109,6 +109,8 @@ export default class GameOverIndicator {
         return 'durch aufgebrauchtes Deck';
       case GameResultType.Destruction:
         return 'durch Zerstörung der Kolonie';
+      case GameResultType.Domination:
+        return 'durch Vorherrscahft';
       default:
         return 'durch Kapitulation';
     }

@@ -124,4 +124,120 @@ describe('GameResult', () => {
       expect(result.gameOver).toBe(false);
     });
   });
+
+  describe('domination victory', () => {
+    let result: GameResult;
+    let mockPlayer: any;
+    let mockMatch: any;
+
+    beforeEach(() => {
+      const mockColonyCardStack = {
+        damage: 0,
+        profile: { energy: 0 }
+      };
+
+      mockMatch = {
+        players: [
+          {
+            no: 0,
+            name: 'Player1',
+            socketId: 'test-socket-1',
+            ready: false,
+            deck: [],
+            discardPile: [],
+            hand: [],
+            cardStacks: [],
+            colonyCardStack: mockColonyCardStack,
+            actionPool: { activate: jest.fn() }
+          },
+          {
+            no: 1,
+            name: 'Player2',
+            socketId: 'test-socket-2',
+            ready: false,
+            deck: [],
+            discardPile: [],
+            hand: [],
+            cardStacks: [],
+            colonyCardStack: mockColonyCardStack,
+            actionPool: { activate: jest.fn() }
+          }
+        ]
+      };
+      result = new GameResult(mockMatch as any);
+      mockPlayer = {
+        no: 1,
+        name: 'TestPlayer',
+        socketId: 'test-socket',
+        match: mockMatch,
+        ready: false,
+        deck: [],
+        discardPile: [],
+        hand: [],
+        cardStacks: [],
+        colonyCardStack: mockColonyCardStack,
+        actionPool: { activate: jest.fn() }
+      };
+    });
+
+    test('should set domination victory correctly', () => {
+      // Mock applyEarnings to avoid database calls
+      const applyEarningsSpy = jest.spyOn(result, 'applyEarnings' as any).mockImplementation(() => 100);
+
+      result.setWinnerByDomination(mockPlayer as any);
+
+      expect(result.gameOver).toBe(true);
+      expect(result.winnerNo).toBe(0); // Opponent of player 1
+      expect(result.type).toBe('domination');
+
+      applyEarningsSpy.mockRestore();
+    });
+
+    test('should calculate winner correctly for domination', () => {
+      // Mock applyEarnings to avoid database calls
+      const applyEarningsSpy = jest.spyOn(result, 'applyEarnings' as any).mockImplementation(() => 100);
+
+      const player1 = {
+        no: 0,
+        name: 'Player1',
+        socketId: 'test-socket-1',
+        match: mockMatch,
+        ready: false,
+        deck: [],
+        discardPile: [],
+        hand: [],
+        cardStacks: [],
+        colonyCardStack: { damage: 0, profile: { energy: 0 } },
+        actionPool: { activate: jest.fn() }
+      };
+      const player2 = {
+        no: 1,
+        name: 'Player2',
+        socketId: 'test-socket-2',
+        match: mockMatch,
+        ready: false,
+        deck: [],
+        discardPile: [],
+        hand: [],
+        cardStacks: [],
+        colonyCardStack: { damage: 0, profile: { energy: 0 } },
+        actionPool: { activate: jest.fn() }
+      };
+
+      // Player 1 dominates
+      result.setWinnerByDomination(player2 as any);
+      expect(result.winnerNo).toBe(0);
+
+      // Reset for next test
+      result.gameOver = false;
+      result.winnerNo = undefined;
+      result.type = undefined;
+
+      // Player 2 dominates
+      result.setWinnerByDomination(player1 as any);
+      expect(result.winnerNo).toBe(1);
+
+      applyEarningsSpy.mockRestore();
+    });
+  });
 });
