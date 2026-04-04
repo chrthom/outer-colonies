@@ -14,7 +14,6 @@ import {
 } from '../../shared/interfaces/client_state';
 import { InterventionAttack } from '../game_state/intervention';
 import CardStack from '../cards/card_stack';
-import { constants } from '../../shared/config/constants';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];
@@ -37,9 +36,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     type: match.battle.type,
     playerShipIds: match.battle.ships[playerNo].map(cs => cs.uuid),
     opponentShipIds: match.battle.ships[opponentPlayerNo(playerNo)].map(cs => cs.uuid),
-    priceCardIds: match.battle.downsidePriceCards
-      .map(() => constants.cardBackSideID)
-      .concat(match.battle.upsidePriceCards.map(c => c.id)),
     range: match.battle.range,
     recentAttack: match.battle.recentAttack
   };

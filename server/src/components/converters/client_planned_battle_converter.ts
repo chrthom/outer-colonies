@@ -11,15 +11,10 @@ export default function toBattle(match: Match, plannedBattle: ClientPlannedBattl
     .filter((cs): cs is CardStack => !!cs && cs.isMissionReady);
   if (plannedBattle.shipIds.length == 0) return new Battle(BattleType.None, match.pendingActionPlayerNo);
   let battle: Battle;
-  // Always use 1 downside and 1 upside card for missions
-  const downsideCards = match.activePlayer.pickCardsFromDeck(1);
-  const upsideCards = match.activePlayer.pickCardsFromTopOfDiscardPile(1);
   switch (plannedBattle.type) {
     case BattleType.Mission:
       battle = new Battle(BattleType.Mission, match.pendingActionPlayerNo);
       battle.ships[match.pendingActionPlayerNo] = ships;
-      battle.downsidePriceCards = downsideCards;
-      battle.upsidePriceCards = upsideCards;
       break;
     case BattleType.Raid:
       battle = new Battle(BattleType.Raid, match.pendingActionPlayerNo);

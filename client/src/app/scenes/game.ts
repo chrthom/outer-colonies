@@ -24,7 +24,6 @@ import ClientPlannedBattle, {
 import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
-import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
 import Background from '../components/background';
@@ -46,7 +45,6 @@ interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
   exitButton: ExitButton;
-  missionCards: MissionCards;
   optionPicker?: OptionPicker;
   zoomCard: ZoomCard;
   raidButton: RaidButton;
@@ -130,7 +128,6 @@ export default class Game extends Phaser.Scene {
       continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
       zoomCard: new ZoomCard(this),
-      missionCards: new MissionCards(this),
       raidButton: new RaidButton(this),
       missionButton: new MissionButton(this)
     };
@@ -176,7 +173,6 @@ export default class Game extends Phaser.Scene {
     this.obj.continueButton.update();
     this.obj.combatRangeIndicator.update();
     this.obj.exitButton.update();
-    this.obj.missionCards.update();
     this.obj.zoomCard.hide();
     this.obj.raidButton.updateVisibility();
     this.obj.missionButton.updateVisibility();
