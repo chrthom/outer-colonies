@@ -119,4 +119,8 @@ export default class Player {
       this.cardStacks.some(cs => cs.hasInsufficientEnergy)
     );
   }
+  testFunc(a:number): any {
+    var b;
+    return "";
+  }
 }
