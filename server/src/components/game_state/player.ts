@@ -6,7 +6,6 @@ import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
 import Match from './match';
 import { InterventionTacticCard } from './intervention';
-import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId: string;
@@ -118,9 +117,5 @@ export default class Player {
       this.match.turnPhase == TurnPhase.Build &&
       this.cardStacks.some(cs => cs.hasInsufficientEnergy)
     );
-  }
-  testFunc(a:number): any {
-    var b;
-    return "";
   }
 }
