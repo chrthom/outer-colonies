@@ -1,7 +1,6 @@
 import Game from '../../scenes/game';
 import { layoutConfig } from '../../config/layout';
 import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { BaseButton } from './base_button';
 
 export default class MissionButton extends BaseButton {
@@ -36,6 +35,7 @@ export default class MissionButton extends BaseButton {
   }
 
   protected onClickAction() {
+    // Toggle mission type - backend will always use 1 downside and 1 upside card
     if (
       this.gameScene.state &&
       this.gameScene.state.playerPendingAction &&
@@ -43,17 +43,9 @@ export default class MissionButton extends BaseButton {
       this.gameScene.state.turnPhase == TurnPhase.Build &&
       !this.gameScene.activeCards.hand
     ) {
-      if (ClientPlannedBattleHelper.cardLimitReached(this.gameScene.plannedBattle)) {
-        this.gameScene.resetView(BattleType.None);
-      } else {
-        if (this.gameScene.plannedBattle.type != BattleType.Mission) {
-          this.gameScene.resetView(BattleType.Mission);
-        }
-        if (!ClientPlannedBattleHelper.cardLimitReached(this.gameScene.plannedBattle)) {
-          this.gameScene.plannedBattle.downsideCardsNum++;
-          this.gameScene.updateView();
-        }
-      }
+      this.gameScene.resetView(
+        this.gameScene.plannedBattle.type == BattleType.Mission ? BattleType.None : BattleType.Mission
+      );
     }
   }
 }
