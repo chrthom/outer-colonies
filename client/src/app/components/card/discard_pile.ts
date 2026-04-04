@@ -27,7 +27,7 @@ export default class DiscardPile extends CardImage {
       this.setCardId(this.topCard).setVisible(true).enableMaximizeOnRightclick();
       this.indicator = new ValueIndicator(
         this.scene,
-        this.cardIds.length.toString(),
+        this.cardIds.length,
         false,
         this.placementConfig.discardPile.x.value2d,
         this.placementConfig.discardPile.y.value2d,

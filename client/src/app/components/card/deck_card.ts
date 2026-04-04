@@ -23,7 +23,7 @@ export default class DeckCard extends CardImage {
     if (this.indicator) this.indicator.destroy();
     this.indicator = new ValueIndicator(
       this.scene,
-      this.deckSize.toString(),
+      this.deckSize,
       this.deckSize < 10,
       this.placementConfig.deck.x.value2d,
       this.placementConfig.deck.y.value2d,
