@@ -124,7 +124,7 @@ class LayoutGameConfig {
     },
     baseButtons: {
       xTextOffset: -30,
-      yTextOffset: -4,
+      yTextOffset: -4
     },
     combatRange: {
       x: 1855,

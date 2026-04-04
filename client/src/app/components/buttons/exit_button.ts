@@ -11,13 +11,7 @@ export default class ExitButton extends BaseButton {
   private confirmText!: Phaser.GameObjects.Text;
 
   constructor(scene: Matchmaking | Game) {
-    super(
-      scene,
-      layoutConfig.game.ui.exitButton.x,
-      layoutConfig.game.ui.exitButton.y,
-      'exit',
-      ''
-    );
+    super(scene, layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'exit', '');
     this.isMatchmaking = !(scene instanceof Game);
 
     // Create confirmation text

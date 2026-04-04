@@ -10,23 +10,24 @@ export abstract class BaseButton {
   protected image!: Phaser.GameObjects.Image;
   protected isVisible: boolean = false;
 
-  constructor(
-    scene: Game | Matchmaking,
-    x: number,
-    y: number,
-    iconKey: string,
-    initialText: string
-  ) {
+  constructor(scene: Game | Matchmaking, x: number, y: number, iconKey: string, initialText: string) {
     this.scene = scene;
 
     // Create button icon
-    this.image = scene.add.image(x, y, 'icon_' + iconKey).setOrigin(0.5).setInteractive({
-      useHandCursor: true
-    });
+    this.image = scene.add
+      .image(x, y, 'icon_' + iconKey)
+      .setOrigin(0.5)
+      .setInteractive({
+        useHandCursor: true
+      });
 
     // Create button text
     this.text = scene.add
-      .text(x + layoutConfig.game.ui.baseButtons.xTextOffset, y + layoutConfig.game.ui.baseButtons.yTextOffset, initialText)
+      .text(
+        x + layoutConfig.game.ui.baseButtons.xTextOffset,
+        y + layoutConfig.game.ui.baseButtons.yTextOffset,
+        initialText
+      )
       .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.neutral)
