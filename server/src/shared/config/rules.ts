@@ -1,6 +1,5 @@
 class OCRules {
   readonly cardsToDrawPerTurn = 2;
-  readonly cardsPerMission = 2;
   readonly colonyHP = 50;
   readonly controlLimit = 20;
   readonly initialCardsToDraw = 7;

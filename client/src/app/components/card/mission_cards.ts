@@ -1,8 +1,7 @@
 import CardImage from './card_image';
-import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { perspectiveConfig } from 'src/app/config/perspective';
 
+// This class is not in use anymore - still here as template for the future mission cards in 3.0
 export default class MissionCards {
   minCards: CardImage[] = [];
   private scene: Game;
@@ -10,6 +9,7 @@ export default class MissionCards {
     this.scene = scene;
   }
   update() {
+    /*
     if (this.scene.state && this.scene.state.battle) {
       const battle = this.scene.state.battle;
       if (this.minCards) this.minCards.forEach(c => c.destroy());
@@ -31,5 +31,6 @@ export default class MissionCards {
       });
       this.minCards.filter(c => c.cardId != 1).forEach(c => c.enableMaximizeOnRightclick());
     }
+    */
   }
 }

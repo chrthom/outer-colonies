@@ -148,6 +148,15 @@ export function gameSocketListeners(io: Server, socket: Socket) {
       emitState(io, match);
     }
   });
+  socket.on(MsgTypeInbound.Surrender, () => {
+    doWithMatchAndPlayer(socket, (match, player) => {
+      if (!match.gameResult.gameOver) {
+        console.log(`Player ${player.name} surrendered`);
+        match.gameResult.setWinnerBySurrender(player);
+      }
+      emitState(io, match);
+    });
+  });
 }
 
 export function gameCron(io: Server) {

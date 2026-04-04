@@ -30,7 +30,7 @@ Scan `README.md` to get further information on project background and structure.
 - All subprojects must pass quality checks before PR creation
 
 ## Documentation Requirements
-- Update `README.md` for significant changes
+- Update @README.md for significant changes
 - Add JSDoc comments for new public or protected functions
 - Update TypeScript declarations when server interfaces change
 

@@ -8,7 +8,7 @@ export default class ValueIndicator {
   private ownedByPlayer: boolean;
   constructor(
     scene: Game,
-    value: string,
+    value: number,
     critical: boolean,
     cardX: number,
     cardY: number,
@@ -27,7 +27,7 @@ export default class ValueIndicator {
       .setOrigin(0.5)
       .setDepth(layoutConfig.depth.indicator);
     this.text = scene.add
-      .text(this.x(cardX), this.y(cardY), value)
+      .text(this.x(cardX), this.y(cardY), value.toString())
       .setFontSize(layoutConfig.fontSize.small)
       .setFontFamily(designConfig.fontFamily.caption)
       .setColor(designConfig.color.hover)

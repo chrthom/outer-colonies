@@ -32,7 +32,6 @@ export interface ClientBattle {
   type: BattleType;
   playerShipIds: string[];
   opponentShipIds: string[];
-  priceCardIds: number[];
   range: number;
   recentAttack?: ClientAttack;
 }
@@ -107,7 +106,6 @@ export const emptyClientState: ClientState = {
     type: BattleType.None,
     playerShipIds: [],
     opponentShipIds: [],
-    priceCardIds: [],
     range: 0
   },
   cardStacks: [],

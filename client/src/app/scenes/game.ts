@@ -1,5 +1,7 @@
 import { Socket } from 'socket.io-client';
 import ContinueButton from '../components/buttons/continue_button';
+import RaidButton from '../components/buttons/raid_button';
+import MissionButton from '../components/buttons/mission_button';
 import {
   ClientHandCard,
   ClientPlayer,
@@ -22,7 +24,6 @@ import ClientPlannedBattle, {
 import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
-import MissionCards from '../components/card/mission_cards';
 import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
 import Background from '../components/background';
@@ -44,9 +45,10 @@ interface FixedUIElements {
   continueButton: ContinueButton;
   combatRangeIndicator: CombatRangeIndicator;
   exitButton: ExitButton;
-  missionCards: MissionCards;
   optionPicker?: OptionPicker;
   zoomCard: ZoomCard;
+  raidButton: RaidButton;
+  missionButton: MissionButton;
 }
 
 interface InitData {
@@ -126,7 +128,8 @@ export default class Game extends Phaser.Scene {
       continueButton: new ContinueButton(this),
       exitButton: new ExitButton(this),
       zoomCard: new ZoomCard(this),
-      missionCards: new MissionCards(this)
+      raidButton: new RaidButton(this),
+      missionButton: new MissionButton(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
@@ -170,8 +173,9 @@ export default class Game extends Phaser.Scene {
     this.obj.continueButton.update();
     this.obj.combatRangeIndicator.update();
     this.obj.exitButton.update();
-    this.obj.missionCards.update();
     this.obj.zoomCard.hide();
+    this.obj.raidButton.updateVisibility();
+    this.obj.missionButton.updateVisibility();
     this.updateHighlighting();
   }
 
@@ -293,12 +297,6 @@ export default class Game extends Phaser.Scene {
     });
     this.cardStacks.forEach(c => c.highlightReset());
     if (this.state.playerPendingAction) {
-      if (this.plannedBattle.type == BattleType.Mission) {
-        this.player.deck.highlightSelected();
-        if (this.player.discardPile.cardIds.length > 0) {
-          this.player.discardPile.highlightSelected();
-        }
-      }
       this.player.hand.forEach(c => {
         if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
         else if (this.activeCards.hand == c.uuid) c.highlightSelected();
@@ -316,10 +314,7 @@ export default class Game extends Phaser.Scene {
             case TurnPhase.Build:
               if (this.plannedBattle.type != BattleType.None) {
                 // Assign ships for battle
-                if (
-                  (cs.isOpponentColony && this.plannedBattle.type == BattleType.Raid) ||
-                  this.plannedBattle.shipIds.includes(cs.uuid)
-                ) {
+                if (this.plannedBattle.shipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
                 } else if (cs.data.missionReady) {
                   cs.highlightSelectable();

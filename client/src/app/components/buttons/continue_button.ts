@@ -5,7 +5,6 @@ import {
   MsgTypeOutbound,
   TurnPhase
 } from '../../../../../server/src/shared/config/enums';
-import { ClientPlannedBattleHelper } from '../../../../../server/src/shared/interfaces/client_planned_battle';
 import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -134,9 +133,7 @@ export default class ContinueButton {
   }
   private showNextPhase() {
     const text =
-      this.scene.plannedBattle.shipIds.length == 0 ||
-      (this.scene.plannedBattle.type == BattleType.Mission &&
-        !ClientPlannedBattleHelper.cardLimitReached(this.scene.plannedBattle))
+      this.scene.plannedBattle.shipIds.length == 0
         ? 'Zug beenden'
         : `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
     this.show(text, 'active_build', () =>
