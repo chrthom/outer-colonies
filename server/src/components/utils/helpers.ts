@@ -30,6 +30,10 @@ export function opponentPlayerNo(playerNo: number): number {
   return playerNo == 0 ? 1 : 0;
 }
 
+export function pickRandom<T>(array: T[]): T {
+  return array[Math.random() * array.length];
+}
+
 export function shuffle<T>(array: T[]): T[] {
   return array.sort(() => Math.random() - 0.5);
 }

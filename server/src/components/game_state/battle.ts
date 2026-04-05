@@ -92,8 +92,9 @@ export default class Battle {
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;
     if (this.ships[match.activePlayerNo].length > 0) {
-      player.drawCards(1);
       player.deck.push(...match.activePlayer.pickCardsFromTopOfDiscardPile(1));
+      player.drawCards(1);
+      this.ships[0].forEach(cs => cs.onMissionCompletion());
       const controlSurplus = this.sumControl(this.ships[0]) - this.sumControl(this.ships[1]);
       player.gainControl(Math.max(controlSurplus, 0));
     }

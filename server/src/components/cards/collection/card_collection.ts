@@ -49,6 +49,7 @@ import {
   Card164,
   Card183,
   Card219,
+  Card239,
   Card320,
   Card336,
   Card413
@@ -113,7 +114,17 @@ import {
   Card310,
   Card420
 } from './equipment_weapon_kinetic_cards';
-import { Card104, Card109, Card124, Card161, Card325, Card434, Card449 } from './equipment_util_cards';
+import {
+  Card104,
+  Card109,
+  Card124,
+  Card161,
+  Card211,
+  Card241,
+  Card325,
+  Card434,
+  Card449
+} from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card203, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
 import {
@@ -211,8 +222,10 @@ import {
   Card149,
   Card175,
   Card176,
+  Card205,
   Card208,
   Card214,
+  Card222,
   Card231,
   Card323,
   Card330,
@@ -314,10 +327,12 @@ export default class CardCollection {
     187: <Card>new Card187(),
     188: <Card>new Card188(),
     203: <Card>new Card203(),
+    205: <Card>new Card205(),
     207: <Card>new Card207(),
     208: <Card>new Card208(),
     209: <Card>new Card209(),
     210: <Card>new Card210(),
+    211: <Card>new Card211(),
     213: <Card>new Card213(),
     214: <Card>new Card214(),
     216: <Card>new Card216(),
@@ -325,6 +340,7 @@ export default class CardCollection {
     219: <Card>new Card219(),
     220: <Card>new Card220(),
     221: <Card>new Card221(),
+    222: <Card>new Card222(),
     223: <Card>new Card223(),
     224: <Card>new Card224(),
     225: <Card>new Card225(),
@@ -340,7 +356,9 @@ export default class CardCollection {
     236: <Card>new Card236(),
     237: <Card>new Card237(),
     238: <Card>new Card238(),
+    239: <Card>new Card239(),
     240: <Card>new Card240(),
+    241: <Card>new Card241(),
     242: <Card>new Card242(),
     243: <Card>new Card243(),
     244: <Card>new Card244(),

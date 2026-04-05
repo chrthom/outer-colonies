@@ -1,6 +1,12 @@
-import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import {
+  CardDurability,
+  CardType,
+  InterventionType,
+  TacticDiscipline,
+  Zone
+} from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -64,6 +70,24 @@ export class Card176 extends IntelligenceTacticCard {
   }
 }
 
+export class Card205 extends IntelligenceTacticCard {
+  constructor() {
+    super(205, 'Der große Coup', 4, {
+      control: 5
+    });
+  }
+  override get durability(): CardDurability {
+    return CardDurability.Turn;
+  }
+  override onMissionCompletion(player: Player): void {
+    player.drawCards(1);
+  }
+  onEnterGame() {}
+  getValidTargets(player: Player): CardStack[] {
+    return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profile.speed > 0);
+  }
+}
+
 export class Card208 extends IntelligenceTacticCard {
   private readonly oneTimeActionPool = new ActionPool(
     new CardAction(TacticDiscipline.Intelligence),
@@ -103,6 +127,30 @@ export class Card214 extends IntelligenceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Colony);
+  }
+}
+
+export class Card222 extends IntelligenceTacticCard {
+  private readonly cardsToRestore = 3;
+  constructor() {
+    super(222, 'Wracks plündern', 2);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    optionalParameters
+      ?.map(cardId => spliceCardById(player.discardPile, cardId))
+      .forEach(c => (c ? player.deck.push(c) : {}));
+    player.shuffleDeck();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.discardPile.filter(c => c.type == CardType.Hull).length > 0
+      ? this.onlyColonyTarget(player.cardStacks)
+      : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.discardPile.filter(c => c.type == CardType.Hull).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+    return Math.min(this.cardsToRestore, player.discardPile.filter(c => c.type == CardType.Hull).length);
   }
 }
 

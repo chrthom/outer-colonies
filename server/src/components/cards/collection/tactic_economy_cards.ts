@@ -125,7 +125,6 @@ export class Card217 extends EconomyTacticCard {
     super(217, 'Schrottsammler', 2);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    // TODO: Make sure to limit number of cards, print warning if no card found
     optionalParameters
       ?.map(cardId => spliceCardById(player.discardPile, cardId))
       .forEach(c => (c ? player.deck.push(c) : {}));
@@ -137,8 +136,8 @@ export class Card217 extends EconomyTacticCard {
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
     return player.discardPile.map(c => c.id);
   }
-  override onEnterGameNumberOfSelectableCardOptions(): number {
-    return this.cardsToRestore;
+  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+    return Math.min(this.cardsToRestore, player.discardPile.length);
   }
 }
 

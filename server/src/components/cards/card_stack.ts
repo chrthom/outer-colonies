@@ -145,6 +145,10 @@ export default abstract class CardStack {
     this.card.onDestruction(this.player);
     this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
+  onMissionCompletion() {
+    this.card.onMissionCompletion(this.player);
+    this.attachedCardStacks.forEach(cs => cs.onMissionCompletion());
+  }
   onStartTurn() {
     this.card.onStartTurn(this.player, this);
     this.attachedCardStacks.forEach(cs => cs.onStartTurn());
