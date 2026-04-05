@@ -55,7 +55,6 @@ export enum ItemBoxContentType {
 }
 
 export enum GameResultType {
-  Countdown = 'countdown',
   Depletion = 'depletion',
   Destruction = 'destruction',
   Domination = 'domination',

@@ -18,21 +18,26 @@ export function gameSocketListeners(io: Server, socket: Socket) {
           match.players[player.no].ready = true;
           if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
-          if (match.intervention) {
-            match.skipIntervention();
-          } else {
-            switch (turnPhase) {
-              case TurnPhase.Build:
-                if (getSocketData(socket).playerNo == match.activePlayerNo) {
-                  match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
-                } else {
-                  match.prepareCombatPhase(<string[]>data);
-                }
-                break;
-              case TurnPhase.Combat:
-                match.processBattleRound();
-                break;
+          // Verify conditions before processing ready event
+          if (verifyReadyConditions(player, turnPhase)) {
+            if (match.intervention) {
+              match.skipIntervention();
+            } else {
+              switch (turnPhase) {
+                case TurnPhase.Build:
+                  if (getSocketData(socket).playerNo == match.activePlayerNo) {
+                    match.prepareBuildPhaseReaction(<ClientPlannedBattle>data);
+                  } else {
+                    match.prepareCombatPhase(<string[]>data);
+                  }
+                  break;
+                case TurnPhase.Combat:
+                  match.processBattleRound();
+                  break;
+              }
             }
+          } else {
+            console.log(`WARN: ${player.name} tried to ready but conditions not met`);
           }
         }
       }
@@ -172,13 +177,13 @@ export function gameCron(io: Server) {
     .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
     .forEach(match => {
       if (--match.countdown <= 0) {
-        match.gameResult.setWinnerByCountdown(match.pendingActionPlayer);
+        // Trigger automatic ready event instead of timeout victory
+        match.pendingActionPlayer.handleAutomaticReady();
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
         const socket = getSocket(io, match, playerNo);
-        if (socket)
-          socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
+        if (socket) socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
         else console.log('WARN: Could not find socket to emit countdown');
       });
     });
@@ -221,4 +226,16 @@ function initMatch(io: Server, match: Match) {
   });
   match.prepareStartPhase();
   emitState(io, match);
+}
+
+export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+  // Check hand card limit (only during end of phase)
+  if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
+    return false;
+  }
+  // Check if player has to retract cards
+  if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
+    return false;
+  }
+  return true;
 }

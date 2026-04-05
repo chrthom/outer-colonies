@@ -240,4 +240,6 @@ describe('GameResult', () => {
       applyEarningsSpy.mockRestore();
     });
   });
+
+
 });

@@ -103,8 +103,6 @@ export default class GameOverIndicator {
   }
   private get gameOverText(): string {
     switch (this.gameResult.type) {
-      case GameResultType.Countdown:
-        return 'durch abgelaufene Zeit';
       case GameResultType.Depletion:
         return 'durch aufgebrauchtes Deck';
       case GameResultType.Destruction:
