@@ -91,6 +91,8 @@ export default abstract class Card {
   onEnterGameNumberOfSelectableCardOptions(player: Player): number {
     return 0;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onMissionCompletion(player: Player) {}
   abstract onEnterGame(
     player: Player,
     target: CardStack,

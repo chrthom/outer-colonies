@@ -1,4 +1,5 @@
 import Player from '../../game_state/player';
+import { pickRandom } from '../../utils/helpers';
 import CardStack from '../card_stack';
 import EquipmentCard from '../types/equipment_card';
 
@@ -43,6 +44,29 @@ export class Card161 extends EquipmentCard {
       speed: 1,
       delta: -1
     });
+  }
+}
+
+export class Card211 extends EquipmentCard {
+  constructor() {
+    super(211, 'Tarnkappe', 3, {
+      control: 3,
+      speed: -1,
+      delta: -1,
+      omega: -1
+    });
+  }
+}
+
+export class Card241 extends EquipmentCard {
+  constructor() {
+    super(241, 'Freibeuterbesatzung', 1, {
+      omega: -1
+    });
+  }
+  override onMissionCompletion(player: Player): void {
+    const opponent = player.match.inactivePlayer;
+    opponent.discardHandCards(pickRandom(opponent.hand).uuid);
   }
 }
 

@@ -201,6 +201,22 @@ export class Card336 extends ActionInfrastructureCard {
   }
 }
 
+export class Card239 extends ActionInfrastructureCard {
+  constructor() {
+    super(
+      239,
+      'Horchposten',
+      1,
+      {
+        control: 1,
+        energy: -2,
+        psi: -1
+      },
+      [TacticDiscipline.Intelligence]
+    );
+  }
+}
+
 export class Card413 extends ActionInfrastructureCard {
   constructor() {
     super(
