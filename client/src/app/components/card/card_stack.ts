@@ -173,9 +173,7 @@ export default class CardStack {
   }
   private pointerout() {
     this.cards.forEach(c => c.retractCardButton?.hide());
-    if (!this.scene.isAttackAnimating) {
-      this.tween();
-    }
+    this.tween();
     this.summaryBox.toDefaultAlpha();
   }
   private tween(expand?: boolean) {
