@@ -55,7 +55,7 @@ cd /path/to/repo && git remote -v
 
 ### 6. Issue Management
 - Update the GitHub issue you are working on via GitHub API.
-- **Subtask Management**: Update `[ ]` to `[x]` markers for completed subtasks.
+- **Subtask Management**: Update `- [ ]` to `- [x]` markers for completed subtasks.
 - **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
 
 ### 7. Check GitHub Actions checks
