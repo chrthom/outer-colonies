@@ -172,10 +172,10 @@ export default class CardStack {
     this.summaryBox.highlight();
   }
   private pointerout() {
+    this.cards.forEach(c => c.retractCardButton?.hide());
     if (!this.scene.isAttackAnimating) {
       this.tween();
     }
-    this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
   private tween(expand?: boolean) {
