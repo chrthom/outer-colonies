@@ -133,6 +133,35 @@ export class Card331 extends MilitaryTacticCard {
   }
 }
 
+export class Card334 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      334,
+      'Planetare Invasion',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 10,
+        pointDefense: -4,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.range == 1 && player.match.battle.ships[0].length
+      ? this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks)
+      : [];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
+  }
+}
+
 export class Card337 extends MilitaryTacticCard {
   private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),

@@ -16,10 +16,9 @@
     "build:prod": "ng build --configuration production",
     "test": "node scripts/test.js",
     "test:watch": "node scripts/test.js --watch",
-    "test:verify": "./verify-tests.sh",
     "lint": "ng lint",
     "format": "npx prettier . --write",
-    "check": "npm run format; npm run lint; npm run test:verify"
+    "check": "npm run format; npm run lint; npm run test"
   },
   "private": true,
   "author": "Christopher Thomsen",
