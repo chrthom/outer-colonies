@@ -181,6 +181,7 @@ import {
   Card337,
   Card338,
   Card346,
+  Card419,
   Card428
 } from './tactic_military_cards';
 import {
@@ -231,6 +232,7 @@ import {
   Card323,
   Card330,
   Card416,
+  Card417,
   Card430
 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
@@ -425,7 +427,9 @@ export default class CardCollection {
     413: <Card>new Card413(),
     414: <Card>new Card414(),
     416: <Card>new Card416(),
+    417: <Card>new Card417(),
     418: <Card>new Card418(),
+    419: <Card>new Card419(),
     420: <Card>new Card420(),
     421: <Card>new Card421(),
     422: <Card>new Card422(),
