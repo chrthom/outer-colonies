@@ -228,6 +228,33 @@ export class Card416 extends IntelligenceTacticCard {
   }
 }
 
+export class Card417 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      417,
+      'Kritischer Treffer',
+      3,
+      {},
+      {
+        range: 0,
+        damage: 6,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
+  }
+}
+
 export class Card430 extends IntelligenceTacticCard {
   private readonly cardsToDiscard = 3;
   private readonly cardsToDraw = 1;

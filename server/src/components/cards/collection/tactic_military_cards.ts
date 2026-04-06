@@ -153,7 +153,7 @@ export class Card334 extends MilitaryTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.match.battle.range == 1 && player.match.battle.ships[0].length
+    return player.match.battle.range == 1
       ? this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks)
       : [];
   }
@@ -204,6 +204,36 @@ export class Card346 extends MilitaryTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.TacticCard;
+  }
+}
+
+export class Card419 extends MilitaryTacticCard {
+  private speedLimitation = 3;
+  constructor() {
+    super(
+      419,
+      'Kritischer Treffer',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 8,
+        pointDefense: 4,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(
+      cs => cs.type == CardType.Hull && cs.profile.speed <= this.speedLimitation
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
   }
 }
 
