@@ -135,6 +135,26 @@ export default class CardStack {
       layoutConfig.game.cards.expanded.yFactorMoveToCenter;
     return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
   }
+  tween(expand?: boolean) {
+    this.cards.forEach(c => {
+      c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
+      const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
+      const y = this.targetY(c.data.index, expand);
+      const randomAngle = expand
+        ? layoutConfig.game.cards.placement.randomAngle * (c.data.index > this.maxIndex / 2 ? -1 : 1)
+        : this.randomAngle(x.value2d + y.value2d);
+      c.tween({
+        duration: animationConfig.duration.move,
+        x: x,
+        y: y,
+        z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
+        xRotation: expand
+          ? layoutConfig.game.cards.perspective.neutral
+          : layoutConfig.game.cards.perspective.board,
+        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
+      });
+    });
+  }
   get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
   }
@@ -158,7 +178,7 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID) {
+    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
           this.targetXExpanded(c.data.index).value2d,
@@ -175,26 +195,6 @@ export default class CardStack {
     this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
-  }
-  private tween(expand?: boolean) {
-    this.cards.forEach(c => {
-      c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
-      const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
-      const y = this.targetY(c.data.index, expand);
-      const randomAngle = expand
-        ? layoutConfig.game.cards.placement.randomAngle * (c.data.index > this.maxIndex / 2 ? -1 : 1)
-        : this.randomAngle(x.value2d + y.value2d);
-      c.tween({
-        duration: animationConfig.duration.move,
-        x: x,
-        y: y,
-        z: expand ? perspectiveConfig.distance.expanded : perspectiveConfig.distance.board,
-        xRotation: expand
-          ? layoutConfig.game.cards.perspective.neutral
-          : layoutConfig.game.cards.perspective.board,
-        angle: c.shortestAngle((this.ownedByPlayer ? 0 : 180) + randomAngle)
-      });
-    });
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c => {

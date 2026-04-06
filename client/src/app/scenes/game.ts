@@ -74,6 +74,7 @@ export default class Game extends Phaser.Scene {
   plannedBattle: ClientPlannedBattle = ClientPlannedBattleHelper.empty;
   interceptShipIds: Array<string> = [];
   retractCardsExist = false;
+  isAttackAnimating = false;
 
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
@@ -206,11 +207,16 @@ export default class Game extends Phaser.Scene {
   private animateAttack(): boolean {
     const attack = this.state.battle?.recentAttack;
     if (attack) {
+      this.isAttackAnimating = true;
+      this.cardStacks.filter(cs => cs.cards.length > 1).forEach(cs => cs.tween());
       const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceRootUUID);
       if (!attacker?.data.ownedByPlayer) {
         attacker?.animateAttack(attack.sourceSubUUID);
       }
       this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
+      this.time.delayedCall(animationConfig.duration.attack, () => {
+        this.isAttackAnimating = false;
+      });
     }
     return !!attack;
   }
