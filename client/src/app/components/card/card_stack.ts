@@ -158,7 +158,7 @@ export default class CardStack {
     });
   }
   private pointerover() {
-    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID) {
+    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
           this.targetXExpanded(c.data.index).value2d,
@@ -172,7 +172,9 @@ export default class CardStack {
     this.summaryBox.highlight();
   }
   private pointerout() {
-    this.tween();
+    if (!this.scene.isAttackAnimating) {
+      this.tween();
+    }
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
