@@ -208,12 +208,7 @@ export default class Game extends Phaser.Scene {
     const attack = this.state.battle?.recentAttack;
     if (attack) {
       this.isAttackAnimating = true;
-      // Revert any expanded card stacks when attack starts
-      this.cardStacks.forEach(cs => {
-        if (cs.cards.length > 1) {
-          cs['tween'](); // Call private tween method to revert expansion
-        }
-      });
+      this.cardStacks.filter(cs => cs.cards.length > 1).forEach(cs => cs.tween());
       const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceRootUUID);
       if (!attacker?.data.ownedByPlayer) {
         attacker?.animateAttack(attack.sourceSubUUID);
