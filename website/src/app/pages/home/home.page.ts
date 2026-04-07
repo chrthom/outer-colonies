@@ -48,6 +48,54 @@ export class HomePage implements OnInit {
       title: 'Armada',
       description: 'Beende ein Spiel mit mindestens 5 eigenen Schiffen.',
       sol: rules.dailyEarnings.ships
+    },
+    {
+      matcher: r => r.domination,
+      title: 'Vorherrschaft',
+      description: 'Erringe einen Sieg durch Vorherrschaft.',
+      sol: rules.dailyEarnings.domination
+    },
+    {
+      matcher: r => r.destruction,
+      title: 'Keine Gefangenen',
+      description: 'Erringe einen Sieg durch Zerstöring der gegnerischen Kolonie.',
+      sol: rules.dailyEarnings.destruction
+    },
+    {
+      matcher: r => r.control,
+      title: 'Potentes Einsatzteam',
+      description: 'Beende ein Spiel mit mindestens 6 Kontrollpunkten durch deine Schiffe.',
+      sol: rules.dailyEarnings.control
+    },
+    {
+      matcher: r => r.juggernaut,
+      title: 'Juggernaut',
+      description: 'Besitze zum Spielende ein Schiffe mit mindestens 20 Hüllenpunkten.',
+      sol: rules.dailyEarnings.juggernaut
+    },
+    {
+      matcher: r => r.stations,
+      title: 'Ich bleibe hier',
+      description: 'Besitze zum Spielende 3 oder mehr Hüllenkarten mit Geschwindigkeit 0.',
+      sol: rules.dailyEarnings.stations
+    },
+    {
+      matcher: r => r.discard,
+      title: 'Der lange Krieg',
+      description: 'Lege mindestens 50 Karten in einem Spiel ab.',
+      sol: rules.dailyEarnings.discard
+    },
+    {
+      matcher: r => r.colony,
+      title: 'Sweet Home',
+      description: 'Habe zum SPielende mindestens 7 Koloniekarten in deiner Koloniezone.',
+      sol: rules.dailyEarnings.colony
+    },
+    {
+      matcher: r => r.colossus,
+      title: 'Der Koloss',
+      description: 'Besitze zum Spielende ein Schiffe, das aus mindestens 7 Karten besteht.',
+      sol: rules.dailyEarnings.colossus
     }
   ];
   selectedDaily = 1;
