@@ -1,4 +1,4 @@
-import { GameResultType } from '../../shared/config/enums';
+import { CardType, GameResultType } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
@@ -58,10 +58,21 @@ export default class GameResult {
     DBCredentialsDAO.getByUsername(player.name).then(c => {
       if (c) {
         DBProfilesDAO.increaseSol(c.userId, sol);
-        if (won) DBDailiesDAO.achieveVictory(c.userId);
+        if (won) {
+          DBDailiesDAO.achieveVictory(c.userId);
+          if (this.type == GameResultType.Destruction) DBDailiesDAO.achieveDestruction(c.userId);
+          else if (this.type == GameResultType.Domination) DBDailiesDAO.achieveDomination(c.userId);
+        }
         if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
         if (player.colonyCardStack.profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
-        if (player.cardStacks.filter(c => c.isFlightReady).length >= 5) DBDailiesDAO.achieveShips(c.userId);
+        if (player.discardPile.length >= 50) DBDailiesDAO.achieveDiscard(c.userId);
+        if (player.colonyCardStack.cards.length > 7) DBDailiesDAO.achieveColony(c.userId);
+        const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
+        if (readyCardStacks.length >= 5) DBDailiesDAO.achieveShips(c.userId);
+        if (readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10) DBDailiesDAO.achieveControl(c.userId);
+        if (readyCardStacks.find(cs => cs.profile.hp >= 20)) DBDailiesDAO.achieveJuggernaut(c.userId);
+        if (readyCardStacks.find(cs => cs.cards.length >= 7)) DBDailiesDAO.achieveColossus(c.userId);
+        if (readyCardStacks.filter(cs => cs.profile.speed == 0).flatMap(cs => cs.cards).filter(c => c.type == CardType.Hull).length >= 3) DBDailiesDAO.achieveStations(c.userId);
       } else {
         console.log(`ERROR: Could not find user ${player.name} in database`);
       }

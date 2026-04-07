@@ -12,7 +12,15 @@ class OCRules {
     victory: 45,
     game: 70,
     energy: 90,
-    ships: 125
+    ships: 115,
+    domination: 100,
+    destruction: 85,
+    control: 115,
+    juggernaut: 120,
+    stations: 105,
+    discard: 130,
+    colony: 110,
+    colossus: 125
   };
   readonly gameEarnings = {
     victory: 50,

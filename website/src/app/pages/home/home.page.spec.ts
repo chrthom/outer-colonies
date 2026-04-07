@@ -36,7 +36,7 @@ describe('HomePage', () => {
   });
 
   it('should initialize with default dailies', () => {
-    expect(component.dailies.length).toBe(5);
+    expect(component.dailies.length).toBe(13);
     expect(component.dailies[0].title).toBe('Tägliche Inspektion');
     expect(component.dailies[1].title).toBe('Der Duft des Sieges');
   });
@@ -51,7 +51,15 @@ describe('HomePage', () => {
       victory: false,
       game: true,
       energy: false,
-      ships: true
+      ships: true,
+      domination: false,
+      destruction: false,
+      control: false,
+      juggernaut: false,
+      stations: false,
+      discard: false,
+      colony: false,
+      colossus: false
     };
 
     spyOn(component, 'reload').and.callThrough();
@@ -72,7 +80,15 @@ describe('HomePage', () => {
       victory: false,
       game: true,
       energy: false,
-      ships: true
+      ships: true,
+      domination: false,
+      destruction: false,
+      control: false,
+      juggernaut: false,
+      stations: false,
+      discard: false,
+      colony: false,
+      colossus: false
     };
 
     fixture.detectChanges();
@@ -101,7 +117,15 @@ describe('HomePage', () => {
       victory: false,
       game: true,
       energy: false,
-      ships: true
+      ships: true,
+      domination: false,
+      destruction: false,
+      control: false,
+      juggernaut: false,
+      stations: false,
+      discard: false,
+      colony: false,
+      colossus: false
     };
 
     fixture.detectChanges();
