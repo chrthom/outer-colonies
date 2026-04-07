@@ -81,6 +81,30 @@ export default class DBDailiesDAO {
   static async achieveShips(userId: number) {
     await this.achieve(userId, 'ships', rules.dailyEarnings.ships);
   }
+  static async achieveDomination(userId: number) {
+    await this.achieve(userId, 'domination', rules.dailyEarnings.domination);
+  }
+  static async achieveDestruction(userId: number) {
+    await this.achieve(userId, 'destruction', rules.dailyEarnings.destruction);
+  }
+  static async achieveControl(userId: number) {
+    await this.achieve(userId, 'control', rules.dailyEarnings.control);
+  }
+  static async achieveJuggernaut(userId: number) {
+    await this.achieve(userId, 'juggernaut', rules.dailyEarnings.juggernaut);
+  }
+  static async achieveStations(userId: number) {
+    await this.achieve(userId, 'stations', rules.dailyEarnings.stations);
+  }
+  static async achieveDiscard(userId: number) {
+    await this.achieve(userId, 'discard', rules.dailyEarnings.discard);
+  }
+  static async achieveColony(userId: number) {
+    await this.achieve(userId, 'colony', rules.dailyEarnings.colony);
+  }
+  static async achieveColossus(userId: number) {
+    await this.achieve(userId, 'colossus', rules.dailyEarnings.colossus);
+  }
   private static async achieve(userId: number, daily: string, sol: number) {
     await this.getBy(`user_id = ? AND (${daily} < current_date() OR ${daily} IS NULL)`, [userId]).then(b => {
       if (b.length) {

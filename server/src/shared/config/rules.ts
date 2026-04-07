@@ -15,9 +15,9 @@ class OCRules {
     ships: 115,
     domination: 100,
     destruction: 85,
-    control: 105,
+    control: 115,
     juggernaut: 120,
-    stations: 115,
+    stations: 105,
     discard: 130,
     colony: 110,
     colossus: 125
