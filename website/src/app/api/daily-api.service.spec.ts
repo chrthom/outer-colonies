@@ -35,7 +35,15 @@ describe('DailyApiService', () => {
       victory: false,
       game: true,
       energy: false,
-      ships: true
+      ships: true,
+      domination: false,
+      destruction: false,
+      control: false,
+      juggernaut: false,
+      stations: false,
+      discard: false,
+      colony: false,
+      colossus: false
     };
 
     service.dailies.subscribe(dailies => {
