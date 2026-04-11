@@ -21,7 +21,7 @@
         @if (password?.hasError('required')) {
         <mat-error> Bitte w&auml;hle ein Passwort </mat-error>
         } @else if (password?.hasError('maxlength')) {
-        <mat-error> Dein Passwort kann nicht länger als 40 Zeichen sein </mat-error>
+        <mat-error> Dein Passwort kann nicht l&auml;nger als 40 Zeichen sein </mat-error>
         } @else if (password?.hasError('minlength')) {
         <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
         }
@@ -95,7 +95,7 @@
     } @if (registrationSuccessful) {
     <h3>Registrierung erfolgreich</h3>
     <p>
-      Eine E-Mail mit einem Aktivierungslink wurde an dich versandt. Bitte prüfe dein Postfach und folge dem
+      Eine E-Mail mit einem Aktivierungslink wurde an dich versandt. Bitte pr&uuml;fe dein Postfach und folge dem
       darin enthaltenen Link. Danach kannst du dich <a routerLink="/login">hier</a> einloggen.
     </p>
     }

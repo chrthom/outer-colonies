@@ -32,14 +32,14 @@ export default class DBDailiesDAO {
         'CASE WHEN victory IS NULL OR victory < CURRENT_DATE() THEN 0 ELSE 1 END AS victory, ' +
         'CASE WHEN game IS NULL OR game < CURRENT_DATE() THEN 0 ELSE 1 END AS game, ' +
         'CASE WHEN energy IS NULL OR energy < CURRENT_DATE() THEN 0 ELSE 1 END AS energy, ' +
-        'CASE WHEN ships IS NULL OR ships < CURRENT_DATE() THEN 0 ELSE 1 END AS ships ' +
-        'CASE WHEN domination IS NULL OR domination < CURRENT_DATE() THEN 0 ELSE 1 END AS domination ' +
-        'CASE WHEN destruction IS NULL OR destruction < CURRENT_DATE() THEN 0 ELSE 1 END AS destruction ' +
-        'CASE WHEN control IS NULL OR control < CURRENT_DATE() THEN 0 ELSE 1 END AS control ' +
-        'CASE WHEN juggernaut IS NULL OR juggernaut < CURRENT_DATE() THEN 0 ELSE 1 END AS juggernaut ' +
-        'CASE WHEN stations IS NULL OR stations < CURRENT_DATE() THEN 0 ELSE 1 END AS stations ' +
-        'CASE WHEN discard IS NULL OR discard < CURRENT_DATE() THEN 0 ELSE 1 END AS discard ' +
-        'CASE WHEN colony IS NULL OR colony < CURRENT_DATE() THEN 0 ELSE 1 END AS colony ' +
+        'CASE WHEN ships IS NULL OR ships < CURRENT_DATE() THEN 0 ELSE 1 END AS ships, ' +
+        'CASE WHEN domination IS NULL OR domination < CURRENT_DATE() THEN 0 ELSE 1 END AS domination, ' +
+        'CASE WHEN destruction IS NULL OR destruction < CURRENT_DATE() THEN 0 ELSE 1 END AS destruction, ' +
+        'CASE WHEN control IS NULL OR control < CURRENT_DATE() THEN 0 ELSE 1 END AS control, ' +
+        'CASE WHEN juggernaut IS NULL OR juggernaut < CURRENT_DATE() THEN 0 ELSE 1 END AS juggernaut, ' +
+        'CASE WHEN stations IS NULL OR stations < CURRENT_DATE() THEN 0 ELSE 1 END AS stations, ' +
+        'CASE WHEN discard IS NULL OR discard < CURRENT_DATE() THEN 0 ELSE 1 END AS discard, ' +
+        'CASE WHEN colony IS NULL OR colony < CURRENT_DATE() THEN 0 ELSE 1 END AS colony, ' +
         'CASE WHEN colossus IS NULL OR colossus < CURRENT_DATE() THEN 0 ELSE 1 END AS colossus ' +
         `FROM dailies WHERE ${whereClause}`,
       params
