@@ -7,6 +7,7 @@
             <h5>Allgemeines</h5>
             <mat-list-option value="setup" selected="true"><h4>Spielaufbau</h4></mat-list-option>
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
+            <mat-list-option value="victory"><h4>Siegbedingungen</h4></mat-list-option>
             <mat-list-option value="glossar"><h4>Glossar</h4></mat-list-option>
             <h5>Karten</h5>
             <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
@@ -21,6 +22,7 @@
             <h5>Gefechte durchf&uuml;hren</h5>
             <mat-list-option value="battle-overview"><h4>Gefechtsphasen</h4></mat-list-option>
             <mat-list-option value="attacks"><h4>Angriffe durchf&uuml;hren</h4></mat-list-option>
+            <mat-list-option value="battle-end"><h4>Gefechte beenden</h4></mat-list-option>
           </mat-selection-list>
         </td>
         <td id="rules-content">
@@ -29,91 +31,67 @@
             <img [src]="imgUrl('setup')" class="left size-40" />
             <img [src]="imgUrl('intro')" class="right size-20" />
             <p>
-              Willkommen zu <i>Outer Colonies</i>, dem Trading Card Game, welches dich in den unwirtlichen
-              Rand unseres Sonnensystems entführt. Sei einer der abenteuerlustigen Anführer, die fernab der
+              Willkommen zu <i>Outer Colonies</i>, dem digitalen Trading Card Game, das dich in den unwirtlichen
+              Rand unseres Sonnensystems entführt. Sei eine der abenteuerlustigen Anführer:innen, die fernab der
               überbevölkerten und von Kriegen zerrütteten Erde und den marsianischen Oligarchien auf den
               äußeren Monden und Asteroiden um die Vorherrschaft auf Lebensraum und Ressourcen kämpfen.
             </p>
             <p>
               Mit deinen <i>Outer Colonies</i> Karten stellst du dir ein Deck aus <b>60 bis 100</b> Karten
-              zusammen mit dem du gegen einen oder mehrere andere Spieler antreten kannst. Auf den folgenden
-              Seite lernst du, wie eine Partie <i>Outer Colonies</i> abläuft und wie du deine Karten einsetzt.
+              zusammen, mit dem du gegen andere Spieler:innen antreten kannst. Auf den folgenden Seiten lernst du,
+              wie eine Partie <i>Outer Colonies</i> abläuft und wie du deine Karten einsetzt.
             </p>
-            <p>Vor dem Spielbeginn mischen beide Spieler ihr Deck und ziehen <b>7 Karten</b>.</p>
+            <p>Vor dem Spielbeginn mischen beide Spieler:innen ihr Deck und ziehen <b>7 Karten</b>.</p>
             <p>
-              Die Kolonie jedes Spielers hat <b>50 Rumpfpunkte</b>. Jeder Spieler notiert sich die Anzahl
-              seiner verbleibenden Rumpfpunkte für alle sichtbar während des Spieles. Ein Spieler dessen
-              Rumpfpunkte zum Rundenende auf 0 sinken scheidet aus dem Spiel aus. Der Spieler der als letztes
-              im Spiel verbleibt gewinnt.
-            </p>
-            <p>
-              Während des Spiels legst du Karten vor dir aus, die in einer der drei Spielzonen (siehe
-              Abbildung) liegen.
+              Während des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbildung links).
             </p>
           </div>
           } @case ('symbols') {
           <div>
             <p>
-              In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel
+              In Outer Colonies werden der Typ der Karte, ihre Eigenschaftspunkte sowie die sogenannten Sockel
               in Form von Symbolen dargestellt.
             </p>
-            <table>
-              <tr>
-                <th colspan="2">Sockel</th>
-                <th colspan="2">Schiffs- und<br />Ausr&uuml;stungsattribute</th>
-                <th colspan="2">Kartentypen</th>
-              </tr>
-              <tr>
-                <td><h5>&Delta;</h5></td>
-                <td>Delta (Triebwerk)</td>
-                <td><img [src]="iconUrl('point_defense_1')" class="oc-icon" /></td>
-                <td>Punktabwehr</td>
-                <td><img [src]="iconUrl('tactic')" class="oc-icon" /></td>
-                <td>Taktik</td>
-              </tr>
-              <tr>
-                <td><h5>&Theta;</h5></td>
-                <td>Theta (Leichte Waffen)</td>
-                <td><img [src]="iconUrl('shield_1')" class="oc-icon" /></td>
-                <td>Schild</td>
-                <td><img [src]="iconUrl('hull')" class="oc-icon" /></td>
-                <td>Rumpf</td>
-              </tr>
-              <tr>
-                <td><h5>&Xi;</h5></td>
-                <td>Xi (Schwere Waffen)</td>
-                <td><img [src]="iconUrl('armour_1')" class="oc-icon" /></td>
-                <td>Panzerung</td>
-                <td><img [src]="iconUrl('equipment')" class="oc-icon" /></td>
-                <td>Ausr&uuml;stung</td>
-              </tr>
-              <tr>
-                <td><h5>&Phi;</h5></td>
-                <td>Phi (Torpedos)</td>
-                <td><img [src]="iconUrl('hitpoints')" class="oc-icon" /></td>
-                <td>H&uuml;llenintegrit&auml;t</td>
-                <td><img [src]="iconUrl('infrastructure')" class="oc-icon" /></td>
-                <td>Infrastruktur</td>
-              </tr>
-              <tr>
-                <td><h5>&Psi;</h5></td>
-                <td>Psi (Frachtraum)</td>
-                <td><img [src]="iconUrl('speed')" class="oc-icon" /></td>
-                <td>Geschwindigkeit</td>
-                <td colspan="2" rowspan="3"></td>
-              </tr>
-              <tr>
-                <td><h5>&Omega;</h5></td>
-                <td>Omega (Defensivsysteme)</td>
-                <td><img [src]="iconUrl('damage')" class="oc-icon" /></td>
-                <td>Schaden</td>
-              </tr>
-              <tr>
-                <td colspan="2"></td>
-                <td><img [src]="iconUrl('energy')" class="oc-icon" /></td>
-                <td>Energie</td>
-              </tr>
-            </table>
+            <h4>Sockel</h4>
+            <ul>
+              <li><b>&Delta;</b>: Delta (Triebwerk)</li>
+              <li><b>&Theta;</b>: Theta (Leichte Waffen)</li>
+              <li><b>&Xi;</b>: Xi (Schwere Waffen)</li>
+              <li><b>&Phi;</b>: Phi (Torpedos)</li>
+              <li><b>&Psi;</b>: Psi (Frachtraum)</li>
+              <li><b>&Omega;</b>: Omega (Defensivsysteme)</li>
+            </ul>
+            <h4>Schiffs- und Ausr&uuml;stungsattribute</h4>
+            <ul>
+              <li><img [src]="iconUrl('point_defense_1')" class="oc-icon" />: Punktabwehr</li>
+              <li><img [src]="iconUrl('shield_1')" class="oc-icon" />: Schild</li>
+              <li><img [src]="iconUrl('armour_1')" class="oc-icon" />: Panzerung</li>
+              <li><img [src]="iconUrl('hitpoints')" class="oc-icon" />: H&uuml;llenintegrit&auml;t (kurz HP)</li>
+              <li><img [src]="iconUrl('speed')" class="oc-icon" />: Geschwindigkeit</li>
+              <li><img [src]="iconUrl('damage')" class="oc-icon" />: Schaden</li>
+              <li><img [src]="iconUrl('energy')" class="oc-icon" />: Energie</li>
+              <li><img [src]="iconUrl('control')" class="oc-icon" />: Kontrolle</li>
+            </ul>
+            <h4>Kartentypen</h4>
+            <ul>
+              <li><img [src]="iconUrl('tactic')" class="oc-icon" />: Taktik</li>
+              <li><img [src]="iconUrl('hull')" class="oc-icon" />: Rumpf</li>
+              <li><img [src]="iconUrl('equipment')" class="oc-icon" />: Ausr&uuml;stung</li>
+              <li><img [src]="iconUrl('infrastructure')" class="oc-icon" />: Infrastruktur</li>
+              <li><img [src]="iconUrl('orb')" class="oc-icon" />: Himmelsk&ouml;rper</li>
+            </ul>
+          </div>
+          } @case ('victory') {
+          <div>
+            <p>
+              Eine Partie <i>Outer Colonies</i> endet, sobald eine der folgenden Bedingungen erfüllt ist:
+            </p>
+            <ul>
+              <li><b>Vorherrschaft</b>: Eine Spieler:in gewinnt, wenn sie <b>15</b> <img [src]="iconUrl('control')" class="oc-icon" /> mehr für ihre Kolonie errungen hat als ihre Gegner:in.</li>
+              <li><b>Zerstörung</b>: Die Kolonie jeder Spieler:in hat <b>50</b> <img [src]="iconUrl('hitpoints')" class="oc-icon" />. Eine Spieler:in scheidet aus dem Spiel aus, wenn ihre Kolonie keine <img [src]="iconUrl('hitpoints')" class="oc-icon" /> mehr hat. Die verbleibende Spieler:in gewinnt.</li>
+              <li><b>Erschöpfung</b>: Eine Spieler:in scheidet aus dem Spiel aus, wenn sie eine Karte ziehen müsste, aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.</li>
+              <li><b>Kapitulation</b>: Eine Spieler:in kann freiwillig kapitulieren, wodurch die andere Spieler:in gewinnt.</li>
+            </ul>
           </div>
           } @case ('glossar') {
           <div>
@@ -274,28 +252,37 @@
             <h4>Komponenten <i>(Bauteile)</i></h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('hull')" class="oc-icon" />. Ein Schiff aus diesen
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> besteht aus mehreren Teilen. Alle in Klammern
-              angegebene Teile müssen angelegt sein, damit das Schiff als fertig gilt.
+              <img [src]="iconUrl('hull')" class="oc-icon" /> besteht aus mehreren Teilen. Alle in Klammern
+              angegebenen Teile müssen angelegt sein, damit das Schiff als fertig gilt.
+            </p>
+            <h4>Kontrolle <img [src]="iconUrl('control')" class="oc-icon" /></h4>
+            <p>
+              Ein Maß für den Einfluss und die Dominanz einer Spieler:in über das Spielgebiet. Kontrolle wird
+              durch das erfolgreiche Durchführen von Missionen und das Besiegen von gegner:inischen Schiffen
+              erworben. Eine Spieler:in gewinnt das Spiel, wenn sie 15 <img [src]="iconUrl('control')" class="oc-icon" /> mehr als ihre Gegner:in besitzt.
             </p>
             <h4>Mission</h4>
             <p>
-              Der aktive Spieler kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission
-              muss er mindestens ein Schiff zuweisen. Für die Mission platziert er zwei die Missionskarten
-              (offene Missionskarten vom Ablagestapel und/oder verdeckte Missonskarten vom Deck). Ist die
-              Mission erfolgreich (kein Abfangversuch, oder mindestens ein überlebendes Schiff), so darf er
-              verdeckte Missionskarte auf die Hand nehmen und offene Missionskarten in sein Deck mischen.
+              Der aktive Spieler:in kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission
+              muss mindestens ein Schiff zugewiesen werden. Ist die Mission erfolgreich (kein Abfangversuch
+              oder mindestens ein überlebendes Schiff), zieht die Spieler:in eine Karte vom Deck auf die Hand
+              und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die
+              Spieler:in für die eigene Kolonie <img [src]="iconUrl('control')" class="oc-icon" /> in Höhe der
+              Differenz aller <img [src]="iconUrl('control')" class="oc-icon" /> der eigenen überlebenden Schiffe
+              und der <img [src]="iconUrl('control')" class="oc-icon" /> der gegnerischen überlebenden Schiffe der
+              Mission, sofern dieser Wert größer als 0 ist.
             </p>
             <h4>Multiplikator <i>(Kartentyp)</i></h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('infrastructure')" class="oc-icon" /> und
               <img [src]="iconUrl('orb')" class="oc-icon" />. Ziehst du zu Beginn deines Spielzugs mindestens
-              eine Karte des angegebenen Kartentyps, zeige deinem Gegner diese Karte und ziehe eine weitere
+              eine Karte des angegebenen Kartentyps, zeige deinem Gegner:in diese Karte und ziehe eine weitere
               Karte von deinem Deck. <br />Hast du mehrere Karten mit diesem Schlagwort im Spiel, so ziehst du
               gegebenenfalls für jede dieser Karten eine zusätzliche Karte. <br />Gilt der Multiplikator für
               <img [src]="iconUrl('tactic')" class="oc-icon" />, so können zusätzlich eine oder mehrere
               Disziplinen angebenen sein, die die
               <img [src]="iconUrl('tactic')" class="oc-icon" /> einschränken, für die eine weitere Karte
-              gezogen werden dürfen. <br />In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte
+              gezogen werden darf. <br />In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte
               nachgezogen werden.
             </p>
             <h4>Neutrale Zone</h4>
@@ -402,10 +389,10 @@
             </p>
             <h4>Überfall</h4>
             <p>
-              Ein Angriff des aktiven Spielers auf die Kolonie eines anderen Spielers. Schiffe mit
-              <img [src]="iconUrl('speed')" class="oc-icon" /> des verteidigenden Spielers müssen am Gefecht
+              Ein Angriff des aktiven Spieler:in auf die Kolonie eines anderen Spieler:in. Schiffe mit
+              <img [src]="iconUrl('speed')" class="oc-icon" /> des verteidigenden Spieler:in müssen am Gefecht
               teilnehmen. Auf Reichweite 1 eines Überfalls können die Kolonie und Karten in der Koloniezone
-              des Verteidigers angegrffen werden.
+              des Verteidigers angegriffen werden.
             </p>
             <h4>Unerschöpflich</h4>
             <p>
@@ -673,11 +660,8 @@
           <div>
             <img [src]="imgUrl('missions')" class="left size-40" />
             <p>
-              Am Ende der Aufbauphase hast du die Möglichkeit entweder einen Überfall auf eine feindliche
-              Kolonie oder eine Mission anzusagen. Durch Missionen erhälst du zusätzliche Karten. Durch
-              Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegeners
-              angreifen, was letztendlich für den Spielsieg notwendig ist. Die Planung der Missionen und
-              Überfälle läuft in mehreren Schritten ab.
+              Am Ende der Aufbauphase hast du die Möglichkeit, entweder einen Überfall auf eine feindliche
+              Kolonie oder eine Mission anzusagen. Durch Missionen erhältst du <img [src]="iconUrl('control')" class="oc-icon" /> für deine Kolonie. Durch Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegners angreifen. Die Planung der Missionen und Überfälle läuft in mehreren Schritten ab.
             </p>
             <h2>Ansage</h2>
             <p>
@@ -822,11 +806,64 @@
               Zielkarte.
             </p>
             <p>
-              Ist die Kolonie eines Gegners oder eine Karte in der Koloniezone das Ziel, handelst du dies
-              genauso ab als wäre ein Schiff oder eine
+              Ist die Kolonie eines Gegner:in oder eine Karte in der Koloniezone das Ziel, handelst du dies
+              genauso ab, als wäre ein Schiff oder eine
               <img [src]="iconUrl('infrastructure')" class="oc-icon" /> das Ziel. Lege
               <img [src]="iconUrl('damage')" class="oc-icon" />-Marker auf die Kolonie bzw. die Karte in der
               Koloniezone.
+            </p>
+            <h4>Beispiel für Schadensberechnung</h4>
+            <p>
+              Angenommen, ein Schiff greift mit einer <img [src]="iconUrl('equipment')" class="oc-icon" /> an,
+              die 9 <img [src]="iconUrl('damage')" class="oc-icon" /> verursacht. Das Ziel hat 5
+              <img [src]="iconUrl('equipment')" class="oc-icon" />:
+              <ul>
+                <li>1 <img [src]="iconUrl('point_defense_1')" class="oc-icon" /></li>
+                <li>2 <img [src]="iconUrl('shield_1')" class="oc-icon" /> (deaktiviert)</li>
+                <li>1 <img [src]="iconUrl('shield_1')" class="oc-icon" /></li>
+                <li>1 <img [src]="iconUrl('armour_1')" class="oc-icon" /></li>
+                <li>2 <img [src]="iconUrl('armour_1')" class="oc-icon" /></li>
+              </ul>
+              Die Waffe hat Abzüge von 5 für <img [src]="iconUrl('shield_1')" class="oc-icon" /> und 3 für
+              <img [src]="iconUrl('armour_1')" class="oc-icon" />.
+            </p>
+            <p>Der Schaden wird wie folgt berechnet:</p>
+            <ol>
+              <li>1 <img [src]="iconUrl('point_defense_1')" class="oc-icon" />: Wird ignoriert, da keine Abzüge.</li>
+              <li>Deaktiverte 2 <img [src]="iconUrl('shield_1')" class="oc-icon" />: Wird ignoriert, da bereits deaktiviert.</li>
+              <li>1 <img [src]="iconUrl('shield_1')" class="oc-icon" />: 9 - 5 = 4. Die <img [src]="iconUrl('equipment')" class="oc-icon" /> mit <img [src]="iconUrl('shield_1')" class="oc-icon" /> wird deaktiviert.</li>
+              <li>2 <img [src]="iconUrl('armour_1')" class="oc-icon" /> (Doppelpanzerung vor einfacher Panzerung): 4 - (2 * 3) = 0. Wird nicht deaktiviert, da Abzug nicht durch Schaden erreicht wurde.</li>
+              <li>1 <img [src]="iconUrl('armour_1')" class="oc-icon" />: Wird nicht angewandt, da der <img [src]="iconUrl('damage')" class="oc-icon" /> bereits 0 beträgt.</li>
+            </ol>
+            <p>
+              Der finale Schaden beträgt 0 <img [src]="iconUrl('damage')" class="oc-icon" />. Nach dem Angriff
+              sind beim Ziel immernoch die <img [src]="iconUrl('equipment')" class="oc-icon" /> mit 1
+              <img [src]="iconUrl('point_defense_1')" class="oc-icon" />, 1
+              <img [src]="iconUrl('armour_1')" class="oc-icon" /> und 2
+              <img [src]="iconUrl('armour_1')" class="oc-icon" />.
+            </p>
+          </div>
+          } @case ('battle-end') {
+          <div>
+            <h2>Gefechte beenden</h2>
+            <p>
+              Ein Gefecht endet in einem dieser Fälle:
+              <ul>
+                <li>Ein Spieler besitzt keine Karten mehr, die an dem Gefecht teilnehmen</li>
+                <li>Die Kolonie des verteidigenden Spielers wurde zerstört (in diesem Fall endet das Spiel sofort)</li>
+                <li>Die letzte Gefechtsphase (Reichweite 1) wurde beendet</li>
+              </ul>
+            </p>
+            <p>
+              Am Ende eines Gefechts vom Typ <i>Mission</i> wird ermittelt, ob die Mission erfolgreich war. Eine
+              Mission ist erfolgreich, wenn der aktive Spieler:in mindestens ein Schiff besitzt, welches zum
+              Gefechtsende nicht zerstört wurde. Ist die Mission erfolgreich, zieht die Spieler:in eine Karte
+              vom Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich
+              erhält die Spieler:in für die eigene Kolonie <img [src]="iconUrl('control')" class="oc-icon" /> in Höhe
+              der Differenz aller <img [src]="iconUrl('control')" class="oc-icon" /> der eigenen überlebenden Schiffe
+              und der <img [src]="iconUrl('control')" class="oc-icon" /> der gegnerischen überlebenden Schiffe der
+              Mission, sofern dieser Wert größer als 0 ist. Eine Mission gilt ebenfalls als erfolgreich, wenn die
+              Gegenspieler:in keinen Abfangversuch unternimmt.
             </p>
           </div>
           } }
