@@ -36,7 +36,7 @@ Während des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbil
 
 ### Symbole
 
-In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
+In Outer Colonies werden der Typ der Karte, ihre Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
 
 #### Sockel
 - **Δ**: Delta (Triebwerk)
@@ -84,15 +84,15 @@ Der Stapel neben deinem Deck auf den Karten offen gelegt werden, wenn sie das Sp
 Eigenschaftspunkte des Typs Sockel oder <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> mit einem Minus vor dem Wert in einem roten Kasten. Eine Karte kann nicht ausgespielt werden, wenn die Karten, an die diese Karte angelegt wird, diese Eigenschaftspunkte nicht zur Verfügung stellen.
 
 #### Aktion *(Kartentyp)*
-Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />. Erhöhe sofort die Anzahl der Karten, die du vom angegebenen Kartentyp ausspielen darfst (Aktionslimit) um 1. Ist dieses Schlagwort auf einer <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, so gilt die Erhöhung des Aktionslimits für den Kartentyp nur für den aktuellen Spielzug, in allen anderen Fällen dauerhaft, solange die Karte bei Rundenbeginn noch im Spiel ist. Wird das Aktionslimit für <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> erhöht, so können zusätzlich eine oder mehrere Disziplinen angebenen sein, die die <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> einschränken, die zusätzlich ausgespielt werden dürfen. Steht vor dm Kartentyp ein Faktor (z.B. "3x"), so wird das Aktionslimit nicht um 1, sondern um den angegebenen Faktor erhöht. Es können gleichzeitig verschiedene Kartentypen angegeben sein:
+Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />. Erhöhe sofort die Anzahl der Karten, die du vom angegebenen Kartentyp ausspielen darfst (Aktionslimit), um 1. Ist dieses Schlagwort auf einer <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, so gilt die Erhöhung des Aktionslimits für den Kartentyp nur für den aktuellen Spielzug, in allen anderen Fällen dauerhaft, solange die Karte bei Rundenbeginn noch im Spiel ist. Wird das Aktionslimit für <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> erhöht, so können zusätzlich eine oder mehrere Disziplinen angebenen sein, die die <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> einschränken, die zusätzlich ausgespielt werden dürfen. Steht vor dem Kartentyp ein Faktor (z.B. "3x"), so wird das Aktionslimit nicht um 1, sondern um den angegebenen Faktor erhöht. Es können gleichzeitig verschiedene Kartentypen angegeben sein:
 - Sind diese mit **+** verbunden, wird das Aktionslimit **aller** angegebenen Kartentypen um 1 erhöht.
 - Sind diese mit **|** verbunden, wird das Aktionslimit **eines** beleibign angegebenen Kartentyps um 1 erhöht.
 
 #### aktiv / aktivieren
-Karten die im Gefecht noch nicht deaktivert wurden. Nur aktive Karten können in Gechtensphasen verwendet werden. Wird eine Karte wieder aktiviert, kann sie diese Gefechtsrunde wieder verwendet werden.
+Karten, die im Gefecht noch nicht deaktiviert wurden. Nur aktive Karten können in Gefechtsphasen verwendet werden. Wird eine Karte wieder aktiviert, kann sie diese Gefechtsrunde wieder verwendet werden.
 
 #### Ausrüstungskarte <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />
-Ein Kartentyp der nur an <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> angelegt werden kann.
+Ein Kartentyp, der nur an <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> angelegt werden kann.
 
 #### Deck
 Der Nachziehstapel von dem zu Rundenbeginn und für Missionen neue Karten ziehst. Musst du eine Karte ziehen und das Deck ist leer, verlierst du das Spiel.
@@ -116,22 +116,22 @@ Spielrunde eines Gefechts gemessen in der aktuellen Reichweite. Es werden bis zu
 Eigenschaftspunkt von <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> (bei aus mehren <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> bestehenden Schiffen nur vom Heck, da dort das Triebwerk ist). Für einige <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, sowie beim Abfangen relevant, um zu ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an und die <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> plus die Reichweite der aktuellen Gefechtsphase sind kleiner oder gleich der <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> des Ziel, so wir der vom Angriff verursachte <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> halbiert (aufgerundet und vor allen anderen Abzügen).
 
 #### Haltbarkeit *(Spielphase)*
-Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />. Diese Karte wwird nach dem Ausspielen nicht direkt abgelegt, sondern bleiben im Spiel. Sie werden abgelegt sobald die angegebene Spielphase vorbei ist:
+Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />. Diese Karte wird nach dem Ausspielen nicht direkt abgelegt, sondern bleibt im Spiel. Sie wird abgelegt, sobald die angegebene Spielphase vorbei ist:
 - Gefechtsphase: Die Karte wird abgelegt, sobald die aktuelle Gefechtphase beendet ist (nachdem <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> reaktiviert und zerstörte Schiffe entfernt wurden)
 - Permanent: Diese Karte muss an eine andere Karte angelegt werden. Die <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> wird nur abgelegt, wenn die Karte abgelegt wird an die sie angelegt ist.
 - Spielzug: Die Karte wird zu Beginn deines nächsten Spielzugs abgelegt.
 
 #### Himmelskörperkarte <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />
-Ein Kartentyp, der an die Kolonie angelegt wird, von der jeder Spieler:in nur eine im Spiel haben kann, die nicht zurück auf die Hand genommen werden kann und nicht Ziel von Angriffen und <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> sein kann.
+Ein Kartentyp, der an die Kolonie angelegt wird. Von diesem Kartentyp kann jede Spieler:in nur eine im Spiel haben. Diese Karte kann nicht zurück auf die Hand genommen werden und ist nicht Ziel von Angriffen und <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />.
 
 #### Hüllenpunkte <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" />
-Hat ein Schiff oder eine Koloniekarte mindestens so viele Schadensmarken wie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> wird es auf den Ablagestapel gelegt. Wird gelegentlich auch mit "HP" abgekürzt.
+Hat ein Schiff oder eine Koloniekarte mindestens so viele Schadensmarken wie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" />, wird es auf den Ablagestapel gelegt. Wird gelegentlich auch mit "HP" abgekürzt.
 
 #### inaktiv / deaktivieren
-Karten die in der aktuellen Gefechtsphase bereits verwendet wurden. Wird eine Karte durch Anwendung oder eine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> deaktiviert, kann sie diese Gefechtsphase nicht mehr eingesetzt werden.
+Karten, die in der aktuellen Gefechtsphase bereits verwendet wurden. Wird eine Karte durch Anwendung oder eine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> deaktiviert, kann sie diese Gefechtsphase nicht mehr eingesetzt werden.
 
 #### Infrastrukturkarte <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" />
-Ein Kartentyp, der sowohl an <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> als auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt können alle Sockel-Anforderungen ignoriert werden.
+Ein Kartentyp, der sowohl an <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> als auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt, können alle Sockel-Anforderungen ignoriert werden.
 
 #### Intervention *(Spielphase)*
 Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />. Diese Karte darf auch außerhalb der Aufbauphase gespielt werden und auch, wenn du gerade nicht der aktive Spieler:in bist. Der exakte Zeitpunkt, zu dem diese Karten außerhalb deiner eigenen Aufbauphase gespielt werden dürfen ist stets mit angegeben:
@@ -142,25 +142,25 @@ Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width
 - Taktik - *Disziplinen*: Wenn dein Gegner:in eine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> der angegebenen Disziplinen spielt.
 
 #### Koloniezone
-Hier platzieren Spieler:innen ausgespielte <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" />, die du an die Kolonie anlegst, sowie <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> von im Bau befindlichen Schiffen. Karten in der Koloniezone können während eines Überfälls nur in der Gefechtsphase mt Reichweite 1 angegriffen werden. Jede Spieler:in besitzt eine eigene Koloniezone.
+Hier platzieren Spieler:innen ausgespielte <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" />, die an die Kolonie angelegt werden, sowie <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> von im Bau befindlichen Schiffen. Karten in der Koloniezone können während eines Überfalls nur in der Gefechtsphase mit Reichweite 1 angegriffen werden. Jede Spieler:in besitzt eine eigene Koloniezone.
 
 #### Komponenten *(Bauteile)*
-Schlagwort auf <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />. Ein Schiff aus diesen <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> besteht aus mehreren Teilen. Alle in Klammern angegebene Teile müssen angelegt sein, damit das Schiff als fertig gilt.
+Schlagwort auf <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />. Ein Schiff aus diesen <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> besteht aus mehreren Teilen. Alle in Klammern angegebenen Teile müssen angelegt sein, damit das Schiff als fertig gilt.
 
 #### Kontrolle <img src="https://assets.outercolonies.de/icons/control.png" width="20" />
-Ein Maß für den Einfluss und die Dominanz einer Spieler:in über das Spielgebiet. <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> für die Kolonie wird durch das erfolgreiche Durchführen von Missionen mit Schiffen erworben, welche <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> als Attribut besitzen. Eine Spieler:in gewinnt das Spiel, wenn sie 15 <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> mehr als ihre Gegner:in besitzt.
+Ein Maß für den Einfluss und die Dominanz einer Spieler:in über das Spielgebiet. Kontrolle wird durch das erfolgreiche Durchführen von Missionen und das Besiegen von gegner:inischen Schiffen erworben. Eine Spieler:in gewinnt das Spiel, wenn sie 15 <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> mehr als ihre Gegner:in besitzt.
 
 #### Mission
-Der aktive Spieler:in kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission muss er mindestens ein Schiff zuweisen. Ist die Mission erfolgreich (kein Abfangversuch, oder mindestens ein überlebendes Schiff), so zieht die Spieler:in eine Karte von Deck auf die Hand, mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die Spieler:in für die eigene Kolonie <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> in Höhe der Differenz aller <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> der eigenen überlebenden Schiffe und der <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> der gegnerischen überlebenden Schiffe der Mission, sofern dieser Wert größer als 0 ist.
+Der aktive Spieler:in kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission muss mindestens ein Schiff zugewiesen werden. Ist die Mission erfolgreich (kein Abfangversuch oder mindestens ein überlebendes Schiff), zieht die Spieler:in eine Karte vom Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die Spieler:in für die eigene Kolonie <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> in Höhe der Differenz aller <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> der eigenen überlebenden Schiffe und der <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> der gegnerischen überlebenden Schiffe der Mission, sofern dieser Wert größer als 0 ist.
 
 #### Multiplikator *(Kartentyp)*
-Schlagwort auf <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />. Ziehst du zu Beginn deines Spielzugs mindestens eine Karte des angegebenen Kartentyps, zeige deinem Gegner:in diese Karte und ziehe eine weitere Karte von deinem Deck. Hast du mehrere Karten mit diesem Schlagwort im Spiel, so ziehst du gegebenenfalls für jede dieser Karten eine zusätzliche Karte. Gilt der Multiplikator für <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, so können zusätzlich eine oder mehrere Disziplinen angebenen sein, die die <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> einschränken, für die eine weitere Karte gezogen werden dürfen. In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte nachgezogen werden.
+Schlagwort auf <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />. Ziehst du zu Beginn deines Spielzugs mindestens eine Karte des angegebenen Kartentyps, zeige deinem Gegner:in diese Karte und ziehe eine weitere Karte von deinem Deck. Hast du mehrere Karten mit diesem Schlagwort im Spiel, so ziehst du gegebenenfalls für jede dieser Karten eine zusätzliche Karte. Gilt der Multiplikator für <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />, so können zusätzlich eine oder mehrere Disziplinen angegeben sein, die die <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> einschränken, für die eine weitere Karte gezogen werden darf. In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte nachgezogen werden.
 
 #### Neutrale Zone
-Der Bereich des Spielfeld zwischen den Karten der Spieler:in. Hier werden Missionskarten platziert und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn des Spieler:in in diese Zone und können bis dahin an keinen anderen Gefechten teilnehmen.
+Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden Missionskarten platziert und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn der Spieler:innen in dieser Zone und können bis dahin an keinen anderen Gefechten teilnehmen.
 
 #### Orbitale Zone
-Der Bereich des Spielfeldes in dem sich die Flotte der Spieler:innen aufhält. Jede Spieler:in hat eine eigene orbitale Zone. Schiffe in dieser Zone können an Missionen und Überfällen teilnehmen und verteidigen deine Kolonie.
+Der Bereich des Spielfelds, in dem sich die Flotte der Spieler:innen aufhält. Jede Spieler:in hat eine eigene orbitale Zone. Schiffe in dieser Zone können an Missionen und Überfällen teilnehmen und verteidigen die Kolonie.
 
 #### Panzerungspunkte <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />
 Defensivpunkte, die den <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> reduzieren, der von einigen Waffen (primär Kinetik- und Explosivwaffen) verursacht wird. <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> werden in Gefechten **NICHT** wieder aktiviert, wenn sie einmal deaktiviert wurden. Einige Karten stellen auch doppelte <img src="https://assets.outercolonies.de/icons/armour_2.png" width="20" /> und dreifache <img src="https://assets.outercolonies.de/icons/armour_3.png" width="20" /> bereit. Diese werden vor der einfachen <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" /> eingesetzt.
@@ -178,7 +178,7 @@ Defensivpunkte, die den <img src="https://assets.outercolonies.de/icons/damage.p
 Eine Eigenschaft von Offensivwaffen (einige <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />), die in der oberen rechten Ecke angezeigt wird. Eine Waffe kann nur in Gefechtsphasen eingesetzt werden, wenn die Reichweite der Waffe größer oder gleich der Reichweite für die Gefechtsphase ist.
 
 #### Rumpfkarte <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />
-Kartentyp aus dem die Schiffe der Flotte zusammengesetzt werden. Karten werden in der Koloniezone platziert. Einige Schiffe bestehen nur aus einer <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />, andere aus bis zu 3 Karten. Auf merhteilige <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> ist schematisch abgebildet, welche anderen <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> noch benötigt werden. In der Regel sind dies die Bausteine Bug und Heck und manchmal ein Kern. Bei Raumstationen gibt es ledglich <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />-Sektonen von denen die angegebene Anzahl benötigt werden.
+Kartentyp, aus dem die Schiffe der Flotte zusammengesetzt werden. Karten werden in der Koloniezone platziert. Einige Schiffe bestehen nur aus einer <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />, andere aus bis zu 3 Karten. Auf mehrteilige <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> ist schematisch abgebildet, welche anderen <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> noch benötigt werden. In der Regel sind dies die Bausteine Bug und Heck und manchmal ein Kern. Bei Raumstationen gibt es lediglich <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />-Sektionen, von denen die angegebene Anzahl benötigt wird.
 
 #### Schildpunkte <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" />
 Defensivpunkte, die den <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> reduzieren, der von einigen Waffen (primär Strahlen- und Energiewaffen) verursacht wird. <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> werden zwischen den Gefechtsphasen wieder aktiviert. Einige Karten stellen auch doppelte <img src="https://assets.outercolonies.de/icons/shield_2.png" width="20" /> bereit, diese werden vor den einfachen <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> eingesetzt.
@@ -190,13 +190,13 @@ Die Sockel Δ, Θ, Ξ, Φ, Ψ und Ω werden von <img src="https://assets.outerco
 Von Rundenbeginn des aktiven Spieler:in bis zum nächsten Rundenbeginn desselben Spieler:in. Ein Spielzug beinhaltet somit auch explizit die Spielphasen der anderen Spieler:in.
 
 #### Taktikkarte <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />
-Kartentyp, der verschiede Spieleffekte haben kann. Die Karten bleiben meistens nicht im Spiel, außer sie werden zusammen mit einer anderen Karte angelegt. Jede <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> gehört zu genau einer Disziplin.
+Kartentyp, der verschiedene Spieleffekte haben kann. Die Karten bleiben meistens nicht im Spiel, außer sie werden zusammen mit einer anderen Karte angelegt. Jede <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> gehört zu genau einer Disziplin.
 
 #### Tribut *(Anzahl Karten)*
-Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />. Um diese Karten spielen zu können muss zuvor die angegebene Anzahl Karten von der Hand abgelegt werden.
+Schlagwort auf <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />. Um diese Karten spielen zu können, muss zuvor die angegebene Anzahl Karten von der Hand abgelegt werden.
 
 #### Überfall
-Ein Angriff des aktiven Spieler:in auf die Kolonie eines anderen Spieler:in. Schiffe mit <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> des verteidigenden Spieler:in müssen am Gefecht teilnehmen. Auf Reichweite 1 eines Überfalls können die Kolonie und Karten in der Koloniezone des Verteidigers angegrffen werden.
+Ein Angriff des aktiven Spieler:in auf die Kolonie eines anderen Spieler:in. Schiffe mit <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> des verteidigenden Spieler:in müssen am Gefecht teilnehmen. Auf Reichweite 1 eines Überfalls können die Kolonie und Karten in der Koloniezone des Verteidigers angegriffen werden.
 
 #### Unerschöpflich
 Schlagwort auf <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/orb.png" width="20" />. Sollte diese Karte durch einen Angriff deaktiviert werden, da die bereitgestellten <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> oder <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> verwendet wurden, reaktiviere diese sofort nach Abhandlung des Angriffs.
@@ -211,7 +211,7 @@ Schlagwort auf <img src="https://assets.outercolonies.de/icons/equipment.png" wi
 
 ### Aufbau einer Karte
 
-Jede Runde darf der aktive Spieler:in **je** Kartentyp **jeweils** eine Karte aus seiner Hand ausspielen. Einige bereits im Spiel befindliche Karten erlauben es dir weitere Karten auszuspielen. Die Karten, die du und deine Gegner:in noch ausspielen dürfen, werden dir am rechten Bildschrimrand angezeigt. Rot eingefärbte Kartensymbole wurden bereits verbraucht.
+Jede Runde darf der aktive Spieler:in **je** Kartentyp **jeweils** eine Karte aus seiner Hand ausspielen. Einige bereits im Spiel befindliche Karten erlauben es dir, weitere Karten auszuspielen. Die Karten, die du und deine Gegner:in noch ausspielen dürfen, werden dir am rechten Bildschirmrand angezeigt. Rot eingefärbte Kartensymbole wurden bereits verbraucht.
 
 TODO: Screenshot von Action Pool einfügen
 
@@ -231,7 +231,7 @@ TODO: Screenshot von Action Pool einfügen
 
 <img src="https://assets.outercolonies.de/rules/hull_cards.png" align="right" width="400" />
 
-Aus <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> setzt du die Schiffe deiner Flotte zusammen. Einige Schiffe bestehen nur aus einer einzigen <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />, andere sind erst durch Kombination mehrerer Karten vollständig wenn. Wenn du eine <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> ausspielst, spielst du diese entweder durch Klick auf deine Kologiekarte in deine Koloniezone, um hier ein neues Schiff zu konstruieren, oder du kannst sie an bereits ausgespielte <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> eines unvollständigen Schiffs mit passendem Namen anlegen, um den Bau dieses Schiffs fortzusetzen.
+Aus <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> setzt du die Schiffe deiner Flotte zusammen. Einige Schiffe bestehen nur aus einer einzigen <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />, andere sind erst durch Kombination mehrerer Karten vollständig. Wenn du eine <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> ausspielst, spielst du diese entweder durch Klick auf deine Koloniekarte in deine Koloniezone, um hier ein neues Schiff zu konstruieren, oder du kannst sie an bereits ausgespielte <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> eines unvollständigen Schiffs mit passendem Namen anlegen, um den Bau dieses Schiffs fortzusetzen.
 
 Welche <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> benötigt werden, damit das Schiff vollständig ist, wird auf der Karte selbst hinter dem Schlagwort **Komponenten** angezeigt. Vollständige Schiffe werden an Rundenende von der Koloniezone in die orbitale Zone verschoben.
 
@@ -251,7 +251,7 @@ Beachte, dass <img src="https://assets.outercolonies.de/icons/point_defense_1.pn
 
 Anders als <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />, können <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> sowohl an Schiffe (außer die Karte besagt etwas anderes) als auch an die Kolonie selbst angelegt werden. Legst du <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> an ein Schiff an, gelten die selben Regeln wie für <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />. Willst du die Karte an die Kolonie anlegen, platzierst du sie in deiner Koloniezone.
 
-Die Kolonie stellt geforderten Sockel zur Verfügung, jedoch müssen die geforderte <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> auch von der Kolonie zur Verfügung gestellt werden, damit du die Karte in die Koloniezone legen darfst. Hierfür addierst du die <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> aller <img src="https://assets.outercolonies.de/rules/infrastructure_cards.png" align="right" width="400" /> in deiner Koloniezone.
+Die Kolonie stellt die geforderten Sockel zur Verfügung, jedoch müssen die geforderten <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> auch von der Kolonie zur Verfügung gestellt werden, damit du die Karte in die Koloniezone legen darfst. Hierfür addierst du die <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> aller <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> in deiner Koloniezone.
 
 ### Himmelskörperkarten
 
@@ -279,7 +279,7 @@ Es gibt 4 Disziplinen für <img src="https://assets.outercolonies.de/icons/tacti
 
 Die meisten <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> werden nachdem sie gespielt wurden direkt auf den Ablagestapel gelegt. Einige <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> werden an andere Karten angelegt und geben diesen Karten zusätzliche Eigenschaften. 
 
-Einige <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> darfst du auch in Gefechten und auch im Zug deiner Gegenspieler:in oder als Reaktion auf einen Angriff oder eine gespielte Karten deiner Gegner:in spielen. Diese Karten enthalten das Schlagwort *Intervention*. Bedenke, dass du pro Zug in der Regel nur eine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> spielen darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver Spieler:in warst deine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> bereits gespielt, kannst du keine weitere mehr ausspielen, wenn einer deiner Gegner:in der aktive Spieler:in ist.
+Einige <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> darfst du auch in Gefechten und auch im Zug deiner Gegenspieler:in oder als Reaktion auf einen Angriff oder eine gespielte Karte deiner Gegenspieler:in spielen. Diese Karten enthalten das Schlagwort *Intervention*. Bedenke, dass du pro Zug in der Regel nur eine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> spielen darfst (außer andere Karten erlauben dir mehrere zu spielen). Hast du also während du aktiver Spieler:in warst deine <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> bereits gespielt, kannst du keine weitere mehr ausspielen, wenn einer deiner Gegner:in der aktive Spieler:in ist.
 
 ## Spielzug
 
@@ -297,36 +297,36 @@ Einige <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />
 - Du darfst beliebig viele ausgespielte Karten zurück auf die Hand nehmen. Nimmst du <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> auf die Hand, musst du alle <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> desselben Schiffs sowie alle daran angelegten Karten auf die Hand nehmen. Schadensmarken, die auf diesem Schiff lagen werden entfernt.
 - Nehme zudem alle Karten zurück auf die Hand, dessen Anforderungen nicht mehr erfüllt sind.
 - Du darfst bis zu **einer** Karte **jedes** Kartentyps ausspielen. Erlauben dir ausgespielte Karten, weitere Karten auszuspielen, darfst du dies jetzt ebenfalls tun.
-- Entferne Karten aller Spieler:in, die durch Karteneffekte mehr oder gleich viele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker wie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> haben und reaktiviere ggfls. in dieser Phase deaktivierte Karten.
+- Entferne Karten aller Spieler:innen, die durch Karteneffekte mehr oder gleich viele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker wie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> haben und reaktiviere ggf. in dieser Phase deaktivierte Karten.
 - Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission durchführen möchtest.
-- Gegenspieler:in können gegen Missionen Schiffe zum Abfangen schicken bzw. von Überfall betroffener Spieler:in benennt Schiffe zur Verteidigung
+- Gegenspieler:innen können gegen Missionen Schiffe zum Abfangen schicken bzw. von Überfall betroffene Spieler:innen benennen Schiffe zur Verteidigung.
 
 #### 3. Gefechtsphase
-Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spieler:in angreift oder ein anderer Spieler:in eine deiner Mission abfängt. Es nehmen alle zugewiesenen Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
+Ein Gefecht wird jedes Mal abgehandelt, wenn du die Kolonie eines anderen Spieler:in angreifst oder ein anderer Spieler:in eine deiner Missionen abfängt. Es nehmen alle zugewiesenen Schiffe teil, bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
 
 #### 4. Rundenende
-- Für jede Mission bei der kein Abfangversuch unternommen wurde, sowie für jede Mission in der du nach dem Gefecht noch mindestens ein Schiff besitzst, nimmst du die verdeckte Missionskarte auf die Hand bzw. legst die offene Missionkarte unter dein Deck. Die anderen Missionskarten werden auf den Ablagestapel gelegt.
+- Für jede Mission, bei der kein Abfangversuch unternommen wurde, sowie für jede Mission, in der du nach dem Gefecht noch mindestens ein Schiff besitzt, nimmst du die verdeckte Missionskarte auf die Hand bzw. legst die offene Missionskarte unter dein Deck. Die anderen Missionskarten werden auf den Ablagestapel gelegt.
 - Verschiebe alle vollständigen Schiffe aus deiner Koloniezone in deine orbitale Zone.
 - Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenende ausgeführt werden sollen.
 - Solltest du **mehr als 7 Karten** auf der Hand haben, lege so lange Handkarten auf den Ablagestapel bis du noch genau 7 hast.
-- Der  nächste Spieler:in wird zum aktiven Spieler:in.
+- Der nächste Spieler:in wird zum aktiven Spieler:in.
 
 ### Missionen und Überfälle
 
 <img src="https://assets.outercolonies.de/rules/missions.png" align="left" width="400" />
 
-Am Ende der Aufbauphase hast du die Möglichkeit entweder einen Überfall auf eine feindliche Kolonie oder eine Mission anzusagen. Durch Missionen erhälst du <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> für deine Kolonie. Durch Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegeners angreifen. Die Planung der Missionen und Überfälle läuft in mehreren Schritten ab.
+Am Ende der Aufbauphase hast du die Möglichkeit, entweder einen Überfall auf eine feindliche Kolonie oder eine Mission anzusagen. Durch Missionen erhältst du <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> für deine Kolonie. Durch Überfälle kannst du Karten in der gegnerischen Koloniezone sowie die Kolonie des Gegners angreifen. Die Planung der Missionen und Überfälle läuft in mehreren Schritten ab.
 
 #### Ansage
-Sage an, ob du diese Runde einen Überfäll auf eine feindliche Kolonie oder eine Mssion durchführen möchtest.
+Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission durchführen möchtest.
 
 #### Flotte zusammenstellen
 Weise Schiffe aus deiner orbitalen Zone zu, die an dem Überfall oder der Mission teilnehmen sollen. Nur Schiffe mit 1+ <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> können Überfälle oder Missionen durchführen. Versetze die Schiffe in die neutrale Zone.
 
 #### Verteidigung / Abfangen
-Im Falle einer Mission können andere Spieler:in abfangen, um den Erfolg der Mission zu verhindern. Jeder andere Spieler:in sagt an, ob er Schiffe entsenden möchte, um die geplante Mission abzufangen. Es können für das Abfangen nur Schiffe entsandt werden, welche sich in der orbitalen Zone befinden und dessen <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> mindestens so hoch ist wie der niedrigste <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> in der Flotte, die die Mission durchführt. Die abfangende Spieler:in verschiebt diese Schiffe ebenfalls in die neutrale Zone.
+Im Falle einer Mission können andere Spieler:innen abfangen, um den Erfolg der Mission zu verhindern. Jede andere Spieler:in sagt an, ob sie Schiffe entsenden möchte, um die geplante Mission abzufangen. Es können für das Abfangen nur Schiffe entsandt werden, welche sich in der orbitalen Zone befinden und deren <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> mindestens so hoch ist wie der niedrigste <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> in der Flotte, die die Mission durchführt. Die abfangende Spieler:in verschiebt diese Schiffe ebenfalls in die neutrale Zone.
 
-Im Falle eines Überfalls muss die angegriffene Spieler:in kämpfen und wählt Schiffe aus ihrer orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+ <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> nehmen nicht an der Verteidiung teil und werden in die neutrale Zone verschoben.
+Im Falle eines Überfalls muss die angegriffene Spieler:in kämpfen und wählt Schiffe aus ihrer orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+ <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> nehmen nicht an der Verteidigung teil und werden in die neutrale Zone verschoben.
 
 ## Gefechte durchführen
 
@@ -337,14 +337,14 @@ Im Falle eines Überfalls muss die angegriffene Spieler:in kämpfen und wählt S
 Es werden nacheinander bis zu **4 Gefechtsphasen** durchgeführt. Die Gefechtsphasen repräsentieren das Gefecht auf einer bestimmten Distanz. Es wird mit Reichweite 4 begonnen, die nächste Gefechtsphase mit Reichweite 3, dann 2 und zuletzt 1.
 
 Folgende Schritte werden in jeder der bis zu 4 Gefechtsphasen durchgeführt:
-1. Beide Spieler:in (beginnend beim aktiven Spieler:in) haben die Möglichkeit <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> mit dem Schlagwort *Intervention (Gefechtsphasenbeginn)* auszuspielen.
+1. Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit, <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> mit dem Schlagwort *Intervention (Gefechtsphasenbeginn)* auszuspielen.
 2. Der aktive Spieler:in führt seine Angriffe in beliebiger Reihenfolge durch.
 3. Der verteidigende / abfangende Spieler:in führt seine Angriffe in beliebiger Reihenfolge durch.
 4. Alle am Gefecht teilnehmenden Karten werden wieder aktiviert (außer <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit dem Schlagwort *Einmalige Verwendung*).
-5. Beide Spieler:in (beginnend beim aktiven Spieler:in) haben die Möglichkeit <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> mit dem Schlagwort *Intervention (Gefechtsphasenende)* auszuspielen.
-6. Schiffe und an die Kolonie angelegte <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> auf denen mindestens genausoviele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker liegen wie sie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> haben werden zerstört. Alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel seiner Besitzer:in gelegt.
+5. Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit, <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> mit dem Schlagwort *Intervention (Gefechtsphasenende)* auszuspielen.
+6. Schiffe und an die Kolonie angelegte <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" />, auf denen mindestens genauso viele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker liegen wie sie <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> haben, werden zerstört. Alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel ihrer Besitzer:in gelegt.
 
-Sind auf einer <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> keine Angaben zu den <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> gemacht, wird die Karte behandelt als hätte sie 1 <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" />.
+Sind auf einer <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> keine Angaben zu den <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> gemacht, wird die Karte behandelt, als hätte sie 1 <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" />.
 
 ### Angriffe durchführen
 
@@ -356,15 +356,15 @@ Ein Teil der taktischen Tiefe in *Outer Colonies* besteht in der Planung der Ang
 Valide Ziele sind alle gegnerischen Schiffe, die am Gefecht teilnehmen. Sofern es die letzte Gefechtsphase (Reichweite 1) in einem Überfall ist, sind ebenfalls die Kolonie des Verteidigers sowie beliebige Karten in dessen Koloniezone valide Ziele.
 
 #### Schaden ermitteln
-Bei jedem Waffensystem ist unter den Eigenschaftspunkten meist ganz links angegeben, wie viel <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> es verursacht. Dieser Wert kann jedoch durch defensive Systeme des anvisierten Schiffs reduziert werden. <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> werden (in dieser Reihenfolge) angewandt, um den <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> zu reduzieren. Defensive Systeme müssen bei einem Angriff eingesetzt werden, der Spieler:in kann sich nicht entscheiden diese für spätere Angriffe aufzusparen. Prüfe nacheinander, ob die eingesetzte Waffe Abzüge (in gelb) für <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> oder <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> eingetragen hat. Der angegriffene Spieler:in muss die <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" /> von allen Gefecht teilnehmenden Schiffe verwenden, sowie alle <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> des angegriffenen Schiffs.
+Bei jedem Waffensystem ist unter den Eigenschaftspunkten meist ganz links angegeben, wie viel <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> es verursacht. Dieser Wert kann jedoch durch defensive Systeme des anvisierten Schiffs reduziert werden. <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> werden (in dieser Reihenfolge) angewandt, um den <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> zu reduzieren. Defensive Systeme müssen bei einem Angriff eingesetzt werden, der Spieler:in kann sich nicht entscheiden diese für spätere Angriffe aufzusparen. Prüfe nacheinander, ob die eingesetzte Waffe Abzüge (in gelb) für <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> oder <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> eingetragen hat. Der angegriffene Spieler:in muss die <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" /> von allen am Gefecht teilnehmenden Schiffen verwenden, sowie alle <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> und <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> des angegriffenen Schiffs.
 
-Es werden als erstes die Karten mit <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> oder <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> eingesetzt die die meisten dieser Defensivpunkte bieten. <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit defensiven Systemen haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der Textbox illustriert. <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit offensiven und defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie in der selben Gefechtsphase bereits angegriffen haben.
+Es werden als erstes die Karten mit <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> oder <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> eingesetzt, die die meisten dieser Defensivpunkte bieten. <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit defensiven Systemen haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der Textbox illustriert. <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit offensiven und defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie in der selben Gefechtsphase bereits angegriffen haben.
 
 Reduziere nun den <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> je Defensivpunkt um den in den Eigenschaftspunkten der Waffe angegebenen Abzug. Sollte danach der <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> noch bei 0 oder höher liegen, deaktiviere die Karte mit dem entsprechenden Defensivsystem und fahre fort, bis entweder keine Defensivsysteme mehr eingesetzt werden können oder der <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> bei 0 oder darunter liegt. Deaktivierte Karten kannst du dadurch anzeigen, dass du sie um 45° zur Seite neigst. Ist für ein Defensivsystem bei einer Waffe als Abzug „X“ angegeben, kann die Waffe das Defensivsystem nicht durchdringen.
 
-Sollte der <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> nach allen Abzügen höher als 0 sein lege entsprechend viele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker auf die Zielkarte.
+Sollte der <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> nach allen Abzügen höher als 0 sein, lege entsprechend viele <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker auf die Zielkarte.
 
-Ist die Kolonie eines Gegner:in oder eine Karte in der Koloniezone das Ziel, handelst du dies genauso ab als wäre ein Schiff oder eine <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> das Ziel. Lege <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker auf die Kolonie bzw. die Karte in der Koloniezone.
+Ist die Kolonie eines Gegner:in oder eine Karte in der Koloniezone das Ziel, handelst du dies genauso ab, als wäre ein Schiff oder eine <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> das Ziel. Lege <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker auf die Kolonie bzw. die Karte in der Koloniezone.
 
 ### Gefechte beenden
 
@@ -373,4 +373,4 @@ Ein Gefecht endet in einem dieser Fälle:
 - Die Kolonie des verteidigenden Spielers wurde zerstört (in diesem Fall endet das Spiel sofort)
 - Die letzte Gefechtsphase (Reichweite 1) wurde beendet
 
-Am Ende eines Gefechts vom Typ *Mission* wird ermittelt, ob die Mission erfolgreich war. Eine Mission ist erfolgreich, wenn der aktive Spieler mindestens ein Schiff besitzt, welches zum Gefechtsende nicht zerstört wurde. Ist die Mission erfolgreich, so zieht die Spieler:in eine Karte von Deck auf die Hand, mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die Spieler:in für die eigene Kolonie <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> in Höhe der Differenz aller <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> der eigenen überlebenden Schiffe und der <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> der gegnerischen überlebenden Schiffe der Mission, sofern dieser Wert größer als 0 ist. Eine Mission gilt ebenfalls als erfolgreich, wenn die Gegenspieler:in keinen Abfangversuch unternimmt.
+Am Ende eines Gefechts vom Typ *Mission* wird ermittelt, ob die Mission erfolgreich war. Eine Mission ist erfolgreich, wenn der aktive Spieler:in mindestens ein Schiff besitzt, welches zum Gefechtsende nicht zerstört wurde. Ist die Mission erfolgreich, zieht die Spieler:in eine Karte vom Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die Spieler:in für die eigene Kolonie <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> in Höhe der Differenz aller <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> der eigenen überlebenden Schiffe und der <img src="https://assets.outercolonies.de/icons/control.png" width="20" /> der gegnerischen überlebenden Schiffe der Mission, sofern dieser Wert größer als 0 ist. Eine Mission gilt ebenfalls als erfolgreich, wenn die Gegenspieler:in keinen Abfangversuch unternimmt.
