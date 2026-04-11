@@ -17,8 +17,8 @@
             <mat-list-option value="orb-cards"><h4>Himmelsk&ouml;rperkarten</h4></mat-list-option>
             <mat-list-option value="tactic-cards"><h4>Taktikkarten</h4></mat-list-option>
             <h5>Spielzug</h5>
-            <mat-list-option value="turn-overview"><h4>Spielzugübersicht</h4></mat-list-option>
-            <mat-list-option value="missions"><h4>Missionen und Überfälle</h4></mat-list-option>
+            <mat-list-option value="turn-overview"><h4>Spielzug&uuml;bersicht</h4></mat-list-option>
+            <mat-list-option value="missions"><h4>Missionen und &Uuml;berf&auml;lle</h4></mat-list-option>
             <h5>Gefechte durchf&uuml;hren</h5>
             <mat-list-option value="battle-overview"><h4>Gefechtsphasen</h4></mat-list-option>
             <mat-list-option value="attacks"><h4>Angriffe durchf&uuml;hren</h4></mat-list-option>
@@ -33,17 +33,17 @@
             <p>
               Willkommen zu <i>Outer Colonies</i>, dem digitalen Trading Card Game, das dich in den unwirtlichen
               Rand unseres Sonnensystems entführt. Sei eine der abenteuerlustigen Anführer:innen, die fernab der
-              überbevölkerten und von Kriegen zerrütteten Erde und den marsianischen Oligarchien auf den
-              äußeren Monden und Asteroiden um die Vorherrschaft auf Lebensraum und Ressourcen kämpfen.
+              &uuml;berbev&ouml;lkerten und von Kriegen zerr&uuml;tteten Erde und den marsianischen Oligarchien auf den
+              &auml;u&szlig;eren Monden und Asteroiden um die Vorherrschaft auf Lebensraum und Ressourcen k&auml;mpfen.
             </p>
             <p>
               Mit deinen <i>Outer Colonies</i> Karten stellst du dir ein Deck aus <b>60 bis 100</b> Karten
               zusammen, mit dem du gegen andere Spieler:innen antreten kannst. Auf den folgenden Seiten lernst du,
-              wie eine Partie <i>Outer Colonies</i> abläuft und wie du deine Karten einsetzt.
+              wie eine Partie <i>Outer Colonies</i> abl&auml;uft und wie du deine Karten einsetzt.
             </p>
             <p>Vor dem Spielbeginn mischen beide Spieler:innen ihr Deck und ziehen <b>7 Karten</b>.</p>
             <p>
-              Während des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbildung links).
+              W&auml;hrend des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbildung links).
             </p>
           </div>
           } @case ('symbols') {
@@ -84,12 +84,12 @@
           } @case ('victory') {
           <div>
             <p>
-              Eine Partie <i>Outer Colonies</i> endet, sobald eine der folgenden Bedingungen erfüllt ist:
+              Eine Partie <i>Outer Colonies</i> endet, sobald eine der folgenden Bedingungen erf&uuml;llt ist:
             </p>
             <ul>
-              <li><b>Vorherrschaft</b>: Eine Spieler:in gewinnt, wenn sie <b>15</b> <img [src]="iconUrl('control')" class="oc-icon" /> mehr für ihre Kolonie errungen hat als ihre Gegner:in.</li>
-              <li><b>Zerstörung</b>: Die Kolonie jeder Spieler:in hat <b>50</b> <img [src]="iconUrl('hitpoints')" class="oc-icon" />. Eine Spieler:in scheidet aus dem Spiel aus, wenn ihre Kolonie keine <img [src]="iconUrl('hitpoints')" class="oc-icon" /> mehr hat. Die verbleibende Spieler:in gewinnt.</li>
-              <li><b>Erschöpfung</b>: Eine Spieler:in scheidet aus dem Spiel aus, wenn sie eine Karte ziehen müsste, aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.</li>
+              <li><b>Vorherrschaft</b>: Eine Spieler:in gewinnt, wenn sie <b>15</b> <img [src]="iconUrl('control')" class="oc-icon" /> mehr f&uuml;r ihre Kolonie errungen hat als ihre Gegner:in.</li>
+              <li><b>Zerst&ouml;rung</b>: Die Kolonie jeder Spieler:in hat <b>50</b> <img [src]="iconUrl('hitpoints')" class="oc-icon" />. Eine Spieler:in scheidet aus dem Spiel aus, wenn ihre Kolonie keine <img [src]="iconUrl('hitpoints')" class="oc-icon" /> mehr hat. Die verbleibende Spieler:in gewinnt.</li>
+              <li><b>Ersch&ouml;pfung</b>: Eine Spieler:in scheidet aus dem Spiel aus, wenn sie eine Karte ziehen m&uuml;sste, aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.</li>
               <li><b>Kapitulation</b>: Eine Spieler:in kann freiwillig kapitulieren, wodurch die andere Spieler:in gewinnt.</li>
             </ul>
           </div>
@@ -108,31 +108,31 @@
             <p>
               Eigenschaftspunkte des Typs Sockel oder <img [src]="iconUrl('energy')" class="oc-icon" /> mit
               einem Minus vor dem Wert in einem roten Kasten. Eine Karte kann nicht ausgespielt werden, wenn
-              die Karten, an die diese Karte angelegt wird, diese Eigenschaftspunkte nicht zur Verfügung
+              die Karten, an die diese Karte angelegt wird, diese Eigenschaftspunkte nicht zur Verf&uuml;gung
               stellen.
             </p>
             <h4>Aktion <i>(Kartentyp)</i></h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />,
               <img [src]="iconUrl('infrastructure')" class="oc-icon" /> und
-              <img [src]="iconUrl('orb')" class="oc-icon" />. Erhöhe sofort die Anzahl der Karten, die du vom
+              <img [src]="iconUrl('orb')" class="oc-icon" />. Erh&ouml;he sofort die Anzahl der Karten, die du vom
               angegebenen Kartentyp ausspielen darfst (Aktionslimit), um 1. <br />Ist dieses Schlagwort auf
-              einer <img [src]="iconUrl('tactic')" class="oc-icon" />, so gilt die Erhöhung des Aktionslimits
-              für den Kartentyp nur für den aktuellen Spielzug, in allen anderen Fällen dauerhaft, solange die
-              Karte bei Rundenbeginn noch im Spiel ist. <br />Wird das Aktionslimit für
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> erhöht, so können zusätzlich eine oder mehrere
+              einer <img [src]="iconUrl('tactic')" class="oc-icon" />, so gilt die Erh&ouml;hung des Aktionslimits
+              f&uuml;r den Kartentyp nur f&uuml;r den aktuellen Spielzug, in allen anderen F&auml;llen dauerhaft, solange die
+              Karte bei Rundenbeginn noch im Spiel ist. <br />Wird das Aktionslimit f&uuml;r
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> erh&ouml;ht, so k&ouml;nnen zus&auml;tzlich eine oder mehrere
               Disziplinen angegeben sein, die die
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschränken, die zusätzlich ausgespielt
-              werden dürfen. <br />Steht vor dem Kartentyp ein Faktor (z.B. "3x"), so wird das Aktionslimit
-              nicht um 1, sondern um den angegebenen Faktor erhöht. <br />Es können gleichzeitig verschiedene
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschr&auml;nken, die zus&auml;tzlich ausgespielt
+              werden d&uuml;rfen. <br />Steht vor dem Kartentyp ein Faktor (z.B. "3x"), so wird das Aktionslimit
+              nicht um 1, sondern um den angegebenen Faktor erh&ouml;ht. <br />Es k&ouml;nnen gleichzeitig verschiedene
               Kartentypen angegeben sein: <br />&bull; Sind diese mit <b>+</b> verbunden, wird das
-              Aktionslimit <b>aller</b> angegebenen Kartentypen um 1 erhöht. <br />&bull; Sind diese mit
+              Aktionslimit <b>aller</b> angegebenen Kartentypen um 1 erh&ouml;ht. <br />&bull; Sind diese mit
               <b>|</b> verbunden, wird das Aktionslimit <b>eines</b> beliebigen angegebenen Kartentyps um 1
-              erhöht.
+              erh&ouml;ht.
             </p>
             <h4>aktiv / aktivieren</h4>
             <p>
-              Karten, die im Gefecht noch nicht deaktiviert wurden. Nur aktive Karten können in Gefechtsphasen
+              Karten, die im Gefecht noch nicht deaktiviert wurden. Nur aktive Karten k&ouml;nnen in Gefechtsphasen
               verwendet werden. Wird eine Karte wieder aktiviert, kann sie diese Gefechtsrunde wieder
               verwendet werden.
             </p>
@@ -142,13 +142,13 @@
             </p>
             <h4>Deck</h4>
             <p>
-              Der Nachziehstapel von dem zu Rundenbeginn und für Missionen neue Karten ziehst. Musst du eine
+              Der Nachziehstapel von dem zu Rundenbeginn und f&uuml;r Missionen neue Karten ziehst. Musst du eine
               Karte ziehen und das Deck ist leer, verlierst du das Spiel.
             </p>
             <h4>Disziplin</h4>
             <p>
               Subtypen der <img [src]="iconUrl('tactic')" class="oc-icon" />. Einige Karten erlauben dir z.B.
-              eine weitere <img [src]="iconUrl('tactic')" class="oc-icon" /> der Disziplin „Wissenschaft“
+              eine weitere <img [src]="iconUrl('tactic')" class="oc-icon" /> der Disziplin &bdquo;Wissenschaft&ldquo;
               auszuspielen oder eine entsprechende Karte unwirksam zu machen.
             </p>
             <h4>Eigenschaftspunkte</h4>
@@ -160,13 +160,13 @@
               <img [src]="iconUrl('point_defense_1')" class="oc-icon" />,
               <img [src]="iconUrl('shield_1')" class="oc-icon" /> und
               <img [src]="iconUrl('armour_1')" class="oc-icon" /> sind Eigenschaftspunkte. Sie werden unter
-              dem Titel der Karte in blauen und roten Kästen angezeigt.
+              dem Titel der Karte in blauen und roten K&auml;sten angezeigt.
             </p>
             <h4>Einmalige Verwendung</h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('equipment')" class="oc-icon" />. Diese Karte wird zum Ende
               einer Gefechtsphase nicht wieder aktiviert, sondern erst zum Ende des Gefechts. Dies betrifft
-              Waffensysteme (z.B. Torpedos), die pro Gefecht nur einmal eingesetzt werden können, als auch
+              Waffensysteme (z.B. Torpedos), die pro Gefecht nur einmal eingesetzt werden k&ouml;nnen, als auch
               defensive Systeme (z.B. Panzerung), die nachdem sie deaktiviert wurden, nicht wieder aktiviert
               werden.
             </p>
@@ -206,13 +206,13 @@
             </p>
             <h4>Himmelsk&ouml;rperkarte <img [src]="iconUrl('orb')" class="oc-icon" /></h4>
             <p>
-              Ein Kartentyp, der an die Kolonie angelegt wird. Von diesem Kartentyp kann jede Spieler:in nur eine im Spiel haben. Diese Karte kann nicht zurück auf die Hand genommen werden und ist nicht Ziel von Angriffen und
+              Ein Kartentyp, der an die Kolonie angelegt wird. Von diesem Kartentyp kann jede Spieler:in nur eine im Spiel haben. Diese Karte kann nicht zur&uuml;ck auf die Hand genommen werden und ist nicht Ziel von Angriffen und
               <img [src]="iconUrl('tactic')" class="oc-icon" />.
             </p>
             <h4>Hüllenintegrität <img [src]="iconUrl('hitpoints')" class="oc-icon" /></h4>
             <p>
               Hat ein Schiff oder eine Koloniekarte mindestens so viele Schadensmarken wie
-              <img [src]="iconUrl('hitpoints')" class="oc-icon" />, wird es auf den Ablagestapel gelegt. Wird gelegentlich auch mit "HP" abgekürzt.
+              <img [src]="iconUrl('hitpoints')" class="oc-icon" />, wird es auf den Ablagestapel gelegt. Wird gelegentlich auch mit "HP" abgek&uuml;rzt.
             </p>
             <h4>inaktiv / deaktivieren</h4>
             <p>
@@ -223,18 +223,18 @@
             <h4>Infrastrukturkarte <img [src]="iconUrl('infrastructure')" class="oc-icon" /></h4>
             <p>
               Ein Kartentyp, der sowohl an <img [src]="iconUrl('hull')" class="oc-icon" /> als auch an die
-              Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt können alle
+              Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt k&ouml;nnen alle
               Sockel-Anforderungen ignoriert werden.
             </p>
             <h4>Intervention <i>(Spielphase)</i></h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />. Diese Karte darf auch
-              außerhalb der Aufbauphase gespielt werden und auch, wenn du gerade nicht der aktive Spieler
-              bist. Der exakte Zeitpunkt, zu dem diese Karten außerhalb deiner eigenen Aufbauphase gespielt
-              werden dürfen ist stets mit angegeben: <br />&bull; Angriff: Wenn eines deiner Schiffe in einem
+              au&szlig;erhalb der Aufbauphase gespielt werden und auch, wenn du gerade nicht der aktive Spieler
+              bist. Der exakte Zeitpunkt, zu dem diese Karten au&szlig;erhalb deiner eigenen Aufbauphase gespielt
+              werden d&uuml;rfen ist stets mit angegeben: <br />&bull; Angriff: Wenn eines deiner Schiffe in einem
               Gefecht angegriffen wird <br />&bull; Gefechtsphasenbeginn: Zu Beginn einer beliebigen
               Gefechtsphase <br />&bull; Gefechtsphasenende: Zum Ende einer beliebigen Gefechtsphase bevor
-              <img [src]="iconUrl('equipment')" class="oc-icon" /> reaktiviert und zerstörte Schiffe entfernt
+              <img [src]="iconUrl('equipment')" class="oc-icon" /> reaktiviert und zerst&ouml;rte Schiffe entfernt
               werden <br />&bull; Rundenbeginn: Zu Beginn des Spielzuges deines Gegners, nachdem dieser seine
               2 Karten gezogen hat <br />&bull; Taktik - <i>Disziplinen</i>: Wenn dein Gegner eine
               <img [src]="iconUrl('tactic')" class="oc-icon" /> der angegebenen Disziplinen spielt.
@@ -243,7 +243,7 @@
             <p>
               Hier platzieren Spieler:innen ausgespielte
               <img [src]="iconUrl('infrastructure')" class="oc-icon" />, die an die Kolonie angelegt werden, sowie
-              <img [src]="iconUrl('hull')" class="oc-icon" /> von im Bau befindlichen Schiffen. Karten in der Koloniezone können während eines Überfalls nur in der Gefechtsphase mit Reichweite 1 angegriffen werden. Jede Spieler:in besitzt eine eigene Koloniezone.
+              <img [src]="iconUrl('hull')" class="oc-icon" /> von im Bau befindlichen Schiffen. Karten in der Koloniezone k&ouml;nnen w&auml;hrend eines &Uuml;berfalls nur in der Gefechtsphase mit Reichweite 1 angegriffen werden. Jede Spieler:in besitzt eine eigene Koloniezone.
             </p>
             <h4>Komponenten <i>(Bauteile)</i></h4>
             <p>
@@ -253,20 +253,20 @@
             </p>
             <h4>Kontrolle <img [src]="iconUrl('control')" class="oc-icon" /></h4>
             <p>
-              Ein Maß für den Einfluss und die Dominanz einer Spieler:in über das Spielgebiet. Kontrolle wird
-              durch das erfolgreiche Durchführen von Missionen und das Besiegen von gegner:inischen Schiffen
+              Ein Ma&szlig; f&uuml;r den Einfluss und die Dominanz einer Spieler:in &uuml;ber das Spielgebiet. Kontrolle wird
+              durch das erfolgreiche Durchf&uuml;hren von Missionen und das Besiegen von gegner:inischen Schiffen
               erworben. Eine Spieler:in gewinnt das Spiel, wenn sie 15 <img [src]="iconUrl('control')" class="oc-icon" /> mehr als ihre Gegner:in besitzt.
             </p>
             <h4>Mission</h4>
             <p>
-              Der aktive Spieler:in kann pro Zug eine Mission (oder einen Überfall) durchführen. Einer Mission
+              Der aktive Spieler:in kann pro Zug eine Mission (oder einen &Uuml;berfall) durchf&uuml;hren. Einer Mission
               muss mindestens ein Schiff zugewiesen werden. Ist die Mission erfolgreich (kein Abfangversuch
-              oder mindestens ein überlebendes Schiff), zieht die Spieler:in eine Karte vom Deck auf die Hand
-              und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zusätzlich erhält die
-              Spieler:in für die eigene Kolonie <img [src]="iconUrl('control')" class="oc-icon" /> in Höhe der
-              Differenz aller <img [src]="iconUrl('control')" class="oc-icon" /> der eigenen überlebenden Schiffe
-              und der <img [src]="iconUrl('control')" class="oc-icon" /> der gegnerischen überlebenden Schiffe der
-              Mission, sofern dieser Wert größer als 0 ist.
+              oder mindestens ein &uuml;berlebendes Schiff), zieht die Spieler:in eine Karte vom Deck auf die Hand
+              und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck. Zus&auml;tzlich erh&auml;lt die
+              Spieler:in f&uuml;r die eigene Kolonie <img [src]="iconUrl('control')" class="oc-icon" /> in H&ouml;he der
+              Differenz aller <img [src]="iconUrl('control')" class="oc-icon" /> der eigenen &uuml;berlebenden Schiffe
+              und der <img [src]="iconUrl('control')" class="oc-icon" /> der gegnerischen &uuml;berlebenden Schiffe der
+              Mission, sofern dieser Wert gr&ouml;&szlig;er als 0 ist.
             </p>
             <h4>Multiplikator <i>(Kartentyp)</i></h4>
             <p>
@@ -274,21 +274,21 @@
               <img [src]="iconUrl('orb')" class="oc-icon" />. Ziehst du zu Beginn deines Spielzugs mindestens
               eine Karte des angegebenen Kartentyps, zeige deinem Gegner:in diese Karte und ziehe eine weitere
               Karte von deinem Deck. <br />Hast du mehrere Karten mit diesem Schlagwort im Spiel, so ziehst du
-              gegebenenfalls für jede dieser Karten eine zusätzliche Karte. <br />Gilt der Multiplikator für
-              <img [src]="iconUrl('tactic')" class="oc-icon" />, so können zusätzlich eine oder mehrere
+              gegebenenfalls f&uuml;r jede dieser Karten eine zus&auml;tzliche Karte. <br />Gilt der Multiplikator f&uuml;r
+              <img [src]="iconUrl('tactic')" class="oc-icon" />, so k&ouml;nnen zus&auml;tzlich eine oder mehrere
               Disziplinen angebenen sein, die die
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschränken, für die eine weitere Karte
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> einschr&auml;nken, f&uuml;r die eine weitere Karte
               gezogen werden darf. <br />In jedem Fall darf je Karte mit diesem Schlagwort nur eine Karte
               nachgezogen werden.
             </p>
             <h4>Neutrale Zone</h4>
             <p>
               Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden Missionskarten platziert
-              und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn der Spieler:innen in dieser Zone und können bis dahin an keinen anderen Gefechten teilnehmen.
+              und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn der Spieler:innen in dieser Zone und k&ouml;nnen bis dahin an keinen anderen Gefechten teilnehmen.
             </p>
             <h4>Orbitale Zone</h4>
             <p>
-              Der Bereich des Spielfelds, in dem sich die Flotte der Spieler:innen aufhält. Jede Spieler:in hat eine eigene orbitale Zone. Schiffe in dieser Zone können an Missionen und Überfällen teilnehmen und verteidigen die Kolonie.
+              Der Bereich des Spielfelds, in dem sich die Flotte der Spieler:innen aufh&auml;lt. Jede Spieler:in hat eine eigene orbitale Zone. Schiffe in dieser Zone k&ouml;nnen an Missionen und &Uuml;berf&auml;llen teilnehmen und verteidigen die Kolonie.
             </p>
             <h4>Panzerungspunkte <img [src]="iconUrl('armour_1')" class="oc-icon" /></h4>
             <p>
@@ -322,7 +322,7 @@
             <h4>Punktabwehr <img [src]="iconUrl('point_defense_1')" class="oc-icon" /></h4>
             <p>
               Defensivpunkte, die den <img [src]="iconUrl('damage')" class="oc-icon" /> reduzieren, der von
-              einigen Waffen (primär Flugkörper) verursacht werden.
+              einigen Waffen (prim&auml;r Flugk&ouml;rper) verursacht werden.
               <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> werden zwischen den Gefechtsphasen
               wieder aktiviert. Es werden immer alle
               <img [src]="iconUrl('point_defense_1')" class="oc-icon" /> von allen am Gefecht teilnehmenden
@@ -343,15 +343,15 @@
               Koloniezone platziert. Einige Schiffe bestehen nur aus einer
               <img [src]="iconUrl('hull')" class="oc-icon" />, andere aus bis zu 3 Karten. Auf mehrteilige
               <img [src]="iconUrl('hull')" class="oc-icon" /> ist schematisch abgebildet, welche anderen
-              <img [src]="iconUrl('hull')" class="oc-icon" /> noch benötigt werden. In der Regel sind dies die
+              <img [src]="iconUrl('hull')" class="oc-icon" /> noch ben&ouml;tigt werden. In der Regel sind dies die
               Bausteine Bug und Heck und manchmal ein Kern. Bei Raumstationen gibt es lediglich
               <img [src]="iconUrl('hull')" class="oc-icon" />-Sektionen, von denen die angegebene Anzahl
-              benötigt wird.
+              ben&ouml;tigt wird.
             </p>
             <h4>Schildpunkte <img [src]="iconUrl('shield_1')" class="oc-icon" /></h4>
             <p>
               Defensivpunkte, die den <img [src]="iconUrl('damage')" class="oc-icon" /> reduzieren, der von
-              einigen Waffen (primär Strahlen- und Energiewaffen) verursacht werden.
+              einigen Waffen (prim&auml;r Strahlen- und Energiewaffen) verursacht werden.
               <img [src]="iconUrl('shield_1')" class="oc-icon" /> werden zwischen den Gefechtsphasen wieder
               aktiviert. Einige Karten stellen auch doppelte
               <img [src]="iconUrl('shield_2')" class="oc-icon" /> bereit, diese werden vor den einfachen
@@ -361,31 +361,31 @@
             <p>
               Die Sockel &Delta;, &Theta;, &Xi;, &Phi;, &Psi; und &Omega; werden von
               <img [src]="iconUrl('equipment')" class="oc-icon" /> und
-              <img [src]="iconUrl('infrastructure')" class="oc-icon" /> benötigt, damit diese ausgespielt /
-              angelegt werden dürfen. <img [src]="iconUrl('hull')" class="oc-icon" /> stellen Sockel zur
-              Verfügung. Die Kolonie bietet alle Sockel in unbegrenzter Menge.
+              <img [src]="iconUrl('infrastructure')" class="oc-icon" /> ben&ouml;tigt, damit diese ausgespielt /
+              angelegt werden d&uuml;rfen. <img [src]="iconUrl('hull')" class="oc-icon" /> stellen Sockel zur
+              Verf&uuml;gung. Die Kolonie bietet alle Sockel in unbegrenzter Menge.
             </p>
             <h4>Spielzug</h4>
             <p>
-              Von Rundenbeginn des aktiven Spielers bis zum nächsten Rundenbeginn desselben Spielers. Ein
+              Von Rundenbeginn des aktiven Spielers bis zum n&auml;chsten Rundenbeginn desselben Spielers. Ein
               Spielzug beinhaltet somit auch explizit die Spielphasen der anderen Spieler.
             </p>
             <h4>Taktikkarte <img [src]="iconUrl('tactic')" class="oc-icon" /></h4>
             <p>
               Kartentyp, der verschiede Spieleffekte haben kann. Die Karten bleiben meistens nicht im Spiel,
-              außer sie werden zusammen mit einer anderen Karte angelegt. Jede
-              <img [src]="iconUrl('tactic')" class="oc-icon" /> gehört zu genau einer Disziplin.
+              au&szlig;er sie werden zusammen mit einer anderen Karte angelegt. Jede
+              <img [src]="iconUrl('tactic')" class="oc-icon" /> geh&ouml;rt zu genau einer Disziplin.
             </p>
             <h4>Tribut <i>(Anzahl Karten)</i></h4>
             <p>
               Schlagwort auf <img [src]="iconUrl('tactic')" class="oc-icon" />. Um diese Karten spielen zu
-              können muss zuvor die angegebene Anzahl Karten von der Hand abgelegt werden.
+              k&ouml;nnen muss zuvor die angegebene Anzahl Karten von der Hand abgelegt werden.
             </p>
             <h4>Überfall</h4>
             <p>
               Ein Angriff des aktiven Spieler:in auf die Kolonie eines anderen Spieler:in. Schiffe mit
-              <img [src]="iconUrl('speed')" class="oc-icon" /> des verteidigenden Spieler:in müssen am Gefecht
-              teilnehmen. Auf Reichweite 1 eines Überfalls können die Kolonie und Karten in der Koloniezone
+              <img [src]="iconUrl('speed')" class="oc-icon" /> des verteidigenden Spieler:in m&uuml;ssen am Gefecht
+              teilnehmen. Auf Reichweite 1 eines &Uuml;berfalls k&ouml;nnen die Kolonie und Karten in der Koloniezone
               des Verteidigers angegriffen werden.
             </p>
             <h4>Unerschöpflich</h4>

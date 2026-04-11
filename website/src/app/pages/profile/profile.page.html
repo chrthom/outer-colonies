@@ -17,7 +17,7 @@
         } @else if (email?.hasError('exists')) {
         <mat-error>Diese E-Mail Adresse wird bereits von einem anderen Nutzer verwendet</mat-error>
         } @if (emailResetSuccessful) {
-        <mat-hint>Eine Bestätigungs-E-Mail wurde versandt</mat-hint>
+        <mat-hint>Eine Best&auml;tigungs-E-Mail wurde versandt</mat-hint>
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="emailForm.valid ? 'primary' : 'warn'">
