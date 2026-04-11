@@ -81,7 +81,7 @@ export class HomePage implements OnInit {
     {
       matcher: r => r.juggernaut ?? false,
       title: 'Juggernaut',
-      description: 'Besitze zum Spielende ein Schiffe mit mindestens 20 Hüllenpunkten.',
+      description: 'Besitze zum Spielende ein Schiff mit mindestens 20 Hüllenpunkten.',
       sol: rules.dailyEarnings.juggernaut
     },
     {

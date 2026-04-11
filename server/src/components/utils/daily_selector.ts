@@ -1,35 +1,24 @@
 import { createHash } from 'crypto';
+import { DailyType } from '../../shared/config/enums';
 
-export type DailyType =
-  | 'login'
-  | 'victory'
-  | 'game'
-  | 'energy'
-  | 'ships'
-  | 'domination'
-  | 'destruction'
-  | 'control'
-  | 'juggernaut'
-  | 'stations'
-  | 'discard'
-  | 'colony'
-  | 'colossus';
-
-export const ALL_DAILIES: DailyType[] = [
-  'login',
-  'victory',
-  'game',
-  'energy',
-  'ships',
-  'domination',
-  'destruction',
-  'control',
-  'juggernaut',
-  'stations',
-  'discard',
-  'colony',
-  'colossus'
+// Define all daily types explicitly
+const ALL_DAILIES: DailyType[] = [
+  DailyType.Login,
+  DailyType.Victory,
+  DailyType.Game,
+  DailyType.Energy,
+  DailyType.Ships,
+  DailyType.Domination,
+  DailyType.Destruction,
+  DailyType.Control,
+  DailyType.Juggernaut,
+  DailyType.Stations,
+  DailyType.Discard,
+  DailyType.Colony,
+  DailyType.Colossus
 ];
+
+export { ALL_DAILIES };
 
 export function getDailiesOfDay(date: Date = new Date()): DailyType[] {
   // Use date string to create consistent hash for the day
