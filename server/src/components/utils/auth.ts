@@ -7,7 +7,7 @@ import DBDecksDAO from '../persistence/db_decks';
 import DBMagicLinksDAO from '../persistence/db_magic_links';
 import Mailer from './mailer';
 import { APIRejectReason, MagicLinkType } from '../../shared/config/enums';
-import { isDailyOfDay } from './daily_selector';
+
 
 export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
@@ -76,7 +76,7 @@ export default class Auth {
           ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
           : Promise.reject(APIRejectReason.NotFound)
     );
-    if (isDailyOfDay('login')) DBDailiesDAO.achieveLogin(credential.userId);
+    DBDailiesDAO.achieveLogin(credential.userId);
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
     credential.sessionToken = sessionToken;
     return <DBCredentialWithSessionToken>credential;
