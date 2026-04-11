@@ -77,19 +77,19 @@ export interface ProfileGetResponse {
 }
 
 export interface DailyGetResponse {
-  login: boolean;
-  victory: boolean;
-  game: boolean;
-  energy: boolean;
-  ships: boolean;
-  domination: boolean;
-  destruction: boolean;
-  control: boolean;
-  juggernaut: boolean;
-  stations: boolean;
-  discard: boolean;
-  colony: boolean;
-  colossus: boolean;
+  login: boolean | null;
+  victory: boolean | null;
+  game: boolean | null;
+  energy: boolean | null;
+  ships: boolean | null;
+  domination: boolean | null;
+  destruction: boolean | null;
+  control: boolean | null;
+  juggernaut: boolean | null;
+  stations: boolean | null;
+  discard: boolean | null;
+  colony: boolean | null;
+  colossus: boolean | null;
 }
 
 export interface ItemListResponse {

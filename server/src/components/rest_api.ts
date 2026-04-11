@@ -28,6 +28,7 @@ import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
 import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
+import { getDailiesOfDay } from './utils/daily_selector';
 import EquipmentCard from './cards/types/equipment_card';
 
 function performWithSessionTokenCheck(
@@ -326,7 +327,22 @@ export default function restAPI(app: Express) {
   // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
     const sendDailyResponse = (daily: DBDaily) => {
-      const payload: DailyGetResponse = daily;
+      const dailiesOfDay = getDailiesOfDay();
+      const payload: DailyGetResponse = {
+        login: dailiesOfDay.includes('login') ? daily.login : null,
+        victory: dailiesOfDay.includes('victory') ? daily.victory : null,
+        game: dailiesOfDay.includes('game') ? daily.game : null,
+        energy: dailiesOfDay.includes('energy') ? daily.energy : null,
+        ships: dailiesOfDay.includes('ships') ? daily.ships : null,
+        domination: dailiesOfDay.includes('domination') ? daily.domination : null,
+        destruction: dailiesOfDay.includes('destruction') ? daily.destruction : null,
+        control: dailiesOfDay.includes('control') ? daily.control : null,
+        juggernaut: dailiesOfDay.includes('juggernaut') ? daily.juggernaut : null,
+        stations: dailiesOfDay.includes('stations') ? daily.stations : null,
+        discard: dailiesOfDay.includes('discard') ? daily.discard : null,
+        colony: dailiesOfDay.includes('colony') ? daily.colony : null,
+        colossus: dailiesOfDay.includes('colossus') ? daily.colossus : null
+      };
       res.status(200).send(payload);
     };
     performWithSessionTokenCheck(req, res, u => {
@@ -335,6 +351,8 @@ export default function restAPI(app: Express) {
       );
     });
   });
+
+  // List all items
 
   // List all items
   app.get('/api/item', (req, res) => {
