@@ -108,7 +108,7 @@ export default class GameOverIndicator {
       case GameResultType.Destruction:
         return 'durch Zerstörung der Kolonie';
       case GameResultType.Domination:
-        return 'durch Vorherrscahft';
+        return 'durch Vorherrschaft';
       default:
         return 'durch Kapitulation';
     }
