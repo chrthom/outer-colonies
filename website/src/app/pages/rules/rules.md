@@ -366,6 +366,24 @@ Sollte der <img src="https://assets.outercolonies.de/icons/damage.png" width="20
 
 Ist die Kolonie eines Gegner:in oder eine Karte in der Koloniezone das Ziel, handelst du dies genauso ab, als wäre ein Schiff oder eine <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> das Ziel. Lege <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />-Marker auf die Kolonie bzw. die Karte in der Koloniezone.
 
+**Beispiel für Schadensberechnung**:
+Angenommen, ein Schiff greift mit einer <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> an, die 9 <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> verursacht. Das Ziel hat 5 <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />:
+- 1 <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />
+- 2 <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> (deaktiviert)
+- 1 <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" />
+- 1 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />
+- 2 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />
+
+Die Waffe hat Abzüge von 5 für <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> und 3 für <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />.
+
+Der Schaden wird wie folgt berechnet:
+1. 1 <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />: Wird ignoriert, da keine Abzüge.
+2. Deaktiverte 2 <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" />: Wird ignoriert, da bereits deaktiviert.
+3. 1 <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" />: 9 - 5 = 4. Die <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> wird deaktiviert.
+4. 2 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> (Doppelpanzerung vor einfacher Panzerung): 4 - (2 * 3) = 0. Wird nicht deaktiviert, da Abzug nicht durch Schaden erreicht wurde.
+5. 1 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />: Wird nciht angewandt, da der <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> bereits 0 beträgt.
+Der finale Schaden beträgt 0 <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />. Nach dem Angriff sind beim Ziel immernoch die <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> mit 1 <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />, 1 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> und 2 <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />
+
 ### Gefechte beenden
 
 Ein Gefecht endet in einem dieser Fälle:
