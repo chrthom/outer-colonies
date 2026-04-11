@@ -4,7 +4,6 @@ import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';
 import { opponentPlayerNo } from '../utils/helpers';
-import { isDailyOfDay } from '../utils/daily_selector';
 import Match from './match';
 import Player from './player';
 
@@ -60,35 +59,25 @@ export default class GameResult {
       if (c) {
         DBProfilesDAO.increaseSol(c.userId, sol);
         if (won) {
-          if (isDailyOfDay('victory')) DBDailiesDAO.achieveVictory(c.userId);
-          if (this.type == GameResultType.Destruction && isDailyOfDay('destruction'))
-            DBDailiesDAO.achieveDestruction(c.userId);
-          else if (this.type == GameResultType.Domination && isDailyOfDay('domination'))
-            DBDailiesDAO.achieveDomination(c.userId);
+          DBDailiesDAO.achieveVictory(c.userId);
+          if (this.type == GameResultType.Destruction) DBDailiesDAO.achieveDestruction(c.userId);
+          else if (this.type == GameResultType.Domination) DBDailiesDAO.achieveDomination(c.userId);
         }
-        if (this.type != GameResultType.Surrender && isDailyOfDay('game')) DBDailiesDAO.achieveGame(c.userId);
-        if (player.colonyCardStack.profile.energy >= 6 && isDailyOfDay('energy'))
-          DBDailiesDAO.achieveEnergy(c.userId);
-        if (player.discardPile.length >= 50 && isDailyOfDay('discard')) DBDailiesDAO.achieveDiscard(c.userId);
-        if (player.colonyCardStack.cards.length > 7 && isDailyOfDay('colony'))
-          DBDailiesDAO.achieveColony(c.userId);
+        if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
+        if (player.colonyCardStack.profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
+        if (player.discardPile.length >= 50) DBDailiesDAO.achieveDiscard(c.userId);
+        if (player.colonyCardStack.cards.length > 7) DBDailiesDAO.achieveColony(c.userId);
         const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
-        if (readyCardStacks.length >= 5 && isDailyOfDay('ships')) DBDailiesDAO.achieveShips(c.userId);
-        if (
-          readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10 &&
-          isDailyOfDay('control')
-        )
+        if (readyCardStacks.length >= 5) DBDailiesDAO.achieveShips(c.userId);
+        if (readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10)
           DBDailiesDAO.achieveControl(c.userId);
-        if (readyCardStacks.find(cs => cs.profile.hp >= 20) && isDailyOfDay('juggernaut'))
-          DBDailiesDAO.achieveJuggernaut(c.userId);
-        if (readyCardStacks.find(cs => cs.cards.length >= 7) && isDailyOfDay('colossus'))
-          DBDailiesDAO.achieveColossus(c.userId);
+        if (readyCardStacks.find(cs => cs.profile.hp >= 20)) DBDailiesDAO.achieveJuggernaut(c.userId);
+        if (readyCardStacks.find(cs => cs.cards.length >= 7)) DBDailiesDAO.achieveColossus(c.userId);
         if (
           readyCardStacks
             .filter(cs => cs.profile.speed == 0)
             .flatMap(cs => cs.cards)
-            .filter(c => c.type == CardType.Hull).length >= 3 &&
-          isDailyOfDay('stations')
+            .filter(c => c.type == CardType.Hull).length >= 3
         )
           DBDailiesDAO.achieveStations(c.userId);
       } else {
