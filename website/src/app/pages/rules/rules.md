@@ -39,15 +39,32 @@ Während des Spiels legst du Karten vor dir aus, die in einer der drei Spielzone
 
 In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
 
-| Sockel | | Schiffs- und Ausrüstungsattribute | | Kartentypen | |
-|--------|----------------|----------------|----------------|
-| Δ | Delta (Triebwerk) | <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" /> | Punktabwehr | <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" /> | Taktik |
-| Θ | Theta (Leichte Waffen) | <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" /> | Schild | <img src="https://assets.outercolonies.de/icons/hull.png" width="20" /> | Rumpf |
-| Ξ | Xi (Schwere Waffen) | <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" /> | Panzerung | <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" /> | Ausrüstung |
-| Φ | Phi (Torpedos) | <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" /> | Hüllenintegrität | <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" /> | Infrastruktur |
-| Ψ | Psi (Frachtraum) | <img src="https://assets.outercolonies.de/icons/speed.png" width="20" /> | Geschwindigkeit | | |
-| Ω | Omega (Defensivsysteme) | <img src="https://assets.outercolonies.de/icons/damage.png" width="20" /> | Schaden | | |
-| | | <img src="https://assets.outercolonies.de/icons/energy.png" width="20" /> | Energie | | |
+### Symbole
+
+In Outer Colonies wird der Typ der Karte, seine Eigenschaftspunkte sowie die sogenannten Sockel in Form von Symbolen dargestellt.
+
+#### Sockel
+- **Δ**: Delta (Triebwerk)
+- **Θ**: Theta (Leichte Waffen)
+- **Ξ**: Xi (Schwere Waffen)
+- **Φ**: Phi (Torpedos)
+- **Ψ**: Psi (Frachtraum)
+- **Ω**: Omega (Defensivsysteme)
+
+#### Schiffs- und Ausrüstungsattribute
+- <img src="https://assets.outercolonies.de/icons/point_defense_1.png" width="20" />: Punktabwehr
+- <img src="https://assets.outercolonies.de/icons/shield_1.png" width="20" />: Schild
+- <img src="https://assets.outercolonies.de/icons/armour_1.png" width="20" />: Panzerung
+- <img src="https://assets.outercolonies.de/icons/hitpoints.png" width="20" />: Hüllenintegrität
+- <img src="https://assets.outercolonies.de/icons/speed.png" width="20" />: Geschwindigkeit
+- <img src="https://assets.outercolonies.de/icons/damage.png" width="20" />: Schaden
+- <img src="https://assets.outercolonies.de/icons/energy.png" width="20" />: Energie
+
+#### Kartentypen
+- <img src="https://assets.outercolonies.de/icons/tactic.png" width="20" />: Taktik
+- <img src="https://assets.outercolonies.de/icons/hull.png" width="20" />: Rumpf
+- <img src="https://assets.outercolonies.de/icons/equipment.png" width="20" />: Ausrüstung
+- <img src="https://assets.outercolonies.de/icons/infrastructure.png" width="20" />: Infrastruktur
 
 ### Glossar
 
