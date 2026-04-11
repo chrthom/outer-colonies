@@ -68,45 +68,48 @@ export default class DBDailiesDAO {
     await DBConnection.instance.query('INSERT INTO dailies (user_id) VALUES (?)', [userId]);
   }
   static async achieveLogin(userId: number) {
-    if (isDailyOfDay('login')) await this.achieve(userId, 'login', rules.dailyEarnings.login);
+    await this.achieve(userId, 'login', rules.dailyEarnings.login);
   }
   static async achieveVictory(userId: number) {
-    if (isDailyOfDay('victory')) await this.achieve(userId, 'victory', rules.dailyEarnings.victory);
+    await this.achieve(userId, 'victory', rules.dailyEarnings.victory);
   }
   static async achieveGame(userId: number) {
-    if (isDailyOfDay('game')) await this.achieve(userId, 'game', rules.dailyEarnings.game);
+    await this.achieve(userId, 'game', rules.dailyEarnings.game);
   }
   static async achieveEnergy(userId: number) {
-    if (isDailyOfDay('energy')) await this.achieve(userId, 'energy', rules.dailyEarnings.energy);
+    await this.achieve(userId, 'energy', rules.dailyEarnings.energy);
   }
   static async achieveShips(userId: number) {
-    if (isDailyOfDay('ships')) await this.achieve(userId, 'ships', rules.dailyEarnings.ships);
+    await this.achieve(userId, 'ships', rules.dailyEarnings.ships);
   }
   static async achieveDomination(userId: number) {
-    if (isDailyOfDay('domination')) await this.achieve(userId, 'domination', rules.dailyEarnings.domination);
+    await this.achieve(userId, 'domination', rules.dailyEarnings.domination);
   }
   static async achieveDestruction(userId: number) {
-    if (isDailyOfDay('destruction')) await this.achieve(userId, 'destruction', rules.dailyEarnings.destruction);
+    await this.achieve(userId, 'destruction', rules.dailyEarnings.destruction);
   }
   static async achieveControl(userId: number) {
-    if (isDailyOfDay('control')) await this.achieve(userId, 'control', rules.dailyEarnings.control);
+    await this.achieve(userId, 'control', rules.dailyEarnings.control);
   }
   static async achieveJuggernaut(userId: number) {
-    if (isDailyOfDay('juggernaut')) await this.achieve(userId, 'juggernaut', rules.dailyEarnings.juggernaut);
+    await this.achieve(userId, 'juggernaut', rules.dailyEarnings.juggernaut);
   }
   static async achieveStations(userId: number) {
-    if (isDailyOfDay('stations')) await this.achieve(userId, 'stations', rules.dailyEarnings.stations);
+    await this.achieve(userId, 'stations', rules.dailyEarnings.stations);
   }
   static async achieveDiscard(userId: number) {
-    if (isDailyOfDay('discard')) await this.achieve(userId, 'discard', rules.dailyEarnings.discard);
+    await this.achieve(userId, 'discard', rules.dailyEarnings.discard);
   }
   static async achieveColony(userId: number) {
-    if (isDailyOfDay('colony')) await this.achieve(userId, 'colony', rules.dailyEarnings.colony);
+    await this.achieve(userId, 'colony', rules.dailyEarnings.colony);
   }
   static async achieveColossus(userId: number) {
-    if (isDailyOfDay('colossus')) await this.achieve(userId, 'colossus', rules.dailyEarnings.colossus);
+    await this.achieve(userId, 'colossus', rules.dailyEarnings.colossus);
   }
   private static async achieve(userId: number, daily: string, sol: number) {
+    // Only allow achieving dailies that are available today
+    if (!isDailyOfDay(daily as any)) return;
+    
     await this.getBy(`user_id = ? AND (${daily} < current_date() OR ${daily} IS NULL)`, [userId]).then(b => {
       if (b.length) {
         DBConnection.instance.query(`UPDATE dailies SET ${daily} = current_date() WHERE user_id = ?`, [
