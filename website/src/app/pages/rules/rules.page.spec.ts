@@ -21,7 +21,7 @@ describe('RulesPage', () => {
   });
 
   it('should have default active chapter', () => {
-    expect(component.activeChapter).toBe('intro');
+    expect(component.activeChapter).toBe('setup');
   });
 
   it('should generate correct image URL', () => {

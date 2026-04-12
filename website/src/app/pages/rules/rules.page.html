@@ -26,7 +26,12 @@
           </mat-selection-list>
         </td>
         <td id="rules-content">
-          @switch (activeChapter.selectedOptions.selected[0].value) { @case ('setup') {
+          <div id="navigation-buttons-top">
+            <button mat-raised-button color="primary" (click)="previousChapter()" [disabled]="currentIndex === 0">Zurück</button>
+            <button mat-raised-button color="primary" (click)="nextChapter()" [disabled]="currentIndex === chapters.length - 1">Weiter</button>
+          </div>
+          <br />
+          @switch (activeChapter.selectedOptions.selected[0]?.value ?? activeChapter) { @case ('setup') {
           <div>
             <img [src]="imgUrl('setup')" class="left size-40" />
             <img [src]="imgUrl('intro')" class="right size-20" />
@@ -422,12 +427,7 @@
               auszuspielen. Die Karten, die du und deine Gegner:in noch ausspielen dürfen, werden dir am
               rechten Bildschirmrand angezeigt. Rot eingefärbte Kartensymbole wurden bereits verbraucht.
             </p>
-
-            <!-- TODO: Screenshot von Action Pool einfügen -->
-
-            <img [src]="imgUrl('cards_1')" class="right size-30" />
-            <img [src]="imgUrl('cards_2')" class="left size-30" />
-
+            <img [src]="imgUrl('cards_1')" class="right size-40" />
             <p>
               1. Es gibt <b>4 Typen von Karten</b>. Über das Symbol in der oberen linken Ecke kannst du sie am
               einfachsten unterscheiden.<br />
@@ -440,7 +440,11 @@
               Karten referenziert.<br />
               5. <img [src]="iconUrl('equipment')" class="oc-icon" />, die Offensivwaffen sind, haben eine
               Reichweite von 1 bis 4. Je höher die Reichweite ist desto früher und häufiger kann die Waffe im
-              Gefecht eingesetzt werden.<br />
+              Gefecht eingesetzt werden.
+            </p>
+            <img [src]="imgUrl('cards_2')" class="left size-40" />
+            <br /><br /><br /><br />
+            <p>
               6. Die meisten Karten haben <b>Eigenschaftspunkte</b> hier zusammengefasst: Basiswerte (blau),
               positive Verbesserungen (blau mit „+“), Anforderungen (rote Sockel und
               <img [src]="iconUrl('energy')" class="oc-icon" />) sowie Abzüge für Angriffe (gelbe
@@ -855,6 +859,11 @@
             </p>
           </div>
           } }
+          <br />
+          <div id="navigation-buttons-bottom">
+            <button mat-raised-button color="primary" (click)="previousChapter()" [disabled]="currentIndex === 0">Zurück</button>
+            <button mat-raised-button color="primary" (click)="nextChapter()" [disabled]="currentIndex === chapters.length - 1">Weiter</button>
+          </div>
         </td>
       </tr>
     </table>
