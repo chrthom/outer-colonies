@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatSelectionList, MatListOption } from '@angular/material/list';
@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [ContentBoxComponent, MatSelectionList, MatListOption, MatButtonModule]
 })
 export class RulesPage {
-  activeChapter = 'setup';
+  @ViewChild('activeChapter') activeChapterList!: MatSelectionList;
   
   chapters = [
     'setup',
@@ -37,22 +37,29 @@ export class RulesPage {
   iconUrl(iconName: string): string {
     return `${this.assetUrl}/icons/${iconName}.png`;
   }
+  
   previousChapter(): void {
     const currentIndex = this.currentIndex;
     if (currentIndex > 0) {
-      this.activeChapter = this.chapters[currentIndex - 1];
+      const newChapter = this.chapters[currentIndex - 1];
+      this.activeChapterList.selectedOptions.select(this.activeChapterList.options.find(option => option.value === newChapter)!);
     }
   }
+  
   nextChapter(): void {
     const currentIndex = this.currentIndex;
     if (currentIndex < this.chapters.length - 1) {
-      this.activeChapter = this.chapters[currentIndex + 1];
+      const newChapter = this.chapters[currentIndex + 1];
+      this.activeChapterList.selectedOptions.select(this.activeChapterList.options.find(option => option.value === newChapter)!);
     }
   }
+  
+  get currentIndex(): number {
+    const selectedValue = this.activeChapterList?.selectedOptions?.selected[0]?.value;
+    return selectedValue ? this.chapters.indexOf(selectedValue) : 0;
+  }
+  
   get assetUrl(): string {
     return environment.url.assets;
-  }
-  get currentIndex(): number {
-    return this.chapters.indexOf(this.activeChapter);
   }
 }

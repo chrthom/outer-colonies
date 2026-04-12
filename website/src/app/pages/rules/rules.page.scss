@@ -18,7 +18,7 @@
       p,
       ul,
       ol {
-        margin-bottom: 40px;
+        margin-bottom: 30px;
       }
       table {
         border-collapse: collapse;
@@ -58,6 +58,12 @@
       }
       .size-40 {
         max-width: 40%;
+      }
+      .nav-button {
+        margin: 5px 5px 20px 0;
+      }
+      .nav-button:first-child {
+        margin-left: 0;
       }
     }
   }

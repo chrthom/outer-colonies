@@ -21,7 +21,8 @@ describe('RulesPage', () => {
   });
 
   it('should have default active chapter', () => {
-    expect(component.activeChapter).toBe('setup');
+    const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
+    expect(selectedValue).toBe('setup');
   });
 
   it('should generate correct image URL', () => {
