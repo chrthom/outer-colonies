@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('RulesPage', () => {
   let component: RulesPage;
@@ -8,7 +9,7 @@ describe('RulesPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RulesPage]
+      imports: [RulesPage, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RulesPage);
@@ -21,7 +22,8 @@ describe('RulesPage', () => {
   });
 
   it('should have default active chapter', () => {
-    expect(component.activeChapter).toBe('intro');
+    const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
+    expect(selectedValue).toBe('setup');
   });
 
   it('should generate correct image URL', () => {
