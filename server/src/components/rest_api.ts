@@ -25,7 +25,7 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
-import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
+import { APIRejectReason, CardType, ItemBoxContentType, ItemType, DailyType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import { getDailiesOfDay } from './utils/daily_selector';
@@ -329,19 +329,19 @@ export default function restAPI(app: Express) {
     const sendDailyResponse = (daily: DBDaily) => {
       const dailiesOfDay = getDailiesOfDay();
       const payload: DailyGetResponse = {
-        login: dailiesOfDay.includes('login') ? daily.login : null,
-        victory: dailiesOfDay.includes('victory') ? daily.victory : null,
-        game: dailiesOfDay.includes('game') ? daily.game : null,
-        energy: dailiesOfDay.includes('energy') ? daily.energy : null,
-        ships: dailiesOfDay.includes('ships') ? daily.ships : null,
-        domination: dailiesOfDay.includes('domination') ? daily.domination : null,
-        destruction: dailiesOfDay.includes('destruction') ? daily.destruction : null,
-        control: dailiesOfDay.includes('control') ? daily.control : null,
-        juggernaut: dailiesOfDay.includes('juggernaut') ? daily.juggernaut : null,
-        stations: dailiesOfDay.includes('stations') ? daily.stations : null,
-        discard: dailiesOfDay.includes('discard') ? daily.discard : null,
-        colony: dailiesOfDay.includes('colony') ? daily.colony : null,
-        colossus: dailiesOfDay.includes('colossus') ? daily.colossus : null
+        login: dailiesOfDay.includes(DailyType.Login) ? daily.login : null,
+        victory: dailiesOfDay.includes(DailyType.Victory) ? daily.victory : null,
+        game: dailiesOfDay.includes(DailyType.Game) ? daily.game : null,
+        energy: dailiesOfDay.includes(DailyType.Energy) ? daily.energy : null,
+        ships: dailiesOfDay.includes(DailyType.Ships) ? daily.ships : null,
+        domination: dailiesOfDay.includes(DailyType.Domination) ? daily.domination : null,
+        destruction: dailiesOfDay.includes(DailyType.Destruction) ? daily.destruction : null,
+        control: dailiesOfDay.includes(DailyType.Control) ? daily.control : null,
+        juggernaut: dailiesOfDay.includes(DailyType.Juggernaut) ? daily.juggernaut : null,
+        stations: dailiesOfDay.includes(DailyType.Stations) ? daily.stations : null,
+        discard: dailiesOfDay.includes(DailyType.Discard) ? daily.discard : null,
+        colony: dailiesOfDay.includes(DailyType.Colony) ? daily.colony : null,
+        colossus: dailiesOfDay.includes(DailyType.Colossus) ? daily.colossus : null
       };
       res.status(200).send(payload);
     };
