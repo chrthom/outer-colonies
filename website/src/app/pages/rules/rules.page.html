@@ -57,33 +57,124 @@
               in Form von Symbolen dargestellt.
             </p>
             <h4>Sockel</h4>
-            <ul>
-              <li><b>&Delta;</b>: Delta (Triebwerk)</li>
-              <li><b>&Theta;</b>: Theta (Leichte Waffen)</li>
-              <li><b>&Xi;</b>: Xi (Schwere Waffen)</li>
-              <li><b>&Phi;</b>: Phi (Torpedos)</li>
-              <li><b>&Psi;</b>: Psi (Frachtraum)</li>
-              <li><b>&Omega;</b>: Omega (Defensivsysteme)</li>
-            </ul>
+            <table>
+              <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Beschreibung</th>
+              </tr>
+              <tr>
+                <td><b>&Delta;</b></td>
+                <td>Delta</td>
+                <td>Triebwerk</td>
+              </tr>
+              <tr>
+                <td><b>&Theta;</b></td>
+                <td>Theta</td>
+                <td>Leichte Waffen</td>
+              </tr>
+              <tr>
+                <td><b>&Xi;</b></td>
+                <td>Xi</td>
+                <td>Schwere Waffen</td>
+              </tr>
+              <tr>
+                <td><b>&Phi;</b></td>
+                <td>Phi</td>
+                <td>Torpedos</td>
+              </tr>
+              <tr>
+                <td><b>&Psi;</b></td>
+                <td>Psi</td>
+                <td>Frachtraum</td>
+              </tr>
+              <tr>
+                <td><b>&Omega;</b></td>
+                <td>Omega</td>
+                <td>Defensivsysteme</td>
+              </tr>
+            </table>
             <h4>Schiffs- und Ausr&uuml;stungsattribute</h4>
-            <ul>
-              <li><img [src]="iconUrl('point_defense_1')" class="oc-icon" />: Punktabwehr</li>
-              <li><img [src]="iconUrl('shield_1')" class="oc-icon" />: Schild</li>
-              <li><img [src]="iconUrl('armour_1')" class="oc-icon" />: Panzerung</li>
-              <li><img [src]="iconUrl('hitpoints')" class="oc-icon" />: H&uuml;llenintegrit&auml;t (kurz HP)</li>
-              <li><img [src]="iconUrl('speed')" class="oc-icon" />: Geschwindigkeit</li>
-              <li><img [src]="iconUrl('damage')" class="oc-icon" />: Schaden</li>
-              <li><img [src]="iconUrl('energy')" class="oc-icon" />: Energie</li>
-              <li><img [src]="iconUrl('control')" class="oc-icon" />: Kontrolle</li>
-            </ul>
+            <table>
+              <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Beschreibung</th>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('point_defense_1')" class="oc-icon" /></td>
+                <td>Punktabwehr</td>
+                <td>Defensivpunkte, die den Schaden reduzieren, der von einigen Waffen (primär Flugkörper) verursacht wird.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('shield_1')" class="oc-icon" /></td>
+                <td>Schild</td>
+                <td>Defensivpunkte, die den Schaden reduzieren, der von einigen Waffen (primär Strahlen- und Energiewaffen) verursacht wird.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('armour_1')" class="oc-icon" /></td>
+                <td>Panzerung</td>
+                <td>Defensivpunkte, die den Schaden reduzieren, der von einigen Waffen (primär Kinetik- und Explosivwaffen) verursacht wird.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('hitpoints')" class="oc-icon" /></td>
+                <td>H&uuml;llenintegrit&auml;t</td>
+                <td>Hat ein Schiff oder eine Koloniekarte mindestens so viele Schadensmarken wie Hüllenintegrität, wird es auf den Ablagestapel gelegt. (kurz HP)</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('speed')" class="oc-icon" /></td>
+                <td>Geschwindigkeit</td>
+                <td>Eigenschaftspunkt von Rumpfkarten, relevant für einige Ausrüstungen und Taktiken, sowie beim Abfangen.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('damage')" class="oc-icon" /></td>
+                <td>Schaden</td>
+                <td>Angabe, wie viel Schaden eine Waffe verursacht.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('energy')" class="oc-icon" /></td>
+                <td>Energie</td>
+                <td>Wird von einigen Infrastrukturkarten bereitgestellt und von anderen Karten als Anforderung benötigt.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('control')" class="oc-icon" /></td>
+                <td>Kontrolle</td>
+                <td>Ein Maß für den Einfluss und die Dominanz einer Spieler:in über das Spielgebiet.</td>
+              </tr>
+            </table>
             <h4>Kartentypen</h4>
-            <ul>
-              <li><img [src]="iconUrl('tactic')" class="oc-icon" />: Taktik</li>
-              <li><img [src]="iconUrl('hull')" class="oc-icon" />: Rumpf</li>
-              <li><img [src]="iconUrl('equipment')" class="oc-icon" />: Ausr&uuml;stung</li>
-              <li><img [src]="iconUrl('infrastructure')" class="oc-icon" />: Infrastruktur</li>
-              <li><img [src]="iconUrl('orb')" class="oc-icon" />: Himmelsk&ouml;rper</li>
-            </ul>
+            <table>
+              <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Beschreibung</th>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('tactic')" class="oc-icon" /></td>
+                <td>Taktik</td>
+                <td>Kartentyp, der verschiedene Spieleffekte haben kann. Die Karten bleiben meistens nicht im Spiel, außer sie werden zusammen mit einer anderen Karte angelegt.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('hull')" class="oc-icon" /></td>
+                <td>Rumpf</td>
+                <td>Kartentyp aus dem die Schiffe der Flotte zusammengesetzt werden. Karten werden in der Koloniezone platziert.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('equipment')" class="oc-icon" /></td>
+                <td>Ausr&uuml;stung</td>
+                <td>Ein Kartentyp der nur an Rumpfkarten angelegt werden kann.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('infrastructure')" class="oc-icon" /></td>
+                <td>Infrastruktur</td>
+                <td>Ein Kartentyp, der sowohl an Rumpfkarten als auch an die Kolonie angelegt werden kann.</td>
+              </tr>
+              <tr>
+                <td><img [src]="iconUrl('orb')" class="oc-icon" /></td>
+                <td>Himmelsk&ouml;rper</td>
+                <td>Ein Kartentyp, der an die Kolonie angelegt wird. Von diesem Kartentyp kann jede Spieler:in nur eine im Spiel haben.</td>
+              </tr>
+            </table>
           </div>
           } @case ('victory') {
           <div>
