@@ -18,6 +18,9 @@ commit_types = [
     "test",
 ]
 
+[mcp_servers]
+gitmcp = { type = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" }
+
 [github]
 repository = "https://github.com/chrthom/outer-colonies"
 use_issues = true

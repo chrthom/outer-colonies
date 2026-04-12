@@ -49,10 +49,6 @@ export default class DBDailiesDAO {
   // Generic achieve method that works for any daily type
   static async achieve(userId: number, dailyType: DailyType) {
     const dailyDef = DAILY_DEFINITIONS.find(d => d.type === dailyType);
-    if (!dailyDef) {
-      console.error(`Unknown daily type: ${dailyType}`);
-      return;
-    }
 
     // Only allow achieving dailies that are available today
     if (!isDailyOfDay(dailyType)) return;

@@ -139,7 +139,7 @@ export default function restAPI(app: Express) {
           username: u.username,
           email: u.email
         };
-        res.status(200).send(typedPayload);
+        res.status(200).send(payload);
       },
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 401 : 500)
     );
