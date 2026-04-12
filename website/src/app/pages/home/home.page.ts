@@ -3,7 +3,6 @@ import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
 import { DailyGetResponse } from '../../../../../server/src/shared/interfaces/rest_api';
-import { rules } from '../../../../../server/src/shared/config/rules';
 import { DAILY_DEFINITIONS } from '../../../../../server/src/shared/config/dailies';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatAnchor } from '@angular/material/button';
@@ -27,7 +26,7 @@ function generateDailiesArray(): Daily[] {
     matcherStr: `r.${dailyDef.dbColumn}`, // For compatibility with existing filtering logic
     title: dailyDef.title,
     description: dailyDef.description,
-    sol: rules.dailyEarnings[dailyDef.dbColumn]
+    sol: dailyDef.solReward
   }));
 }
 
@@ -66,15 +65,6 @@ export class HomePage implements OnInit {
           // Show daily if it's available today (not null)
           return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
         });
-
-      // Ensure we have at least one daily to show
-      if (this.dailies.length === 0) {
-        // Fallback: show all dailies if none are available (shouldn't happen)
-        this.dailies = this.dailies.map(daily => {
-          const achieved = daily.matcher(res);
-          return { ...daily, achieved };
-        });
-      }
     });
   }
   get gameUrl(): string {

@@ -46,11 +46,6 @@ function generateAlterTableSQL(): string {
   ).join('\n');
 }
 
-console.log('=== Complete CREATE TABLE statement ===');
-console.log(generateDailiesSQL());
-console.log('\n=== Individual ALTER TABLE statements ===');
-console.log(generateAlterTableSQL());
-
 // Export functions for programmatic use
 module.exports = {
   generateDailiesSQL,

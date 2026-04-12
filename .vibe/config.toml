@@ -4,6 +4,9 @@ enabled_skills = [
 installed_agents = [
     "lean",
 ]
+mcp_servers = [
+    { transport = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" }
+]
 
 [git]
 main_branch = "main"
@@ -17,9 +20,6 @@ commit_types = [
     "refactor",
     "test",
 ]
-
-[mcp_servers]
-gitmcp = { type = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" }
 
 [github]
 repository = "https://github.com/chrthom/outer-colonies"
