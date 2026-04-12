@@ -56,9 +56,8 @@ export class RulesPage implements OnInit {
   }
 
   previousChapter(): void {
-    const currentIndex = this.currentIndex;
-    if (currentIndex > 0) {
-      const newChapter = this.chapters[currentIndex - 1];
+    if (this.currentIndex > 0) {
+      const newChapter = this.chapters[this.currentIndex - 1];
       this.activeChapterList.selectedOptions.select(
         this.activeChapterList.options.find(option => option.value === newChapter)!
       );
@@ -67,9 +66,8 @@ export class RulesPage implements OnInit {
   }
 
   nextChapter(): void {
-    const currentIndex = this.currentIndex;
-    if (currentIndex < this.chapters.length - 1) {
-      const newChapter = this.chapters[currentIndex + 1];
+    if (this.currentIndex < this.chapters.length - 1) {
+      const newChapter = this.chapters[this.currentIndex + 1];
       this.activeChapterList.selectedOptions.select(
         this.activeChapterList.options.find(option => option.value === newChapter)!
       );
