@@ -45,8 +45,6 @@ export default class GameResult {
     const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
 
     switch (dailyType) {
-      case DailyType.Login:
-        return false; // Login is handled separately in auth
       case DailyType.Victory:
         return won;
       case DailyType.Game:
@@ -77,7 +75,7 @@ export default class GameResult {
       case DailyType.Colossus:
         return readyCardStacks.find(cs => cs.cards.length >= 7) !== undefined;
       default:
-        return false;
+        return false; // Login achievement is handled separately in auth
     }
   }
 
