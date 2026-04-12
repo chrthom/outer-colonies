@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
 
 describe('RulesPage', () => {
   let component: RulesPage;
@@ -8,7 +11,7 @@ describe('RulesPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RulesPage]
+      imports: [RulesPage, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RulesPage);
