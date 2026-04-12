@@ -46,21 +46,15 @@ describe('HomePage', () => {
   });
 
   it('should reload dailies on init', () => {
-    const mockResponse: DailyGetResponse = {
-      login: true,
-      victory: false,
-      game: true,
-      energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
-    };
+    const mockResponse: DailyGetResponse = {};
+    // Initialize with all daily columns set to null or boolean values
+    component.dailies.forEach((daily, index) => {
+      // Extract the daily key from the matcherStr property or matcher function
+      const matcherStr = daily.matcherStr || daily.matcher.toString();
+      const match = matcherStr.match(/r\[\'(\w+)\'\]/) || matcherStr.match(/r\.(\w+)/);
+      const dailyKey = match ? match[1] : `daily${index}`;
+      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
+    });
 
     spyOn(component, 'reload').and.callThrough();
     fixture.detectChanges();
@@ -75,21 +69,15 @@ describe('HomePage', () => {
   });
 
   it('should cycle through dailies automatically', () => {
-    const mockResponse: DailyGetResponse = {
-      login: true,
-      victory: false,
-      game: true,
-      energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
-    };
+    const mockResponse: DailyGetResponse = {};
+    // Initialize with all daily columns set to null or boolean values
+    component.dailies.forEach((daily, index) => {
+      // Extract the daily key from the matcher function
+      const matcherStr = daily.matcher.toString();
+      const match = matcherStr.match(/r\[\'(\w+)\'\]/);
+      const dailyKey = match ? match[1] : `daily${index}`;
+      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
+    });
 
     fixture.detectChanges();
 
@@ -112,21 +100,15 @@ describe('HomePage', () => {
   });
 
   it('should render welcome message', () => {
-    const mockResponse: DailyGetResponse = {
-      login: true,
-      victory: false,
-      game: true,
-      energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
-    };
+    const mockResponse: DailyGetResponse = {};
+    // Initialize with all daily columns set to null or boolean values
+    component.dailies.forEach((daily, index) => {
+      // Extract the daily key from the matcher function
+      const matcherStr = daily.matcher.toString();
+      const match = matcherStr.match(/r\[\'(\w+)\'\]/);
+      const dailyKey = match ? match[1] : `daily${index}`;
+      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
+    });
 
     fixture.detectChanges();
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);

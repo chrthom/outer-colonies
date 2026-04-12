@@ -9,22 +9,8 @@ class OCRules {
   readonly maxRange = 4;
   readonly countdownTimer = 90;
 
-  // Explicit type definition for dailyEarnings to maintain backward compatibility
-  readonly dailyEarnings: {
-    login: number;
-    victory: number;
-    game: number;
-    energy: number;
-    ships: number;
-    domination: number;
-    destruction: number;
-    control: number;
-    juggernaut: number;
-    stations: number;
-    discard: number;
-    colony: number;
-    colossus: number;
-  };
+  // Dynamic dailyEarnings generated from centralized definitions
+  readonly dailyEarnings: Record<string, number>;
 
   readonly gameEarnings = {
     victory: 50,
@@ -39,24 +25,10 @@ class OCRules {
     // Initialize dailyEarnings from centralized definitions
     this.dailyEarnings = DAILY_DEFINITIONS.reduce(
       (acc, daily) => {
-        acc[daily.dbColumn as keyof typeof acc] = daily.solReward;
+        acc[daily.dbColumn] = daily.solReward;
         return acc;
       },
-      {} as {
-        login: number;
-        victory: number;
-        game: number;
-        energy: number;
-        ships: number;
-        domination: number;
-        destruction: number;
-        control: number;
-        juggernaut: number;
-        stations: number;
-        discard: number;
-        colony: number;
-        colossus: number;
-      }
+      {} as Record<string, number>
     );
   }
 }

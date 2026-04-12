@@ -71,44 +71,4 @@ export default class DBDailiesDAO {
     });
   }
 
-  // Convenience methods for backward compatibility
-  static async achieveLogin(userId: number) {
-    await this.achieve(userId, DailyType.Login);
-  }
-  static async achieveVictory(userId: number) {
-    await this.achieve(userId, DailyType.Victory);
-  }
-  static async achieveGame(userId: number) {
-    await this.achieve(userId, DailyType.Game);
-  }
-  static async achieveEnergy(userId: number) {
-    await this.achieve(userId, DailyType.Energy);
-  }
-  static async achieveShips(userId: number) {
-    await this.achieve(userId, DailyType.Ships);
-  }
-  static async achieveDomination(userId: number) {
-    await this.achieve(userId, DailyType.Domination);
-  }
-  static async achieveDestruction(userId: number) {
-    await this.achieve(userId, DailyType.Destruction);
-  }
-  static async achieveControl(userId: number) {
-    await this.achieve(userId, DailyType.Control);
-  }
-  static async achieveJuggernaut(userId: number) {
-    await this.achieve(userId, DailyType.Juggernaut);
-  }
-  static async achieveStations(userId: number) {
-    await this.achieve(userId, DailyType.Stations);
-  }
-  static async achieveDiscard(userId: number) {
-    await this.achieve(userId, DailyType.Discard);
-  }
-  static async achieveColony(userId: number) {
-    await this.achieve(userId, DailyType.Colony);
-  }
-  static async achieveColossus(userId: number) {
-    await this.achieve(userId, DailyType.Colossus);
-  }
 }
