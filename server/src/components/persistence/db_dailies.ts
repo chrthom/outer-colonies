@@ -7,7 +7,7 @@ import { isDailyOfDay } from '../utils/daily_selector';
 // DBDaily interface with dynamic properties for all daily columns
 export interface DBDaily {
   userId: number;
-  [key: string]: any; // Allow dynamic properties for all daily columns
+  [key: string]: boolean | number; // Dynamic properties for all daily columns (booleans) + userId (number)
 }
 
 export default class DBDailiesDAO {

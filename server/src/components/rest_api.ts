@@ -346,8 +346,6 @@ export default function restAPI(app: Express) {
   });
 
   // List all items
-
-  // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
       const content = <DBItemBoxContent[]>JSON.parse(i.content);
