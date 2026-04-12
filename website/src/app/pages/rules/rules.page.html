@@ -3,7 +3,7 @@
     <table id="main-table">
       <tr>
         <td id="table-of-content">
-          <mat-selection-list #activeChapter [multiple]="false" color="primary">
+          <mat-selection-list #activeChapter [multiple]="false" color="primary" (selectionChange)="onChapterSelected($event)">
             <h5>Allgemeines</h5>
             <mat-list-option value="setup" selected="true"><h4>Spielaufbau</h4></mat-list-option>
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
