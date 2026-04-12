@@ -1,4 +1,4 @@
-import { CardType, GameResultType } from '../../shared/config/enums';
+import { CardType, GameResultType, DailyType } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
@@ -41,6 +41,46 @@ export default class GameResult {
     this.winnerSol = this.applyEarnings(winner, loser, true);
     this.loserSol = this.applyEarnings(loser, winner, false);
   }
+  private shouldAchieveDaily(dailyType: DailyType, player: Player, opponent: Player, won: boolean): boolean {
+    const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
+
+    switch (dailyType) {
+      case DailyType.Login:
+        return false; // Login is handled separately in auth
+      case DailyType.Victory:
+        return won;
+      case DailyType.Game:
+        return this.type != GameResultType.Surrender;
+      case DailyType.Energy:
+        return player.colonyCardStack.profile.energy >= 6;
+      case DailyType.Ships:
+        return readyCardStacks.length >= 5;
+      case DailyType.Domination:
+        return won && this.type == GameResultType.Domination;
+      case DailyType.Destruction:
+        return won && this.type == GameResultType.Destruction;
+      case DailyType.Control:
+        return readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10;
+      case DailyType.Juggernaut:
+        return readyCardStacks.find(cs => cs.profile.hp >= 20) !== undefined;
+      case DailyType.Stations:
+        return (
+          readyCardStacks
+            .filter(cs => cs.profile.speed == 0)
+            .flatMap(cs => cs.cards)
+            .filter(c => c.type == CardType.Hull).length >= 3
+        );
+      case DailyType.Discard:
+        return player.discardPile.length >= 50;
+      case DailyType.Colony:
+        return player.colonyCardStack.cards.length > 7;
+      case DailyType.Colossus:
+        return readyCardStacks.find(cs => cs.cards.length >= 7) !== undefined;
+      default:
+        return false;
+    }
+  }
+
   private applyEarnings(player: Player, opponent: Player, won: boolean): number {
     let sol = 0;
     sol += player.discardPile.length * rules.gameEarnings.discardPile;
@@ -58,28 +98,13 @@ export default class GameResult {
     DBCredentialsDAO.getByUsername(player.name).then(c => {
       if (c) {
         DBProfilesDAO.increaseSol(c.userId, sol);
-        if (won) {
-          DBDailiesDAO.achieveVictory(c.userId);
-          if (this.type == GameResultType.Destruction) DBDailiesDAO.achieveDestruction(c.userId);
-          else if (this.type == GameResultType.Domination) DBDailiesDAO.achieveDomination(c.userId);
-        }
-        if (this.type != GameResultType.Surrender) DBDailiesDAO.achieveGame(c.userId);
-        if (player.colonyCardStack.profile.energy >= 6) DBDailiesDAO.achieveEnergy(c.userId);
-        if (player.discardPile.length >= 50) DBDailiesDAO.achieveDiscard(c.userId);
-        if (player.colonyCardStack.cards.length > 7) DBDailiesDAO.achieveColony(c.userId);
-        const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
-        if (readyCardStacks.length >= 5) DBDailiesDAO.achieveShips(c.userId);
-        if (readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10)
-          DBDailiesDAO.achieveControl(c.userId);
-        if (readyCardStacks.find(cs => cs.profile.hp >= 20)) DBDailiesDAO.achieveJuggernaut(c.userId);
-        if (readyCardStacks.find(cs => cs.cards.length >= 7)) DBDailiesDAO.achieveColossus(c.userId);
-        if (
-          readyCardStacks
-            .filter(cs => cs.profile.speed == 0)
-            .flatMap(cs => cs.cards)
-            .filter(c => c.type == CardType.Hull).length >= 3
-        )
-          DBDailiesDAO.achieveStations(c.userId);
+
+        // Check all dailies using centralized logic
+        Object.values(DailyType).forEach(dailyType => {
+          if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
+            DBDailiesDAO.achieve(c.userId, dailyType);
+          }
+        });
       } else {
         console.log(`ERROR: Could not find user ${player.name} in database`);
       }

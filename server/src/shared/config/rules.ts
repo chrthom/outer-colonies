@@ -1,3 +1,5 @@
+import { DAILY_DEFINITIONS } from './dailies';
+
 class OCRules {
   readonly cardsToDrawPerTurn = 2;
   readonly colonyHP = 50;
@@ -7,21 +9,23 @@ class OCRules {
   readonly maxRange = 4;
   readonly countdownTimer = 90;
 
-  readonly dailyEarnings = {
-    login: 35,
-    victory: 45,
-    game: 70,
-    energy: 90,
-    ships: 115,
-    domination: 100,
-    destruction: 85,
-    control: 115,
-    juggernaut: 120,
-    stations: 105,
-    discard: 130,
-    colony: 110,
-    colossus: 125
+  // Explicit type definition for dailyEarnings to maintain backward compatibility
+  readonly dailyEarnings: {
+    login: number;
+    victory: number;
+    game: number;
+    energy: number;
+    ships: number;
+    domination: number;
+    destruction: number;
+    control: number;
+    juggernaut: number;
+    stations: number;
+    discard: number;
+    colony: number;
+    colossus: number;
   };
+
   readonly gameEarnings = {
     victory: 50,
     cardsInGame: 3,
@@ -30,6 +34,31 @@ class OCRules {
   };
   readonly minCardsForVictoryBonus = 6;
   readonly boosterCosts = [Infinity, 920, 1045, 1045, 1045];
+
+  constructor() {
+    // Initialize dailyEarnings from centralized definitions
+    this.dailyEarnings = DAILY_DEFINITIONS.reduce(
+      (acc, daily) => {
+        acc[daily.dbColumn as keyof typeof acc] = daily.solReward;
+        return acc;
+      },
+      {} as {
+        login: number;
+        victory: number;
+        game: number;
+        energy: number;
+        ships: number;
+        domination: number;
+        destruction: number;
+        control: number;
+        juggernaut: number;
+        stations: number;
+        discard: number;
+        colony: number;
+        colossus: number;
+      }
+    );
+  }
 }
 
 export const rules = new OCRules();

@@ -1,22 +1,9 @@
 import { createHash } from 'crypto';
 import { DailyType } from '../../shared/config/enums';
+import { ALL_DAILY_TYPES } from '../../shared/config/dailies';
 
-// Define all daily types explicitly
-const ALL_DAILIES: DailyType[] = [
-  DailyType.Login,
-  DailyType.Victory,
-  DailyType.Game,
-  DailyType.Energy,
-  DailyType.Ships,
-  DailyType.Domination,
-  DailyType.Destruction,
-  DailyType.Control,
-  DailyType.Juggernaut,
-  DailyType.Stations,
-  DailyType.Discard,
-  DailyType.Colony,
-  DailyType.Colossus
-];
+// Use centralized daily types definition
+const ALL_DAILIES = ALL_DAILY_TYPES;
 
 export { ALL_DAILIES };
 

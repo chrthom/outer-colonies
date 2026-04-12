@@ -8,7 +8,6 @@ import DBMagicLinksDAO from '../persistence/db_magic_links';
 import Mailer from './mailer';
 import { APIRejectReason, MagicLinkType } from '../../shared/config/enums';
 
-
 export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
     return DBCredentialsDAO.getByUsername(username).then(

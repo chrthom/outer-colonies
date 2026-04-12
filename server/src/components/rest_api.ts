@@ -25,10 +25,11 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
-import { APIRejectReason, CardType, ItemBoxContentType, ItemType, DailyType } from '../shared/config/enums';
+import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
 import { getDailiesOfDay } from './utils/daily_selector';
+import { DAILY_DEFINITIONS } from '../shared/config/dailies';
 import EquipmentCard from './cards/types/equipment_card';
 
 function performWithSessionTokenCheck(
@@ -138,7 +139,7 @@ export default function restAPI(app: Express) {
           username: u.username,
           email: u.email
         };
-        res.status(200).send(payload);
+        res.status(200).send(typedPayload);
       },
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 401 : 500)
     );
@@ -328,22 +329,14 @@ export default function restAPI(app: Express) {
   app.get('/api/daily', (req, res) => {
     const sendDailyResponse = (daily: DBDaily) => {
       const dailiesOfDay = getDailiesOfDay();
-      const payload: DailyGetResponse = {
-        login: dailiesOfDay.includes(DailyType.Login) ? daily.login : null,
-        victory: dailiesOfDay.includes(DailyType.Victory) ? daily.victory : null,
-        game: dailiesOfDay.includes(DailyType.Game) ? daily.game : null,
-        energy: dailiesOfDay.includes(DailyType.Energy) ? daily.energy : null,
-        ships: dailiesOfDay.includes(DailyType.Ships) ? daily.ships : null,
-        domination: dailiesOfDay.includes(DailyType.Domination) ? daily.domination : null,
-        destruction: dailiesOfDay.includes(DailyType.Destruction) ? daily.destruction : null,
-        control: dailiesOfDay.includes(DailyType.Control) ? daily.control : null,
-        juggernaut: dailiesOfDay.includes(DailyType.Juggernaut) ? daily.juggernaut : null,
-        stations: dailiesOfDay.includes(DailyType.Stations) ? daily.stations : null,
-        discard: dailiesOfDay.includes(DailyType.Discard) ? daily.discard : null,
-        colony: dailiesOfDay.includes(DailyType.Colony) ? daily.colony : null,
-        colossus: dailiesOfDay.includes(DailyType.Colossus) ? daily.colossus : null
-      };
-      res.status(200).send(payload);
+      // Generate payload dynamically from daily definitions
+      const typedPayload: Record<string, boolean | null> = {};
+      DAILY_DEFINITIONS.forEach(dailyDef => {
+        const dailyValue = daily[dailyDef.dbColumn];
+        typedPayload[dailyDef.dbColumn] = dailiesOfDay.includes(dailyDef.type) ? dailyValue : null;
+      });
+
+      res.status(200).send(typedPayload as DailyGetResponse);
     };
     performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse, reason =>
