@@ -167,15 +167,20 @@ npm run format && npm run lint && npm run test
 
 5. Reply to comment:
 ```bash
+# First, find the review ID for the comment
+REVIEW_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/${pr_number}/comments/${commentId}" | jq -r '.pull_request_review_id')
+
+# Then reply to the comment in the review thread
 curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"body\": \"@${AUTHOR} [Explain changes made]\"}" \
-  "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies"
+  -d "{\"body\": \"@${AUTHOR} [Explain changes made]\", \"in_reply_to\": ${commentId}}" \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/${pr_number}/reviews/${REVIEW_ID}/comments"
 ```
 
 **CRITICAL**: Always reply in same thread using `@username`
 **CRITICAL**: Never edit existing comments or create new top-level comments
-**CRITICAL**: Use exact URL format shown above
+**CRITICAL**: Use the review ID and in_reply_to field to ensure proper threading
 
 6. Mark implementation todo as completed:
 ```bash
