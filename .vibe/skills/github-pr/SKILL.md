@@ -129,7 +129,7 @@ comments.forEach(comment => {
   
   todos.push({
     id: `resp_${commentId}`,
-    content: `Reply to comment ${commentId} in GitHub`,
+    content: `Reply on GitHub in thread of comment ${commentId}`,
     status: "pending",
     priority: "medium"
   });
@@ -165,7 +165,9 @@ todo write --update '{"id": "impl_${commentId}", "status": "in_progress"}'
 npm run format && npm run lint && npm run test
 ```
 
-4. **Reply to the comment on GitHub**
+4. **Commit and push changes**
+
+5. **Reply to the comment on GitHub**
 
 **IMPORTANT**: Always reply to comments in the same thread, never edit them or create new comments. Address the original author using `@username`.
 
@@ -198,24 +200,24 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 All tests pass and the functionality has been verified.
 ```
 
-5. **Mark implementation todo as completed**
+6. **Mark implementation todo as completed**
 ```bash
 todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
 ```
 
-6. **Mark response todo as completed**
+7. **Mark response todo as completed**
 ```bash
 todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 ```
 
-7. **Verify the reply was posted in the correct thread**
+8. **Verify the reply was posted in the correct thread**
 ```bash
 # Check that the reply appears in the comment thread
 curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies" | jq '.[] | select(.body | contains("@${AUTHOR}"))'
 ```
 
-8. **Move to next comment**
+9. **Move to next comment**
 
 ### 8. Cleanup
 Remove all temporary files, which you might have created in the previous steps. These are e.g.:
