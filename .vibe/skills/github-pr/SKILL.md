@@ -1,8 +1,4 @@
---- 
-name: github-pr
-description: Instruction to follow, when instructed to create or work on an existing GitHub pull request
-user-invocable: true
----
+# Skill: github-pr
 
 # GitHub Pull Request Skill
 
@@ -31,16 +27,109 @@ curl -s -H "Authorization: token $GITHUB_TOKEN" \
 git checkout {pr_branch_name}
 ```
 
-### 3. Collect Unresolved Comments (Simplified)
+### 3. Collect Unresolved Comments (GraphQL API - Recommended)
 
-Use this Node.js script to avoid complex bash/jq issues:
+For accurate resolution tracking, use the GitHub GraphQL API:
 
 ```javascript
-// save as collect_comments.js
+// save as collect_comments_graphql.js
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-async function collectComments() {
+async function collectCommentsWithGraphQL() {
+  const owner = "{owner}";
+  const repo = "{repo}";
+  const prNumber = {pr_number};
+  const token = process.env.GITHUB_TOKEN;
+  
+  // GitHub GraphQL query to get unresolved review threads
+  const query = `
+    query {
+      repository(owner: "${owner}", name: "${repo}") {
+        pullRequest(number: ${prNumber}) {
+          reviewThreads(first: 100) {
+            nodes {
+              isResolved
+              comments(first: 100) {
+                nodes {
+                  databaseId
+                  body
+                  path
+                  line
+                  author {
+                    login
+                  }
+                  createdAt
+                  updatedAt
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  
+  // Execute GraphQL query
+  const response = JSON.parse(execSync(
+    `curl -s -H "Authorization: bearer ${token}" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "${query.replace(/\\"/g, '\\\\"')}"}' \
+     https://api.github.com/graphql`
+  ).toString());
+  
+  // Extract unresolved comments from unresolved threads
+  const unresolvedComments = [];
+  
+  try {
+    const threads = response.data.repository.pullRequest.reviewThreads.nodes;
+    
+    threads.forEach(thread => {
+      if (!thread.isResolved) {
+        // This thread is unresolved, so all its comments are considered unresolved
+        thread.comments.nodes.forEach(comment => {
+          unresolvedComments.push({
+            id: comment.databaseId,
+            body: comment.body,
+            path: comment.path,
+            line: comment.line,
+            author: comment.author.login,
+            created_at: comment.createdAt,
+            updated_at: comment.updatedAt,
+            isResolved: false
+          });
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error parsing GraphQL response:', error);
+    console.log('Full response:', JSON.stringify(response, null, 2));
+  }
+  
+  fs.writeFileSync('unresolved_comments.json', JSON.stringify(unresolvedComments, null, 2));
+  console.log(`Found ${unresolvedComments.length} truly unresolved comments via GraphQL`);
+  
+  return unresolvedComments;
+}
+
+collectCommentsWithGraphQL().catch(console.error);
+```
+
+Run it with:
+```bash
+node collect_comments_graphql.js
+```
+
+### 3. Alternative: REST API with Heuristics (Fallback)
+
+If you cannot use GraphQL API, use this REST API version with temporal filtering:
+
+```javascript
+// save as collect_comments_rest.js
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+async function collectCommentsREST() {
   const owner = "{owner}";
   const repo = "{repo}";
   const prNumber = {pr_number};
@@ -49,75 +138,42 @@ async function collectComments() {
   // Fetch PR-level comments
   const prComments = JSON.parse(execSync(
     `curl -s -H "Authorization: token ${token}" \
+     https://api.github.com/repos/${owner}/${repo}/issues/${prNumber}/comments`
+  ).toString());
+  
+  // Fetch review comments
+  const reviewComments = JSON.parse(execSync(
+    `curl -s -H "Authorization: token ${token}" \
      https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}/comments`
   ).toString());
   
-  // Fetch all reviews
-  const allReviews = [];
-  let page = 1;
-  while (true) {
-    const reviews = JSON.parse(execSync(
-      `curl -s -H "Authorization: token ${token}" \
-       https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}/reviews?page=${page}&per_page=100`
-    ).toString());
-    
-    if (!reviews.length) break;
-    allReviews.push(...reviews);
-    
-    if (reviews.length < 100) break;
-    page++;
-  }
+  // Combine all comments
+  const allComments = [...prComments, ...reviewComments];
   
-  // Collect all unresolved comments
-  const unresolvedComments = [];
+  // Filter out responses (comments starting with @)
+  const potentialComments = allComments.filter(comment => !comment.body.startsWith('@'));
   
-  // Add PR-level unresolved comments
-  prComments.forEach(comment => {
-    if (!comment.resolved_at && !comment.body.startsWith('@')) {
-      unresolvedComments.push(comment);
-    }
+  // Use temporal filtering as heuristic for REST API limitations
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  
+  const unresolvedComments = potentialComments.filter(comment => {
+    const commentDate = new Date(comment.created_at);
+    return commentDate > twentyFourHoursAgo;
   });
   
-  // Add review comments
-  const commentedReviews = allReviews.filter(r => r.state === 'COMMENTED');
-  for (const review of commentedReviews) {
-    let reviewPage = 1;
-    while (true) {
-      const reviewComments = JSON.parse(execSync(
-        `curl -s -H "Authorization: token ${token}" \
-         https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}/reviews/${review.id}/comments?page=${reviewPage}&per_page=100`
-      ).toString());
-      
-      if (!reviewComments.length) break;
-      
-      reviewComments.forEach(comment => {
-        if (!comment.resolved_at && !comment.body.startsWith('@')) {
-          unresolvedComments.push(comment);
-        }
-      });
-      
-      if (reviewComments.length < 100) break;
-      reviewPage++;
-    }
-  }
+  fs.writeFileSync('unresolved_comments.json', JSON.stringify(unresolvedComments, null, 2));
+  console.log(`Found ${unresolvedComments.length} recent comments via REST API (last 24 hours)`);
+  console.log('Note: REST API cannot determine true resolution status - use GraphQL for accuracy');
   
-  // Remove duplicates by ID
-  const uniqueComments = Array.from(new Map(
-    unresolvedComments.map(c => [c.id, c])
-  ).values());
-  
-  fs.writeFileSync('unresolved_comments.json', JSON.stringify(uniqueComments, null, 2));
-  console.log(`Found ${uniqueComments.length} unresolved comments`);
-  
-  return uniqueComments;
+  return unresolvedComments;
 }
 
-collectComments().catch(console.error);
+collectCommentsREST().catch(console.error);
 ```
 
 Run it with:
 ```bash
-node collect_comments.js
+node collect_comments_rest.js
 ```
 
 ### 4. Generate Todos (Simplified)
@@ -131,7 +187,7 @@ const todos = [];
 
 comments.forEach(comment => {
   const commentId = comment.id;
-  const shortBody = comment.body.substring(0, 60).replace(/[\"\\]/g, '').replace(/\n/g, ' ');
+  const shortBody = comment.body.substring(0, 60).replace(/["\\]/g, '').replace(/\n/g, ' ');
   
   todos.push({
     id: `impl_${commentId}`,
@@ -172,36 +228,43 @@ todo write --file generated_todos.json
 ## Key Improvements
 
 ### Fixed Issues:
-1. **No more duplicate todos** - Proper deduplication using Map
-2. **Simplified API calls** - Using Node.js instead of complex bash/jq
-3. **Better error handling** - Native JavaScript error handling
-4. **No quoting/escaped issues** - Avoids bash command substitution problems
+1. **Accurate resolution tracking** - GraphQL API provides `isResolved` field
+2. **Fallback option** - REST API with temporal filtering for limited access
+3. **Better error handling** - Proper GraphQL response parsing
+4. **Clear documentation** - Explains API limitations and workarounds
 
-### Simplified Workflow:
-- Reduced from 500+ lines to ~100 lines
-- Uses reliable Node.js scripts instead of error-prone bash
-- Clear separation of concerns
-- Easier to maintain and debug
+### API Comparison:
+
+| Approach | Resolution Accuracy | Requirements | Complexity |
+|----------|-------------------|--------------|------------|
+| GraphQL | ✅ Perfect - uses `isResolved` field | Personal access token | Moderate |
+| REST | ⚠️ Heuristic - temporal filtering | Basic auth | Simple |
 
 ### Best Practices:
-1. **Always deduplicate** - Use `Array.from(new Map(values))` pattern
-2. **Check for resolved comments** - Filter by `resolved_at == null`
-3. **Exclude responses** - Filter out comments starting with `@`
-4. **Use proper tools** - Node.js for complex JSON manipulation
-5. **Keep it simple** - Avoid over-engineering the workflow
+1. **Use GraphQL when possible** - For accurate resolution status
+2. **Fallback to REST** - When GraphQL is not available
+3. **Document limitations** - Be clear about heuristic approaches
+4. **Error handling** - Handle API response parsing carefully
+5. **Conservative filtering** - Better to miss some than create false todos
 
-## Error Handling
+## Important Limitations
 
-### Common Issues:
-- **Rate limiting**: Add `sleep` between API calls if needed
-- **Network errors**: Wrap API calls in try/catch
-- **Invalid JSON**: Validate responses before parsing
-- **Duplicate IDs**: Always deduplicate by comment ID
+### REST API Limitations:
+- **No resolution tracking**: GitHub REST API doesn't include resolution status for review comments
+- **Heuristic approach**: Temporal filtering is a practical workaround but not perfect
+- **Manual verification needed**: Always review the generated todos
+
+### GraphQL API Advantages:
+- **Accurate resolution status**: `isResolved` field on review threads
+- **Thread-level tracking**: Resolution applies to entire comment threads
+- **Comprehensive data**: Includes all comment metadata in one query
 
 ## Verification
 
 Before starting work:
-1. Check todo count matches comment count
+1. Check todo count matches your expectation
 2. Verify no duplicate comment IDs
 3. Ensure you're on the correct branch
 4. Confirm clean working directory
+
+Base directory for this skill: /home/christopher/Dokumente/outer-colonies/.vibe/skills/github-pr
