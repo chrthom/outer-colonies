@@ -1,5 +1,6 @@
 import { DailyType } from '../../shared/config/enums';
 import DBDailiesDAO from '../persistence/db_dailies';
+import DBCredentialsDAO from '../persistence/db_credentials';
 import AuthUtils from './auth';
 
 describe('AuthUtils', () => {
@@ -18,7 +19,6 @@ describe('AuthUtils', () => {
       };
 
       // Mock the getByUsername method to return our mock credential
-      import DBCredentialsDAO from '../persistence/db_credentials';
       jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockCredential);
       jest.spyOn(DBCredentialsDAO, 'login').mockResolvedValue('test-token');
 
