@@ -43,14 +43,26 @@ cd /path/to/repo && git remote -v
 
 ### 4. Perform implementation
 - Breakdown the issue into todos and implement them one by one.
-- Run format, lint and test before git commit and git push.
+- Follow the validation loop before committing.
 
-### 5. Issue Management
+### 5. Validation Loop
+After implementation:
+1. Run quality checks: `npm run format && npm run lint && npm run test`
+2. If any step fails, fix issues and repeat
+3. Only proceed to commit when all checks pass
+
+### 6. Gotchas
+- Always check for existing branches before creating new ones
+- Never work directly on main branch
+- Ensure GITHUB_TOKEN environment variable is set before API calls
+- The issue description may contain hidden requirements - read carefully
+
+### 7. Issue Management
 - Update the GitHub issue you are working on via GitHub API.
 - **Subtask Management**: Update `- [ ]` to `- [x]` markers for completed subtasks.
 - **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
 
-### 6. Create Pull Request (PR)
+### 8. Create Pull Request (PR)
 - **First Push**: Only create, if it does not exist yet.
 - **Title Format**: `#<issue_id> : <description>`
 - **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
