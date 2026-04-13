@@ -20,10 +20,11 @@ export class HomePage implements OnInit {
 
   dailies: Daily[] = this.generateDailiesArray();
   selectedDaily = 1;
+  private autoAdvanceInterval: any;
 
   ngOnInit() {
     this.reload();
-    setInterval(this.showNextDaily(this.dailies.length), 3000);
+    this.startAutoAdvance();
   }
 
   reload() {
@@ -56,6 +57,17 @@ export class HomePage implements OnInit {
     return () => {
       if (++this.selectedDaily >= length) this.selectedDaily = 0;
     };
+  }
+
+  private startAutoAdvance() {
+    this.autoAdvanceInterval = setInterval(this.showNextDaily(this.dailies.length), 3000);
+  }
+
+  private resetAutoAdvance() {
+    if (this.autoAdvanceInterval) {
+      clearInterval(this.autoAdvanceInterval);
+    }
+    this.startAutoAdvance();
   }
 
   // Helper function to determine which dailies are available today

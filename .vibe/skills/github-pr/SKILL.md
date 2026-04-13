@@ -121,21 +121,20 @@ comments.forEach(comment => {
   todos.push({
     id: `impl_${commentId}`,
     content: `Address comment ${commentId}: ${shortBody} - ${comment.path}`,
-    status: "pending",
-    priority: "high"
+    status: "pending"
   });
   
   todos.push({
     id: `resp_${commentId}`,
     content: `Reply on GitHub in thread of comment ${commentId}`,
-    status: "pending",
-    priority: "medium"
+    status: "pending"
   });
 });
 
 todos.push(
-  {id: "qa_format", content: "Run format, lint, and test", status: "pending", priority: "high"},
-  {id: "qa_github", content: "Check GitHub Actions status", status: "pending", priority: "high"}
+  {id: "qa_quality", content: "Run format, lint, and test", status: "pending"},
+  {id: "qa_github", content: "Check GitHub Actions status", status: "pending"},
+  {id: "qa_cleanup", content: "Cleanup temporary files", status: "pending"}
 );
 
 fs.writeFileSync('generated_todos.json', JSON.stringify(todos, null, 2));
@@ -147,25 +146,40 @@ console.log(`Generated ${todos.length} todos`);
 todo write --file generated_todos.json
 ```
 
-### 6. Process Comments
+### 6. Process Todos
 
-For each comment:
+#### 6.1 Todos to "Address comment"
 
 1. Mark todo as in_progress:
+
 ```bash
 todo write --update '{"id": "impl_${commentId}", "status": "in_progress"}'
 ```
 
 2. Implement required changes
 
-3. Run quality checks:
+3. Run quality checks and fix them if necessary:
 ```bash
 npm run format && npm run lint && npm run test
 ```
 
 4. Commit and push changes
 
-5. Reply to comment:
+5. Mark response todo as completed:
+```bash
+todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
+```
+
+#### 6.2 Todos to "Reply on GitHub in thread of comment"
+
+1. Mark todo as in_progress:
+
+```bash
+todo write --update '{"id": "resp_${commentId}", "status": "in_progress"}'
+```
+
+2. Reply to comment:
+
 ```bash
 # First, find the review ID for the comment
 REVIEW_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
@@ -182,23 +196,18 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 **CRITICAL**: Never edit existing comments or create new top-level comments
 **CRITICAL**: Use the review ID and in_reply_to field to ensure proper threading
 
-6. Mark implementation todo as completed:
-```bash
-todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
-```
-
-7. Mark response todo as completed:
-```bash
-todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
-```
-
-8. Verify reply was posted:
+3. Verify reply was posted:
 ```bash
 curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies" | jq '.[] | select(.body | contains("@${AUTHOR}"))'
 ```
+4. Mark response todo as completed:
+```bash
+todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
+```
 
-### 7. Cleanup
+#### 6.4 Cleanup temporary files
+
 Remove temporary files:
 - collect_comments_graphql.js
 - generate_todos.js
