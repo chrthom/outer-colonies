@@ -17,47 +17,60 @@ This skill provides instructions for working on GitHub pull requests in a struct
 
 ## Systematic Workflow
 
-### 1. Start from main branch
-- Checkout the main branch, if currently on any other branch
-- `git pull` on main branch
+### 1. Create Pull Request (PR)
+- **First Push**: Only create, if it does not exist yet.
+- **Title Format**: `#<issue_id> : <description>`
+- **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
 
-### 2. Fetch GitHub issue
-
-To fetch issue details using the GitHub API, use the following `curl` command:
-
+### 2. Fetch GitHub pull request
+Use the GitHub API to fetch PR details:
 ```bash
-curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/<owner>/<repo>/issues/<issue_number>
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}
 ```
-
-Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
 
 **Note**: First determine the correct repository owner and name by checking the git remote:
 ```bash
 cd /path/to/repo && git remote -v
 ```
 
-### 3. Create a branch
-- **Format**: 
-  - For features: `feature/<issue_number>_<description>`
-  - For bugfixes: `bugfix/<issue_number>_<description>`
-- **Check for Existing Branch**: If a branch with the same name exists, create a new one with a slightly different name.
-- **No main branch**: Never work directly on the main branch.
+### 3. Check all unresolved comments
+Fetch all review comments:
+```bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments
+```
 
-### 4. Perform implementation
-- Breakdown the issue into todos and implement them one by one.
-- Run format, lint and test before git commit and git push
+- Filter comments where `resolved_at` is null
+- Group comments by file and line number
+- Create todos for each unresolved comment thread
+- Include comment ID in todo for later reference
 
-### 5. Create Pull Request (PR)
-- **First Push**: Only create, if it does not exist yet.
-- **Title Format**: `#<issue_id> : <description>`
-- **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
+### 4. Check all GitHub Actions checks
+Fetch check runs:
+```bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}/check-runs
+```
 
-### 6. Issue Management
-- Update the GitHub issue you are working on via GitHub API.
-- **Subtask Management**: Update `- [ ]` to `- [x]` markers for completed subtasks.
-- **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
+- If checks are still running, wait and fetch again after 15 seconds (wait up to 3 minutes in total for them to complete).
+- For failing checks:
+  - Fetch detailed logs
+  - Parse error messages
+  - Create specific todos for each failure
 
-### 7. Check GitHub Actions checks
-- Wait for the GitHub Actions checks of the PR to be completed
-- If checks failed, create todos to fix them and start over at step "3. Perform implementation"
+### 5. Perform implementation
+- Work on the created todos one by one.
+- Run format, lint and test before git commit and git push.
+
+### 6. Respond to comments
+Post responses to review comments using the GitHub API:
+```bash
+curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments/{comment_id}/replies \
+  -d '{"body":"@<reviewer> I have addressed your comment by <describe changes>. Please review."}'
+```
+
+## Error Handling
+- **Rate Limits**: Check `X-RateLimit-Remaining` header and wait if needed
+- **Retry Logic**: Implement exponential backoff for API errors
