@@ -119,3 +119,19 @@ export enum APIRejectReason {
   NotFound = 'not_found',
   ConditionNotMet = 'condition_not_met'
 }
+
+export enum DailyType {
+  Login = 'login',
+  Victory = 'victory',
+  Game = 'game',
+  Energy = 'energy',
+  Ships = 'ships',
+  Domination = 'domination',
+  Destruction = 'destruction',
+  Control = 'control',
+  Juggernaut = 'juggernaut',
+  Stations = 'stations',
+  Discard = 'discard',
+  Colony = 'colony',
+  Colossus = 'colossus'
+}

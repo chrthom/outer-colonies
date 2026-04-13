@@ -26,15 +26,20 @@
   </div>
   <div id="daily-box" class="inner-box">
     <oc-content-box title="Tägliche Aufgaben">
-      <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedDaily">
+      <mat-tab-group
+        headerPosition="below"
+        [(selectedIndex)]="selectedDaily"
+        (selectedIndexChange)="resetAutoAdvance()"
+      >
         @for (daily of dailies; track daily) {
         <mat-tab label="&oplus;">
           <h3>{{ daily.title }}</h3>
           <p>{{ daily.description }}</p>
           @if (daily.achieved) {
           <span>
-            <h4 class="daily-done">Erledigt!</h4>
-            <i> {{ daily.sol }} Sol erhalten</i>
+            <i>Erledigt: </i>
+            <h4 class="daily-done">{{ daily.sol }} Sol</h4>
+            <i> erhalten</i>
           </span>
           } @if (!daily.achieved) {
           <span>

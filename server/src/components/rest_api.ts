@@ -28,6 +28,8 @@ import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
 import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
+import { getDailiesOfDay } from './utils/daily_selector';
+import { DAILY_DEFINITIONS } from '../shared/config/dailies';
 import EquipmentCard from './cards/types/equipment_card';
 
 function performWithSessionTokenCheck(
@@ -326,8 +328,17 @@ export default function restAPI(app: Express) {
   // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
     const sendDailyResponse = (daily: DBDaily) => {
-      const payload: DailyGetResponse = daily;
-      res.status(200).send(payload);
+      const dailiesOfDay = getDailiesOfDay();
+      // Generate payload dynamically from daily definitions
+      const typedPayload: DailyGetResponse = {} as DailyGetResponse;
+      DAILY_DEFINITIONS.forEach(dailyDef => {
+        const dailyValue = daily[dailyDef.dbColumn];
+        typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+          ? dailyValue
+          : null;
+      });
+
+      res.status(200).send(typedPayload);
     };
     performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse, reason =>
@@ -440,4 +451,33 @@ export default function restAPI(app: Express) {
         });
     });
   });
+}
+// Export the daily response function for testing
+export async function getDailies(userId: number): Promise<DailyGetResponse> {
+  const daily = await DBDailiesDAO.getByUserId(userId);
+  const dailiesOfDay = getDailiesOfDay();
+  // Generate payload dynamically from daily definitions
+  const typedPayload: DailyGetResponse = {} as DailyGetResponse;
+  DAILY_DEFINITIONS.forEach(dailyDef => {
+    const dailyValue = daily[dailyDef.dbColumn];
+    typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+      ? dailyValue
+      : null;
+  });
+
+  return typedPayload;
+}
+
+export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
+  const dailiesOfDay = getDailiesOfDay();
+  // Generate payload dynamically from daily definitions
+  const typedPayload: DailyGetResponse = {} as DailyGetResponse;
+  DAILY_DEFINITIONS.forEach(dailyDef => {
+    const dailyValue = daily[dailyDef.dbColumn];
+    typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+      ? dailyValue
+      : null;
+  });
+
+  return typedPayload;
 }

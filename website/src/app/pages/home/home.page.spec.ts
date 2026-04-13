@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HomePage } from './home.page';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
@@ -45,51 +45,53 @@ describe('HomePage', () => {
     expect(component.selectedDaily).toBe(1);
   });
 
-  it('should reload dailies on init', () => {
+  it('should reload dailies on init', fakeAsync(() => {
+    spyOn(component, 'reload').and.callThrough();
+    fixture.detectChanges();
+
+    // Create a mock response with specific available dailies
     const mockResponse: DailyGetResponse = {
       login: true,
       victory: false,
       game: true,
       energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
+      ships: null,
+      domination: null,
+      destruction: null,
+      control: null,
+      juggernaut: null,
+      stations: null,
+      discard: null,
+      colony: null,
+      colossus: null
     };
-
-    spyOn(component, 'reload').and.callThrough();
-    fixture.detectChanges();
 
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
 
+    tick(); // Wait for async operations to complete
+    fixture.detectChanges();
+
     expect(component.reload).toHaveBeenCalled();
+    // Only available dailies should be shown (first 4), and only login and game should be achieved
+    expect(component.dailies.length).toBe(4);
     expect(component.dailies[0].achieved).toBeTrue();
     expect(component.dailies[1].achieved).toBeFalse();
-  });
+    expect(component.dailies[2].achieved).toBeTrue();
+    expect(component.dailies[3].achieved).toBeFalse();
+  }));
 
   it('should cycle through dailies automatically', () => {
-    const mockResponse: DailyGetResponse = {
-      login: true,
-      victory: false,
-      game: true,
-      energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
-    };
+    const mockResponse: DailyGetResponse = {};
+    // Initialize with all daily columns set to null or boolean values
+    component.dailies.forEach((daily, index) => {
+      // Extract the daily key from the matcherStr property or matcher function
+      const matcherStr = daily.matcherStr || daily.matcher.toString();
+      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
+      const dailyKey = match ? match[1] : `daily${index}`;
+      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
+    });
 
     fixture.detectChanges();
 
@@ -112,21 +114,15 @@ describe('HomePage', () => {
   });
 
   it('should render welcome message', () => {
-    const mockResponse: DailyGetResponse = {
-      login: true,
-      victory: false,
-      game: true,
-      energy: false,
-      ships: true,
-      domination: false,
-      destruction: false,
-      control: false,
-      juggernaut: false,
-      stations: false,
-      discard: false,
-      colony: false,
-      colossus: false
-    };
+    const mockResponse: DailyGetResponse = {};
+    // Initialize with all daily columns set to null or boolean values
+    component.dailies.forEach((daily, index) => {
+      // Extract the daily key from the matcherStr property or matcher function
+      const matcherStr = daily.matcherStr || daily.matcher.toString();
+      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
+      const dailyKey = match ? match[1] : `daily${index}`;
+      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
+    });
 
     fixture.detectChanges();
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
