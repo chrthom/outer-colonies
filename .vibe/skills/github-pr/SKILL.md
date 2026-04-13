@@ -177,9 +177,17 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies"
 ```
 
-- **CRITICAL**: Always post replies to comments in the same thread using the `/pulls/comments/{comment_id}/replies` endpoint
-- **CRITICAL**: Never edit existing comments or create new top-level comments
-- **CRITICAL**: Always address the original comment author using `@username` in replies
+**CRITICAL**: Never edit existing comments or create new top-level comments
+**CRITICAL**: Always address the original comment author using `@username` in replies
+**CRITICAL**: Use the exact URL format: `https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies`
+
+**Example with real values**:
+```bash
+curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"body\": \"@chrthom I have addressed your comment by changing the interface type.\"}" \
+  "https://api.github.com/repos/chrthom/outer-colonies/pulls/comments/3074176232/replies"
+```
 
 **Example reply format**:
 ```
@@ -200,7 +208,14 @@ todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
 todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 ```
 
-7. **Move to next comment**
+7. **Verify the reply was posted in the correct thread**
+```bash
+# Check that the reply appears in the comment thread
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies" | jq '.[] | select(.body | contains("@${AUTHOR}"))'
+```
+
+8. **Move to next comment**
 
 ### 8. Cleanup
 Remove all temporary files, which you might have created in the previous steps. These are e.g.:
