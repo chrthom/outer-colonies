@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
 import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
+import AnimationConfig from '../config/animation';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;
