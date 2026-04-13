@@ -1,19 +1,19 @@
 --- 
-name: github-workflow
-description: Instruction to follow, when instructed to work on GitHub issue
+name: github-pr
+description: Instruction to follow, when instructed to create or work on an existing GitHub pull request
 user-invocable: true
 ---
 
-# GitHub Workflow Skill
+# GitHub Pull Request Skill
 
-This skill provides instructions for working on GitHub issues in a structured manner.
+This skill provides instructions for working on GitHub pull requests in a structured manner.
 
 ## When to use
 
-- Should work on an GitHub issue (references e.g. with #123)
-- Fetch information from GitHub
-- Check for a failing GitHub Actions check
-- Create Pull Requests
+- Should work on an GitHub pull request (references e.g. PR #567)
+- Check for a failing GitHub Actions checks
+- Create pull requests
+- Check review comments in a pull request
 
 ## Systematic Workflow
 
