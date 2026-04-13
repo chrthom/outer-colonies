@@ -7,7 +7,7 @@ import { isDailyOfDay } from '../utils/daily_selector';
 // DBDaily interface with dynamic properties for all daily columns
 export interface DBDaily {
   userId: number;
-  [key: string]: boolean | number; // Dynamic properties for all daily columns (booleans) + userId (number)
+  [key: string]: boolean | number | null; // Dynamic properties for all daily columns (booleans) + userId (number)
 }
 
 export default class DBDailiesDAO {
@@ -29,16 +29,17 @@ export default class DBDailiesDAO {
     );
 
     return queryResult.map(r => {
-      const daily: DBDaily = {
-        userId: Number(r.user_id)
-      };
+      // Dynamically add all daily properties using map
+      const dailyProperties = DAILY_DEFINITIONS.map(dailyDef => ({
+        [dailyDef.dbColumn]: Boolean(r[dailyDef.dbColumn])
+      }));
 
-      // Dynamically add all daily properties
-      DAILY_DEFINITIONS.forEach(dailyDef => {
-        daily[dailyDef.dbColumn] = Boolean(r[dailyDef.dbColumn]);
-      });
-
-      return daily;
+      return dailyProperties.reduce(
+        (daily: DBDaily, prop) => {
+          return { ...daily, ...prop };
+        },
+        { userId: Number(r.user_id) } as DBDaily
+      );
     });
   }
 

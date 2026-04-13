@@ -330,13 +330,15 @@ export default function restAPI(app: Express) {
     const sendDailyResponse = (daily: DBDaily) => {
       const dailiesOfDay = getDailiesOfDay();
       // Generate payload dynamically from daily definitions
-      const typedPayload: Record<string, boolean | null> = {};
+      const typedPayload: DailyGetResponse = {} as DailyGetResponse;
       DAILY_DEFINITIONS.forEach(dailyDef => {
         const dailyValue = daily[dailyDef.dbColumn];
-        typedPayload[dailyDef.dbColumn] = dailiesOfDay.includes(dailyDef.type) ? dailyValue : null;
+        typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+          ? dailyValue
+          : null;
       });
 
-      res.status(200).send(typedPayload as DailyGetResponse);
+      res.status(200).send(typedPayload);
     };
     performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse, reason =>

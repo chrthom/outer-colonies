@@ -43,6 +43,7 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 - Group comments by file and line number
 - Create todos for each unresolved comment thread
 - Include comment ID in todo for later reference
+- Make sure you missed no comment and that you created one todo for every unresolved comment
 
 ### 4. Check all GitHub Actions checks
 Fetch check runs:
@@ -72,7 +73,7 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 - It is also allowed to not solve the issue but respond with a question to the comment.
 - Always respond directly to the comment instead of creating a new comment.
 - Create one respond at a time (one GitHub API call per respond).
-- In any case you should **always respond** to every unresolved comment.
+- In any case you should **always respond** to **every unresolved comment**.
 
 ### 7. Check all GitHub Actions checks again
 - Check all GitHub actions checks again (same as in step 4.).
