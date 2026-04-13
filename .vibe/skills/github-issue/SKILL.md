@@ -51,6 +51,6 @@ cd /path/to/repo && git remote -v
 - **Commenting**: Comment on the GitHub issue if necessary to provide updates or clarifications.
 
 ### 6. Create Pull Request (PR)
-- Use the GitHub Pull Request Skill to create a pull request in GitHub.
-
-
+- **First Push**: Only create, if it does not exist yet.
+- **Title Format**: `#<issue_id> : <description>`
+- **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
