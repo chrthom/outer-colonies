@@ -40,10 +40,27 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 ```
 
 - Filter comments where `resolved_at` is null
+- **Exclude responses**: Filter out comments that start with "@<username>" as these are responses, not original review comments
 - Group comments by file and line number
 - Create todos for each unresolved comment thread
 - Include comment ID in todo for later reference
 - Make sure you missed no comment and that you created one todo for every unresolved comment
+
+### 3.1. Check for additional review comments
+Also fetch all reviews to find additional comments:
+```bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews
+```
+
+- For each review with state "COMMENTED", fetch the specific review comments:
+```bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews/{review_id}/comments
+```
+
+- Apply the same filtering logic as above to identify unresolved comments
+- Create additional todos for any new unresolved comments found
 
 ### 4. Check all GitHub Actions checks
 Fetch check runs:
