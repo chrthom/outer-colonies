@@ -73,6 +73,10 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 
 It is also allowed to not solve the issue but respond with a question to the comment.
 
+### 7. Check all GitHub Actions checks again
+- Check all GitHub actions checks again (same as in step 4.).
+- If a check fails, go back to step 4 to analyze and fix the errors.
+
 ## Error Handling
-- **Rate Limits**: Check `X-RateLimit-Remaining` header and wait if needed
-- **Retry Logic**: Implement exponential backoff for API errors
+- **Rate Limits**: Check `X-RateLimit-Remaining` header and wait if needed.
+- **Retry Logic**: Implement exponential backoff for API errors.
