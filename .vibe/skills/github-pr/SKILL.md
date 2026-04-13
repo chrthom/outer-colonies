@@ -1,4 +1,8 @@
-# Skill: github-pr
+--- 
+name: github-pr
+description: Instruction to follow, when instructed to work on GitHub pull request
+user-invocable: true
+---
 
 # GitHub Pull Request Skill
 
