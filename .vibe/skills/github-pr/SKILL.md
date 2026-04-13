@@ -30,7 +30,7 @@ cd /path/to/repo && git remote -v
 ```
 
 ### 2. Checkout PR branch
-- Locally checkout the branch that the PR is using
+Locally checkout the branch that the PR is using
 
 ### 3. Check all unresolved comments
 Fetch **all** review comments:
@@ -51,21 +51,27 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
   https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews/{review_id}/comments
 ```
 
-### 4. Filter comments and create todos
+### 4. Filter comments
 - Only work with comments where `resolved_at` is null, ignore all others.
 - **Exclude responses**: Filter out comments that start with "@<username>" as these are responses, not original review comments.
-- Group comments by file and line number.
+
+### 5. Create ToDos
+Create the todos in this order:
 - Create todos for each unresolved comment thread:
   - Create a todo to work on the comment (analyse or fix it)
   - Always create one todo per comment to respond to the comment
-- Include comment ID in todo for later reference.
+  - Include comment ID in todo for later reference.
+- Create a todo to run format, lint and test and fix it if necessary
+- Create one todo to check the GitHub checks succeeded
 
-### 5. Perform implementation and respond
-- Work on the created todos one by one.
+### 6. Work on todos
+Work on the created todos one by one.
+
+#### 6.1 For todos that include implementation
 - Run format, lint and test before git commit and git push.
+- If lint or format do fail, fix them and run them again until they pass.
 
-For todos that include responding to a comment:
-
+#### 6.2 For todos that include responding to a comment
 Post responses to review comments using the GitHub API:
 ```bash
 curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
@@ -78,10 +84,7 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 - Create one respond at a time (one GitHub API call per respond).
 - In any case you should **always respond** to **every unresolved comment**.
 
-### 6. Check all GitHub Actions checks again
-- Run `npm run lint` and `npm run test` one last time to check that they pass. If not, fix them and run them again until they pass.
-- Push your changes if there are any left.
-
+#### 6.3 For todos to check GitHub Actions checks
 Check all GitHub actions:
 
 Fetch check runs:
