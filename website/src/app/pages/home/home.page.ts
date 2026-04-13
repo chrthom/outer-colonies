@@ -63,7 +63,7 @@ export class HomePage implements OnInit {
     this.autoAdvanceInterval = setInterval(this.showNextDaily(this.dailies.length), 3000);
   }
 
-  private resetAutoAdvance() {
+  resetAutoAdvance() {
     if (this.autoAdvanceInterval) {
       clearInterval(this.autoAdvanceInterval);
     }
