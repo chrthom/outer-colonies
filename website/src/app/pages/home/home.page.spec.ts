@@ -72,9 +72,9 @@ describe('HomePage', () => {
     const mockResponse: DailyGetResponse = {};
     // Initialize with all daily columns set to null or boolean values
     component.dailies.forEach((daily, index) => {
-      // Extract the daily key from the matcher function
-      const matcherStr = daily.matcher.toString();
-      const match = matcherStr.match(/r['(\w+)']/);
+      // Extract the daily key from the matcherStr property or matcher function
+      const matcherStr = daily.matcherStr || daily.matcher.toString();
+      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
       const dailyKey = match ? match[1] : `daily${index}`;
       mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
     });
@@ -103,9 +103,9 @@ describe('HomePage', () => {
     const mockResponse: DailyGetResponse = {};
     // Initialize with all daily columns set to null or boolean values
     component.dailies.forEach((daily, index) => {
-      // Extract the daily key from the matcher function
-      const matcherStr = daily.matcher.toString();
-      const match = matcherStr.match(/r['(\w+)']/);
+      // Extract the daily key from the matcherStr property or matcher function
+      const matcherStr = daily.matcherStr || daily.matcher.toString();
+      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
       const dailyKey = match ? match[1] : `daily${index}`;
       mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
     });
