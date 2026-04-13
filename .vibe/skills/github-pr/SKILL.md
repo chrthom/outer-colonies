@@ -182,6 +182,10 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/{owner}/{repo}/issues/${pr_number}/comments"
 ```
 
+- **CRITICAL**: Always post replies to comments, never edit existing comments
+- **CRITICAL**: Always address the original comment author using `@username` in replies
+- Use the PR issues endpoint for replies: `/repos/{owner}/{repo}/issues/{pr_number}/comments`
+
 **Example reply format**:
 ```
 @chrthom I have addressed your comment by [explain changes]. The changes include:
@@ -209,8 +213,3 @@ todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 - Uses `isResolved` field for accurate comment resolution tracking
 - Always verify generated todos before starting work
 - Temporary files (`unresolved_comments.json`, `generated_todos.json`) should be cleaned up after use
-- **CRITICAL**: Always post replies to comments, never edit existing comments
-- **CRITICAL**: Always address the original comment author using `@username` in replies
-- Use the PR issues endpoint for replies: `/repos/{owner}/{repo}/issues/{pr_number}/comments`
-
-Base directory for this skill: /home/christopher/Dokumente/outer-colonies/.vibe/skills/github-pr
