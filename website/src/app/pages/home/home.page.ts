@@ -72,7 +72,7 @@ export class HomePage implements OnInit {
   // Generate dailies array dynamically from centralized definitions
   private generateDailiesArray(): Daily[] {
     return DAILY_DEFINITIONS.map(dailyDef => ({
-      matcher: (r: DailyGetResponse) => r[dailyDef.dbColumn as keyof DailyGetResponse] ?? false,
+      matcher: (r: DailyGetResponse) => Boolean(r[dailyDef.dbColumn as keyof DailyGetResponse] ?? false),
       matcherStr: `r.${dailyDef.dbColumn}`, // For compatibility with existing filtering logic
       title: dailyDef.title,
       description: dailyDef.description,

@@ -33,8 +33,9 @@
           <p>{{ daily.description }}</p>
           @if (daily.achieved) {
           <span>
-            <h4 class="daily-done">Erledigt!</h4>
-            <i> {{ daily.sol }} Sol erhalten</i>
+            <i>Erledigt: </i>
+            <h4 class="daily-done">{{ daily.sol }} Sol</h4>
+            <i> erhalten</i>
           </span>
           } @if (!daily.achieved) {
           <span>

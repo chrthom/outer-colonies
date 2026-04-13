@@ -452,3 +452,32 @@ export default function restAPI(app: Express) {
     });
   });
 }
+// Export the daily response function for testing
+export async function getDailies(userId: number): Promise<DailyGetResponse> {
+  const daily = await DBDailiesDAO.getByUserId(userId);
+  const dailiesOfDay = getDailiesOfDay();
+  // Generate payload dynamically from daily definitions
+  const typedPayload: DailyGetResponse = {} as DailyGetResponse;
+  DAILY_DEFINITIONS.forEach(dailyDef => {
+    const dailyValue = daily[dailyDef.dbColumn];
+    typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+      ? dailyValue
+      : null;
+  });
+
+  return typedPayload;
+}
+
+export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
+  const dailiesOfDay = getDailiesOfDay();
+  // Generate payload dynamically from daily definitions
+  const typedPayload: DailyGetResponse = {} as DailyGetResponse;
+  DAILY_DEFINITIONS.forEach(dailyDef => {
+    const dailyValue = daily[dailyDef.dbColumn];
+    typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
+      ? dailyValue
+      : null;
+  });
+
+  return typedPayload;
+}

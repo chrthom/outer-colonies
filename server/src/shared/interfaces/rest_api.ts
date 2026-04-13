@@ -77,7 +77,7 @@ export interface ProfileGetResponse {
 }
 
 export interface DailyGetResponse {
-  [key: string]: boolean | null;
+  [key: string]: boolean | number | null;
 }
 
 export interface ItemListResponse {
