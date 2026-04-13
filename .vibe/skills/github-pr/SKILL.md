@@ -129,7 +129,7 @@ comments.forEach(comment => {
   
   todos.push({
     id: `resp_${commentId}`,
-    content: `Respond to comment ${commentId}`,
+    content: `Reply to comment ${commentId} in GitHub`,
     status: "pending",
     priority: "medium"
   });
@@ -167,24 +167,19 @@ npm run format && npm run lint && npm run test
 
 4. **Reply to the comment on GitHub**
 
-**IMPORTANT**: Always reply to comments, never edit them. Address the original author using `@username`.
+**IMPORTANT**: Always reply to comments in the same thread, never edit them or create new comments. Address the original author using `@username`.
 
 ```bash
-# First, get the comment details to find the author
-COMMENT_DETAILS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-  "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}")
-AUTHOR=$(echo $COMMENT_DETAILS | jq -r '.user.login')
-
-# Then post a reply addressing the author
+# Post a reply in the same comment thread
 curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"body\": \"@${AUTHOR} [Your response explaining the changes made]\"}" \
-  "https://api.github.com/repos/{owner}/{repo}/issues/${pr_number}/comments"
+  "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies"
 ```
 
-- **CRITICAL**: Always post replies to comments, never edit existing comments
+- **CRITICAL**: Always post replies to comments in the same thread using the `/pulls/comments/{comment_id}/replies` endpoint
+- **CRITICAL**: Never edit existing comments or create new top-level comments
 - **CRITICAL**: Always address the original comment author using `@username` in replies
-- Use the PR issues endpoint for replies: `/repos/{owner}/{repo}/issues/{pr_number}/comments`
 
 **Example reply format**:
 ```
