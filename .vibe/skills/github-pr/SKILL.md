@@ -33,71 +33,184 @@ cd /path/to/repo && git remote -v
 Locally checkout the branch that the PR is using
 
 ### 3. Check all unresolved comments
-Fetch **all** review comments:
+
+**Step 3.1: Fetch all PR-level comments**
 ```bash
 curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments > pr_comments.json
 ```
 
-Also fetch all reviews to find additional comments:
+**Step 3.2: Fetch all reviews (handle pagination)**
 ```bash
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews
+# Fetch all reviews with pagination support
+reviews_file="all_reviews.json"
+echo "[]" > $reviews_file
+page=1
+while true; do
+  response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+    "https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews?page=$page&per_page=100")
+  
+  # Check if response is empty or invalid
+  if [ -z "$response" ] || [ "$response" = "[]" ]; then
+    break
+  fi
+  
+  # Append to our file
+  jq -s '.[0] + .[1]' $reviews_file <(echo "$response") > temp.json && mv temp.json $reviews_file
+  
+  # Check if we have less than 100 items (last page)
+  length=$(echo "$response" | jq 'length')
+  if [ "$length" -lt 100 ]; then
+    break
+  fi
+  
+  ((page++))
+done
 ```
 
-- For each review with state "COMMENTED", fetch the specific review comments:
+**Step 3.3: Extract all review IDs with state "COMMENTED"**
 ```bash
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews/{review_id}/comments
+review_ids=$(jq -r '[.[] | select(.state == "COMMENTED") | .id] | .[]' all_reviews.json)
 ```
 
-### 4. Filter comments
-- Only work with comments where `resolved_at` is null, ignore all others.
-- **Exclude responses**: Filter out comments that start with "@<username>" as these are responses, not original review comments.
-
-### 4.1 Comment Filtering Example
-
-Use this jq command to filter unresolved comments:
+**Step 3.4: Fetch comments for each review**
 ```bash
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments | \
-  jq '.[] | select(.resolved_at == null) | {id, body, path, resolved_at}'
+all_comments_file="all_unresolved_comments.json"
+echo "[]" > $all_comments_file
+
+for review_id in $review_ids; do
+  echo "Fetching comments for review $review_id..."
+  
+  # Handle pagination for review comments
+  page=1
+  while true; do
+    response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+      "https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews/$review_id/comments?page=$page&per_page=100")
+    
+    if [ -z "$response" ] || [ "$response" = "[]" ]; then
+      break
+    fi
+    
+    # Filter for unresolved comments (resolved_at == null) and non-responses (body doesn't start with @)
+    filtered=$(echo "$response" | jq '[.[] | select(.resolved_at == null and (.body | startswith("@") | not))]')
+    
+    # Append to our master file
+    jq -s '.[0] + .[1]' $all_comments_file <(echo "$filtered") > temp.json && mv temp.json $all_comments_file
+    
+    # Check if last page
+    length=$(echo "$response" | jq 'length')
+    if [ "$length" -lt 100 ]; then
+      break
+    fi
+    
+    ((page++))
+  done
+done
 ```
 
-### 4.2 Response Comment Identification
-
-Filter out response comments (those starting with "@username"):
+**Step 3.5: Combine PR-level and review comments**
 ```bash
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments | \
-  jq '.[] | select(.resolved_at == null and (.body | startswith("@") | not)) | {id, body, path}'
+# Filter PR-level comments for unresolved, non-response comments
+pr_filtered=$(jq '[.[] | select(.resolved_at == null and (.body | startswith("@") | not))]' pr_comments.json)
+
+# Combine with review comments
+jq -s '.[0] + .[1]' <(echo "$pr_filtered") $all_comments_file > final_unresolved_comments.json
+
+# Get count
+total_unresolved=$(jq 'length' final_unresolved_comments.json)
+echo "Found $total_unresolved unresolved comments that need attention"
+```
+
+### 4. Verify and display all unresolved comments
+
+**Step 4.1: Display summary of all unresolved comments**
+```bash
+echo "=== UNRESOLVED COMMENTS SUMMARY ==="
+jq -r '.[] | "ID: \(.id) | Path: \(.path) | Comment: \(.body[0:80])" + if (.body | length > 80) then "..." else "" end' final_unresolved_comments.json
+```
+
+**Step 4.2: Create detailed report**
+```bash
+report_file="comment_report.txt"
+echo "UNRESOLVED COMMENTS REPORT - $(date)" > $report_file
+echo "=================================" >> $report_file
+echo "Total: $total_unresolved comments" >> $report_file
+echo "" >> $report_file
+
+jq -r '.[] | "Comment ID: \(.id)", "File: \(.path)", "Line: \(.original_line // "N/A")", "Comment:", \(.body), "---"' final_unresolved_comments.json >> $report_file
+
+cat $report_file
+```
+
+**Step 4.3: Verify no duplicates**
+```bash
+unique_count=$(jq 'unique_by(.id) | length' final_unresolved_comments.json)
+if [ $total_unresolved -ne $unique_count ]; then
+  echo "ERROR: Duplicate comments found! Total: $total_unresolved, Unique: $unique_count"
+  exit 1
+fi
 ```
 
 ### 5. Create ToDos Systematically
 
-For EACH unresolved comment (where `resolved_at` is null):
+**Step 5.1: Generate todos from JSON file**
+```bash
+todos_file="generated_todos.json"
+echo "[]" > $todos_file
 
-1. **Implementation Todo**: Create a todo to address the comment
-   - Format: "Address comment {id}: {brief_description}"
-   - Include the comment ID for reference
-   - Example: "Address comment 3069803107: Remove dailyEarnings from rules.ts"
+# Generate implementation and response todos for each comment
+jq -r '.[] | "IMPLEMENT:\nAddress comment \(.id): \(.body[0:50] | gsub("[\"\\]\"; "") | gsub("\\n"; " ")) - \(.path)", "RESPOND:\nRespond to comment \(.id)"' final_unresolved_comments.json | 
+while read -r impl_todo; read -r resp_todo; do
+  # Extract comment ID from implementation todo
+  comment_id=$(echo "$impl_todo" | grep -oP 'Address comment \K[0-9]+')
+  
+  # Create implementation todo
+  impl_json=$(jq -n --arg id "impl_$comment_id" --arg content "$impl_todo" --arg status "pending" --arg priority "high" 
+    '{id: $id, content: $content, status: $status, priority: $priority}')
+  
+  # Create response todo  
+  resp_json=$(jq -n --arg id "resp_$comment_id" --arg content "$resp_todo" --arg status "pending" --arg priority "medium" 
+    '{id: $id, content: $content, status: $status, priority: $priority}')
+  
+  # Append to todos file
+  jq -s '.[0] + [.[1]] + [.[2]]' $todos_file <(echo "$impl_json") <(echo "$resp_json") > temp.json && mv temp.json $todos_file
+done
 
-2. **Response Todo**: Create a todo to respond to the comment
-   - Format: "Respond to comment {id}"
-   - Include the comment ID for the API call
-   - Example: "Respond to comment 3069803107"
+# Add quality assurance todos
+qa_todos='[
+  {"id": "qa_format", "content": "Run format, lint, and test", "status": "pending", "priority": "high"},
+  {"id": "qa_github", "content": "Check GitHub Actions status", "status": "pending", "priority": "high"}
+]' 
+jq -s '.[0] + .[1]' $todos_file <(echo "$qa_todos") > temp.json && mv temp.json $todos_file
+```
 
-3. **Verification Todo**: Create a todo to verify the fix
-   - Format: "Verify fix for comment {id}"
-   - Example: "Verify fix for comment 3069803107"
+**Step 5.2: Display and verify todos**
+```bash
+echo "=== GENERATED TODOS ==="
+jq -r '.[] | "[\(.priority)] \(.id): \(.content)"' $todos_file
 
-### 5.1 Todo Creation Checklist
+expected_impl_count=$total_unresolved
+expected_resp_count=$total_unresolved
+actual_impl_count=$(jq '[.[] | select(.content | startswith("Address comment"))] | length' $todos_file)
+actual_resp_count=$(jq '[.[] | select(.content | startswith("Respond to comment"))] | length' $todos_file)
 
-- [ ] All unresolved comments have implementation todos
-- [ ] All unresolved comments have response todos  
-- [ ] All unresolved comments have verification todos
-- [ ] Quality assurance todos (format, lint, test)
-- [ ] GitHub Actions check todo
+if [ $actual_impl_count -ne $expected_impl_count ] || [ $actual_resp_count -ne $expected_resp_count ]; then
+  echo "ERROR: Todo count mismatch!"
+  echo "Expected $expected_impl_count implementation todos, got $actual_impl_count"
+  echo "Expected $expected_resp_count response todos, got $actual_resp_count"
+  exit 1
+fi
+```
+
+**Step 5.3: Load todos into system**
+```bash
+# Display the final todos file for manual verification
+echo "Final todos to be loaded:"
+cat $todos_file | jq .
+
+# Note: Use the todo tool to load these into the system
+# todo write --file $todos_file
+```
 
 ### 5.2 Comment Processing Flow
 
@@ -179,7 +292,7 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 - Check that the response appears in GitHub UI
 - Verify the comment thread shows as resolved
 
-#### 6.3 For todos to check GitHub Actions checks
+#### 6.3 For todos to check GitHub checks
 Check all GitHub actions:
 
 Fetch check runs:
