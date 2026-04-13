@@ -63,7 +63,7 @@ export class HomePage implements OnInit {
           const dailyKey = match ? match[1] : null;
 
           // Show daily if it's available today (not null)
-          return dailyKey && availableDailyKeys.includes(dailyKey as keyof DailyGetResponse);
+          return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
         });
     });
   }

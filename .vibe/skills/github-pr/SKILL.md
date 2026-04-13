@@ -70,7 +70,9 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
 ```
 
 - It is also allowed to not solve the issue but respond with a question to the comment.
-- In any case you should always respond to every unresolved comment.
+- Always respond directly to the comment instead of creating a new comment.
+- Create one respond at a time (one GitHub API call per respond).
+- In any case you should **always respond** to every unresolved comment.
 
 ### 7. Check all GitHub Actions checks again
 - Check all GitHub actions checks again (same as in step 4.).
