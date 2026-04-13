@@ -1,5 +1,6 @@
 enabled_skills = [
-    "github-workflow",
+    "github-issue",
+    "github-pr"
 ]
 installed_agents = [
     "lean",

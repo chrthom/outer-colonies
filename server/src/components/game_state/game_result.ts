@@ -96,7 +96,6 @@ export default class GameResult {
     DBCredentialsDAO.getByUsername(player.name).then(c => {
       if (c) {
         DBProfilesDAO.increaseSol(c.userId, sol);
-
         // Check all dailies using centralized logic
         Object.values(DailyType).forEach(dailyType => {
           if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
