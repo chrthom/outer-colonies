@@ -202,9 +202,17 @@ todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 
 7. **Move to next comment**
 
+### 8. Cleanup
+Remove all temporary files, which you might have created in the previous steps. These are e.g.:
+- collect_comments_graphql.js
+- generate_todos.js
+- generated_todos.json
+- reply.json
+- unresolved_comments.json
+
 ## Notes
 
 - Requires GitHub GraphQL API access with `repo` scope token
 - Uses `isResolved` field for accurate comment resolution tracking
 - Always verify generated todos before starting work
-- Temporary files (`unresolved_comments.json`, `generated_todos.json`) should be cleaned up after use
+- Temporary files should be cleaned up after use
