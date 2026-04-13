@@ -206,7 +206,21 @@ curl -s -H "Authorization: token $GITHUB_TOKEN" \
 todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 ```
 
-#### 6.4 Cleanup temporary files
+#### 6.3 Todos to "Run format, lint, and test"
+Run via:
+- `npm run format`
+- `npm run lint`
+- `npm run test`
+
+If lint or test fail, fix the error and run it again.
+
+#### 6.4 Todos to "Check GitHub Actions status"
+- Use GitHub Rest API to check status
+- If status is failed, check the GitHub Actions logs of that check
+- If checks are still running wait for 15 seconds and check again (wait for max 3 minutes)
+- If checks failed, fix them, run format, lint and test locally and push changes, befor checking the GitHub Actions status again 
+
+#### 6.5 Todos to "Cleanup temporary files"
 
 Remove temporary files:
 - collect_comments_graphql.js
