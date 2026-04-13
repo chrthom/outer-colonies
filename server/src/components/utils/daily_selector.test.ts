@@ -1,4 +1,6 @@
-import { getDailiesOfDay, isDailyOfDay, ALL_DAILIES } from './daily_selector';
+import { getDailiesOfDay, isDailyOfDay } from './daily_selector';
+import { ALL_DAILY_TYPES } from '../../shared/config/dailies';
+import { DailyType } from '../../shared/config/enums';
 
 describe('Daily Selector', () => {
   it('should return exactly 4 dailies', () => {
@@ -9,7 +11,7 @@ describe('Daily Selector', () => {
   it('should return only valid daily types', () => {
     const dailies = getDailiesOfDay();
     dailies.forEach(daily => {
-      expect(ALL_DAILIES).toContain(daily);
+      expect(ALL_DAILY_TYPES).toContain(daily);
     });
   });
 
@@ -41,7 +43,7 @@ describe('Daily Selector', () => {
 
     // Check that some dailies are not of the day
     const allDailies = getDailiesOfDay(date);
-    const nonDailies = ALL_DAILIES.filter(d => !allDailies.includes(d));
+    const nonDailies = ALL_DAILY_TYPES.filter((d: DailyType) => !allDailies.includes(d));
     if (nonDailies.length > 0) {
       expect(isDailyOfDay(nonDailies[0], date)).toBe(false);
     }
@@ -53,7 +55,7 @@ describe('Daily Selector', () => {
     const dailyCounts: Record<string, number> = {};
 
     // Initialize counts
-    ALL_DAILIES.forEach(daily => {
+    ALL_DAILY_TYPES.forEach((daily: DailyType) => {
       dailyCounts[daily] = 0;
     });
 
@@ -70,11 +72,11 @@ describe('Daily Selector', () => {
 
     // Each daily should appear roughly (4/13) * 100 ≈ 30.77 times
     // Allow some variance but ensure no daily is completely missing or dominates
-    const expectedCount = (4 / ALL_DAILIES.length) * dateCount;
+    const expectedCount = (4 / ALL_DAILY_TYPES.length) * dateCount;
     const minExpected = expectedCount * 0.5; // At least 50% of expected
     const maxExpected = expectedCount * 1.5; // At most 150% of expected
 
-    ALL_DAILIES.forEach(daily => {
+    ALL_DAILY_TYPES.forEach((daily: DailyType) => {
       const count = dailyCounts[daily];
       expect(count).toBeGreaterThan(minExpected);
       expect(count).toBeLessThan(maxExpected);

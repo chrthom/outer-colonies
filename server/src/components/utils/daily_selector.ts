@@ -2,11 +2,6 @@ import { createHash } from 'crypto';
 import { DailyType } from '../../shared/config/enums';
 import { ALL_DAILY_TYPES } from '../../shared/config/dailies';
 
-// Use centralized daily types definition
-const ALL_DAILIES = ALL_DAILY_TYPES;
-
-export { ALL_DAILIES };
-
 export function getDailiesOfDay(date: Date = new Date()): DailyType[] {
   // Use date string to create consistent hash for the day
   const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -17,7 +12,7 @@ export function getDailiesOfDay(date: Date = new Date()): DailyType[] {
 
   // Use hash to select 4 unique indices
   const indices: number[] = [];
-  const maxIndex = ALL_DAILIES.length - 1;
+  const maxIndex = ALL_DAILY_TYPES.length - 1;
 
   // Simple algorithm to generate 4 unique indices based on hash
   for (let i = 0; i < 4; i++) {
@@ -39,7 +34,7 @@ export function getDailiesOfDay(date: Date = new Date()): DailyType[] {
   }
 
   // Return the selected dailies
-  return indices.map(i => ALL_DAILIES[i]);
+  return indices.map(i => ALL_DAILY_TYPES[i]);
 }
 
 export function isDailyOfDay(daily: DailyType, date: Date = new Date()): boolean {

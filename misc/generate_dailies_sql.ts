@@ -3,8 +3,17 @@
 /**
  * Script to generate SQL for dailies table from centralized configuration
  * Run with: npx ts-node misc/generate_dailies_sql.ts
+ *
+ * TODO: This script currently uses hardcoded definitions for simplicity.
+ * To use centralized configuration, run:
+ *   cd server && npx tsc src/shared/config/dailies.ts src/shared/config/enums.ts --outDir dist
+ * Then uncomment the import below and remove the hardcoded DAILY_DEFINITIONS.
  */
 
+// Import from centralized configuration (requires compilation first)
+// const { DAILY_DEFINITIONS } = require('./server/dist/dailies');
+
+// Hardcoded definitions for now (to be replaced with import from centralized config)
 interface DailyDefinition {
   type: string;
   dbColumn: string;
@@ -30,7 +39,7 @@ const DAILY_DEFINITIONS: DailyDefinition[] = [
 ];
 
 function generateDailiesSQL(): string {
-  const columns = DAILY_DEFINITIONS.map(daily =>
+  const columns = DAILY_DEFINITIONS.map((daily: any) =>
     `  \`${daily.dbColumn}\` date DEFAULT NULL`
   ).join(',\n');
 
@@ -41,7 +50,7 @@ ${columns}
 }
 
 function generateAlterTableSQL(): string {
-  return DAILY_DEFINITIONS.map(daily =>
+  return DAILY_DEFINITIONS.map((daily: any) =>
     `ALTER TABLE \`dailies\` ADD COLUMN \`${daily.dbColumn}\` date DEFAULT NULL;`
   ).join('\n');
 }
@@ -51,3 +60,22 @@ module.exports = {
   generateDailiesSQL,
   generateAlterTableSQL
 };
+
+// Command line interface
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  
+  if (args.length === 0 || args.includes('--create')) {
+    console.log(generateDailiesSQL());
+  }
+  
+  if (args.includes('--alter')) {
+    console.log(generateAlterTableSQL());
+  }
+  
+  if (args.length === 0) {
+    console.log('\nUsage:');
+    console.log('  npx ts-node misc/generate_dailies_sql.ts --create   # Generate CREATE TABLE SQL');
+    console.log('  npx ts-node misc/generate_dailies_sql.ts --alter    # Generate ALTER TABLE SQL');
+  }
+}

@@ -10,5 +10,8 @@
     "version": "read -p \"Version number (x.x.x)?: \" V; read -p \"Version name?: \" N; misc/version.sh $V $N"
   },
   "private": true,
-  "author": "Christopher Thomsen"
+  "author": "Christopher Thomsen",
+  "dependencies": {
+    "typescript": "^6.0.0"
+  }
 }

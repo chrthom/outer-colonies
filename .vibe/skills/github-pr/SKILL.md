@@ -149,6 +149,42 @@ console.log(`Generated ${todos.length} todos`);
 todo write --file generated_todos.json
 ```
 
+### 6. Address Comments and Reply on GitHub
+
+For each comment:
+
+1. **Mark implementation todo as in_progress**
+```bash
+todo write --update '{"id": "impl_${commentId}", "status": "in_progress"}'
+```
+
+2. **Implement the required changes**
+
+3. **Run quality checks**
+```bash
+npm run format && npm run lint && npm run test
+```
+
+4. **Reply to the comment on GitHub**
+```bash
+curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"body": "[Your response explaining the changes made]"}' \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}"
+```
+
+5. **Mark implementation todo as completed**
+```bash
+todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
+```
+
+6. **Mark response todo as completed**
+```bash
+todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
+```
+
+7. **Move to next comment**
+
 ## Notes
 
 - Requires GitHub GraphQL API access with `repo` scope token
