@@ -1,16 +1,16 @@
 --- 
 name: github-pr
-description: Instruction to follow, when instructed to work on GitHub pull request
+description: Workflow for addressing GitHub pull request review comments
 user-invocable: true
 ---
 
 # GitHub Pull Request Skill
 
-This skill provides a workflow for working on GitHub pull requests.
+## Purpose
+Systematically address PR review comments using a structured workflow.
 
 ## When to use
-
-- Work on an existing GitHub pull request (e.g., PR #567)
+- Work on existing GitHub pull requests
 - Address review comments systematically
 
 ## Workflow
@@ -28,9 +28,8 @@ git checkout {pr_branch_name}
 ```
 
 ### 3. Collect Unresolved Comments
-
 ```javascript
-// save as collect_comments_graphql.js
+// collect_comments_graphql.js
 const fs = require('fs');
 const { execSync } = require('child_process');
 
@@ -108,9 +107,8 @@ collectCommentsWithGraphQL().catch(console.error);
 ```
 
 ### 4. Generate Todos
-
 ```javascript
-// save as generate_todos.js
+// generate_todos.js
 const fs = require('fs');
 
 const comments = JSON.parse(fs.readFileSync('unresolved_comments.json', 'utf8'));
@@ -149,87 +147,55 @@ console.log(`Generated ${todos.length} todos`);
 todo write --file generated_todos.json
 ```
 
-### 6. Address Comments and Reply on GitHub
+### 6. Process Comments
 
 For each comment:
 
-1. **Mark implementation todo as in_progress**
+1. Mark todo as in_progress:
 ```bash
 todo write --update '{"id": "impl_${commentId}", "status": "in_progress"}'
 ```
 
-2. **Implement the required changes**
+2. Implement required changes
 
-3. **Run quality checks**
+3. Run quality checks:
 ```bash
 npm run format && npm run lint && npm run test
 ```
 
-4. **Commit and push changes**
+4. Commit and push changes
 
-5. **Reply to the comment on GitHub**
-
-**IMPORTANT**: Always reply to comments in the same thread, never edit them or create new comments. Address the original author using `@username`.
-
+5. Reply to comment:
 ```bash
-# Post a reply in the same comment thread
 curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"body\": \"@${AUTHOR} [Your response explaining the changes made]\"}" \
+  -d "{\"body\": \"@${AUTHOR} [Explain changes made]\"}" \
   "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies"
 ```
 
+**CRITICAL**: Always reply in same thread using `@username`
 **CRITICAL**: Never edit existing comments or create new top-level comments
-**CRITICAL**: Always address the original comment author using `@username` in replies
-**CRITICAL**: Use the exact URL format: `https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies`
+**CRITICAL**: Use exact URL format shown above
 
-**Example with real values**:
-```bash
-curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"body\": \"@chrthom I have addressed your comment by changing the interface type.\"}" \
-  "https://api.github.com/repos/chrthom/outer-colonies/pulls/comments/3074176232/replies"
-```
-
-**Example reply format**:
-```
-@chrthom I have addressed your comment by [explain changes]. The changes include:
-- [Change 1]
-- [Change 2]
-
-All tests pass and the functionality has been verified.
-```
-
-6. **Mark implementation todo as completed**
+6. Mark implementation todo as completed:
 ```bash
 todo write --update '{"id": "impl_${commentId}", "status": "completed"}'
 ```
 
-7. **Mark response todo as completed**
+7. Mark response todo as completed:
 ```bash
 todo write --update '{"id": "resp_${commentId}", "status": "completed"}'
 ```
 
-8. **Verify the reply was posted in the correct thread**
+8. Verify reply was posted:
 ```bash
-# Check that the reply appears in the comment thread
 curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/{owner}/{repo}/pulls/comments/${commentId}/replies" | jq '.[] | select(.body | contains("@${AUTHOR}"))'
 ```
 
-9. **Move to next comment**
-
-### 8. Cleanup
-Remove all temporary files, which you might have created in the previous steps. These are e.g.:
+### 7. Cleanup
+Remove temporary files:
 - collect_comments_graphql.js
 - generate_todos.js
 - generated_todos.json
-- reply.json
 - unresolved_comments.json
-
-## Notes
-
-- Requires GitHub GraphQL API access with `repo` scope token
-- Uses `isResolved` field for accurate comment resolution tracking
-- Always verify generated todos before starting work
-- Temporary files should be cleaned up after use
