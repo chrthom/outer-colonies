@@ -2,7 +2,7 @@ import { DailyType } from '../../shared/config/enums';
 import { DAILY_DEFINITIONS } from '../../shared/config/dailies';
 import DBDailiesDAO from './db_dailies';
 import DBConnection from './db_connector';
-import { isDailyOfDay } from '../utils/daily_selector';
+import * as dailySelector from '../utils/daily_selector';
 
 describe('DBDailiesDAO', () => {
   describe('achieve', () => {
@@ -11,7 +11,7 @@ describe('DBDailiesDAO', () => {
       const dailyType = DailyType.Login;
 
       // Mock isDailyOfDay to return true for login
-      jest.spyOn(require('../utils/daily_selector'), 'isDailyOfDay').mockReturnValue(true);
+      jest.spyOn(dailySelector, 'isDailyOfDay').mockReturnValue(true);
 
       // Mock the database methods
       const mockGetBy = jest.spyOn(DBDailiesDAO as any, 'getBy');
@@ -40,7 +40,7 @@ describe('DBDailiesDAO', () => {
       const dailyType = DailyType.Victory;
 
       // Mock isDailyOfDay to return false
-      jest.spyOn(require('../utils/daily_selector'), 'isDailyOfDay').mockReturnValue(false);
+      jest.spyOn(dailySelector, 'isDailyOfDay').mockReturnValue(false);
 
       const querySpy = jest.spyOn(DBConnection.instance, 'query');
 
@@ -56,7 +56,7 @@ describe('DBDailiesDAO', () => {
 
     it('should handle all daily types', async () => {
       // Mock isDailyOfDay to return true
-      jest.spyOn(require('../utils/daily_selector'), 'isDailyOfDay').mockReturnValue(true);
+      jest.spyOn(dailySelector, 'isDailyOfDay').mockReturnValue(true);
 
       const querySpy = jest.spyOn(DBConnection.instance, 'query');
       querySpy.mockResolvedValue({});

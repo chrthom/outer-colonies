@@ -2,6 +2,7 @@ import { DailyType } from '../shared/config/enums';
 import { DAILY_DEFINITIONS } from '../shared/config/dailies';
 import DBDailiesDAO from './persistence/db_dailies';
 import { getDailies, getDailiesResponse } from './rest_api';
+import * as dailySelector from './utils/daily_selector';
 
 describe('RESTAPI Daily Endpoints', () => {
   describe('getDailies', () => {
@@ -19,7 +20,7 @@ describe('RESTAPI Daily Endpoints', () => {
       getByUserIdSpy.mockResolvedValue(mockDailyData1);
 
       // Mock getDailiesOfDay to return some daily types
-      const mockGetDailiesOfDay = jest.spyOn(require('./utils/daily_selector'), 'getDailiesOfDay');
+      const mockGetDailiesOfDay = jest.spyOn(dailySelector, 'getDailiesOfDay');
       mockGetDailiesOfDay.mockReturnValue([
         DailyType.Login,
         DailyType.Energy,
@@ -59,7 +60,7 @@ describe('RESTAPI Daily Endpoints', () => {
       getByUserIdSpy2.mockResolvedValue(allDailiesData);
 
       // Mock getDailiesOfDay to return all daily types
-      const mockGetDailiesOfDay2 = jest.spyOn(require('./utils/daily_selector'), 'getDailiesOfDay');
+      const mockGetDailiesOfDay2 = jest.spyOn(dailySelector, 'getDailiesOfDay');
       mockGetDailiesOfDay2.mockReturnValue(DAILY_DEFINITIONS.map(d => d.type));
 
       // Call the method
@@ -88,7 +89,7 @@ describe('RESTAPI Daily Endpoints', () => {
       getByUserIdSpy3.mockResolvedValue(mockDailyData3);
 
       // Mock getDailiesOfDay to return only login daily
-      const mockGetDailiesOfDay3 = jest.spyOn(require('./utils/daily_selector'), 'getDailiesOfDay');
+      const mockGetDailiesOfDay3 = jest.spyOn(dailySelector, 'getDailiesOfDay');
       mockGetDailiesOfDay3.mockReturnValue([DailyType.Login]);
 
       // Call the method
@@ -120,7 +121,7 @@ describe('RESTAPI Daily Endpoints', () => {
       };
 
       // Mock getDailiesOfDay
-      const mockGetDailiesOfDay = jest.spyOn(require('./utils/daily_selector'), 'getDailiesOfDay');
+      const mockGetDailiesOfDay = jest.spyOn(dailySelector, 'getDailiesOfDay');
       mockGetDailiesOfDay.mockReturnValue([DailyType.Login, DailyType.Victory, DailyType.Game]);
 
       const result = getDailiesResponse(mockDailyData);
