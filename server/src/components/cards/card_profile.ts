@@ -22,7 +22,7 @@ export default class CardProfile implements CardProfileConfig {
     this.speed = profile.speed ?? 0;
     this.energy = profile.energy ?? 0;
     this.theta = profile.theta ?? 0;
-    this.xi = profile.xi ?? 1;
+    this.xi = profile.xi ?? 0;
     this.phi = profile.phi ?? 0;
     this.omega = profile.omega ?? 0;
     this.delta = profile.delta ?? 0;
