@@ -71,6 +71,8 @@ curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
   -d '{"body":"@<reviewer> I have addressed your comment by <describe changes>. Please review."}'
 ```
 
+It is also allowed to not solve the issue but respond with a question to the comment.
+
 ## Error Handling
 - **Rate Limits**: Check `X-RateLimit-Remaining` header and wait if needed
 - **Retry Logic**: Implement exponential backoff for API errors
