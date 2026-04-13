@@ -24,7 +24,7 @@ Maintain consistency across the three subprojects
 - **Format**: `npm run format` (Prettier)
 - **Lint**: `npm run lint` (ESLint)
 - **Test**: `npm run test` (Jest/Karma)
-- All subprojects must pass these checks before commiting them
+- All subprojects must pass these checks before commiting and pushing them
 
 ## Documentation Requirements
 - Update @README.md for significant changes
