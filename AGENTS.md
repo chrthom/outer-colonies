@@ -16,7 +16,8 @@ Scan `README.md` to get further information on project background and structure.
 
 ## Working with GitHub
 - **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
-- Use the GitHub Workflow Skill when asked to work on an GitHub issue - see `.vibe/skills/github-workflow/SKILL.md`
+- Use the **GitHub Issue Skill** when asked to work on an GitHub issue - see @.vibe/skills/github-issue/SKILL.md
+- Use the **GitHub Pull Request Skill** when asked to work on an GitHub PR - see @.vibe/skills/github-pr/SKILL.md
 
 ## Working with Git
 - Use conventional commits

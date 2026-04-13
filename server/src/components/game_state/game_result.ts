@@ -69,10 +69,17 @@ export default class GameResult {
         if (player.colonyCardStack.cards.length > 7) DBDailiesDAO.achieveColony(c.userId);
         const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
         if (readyCardStacks.length >= 5) DBDailiesDAO.achieveShips(c.userId);
-        if (readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10) DBDailiesDAO.achieveControl(c.userId);
+        if (readyCardStacks.map(cs => cs.profile.control).reduce((a, b) => a + b, 0) >= 10)
+          DBDailiesDAO.achieveControl(c.userId);
         if (readyCardStacks.find(cs => cs.profile.hp >= 20)) DBDailiesDAO.achieveJuggernaut(c.userId);
         if (readyCardStacks.find(cs => cs.cards.length >= 7)) DBDailiesDAO.achieveColossus(c.userId);
-        if (readyCardStacks.filter(cs => cs.profile.speed == 0).flatMap(cs => cs.cards).filter(c => c.type == CardType.Hull).length >= 3) DBDailiesDAO.achieveStations(c.userId);
+        if (
+          readyCardStacks
+            .filter(cs => cs.profile.speed == 0)
+            .flatMap(cs => cs.cards)
+            .filter(c => c.type == CardType.Hull).length >= 3
+        )
+          DBDailiesDAO.achieveStations(c.userId);
       } else {
         console.log(`ERROR: Could not find user ${player.name} in database`);
       }

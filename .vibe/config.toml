@@ -1,6 +1,6 @@
 # Mistral Vibe Configuration for Outer Colonies
 
-enabled_skills = ["github-workflow"]
+enabled_skills = ["github-issue", "github-pr"]
 
 [git]
 main_branch = "main"
