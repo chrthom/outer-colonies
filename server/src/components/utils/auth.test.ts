@@ -18,7 +18,7 @@ describe('AuthUtils', () => {
       };
 
       // Mock the getByUsername method to return our mock credential
-      const DBCredentialsDAO = require('../persistence/db_credentials').default;
+      import DBCredentialsDAO from '../persistence/db_credentials';
       jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockCredential);
       jest.spyOn(DBCredentialsDAO, 'login').mockResolvedValue('test-token');
 
