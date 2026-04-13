@@ -312,45 +312,243 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 
 Before starting any implementation work:
 
-1. **Todo Completeness Check:**
-   ```bash
-   # Count unresolved comments
-   unresolved_count=$(curl -H "Authorization: token $GITHUB_TOKEN" \
-     https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments | \
-     jq '[.[] | select(.resolved_at == null and (.body | startswith("@") | not))] | length')
+**Step 1: Verify comment collection completeness**
+```bash
+# Count from our collected file
+todos_impl_count=$(jq '[.[] | select(.content | startswith("Address comment"))] | length' $todos_file)
+todos_resp_count=$(jq '[.[] | select(.content | startswith("Respond to comment"))] | length' $todos_file)
 
-   # Count implementation todos
-   impl_todos=$(todo read | grep -c "Address comment")
+if [ $todos_impl_count -ne $total_unresolved ] || [ $todos_resp_count -ne $total_unresolved ]; then
+  echo "ERROR: Todo generation failed!"
+  echo "Unresolved comments: $total_unresolved"
+  echo "Implementation todos generated: $todos_impl_count"
+  echo "Response todos generated: $todos_resp_count"
+  exit 1
+fi
+```
 
-   # Count response todos
-   resp_todos=$(todo read | grep -c "Respond to comment")
+**Step 2: Cross-verify with live API**
+```bash
+# Fetch current unresolved comments from API
+current_unresolved=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments | \
+  jq '[.[] | select(.resolved_at == null and (.body | startswith("@") | not))] | length')
 
-   if [ $unresolved_count -ne $impl_todos ] || [ $unresolved_count -ne $resp_todos ]; then
-     echo "ERROR: Todo count mismatch!"
-     echo "Unresolved comments: $unresolved_count"
-     echo "Implementation todos: $impl_todos"
-     echo "Response todos: $resp_todos"
-     exit 1
-   fi
-   ```
+# Fetch all reviews and their comments
+current_review_unresolved=0
+review_page=1
+while true; do
+  reviews_response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+    "https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews?page=$review_page&per_page=100")
+  
+  if [ -z "$reviews_response" ] || [ "$reviews_response" = "[]" ]; then
+    break
+  fi
+  
+  review_ids=$(echo "$reviews_response" | jq -r '[.[] | select(.state == "COMMENTED") | .id] | .[]')
+  for review_id in $review_ids; do
+    comments_response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+      "https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews/$review_id/comments")
+    review_unresolved=$(echo "$comments_response" | jq '[.[] | select(.resolved_at == null and (.body | startswith("@") | not))] | length')
+    current_review_unresolved=$((current_review_unresolved + review_unresolved))
+  done
+  
+  length=$(echo "$reviews_response" | jq 'length')
+  if [ "$length" -lt 100 ]; then
+    break
+  fi
+  
+  ((review_page++))
+done
 
-2. **Branch Verification:**
-   ```bash
-   current_branch=$(git rev-parse --abbrev-ref HEAD)
-   if [ "$current_branch" != "{pr_branch_name}" ]; then
-     echo "ERROR: Not on correct branch. Expected {pr_branch_name}, got $current_branch"
-     exit 1
-   fi
-   ```
+total_current_unresolved=$((current_unresolved + current_review_unresolved))
 
-3. **Clean Working Directory:**
-   ```bash
-   if ! git diff --quiet; then
-     echo "ERROR: Working directory has uncommitted changes"
-     exit 1
-   fi
-   ```
+if [ $total_current_unresolved -ne $total_unresolved ]; then
+  echo "WARNING: Comment count mismatch between collection and live API!"
+  echo "Collected: $total_unresolved"
+  echo "Live API: $total_current_unresolved"
+  echo "This might indicate new comments were added or some were resolved since collection."
+  echo "Consider re-running the collection process."
+fi
+```
 
-## Error Handling
-- **Rate Limits**: Check `X-RateLimit-Remaining` header and wait if needed.
-- **Retry Logic**: Implement exponential backoff for API errors.
+**Step 3: Branch Verification**
+```bash
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+expected_branch=$(jq -r '.head.ref' pr_details.json 2>/dev/null || echo "{pr_branch_name}")
+
+if [ "$current_branch" != "$expected_branch" ]; then
+  echo "ERROR: Not on correct branch. Expected $expected_branch, got $current_branch"
+  exit 1
+fi
+```
+
+**Step 4: Clean Working Directory**
+```bash
+if ! git diff --quiet; then
+  echo "ERROR: Working directory has uncommitted changes"
+  git status
+  exit 1
+fi
+```
+
+**Step 5: Verify file accessibility**
+```bash
+# Check that all files mentioned in comments exist and are readable
+missing_files=()
+for file in $(jq -r '.[] | .path' final_unresolved_comments.json | sort -u); do
+  if [ ! -f "$file" ]; then
+    missing_files+=("$file")
+  fi
+done
+
+if [ ${#missing_files[@]} -gt 0 ]; then
+  echo "WARNING: The following files mentioned in comments don't exist locally:"
+  printf '  - %s\n' "${missing_files[@]}"
+  echo "This might be expected for new files that need to be created."
+fi
+```
+
+## Error Handling and Best Practices
+
+### Rate Limit Handling
+```bash
+# Check rate limits before making API calls
+rate_limit_info=$(curl -s -I -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number} | \
+  grep -i "X-RateLimit-")
+
+echo "Rate Limit Info:"
+echo "$rate_limit_info"
+
+remaining=$(echo "$rate_limit_info" | grep -oP 'X-RateLimit-Remaining: \K\d+')
+reset_time=$(echo "$rate_limit_info" | grep -oP 'X-RateLimit-Reset: \K\d+')
+
+if [ "$remaining" -lt 50 ]; then
+  echo "WARNING: Low rate limit remaining: $remaining"
+  reset_in=$((reset_time - $(date +%s)))
+  if [ $reset_in -gt 0 ]; then
+    echo "Rate limit resets in $reset_in seconds"
+    if [ "$remaining" -lt 10 ]; then
+      echo "Waiting for rate limit reset..."
+      sleep $reset_in
+    fi
+  fi
+fi
+```
+
+### API Error Handling
+```bash
+# Function to handle API calls with retries
+api_call_with_retry() {
+  local url="$1"
+  local method="${2:-GET}"
+  local data="${3:-}"
+  local max_retries=3
+  local retry_delay=5
+  
+  for ((retry=1; retry<=$max_retries; retry++)); do
+    if [ "$method" = "GET" ]; then
+      response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$url")
+    else
+      response=$(curl -s -X "$method" -H "Authorization: token $GITHUB_TOKEN" -d "$data" "$url")
+    fi
+    
+    # Check for API errors
+    if echo "$response" | jq -e '.message' >/dev/null 2>&1; then
+      error_message=$(echo "$response" | jq -r '.message')
+      echo "API Error (attempt $retry/$max_retries): $error_message"
+      
+      # Check for rate limiting
+      if echo "$error_message" | grep -qi "rate limit"; then
+        reset_time=$(echo "$response" | jq -r '.headers["X-RateLimit-Reset"] // "0"')
+        sleep_time=$((reset_time - $(date +%s) + 10))
+        if [ $sleep_time -gt 0 ]; then
+          echo "Rate limited. Waiting $sleep_time seconds..."
+          sleep $sleep_time
+        fi
+      fi
+      
+      if [ $retry -lt $max_retries ]; then
+        sleep $retry_delay
+        retry_delay=$((retry_delay * 2))  # Exponential backoff
+      else
+        echo "Max retries reached. Failing."
+        return 1
+      fi
+    else
+      echo "$response"
+      return 0
+    fi
+  done
+}
+
+# Usage example:
+# comments=$(api_call_with_retry "https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments")
+```
+
+### Data Validation
+```bash
+# Validate that collected data is not empty
+if [ ! -s "final_unresolved_comments.json" ] || [ "$(jq 'length' final_unresolved_comments.json)" = "0" ]; then
+  echo "ERROR: No comments collected. This might indicate:"
+  echo "  - All comments are already resolved"
+  echo "  - API access issues"
+  echo "  - Incorrect filtering"
+  exit 1
+fi
+
+# Validate JSON structure
+if ! jq empty final_unresolved_comments.json 2>/dev/null; then
+  echo "ERROR: Invalid JSON in final_unresolved_comments.json"
+  exit 1
+fi
+```
+
+### Cleanup and Recovery
+```bash
+# Cleanup temporary files on error
+cleanup() {
+  echo "Cleaning up temporary files..."
+  rm -f pr_comments.json all_reviews.json all_unresolved_comments.json \
+        final_unresolved_comments.json comment_report.txt generated_todos.json \
+        temp.json pr_details.json
+}
+
+trap cleanup EXIT
+
+# Recovery from partial failures
+if [ -f "final_unresolved_comments.json" ] && [ $total_unresolved -gt 0 ]; then
+  echo "Recovering from previous run..."
+  # Continue from todo generation step
+fi
+```
+
+### Debugging Tips
+1. **Check API responses directly**: Use `curl -v` for verbose output
+2. **Validate jq queries**: Test them separately on sample data
+3. **Inspect intermediate files**: Check JSON files at each step
+4. **Test with small datasets**: Use `jq 'limit(5; .[])'` to work with subsets
+5. **Check GitHub UI**: Compare API results with what you see in the browser
+
+### Common Issues and Solutions
+
+**Issue: Missing comments in collection**
+- **Cause**: Not handling pagination properly
+- **Solution**: Always check response length and iterate through pages
+
+**Issue: Duplicate comments**
+- **Cause**: Same comment appearing in multiple reviews
+- **Solution**: Use `unique_by(.id)` in jq to deduplicate
+
+**Issue: Response comments included**
+- **Cause**: Filter not working correctly
+- **Solution**: Verify jq filter: `select(.resolved_at == null and (.body | startswith("@") | not))`
+
+**Issue: Rate limiting**
+- **Cause**: Too many API calls in short time
+- **Solution**: Add delays, check rate limits, consider caching
+
+**Issue: File paths don't match**
+- **Cause**: Local repo structure differs from GitHub
+- **Solution**: Normalize paths, handle different separators
