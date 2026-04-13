@@ -17,12 +17,7 @@ This skill provides instructions for working on GitHub pull requests in a struct
 
 ## Systematic Workflow
 
-### 1. Create Pull Request (PR)
-- **First Push**: Only create, if it does not exist yet.
-- **Title Format**: `#<issue_id> : <description>`
-- **Link to Issue**: Ensure the PR is linked to the GitHub issue by using keywords in the description: "Closes #<issue_id>"
-
-### 2. Fetch GitHub pull request
+### 1. Fetch GitHub pull request
 Use the GitHub API to fetch PR details:
 ```bash
 curl -H "Authorization: token $GITHUB_TOKEN" \
@@ -33,6 +28,9 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 ```bash
 cd /path/to/repo && git remote -v
 ```
+
+### 2. Checkout PR branch
+- Locally checkout the branch that the PR is using
 
 ### 3. Check all unresolved comments
 Fetch all review comments:
