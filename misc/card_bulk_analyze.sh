@@ -1,7 +1,7 @@
 #!/bin/bash
 # Process all XCF files in subfolders 1-4 and merge results into a single CSV
 
-# Usage: ./process_cards_bulk.sh [base_directory]
+# Usage: ./card_bulk_analyze.sh [base_directory]
 # Default base_directory: /home/christopher/Downloads/oc
 
 BASE_DIR="$1"
@@ -12,8 +12,8 @@ FINAL_CSV="${OUTPUT_DIR}/cards.csv"
 rm -f "${OUTPUT_DIR}"/cards_*.csv
 
 # Process each subfolder
-echo "Processing XCF files from ${BASE_DIR}/1-4..."
-for i in 1 2; do
+echo "Processing XCF files from ${BASE_DIR}/1-5..."
+for i in 1 2 3 4 5; do
     SUBFOLDER="${BASE_DIR}/${i}"
     if [ -d "$SUBFOLDER" ]; then
         echo "  Processing subfolder ${i}..."

@@ -3,9 +3,9 @@
 Process all XCF files in a directory and write visibility results to cards.csv.
 
 Usage:
-  flatpak run org.gimp.GIMP --batch-interpreter python-fu-eval -i -b \
+  flatpak run org.gimp.GIMP --batch-interpreter=python-fu-eval -b \
     'import sys; sys.argv = ["process_cards.py", "/path/to/cards/dir"]; \
-     exec(open("/home/christopher/Dokumente/outer-colonies/misc/cards/process_cards.py").read())'
+     exec(open("/home/christopher/Dokumente/outer-colonies/misc/process_cards.py").read())'
 
 CSV Output:
   id;type;title;effect;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hull;armour;shield;abm;damage;control
@@ -384,13 +384,12 @@ def main():
     """Main function: process all XCF files in a directory and write CSV."""
     # Default directory
     cards_dir = "/home/christopher/Dokumente/outer-colonies/misc/cards"
+    # Always write to ./misc/cards.csv
     output_csv = "/home/christopher/Dokumente/outer-colonies/misc/cards.csv"
     
     # Accept directory as first argument
     if len(sys.argv) > 1:
         cards_dir = sys.argv[1]
-    # Always write to ./misc/cards.csv
-    output_csv = "/home/christopher/Dokumente/outer-colonies/misc/cards.csv"
     
     # Get all XCF files (excluding scripts)
     xcf_files = sorted([
