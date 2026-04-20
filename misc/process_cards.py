@@ -428,29 +428,10 @@ def main():
 
 if __name__ == "__main__":
     main()
-    import sys
+    # Quit GIMP by sending SIGTERM to parent process (GIMPInstance running this script)
     import os
-    # Force GIMP to quit - try all known methods for GIMP 3.x flatpak
+    import signal
     try:
-        # GIMP 2.x / Python-Fu
-        from gimp import pdb as gimp_pdb
-        gimp_pdb.gimp_quit(0)
-    except ImportError:
-        try:
-            # GIMP 3.x with gi.repository
-            from gi.repository import Gimp
-            pdb = Gimp.get_pdb()
-            pdb.gimp_quit(0)
-        except Exception:
-            try:
-                Gimp.quit()
-            except Exception:
-                try:
-                    Gimp.main_quit()
-                except Exception:
-                    try:
-                        app = Gimp.Application.get_instance()
-                        app.quit()
-                    except Exception:
-                        pass
-    sys.exit(0)
+        os.kill(os.getppid(), signal.SIGTERM)
+    except Exception:
+        pass
