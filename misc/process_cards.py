@@ -429,6 +429,8 @@ def main():
 if __name__ == "__main__":
     main()
     import sys
+    import os
+    # Force GIMP to quit - try all known methods
     try:
         from gimp import pdb
         pdb.gimp_quit(0)
@@ -436,7 +438,15 @@ if __name__ == "__main__":
         pass
     try:
         from gi.repository import Gimp
-        Gimp.main_quit()
+        Gimp.quit()
     except Exception:
-        pass
+        try:
+            Gimp.main_quit()
+        except Exception:
+            try:
+                app = Gimp.Application.get_instance()
+                app.quit()
+            except Exception:
+                pass
     sys.exit(0)
+    os._exit(0)
