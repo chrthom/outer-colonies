@@ -17,7 +17,7 @@ for i in 1 2; do
     SUBFOLDER="${BASE_DIR}/${i}"
     if [ -d "$SUBFOLDER" ]; then
         echo "  Processing subfolder ${i}..."
-        flatpak run org.gimp.GIMP --batch --batch-interpreter python-fu-eval \
+        flatpak run org.gimp.GIMP --batch-interpreter python-fu-eval -b \
             "import sys; sys.argv = ['process_cards.py', '${SUBFOLDER}']; exec(open('/home/christopher/Dokumente/outer-colonies/misc/process_cards.py').read())" 2>/dev/null
         
         # Copy result to temporary file
