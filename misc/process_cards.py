@@ -428,12 +428,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+    import sys
     try:
         from gimp import pdb
         pdb.gimp_quit(0)
     except ImportError:
-        try:
-            app = Gimp.Application.get_instance()
-            app.quit()
-        except Exception:
-            pass
+        pass
+    try:
+        from gi.repository import Gimp
+        Gimp.main_quit()
+    except Exception:
+        pass
+    sys.exit(0)
