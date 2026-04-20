@@ -66,7 +66,7 @@ async function collectCommentsWithGraphQL() {
     console.log('Response:', JSON.stringify(response, null, 2));
   }
   
-  fs.writeFileSync('unresolved_comments.json', JSON.stringify(unresolvedComments, null, 2));
+  fs.writeFileSync('/tmp/unresolved_comments.json', JSON.stringify(unresolvedComments, null, 2));
   console.log(`Found ${unresolvedComments.length} unresolved comments`);
   
   return unresolvedComments;

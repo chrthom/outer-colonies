@@ -43,11 +43,6 @@ Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
 1. Run quality checks: `npm run format && npm run lint && npm run test`
 2. Fix any issues and repeat until all checks pass.
 
-### 6. Gotchas
-- **Critical**: Never work directly on the main branch.
-- Ensure `GITHUB_TOKEN` is set before making API calls.
-- Read the issue description carefully for hidden requirements.
-
 ### 7. Issue Management
 - Update the GitHub issue via the API.
 - Mark completed subtasks by updating `- [ ]` to `- [x]`.
@@ -56,3 +51,8 @@ Replace `<owner>`, `<repo>`, and `<issue_number>` with the appropriate values.
 ### 8. Create Pull Request
 - **Title Format**: `#<issue_id> : <description>`
 - **Link to Issue**: Use "Closes #<issue_id>" in the PR description to link it to the issue.
+
+## Gotchas
+- **Critical**: Never work directly on the main branch.
+- Ensure `GITHUB_TOKEN` is set before making API calls.
+- Read the issue description carefully for hidden requirements.

@@ -33,7 +33,7 @@ Use the script in `scripts/collect_comments.js` to gather unresolved comments:
 node scripts/collect_comments.js
 ```
 
-This will create `unresolved_comments.json` with all unresolved review comments.
+This will create `/tmp/unresolved_comments.json` with all unresolved review comments.
 
 ### 4. Generate Todos
 Use the script in `scripts/generate_todos.js` to create todo items:
@@ -42,11 +42,11 @@ Use the script in `scripts/generate_todos.js` to create todo items:
 node scripts/generate_todos.js
 ```
 
-This will create `generated_todos.json` with structured todo items for each comment.
+This will create `/tmp/generated_todos.json` with structured todo items for each comment.
 
 ### 5. Load Todos
 ```bash
-todo write --file generated_todos.json
+todo write --file /tmp/generated_todos.json
 ```
 
 ### 6. Gotchas
@@ -125,8 +125,4 @@ For all quality-related todos, follow this validation loop:
 3. **GitHub Actions**: Check status via API, wait up to 3 minutes for completion.
 4. **Fix failures**: If GitHub Actions fail, fix locally, validate, then push.
 
-#### 7.4 Cleanup
-Remove temporary files:
-- `unresolved_comments.json`
-- `generated_todos.json`
-- Any temporary script files created during the process.
+
