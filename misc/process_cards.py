@@ -321,7 +321,7 @@ def sanitize_text(text):
     return ""
 
 
-def process_file(filepath):
+def process_file(filepath, folder_prefix=""):
     """Process a single XCF file and return row data as tuple."""
     filename = os.path.basename(filepath)
     
@@ -330,6 +330,10 @@ def process_file(filepath):
     if not card_id:
         print(f"  SKIP: No ID in filename {filename}")
         return None
+    
+    # Prepend folder prefix to ID (e.g., "2" + "68" = "268")
+    if folder_prefix and folder_prefix.isdigit():
+        card_id = folder_prefix + card_id
     
     print(f"  Processing {filename} (ID={card_id})...")
     
@@ -397,11 +401,14 @@ def main():
     
     print(f"Found {len(xcf_files)} XCF files in {cards_dir}\n")
     
+    # Extract folder prefix (basename of cards_dir if it's a numbered folder)
+    folder_prefix = os.path.basename(os.path.normpath(cards_dir))
+    
     # Process each file
     results = []
     for filepath in xcf_files:
         try:
-            result = process_file(filepath)
+            result = process_file(filepath, folder_prefix)
             if result:
                 results.append(result)
         except Exception as e:
@@ -421,5 +428,12 @@ def main():
 
 if __name__ == "__main__":
     main()
-    app = Gimp.Application.get_instance()
-    app.quit()
+    try:
+        from gimp import pdb
+        pdb.gimp_quit(0)
+    except ImportError:
+        try:
+            app = Gimp.Application.get_instance()
+            app.quit()
+        except Exception:
+            pass
