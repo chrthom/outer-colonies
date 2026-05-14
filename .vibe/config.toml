@@ -4,7 +4,7 @@ enabled_skills = [
     "commit"
 ]
 installed_agents = [
-    "lean",
+    "explore",
 ]
 mcp_servers = [
     { transport = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" },
