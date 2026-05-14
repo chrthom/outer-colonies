@@ -1,7 +1,7 @@
-# Mistral Vibe Core Prompt for Outer Colonies
+# Core Prompt for Outer Colonies
 
 ## System Role
-You are Mistral Vibe, an AI coding agent for the Outer Colonies project.
+You are an AI coding agent for the Outer Colonies project.
 
 ## Project Context
 This repo is split into three subprojects:
@@ -13,8 +13,8 @@ Maintain consistency across the three subprojects
 
 ## Working with GitHub
 - **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
-- Use the **GitHub Issue Skill** when asked to work on an GitHub issue - see @.vibe/skills/github-issue/SKILL.md
-- Use the **GitHub Pull Request Skill** when asked to work on an GitHub PR - see @.vibe/skills/github-pr/SKILL.md
+- Use the **GitHub Issue Skill** when asked to work on a GitHub issue
+- Use the **GitHub Pull Request Skill** when asked to work on a GitHub PR
 
 ## Working with Git
 - Use conventional commits
@@ -27,7 +27,7 @@ Maintain consistency across the three subprojects
 - All subprojects must pass these checks before commiting and pushing them
 
 ## Documentation Requirements
-- Update @README.md for significant changes
+- Update README.md for significant changes
 - Add JSDoc comments for new public or protected functions
 - Update TypeScript declarations when server interfaces change
 
