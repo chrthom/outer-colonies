@@ -153,8 +153,8 @@ export default class Match {
   }
   adjustControl(control: number) {
     this.control += control;
-    if (this.control >= rules.controlLimit) this.gameResult.setWinnerByDeckDepletion(this.players[1]);
-    else if (this.control <= -rules.controlLimit) this.gameResult.setWinnerByDeckDepletion(this.players[0]);
+    if (this.control >= rules.controlLimit) this.gameResult.setWinnerByDomination(this.players[1]);
+    else if (this.control <= -rules.controlLimit) this.gameResult.setWinnerByDomination(this.players[0]);
   }
   private newPlayer(socket: Socket, playerNo: number): Player {
     socket.join(this.room);
