@@ -1,84 +1,83 @@
 ---
 name: commit
-description: Add relevant changes, commit them and push the changes on the current branch
+description: Analyze changes, create conventional commit, and push to current branch
 user-invocable: true
 ---
 
 # Commit Skill
 
-## Purpose
-Provide a structured workflow for committing changes following conventional commit format and pushing to the current branch.
-
-## When to Use
-- When you need to commit and push changes to the current branch
-- When following conventional commit format is required
-- When you want to automate the git workflow
-
 ## Workflow
 
-### 1. Check Current Status
-First, check the current git status to understand what changes are available:
+1. **Get changed files**:
+   ```bash
+   git diff --name-only
+   ```
 
-```bash
-git status
-```
+2. **Identify affected subprojects**:
+   - Check which of `server/`, `client/`, `website/` contain changed files
+   - Only proceed with quality checks for affected subprojects
 
-### 2. Stage Relevant Changes
-Add relevant changes to the staging area. Be selective about what to include:
+3. **Determine if logic changed**:
+   - Logic files: `.ts`, `.js`, `.py`, `.java` (excluding `.spec.`, `.test.`, `*.d.ts`)
+   - Non-logic files: `.md`, `.json`, `.yml`, `.yaml`, `.toml`, `.css`, `.html`
+   - If any logic files changed → run tests
 
-```bash
-# For specific files:
-git add <file1> <file2>
+4. **Run quality checks per subproject** (only if subproject has package.json):
+   ```bash
+   cd <subproject> && npm run format && npm run lint
+   ```
+   Only if logic files changed in that subproject:
+   ```bash
+   cd <subproject> && npm run test
+   ```
 
-# For all changes (use with caution):
-git add -A
-```
+5. **Analyze all changes**:
+   ```bash
+   git diff --stat
+   ```
 
-### 3. Create Conventional Commit
-Follow the conventional commit format for the commit message:
+6. **Determine commit type** based on changes:
+   - `feat`: New features or functionality added
+   - `fix`: Bug fixes or corrections
+   - `docs`: Documentation-only changes
+   - `refactor`: Code structure changes without new features/bugfixes
+   - `perf`: Performance improvements
+   - `style`: Formatting, whitespace, semicolons, etc.
+   - `test`: Adding or correcting tests
+   - `chore`: Build process, dependencies, configuration changes
 
-```bash
-git commit -m "<type>(<scope>): <description>"
+7. **Generate commit message** from the actual changes:
+   - Extract scope from changed file paths (e.g., `server`, `client`, `website`)
+   - Create description from diff summary (max 72 chars)
+   - Format: `<type>(<scope>): <description>`
+   - Use imperative mood, lowercase, no period at end
 
-Co-Authored-By: OpenClaude (devstral-latest) <openclaude@gitlawb.com>
-```
+8. **Stage all changes**:
+   ```bash
+   git add --all
+   ```
 
-#### Conventional Commit Types:
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation only changes
-- `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-- `refactor`: A code change that neither fixes a bug nor adds a feature
-- `perf`: A code change that improves performance
-- `test`: Adding missing tests or correcting existing tests
-- `chore`: Changes to the build process or auxiliary tools and libraries
+9. **Commit with auto-generated message**:
+   ```bash
+   git commit -m "<generated message>"
+   ```
 
-### 4. Push Changes
-Push the committed changes to the current branch:
+10. **Push to current branch**:
+    ```bash
+    git push
+    ```
 
-```bash
-git push
-```
+11. **Verify**:
+    ```bash
+    git status
+    ```
 
-### 5. Verify Push
-Check that the push was successful:
-
-```bash
-git status
-```
-
-## Gotchas
-- **Critical**: Always review changes before committing
-- **Critical**: Follow conventional commit format strictly
-- Ensure you're on the correct branch before pushing
-- Never commit sensitive files (check .gitignore)
-- Run quality checks before committing: `npm run format && npm run lint && npm run test`
-
-## Quality Validation
-Before committing, ensure all quality checks pass:
-
-```bash
-npm run format && npm run lint && npm run test
-```
-
-If any checks fail, fix the issues before proceeding with the commit.
+## Rules
+- ALWAYS analyze `git diff` before generating the commit message
+- ALWAYS use conventional commit format
+- NEVER ask the user for the commit message
+- NEVER commit if quality checks fail
+- NEVER commit sensitive files (respect .gitignore)
+- Only run format/lint/test for subprojects with changed files
+- Only run test if logic files changed in that subproject
+- Use `git add --all` to stage all changes
