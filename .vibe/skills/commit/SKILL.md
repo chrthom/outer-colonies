@@ -8,21 +8,19 @@ user-invocable: true
 
 ## Workflow
 
-1. **Get changed files**:
+1. **Identify affected subprojects**:
    ```bash
    git diff --name-only
    ```
 
-2. **Identify affected subprojects**:
    - Check which of `server/`, `client/`, `website/` contain changed files
    - Only proceed with quality checks for affected subprojects
 
-3. **Determine if logic changed**:
-   - Logic files: `.ts`, `.js`, `.py`, `.java` (excluding `.spec.`, `.test.`, `*.d.ts`)
+2. **Determine if logic changed**:
+   - Logic files: `.ts`, `.js`, `.py` (excluding `.spec.`, `.test.`, `*.d.ts`)
    - Non-logic files: `.md`, `.json`, `.yml`, `.yaml`, `.toml`, `.css`, `.html`
-   - If any logic files changed → run tests
 
-4. **Run quality checks per subproject** (only if subproject has package.json):
+3. **Run quality checks per subproject** (only if subproject has package.json):
    ```bash
    cd <subproject> && npm run format && npm run lint
    ```
@@ -31,12 +29,12 @@ user-invocable: true
    cd <subproject> && npm run test
    ```
 
-5. **Analyze all changes**:
+4. **Analyze all changes**:
    ```bash
    git diff --stat
    ```
 
-6. **Determine commit type** based on changes:
+5. **Determine commit type** based on changes:
    - `feat`: New features or functionality added
    - `fix`: Bug fixes or corrections
    - `docs`: Documentation-only changes
@@ -46,31 +44,18 @@ user-invocable: true
    - `test`: Adding or correcting tests
    - `chore`: Build process, dependencies, configuration changes
 
-7. **Generate commit message** from the actual changes:
+6. **Generate commit message** from the actual changes:
    - Extract scope from changed file paths (e.g., `server`, `client`, `website`)
    - Create description from diff summary (max 72 chars)
    - Format: `<type>(<scope>): <description>`
    - Use imperative mood, lowercase, no period at end
 
-8. **Stage all changes**:
+7. **Stage, commit and push**:
    ```bash
-   git add --all
+   git add --all && \
+      git commit -m "<generated message>" && \
+      git push
    ```
-
-9. **Commit with auto-generated message**:
-   ```bash
-   git commit -m "<generated message>"
-   ```
-
-10. **Push to current branch**:
-    ```bash
-    git push
-    ```
-
-11. **Verify**:
-    ```bash
-    git status
-    ```
 
 ## Rules
 - ALWAYS analyze `git diff` before generating the commit message
@@ -80,4 +65,3 @@ user-invocable: true
 - NEVER commit sensitive files (respect .gitignore)
 - Only run format/lint/test for subprojects with changed files
 - Only run test if logic files changed in that subproject
-- Use `git add --all` to stage all changes
