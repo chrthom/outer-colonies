@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "WebFetch"
+    ]
+  },
+  "autoFix": {
+    "enabled": true,
+    "lint": "npm run format && npm run lint",
+    "test": "npm run test",
+    "maxRetries": 3,
+    "timeout": 30000
+  }
+}

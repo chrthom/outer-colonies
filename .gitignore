@@ -1,4 +1,4 @@
 .vscode
 *.zip
 node_modules
-.openclaude/
+.openclaude/settings.local.json
