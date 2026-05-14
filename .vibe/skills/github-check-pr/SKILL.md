@@ -2,7 +2,6 @@
 name: github-check-pr
 description: Check and address GitHub pull request review comments systematically
 user-invocable: true
-slash_command: /github-check-pr
 ---
 
 # GitHub Check PR Skill

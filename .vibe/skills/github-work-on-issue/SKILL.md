@@ -2,7 +2,6 @@
 name: github-work-on-issue
 description: Work on GitHub issues systematically using a structured workflow
 user-invocable: true
-slash_command: /github-work-on-issue
 ---
 
 # GitHub Work On Issue Skill
