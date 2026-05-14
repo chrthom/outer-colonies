@@ -1,7 +1,7 @@
 enabled_skills = [
-    "github-issue",
-    "github-pr-review",
-    "commit"
+    "commit",
+    "github-check-pr",
+    "github-work-on-issue"
 ]
 installed_agents = [
     "explore",
