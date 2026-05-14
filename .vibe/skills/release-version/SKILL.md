@@ -4,14 +4,12 @@ description: Create a release by creating release branch, tag, GitHub release, a
 user-invocable: true
 ---
 
-# Release Version Skill
+Create a release by following this workflow:
 
-## Workflow
-
-### 1. Load Generic GitHub Skill
+1. Load Generic GitHub Skill
 Load `github` skill for shared utilities and API functions.
 
-### 2. Validate and Sync Main Branch
+2. Validate and Sync Main Branch
 Check if the working directory is dirty, abort if so, then sync main:
 ```bash
 if ! git diff --quiet || ! git diff --cached --quiet; then
@@ -21,7 +19,7 @@ fi
 sync_main
 ```
 
-### 3. Extract Current Version and Name
+3. Extract Current Version and Name
 Get version from package.json and name from version indicator files:
 ```bash
 # Get version from any subproject package.json (all are in sync)
@@ -38,7 +36,7 @@ PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
 echo "Current version: v${CURRENT_VERSION} (${CURRENT_NAME})"
 ```
 
-### 4. Determine Release Type
+4. Determine Release Type
 If patch version > 0, it's a patch release; otherwise it's a major/minor release:
 ```bash
 if [ "$PATCH" -gt 0 ]; then
@@ -55,13 +53,13 @@ fi
 echo "Release type: $( [ "$IS_PATCH" = true ] && echo "Patch (Hotfix ${HOTFIX_NUM})" || echo "Major/Minor")"
 ```
 
-### 5. Get Milestone and Build Release Body
+5. Get Milestone and Build Release Body
 Get milestone info for tag description and build comprehensive release description:
 ```bash
 source .vibe/skills/release-version/scripts/get_milestone.sh
 ```
 
-### 6. Create Release Branch
+6. Create Release Branch
 ```bash
 # Extract major.minor for branch name
 BRANCH_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/\.[0-9]+$//')
@@ -76,18 +74,18 @@ else
 fi
 ```
 
-### 7. Create Annotated Tag
+7. Create Annotated Tag
 ```bash
 git tag -a "v${CURRENT_VERSION}" -m "${TAG_DESCRIPTION}"
 git push origin "v${CURRENT_VERSION}"
 ```
 
-### 8. Checkout Main Branch
+8. Checkout Main Branch
 ```bash
 git checkout main
 ```
 
-### 9. Create GitHub Release
+9. Create GitHub Release
 Replace newlines in release body for JSON compatibility, then create GitHub release:
 ```bash
 # Replace newlines with \n for JSON
@@ -99,26 +97,26 @@ RELEASE_ID=$(echo "$RELEASE_DATA" | jq -r '.id')
 echo "Created GitHub Release: $RELEASE_ID"
 ```
 
-### 10. Find Next Milestone
+10. Find Next Milestone
 Get the next milestone for version increment:
 ```bash
 source .vibe/skills/release-version/scripts/find_next_milestone.sh
 ```
 
-### 11. Increment Version in All Subprojects
+11. Increment Version in All Subprojects
 Use the existing version.sh script to update all version files:
 ```bash
 ./misc/version.sh "${NEXT_VERSION}" "${NEXT_NAME}"
 ```
 
-### 12. Commit Version Changes
+12. Commit Version Changes
 ```bash
 git add --all
 git commit -m "chore: bump version to v${NEXT_VERSION} - ${NEXT_NAME}"
 git push origin main
 ```
 
-### 13. Verify
+13. Verify
 ```bash
 git status
 echo "Release v${CURRENT_VERSION} (${CURRENT_NAME}) created successfully"
