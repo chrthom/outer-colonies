@@ -1,7 +1,6 @@
 ---
 name: github-issue
 description: Work on GitHub issues systematically using a structured workflow
-user-invocable: true
 ---
 
 # GitHub Issue Skill

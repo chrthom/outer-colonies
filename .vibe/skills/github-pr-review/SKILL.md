@@ -1,7 +1,6 @@
 ---
 name: github-pr-review
 description: Address GitHub pull request review comments systematically
-user-invocable: true
 ---
 
 # GitHub Pull Request Review Skill
