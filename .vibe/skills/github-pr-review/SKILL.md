@@ -1,10 +1,10 @@
 ---
-name: github-pr
+name: github-pr-review
 description: Address GitHub pull request review comments systematically
 user-invocable: true
 ---
 
-# GitHub Pull Request Skill
+# GitHub Pull Request Review Skill
 
 ## Purpose
 Provide a structured workflow for addressing PR review comments efficiently.

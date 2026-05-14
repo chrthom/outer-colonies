@@ -1,6 +1,6 @@
 enabled_skills = [
     "github-issue",
-    "github-pr"
+    "github-pr-review"
 ]
 installed_agents = [
     "lean",

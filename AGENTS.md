@@ -14,7 +14,7 @@ Maintain consistency across the three subprojects
 ## Working with GitHub
 - **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
 - Use the **GitHub Issue Skill** when asked to work on a GitHub issue
-- Use the **GitHub Pull Request Skill** when asked to work on a GitHub PR
+- Use the **GitHub Pull Request Review Skill** when asked to work on a GitHub PR
 
 ## Working with Git
 - Use conventional commits
