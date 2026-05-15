@@ -13,6 +13,7 @@ This file tracks manual text corrections made during the ICON placeholder review
 
 | ID | Field | Original | Corrected | Note |
 |----|-------|----------|-----------|------|
+| 104 | lore | equivalent | äquivalent | German spelling correction |
 | 123 | effect | nicht- Karte | nicht-{ICON:orb} Karte | Added missing orb icon placeholder |
 | 123 | lore | Resourcen | Ressourcen | German spelling correction |
 | 123 | lore | ermöglichen | ermöglicht | Subject-verb agreement |
