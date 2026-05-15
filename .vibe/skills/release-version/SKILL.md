@@ -6,10 +6,23 @@ user-invocable: true
 
 Create a release by following this workflow:
 
-1. Load Generic GitHub Skill
-Load `github` skill for shared utilities and API functions.
+## Phase 1: Read-Only Operations (Information Gathering)
 
-2. Validate and Sync Main Branch
+All operations in this phase only read data and do not modify anything.
+
+### Step 1: Load GitHub Skill and Validate
+Load `github` skill for shared utilities and API functions, then validate token:
+```bash
+# Load github skill scripts
+source "$SKILL_DIR/../github/scripts/config.sh"
+source "$SKILL_DIR/../github/scripts/api.sh"
+source "$SKILL_DIR/../github/scripts/branch.sh"
+
+# Validate token
+validate_github_token
+```
+
+### Step 2: Validate and Sync Main Branch
 Check if the working directory is dirty, abort if so, then sync main:
 ```bash
 if ! git diff --quiet || ! git diff --cached --quiet; then
@@ -19,14 +32,14 @@ fi
 sync_main
 ```
 
-3. Extract Current Version and Name
+### Step 3: Extract Current Version and Name
 Get version from package.json and name from version indicator files:
 ```bash
 # Get version from any subproject package.json (all are in sync)
 CURRENT_VERSION=$(grep '"version"' client/package.json | head -1 | sed -E 's/.*"version": "([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
 
 # Get version name from version_indicator.ts
-CURRENT_NAME=$(grep '\`.*v[0-9]' client/src/app/components/indicators/version_indicator.ts | grep -oP '[A-Z][a-z]+' | head -1)
+CURRENT_NAME=$(grep -oP '[A-Z][a-z]+' client/src/app/components/indicators/version_indicator.ts | head -1)
 
 # Extract major, minor, patch
 MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
@@ -36,7 +49,7 @@ PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
 echo "Current version: v${CURRENT_VERSION} (${CURRENT_NAME})"
 ```
 
-4. Determine Release Type
+### Step 4: Determine Release Type
 If patch version > 0, it's a patch release; otherwise it's a major/minor release:
 ```bash
 if [ "$PATCH" -gt 0 ]; then
@@ -53,93 +66,265 @@ fi
 echo "Release type: $( [ "$IS_PATCH" = true ] && echo "Patch (Hotfix ${HOTFIX_NUM})" || echo "Major/Minor")"
 ```
 
-5. Get Milestone and Build Release Body
-Get milestone info for tag description and build comprehensive release description:
+### Step 5: Get Milestone Information
+Source the get_milestone script to fetch milestone data and build release body:
 ```bash
-source .vibe/skills/release-version/scripts/get_milestone.sh
+# Source the get_milestone script to populate MILESTONE_NUMBER, MILESTONE_DESCRIPTION, RELEASE_BODY
+source "$SKILL_DIR/scripts/get_milestone.sh"
+
+# Update TAG_DESCRIPTION from milestone if available and not patch
+if [ "$IS_PATCH" = false ] && [ -n "$MILESTONE_DESCRIPTION" ]; then
+  TAG_DESCRIPTION="$MILESTONE_DESCRIPTION"
+fi
 ```
 
-6. Create Release Branch
+### Step 6: Find Next Milestone
+Source the find_next_milestone script to determine the next version:
 ```bash
-# Extract major.minor for branch name
-BRANCH_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/\.[0-9]+$//')
-RELEASE_BRANCH="release/${BRANCH_VERSION}"
+source "$SKILL_DIR/scripts/find_next_milestone.sh"
 
+echo "Next version: ${NEXT_VERSION} (${NEXT_NAME})"
+```
+
+### Step 7: Build Changelog
+Construct the full changelog for the release:
+```bash
+# For non-patch releases, build changelog from milestone issues
+if [ "$IS_PATCH" = false ] && [ -n "$MILESTONE_NUMBER" ]; then
+  ISSUES_JSON=$(github_api GET "/milestones/${MILESTONE_NUMBER}/issues?state=closed")
+  
+  CHANGELOG_FILE=$(mktemp)
+  echo "## What's New in ${CURRENT_VERSION} ${CURRENT_NAME}" > "$CHANGELOG_FILE"
+  echo "" >> "$CHANGELOG_FILE"
+  
+  if [ -n "$MILESTONE_DESCRIPTION" ]; then
+    echo "${MILESTONE_DESCRIPTION}" >> "$CHANGELOG_FILE"
+    echo "" >> "$CHANGELOG_FILE"
+  fi
+  
+  echo "### Features & Improvements" >> "$CHANGELOG_FILE"
+  ISSUES_COUNT=$(echo "$ISSUES_JSON" | jq -r '.[] | select(.pull_request == null) | .title' | wc -l)
+  if [ "$ISSUES_COUNT" -gt 0 ]; then
+    echo "$ISSUES_JSON" | jq -r '.[] | select(.pull_request == null) | "- " + (.title // "Untitled") + " (#" + (.number | tostring) + ")"' >> "$CHANGELOG_FILE"
+  else
+    echo "  No issues found" >> "$CHANGELOG_FILE"
+  fi
+  echo "" >> "$CHANGELOG_FILE"
+  
+  echo "### Pull Requests" >> "$CHANGELOG_FILE"
+  PR_COUNT=$(echo "$ISSUES_JSON" | jq -r '.[] | select(.pull_request != null) | .title' | wc -l)
+  if [ "$PR_COUNT" -gt 0 ]; then
+    echo "$ISSUES_JSON" | jq -r '.[] | select(.pull_request != null) | "- " + (.title // "Untitled") + " (#" + (.number | tostring) + ")"' >> "$CHANGELOG_FILE"
+  else
+    echo "  No pull requests found" >> "$CHANGELOG_FILE"
+  fi
+  
+  RELEASE_BODY=$(cat "$CHANGELOG_FILE")
+  rm "$CHANGELOG_FILE"
+fi
+
+# For patch releases, build a simpler changelog from recent closed issues
+if [ "$IS_PATCH" = true ]; then
+  SEVEN_DAYS_AGO=$(date -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+  ALL_ISSUES_JSON=$(github_api GET "/issues?state=closed&since=${SEVEN_DAYS_AGO}")
+  
+  CHANGELOG_FILE=$(mktemp)
+  echo "## Hotfix ${HOTFIX_NUM} for ${CURRENT_VERSION} ${CURRENT_NAME}" > "$CHANGELOG_FILE"
+  echo "" >> "$CHANGELOG_FILE"
+  echo "### Bug Fixes" >> "$CHANGELOG_FILE"
+  
+  ISSUES_COUNT=$(echo "$ALL_ISSUES_JSON" | jq -r '.[] | select(.pull_request == null) | .title' | wc -l)
+  if [ "$ISSUES_COUNT" -gt 0 ]; then
+    echo "$ALL_ISSUES_JSON" | jq -r '.[] | select(.pull_request == null) | "- " + (.title // "Untitled") + " (#" + (.number | tostring) + ")"' >> "$CHANGELOG_FILE"
+  else
+    echo "  No bug fixes found" >> "$CHANGELOG_FILE"
+  fi
+  
+  RELEASE_BODY=$(cat "$CHANGELOG_FILE")
+  rm "$CHANGELOG_FILE"
+fi
+
+echo "Release body preview:"
+echo "---"
+echo "$RELEASE_BODY"
+echo "---"
+```
+
+## Phase 2: User Approval
+
+Present the release plan to the user for approval:
+
+```bash
+cat << EOF
+
+=== RELEASE PLAN SUMMARY ===
+
+Current Version: v${CURRENT_VERSION} (${CURRENT_NAME})
+Release Type: $( [ "$IS_PATCH" = true ] && echo "Patch (Hotfix ${HOTFIX_NUM})" || echo "Major/Minor")
+
+--- Next Release ---
+Version: ${NEXT_VERSION}
+Name: ${NEXT_NAME}
+
+--- Release Details ---
+Tag: v${CURRENT_VERSION}
+Tag Description: ${TAG_DESCRIPTION}
+Release Title: ${RELEASE_NAME}
+
+--- Release Description Preview ---
+${RELEASE_BODY}
+
+=== APPROVAL REQUIRED ===
+Do you approve this release plan?
+- Type "yes", "approve", or "y" to proceed with creating the release
+- Type "no" or provide feedback to adjust the plan
+- Type "abort" or "cancel" to cancel the release process
+
+EOF
+
+# Read user input
+read -p "Your decision: " USER_RESPONSE
+
+# Check user response - case insensitive
+USER_RESPONSE_LOWER=$(echo "$USER_RESPONSE" | tr '[:upper:]' '[:lower:]')
+
+case "$USER_RESPONSE_LOWER" in
+  yes|approve|y)
+    echo "Release approved. Proceeding with write operations..."
+    ;;
+  no|abort|cancel|n)
+    echo "Release cancelled by user."
+    exit 0
+    ;;
+  *)
+    if [ -n "$USER_RESPONSE" ]; then
+      echo "Feedback received: $USER_RESPONSE"
+      echo "Please adjust the release plan manually or re-run the skill with corrections."
+    fi
+    exit 0
+    ;;
+esac
+```
+
+## Phase 3: Write Operations (After Approval)
+
+All modifications happen in this phase, only after user approval.
+
+### Step 8: Create Release Branch
+```bash
+RELEASE_BRANCH="release/${CURRENT_VERSION}"
+
+# Check if release branch already exists
 if git branch -a | grep -q "$RELEASE_BRANCH"; then
   git checkout "$RELEASE_BRANCH"
   git pull origin "$RELEASE_BRANCH"
 else
   git checkout -b "$RELEASE_BRANCH"
-  git push --set-upstream origin "$RELEASE_BRANCH"
 fi
 ```
 
-7. Create Annotated Tag
+### Step 9: Create Git Tag
 ```bash
-git tag -a "v${CURRENT_VERSION}" -m "${TAG_DESCRIPTION}"
-git push origin "v${CURRENT_VERSION}"
+TAG_NAME="v${CURRENT_VERSION}"
+
+git tag -a "$TAG_NAME" -m "${TAG_DESCRIPTION}"
+git push origin "$TAG_NAME"
 ```
 
-8. Checkout Main Branch
+### Step 10: Create GitHub Release
 ```bash
-git checkout main
+# Escape newlines in release body for JSON
+RELEASE_BODY_JSON=$(echo "$RELEASE_BODY" | jq -Rs .)
+
+# Create the GitHub release
+RELEASE_DATA=$(jq -n \
+  --arg tag "$TAG_NAME" \
+  --arg name "$RELEASE_NAME" \
+  --arg body "$RELEASE_BODY_JSON" \
+  '{
+    "tag_name": $tag,
+    "name": $name,
+    "body": $body,
+    "draft": false,
+    "prerelease": false
+  }')
+
+RELEASE_RESPONSE=$(github_api POST "/releases" "$RELEASE_DATA")
+RELEASE_ID=$(echo "$RELEASE_RESPONSE" | jq -r '.id')
+
+echo "GitHub Release created: $RELEASE_ID"
+echo "Release URL: ${GITHUB_BASE_URL}/releases/${TAG_NAME}"
 ```
 
-9. Create GitHub Release
-Replace newlines in release body for JSON compatibility, then create GitHub release:
+### Step 11: Update Version Files
+Use the version.sh script to update all version references:
 ```bash
-# Replace newlines with \n for JSON
-RELEASE_BODY_JSON=$(echo "$RELEASE_BODY" | sed ':a;N;$!ba;s/\n/\\n/g')
-
-RELEASE_DATA=$(github_api POST "/releases" "{\"tag_name\": \"v${CURRENT_VERSION}\", \"name\": \"${RELEASE_NAME}\", \"body\": \"${RELEASE_BODY_JSON}\"}")
-
-RELEASE_ID=$(echo "$RELEASE_DATA" | jq -r '.id')
-echo "Created GitHub Release: $RELEASE_ID"
+# Update version in all subprojects
+"$SKILL_DIR/../../misc/version.sh" "$NEXT_VERSION" "$NEXT_NAME"
 ```
 
-10. Find Next Milestone
-Get the next milestone for version increment:
+### Step 12: Commit Version Updates
 ```bash
-source .vibe/skills/release-version/scripts/find_next_milestone.sh
+# Stage all version changes
+git add client/package.json server/package.json website/package.json \
+  client/src/app/components/indicators/version_indicator.ts \
+  website/src/app/app.component.html
+
+# Commit the version updates
+COMMIT_MESSAGE="chore: update version to ${NEXT_VERSION} (${NEXT_NAME})"
+git commit -m "$COMMIT_MESSAGE"
 ```
 
-11. Increment Version in All Subprojects
-Use the existing version.sh script to update all version files:
+### Step 13: Push Release Branch
 ```bash
-./misc/version.sh "${NEXT_VERSION}" "${NEXT_NAME}"
+git push origin "$RELEASE_BRANCH"
 ```
 
-12. Commit Version Changes
+### Step 14: Create PR to Main
 ```bash
-git add --all
-git commit -m "chore: bump version to v${NEXT_VERSION} - ${NEXT_NAME}"
-git push origin main
+# Create a PR from release branch to main
+PR_TITLE="chore: release ${CURRENT_VERSION} ${CURRENT_NAME}"
+PR_BODY="Automated release commit for ${CURRENT_VERSION} ${CURRENT_NAME}
+
+Version updated to ${NEXT_VERSION} (${NEXT_NAME}) for next development cycle."
+
+PR_RESPONSE=$(github_api POST "/pulls" "{\"title\": \"${PR_TITLE}\", \"body\": \"${PR_BODY}\", \"head\": \"${RELEASE_BRANCH}\", \"base\": \"main\"}")
+PR_URL=$(echo "$PR_RESPONSE" | jq -r '.html_url')
+
+echo "Pull Request created: $PR_URL"
 ```
 
-13. Verify
+### Step 15: Close Milestone
 ```bash
-git status
-echo "Release v${CURRENT_VERSION} (${CURRENT_NAME}) created successfully"
-echo "Release type: $( [ "$IS_PATCH" = true ] && echo "Patch (Hotfix ${HOTFIX_NUM})" || echo "Major/Minor")"
-echo "Release Branch: $RELEASE_BRANCH"
-echo "Tag: v${CURRENT_VERSION}"
-echo "Tag description: $TAG_DESCRIPTION"
-echo "GitHub Release ID: $RELEASE_ID"
-echo "Version bumped to: v${NEXT_VERSION} (${NEXT_NAME}) on main"
+# Close the current milestone
+if [ -n "$MILESTONE_NUMBER" ]; then
+  github_api PATCH "/milestones/${MILESTONE_NUMBER}" '{"state": "closed"}'
+  echo "Milestone #${MILESTONE_NUMBER} closed"
+fi
+```
+
+### Step 16: Final Summary
+```bash
+cat << EOF
+
+=== RELEASE COMPLETE ===
+
+Tag: ${TAG_NAME}
+GitHub Release: ${GITHUB_BASE_URL}/releases/${TAG_NAME}
+Next Version: ${NEXT_VERSION} (${NEXT_NAME})
+Release Branch: ${RELEASE_BRANCH}
+Pull Request: ${PR_URL:-N/A (not created)}
+
+All write operations completed successfully.
+
+EOF
 ```
 
 ## Rules
-- ALWAYS pull latest changes from main
-- ALWAYS create tag with descriptive message
-- ALWAYS create GitHub release referring to the tag
-- ALWAYS update version in all subprojects (client, server, website)
-- ALWAYS commit version changes to main branch
-- NEVER create release from dirty working directory
-- NEVER skip tag creation or GitHub release creation
-- Release branch name uses major.minor format (e.g., release/3.0 for version 3.0.x)
-- Patch release detected when patch version > 0
-- Tag description for patch releases follows format "<Name> - Hotfix <N>"
-- Tag description for major/minor releases uses milestone description
-- GitHub Release body for major/minor includes all closed issues from milestone
-- GitHub Release name for patch releases includes "(Hotfix N)" suffix
-- Next version and name are extracted from the next open milestone
+- Always validate GITHUB_TOKEN is set before API calls
+- Always extract owner/repo from git remote via config.sh
+- Always use github_api helper function instead of raw curl commands
+- Never perform write operations before user approval
+- All read-only operations must complete before showing approval prompt
+- After approval, all write operations execute sequentially
+- Handle user feedback gracefully - abort on any non-approval response

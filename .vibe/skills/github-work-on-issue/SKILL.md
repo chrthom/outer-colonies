@@ -6,12 +6,21 @@ user-invocable: true
 
 Work on GitHub issues by following this workflow:
 
-1. Load Generic GitHub Skill
-Load `github` skill for shared utilities and API functions.
+1. Load GitHub Scripts
+```bash
+source .vibe/skills/github/scripts/config.sh
+source .vibe/skills/github/scripts/api.sh
+source .vibe/skills/github/scripts/branch.sh
+source .vibe/skills/github/scripts/issue.sh
+source .vibe/skills/github/scripts/pr.sh
+source .vibe/skills/github/scripts/quality.sh
+
+validate_github_token
+```
 
 2. Extract Issue Context
 - Extract `{issue_number}` from user input or context
-- Use `github` skill functions to set `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
+- Repository context is set by config.sh: `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
 
 3. Fetch Issue Details
 ```bash
