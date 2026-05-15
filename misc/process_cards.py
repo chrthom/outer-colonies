@@ -83,7 +83,9 @@ def replace_icon_placeholders(text, card_type):
 
                 icon_type = determine_icon_type(before, after, card_type)
                 result_parts.append(text[last_pos:start])
-                result_parts.append(f"{{ICON:{icon_type}}}")
+                # Ensure exactly one space before and after the placeholder
+                placeholder = f" {{ICON:{icon_type}}} "
+                result_parts.append(placeholder)
                 last_pos = i
             else:
                 i += 1
@@ -91,7 +93,12 @@ def replace_icon_placeholders(text, card_type):
             i += 1
 
     result_parts.append(text[last_pos:])
-    return ''.join(result_parts)
+    result = ''.join(result_parts)
+    # Clean up double spaces that may have been created
+    # (e.g., if there was already a space before/after the icon location)
+    result = re.sub(r'  +', ' ', result)
+    # Trim leading/trailing spaces
+    return result.strip()
 
 
 def determine_icon_type(before, after, card_type):
