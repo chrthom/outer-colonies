@@ -4,18 +4,25 @@ description: Work on GitHub issues systematically using a structured workflow
 user-invocable: true
 ---
 
-# GitHub Work On Issue Skill
+Work on GitHub issues by following this workflow:
 
-## Workflow
+1. Load GitHub Scripts
+```bash
+source .vibe/skills/github/scripts/config.sh
+source .vibe/skills/github/scripts/api.sh
+source .vibe/skills/github/scripts/branch.sh
+source .vibe/skills/github/scripts/issue.sh
+source .vibe/skills/github/scripts/pr.sh
+source .vibe/skills/github/scripts/quality.sh
 
-### 1. Load Generic GitHub Skill
-Load `github` skill for shared utilities and API functions.
+validate_github_token
+```
 
-### 2. Extract Issue Context
+2. Extract Issue Context
 - Extract `{issue_number}` from user input or context
-- Use `github` skill functions to set `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
+- Repository context is set by config.sh: `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
 
-### 3. Fetch Issue Details
+3. Fetch Issue Details
 ```bash
 ISSUE_DATA=$(fetch_issue "$issue_number")
 if [ -z "$ISSUE_DATA" ]; then
@@ -28,7 +35,7 @@ ISSUE_BODY=$(echo "$ISSUE_DATA" | jq -r '.body')
 ISSUE_LABELS=$(echo "$ISSUE_DATA" | jq -r '[.labels[].name] | join(", ")')
 ```
 
-### 4. Determine Issue Type and Branch Prefix
+4. Determine Issue Type and Branch Prefix
 ```bash
 if echo "$ISSUE_LABELS" | grep -q "bug"; then
   BRANCH_PREFIX="bugfix"
@@ -39,24 +46,24 @@ else
 fi
 ```
 
-### 5. Create Short Description for Branch
+5. Create Short Description for Branch
 ```bash
 # Extract first 10 words from title, lowercase, replace spaces with underscores
 BRANCH_DESC=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '_' | head -c 30)
 BRANCH_NAME="${BRANCH_PREFIX}/${issue_number}_${BRANCH_DESC}"
 ```
 
-### 6. Start from Main Branch
+6. Start from Main Branch
 ```bash
 sync_main
 ```
 
-### 7. Create or Checkout Branch
+7. Create or Checkout Branch
 ```bash
 create_branch "$BRANCH_PREFIX" "$issue_number" "$BRANCH_DESC"
 ```
 
-### 8. Break Issue into Subtasks
+8. Break Issue into Subtasks
 Parse issue body for checkboxes and create todos:
 ```bash
 # Extract checkboxes from issue body
@@ -78,7 +85,7 @@ if echo "$ISSUE_BODY" | grep -q '^- \[ \]'; then
 fi
 ```
 
-### 9. Implement Changes
+9. Implement Changes
 For each todo:
 1. Mark as `in_progress` via todo tool
 2. Implement the required change
@@ -90,7 +97,7 @@ For each todo:
    ```
 5. Mark as `completed` via todo tool
 
-### 10. Update Issue Progress
+10. Update Issue Progress
 After completing each subtask:
 ```bash
 # Mark checkbox as completed
@@ -98,7 +105,7 @@ UPDATED_BODY=$(echo "$ISSUE_BODY" | sed "s/^- \[ \] ${TASK}/- [x] ${TASK}/")
 update_issue "$issue_number" "{\"body\": \"${UPDATED_BODY}\"}"
 ```
 
-### 11. Create Pull Request (When All Done)
+11. Create Pull Request (When All Done)
 ```bash
 PR_TITLE="#${issue_number}: ${ISSUE_TITLE}"
 PR_BODY="Closes #${issue_number}\n\n${ISSUE_BODY}"
