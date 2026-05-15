@@ -2,16 +2,32 @@
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Software Architecture](#software-architecture)
-   - [High-Level Overview](#high-level-overview)
-   - [Component Breakdown](#component-breakdown)
-   - [Data Flow and Communication](#data-flow-and-communication)
-3. [Developer Documentation](#developer-documentation)
-   - [Setup and Installation](#setup-and-installation)
-   - [Development Workflow](#development-workflow)
-   - [Testing and Deployment](#testing-and-deployment)
-4. [Technologies and Frameworks](#technologies-and-frameworks)
+- [Outer Colonies](#outer-colonies)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Software Architecture](#software-architecture)
+    - [High-Level Overview](#high-level-overview)
+    - [Component Breakdown](#component-breakdown)
+      - [Website (Angular)](#website-angular)
+      - [Client (Phaser 3)](#client-phaser-3)
+      - [Server (Express + Socket.IO)](#server-express--socketio)
+      - [REST Endpoints](#rest-endpoints)
+      - [WebSocket Events](#websocket-events)
+  - [Developer Documentation](#developer-documentation)
+    - [Setup and Installation](#setup-and-installation)
+      - [Prerequisites](#prerequisites)
+      - [Installation Steps](#installation-steps)
+    - [Development Workflow](#development-workflow)
+      - [Running the Projects](#running-the-projects)
+      - [Building the Projects](#building-the-projects)
+      - [Code Quality and Testing](#code-quality-and-testing)
+      - [Deployment](#deployment)
+      - [Creating a Release](#creating-a-release)
+  - [Technologies and Frameworks](#technologies-and-frameworks)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Development Tools](#development-tools)
+    - [Database](#database)
 
 ## Introduction
 
@@ -30,11 +46,11 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 │                                                                               │
 │   ┌─────────────┐                           ┌─────────────┐                   │
 │   │             │                           │             │                   │
-│   │   Website   │                           │   Client    │                   │
-│   │  (Angular)  │                           │ (Phaser 3)  │                   │
+│   │   Client    │                           │   Website   │                   │
+│   │ (Phaser 3)  │                           │  (Angular)  │                   │
 │   │             │                           │             │                   │
 │   └──────┬──────┘                           └──────┬──────┘                   │
-│          │ REST API                                │ WebSocket                │
+│          │                                         │                          │
 │          │                                         │                          │
 │          │                                         │                          │
 │   ┌───────────────────────────────────────────────────────────────────────┐   │

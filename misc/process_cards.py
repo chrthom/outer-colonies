@@ -36,6 +36,123 @@ import html
 from pathlib import Path
 from gi.repository import Gimp, Gio
 
+# Discipline names for icon detection
+DISCIPLINES = ["Information", "Wirtschaft", "Wissenschaft", "Militär"]
+
+# Card types for icon detection
+CARD_TYPES = ["tactic", "equipment", "hull", "infrastructure", "orb"]
+
+
+def replace_icon_placeholders(text, card_type):
+    """
+    Replace sequences of 2-6 spaces with {ICON:type} placeholders.
+    Uses heuristics to determine the icon type.
+
+    Args:
+        text: The text containing icon placeholders (multiple spaces)
+        card_type: The card type (Tactic, Equipment, Hull, Infrastructure, Orb)
+
+    Returns:
+        Text with spaces replaced by {ICON:type} placeholders
+    """
+    if not text:
+        return text
+
+    # Find all sequences of 2-6 spaces
+    # We need to process them in context to determine the type
+    result = text
+
+    # Pattern to find 2-6 spaces
+    # We'll process the text character by character to get context
+    i = 0
+    result_parts = []
+    last_pos = 0
+
+    while i < len(text):
+        if text[i] == ' ':
+            # Find the end of the space sequence
+            start = i
+            while i < len(text) and text[i] == ' ' and (i - start) < 6:
+                i += 1
+            space_count = i - start
+
+            if space_count >= 2:
+                # Get context before and after
+                before = text[max(0, start - 20):start]
+                after = text[i:min(len(text), i + 20)]
+
+                icon_type = determine_icon_type(before, after, card_type)
+                result_parts.append(text[last_pos:start])
+                result_parts.append(f"{{ICON:{icon_type}}}")
+                last_pos = i
+            else:
+                i += 1
+        else:
+            i += 1
+
+    result_parts.append(text[last_pos:])
+    return ''.join(result_parts)
+
+
+def determine_icon_type(before, after, card_type):
+    """
+    Determine the icon type based on context.
+
+    Heuristics:
+    - Discipline (Information, Wirtschaft, Wissenschaft, Militär) -> tactic
+    - Multiplikator followed by discipline -> tactic
+    - Multiplikator without discipline -> type?
+    - Aktion followed by discipline -> tactic
+    - Aktion with socket symbols (|, Δ, Θ, Ξ, Φ, Ψ, Ω) -> type?
+    - N+ followed by spaces -> speed?
+    - "-Karten" or "-Karte" -> hull (or one of the 5 types)
+    - Special case: 139 -> equipment and abm
+    - Otherwise -> ?
+    """
+    after_lower = after.lower()
+    before_lower = before.lower()
+    card_type_lower = card_type.lower()
+
+    # Check if followed by a discipline
+    for discipline in DISCIPLINES:
+        if after.startswith(discipline):
+            return "tactic"
+        if after_lower.startswith(discipline.lower()):
+            return "tactic"
+
+    # Check for Multiplikator followed by discipline
+    if "multiplikator" in before_lower or "aktion" in before_lower:
+        for discipline in DISCIPLINES:
+            if discipline.lower() in after_lower:
+                return "tactic"
+
+    # Check for Multiplikator without discipline
+    if "multiplikator" in before_lower or "aktion" in before_lower:
+        # Check if it's just parentheses or pipes
+        if after.strip().startswith(('(', '|', 'Δ', 'Θ', 'Ξ', 'Φ', 'Ψ', 'Ω')):
+            return "type?"
+        return "type?"
+
+    # Check for speed pattern (N+ followed by spaces)
+    # Look for pattern like "1+    " or "2+    " or "3+    "
+    speed_pattern = re.search(r'(\d+)\+\s*$', before)
+    if speed_pattern or re.search(r'\d+\+', before):
+        return "speed?"
+
+    # Check for "-Karten" or "-Karte" pattern
+    if "-karten" in after_lower or "-karte" in after_lower:
+        return "hull"
+
+    # Check for socket symbols in context
+    socket_symbols = ['Δ', 'Θ', 'Ξ', 'Φ', 'Ψ', 'Ω', '|']
+    for sym in socket_symbols:
+        if sym in after or sym in before:
+            return "type?"
+
+    # Check for energy/damage/abm/shield/armour context
+    # These are harder to detect, use generic ?
+    return "?"
+
 
 def extract_id_from_filename(filename):
     """Extract numeric ID from filename (before first '_')."""
@@ -358,12 +475,25 @@ def get_modules_data(img):
 
 
 def sanitize_text(text):
-    """Replace newlines and tabs with spaces, strip leading/trailing whitespace."""
+    """Replace newlines and tabs with spaces, strip leading/trailing whitespace.
+
+    Preserves {ICON:...} placeholders.
+    """
     if text:
         # Replace newlines and tabs with spaces
         text = text.replace('\n', ' ').replace('\t', ' ')
-        # Collapse multiple spaces to single space
-        text = re.sub(r' +', ' ', text)
+        # Collapse multiple spaces to single space, but preserve {ICON:...} placeholders
+        # Split by {ICON:...} to handle them separately
+        parts = re.split(r'(\{ICON:[^}]+\})', text)
+        result = []
+        for part in parts:
+            if part.startswith('{ICON:') and part.endswith('}'):
+                result.append(part)
+            else:
+                # Collapse multiple spaces in non-placeholder parts
+                part = re.sub(r' +', ' ', part)
+                result.append(part)
+        text = ''.join(result)
         return text.strip()
     return ""
 
@@ -402,7 +532,7 @@ def process_file(filepath, folder_prefix=""):
             print(f"  WARNING: header_left_icon group not found")
         
         # Get and sanitize all text fields
-        title = sanitize_text(get_title(img))
+        title = get_title(img)
 
         # Extract effect and tags (italic part) separately
         textbox_text_rule = navigate_to_layer(img, ["card", "textbox", "textbox_text_rule"])
@@ -411,6 +541,13 @@ def process_file(filepath, folder_prefix=""):
         else:
             effect = ""
             tags = ""
+
+        # Replace icon placeholders (multiple spaces) with {ICON:type} tokens
+        # This must be done BEFORE sanitization to preserve the placeholders
+        title = replace_icon_placeholders(title, card_type)
+        effect = replace_icon_placeholders(effect, card_type)
+        tags = replace_icon_placeholders(tags, card_type)
+
         title = sanitize_text(title)
         effect = sanitize_text(effect)
         tags = sanitize_text(tags)
@@ -423,16 +560,41 @@ def process_file(filepath, folder_prefix=""):
         # Get modules data
         modules_data = get_modules_data(img)
 
-        print(f"  Result: type={card_type}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
+        # Lowercase the card type
+        card_type_lower = card_type.lower()
+
+        # Get module values
+        hull_val = modules_data.get('hull', '')
+        armour_val = modules_data.get('armour', '')
+        shield_val = modules_data.get('shield', '')
+        abm_val = modules_data.get('abm', '')
+
+        # Calculate damage_* columns: if value is negative, put it in damage_* column
+        # and empty the positive column
+        damage_abm = ''
+        damage_shield = ''
+        damage_armour = ''
+
+        if abm_val and abm_val.startswith('-'):
+            damage_abm = abm_val
+            abm_val = ''
+        if shield_val and shield_val.startswith('-'):
+            damage_shield = shield_val
+            shield_val = ''
+        if armour_val and armour_val.startswith('-'):
+            damage_armour = armour_val
+            armour_val = ''
+
+        print(f"  Result: type={card_type_lower}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
         print(f"  Modules: {modules_data}")
-        return (card_id, card_type, title, effect, tags, lore, discipline, rarity, author,
+        return (card_id, card_type_lower, title, effect, tags, lore, discipline, rarity, author,
                 modules_data.get('socket_a', ''), modules_data.get('socket_b', ''),
                 modules_data.get('socket_d', ''), modules_data.get('socket_e', ''),
                 modules_data.get('socket_f', ''), modules_data.get('socket_g', ''),
                 modules_data.get('energy', ''), modules_data.get('speed', ''),
-                modules_data.get('hull', ''), modules_data.get('armour', ''),
-                modules_data.get('shield', ''), modules_data.get('abm', ''),
-                modules_data.get('damage', ''), modules_data.get('control', ''))
+                hull_val, armour_val, shield_val, abm_val,
+                modules_data.get('damage', ''), modules_data.get('control', ''),
+                damage_abm, damage_shield, damage_armour)
         
     finally:
         img.delete()
@@ -477,7 +639,8 @@ def main():
         writer = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_ALL)
         writer.writerow(['id', 'type', 'title', 'effect', 'tags', 'lore', 'discipline', 'rarity', 'author',
                          'socket_a', 'socket_b', 'socket_d', 'socket_e', 'socket_f', 'socket_g',
-                         'energy', 'speed', 'hull', 'armour', 'shield', 'abm', 'damage', 'control'])
+                         'energy', 'speed', 'hp', 'armour', 'shield', 'abm', 'damage', 'control',
+                         'damage_abm', 'damage_shield', 'damage_armour'])
         for row in results:
             writer.writerow(row)
     
