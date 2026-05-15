@@ -2,6 +2,11 @@
 name: github-work-on-issue
 description: Work on GitHub issues systematically using a structured workflow
 user-invocable: true
+parameters:
+  - name: issue_number
+    type: number
+    required: true
+    description: The GitHub issue ID to work on (e.g., 310)
 ---
 
 Work on GitHub issues by following this workflow:
@@ -19,7 +24,7 @@ validate_github_token
 ```
 
 2. Extract Issue Context
-- Extract `{issue_number}` from user input or context
+- Use provided `issue_number` parameter
 - Repository context is set by config.sh: `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
 
 3. Fetch Issue Details

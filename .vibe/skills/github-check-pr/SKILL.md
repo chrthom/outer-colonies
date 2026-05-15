@@ -2,6 +2,11 @@
 name: github-check-pr
 description: Check and address GitHub pull request review comments systematically
 user-invocable: true
+parameters:
+  - name: pr_number
+    type: number
+    required: true
+    description: The GitHub pull request ID to check (e.g., 417)
 ---
 
 Check and address GitHub pull request review comments by following this workflow:
@@ -18,7 +23,7 @@ validate_github_token
 ```
 
 2. Extract PR Context
-- Extract `{pr_number}` from user input or context
+- Use provided `pr_number` parameter
 - Repository context is set by config.sh: `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`, `GITHUB_BASE_URL`
 
 3. Validate PR Exists
