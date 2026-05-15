@@ -271,9 +271,11 @@ def get_title(img):
 
 
 def extract_effect_parts(layer):
-    """Extract effect text and tags (italic part) from a text layer.
-    Returns (effect_text, tags_text) tuple.
+    """Extract effect text, tags (italic part) and conditional_tags from a text layer.
+    Returns (effect_text, tags_text, conditional_tags_text) tuple.
     Italic parts (wrapped in <i> tags) are extracted as tags.
+    If there are multiple italic sections separated by normal text,
+    the first italic section is tags, and subsequent ones are conditional_tags.
     """
     try:
         if hasattr(layer, 'get_markup'):
@@ -293,14 +295,62 @@ def extract_effect_parts(layer):
                         normal_parts.append(p)
                 # Join parts and strip HTML tags
                 effect = re.sub(r'<[^>]+>', '', ''.join(normal_parts))
-                tags = re.sub(r'<[^>]+>', '', ''.join(italic_parts))
+                all_italic = re.sub(r'<[^>]+>', '', ''.join(italic_parts))
                 # Decode HTML entities
                 effect = html.unescape(effect)
-                tags = html.unescape(tags)
-                return effect, tags.strip()
+                all_italic = html.unescape(all_italic)
+
+                # Check if we have the pattern: italic -> normal -> italic
+                # This indicates conditional tags (tags, effect text, conditional_tags)
+                # We need to check the original markup structure
+                # Re-parse to get the sequence of content blocks
+                content_blocks = []
+                current_block = {'type': 'normal', 'text': ''}
+                in_i = False
+                for p in parts:
+                    if p.startswith('<i'):
+                        if current_block['text']:
+                            content_blocks.append(current_block)
+                        current_block = {'type': 'italic', 'text': ''}
+                        in_i = True
+                    elif p.startswith('</i'):
+                        if current_block['text']:
+                            content_blocks.append(current_block)
+                        current_block = {'type': 'normal', 'text': ''}
+                        in_i = False
+                    else:
+                        current_block['text'] += p
+                if current_block['text']:
+                    content_blocks.append(current_block)
+
+                # Clean HTML tags from blocks
+                for block in content_blocks:
+                    block['text'] = re.sub(r'<[^>]+>', '', block['text'])
+
+                # Check for pattern: italic, normal, italic
+                if len(content_blocks) >= 3:
+                    if (content_blocks[0]['type'] == 'italic' and
+                        content_blocks[1]['type'] == 'normal' and
+                        content_blocks[2]['type'] == 'italic'):
+                        # First italic -> tags
+                        tags = html.unescape(content_blocks[0]['text'])
+                        # Normal -> effect
+                        effect = html.unescape(content_blocks[1]['text'])
+                        # Second italic -> conditional_tags
+                        conditional_tags = html.unescape(content_blocks[2]['text'])
+                        # If there are more blocks, append to conditional_tags
+                        for block in content_blocks[3:]:
+                            if block['type'] == 'italic':
+                                conditional_tags += block['text']
+                            else:
+                                effect += block['text']
+                        return effect.strip(), tags.strip(), conditional_tags.strip()
+
+                # Default behavior: all italic -> tags, all normal -> effect
+                return effect.strip(), all_italic.strip(), ""
     except Exception:
         pass
-    return "", ""
+    return "", "", ""
 
 
 def get_effect(img):
@@ -544,20 +594,23 @@ def process_file(filepath, folder_prefix=""):
         # Extract effect and tags (italic part) separately
         textbox_text_rule = navigate_to_layer(img, ["card", "textbox", "textbox_text_rule"])
         if textbox_text_rule and textbox_text_rule.get_visible():
-            effect, tags = extract_effect_parts(textbox_text_rule)
+            effect, tags, conditional_tags = extract_effect_parts(textbox_text_rule)
         else:
             effect = ""
             tags = ""
+            conditional_tags = ""
 
         # Replace icon placeholders (multiple spaces) with {ICON:type} tokens
         # This must be done BEFORE sanitization to preserve the placeholders
         title = replace_icon_placeholders(title, card_type)
         effect = replace_icon_placeholders(effect, card_type)
         tags = replace_icon_placeholders(tags, card_type)
+        conditional_tags = replace_icon_placeholders(conditional_tags, card_type)
 
         title = sanitize_text(title)
         effect = sanitize_text(effect)
         tags = sanitize_text(tags)
+        conditional_tags = sanitize_text(conditional_tags)
 
         lore = sanitize_text(get_lore(img))
         discipline = sanitize_text(get_discipline(img))
@@ -592,9 +645,9 @@ def process_file(filepath, folder_prefix=""):
             damage_armour = armour_val
             armour_val = ''
 
-        print(f"  Result: type={card_type_lower}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
+        print(f"  Result: type={card_type_lower}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., conditional_tags={conditional_tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
         print(f"  Modules: {modules_data}")
-        return (card_id, card_type_lower, title, effect, tags, lore, discipline, rarity, author,
+        return (card_id, card_type_lower, title, effect, tags, conditional_tags, lore, discipline, rarity, author,
                 modules_data.get('socket_a', ''), modules_data.get('socket_b', ''),
                 modules_data.get('socket_d', ''), modules_data.get('socket_e', ''),
                 modules_data.get('socket_f', ''), modules_data.get('socket_g', ''),
@@ -644,7 +697,7 @@ def main():
     # Use QUOTE_ALL to ensure fields with newlines/special chars are properly quoted
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_ALL)
-        writer.writerow(['id', 'type', 'title', 'effect', 'tags', 'lore', 'discipline', 'rarity', 'author',
+        writer.writerow(['id', 'type', 'title', 'effect', 'tags', 'conditional_tags', 'lore', 'discipline', 'rarity', 'author',
                          'socket_a', 'socket_b', 'socket_d', 'socket_e', 'socket_f', 'socket_g',
                          'energy', 'speed', 'hp', 'armour', 'shield', 'abm', 'damage', 'control',
                          'damage_abm', 'damage_shield', 'damage_armour'])
