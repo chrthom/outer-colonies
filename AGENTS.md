@@ -8,23 +8,13 @@ This repo is split into three subprojects:
 - **website**: Angular 20 frontend for user management and deck configuration
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Express + Socket.IO backend with TypeScript
+- **misc**: Utility scripts for development
 Scan `README.md` to get further information on project background and structure.
 Maintain consistency across the three subprojects
 
-## Working with GitHub
-- **GITHUB_TOKEN**: Provided as an environment variable to access the GitHub API.
-- Use the **GitHub Issue Skill** when asked to work on a GitHub issue
-- Use the **GitHub Pull Request Review Skill** when asked to work on a GitHub PR
-
 ## Working with Git
-- Use conventional commits
-- When you are done commit and push your changes
-
-### Formatting, Linting, Testing
-- **Format**: `npm run format` (Prettier)
-- **Lint**: `npm run lint` (ESLint)
-- **Test**: `npm run test` (Jest/Karma)
-- All subprojects must pass these checks before commiting and pushing them
+- Use conventional commits (see `commit` skill for details)
+- Skills available: `commit`, `github`, `github-check-pr`, `github-work-on-issue`, `release-version`
 
 ## Documentation Requirements
 - Update README.md for significant changes
