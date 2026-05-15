@@ -1,13 +1,16 @@
 enabled_skills = [
-    "github-issue",
-    "github-pr"
+    "commit",
+    "github-check-pr",
+    "github-work-on-issue",
+    "release-version"
 ]
 installed_agents = [
-    "lean",
+    "explore",
 ]
 mcp_servers = [
-    { transport = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" }
+    { transport = "http", url = "https://gitmcp.io/chrthom/outer-colonies", name = "GitMCP" },
 ]
+active_model = "mistral-medium-3.5"
 
 [git]
 main_branch = "main"
