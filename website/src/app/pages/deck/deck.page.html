@@ -45,7 +45,7 @@
           <td class="id-col">{{ card.cardId }}</td>
           <td class="name-col">{{ card.name }}</td>
           <td class="type-col">
-            <img [src]="cardTypeToUrl(card.type)" [matTooltip]="typeTooltip(card.type)" />
+            <span class="oc-icon" [innerHTML]="cardTypeToUrl(card.type) || ''"></span>
           </td>
           <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
           <td class="attack-col">
@@ -54,18 +54,18 @@
             } @if (card.damage) {
             <h3>{{ card.damage }}</h3>
             } @if (card.damage) {
-            <img [src]="toIconUrl('damage')" matTooltip="Verursachter Schaden" />
+            <span class="oc-icon" [innerHTML]="toIconUrl('damage') || ''" matTooltip="Verursachter Schaden"></span>
             }
           </td>
           <td class="defense-col">
             @if (card.defense) {
-            <img [src]="toIconUrl(card.defense)" [matTooltip]="defenseTooltip(card.defense)" />
+            <span class="oc-icon" [innerHTML]="toIconUrl(card.defense) || ''" [matTooltip]="defenseTooltip(card.defense)"></span>
             } @if (card.hp && card.defense) {
             <h3>+</h3>
             } @if (card.hp) {
             <h3>{{ card.hp }}</h3>
             } @if (card.hp) {
-            <img [src]="toIconUrl('hitpoints')" matTooltip="H&uuml;llenintegrit&auml;t" />
+            <span class="oc-icon" [innerHTML]="toIconUrl('hitpoints') || ''" matTooltip="H&uuml;llenintegrit&auml;t"></span>
             }
           </td>
           <td class="rarity-col">
@@ -136,7 +136,7 @@
             @if (s.title) {
             <h1 [innerHtml]="s.title"></h1>
             } @if (s.energyIcon) {
-            <img [src]="toIconUrl('energy')" class="oc-icon big" />
+            <span class="oc-icon big" [innerHTML]="toIconUrl('energy') || ''"></span>
             }
           </th>
           }
