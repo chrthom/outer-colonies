@@ -1,0 +1,39 @@
+/* Outer Colonies Icon Font */
+/* Generated from SVG icons using webfont */
+
+@font-face {
+  font-family: 'outer-colonies-icons';
+  src: url('../assets/fonts/outer-colonies-icons.woff2') format('woff2'),
+       url('../assets/fonts/outer-colonies-icons.woff') format('woff'),
+       url('../assets/fonts/outer-colonies-icons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.oc-icon {
+  font-family: 'outer-colonies-icons';
+  font-size: 1em;
+  line-height: 1;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon mapping (Unicode Private Use Area) */
+/* U+EA01 = armour */
+/* U+EA02 = control */
+/* U+EA03 = damage */
+/* U+EA04 = energy */
+/* U+EA05 = equip */
+/* U+EA06 = hp */
+/* U+EA07 = hull */
+/* U+EA08 = infra */
+/* U+EA09 = orb */
+/* U+EA0A = point_def */
+/* U+EA0B = shield */
+/* U+EA0C = tactic */
