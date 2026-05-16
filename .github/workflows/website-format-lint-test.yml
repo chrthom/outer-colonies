@@ -38,9 +38,8 @@ jobs:
 
     - name: Check for format changes
       id: format-changes
-      working-directory: ./website
       run: |
-        git diff --exit-code || echo "changes_detected=true" >> $GITHUB_OUTPUT
+        cd ./website && git diff --exit-code || echo "changes_detected=true" >> $GITHUB_OUTPUT
 
     - name: Commit format changes if any
       if: steps.format-changes.outputs.changes_detected == 'true'
