@@ -94,3 +94,12 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 426 | effect | {ICON:equipment} -Karte | {ICON:equipment}-Karte | Removed extra space before dash |
 | 428 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
 | 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
+| 139 | effect | {ICON:abm} . | {ICON:abm}. | Removed extra space before period |
+| 162 | effect | {ICON:shield} . | {ICON:shield}. | Removed extra space before period |
+| 165 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
+| 212 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
+| 312 | effect | {ICON:shield} . | {ICON:shield}. | Removed extra space before period |
+| 330 | effect | {ICON:control} . | {ICON:control}. | Removed extra space before period |
+| 408 | effect | 1 - 3 {ICON:speed} | 1-3 {ICON:speed} | Removed extra spaces around dash |
+| 419 | effect | 0 - 3 {ICON:speed} | 0-3 {ICON:speed} | Removed extra spaces around dash |
+| 425 | effect | {ICON:damage} . | {ICON:damage}. | Removed extra space before period |
