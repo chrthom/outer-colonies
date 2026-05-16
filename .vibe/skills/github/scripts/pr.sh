@@ -24,14 +24,23 @@ fetch_unresolved_comments() {
 }
 
 # Reply to PR comment (in thread)
-# Usage: reply_to_comment <pr_number> <comment_id> <review_id> <body>
+# Usage: reply_to_comment <comment_id> <body>
+# Auto-discovers PR number and review_id from the comment
 reply_to_comment() {
-  local pr_number=$1
-  local comment_id=$2
-  local review_id=$3
-  local body=$4
-  
-  github_api POST "/pulls/${pr_number}/reviews/${review_id}/comments" \
+  local comment_id=$1
+  local body=$2
+
+  # Auto-discover PR number and review_id from the comment
+  local comment_data=$(github_api GET "/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/pulls/comments/${comment_id}")
+  local pr_number=$(echo "$comment_data" | jq -r '.pull_request.url' | grep -oE '/[0-9]+$' | tr -d '/')
+  local review_id=$(echo "$comment_data" | jq -r '.pull_request_review_id // empty')
+
+  if [ -z "$review_id" ]; then
+    echo "ERROR: Cannot find review_id for comment ${comment_id}" >&2
+    return 1
+  fi
+
+  github_api POST "/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/pulls/${pr_number}/reviews/${review_id}/comments" \
     "{\"body\": \"${body}\", \"in_reply_to\": ${comment_id}}"
 }
 
