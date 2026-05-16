@@ -1,6 +1,7 @@
 @use "@angular/material" as mat;
 @use "./style/material-theme.scss" as oc;
 @use "./style/fonts.scss";
+@use "./style/outer-colonies-icons.css";
 @include mat.elevation-classes();
 @include mat.app-background();
 @include mat.all-component-themes(oc.$theme);
@@ -64,9 +65,15 @@ ul {
 .oc-icon {
   vertical-align: middle;
   width: 24px;
+  font-family: 'outer-colonies-icons', sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  text-align: center;
 }
 .oc-icon.big {
   width: 32px;
+  font-size: 32px;
 }
 .primary-color {
   color: var(--color-primary);

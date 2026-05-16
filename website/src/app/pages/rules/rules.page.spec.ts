@@ -32,10 +32,16 @@ describe('RulesPage', () => {
     expect(component.imgUrl(imgName)).toBe(expectedUrl);
   });
 
-  it('should generate correct icon URL', () => {
-    const iconName = 'test-icon';
-    const expectedUrl = `${environment.url.assets}/icons/${iconName}.png`;
-    expect(component.iconUrl(iconName)).toBe(expectedUrl);
+  it('should return icon font character for known icons', () => {
+    const iconName = 'control';
+    const result = component.iconUrl(iconName);
+    // iconUrl now returns the Unicode character from the icon font
+    expect(result).toBe('\uea02');
+  });
+
+  it('should return null for unknown icons', () => {
+    const iconName = 'unknown-icon';
+    expect(component.iconUrl(iconName)).toBeNull();
   });
 
   it('should return asset URL from environment', () => {
@@ -43,8 +49,9 @@ describe('RulesPage', () => {
   });
 
   it('should have URL generation methods', () => {
-    // Test URL generation logic instead of template rendering
+    // Test URL generation logic
     expect(component.imgUrl('test')).toContain('/rules/test.png');
-    expect(component.iconUrl('test')).toContain('/icons/test.png');
+    // iconUrl now returns icon font characters, not PNG URLs
+    expect(component.iconUrl('test')).toBeNull();
   });
 });
