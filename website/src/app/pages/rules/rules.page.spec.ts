@@ -49,8 +49,9 @@ describe('RulesPage', () => {
   });
 
   it('should have URL generation methods', () => {
-    // Test URL generation logic instead of template rendering
+    // Test URL generation logic
     expect(component.imgUrl('test')).toContain('/rules/test.png');
-    expect(component.iconUrl('test')).toContain('/icons/test.png');
+    // iconUrl now returns icon font characters, not PNG URLs
+    expect(component.iconUrl('test')).toBeNull();
   });
 });
