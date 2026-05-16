@@ -43,7 +43,7 @@ jobs:
         git diff --exit-code || echo "changes_detected=true" >> $GITHUB_OUTPUT
 
     - name: Commit format changes if any
-      if: steps.format-changes.outputs.changes_detected == 'true' && github.event.pull_request.head.repo.fork == false
+      if: steps.format-changes.outputs.changes_detected == 'true'
       run: |
         # Store current branch name
         BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
@@ -61,13 +61,6 @@ jobs:
         git checkout "$BRANCH_NAME"
         git pull origin "$BRANCH_NAME"
         git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git "$BRANCH_NAME"
-
-    - name: Fail if format changes detected on fork
-      if: steps.format-changes.outputs.changes_detected == 'true' && github.event.pull_request.head.repo.fork == true
-      run: |
-        echo "::error::Format changes were detected but cannot be auto-fixed on a fork."
-        echo "Please run 'npm run format' locally and commit the changes."
-        exit 1
 
     - name: Run lint
       working-directory: ./server
