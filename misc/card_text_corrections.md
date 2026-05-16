@@ -83,3 +83,14 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 331 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
 | 331 | lore | Dekomprression | Dekompression | Typo fix |
 | 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
+| 210 | effect | {ICON:equipment} -Karten | {ICON:equipment}-Karten | Removed extra space before dash |
+| 225 | tags | {ICON:tactic} - Wirtschaft | {ICON:tactic}-Wirtschaft | Removed extra space before dash (both occurrences) |
+| 331 | tags | Gefechtphasenende | Gefechtsphasenende | Typo fix |
+| 403 | effect | {ICON:infrastructure} -Karte | {ICON:infrastructure}-Karte | Removed extra space before dash |
+| 407 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
+| 407 | effect | 0 - 2 {ICON:speed} | 0-2 {ICON:speed} | Removed extra spaces around dash |
+| 408 | lore | Röntgenstrahungsenergie | Röntgenstrahlungsenergie | Typo fix |
+| 408 | lore | einen Schiff | ein Schiff | Accusative singular neuter fix |
+| 426 | effect | {ICON:equipment} -Karte | {ICON:equipment}-Karte | Removed extra space before dash |
+| 428 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
+| 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
