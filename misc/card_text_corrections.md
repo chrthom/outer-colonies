@@ -61,3 +61,14 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 406 | lore | halb-anaorganische | halb-anorganische | Typo fix |
 | 406 | lore | basierenen Alternativen | basierenden Alternativen | Grammar fix |
 | 407 | lore | ballistischen Geschossen auszuweichen begrenzt | ballistischen Geschossen auszuweichen, begrenzt | Added comma before "begrenzt" |
+| 201 | effect | außer das Schiff | außer auf das Schiff | Fixed preposition for dative case |
+| 202 | effect | die einen Φ -Sockel nutzen. | die einen Φ-Sockel nutzen. | Removed extra spaces around dash in socket reference |
+| 206 | effect | 4 {ICON:damage} , | 4 {ICON:damage), | Removed extra space before comma |
+| 209 | lore | interferieren in den Bindungen | interferieren mit den Bindungen | Fixed preposition (mit = with, not in) |
+| 209 | lore | unverhersagbare | unvorhersehbare | Typo fix |
+| 229 | lore | Nur dort wo es Wasser | Nur dort, wo es Wasser | Added comma before "wo" |
+| 319 | effect | die einen Φ -Sockel benötigen. | die einen Φ-Sockel benötigen. | Removed extra spaces around dash in socket reference |
+| 349 | lore | Oberfläsche | Oberfläche | Typo fix |
+| 412 | lore | effektivien | effektiven | Typo fix |
+| 441 | lore | begünstigen | begünstigt | Subject-verb agreement fix |
+| 441 | lore | Bogenminute | Bogenminuten | Plural form fix |
