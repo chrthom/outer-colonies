@@ -51,3 +51,13 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 439 | lore | Ein erschwingliches Schiff mit großes Frachtraum | Ein erschwingliches Schiff mit großem Frachtraum | Fixed "großes" → "großem" (dative case) |
 | 440 | lore | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierenden Strahlenwaffe | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierende Strahlenwaffe | Fixed "basierenden" → "basierende" (adjective before noun) |
 | 165 | lore | können die Kolonie aber schnell voran bringen | können die Kolonie aber schnell voranbringen | Fixed "voran bringen" → "voranbringen" (infinitive at end of sentence) |
+| 233 | effect | Reaktiviere {ICON:equipment} die in Summe bis zu 4 {ICON:abm} bieten | Reaktiviere {ICON:equipment} deines Gegners, die in Summe bis zu 4 {ICON:abm} bieten | Added "deines Gegners" for consistency with ID 139 |
+| 233 | lore | synchonisiert | synchronisiert | Typo fix |
+| 234 | lore | Manch ein Kapitän | Mancher Kapitän | Grammar fix |
+| 235 | effect | Negiere den Angriffs einer {ICON:equipment} | Negiere den Angriff einer {ICON:equipment} | Removed -s from Angriffs |
+| 319 | effect | an diesem Schiff anliegenden {ICON:equipment} , | an diesem Schiff anliegenden {ICON:equipment}, | Removed extra space before comma |
+| 336 | lore | scholatischen Ausbildung | scholastischen Ausbildung | Typo fix |
+| 336 | lore | wichtiger Einrichtigungen | wichtiger Einrichtungen | Typo fix |
+| 406 | lore | halb-anaorganische | halb-anorganische | Typo fix |
+| 406 | lore | basierenen Alternativen | basierenden Alternativen | Grammar fix |
+| 407 | lore | ballistischen Geschossen auszuweichen begrenzt | ballistischen Geschossen auszuweichen, begrenzt | Added comma before "begrenzt" |
