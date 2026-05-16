@@ -56,10 +56,7 @@ jobs:
         # Go back to root for git operations
         cd ..
         git commit -m "chore: auto-format website"
-        git fetch origin "$BRANCH_NAME"
-        git checkout "$BRANCH_NAME"
-        git pull origin "$BRANCH_NAME"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git "$BRANCH_NAME"
+        git push origin HEAD:"${BRANCH_NAME}"
 
     - name: Run lint
       working-directory: ./website
