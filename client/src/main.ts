@@ -4,6 +4,6 @@ import { importProvidersFrom } from '@angular/core';
 
 // Test comment with bad formatting
 
-bootstrapApplication(AppComponent, {
+    bootstrapApplication(AppComponent, {
   providers: [importProvidersFrom(BrowserModule),],
 }).catch(err=>console.error(err));
