@@ -113,3 +113,9 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 405 | lore | "" Friedrich Nietzsche | "" - Friedrich Nietzsche | Added dash before author |
 | 414 | effect | {ICON:equipment} . | {ICON:equipment}. | Removed extra space before period |
 | 442 | tags | Halbarkeit | Haltbarkeit | Typo fix |
+| 219 | lore | """. - Johann Wolfgang von Goethe | """. - Johann Wolfgang von Goethe | Removed extra period |
+| 352 | lore | "" George Carlin | "" - George Carlin | Added dash before author |
+| 420 | lore | "" Mark Twain | "" - Mark Twain | Added dash before author |
+| 422 | lore | "" William Shakespeare | "" - William Shakespeare | Added dash before author |
+| 422 | lore | größrer | größerer | Typo fix |
+| 429 | lore | "" Filippo Tommaso Marinetti | "" - Filippo Tommaso Marinetti | Added dash before author |
