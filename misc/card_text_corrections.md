@@ -103,3 +103,13 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 408 | effect | 1 - 3 {ICON:speed} | 1-3 {ICON:speed} | Removed extra spaces around dash |
 | 419 | effect | 0 - 3 {ICON:speed} | 0-3 {ICON:speed} | Removed extra spaces around dash |
 | 425 | effect | {ICON:damage} . | {ICON:damage}. | Removed extra space before period |
+| 218 | lore | nicht da wo es | nicht da, wo es | Added comma before "wo" |
+| 235 | effect | Φ -Sockel | Φ-Sockel | Removed extra space before dash |
+| 302 | lore | "" Robert Oppenheimer | "" - Robert Oppenheimer | Added dash before author |
+| 303 | lore | "" Julius Cäsar | "" - Julius Cäsar | Added dash before author |
+| 332 | lore | "" Sunzi | "" - Sunzi | Added dash before author |
+| 350 | lore | "" Wilhelm von Humboldt | "" - Wilhelm von Humboldt | Added dash before author |
+| 402 | lore | "" Sunzi | "" - Sunzi | Added dash before author |
+| 405 | lore | "" Friedrich Nietzsche | "" - Friedrich Nietzsche | Added dash before author |
+| 414 | effect | {ICON:equipment} . | {ICON:equipment}. | Removed extra space before period |
+| 442 | tags | Halbarkeit | Haltbarkeit | Typo fix |
