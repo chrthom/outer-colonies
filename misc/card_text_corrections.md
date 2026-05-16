@@ -41,3 +41,13 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 209 | lore | Waffensystemen gegen die es | Waffensystemen, gegen die es | Added comma before relative clause |
 | 214 | effect | oder die Kolonie | oder auf die Kolonie | Added "auf" for parallel structure |
 | 344 | lore | Anders als bei dem meisten industriellen und militärischen Lasern, ist | Anders als bei den meisten industriellen und militärischen Lasern ist | Fixed "bei dem meisten" → "bei den meisten", removed comma after "Lasern" |
+| 179 | lore | Winzige Metallkörner die im Vakuum | Winzige Metallkörner, die im Vakuum | Added comma before relative clause "die" |
+| 231 | lore | Es gibt nur eine Sache die größer ist als die Liebe zur Freiheit: Der Hass auf die Person, die sie dir weg nimmt. | Es gibt nur eine Sache, die größer ist als die Liebe zur Freiheit: Der Hass auf die Person, die sie dir wegnimmt. | Added comma before relative clause, fixed "weg nimmt" → "wegnimmt" |
+| 234 | lore | Wenn Flottengefechte länger andauern ist das Letzte was man möchte | Wenn Flottengefechte länger andauern, ist das Letzte, was man möchte | Added commas after "andauern" and "Letzte" |
+| 325 | lore | Risse, Löcher und anderen Kleinstschäden in der Außenhülle, regeneriert | Risse, Löcher und andere Kleinstschäden in der Außenhülle regeneriert | Fixed "und anderen" → "und andere", removed comma before "regeneriert" |
+| 338 | lore | Das einer von ihnen unsere Kolonie mit regelmäßigen Nachschublieferungen unterstützt ist ein großes Glück. | Dass einer von ihnen unsere Kolonie mit regelmäßigen Nachschublieferungen unterstützt, ist ein großes Glück. | Fixed "Das" → "Dass", added comma before "ist" |
+| 416 | lore | Stattdessen befinden sie sich auf ihrer Umlaufbahn die Hälfte der Zeit | Stattdessen befinden sie sich auf ihrer Umlaufbahn, die Hälfte der Zeit | Added comma before relative clause "die" |
+| 438 | lore | Zivile und militärische Strahlenschilde basieren allesamt auf der gleichen Methode | Zivile und militärische Strahlenschilde basieren allesamt auf derselben Methode | Fixed "der gleichen" → "derselben" |
+| 439 | lore | Ein erschwingliches Schiff mit großes Frachtraum | Ein erschwingliches Schiff mit großem Frachtraum | Fixed "großes" → "großem" (dative case) |
+| 440 | lore | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierenden Strahlenwaffe | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierende Strahlenwaffe | Fixed "basierenden" → "basierende" (adjective before noun) |
+| 165 | lore | können die Kolonie aber schnell voran bringen | können die Kolonie aber schnell voranbringen | Fixed "voran bringen" → "voranbringen" (infinitive at end of sentence) |
