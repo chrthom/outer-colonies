@@ -6,22 +6,23 @@ user-invocable: true
 
 Commit and push the changes on this branch by following this workflow:
 
-1. Run quality checks per subproject (only if subproject has package.json):
+1. Load GitHub Skill for quality check utilities:
    ```bash
-   git diff --name-only
-   ```
-   - Check which of `server/`, `client/`, `website/` contain changed files
-   - Only proceed with quality checks for affected subprojects
-   ```bash
-   cd <subproject> && npm run format && npm run lint
+   source "$SKILL_DIR/../github/scripts/quality.sh"
    ```
 
-2. Analyze all changes:
+2. Run quality checks for affected subprojects:
+   ```bash
+   check_all_affected
+   ```
+   This automatically checks which of `server/`, `client/`, `website/` contain changed files and runs format/lint/tests as needed.
+
+3. Analyze all changes:
    ```bash
    git diff --stat
    ```
 
-3. Determine commit type based on changes:
+4. Determine commit type based on changes:
    - `feat`: New features or functionality added
    - `fix`: Bug fixes or corrections
    - `docs`: Documentation-only changes
@@ -31,13 +32,13 @@ Commit and push the changes on this branch by following this workflow:
    - `test`: Adding or correcting tests
    - `chore`: Build process, dependencies, configuration changes
 
-4. Generate commit message from the actual changes:
+5. Generate commit message from the actual changes:
    - Extract scope from changed file paths (e.g., `server`, `client`, `website`)
    - Create description from diff summary (max 72 chars)
    - Format: `<type>(<scope>): <description>`
    - Use imperative mood, lowercase, no period at end
 
-5. Stage, commit and push:
+6. Stage, commit and push:
    ```bash
    git add --all && \
       git commit -m "<generated message>" && \

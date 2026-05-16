@@ -16,6 +16,7 @@ Load `github` skill for shared utilities and API functions, then validate token:
 source "$SKILL_DIR/../github/scripts/config.sh"
 source "$SKILL_DIR/../github/scripts/api.sh"
 source "$SKILL_DIR/../github/scripts/branch.sh"
+source "$SKILL_DIR/../github/scripts/quality.sh"
 
 validate_github_token
 ```
@@ -35,7 +36,17 @@ Get version from package.json and name from version indicator files:
 ```bash
 CURRENT_VERSION=$(grep '"version"' client/package.json | head -1 | sed -E 's/.*"version": "([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
 
+if [ -z "$CURRENT_VERSION" ]; then
+  echo "ERROR: Could not extract version from client/package.json" >&2
+  exit 1
+fi
+
 CURRENT_NAME=$(grep -oP '[A-Z][a-z]+' client/src/app/components/indicators/version_indicator.ts | head -1)
+
+if [ -z "$CURRENT_NAME" ]; then
+  echo "ERROR: Could not extract version name from version_indicator.ts" >&2
+  exit 1
+fi
 
 MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
 MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
