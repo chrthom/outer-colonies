@@ -72,3 +72,14 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 412 | lore | effektivien | effektiven | Typo fix |
 | 441 | lore | begünstigen | begünstigt | Subject-verb agreement fix |
 | 441 | lore | Bogenminute | Bogenminuten | Plural form fix |
+| 164 | lore | wichstigste | wichtigste | Typo fix |
+| 174 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
+| 204 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
+| 207 | effect | den Ziel | dem Ziel | Dative case fix |
+| 212 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra spaces before dash (both occurrences) |
+| 222 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
+| 224 | effect | Wirkungslos (3+ {ICON:speed} ) | Wirkungslos (3+ {ICON:speed}) | Removed extra space before closing parenthesis |
+| 231 | effect | {ICON:hull} -Karte | {ICON:hull}-Karte | Removed extra space before dash |
+| 331 | effect | {ICON:hull} -Karten | {ICON:hull}-Karten | Removed extra space before dash |
+| 331 | lore | Dekomprression | Dekompression | Typo fix |
+| 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
