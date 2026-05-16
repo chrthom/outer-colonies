@@ -11,7 +11,10 @@ jobs:
   format-lint-test:
     name: Format, Lint and Test
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
