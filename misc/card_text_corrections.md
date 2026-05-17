@@ -142,3 +142,4 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 151 | lore | Großkalibrige ballistische Geschütze welche ummantelte | Großkalibrige ballistische Geschütze, welche ummantelte | Added comma before "welche" |
 | 201 | lore | gebaut um eine Schlacht | gebaut, um eine Schlacht | Added comma before "um" |
 | 212 | lore | einen Platz um ihre Berufung | einen Platz, um ihre Berufung | Added comma before "um" |
+| 174 | lore | Nach Gefechten bleibt nicht immer Zeit alle Schäden | Nach Gefechten bleibt nicht immer Zeit, alle Schäden | Added comma after "Zeit" |
