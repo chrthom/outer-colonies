@@ -48,6 +48,16 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 338 | lore | Das einer von ihnen unsere Kolonie mit regelmäßigen Nachschublieferungen unterstützt ist ein großes Glück. | Dass einer von ihnen unsere Kolonie mit regelmäßigen Nachschublieferungen unterstützt, ist ein großes Glück. | Fixed "Das" → "Dass", added comma before "ist" |
 | 416 | lore | Stattdessen befinden sie sich auf ihrer Umlaufbahn die Hälfte der Zeit | Stattdessen befinden sie sich auf ihrer Umlaufbahn, die Hälfte der Zeit | Added comma before relative clause "die" |
 | 438 | lore | Zivile und militärische Strahlenschilde basieren allesamt auf der gleichen Methode | Zivile und militärische Strahlenschilde basieren allesamt auf derselben Methode | Fixed "der gleichen" → "derselben" |
+
+| 142 | lore | sind häufiger geneigt weit entfernten Kolonien | sind häufiger geneigt, weit entfernten Kolonien | Added comma before infinitive clause |
+| 146 | lore | Eismond unter dessen Oberfläche | Eismond, unter dessen Oberfläche | Added comma before relative clause |
+| 174 | lore | ist in der Lage die notwendigen Reparaturen | ist in der Lage, die notwendigen Reparaturen | Added comma before relative clause |
+| 403 | lore | Kuipitergürtel | Kuipergürtel | Typo fix |
+| 406 | lore | auf Metalllegierungen basierenden Alternativen | auf Metalllegierungen basierende Alternativen | Adjective agreement fix (dative plural → accusative plural) |
+| 410 | title | Planetar Unerschöplich | Planetar Unerschöpflich | Typo fix |
+| 433 | lore | Kuipitergürtel | Kuipergürtel | Typo fix |
+| 439 | lore | Kuipitergürtels | Kuipergürtels | Typo fix |
+| 452 | effect | unversiegbaren | unerschöpflichen | Wrong word - "unversiegbaren" (unsealable) → "unerschöpflichen" (inexhaustible) |
 | 439 | lore | Ein erschwingliches Schiff mit großes Frachtraum | Ein erschwingliches Schiff mit großem Frachtraum | Fixed "großes" → "großem" (dative case) |
 | 440 | lore | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierenden Strahlenwaffe | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierende Strahlenwaffe | Fixed "basierenden" → "basierende" (adjective before noun) |
 | 165 | lore | können die Kolonie aber schnell voran bringen | können die Kolonie aber schnell voranbringen | Fixed "voran bringen" → "voranbringen" (infinitive at end of sentence) |
