@@ -1,6 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import { removeFirstMatchingElement, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -318,5 +318,26 @@ export class Card524 extends ScienceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card526 extends ScienceTacticCard {
+  private readonly oneTimeActionPool = new ActionPool(new CardAction(TacticDiscipline.Science));
+  private readonly cardsToDraw = 3;
+  constructor() {
+    super(526, 'Forschungsexpedition', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    player.drawCards(this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.hand.length > 1 ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return removeFirstMatchingElement(player.hand.slice(), cs => cs.card.id == this.id).map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }
