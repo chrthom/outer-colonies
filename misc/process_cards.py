@@ -514,7 +514,11 @@ def get_modules_data(img):
         # Extract column name: text after '_icon_' up to first ' ', '-', or end
         rest = icon_layer.get_name().split('_icon_', 1)[1]
         column_name = re.split(r'[ -]', rest)[0]
-        
+
+        # Map American 'armor' to British 'armour'
+        if column_name == 'armor':
+            column_name = 'armour'
+
         if column_name not in result:
             continue
         
@@ -629,19 +633,19 @@ def process_file(filepath, folder_prefix=""):
         shield_val = modules_data.get('shield', '')
         abm_val = modules_data.get('abm', '')
 
-        # Calculate damage_* columns: if value is negative, put it in damage_* column
+        # Calculate damage_* columns: if value is negative or 'X', put it in damage_* column
         # and empty the positive column
         damage_abm = ''
         damage_shield = ''
         damage_armour = ''
 
-        if abm_val and abm_val.startswith('-'):
+        if abm_val and (abm_val.startswith('-') or abm_val == 'X'):
             damage_abm = abm_val
             abm_val = ''
-        if shield_val and shield_val.startswith('-'):
+        if shield_val and (shield_val.startswith('-') or shield_val == 'X'):
             damage_shield = shield_val
             shield_val = ''
-        if armour_val and armour_val.startswith('-'):
+        if armour_val and (armour_val.startswith('-') or armour_val == 'X'):
             damage_armour = armour_val
             armour_val = ''
 
