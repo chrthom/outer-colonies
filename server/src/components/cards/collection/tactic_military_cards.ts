@@ -254,3 +254,27 @@ export class Card428 extends MilitaryTacticCard {
     return InterventionType.BattleRoundStart;
   }
 }
+
+export class Card501 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      501,
+      'Nukleare Apokalypse',
+      5,
+      {},
+      {
+        range: 0,
+        damage: 24,
+        pointDefense: -5,
+        shield: -3,
+        armour: -4
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}

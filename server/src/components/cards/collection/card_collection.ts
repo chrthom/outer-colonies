@@ -182,7 +182,8 @@ import {
   Card338,
   Card346,
   Card419,
-  Card428
+  Card428,
+  Card501
 } from './tactic_military_cards';
 import {
   Card108,
@@ -459,7 +460,8 @@ export default class CardCollection {
     450: <Card>new Card450(),
     451: <Card>new Card451(),
     452: <Card>new Card452(),
-    453: <Card>new Card453()
+    453: <Card>new Card453(),
+    501: <Card>new Card501(),
   };
 
   static allCards = Object.values(this.cards);
