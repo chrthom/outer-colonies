@@ -8,7 +8,7 @@ Usage:
      exec(open("/home/christopher/Dokumente/outer-colonies/misc/process_cards.py").read())'
 
 CSV Output:
-  id;type;title;effect;tags;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hull;armour;shield;abm;damage;control
+  id;type;title;effect;tags;conditional_tags;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hp;armour;shield;abm;damage;control;damage_abm;damage_shield;damage_armour
 
 Columns:
 - ID: numeric part of filename before first "_"
@@ -19,9 +19,10 @@ Columns:
   * "Hull" if header_left_icon_hull OR header_left_icon_ship is visible
   * "Infrastructure" if header_left_icon_planetary OR header_left_icon_infrastructure is visible
 - title: text from card/header/header_title/header title_text layer
-- Effect: normal text from card/textbox/textbox_text_rule (non-italic parts)
-- Tags: italic text from card/textbox/textbox_text_rule (italic parts)
-- Lore: text from card/textbox/textbox_text_lore
+- Effect: bold text from card/textbox/textbox_text_rule
+- Tags: bold+italic text from card/textbox/textbox_text_rule
+- Conditional Tags: additional conditional tags (from pattern: italic, bold, italic)
+- Lore: italic-only text from textbox_text_rule + text from card/textbox/textbox_text_lore
 - Discipline: text from card/textbox/textbox_tag/textbox_tag_text (only if textbox_tag group is visible)
 - Rarity: highest visible rarity<value>_red layer (5-0), defaults to 0
 - Author: text from card/footer/footer_illustration or card/footer-Kopie/footer_illustration
@@ -271,9 +272,13 @@ def get_title(img):
 
 
 def extract_effect_parts(layer):
-    """Extract effect text, tags (italic part) and conditional_tags from a text layer.
-    Returns (effect_text, tags_text, conditional_tags_text) tuple.
-    Italic parts (wrapped in <i> tags) are extracted as tags.
+    """Extract effect text, tags (italic part), conditional_tags, and lore from a text layer.
+    Returns (effect_text, tags_text, conditional_tags_text, lore_text) tuple.
+
+    Bold parts (wrapped in <b>, <span weight=...> etc.) are extracted as effect (rule text).
+    Bold+Italic parts are extracted as tags.
+    Italic-only parts are extracted as lore.
+    Regular (non-bold, non-italic) parts are treated as lore text.
     If there are multiple italic sections separated by normal text,
     the first italic section is tags, and subsequent ones are conditional_tags.
     """
@@ -281,76 +286,120 @@ def extract_effect_parts(layer):
         if hasattr(layer, 'get_markup'):
             markup = layer.get_markup()
             if markup:
-                # Split by <i> and </i> tags to separate italic from normal text
-                parts = re.split(r'(<i[^>]*>|</i>)', markup)
-                normal_parts = []
-                italic_parts = []
-                in_italic = False
-                for p in parts:
-                    if p.startswith('<i') or p.startswith('</i'):
-                        in_italic = p.startswith('<i')
-                    elif in_italic:
-                        italic_parts.append(p)
-                    else:
-                        normal_parts.append(p)
-                # Join parts and strip HTML tags
-                effect = re.sub(r'<[^>]+>', '', ''.join(normal_parts))
-                all_italic = re.sub(r'<[^>]+>', '', ''.join(italic_parts))
-                # Decode HTML entities
-                effect = html.unescape(effect)
-                all_italic = html.unescape(all_italic)
+                # Patterns for bold tags
+                bold_open_pattern = re.compile(r'<b(?:[^>]*)?>|<span[^>]*weight\s*=\s*["\']?(?:bold|700|[7-9]00)["\']?[^>]*>')
+                bold_close_pattern = re.compile(r'</b>|</span>')
+                italic_open_pattern = re.compile(r'<i(?:[^>]*)?>|<span[^>]*style\s*=\s*["\']?italic["\']?[^>]*>')
+                italic_close_pattern = re.compile(r'</i>|</span>')
 
-                # Check if we have the pattern: italic -> normal -> italic
-                # This indicates conditional tags (tags, effect text, conditional_tags)
-                # We need to check the original markup structure
-                # Re-parse to get the sequence of content blocks
+                # Tokenize the markup
+                tokens = re.split(r'(<[^>]+>)', markup)
+
+                # Parse into content blocks with styling info
                 content_blocks = []
                 current_block = {'type': 'normal', 'text': ''}
-                in_i = False
-                for p in parts:
-                    if p.startswith('<i'):
+                in_bold = False
+                in_italic = False
+
+                for token in tokens:
+                    if not token:
+                        continue
+
+                    if token.startswith('<'):
+                        # Flush current block
                         if current_block['text']:
                             content_blocks.append(current_block)
-                        current_block = {'type': 'italic', 'text': ''}
-                        in_i = True
-                    elif p.startswith('</i'):
-                        if current_block['text']:
-                            content_blocks.append(current_block)
-                        current_block = {'type': 'normal', 'text': ''}
-                        in_i = False
+                            current_block = {'type': 'normal', 'text': ''}
+
+                        # Determine tag type and update state
+                        if bold_open_pattern.match(token):
+                            in_bold = True
+                        elif bold_close_pattern.match(token):
+                            in_bold = False
+                        elif italic_open_pattern.match(token):
+                            in_italic = True
+                        elif italic_close_pattern.match(token):
+                            in_italic = False
+
+                        # Update current block type based on state
+                        if in_bold and in_italic:
+                            current_block['type'] = 'bold_italic'
+                        elif in_bold:
+                            current_block['type'] = 'bold'
+                        elif in_italic:
+                            current_block['type'] = 'italic'
+                        else:
+                            current_block['type'] = 'normal'
                     else:
-                        current_block['text'] += p
+                        current_block['text'] += token
+
                 if current_block['text']:
                     content_blocks.append(current_block)
 
-                # Clean HTML tags from blocks
+                # Clean HTML tags from blocks and decode entities
                 for block in content_blocks:
                     block['text'] = re.sub(r'<[^>]+>', '', block['text'])
+                    block['text'] = html.unescape(block['text'])
+                    block['text'] = block['text'].strip()
 
-                # Check for pattern: italic, normal, italic
+                # Separate blocks by type
+                effect_parts = []
+                tags_parts = []
+                lore_parts = []
+
+                for block in content_blocks:
+                    block_type = block['type']
+                    text = block['text']
+                    if not text:
+                        continue
+                    if block_type == 'bold':
+                        effect_parts.append(text)
+                    elif block_type == 'bold_italic':
+                        tags_parts.append(text)
+                    elif block_type == 'italic':
+                        lore_parts.append(text)
+                    else:  # normal
+                        lore_parts.append(text)
+
+                # Join parts
+                effect = ' '.join(effect_parts)
+                tags = ' '.join(tags_parts)
+                lore_in_rule = ' '.join(lore_parts)
+
+                # Check for pattern: italic -> normal/bold -> italic
+                # This indicates conditional tags (tags, effect text, conditional_tags)
                 if len(content_blocks) >= 3:
                     if (content_blocks[0]['type'] == 'italic' and
-                        content_blocks[1]['type'] == 'normal' and
                         content_blocks[2]['type'] == 'italic'):
                         # First italic -> tags
-                        tags = html.unescape(content_blocks[0]['text'])
-                        # Normal -> effect
-                        effect = html.unescape(content_blocks[1]['text'])
-                        # Second italic -> conditional_tags
-                        conditional_tags = html.unescape(content_blocks[2]['text'])
-                        # If there are more blocks, append to conditional_tags
-                        for block in content_blocks[3:]:
+                        tags = content_blocks[0]['text']
+                        # Middle parts -> effect (filter out regular text)
+                        effect_parts = []
+                        for block in content_blocks[1:]:
                             if block['type'] == 'italic':
-                                conditional_tags += block['text']
-                            else:
-                                effect += block['text']
-                        return effect.strip(), tags.strip(), conditional_tags.strip()
+                                break  # Stop at next italic (conditional tags)
+                            if block['type'] == 'bold':
+                                effect_parts.append(block['text'])
+                        effect = ' '.join(effect_parts)
+                        # Remaining italic -> conditional_tags
+                        conditional_tags_parts = []
+                        found_italic = False
+                        for block in content_blocks[1:]:
+                            if block['type'] == 'italic':
+                                found_italic = True
+                                conditional_tags_parts.append(block['text'])
+                            elif found_italic and block['type'] == 'bold':
+                                conditional_tags_parts.append(block['text'])
+                        conditional_tags = ' '.join(conditional_tags_parts)
+                        return effect.strip(), tags.strip(), conditional_tags.strip(), ""
 
-                # Default behavior: all italic -> tags, all normal -> effect
-                return effect.strip(), all_italic.strip(), ""
-    except Exception:
+                # Default: return effect, tags, empty conditional_tags, lore from rule layer
+                return effect.strip(), tags.strip(), "", lore_in_rule.strip()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         pass
-    return "", "", ""
+    return "", "", "", ""
 
 
 def get_effect(img):
@@ -595,14 +644,15 @@ def process_file(filepath, folder_prefix=""):
         # Get and sanitize all text fields
         title = get_title(img)
 
-        # Extract effect and tags (italic part) separately
+        # Extract effect, tags, conditional_tags, and lore from rule layer
         textbox_text_rule = navigate_to_layer(img, ["card", "textbox", "textbox_text_rule"])
         if textbox_text_rule and textbox_text_rule.get_visible():
-            effect, tags, conditional_tags = extract_effect_parts(textbox_text_rule)
+            effect, tags, conditional_tags, lore_in_rule = extract_effect_parts(textbox_text_rule)
         else:
             effect = ""
             tags = ""
             conditional_tags = ""
+            lore_in_rule = ""
 
         # Replace icon placeholders (multiple spaces) with {ICON:type} tokens
         # This must be done BEFORE sanitization to preserve the placeholders
@@ -615,8 +665,16 @@ def process_file(filepath, folder_prefix=""):
         effect = sanitize_text(effect)
         tags = sanitize_text(tags)
         conditional_tags = sanitize_text(conditional_tags)
+        lore_in_rule = sanitize_text(lore_in_rule)
 
-        lore = sanitize_text(get_lore(img))
+        # Combine lore from rule layer (italic-only text) with dedicated lore layer
+        lore_from_lore_layer = sanitize_text(get_lore(img))
+        lore_parts = []
+        if lore_in_rule:
+            lore_parts.append(lore_in_rule)
+        if lore_from_lore_layer:
+            lore_parts.append(lore_from_lore_layer)
+        lore = ' '.join(lore_parts)
         discipline = sanitize_text(get_discipline(img))
         rarity = sanitize_text(get_rarity(img))
         author = sanitize_text(get_author(img))
