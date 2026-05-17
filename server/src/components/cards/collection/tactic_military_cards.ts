@@ -278,3 +278,27 @@ export class Card501 extends MilitaryTacticCard {
     return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
 }
+
+export class Card504 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      504,
+      'Interplanetares Geschütz',
+      4,
+      {},
+      {
+        range: 0,
+        damage: 28,
+        pointDefense: 0,
+        shield: 0,
+        armour: 6
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Orbital && cs.profile.speed == 0);
+  }
+}
