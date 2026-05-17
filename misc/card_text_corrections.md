@@ -143,3 +143,13 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 201 | lore | gebaut um eine Schlacht | gebaut, um eine Schlacht | Added comma before "um" |
 | 212 | lore | einen Platz um ihre Berufung | einen Platz, um ihre Berufung | Added comma before "um" |
 | 174 | lore | Nach Gefechten bleibt nicht immer Zeit alle Schäden | Nach Gefechten bleibt nicht immer Zeit, alle Schäden | Added comma after "Zeit" |
+| 105 | effect | füge vor entfernen dieser Karte | füge vor dem Entfernen dieser Karte | Added article "dem" before infinitive noun |
+| 108 | effect | Swing-by Manövers | Swing-by-Manövers | Added hyphen to compound noun |
+| 129 | effect | oder eine Karte | oder auf eine Karte | Added preposition "auf" for parallel structure |
+| 162 | effect | Lege diese Karte an ein Schiff mit 1+ {ICON:shield} an | Lege diese Karte an ein Schiff mit 1+ {ICON:shield} | Removed double preposition "an" |
+| 201 | effect | beteiligte Schiffe | beteiligten Schiffe | Corrected declension to accusative plural |
+| 205 | effect | Lege diese Karte an ein Schiff mit 1+ {ICON:speed} an | Lege diese Karte an ein Schiff mit 1+ {ICON:speed} | Removed double preposition "an" |
+| 206 | effect | sollte er mehr als 4 {ICON:damage} verursachen | falls er mehr als 4 {ICON:damage} verursachen würde | Corrected conditional to proper form |
+| 305 | effect | Anwendung erhälst | Anwendung, erhältst | Added comma and corrected spelling "erhälst" to "erhältst" |
+| 307 | effect | Du darfst dieses Gefecht Angriffe | Du darfst in diesem Gefecht Angriffe | Added preposition "in" before "diesem Gefecht" |
+| 312 | effect | Kann an keinem Schiff angelegt sein, das | Kann an kein Schiff angelegt werden, das | Corrected to proper passive form |
