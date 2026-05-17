@@ -30,11 +30,11 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 │                                                                               │
 │   ┌─────────────┐                           ┌─────────────┐                   │
 │   │             │                           │             │                   │
-│   │   Client    │                           │   Website   │                   │
-│   │ (Phaser 3)  │                           │  (Angular)  │                   │
+│   │   Website   │                           │   Client    │                   │
+│   │  (Angular)  │                           │ (Phaser 3)  │                   │
 │   │             │                           │             │                   │
 │   └──────┬──────┘                           └──────┬──────┘                   │
-│          │                                         │                          │
+│          │ REST API                                │ WebSocket                │
 │          │                                         │                          │
 │          │                                         │                          │
 │   ┌───────────────────────────────────────────────────────────────────────┐   │
