@@ -15,7 +15,6 @@ This file tracks manual text corrections made during the ICON placeholder review
 |----|-------|----------|-----------|------|
 | 101 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
 | 103 | lore | Adamantium ist eine äußerst seltene Legierung die nur in einigen wenigen Legierungsgießereien im Sonnensystem hergestellt werden können. | Adamantium ist eine äußerst seltene Legierung, die nur in einigen wenigen Legierungsgießereien im Sonnensystem hergestellt werden kann. | Added comma before relative clause, fixed verb agreement (können → kann) |
-| 104 | lore | equivalent | äquivalent | German spelling correction |
 | 105 | effect | füge vor entfernen dieser Karte | füge vor dem Entfernen dieser Karte | Added article "dem" before infinitive noun |
 | 108 | effect | Swing-by Manövers | Swing-by-Manövers | Added hyphen to compound noun |
 | 110 | effect | von jeder deiner -Karten | von jeder deiner {ICON:hull}-Karten | Added missing hull icon placeholder |
@@ -24,19 +23,15 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 123 | effect | nicht- Karte | nicht-{ICON:orb} Karte | Added missing orb icon placeholder |
 | 123 | lore | Resourcen | Ressourcen | German spelling correction |
 | 123 | lore | ermöglichen | ermöglicht | Subject-verb agreement |
-| 128 | lore | "" Robert Oppenheimer | "" - Robert Oppenheimer | Added dash before author |
 | 129 | effect | oder eine Karte | oder auf eine Karte | Added preposition "auf" for parallel structure |
 | 129 | tags/effect | "Intervention (Angriff)" in effect | Moved to tags column | Tag was incorrectly placed in effect column |
-| 130 | lore | "" Julius Cäsar | "" - Julius Cäsar | Added dash before author |
 | 134 | effect | {ICON:abm} . | {ICON:abm}. | Removed extra space before period |
 | 139 | effect | {ICON:abm} . | {ICON:abm}. | Removed extra space before period |
 | 142 | lore | sind häufiger geneigt weit entfernten Kolonien | sind häufiger geneigt, weit entfernten Kolonien | Added comma before infinitive clause |
 | 146 | lore | Eismond unter dessen Oberfläche | Eismond, unter dessen Oberfläche | Added comma before relative clause |
 | 151 | lore | Großkalibrige ballistische Geschütze welche ummantelte | Großkalibrige ballistische Geschütze, welche ummantelte | Added comma before "welche" |
 | 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
-| 159 | lore | nennenswerten | nennenswertes | Accusative singular neuter fix |
 | 162 | effect | {ICON:shield} . | {ICON:shield}. | Removed extra space before period |
-| 162 | effect | Lege diese Karte an ein Schiff mit 1+ {ICON:shield} an | Lege diese Karte an ein Schiff mit 1+ {ICON:shield} | Removed double preposition "an" |
 | 164 | lore | wichstigste | wichtigste | Typo fix |
 | 165 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
 | 165 | lore | können die Kolonie aber schnell voran bringen | können die Kolonie aber schnell voranbringen | Fixed "voran bringen" → "voranbringen" (infinitive at end of sentence) |
@@ -83,13 +78,13 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 232 | lore | Venus Habitaten | Venus-Habitaten | Added hyphen |
 | 233 | effect | Reaktiviere {ICON:equipment} die in Summe bis zu 4 {ICON:abm} bieten | Reaktiviere {ICON:equipment} deines Gegners, die in Summe bis zu 4 {ICON:abm} bieten | Added "deines Gegners" for consistency with ID 139 |
 | 233 | lore | synchonisiert | synchronisiert | Typo fix |
-| 234 | effect | Negiere den Angriffs einer {ICON:equipment} | Negiere den Angriff einer {ICON:equipment} | Removed -s from Angriffs |
 | 234 | lore | Wenn Flottengefechte länger andauern ist das Letzte was man möchte | Wenn Flottengefechte länger andauern, ist das Letzte, was man möchte | Added commas after "andauern" and "Letzte" |
 | 234 | lore | Manch ein Kapitän | Mancher Kapitän | Grammar fix |
 | 235 | effect | Negiere den Angriffs einer {ICON:equipment} | Negiere den Angriff einer {ICON:equipment} | Removed -s from Angriffs |
 | 235 | effect | Φ -Sockel | Φ-Sockel | Removed extra space before dash |
 | 302 | lore | "" Robert Oppenheimer | "" - Robert Oppenheimer | Added dash before author |
 | 303 | lore | "" Julius Cäsar | "" - Julius Cäsar | Added dash before author |
+| 304 | lore | equivalent | äquivalent | German spelling correction |
 | 305 | effect | Anwendung erhälst | Anwendung, erhältst | Added comma and corrected spelling "erhälst" to "erhältst" |
 | 306 | lore | Entschlossenheut | Entschlossenheit | Corrected spelling |
 | 307 | effect | Du darfst dieses Gefecht Angriffe | Du darfst in diesem Gefecht Angriffe | Added preposition "in" before "diesem Gefecht" |
@@ -132,19 +127,17 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 407 | lore | ballistischen Geschossen auszuweichen begrenzt | ballistischen Geschossen auszuweichen, begrenzt | Added comma before "begrenzt" |
 | 408 | effect | 1 - 3 {ICON:speed} | 1-3 {ICON:speed} | Removed extra spaces around dash |
 | 408 | lore | Röntgenstrahungsenergie | Röntgenstrahlungsenergie | Typo fix |
-| 408 | lore | einen Schiff | ein Schiff | Accusative singular neuter fix |
 | 408 | lore | sind für die Crew ein Schiff | sind für die Crew eines Schiffes | Fixed "ein Schiff" → "eines Schiffes" (genitive case) |
 | 410 | title | Planetar Unerschöplich | Planetar Unerschöpflich | Typo fix |
 | 411 | lore | Konzentriere und beschleunigte | Konzentrierte und beschleunigte | Fixed "Konzentriere" → "Konzentrierte" (participle form) |
 | 412 | effect | {ICON:equipment} . | {ICON:equipment}. | Removed extra space before period |
 | 412 | lore | effektivien | effektiven | Typo fix |
-| 413 | lore | Versorgungsnetzwerk für die Kolonie, bedarf es etliche logistische | Versorgungsnetzwerks für die Kolonie bedarf es etlicher logistischer | Fixed "Versorgungsnetzwerk" → "Versorgungsnetzwerks" (genitive), "etliche logistische" → "etlicher logistischer" (genitive plural) |
+| 413 | lore | Versorgungsnetzwerk für die Kolonie, bedarf es etliche logistische | Versorgungsnetzwerks für die Kolonie bedarf es etlicher logistischer | Fixed "Versorgungsnetzwerk" → "Versorgungsnetzwerks" (genitive) |
 | 414 | effect | {ICON:equipment} . | {ICON:equipment}. | Removed extra space before period |
 | 416 | lore | Stattdessen befinden sie sich auf ihrer Umlaufbahn die Hälfte der Zeit | Stattdessen befinden sie sich auf ihrer Umlaufbahn, die Hälfte der Zeit | Added comma before relative clause "die" |
 | 419 | effect | 0 - 3 {ICON:speed} | 0-3 {ICON:speed} | Removed extra spaces around dash |
 | 420 | lore | "" Mark Twain | "" - Mark Twain | Added dash before author |
 | 422 | lore | "" William Shakespeare | "" - William Shakespeare | Added dash before author |
-| 422 | lore | größrer | größerer | Typo fix |
 | 425 | effect | {ICON:damage} . | {ICON:damage}. | Removed extra space before period |
 | 426 | effect | {ICON:equipment} -Karte | {ICON:equipment}-Karte | Removed extra space before dash |
 | 428 | effect | {ICON:speed} . | {ICON:speed}. | Removed extra space before period |
@@ -154,7 +147,6 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 438 | lore | Zivile und militärische Strahlenschilde basieren allesamt auf der gleichen Methode | Zivile und militärische Strahlenschilde basieren allesamt auf derselben Methode | Fixed "der gleichen" → "derselben" |
 | 439 | lore | Kuipitergürtels | Kuipergürtels | Typo fix |
 | 439 | lore | Ein erschwingliches Schiff mit großes Frachtraum | Ein erschwingliches Schiff mit großem Frachtraum | Fixed "großes" → "großem" (dative case) |
-| 440 | lore | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierenden Strahlenwaffe | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierende Strahlenwaffe | Fixed "basierenden" → "basierende" (adjective before noun) |
 | 441 | lore | begünstigen | begünstigt | Subject-verb agreement fix |
 | 441 | lore | Bogenminute | Bogenminuten | Plural form fix |
 | 442 | tags | Halbarkeit | Haltbarkeit | Typo fix |
