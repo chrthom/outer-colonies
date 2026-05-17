@@ -25,7 +25,8 @@ import {
   Card349,
   Card406,
   Card426,
-  Card447
+  Card447,
+  Card522
 } from './equipment_defense_cards';
 import {
   Card130,
@@ -464,6 +465,7 @@ export default class CardCollection {
     453: <Card>new Card453(),
     501: <Card>new Card501(),
     504: <Card>new Card504(),
+    522: <Card>new Card522(),
   };
 
   static allCards = Object.values(this.cards);

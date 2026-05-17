@@ -161,3 +161,14 @@ export class Card447 extends ShieldDefenseCard {
     });
   }
 }
+
+export class Card522 extends ShieldDefenseCard {
+  constructor() {
+    super(522, 'Heckdeflektor', 2, {
+      energy: -1,
+      shield: 2,
+      delta: -1,
+      omega: -1
+    });
+  }
+}
