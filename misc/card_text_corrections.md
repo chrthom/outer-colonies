@@ -139,3 +139,6 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 422 | lore | "" William Shakespeare | "" - William Shakespeare | Added dash before author |
 | 422 | lore | größrer | größerer | Typo fix |
 | 429 | lore | "" Filippo Tommaso Marinetti | "" - Filippo Tommaso Marinetti | Added dash before author |
+| 151 | lore | Großkalibrige ballistische Geschütze welche ummantelte | Großkalibrige ballistische Geschütze, welche ummantelte | Added comma before "welche" |
+| 201 | lore | gebaut um eine Schlacht | gebaut, um eine Schlacht | Added comma before "um" |
+| 212 | lore | einen Platz um ihre Berufung | einen Platz, um ihre Berufung | Added comma before "um" |
