@@ -307,3 +307,16 @@ export class Card443 extends ScienceTacticCard {
     return InterventionType.TacticCard;
   }
 }
+
+export class Card524 extends ScienceTacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(524, 'Prototypen Feldtest', 2);
+  }
+  onEnterGame(player: Player) {
+    this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}

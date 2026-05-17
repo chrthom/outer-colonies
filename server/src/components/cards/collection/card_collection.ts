@@ -202,7 +202,8 @@ import {
   Card414,
   Card423,
   Card429,
-  Card443
+  Card443,
+  Card524
 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -466,6 +467,7 @@ export default class CardCollection {
     501: <Card>new Card501(),
     504: <Card>new Card504(),
     522: <Card>new Card522(),
+    524: <Card>new Card524(),
   };
 
   static allCards = Object.values(this.cards);
