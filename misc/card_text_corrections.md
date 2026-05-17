@@ -153,3 +153,8 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 305 | effect | Anwendung erhälst | Anwendung, erhältst | Added comma and corrected spelling "erhälst" to "erhältst" |
 | 307 | effect | Du darfst dieses Gefecht Angriffe | Du darfst in diesem Gefecht Angriffe | Added preposition "in" before "diesem Gefecht" |
 | 312 | effect | Kann an keinem Schiff angelegt sein, das | Kann an kein Schiff angelegt werden, das | Corrected to proper passive form |
+| 306 | lore | Entschlossenheut | Entschlossenheit | Corrected spelling |
+| 347 | lore | standard Dual-Lasergeschützen | Standard-Dual-Lasergeschützen | Added hyphen to compound noun |
+| 348 | lore | fester Bestandteil | ein fester Bestandteil | Added article "ein" |
+| 412 | lore | 10-mal größerer Reichweite...ausreichend Flugkörperabwehr | 10-fach größerer Reichweite...ausreichende Flugkörperabwehr | Corrected adverb form and declension |
+| 432 | lore | der 5 großen | der fünf großen | Wrote out number "fünf" |
