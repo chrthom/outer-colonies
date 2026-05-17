@@ -60,6 +60,16 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 452 | effect | unversiegbaren | unerschöpflichen | Wrong word - "unversiegbaren" (unsealable) → "unerschöpflichen" (inexhaustible) |
 | 439 | lore | Ein erschwingliches Schiff mit großes Frachtraum | Ein erschwingliches Schiff mit großem Frachtraum | Fixed "großes" → "großem" (dative case) |
 | 440 | lore | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierenden Strahlenwaffe | Ein Hybrid aus einem Partikelbeschleuniger und einer auf Lichtimpulsen basierende Strahlenwaffe | Fixed "basierenden" → "basierende" (adjective before noun) |
+
+| 229 | lore | ist es schwer diese Dinge zu transportieren | ist es schwer, diese Dinge zu transportieren | Added comma before infinitive clause |
+| 307 | lore | Schub die Periapsis | Schub, die Periapsis | Added comma before main clause |
+| 308 | lore | Systeme, sollen dieses Schlachtschiff befähigen auch ohne | Systeme sollen dieses Schlachtschiff befähigen, auch ohne | Removed comma after "Systeme", added comma before "auch ohne" |
+| 322 | lore | wäre so töricht gegen | wäre so töricht, gegen | Added comma before infinitive clause |
+| 339 | lore | Prinzip, vereint | Prinzip vereint | Removed extra comma after "Prinzip" |
+| 350 | lore | nach, ist | nach ist | Removed extra comma after "nach" |
+| 408 | lore | sind für die Crew ein Schiff | sind für die Crew eines Schiffes | Fixed "ein Schiff" → "eines Schiffes" (genitive case) |
+| 411 | lore | Konzentriere und beschleunigte | Konzentrierte und beschleunigte | Fixed "Konzentriere" → "Konzentrierte" (participle form) |
+| 413 | lore | Versorgungsnetzwerk für die Kolonie, bedarf es etliche logistische | Versorgungsnetzwerks für die Kolonie bedarf es etlicher logistischer | Fixed "Versorgungsnetzwerk" → "Versorgungsnetzwerks" (genitive), "etliche logistische" → "etlicher logistischer" (genitive plural)
 | 165 | lore | können die Kolonie aber schnell voran bringen | können die Kolonie aber schnell voranbringen | Fixed "voran bringen" → "voranbringen" (infinitive at end of sentence) |
 | 233 | effect | Reaktiviere {ICON:equipment} die in Summe bis zu 4 {ICON:abm} bieten | Reaktiviere {ICON:equipment} deines Gegners, die in Summe bis zu 4 {ICON:abm} bieten | Added "deines Gegners" for consistency with ID 139 |
 | 233 | lore | synchonisiert | synchronisiert | Typo fix |
