@@ -299,6 +299,8 @@ export class Card504 extends MilitaryTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Orbital && cs.profile.speed == 0);
+    return this.getOpponentPlayer(player).cardStacks.filter(
+      cs => cs.zone == Zone.Orbital && cs.profile.speed == 0
+    );
   }
 }
