@@ -304,3 +304,16 @@ export class Card504 extends MilitaryTacticCard {
     );
   }
 }
+
+export class Card531 extends MilitaryTacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(531, 'Umbau ziviler Werften', 2);
+  }
+  onEnterGame(player: Player) {
+    this.drawSpecificCards(player, c => c.type == CardType.Hull, this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
