@@ -238,7 +238,8 @@ import {
   Card330,
   Card416,
   Card417,
-  Card430
+  Card430,
+  Card528
 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
 import { Card305 } from './infrastructure_special_cards';
@@ -470,6 +471,7 @@ export default class CardCollection {
     522: <Card>new Card522(),
     524: <Card>new Card524(),
     526: <Card>new Card526(),
+    528: <Card>new Card528(),
   };
 
   static allCards = Object.values(this.cards);
