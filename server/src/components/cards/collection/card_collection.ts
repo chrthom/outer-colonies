@@ -25,7 +25,8 @@ import {
   Card349,
   Card406,
   Card426,
-  Card447
+  Card447,
+  Card522
 } from './equipment_defense_cards';
 import {
   Card130,
@@ -182,7 +183,9 @@ import {
   Card338,
   Card346,
   Card419,
-  Card428
+  Card428,
+  Card501,
+  Card504
 } from './tactic_military_cards';
 import {
   Card108,
@@ -199,7 +202,9 @@ import {
   Card414,
   Card423,
   Card429,
-  Card443
+  Card443,
+  Card524,
+  Card526
 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -459,7 +464,12 @@ export default class CardCollection {
     450: <Card>new Card450(),
     451: <Card>new Card451(),
     452: <Card>new Card452(),
-    453: <Card>new Card453()
+    453: <Card>new Card453(),
+    501: <Card>new Card501(),
+    504: <Card>new Card504(),
+    522: <Card>new Card522(),
+    524: <Card>new Card524(),
+    526: <Card>new Card526(),
   };
 
   static allCards = Object.values(this.cards);

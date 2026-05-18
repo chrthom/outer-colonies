@@ -7,7 +7,7 @@ import { matchMakingSocketListeners, matchMakingCron } from './components/matchm
 import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import restAPI from './components/rest_api';
-import process from 'node:process',;
+import process from 'node:process';
 
 const app = express();
 app.use(cors());
