@@ -471,7 +471,7 @@ export default class CardCollection {
     522: <Card>new Card522(),
     524: <Card>new Card524(),
     526: <Card>new Card526(),
-    528: <Card>new Card528(),
+    528: <Card>new Card528()
   };
 
   static allCards = Object.values(this.cards);
