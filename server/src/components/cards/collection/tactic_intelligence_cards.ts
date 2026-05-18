@@ -298,3 +298,21 @@ export class Card528 extends IntelligenceTacticCard {
     return InterventionType.BattleRoundEnd;
   }
 }
+
+export class Card529 extends IntelligenceTacticCard {
+  private readonly removeActions: CardAction[] = [CardType.Tactic, CardType.Infrastructure].map(
+    ct => new CardAction(ct)
+  );
+  constructor() {
+    super(529, 'Fake-News verbreiten', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
+  }
+}
