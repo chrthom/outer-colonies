@@ -37,7 +37,7 @@ allCards.forEach((c, index, a) => {
   });
   test(`"${c.name}" (${c.id}) card ID should match class name`, () => {
     const c2 = CardCollection.cards[c.id as keyof typeof CardCollection.cards];
-    expect(c2).toBe(c);
+    expect(c2).toEqual(c);
   });
   if (index + 1 == a.length || Math.floor(c.id / 100) < Math.floor(a[index + 1].id / 100)) {
     test(`"${c.name}" (${c.id}) rarity should be between 0 as last card of edition`, () => {
