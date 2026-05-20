@@ -318,6 +318,33 @@ export class Card531 extends MilitaryTacticCard {
   }
 }
 
+export class Card532 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      532,
+      'Angriffsdrohnengeschwader',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 5,
+        pointDefense: 0,
+        shield: 0,
+        armour: -3
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
 export class Card533 extends MilitaryTacticCard {
   constructor() {
     super(

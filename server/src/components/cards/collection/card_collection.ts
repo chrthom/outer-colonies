@@ -187,6 +187,7 @@ import {
   Card501,
   Card504,
   Card531,
+  Card532,
   Card533
 } from './tactic_military_cards';
 import {
@@ -477,6 +478,7 @@ export default class CardCollection {
     528: <Card>new Card528(),
     529: <Card>new Card529(),
     531: <Card>new Card531(),
+    532: <Card>new Card532(),
     533: <Card>new Card533()
   };
 
