@@ -379,7 +379,7 @@ export class Card550 extends MilitaryTacticCard {
     super(450, 'Nachschublinien überfallen', 1);
   }
   onEnterGame(player: Player) {
-    const p = this.getOpponentPlayer(player)
+    const p = this.getOpponentPlayer(player);
     for (let i = 0; i < this.cardsToDiscard; i++) {
       if (p.hand) {
         p.discardHandCards(pickRandom(p.hand).uuid);
