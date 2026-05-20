@@ -1,6 +1,11 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { pickRandom, removeFirstMatchingElement, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import {
+  pickRandom,
+  removeFirstMatchingElement,
+  spliceCardById,
+  spliceCardStackByUUID
+} from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
