@@ -248,7 +248,7 @@ export class Card417 extends IntelligenceTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage);
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(cs => cs.damage);
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundEnd;
@@ -269,5 +269,50 @@ export class Card430 extends IntelligenceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card528 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      528,
+      'Verräter an Bord',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 3,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
+  }
+}
+
+export class Card529 extends IntelligenceTacticCard {
+  private readonly removeActions: CardAction[] = [CardType.Tactic, CardType.Infrastructure].map(
+    ct => new CardAction(ct)
+  );
+  constructor() {
+    super(529, 'Fake-News verbreiten', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
   }
 }

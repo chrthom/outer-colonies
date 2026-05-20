@@ -101,3 +101,22 @@ export class Card449 extends EquipmentCard {
     });
   }
 }
+
+export class Card537 extends EquipmentCard {
+  constructor() {
+    super(537, 'Quantenmechanischer Antrieb', 2, {
+      speed: 1,
+      delta: -1,
+      omega: -1
+    });
+  }
+}
+
+export class Card545 extends EquipmentCard {
+  constructor() {
+    super(545, 'Schwere Bewaffnung', 1, {
+      theta: -1,
+      xi: 1
+    });
+  }
+}

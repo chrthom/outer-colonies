@@ -1,6 +1,11 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import {
+  pickRandom,
+  removeFirstMatchingElement,
+  spliceCardById,
+  spliceCardStackByUUID
+} from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -305,5 +310,72 @@ export class Card443 extends ScienceTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.TacticCard;
+  }
+}
+
+export class Card524 extends ScienceTacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(524, 'Prototypen Feldtest', 2);
+  }
+  onEnterGame(player: Player) {
+    this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card525 extends ScienceTacticCard {
+  private readonly cardsToDraw = 5;
+  constructor() {
+    super(525, 'Heureka!', 2);
+  }
+  onEnterGame(player: Player) {
+    player.discardHandCards(...player.hand.map(h => h.uuid));
+    player.drawCards(this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card526 extends ScienceTacticCard {
+  private readonly oneTimeActionPool = new ActionPool(new CardAction(TacticDiscipline.Science));
+  private readonly cardsToDraw = 3;
+  constructor() {
+    super(526, 'Forschungsexpedition', 2);
+  }
+  onEnterGame(player: Player) {
+    player.actionPool.push(...this.oneTimeActionPool.pool);
+    player.drawCards(this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.hand.length > 1 ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return removeFirstMatchingElement(player.hand.slice(), cs => cs.card.id == this.id).map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
+export class Card530 extends ScienceTacticCard {
+  private readonly cardsToDiscard = 4;
+  constructor() {
+    super(530, 'Pandemie', 2);
+  }
+  onEnterGame(player: Player) {
+    [player, this.getOpponentPlayer(player)].forEach(p => {
+      for (let i = 0; i < this.cardsToDiscard; i++) {
+        if (p.hand) {
+          p.discardHandCards(pickRandom(p.hand).uuid);
+        }
+      }
+    });
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }
