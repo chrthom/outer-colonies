@@ -244,7 +244,9 @@ export class Card555 extends EquipmentCard {
     );
   }
   override getValidTargets(player: Player): CardStack[] {
-    return player.hand.length > 1 ? player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profileMatches(this.profile)) : [];
+    return player.hand.length > 1
+      ? player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profileMatches(this.profile))
+      : [];
   }
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
     return removeFirstMatchingElement(player.hand.slice(), cs => cs.card.id == this.id).map(c => c.card.id);
