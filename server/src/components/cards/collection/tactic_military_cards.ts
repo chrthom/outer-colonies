@@ -376,7 +376,7 @@ export class Card533 extends MilitaryTacticCard {
 export class Card550 extends MilitaryTacticCard {
   private readonly cardsToDiscard = 2;
   constructor() {
-    super(450, 'Nachschublinien überfallen', 1);
+    super(550, 'Nachschublinien überfallen', 1);
   }
   onEnterGame(player: Player) {
     const p = this.getOpponentPlayer(player);

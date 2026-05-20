@@ -232,7 +232,7 @@ export class Card509 extends EconomyTacticCard {
 export class Card534 extends EconomyTacticCard {
   private readonly cardsToDiscard = 5;
   constructor() {
-    super(434, 'Feindliche Übernahme', 2);
+    super(534, 'Feindliche Übernahme', 2);
   }
   onEnterGame(player: Player) {
     this.getOpponentPlayer(player).discardCards(
@@ -248,7 +248,7 @@ export class Card542 extends EconomyTacticCard {
   private readonly cardsToDrawPlayer = 3;
   private readonly cardsToDrawOpponent = 1;
   constructor() {
-    super(242, 'Freihandelsabkommen', 1);
+    super(542, 'Freihandelsabkommen', 1);
   }
   onEnterGame(player: Player) {
     player.drawCards(this.cardsToDrawPlayer);

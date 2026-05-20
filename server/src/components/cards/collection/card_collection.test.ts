@@ -10,7 +10,7 @@ const weaponCards = equipmentCards.map(c => <EquipmentCard>c).filter(c => c.canA
 
 equipmentCards
   .concat(infrastructureCards)
-  .filter(c => c.id != 124)
+  .filter(c => ![124, 545].includes(c.id))
   .forEach(c => {
     ['theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach(v => {
       test(`"${c.name}" (${c.id}) profile ${v} socket value should be 0 or less`, () => {

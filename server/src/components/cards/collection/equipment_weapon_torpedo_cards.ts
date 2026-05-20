@@ -1,4 +1,7 @@
+import { CardType } from '../../../shared/config/enums';
+import Player from '../../game_state/player';
 import { removeFirstMatchingElement } from '../../utils/helpers';
+import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card101 extends EquipmentCard {
