@@ -317,3 +317,30 @@ export class Card531 extends MilitaryTacticCard {
     return this.onlyColonyTarget(player.cardStacks);
   }
 }
+
+export class Card533 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      533,
+      'Kamikaze-Drohnengeschwader',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 8,
+        pointDefense: -4,
+        shield: 0,
+        armour: -4
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
