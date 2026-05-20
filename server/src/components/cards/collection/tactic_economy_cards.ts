@@ -214,6 +214,21 @@ export class Card427 extends EconomyTacticCard {
   }
 }
 
+export class Card509 extends EconomyTacticCard {
+  constructor() {
+    super(509, 'Zahn der Zeit', 4);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.retract();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
+  }
+}
+
 export class Card534 extends EconomyTacticCard {
   private readonly cardsToDiscard = 5;
   constructor() {

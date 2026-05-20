@@ -83,6 +83,7 @@ import {
   Card236,
   Card321,
   Card427,
+  Card509,
   Card534,
   Card542
 } from './tactic_economy_cards';
@@ -481,6 +482,7 @@ export default class CardCollection {
     453: <Card>new Card453(),
     501: <Card>new Card501(),
     504: <Card>new Card504(),
+    509: <Card>new Card509(),
     517: <Card>new Card517(),
     522: <Card>new Card522(),
     524: <Card>new Card524(),
