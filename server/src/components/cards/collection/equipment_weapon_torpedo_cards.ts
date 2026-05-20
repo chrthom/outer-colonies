@@ -1,3 +1,4 @@
+import { removeFirstMatchingElement } from '../../utils/helpers';
 import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
 export class Card101 extends EquipmentCard {
@@ -201,5 +202,54 @@ export class Card422 extends EquipmentCardColonyKiller {
         armour: -4
       }
     );
+  }
+}
+
+export class Card554 extends EquipmentCard {
+  constructor() {
+    super(
+      554,
+      'Pegasus-Torpedos',
+      1,
+      {
+        phi: -1
+      },
+      {
+        range: 2,
+        damage: 9,
+        pointDefense: -4,
+        shield: 0,
+        armour: -4
+      }
+    );
+  }
+}
+
+export class Card555 extends EquipmentCard {
+  constructor() {
+    super(
+      555,
+      'Penetrator-Torpedos',
+      1,
+      {
+        phi: -1
+      },
+      {
+        range: 2,
+        damage: 8,
+        pointDefense: -2,
+        shield: -2,
+        armour: -2
+      }
+    );
+  }
+  override getValidTargets(player: Player): CardStack[] {
+    return player.hand.length > 1 ? player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.profileMatches(this.profile)) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return removeFirstMatchingElement(player.hand.slice(), cs => cs.card.id == this.id).map(c => c.card.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }

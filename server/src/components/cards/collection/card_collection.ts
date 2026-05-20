@@ -141,7 +141,9 @@ import {
   Card304,
   Card318,
   Card412,
-  Card422
+  Card422,
+  Card554,
+  Card555
 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -492,7 +494,9 @@ export default class CardCollection {
     537: <Card>new Card534(),
     542: <Card>new Card542(),
     545: <Card>new Card545(),
-    550: <Card>new Card550()
+    550: <Card>new Card550(),
+    554: <Card>new Card554(),
+    555: <Card>new Card555()
   };
 
   static allCards = Object.values(this.cards);
