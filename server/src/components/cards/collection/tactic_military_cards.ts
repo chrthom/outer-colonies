@@ -1,5 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { pickRandom } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -369,5 +370,23 @@ export class Card533 extends MilitaryTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundStart;
+  }
+}
+
+export class Card550 extends MilitaryTacticCard {
+  private readonly cardsToDiscard = 2;
+  constructor() {
+    super(450, 'Nachschublinien überfallen', 1);
+  }
+  onEnterGame(player: Player) {
+    const p = this.getOpponentPlayer(player)
+    for (let i = 0; i < this.cardsToDiscard; i++) {
+      if (p.hand) {
+        p.discardHandCards(pickRandom(p.hand).uuid);
+      }
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
 }
