@@ -1,6 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { removeFirstMatchingElement, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import { pickRandom, removeFirstMatchingElement, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -339,5 +339,24 @@ export class Card526 extends ScienceTacticCard {
   }
   override onEnterGameNumberOfSelectableCardOptions(): number {
     return 1;
+  }
+}
+
+export class Card530 extends ScienceTacticCard {
+  private readonly cardsToDiscard = 4;
+  constructor() {
+    super(530, 'Pandemie', 2);
+  }
+  onEnterGame(player: Player) {
+    [player, this.getOpponentPlayer(player)].forEach(p => {
+      for (let i = 0; i < this.cardsToDiscard; i++) {
+        if (p.hand) {
+          p.discardHandCards(pickRandom(p.hand).uuid);
+        }
+      }
+    });
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }

@@ -210,7 +210,8 @@ import {
   Card429,
   Card443,
   Card524,
-  Card526
+  Card526,
+  Card530
 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -480,6 +481,7 @@ export default class CardCollection {
     526: <Card>new Card526(),
     528: <Card>new Card528(),
     529: <Card>new Card529(),
+    530: <Card>new Card530(),
     531: <Card>new Card531(),
     532: <Card>new Card532(),
     533: <Card>new Card533(),
