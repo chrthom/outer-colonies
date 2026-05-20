@@ -101,3 +101,13 @@ export class Card449 extends EquipmentCard {
     });
   }
 }
+
+export class Card537 extends EquipmentCard {
+  constructor() {
+    super(537, 'Quantenmechanischer Antrieb', 2, {
+      speed: 1,
+      delta: -1,
+      omega: -1
+    });
+  }
+}
