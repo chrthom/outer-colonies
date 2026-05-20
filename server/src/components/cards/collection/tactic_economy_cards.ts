@@ -213,3 +213,18 @@ export class Card427 extends EconomyTacticCard {
     return this.onlyColonyTarget(player.cardStacks);
   }
 }
+
+export class Card534 extends EconomyTacticCard {
+  private readonly cardsToDiscard = 5;
+  constructor() {
+    super(434, 'Feindliche Übernahme', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).discardCards(
+      ...this.getOpponentPlayer(player).pickCardsFromDeck(this.cardsToDiscard)
+    );
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
