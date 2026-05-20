@@ -6,7 +6,7 @@ import {
   Zone
 } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID, spliceFrom } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -269,6 +269,30 @@ export class Card430 extends IntelligenceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card517 extends IntelligenceTacticCard {
+  constructor() {
+    super(517, 'Diasporabewegung', 3);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
+      if (card) {
+        player.deck.unshift(card);
+        player.shuffleDeck();
+      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.deck.find(c => c.type == CardType.Orb) ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.filter(c => c.type == CardType.Orb).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
   }
 }
 
