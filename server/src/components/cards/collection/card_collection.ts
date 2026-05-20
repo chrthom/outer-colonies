@@ -126,7 +126,8 @@ import {
   Card241,
   Card325,
   Card434,
-  Card449
+  Card449,
+  Card545
 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card203, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
@@ -484,7 +485,8 @@ export default class CardCollection {
     533: <Card>new Card533(),
     534: <Card>new Card534(),
     537: <Card>new Card534(),
-    542: <Card>new Card542()
+    542: <Card>new Card542(),
+    545: <Card>new Card545()
   };
 
   static allCards = Object.values(this.cards);
