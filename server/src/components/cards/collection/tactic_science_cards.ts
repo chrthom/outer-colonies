@@ -321,6 +321,20 @@ export class Card524 extends ScienceTacticCard {
   }
 }
 
+export class Card525 extends ScienceTacticCard {
+  private readonly cardsToDraw = 5;
+  constructor() {
+    super(525, 'Heureka!', 2);
+  }
+  onEnterGame(player: Player) {
+    player.discardHandCards(...player.hand.map(h => h.uuid));
+    player.drawCards(this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
 export class Card526 extends ScienceTacticCard {
   private readonly oneTimeActionPool = new ActionPool(new CardAction(TacticDiscipline.Science));
   private readonly cardsToDraw = 3;

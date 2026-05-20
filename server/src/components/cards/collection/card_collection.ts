@@ -210,6 +210,7 @@ import {
   Card429,
   Card443,
   Card524,
+  Card525,
   Card526,
   Card530
 } from './tactic_science_cards';
@@ -478,6 +479,7 @@ export default class CardCollection {
     504: <Card>new Card504(),
     522: <Card>new Card522(),
     524: <Card>new Card524(),
+    525: <Card>new Card525(),
     526: <Card>new Card526(),
     528: <Card>new Card528(),
     529: <Card>new Card529(),
