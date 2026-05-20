@@ -83,7 +83,8 @@ import {
   Card236,
   Card321,
   Card427,
-  Card534
+  Card534,
+  Card542
 } from './tactic_economy_cards';
 import {
   Card102,
@@ -482,7 +483,8 @@ export default class CardCollection {
     532: <Card>new Card532(),
     533: <Card>new Card533(),
     534: <Card>new Card534(),
-    537: <Card>new Card534()
+    537: <Card>new Card534(),
+    542: <Card>new Card542()
   };
 
   static allCards = Object.values(this.cards);
