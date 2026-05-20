@@ -9,7 +9,8 @@ import {
   Card351,
   Card436,
   Card439,
-  Card450
+  Card450,
+  Card559
 } from './hull_1_part_cards';
 import {
   Card103,
@@ -500,7 +501,8 @@ export default class CardCollection {
     545: <Card>new Card545(),
     550: <Card>new Card550(),
     554: <Card>new Card554(),
-    555: <Card>new Card555()
+    555: <Card>new Card555(),
+    559: <Card>new Card559()
   };
 
   static allCards = Object.values(this.cards);
