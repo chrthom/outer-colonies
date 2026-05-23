@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
 import { RouterTestingModule } from '@angular/router/testing';
+import { IconService } from 'src/app/icon.service';
 
 describe('RulesPage', () => {
   let component: RulesPage;
@@ -9,7 +10,8 @@ describe('RulesPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RulesPage, RouterTestingModule]
+      imports: [RulesPage, RouterTestingModule],
+      providers: [IconService]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RulesPage);
