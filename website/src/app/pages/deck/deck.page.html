@@ -54,18 +54,30 @@
             } @if (card.damage) {
             <h3>{{ card.damage }}</h3>
             } @if (card.damage) {
-            <span class="oc-icon" [innerHTML]="toIconUrl('damage') || ''" matTooltip="Verursachter Schaden"></span>
+            <span
+              class="oc-icon"
+              [innerHTML]="toIconUrl('damage') || ''"
+              matTooltip="Verursachter Schaden"
+            ></span>
             }
           </td>
           <td class="defense-col">
             @if (card.defense) {
-            <span class="oc-icon" [innerHTML]="toIconUrl(card.defense) || ''" [matTooltip]="defenseTooltip(card.defense)"></span>
+            <span
+              class="oc-icon"
+              [innerHTML]="toIconUrl(card.defense) || ''"
+              [matTooltip]="defenseTooltip(card.defense)"
+            ></span>
             } @if (card.hp && card.defense) {
             <h3>+</h3>
             } @if (card.hp) {
             <h3>{{ card.hp }}</h3>
             } @if (card.hp) {
-            <span class="oc-icon" [innerHTML]="toIconUrl('hitpoints') || ''" matTooltip="H&uuml;llenintegrit&auml;t"></span>
+            <span
+              class="oc-icon"
+              [innerHTML]="toIconUrl('hitpoints') || ''"
+              matTooltip="H&uuml;llenintegrit&auml;t"
+            ></span>
             }
           </td>
           <td class="rarity-col">

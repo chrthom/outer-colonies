@@ -431,7 +431,7 @@ export default function restAPI(app: Express) {
   });
 
   // Buy a booster pack
-  app.post('/api/buy/booster/:boosterNo([1-4])', (req, res) => {
+  app.post('/api/buy/booster/:boosterNo([1-5])', (req, res) => {
     const boosterNo = Number(req.params['boosterNo']);
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo])
