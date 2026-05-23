@@ -58,6 +58,16 @@ export class Card211 extends EquipmentCard {
   }
 }
 
+export class Card212 extends EquipmentCard {
+  constructor() {
+    super(212, 'Black Ops Team', 3, {
+      omega: -1,
+      delta: -1,
+      control: 3
+    });
+  }
+}
+
 export class Card241 extends EquipmentCard {
   constructor() {
     super(241, 'Freibeuterbesatzung', 1, {
