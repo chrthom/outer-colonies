@@ -15,6 +15,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { IconService } from 'src/app/icon.service';
 
 describe('DeckPage', () => {
   let component: DeckPage;
@@ -88,7 +89,8 @@ describe('DeckPage', () => {
       declarations: [],
       providers: [
         { provide: DeckApiService, useValue: deckApiSpy },
-        { provide: MatDialog, useValue: dialogSpy }
+        { provide: MatDialog, useValue: dialogSpy },
+        IconService
       ]
     }).compileComponents();
 
