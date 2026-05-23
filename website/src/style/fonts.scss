@@ -46,10 +46,11 @@
 
 /* Outer Colonies Icon Font */
 @font-face {
-  font-family: 'outer-colonies-icons';
-  src: url("../assets/fonts/outer-colonies-icons.woff2") format("woff2"),
-       url("../assets/fonts/outer-colonies-icons.woff") format("woff"),
-       url("../assets/fonts/outer-colonies-icons.ttf") format("truetype");
+  font-family: "outer-colonies-icons";
+  src:
+    url("../assets/fonts/outer-colonies-icons.woff2") format("woff2"),
+    url("../assets/fonts/outer-colonies-icons.woff") format("woff"),
+    url("../assets/fonts/outer-colonies-icons.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: block;
