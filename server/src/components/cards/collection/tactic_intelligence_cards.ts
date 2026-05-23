@@ -6,7 +6,7 @@ import {
   Zone
 } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID, spliceFrom } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -248,7 +248,7 @@ export class Card417 extends IntelligenceTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage);
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(cs => cs.damage);
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundEnd;
@@ -269,5 +269,74 @@ export class Card430 extends IntelligenceTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card517 extends IntelligenceTacticCard {
+  constructor() {
+    super(517, 'Diasporabewegung', 3);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    if (optionalParameters && optionalParameters[0]) {
+      const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
+      if (card) {
+        player.deck.unshift(card);
+        player.shuffleDeck();
+      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.deck.find(c => c.type == CardType.Orb) ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.filter(c => c.type == CardType.Orb).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
+export class Card528 extends IntelligenceTacticCard {
+  constructor() {
+    super(
+      528,
+      'Verräter an Bord',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 3,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
+  }
+}
+
+export class Card529 extends IntelligenceTacticCard {
+  private readonly removeActions: CardAction[] = [CardType.Tactic, CardType.Infrastructure].map(
+    ct => new CardAction(ct)
+  );
+  constructor() {
+    super(529, 'Fake-News verbreiten', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
   }
 }

@@ -9,7 +9,8 @@ import {
   Card351,
   Card436,
   Card439,
-  Card450
+  Card450,
+  Card559
 } from './hull_1_part_cards';
 import {
   Card103,
@@ -25,7 +26,8 @@ import {
   Card349,
   Card406,
   Card426,
-  Card447
+  Card447,
+  Card522
 } from './equipment_defense_cards';
 import {
   Card130,
@@ -81,7 +83,10 @@ import {
   Card235,
   Card236,
   Card321,
-  Card427
+  Card427,
+  Card509,
+  Card534,
+  Card542
 } from './tactic_economy_cards';
 import {
   Card102,
@@ -123,7 +128,8 @@ import {
   Card241,
   Card325,
   Card434,
-  Card449
+  Card449,
+  Card545
 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
 import { Card106, Card107, Card203, Card207, Card405, Card438 } from './equipment_weapon_particle_cards';
@@ -137,7 +143,9 @@ import {
   Card304,
   Card318,
   Card412,
-  Card422
+  Card422,
+  Card554,
+  Card555
 } from './equipment_weapon_torpedo_cards';
 import {
   Card131,
@@ -182,7 +190,13 @@ import {
   Card338,
   Card346,
   Card419,
-  Card428
+  Card428,
+  Card501,
+  Card504,
+  Card531,
+  Card532,
+  Card533,
+  Card550
 } from './tactic_military_cards';
 import {
   Card108,
@@ -199,7 +213,11 @@ import {
   Card414,
   Card423,
   Card429,
-  Card443
+  Card443,
+  Card524,
+  Card525,
+  Card526,
+  Card530
 } from './tactic_science_cards';
 import Card from '../card';
 import { Card172 } from './infrastructure_util_cards';
@@ -233,7 +251,10 @@ import {
   Card330,
   Card416,
   Card417,
-  Card430
+  Card430,
+  Card517,
+  Card528,
+  Card529
 } from './tactic_intelligence_cards';
 import { starterDecks } from '../../../shared/config/starter_decks';
 import { Card305 } from './infrastructure_special_cards';
@@ -459,7 +480,29 @@ export default class CardCollection {
     450: <Card>new Card450(),
     451: <Card>new Card451(),
     452: <Card>new Card452(),
-    453: <Card>new Card453()
+    453: <Card>new Card453(),
+    501: <Card>new Card501(),
+    504: <Card>new Card504(),
+    509: <Card>new Card509(),
+    517: <Card>new Card517(),
+    522: <Card>new Card522(),
+    524: <Card>new Card524(),
+    525: <Card>new Card525(),
+    526: <Card>new Card526(),
+    528: <Card>new Card528(),
+    529: <Card>new Card529(),
+    530: <Card>new Card530(),
+    531: <Card>new Card531(),
+    532: <Card>new Card532(),
+    533: <Card>new Card533(),
+    534: <Card>new Card534(),
+    537: <Card>new Card534(),
+    542: <Card>new Card542(),
+    545: <Card>new Card545(),
+    550: <Card>new Card550(),
+    554: <Card>new Card554(),
+    555: <Card>new Card555(),
+    559: <Card>new Card559()
   };
 
   static allCards = Object.values(this.cards);

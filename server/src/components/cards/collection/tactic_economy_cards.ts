@@ -213,3 +213,48 @@ export class Card427 extends EconomyTacticCard {
     return this.onlyColonyTarget(player.cardStacks);
   }
 }
+
+export class Card509 extends EconomyTacticCard {
+  constructor() {
+    super(509, 'Zahn der Zeit', 4);
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    target.retract();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.OpponentTurnStart;
+  }
+}
+
+export class Card534 extends EconomyTacticCard {
+  private readonly cardsToDiscard = 5;
+  constructor() {
+    super(534, 'Feindliche Übernahme', 2);
+  }
+  onEnterGame(player: Player) {
+    this.getOpponentPlayer(player).discardCards(
+      ...this.getOpponentPlayer(player).pickCardsFromDeck(this.cardsToDiscard)
+    );
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card542 extends EconomyTacticCard {
+  private readonly cardsToDrawPlayer = 3;
+  private readonly cardsToDrawOpponent = 1;
+  constructor() {
+    super(542, 'Freihandelsabkommen', 1);
+  }
+  onEnterGame(player: Player) {
+    player.drawCards(this.cardsToDrawPlayer);
+    this.getOpponentPlayer(player).drawCards(this.cardsToDrawOpponent);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}

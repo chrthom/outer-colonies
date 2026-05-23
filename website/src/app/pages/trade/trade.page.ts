@@ -68,6 +68,11 @@ export class TradePage implements OnInit {
       no: 3,
       title: 'Marsianische Hegemonie',
       price: rules.boosterCosts[3]
+    },
+    {
+      no: 5,
+      title: 'Sichere Häfen',
+      price: rules.boosterCosts[5]
     }
   ];
   ngOnInit() {

@@ -120,3 +120,9 @@ export class Card450 extends CardCorvette {
     super(450);
   }
 }
+
+export class Card559 extends CardCorvette {
+  constructor() {
+    super(559);
+  }
+}

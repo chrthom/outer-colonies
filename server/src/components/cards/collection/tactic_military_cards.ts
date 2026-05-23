@@ -1,5 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
+import { pickRandom } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -252,5 +253,140 @@ export class Card428 extends MilitaryTacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundStart;
+  }
+}
+
+export class Card501 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      501,
+      'Nukleare Apokalypse',
+      5,
+      {},
+      {
+        range: 0,
+        damage: 24,
+        pointDefense: -5,
+        shield: -3,
+        armour: -4
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+}
+
+export class Card504 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      504,
+      'Interplanetares Geschütz',
+      4,
+      {},
+      {
+        range: 0,
+        damage: 28,
+        pointDefense: 0,
+        shield: 0,
+        armour: 6
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(
+      cs => cs.zone == Zone.Orbital && cs.profile.speed == 0
+    );
+  }
+}
+
+export class Card531 extends MilitaryTacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(531, 'Umbau ziviler Werften', 2);
+  }
+  onEnterGame(player: Player) {
+    this.drawSpecificCards(player, c => c.type == CardType.Hull, this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
+  }
+}
+
+export class Card532 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      532,
+      'Angriffsdrohnengeschwader',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 5,
+        pointDefense: 0,
+        shield: 0,
+        armour: -3
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
+export class Card533 extends MilitaryTacticCard {
+  constructor() {
+    super(
+      533,
+      'Kamikaze-Drohnengeschwader',
+      2,
+      {},
+      {
+        range: 0,
+        damage: 8,
+        pointDefense: -4,
+        shield: 0,
+        armour: -4
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo];
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
+export class Card550 extends MilitaryTacticCard {
+  private readonly cardsToDiscard = 2;
+  constructor() {
+    super(550, 'Nachschublinien überfallen', 1);
+  }
+  onEnterGame(player: Player) {
+    const p = this.getOpponentPlayer(player);
+    for (let i = 0; i < this.cardsToDiscard; i++) {
+      if (p.hand) {
+        p.discardHandCards(pickRandom(p.hand).uuid);
+      }
+    }
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
   }
 }
