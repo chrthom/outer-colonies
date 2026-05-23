@@ -272,13 +272,13 @@ def get_title(img):
 
 
 def extract_effect_parts(layer):
-    """Extract effect text, tags (italic part), conditional_tags, and lore from a text layer.
+    """Extract effect text, tags, and conditional_tags from a text layer.
     Returns (effect_text, tags_text, conditional_tags_text, lore_text) tuple.
+    Note: lore_text is always empty as lore ONLY comes from textbox_text_lore layer.
 
     Bold parts (wrapped in <b>, <span weight=...> etc.) are extracted as effect (rule text).
     Bold+Italic parts are extracted as tags.
-    Italic-only parts are extracted as lore.
-    Regular (non-bold, non-italic) parts are treated as lore text.
+    Italic-only and normal parts in rule layer are treated as effect.
     If there are multiple italic sections separated by normal text,
     the first italic section is tags, and subsequent ones are conditional_tags.
     """
@@ -343,58 +343,95 @@ def extract_effect_parts(layer):
                     block['text'] = block['text'].strip()
 
                 # Separate blocks by type
+                # Rule layer: normal/bold = effect, italic/bold_italic = tags/conditional_tags
+                # - Italic text at the beginning = tags
+                # - Italic text after normal text = conditional_tags
                 effect_parts = []
                 tags_parts = []
-                lore_parts = []
+                conditional_tags_parts = []
+
+                found_normal = False
 
                 for block in content_blocks:
                     block_type = block['type']
                     text = block['text']
                     if not text:
                         continue
-                    if block_type == 'bold':
+                    # In rule layer: italic = tags/conditional_tags, everything else = effect
+                    if block_type == 'italic' or block_type == 'bold_italic':
+                        if found_normal:
+                            conditional_tags_parts.append(text)
+                        else:
+                            tags_parts.append(text)
+                    else:  # bold or normal
+                        found_normal = True
                         effect_parts.append(text)
-                    elif block_type == 'bold_italic':
-                        tags_parts.append(text)
-                    elif block_type == 'italic':
-                        lore_parts.append(text)
-                    else:  # normal
-                        lore_parts.append(text)
 
                 # Join parts
                 effect = ' '.join(effect_parts)
                 tags = ' '.join(tags_parts)
-                lore_in_rule = ' '.join(lore_parts)
+                conditional_tags = ' '.join(conditional_tags_parts)
 
-                # Check for pattern: italic -> normal/bold -> italic
-                # This indicates conditional tags (tags, effect text, conditional_tags)
-                if len(content_blocks) >= 3:
-                    if (content_blocks[0]['type'] == 'italic' and
-                        content_blocks[2]['type'] == 'italic'):
-                        # First italic -> tags
-                        tags = content_blocks[0]['text']
-                        # Middle parts -> effect (filter out regular text)
-                        effect_parts = []
-                        for block in content_blocks[1:]:
-                            if block['type'] == 'italic':
-                                break  # Stop at next italic (conditional tags)
-                            if block['type'] == 'bold':
-                                effect_parts.append(block['text'])
-                        effect = ' '.join(effect_parts)
-                        # Remaining italic -> conditional_tags
-                        conditional_tags_parts = []
-                        found_italic = False
-                        for block in content_blocks[1:]:
-                            if block['type'] == 'italic':
-                                found_italic = True
-                                conditional_tags_parts.append(block['text'])
-                            elif found_italic and block['type'] == 'bold':
-                                conditional_tags_parts.append(block['text'])
-                        conditional_tags = ' '.join(conditional_tags_parts)
-                        return effect.strip(), tags.strip(), conditional_tags.strip(), ""
+                # If there are no italic or bold_italic blocks (all text is normal),
+                # we need to parse the plain text to extract tags from the beginning
+                # This handles edition 5 XCF files which have plain text without Pango markup
+                has_italic = any(block['type'] in ('italic', 'bold_italic') for block in content_blocks)
+                if not has_italic and effect:
+                    # All text is normal - parse plain text for tags and effect
+                    # Tags typically appear at the beginning with specific patterns
+                    plain_text = effect
+                    effect = ""
+                    tags = ""
 
-                # Default: return effect, tags, empty conditional_tags, lore from rule layer
-                return effect.strip(), tags.strip(), "", lore_in_rule.strip()
+                    # Pattern 1: "Intervention (...)" at the start
+                    intervention_match = re.match(r'^(\s*Intervention\s*\([^)]*\))\s*', plain_text, re.IGNORECASE)
+                    if intervention_match:
+                        tags = intervention_match.group(1).strip()
+                        plain_text = plain_text[intervention_match.end():].strip()
+
+                    # Pattern 2: "Tribut X" at the start
+                    # Tribut tags look like: "Tribut 1", "Tribut 1 Aktion (...)"
+                    # The tag ends at the closing paren of the action description
+                    tribut_match = re.match(r'^(\s*Tribut\s+\d+\s+(?:Aktion\s*\([^)]*\))\s*)', plain_text, re.IGNORECASE)
+                    if tribut_match:
+                        if tags:
+                            tags = f"{tags} {tribut_match.group(1).strip()}"
+                        else:
+                            tags = tribut_match.group(1).strip()
+                        plain_text = plain_text[tribut_match.end():].strip()
+                    elif re.match(r'^(\s*Tribut\s+\d+)\s+', plain_text, re.IGNORECASE):
+                        # Just "Tribut X" - treat as tag, rest as effect
+                        tribut_simple = re.match(r'^(\s*Tribut\s+\d+)\s+', plain_text, re.IGNORECASE)
+                        if tribut_simple:
+                            if tags:
+                                tags = f"{tags} {tribut_simple.group(1).strip()}"
+                            else:
+                                tags = tribut_simple.group(1).strip()
+                            plain_text = plain_text[tribut_simple.end():].strip()
+
+                    # Pattern 3: "Einmalige Verwendung" at the start
+                    if re.match(r'^(\s*Einmalige\s+Verwendung)\b', plain_text, re.IGNORECASE):
+                        einmalige_match = re.match(r'^(\s*Einmalige\s+Verwendung)\W*', plain_text, re.IGNORECASE)
+                        if tags:
+                            tags = f"{tags} Einmalige Verwendung"
+                        else:
+                            tags = "Einmalige Verwendung"
+                        plain_text = re.sub(r'^\s*Einmalige\s+Verwendung\W*', '', plain_text, flags=re.IGNORECASE).strip()
+
+                    # Pattern 4: "Aktion (...)" at the start
+                    action_match = re.match(r'^(\s*Aktion\s*\([^)]*\))\s*', plain_text, re.IGNORECASE)
+                    if action_match:
+                        if tags:
+                            tags = f"{tags} {action_match.group(1).strip()}"
+                        else:
+                            tags = action_match.group(1).strip()
+                        plain_text = plain_text[action_match.end():].strip()
+
+                    # Remaining text is effect
+                    effect = plain_text
+
+                # Default: return effect, tags, conditional_tags, empty lore
+                return effect.strip(), tags.strip(), conditional_tags.strip(), ""
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -665,16 +702,9 @@ def process_file(filepath, folder_prefix=""):
         effect = sanitize_text(effect)
         tags = sanitize_text(tags)
         conditional_tags = sanitize_text(conditional_tags)
-        lore_in_rule = sanitize_text(lore_in_rule)
 
-        # Combine lore from rule layer (italic-only text) with dedicated lore layer
-        lore_from_lore_layer = sanitize_text(get_lore(img))
-        lore_parts = []
-        if lore_in_rule:
-            lore_parts.append(lore_in_rule)
-        if lore_from_lore_layer:
-            lore_parts.append(lore_from_lore_layer)
-        lore = ' '.join(lore_parts)
+        # Lore ONLY comes from the dedicated lore layer (textbox_text_lore)
+        lore = sanitize_text(get_lore(img))
         discipline = sanitize_text(get_discipline(img))
         rarity = sanitize_text(get_rarity(img))
         author = sanitize_text(get_author(img))
