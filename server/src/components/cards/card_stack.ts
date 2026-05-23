@@ -84,7 +84,7 @@ export default abstract class CardStack {
     return this.cardStacks.map(cs => cs.card);
   }
   get cardStacks(): CardStack[] {
-    return this.attachedCardStacks.flatMap(cs => cs.cardStacks).concat(this);
+    return [this, ...this.attachedCardStacks.flatMap(cs => cs.cardStacks)];
   }
   get player(): Player {
     if (this.parentCardStack) return this.parentCardStack.player;
