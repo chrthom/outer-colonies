@@ -21,7 +21,7 @@ abstract class CardPowerPlant extends InfrastructureEnergyCard {
   }
 }
 
-abstract class NuclearReactorCard extends InfrastructureEnergyCard {
+abstract class CardNuclearReactor extends InfrastructureEnergyCard {
   constructor(id: number) {
     super(id, 'Atomreaktor', 0, {
       energy: 2,
@@ -30,7 +30,7 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
   }
 }
 
-abstract class SolarPanelCard extends InfrastructureEnergyCard {
+abstract class CardSolarPanel extends InfrastructureEnergyCard {
   constructor(id: number) {
     super(id, 'Solarpanele', 0, {
       energy: 1
@@ -78,7 +78,7 @@ export class Card185 extends CardPowerPlant {
   }
 }
 
-export class Card187 extends NuclearReactorCard {
+export class Card187 extends CardNuclearReactor {
   constructor() {
     super(187);
   }
@@ -96,13 +96,13 @@ export class Card242 extends CardPowerPlant {
   }
 }
 
-export class Card244 extends NuclearReactorCard {
+export class Card244 extends CardNuclearReactor {
   constructor() {
     super(244);
   }
 }
 
-export class Card245 extends SolarPanelCard {
+export class Card245 extends CardSolarPanel {
   constructor() {
     super(245);
   }
@@ -114,25 +114,25 @@ export class Card350 extends CardPowerPlant {
   }
 }
 
-export class Card352 extends NuclearReactorCard {
+export class Card352 extends CardNuclearReactor {
   constructor() {
     super(352);
   }
 }
 
-export class Card353 extends SolarPanelCard {
+export class Card353 extends CardSolarPanel {
   constructor() {
     super(353);
   }
 }
 
-export class Card451 extends NuclearReactorCard {
+export class Card451 extends CardNuclearReactor {
   constructor() {
     super(451);
   }
 }
 
-export class Card452 extends SolarPanelCard {
+export class Card452 extends CardSolarPanel {
   constructor() {
     super(452);
   }

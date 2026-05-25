@@ -1,12 +1,6 @@
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
-import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
-
-abstract class ShieldDefenseCard extends EquipmentCardRechargeable {
-  override getValidTargets(player: Player): CardStack[] {
-    return super.getValidTargets(player).filter(cs => !cs.cards.find(c => c.id == 312)); // Cannot be attached if "Refraktorfeld" is already attached
-  }
-}
+import EquipmentCard, { EquipmentCardRechargeable, ShieldDefenseCard } from '../types/equipment_card';
 
 export class Card103 extends EquipmentCard {
   constructor() {
