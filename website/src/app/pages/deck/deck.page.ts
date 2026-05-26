@@ -64,6 +64,8 @@ export class DeckPage implements OnInit {
 
   readonly minCards = 60;
   readonly maxCards = 100;
+  loadFailed = false;
+  actionFailed = false;
   filterFormControl = new FormControl('');
   viewFormControl = new FormControl('list');
   private activeCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
@@ -119,19 +121,31 @@ export class DeckPage implements OnInit {
     this.update();
   }
   update() {
-    this.deckApiService.listDeck().subscribe(res => {
-      this.activeCards$.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
-      this.reserveCards$.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
+    this.loadFailed = false;
+    this.deckApiService.listDeck().subscribe({
+      next: res => {
+        this.activeCards$.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
+        this.reserveCards$.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
+      },
+      error: () => (this.loadFailed = true)
     });
   }
   activateCard(card: DeckCard) {
     if (this.canActivateDeckCard) {
-      this.deckApiService.activateCard(card.id).subscribe(() => this.update());
+      this.actionFailed = false;
+      this.deckApiService.activateCard(card.id).subscribe({
+        next: () => this.update(),
+        error: () => (this.actionFailed = true)
+      });
     }
   }
   deactivateCard(card: DeckCard) {
     if (this.canDeactivateDeckCard) {
-      this.deckApiService.deactivateCard(card.id).subscribe(() => this.update());
+      this.actionFailed = false;
+      this.deckApiService.deactivateCard(card.id).subscribe({
+        next: () => this.update(),
+        error: () => (this.actionFailed = true)
+      });
     }
   }
   openImgInModal(card: DeckCard) {
