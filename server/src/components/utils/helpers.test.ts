@@ -8,6 +8,7 @@ import {
   opponentPlayerNo,
   pickRandom,
   removeFirstMatchingElement,
+  shuffle,
   spliceCardById,
   spliceCardStackByUUID,
   spliceFrom
@@ -185,6 +186,41 @@ describe('pickRandom', () => {
     for (let i = 0; i < 100; i++) {
       expect(items).toContain(pickRandom(items));
     }
+  });
+});
+
+describe('shuffle', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('shuffles in place and returns the same array reference', () => {
+    const items = [1, 2, 3];
+
+    expect(shuffle(items)).toBe(items);
+  });
+
+  it('preserves the multiset of elements', () => {
+    const items = [1, 2, 3, 4, 5, 6, 7, 8];
+    const original = [...items];
+
+    shuffle(items);
+
+    expect([...items].sort((a, b) => a - b)).toEqual(original);
+  });
+
+  it('produces the Fisher-Yates permutation for a fixed RNG sequence', () => {
+    const sequence = [0, 0, 0];
+    jest.spyOn(Math, 'random').mockImplementation(() => sequence.shift()!);
+
+    expect(shuffle(['a', 'b', 'c', 'd'])).toEqual(['b', 'c', 'd', 'a']);
+  });
+
+  it('is identity when each RNG draw selects the last index', () => {
+    const sequence = [0.999, 0.999, 0.999];
+    jest.spyOn(Math, 'random').mockImplementation(() => sequence.shift()!);
+
+    expect(shuffle(['a', 'b', 'c', 'd'])).toEqual(['a', 'b', 'c', 'd']);
   });
 });
 
