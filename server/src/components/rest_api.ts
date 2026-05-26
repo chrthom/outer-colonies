@@ -95,7 +95,15 @@ export default function restAPI(app: Express) {
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
-    fetch(`${config.get('url.assets')}/${file}`).then(actual => actual.body.pipe(res));
+    fetch(`${config.get('url.assets')}/${file}`)
+      .then(actual => {
+        if (!actual.body) {
+          res.status(502).end();
+          return;
+        }
+        actual.body.pipe(res).on('error', () => res.status(502).end());
+      })
+      .catch(() => res.status(502).end());
   });
 
   // Register new user
