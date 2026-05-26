@@ -38,8 +38,11 @@ export default class AuthService {
 
   logout() {
     if (this.sessionToken) {
-      this.authAPIService.logout(this.sessionToken).subscribe(() => {
-        /* Do nothing */
+      this.authAPIService.logout(this.sessionToken).subscribe({
+        next: () => {
+          /* Do nothing */
+        },
+        error: err => console.error('Logout API call failed', err)
       });
     }
     this.username = undefined;

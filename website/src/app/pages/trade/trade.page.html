@@ -1,4 +1,9 @@
 <div id="outer-box">
+  @if (loadFailed) {
+  <p class="error-message">
+    Die Inventardaten konnten nicht geladen werden. Bitte versuche es sp&auml;ter erneut.
+  </p>
+  }
   <div id="inventory-box" class="inner-box">
     <oc-content-box title="Inventar">
       <div class="scroll">

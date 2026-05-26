@@ -1,4 +1,10 @@
-@for (box of boxes; track box) {
+@if (loadFailed) {
+<p class="error-message">Das Deck konnte nicht geladen werden. Bitte versuche es sp&auml;ter erneut.</p>
+} @if (actionFailed) {
+<p class="error-message">
+  Die letzte Aktion konnte nicht ausgef&uuml;hrt werden. Bitte versuche es sp&auml;ter erneut.
+</p>
+} @for (box of boxes; track box) {
 <div class="deck-box">
   <oc-content-box [title]="box.title">
     <div class="scroll">

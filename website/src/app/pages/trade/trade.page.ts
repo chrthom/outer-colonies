@@ -47,6 +47,8 @@ export class TradePage implements OnInit {
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
   openedBoxContent?: ItemListResponseBox;
+  loadFailed = false;
+  actionFailed = false;
   readonly assetURL = environment.url.assets;
   readonly availableBoosters = [
     {
@@ -79,33 +81,60 @@ export class TradePage implements OnInit {
     this.reload();
   }
   reload() {
-    this.profileApiService.profile.subscribe(p => {
-      this.sol = p.sol;
+    this.loadFailed = false;
+    this.profileApiService.profile.subscribe({
+      next: p => {
+        this.sol = p.sol;
+      },
+      error: () => (this.loadFailed = true)
     });
-    this.itemApiService.items.subscribe(i => {
-      this.boosters = i.boosters;
-      this.boxes = i.boxes;
+    this.itemApiService.items.subscribe({
+      next: i => {
+        this.boosters = i.boosters;
+        this.boxes = i.boxes;
+      },
+      error: () => (this.loadFailed = true)
     });
   }
   buyBooster(boosterNo: number) {
     if (this.sol >= rules.boosterCosts[boosterNo]) {
-      this.itemApiService.buyBooster(boosterNo).subscribe(() => {
-        this.reload();
-        const booster = this.availableBoosters.find(b => b.no == boosterNo);
-        this.snackBar.open(
-          `Du hast ein Booster Pack "${booster?.title}" für ${booster?.price} Sol erworben.`,
-          'OK',
-          {
-            duration: 5000
-          }
-        );
+      this.actionFailed = false;
+      this.itemApiService.buyBooster(boosterNo).subscribe({
+        next: () => {
+          this.reload();
+          const booster = this.availableBoosters.find(b => b.no == boosterNo);
+          this.snackBar.open(
+            `Du hast ein Booster Pack "${booster?.title}" für ${booster?.price} Sol erworben.`,
+            'OK',
+            {
+              duration: 5000
+            }
+          );
+        },
+        error: () => {
+          this.actionFailed = true;
+          this.snackBar.open(
+            'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
+            'OK',
+            { duration: 5000 }
+          );
+        }
       });
     }
   }
   open(itemId: number) {
-    this.itemApiService.open(itemId).subscribe(content => {
-      this.reload();
-      this.openedBoxContent = content;
+    this.actionFailed = false;
+    this.itemApiService.open(itemId).subscribe({
+      next: content => {
+        this.reload();
+        this.openedBoxContent = content;
+      },
+      error: () => {
+        this.actionFailed = true;
+        this.snackBar.open('Das Item konnte nicht geöffnet werden. Bitte versuche es später erneut.', 'OK', {
+          duration: 5000
+        });
+      }
     });
   }
   boxClosed() {

@@ -65,4 +65,29 @@ describe('HomePage', () => {
   it('should expose the game URL from the environment', () => {
     expect(component.gameUrl).toContain('game');
   });
+
+  it('should clear the auto-advance interval on destroy', () => {
+    const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
+    fixture.detectChanges(); // triggers ngOnInit -> startAutoAdvance
+    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
+    req.flush({
+      login: null,
+      victory: null,
+      game: null,
+      energy: null,
+      ships: null,
+      domination: null,
+      destruction: null,
+      control: null,
+      juggernaut: null,
+      stations: null,
+      discard: null,
+      colony: null,
+      colossus: null
+    });
+
+    fixture.destroy();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+  });
 });
