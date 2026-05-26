@@ -1,11 +1,4 @@
-import HullCard from '../types/hull_card';
-import { HullMultipart } from '../types/hull_card';
-
-const noMultipart: HullMultipart = {
-  numberOfRequiredParts: 1,
-  neededPartIds: [],
-  duplicatesAllowed: false
-};
+import HullCard, { noMultipart } from '../types/hull_card';
 
 abstract class CardCorvette extends HullCard {
   constructor(id: number) {
@@ -126,3 +119,17 @@ export class Card559 extends CardCorvette {
     super(559);
   }
 }
+
+export const allCards = [
+  new Card160(),
+  new Card186(),
+  new Card220(),
+  new Card243(),
+  new Card342(),
+  new Card348(),
+  new Card351(),
+  new Card436(),
+  new Card439(),
+  new Card450(),
+  new Card559()
+];

@@ -172,3 +172,21 @@ export class Card522 extends ShieldDefenseCard {
     });
   }
 }
+
+export const allCards = [
+  new Card103(),
+  new Card115(),
+  new Card140(),
+  new Card163(),
+  new Card170(),
+  new Card171(),
+  new Card184(),
+  new Card240(),
+  new Card312(),
+  new Card341(),
+  new Card349(),
+  new Card406(),
+  new Card426(),
+  new Card447(),
+  new Card522()
+];

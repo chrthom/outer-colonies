@@ -111,6 +111,9 @@ export default abstract class Card {
   protected removeFromActionPool(player: Player) {
     player.actionPool.remove(...this.actionPool.pool);
   }
+  protected repairDamage(target: CardStack, amount: number) {
+    target.damage -= Math.min(amount, target.damage);
+  }
   protected additionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
     const relevantCardDrawn = this.getDrawnCards(player).some(c =>
       cardTypes.some(

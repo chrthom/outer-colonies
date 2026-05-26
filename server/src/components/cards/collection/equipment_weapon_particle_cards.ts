@@ -131,3 +131,12 @@ export class Card438 extends EquipmentCardRechargeable {
     return target.type == CardType.Colony || !this.attackProfile ? 0 : this.attackProfile.damage;
   }
 }
+
+export const allCards = [
+  new Card106(),
+  new Card107(),
+  new Card203(),
+  new Card207(),
+  new Card405(),
+  new Card438()
+];
