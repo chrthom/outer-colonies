@@ -24,11 +24,7 @@ class TacticProbe extends TacticCard {
   onEnterGame(): void {}
 
   // Expose protected helpers.
-  public exposedTributeFromPile(
-    params: number[] | undefined,
-    pile: Card[],
-    action: (card: Card) => void
-  ) {
+  public exposedTributeFromPile(params: number[] | undefined, pile: Card[], action: (card: Card) => void) {
     return this.tributeCardFromPile(params, pile, action);
   }
   public exposedTributeHandCard(
@@ -38,11 +34,7 @@ class TacticProbe extends TacticCard {
   ) {
     return this.tributeHandCard(player, params, action);
   }
-  public exposedTributeMultiple(
-    params: number[] | undefined,
-    pile: Card[],
-    action: (card: Card) => void
-  ) {
+  public exposedTributeMultiple(params: number[] | undefined, pile: Card[], action: (card: Card) => void) {
     return this.tributeMultipleFromPile(params, pile, action);
   }
   public exposedTogglePointDefense(targets: CardStack[], count: number, newState: boolean) {
