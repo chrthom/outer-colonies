@@ -1,4 +1,5 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authTokenInterceptor } from './app/api/auth-token.interceptor';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -46,7 +47,7 @@ bootstrapApplication(AppComponent, {
       MatTooltipModule,
       ReactiveFormsModule
     ),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([authTokenInterceptor])),
     provideAnimations(),
     IconService
   ]

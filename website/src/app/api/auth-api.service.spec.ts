@@ -2,19 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import AuthApiService from './auth-api.service';
 import { environment } from 'src/environments/environment';
-import AuthService from '../auth.service';
 
 describe('AuthApiService', () => {
   let service: AuthApiService;
   let httpMock: HttpTestingController;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AuthApiService, { provide: AuthService, useValue: authServiceSpy }]
+      providers: [AuthApiService]
     });
     service = TestBed.inject(AuthApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -84,15 +80,12 @@ describe('AuthApiService', () => {
   });
 
   it('should logout user', () => {
-    const testToken = 'test-token';
-
-    service.logout(testToken).subscribe(() => {
+    service.logout().subscribe(() => {
       // Logout successful
     });
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
     expect(req.request.method).toBe('DELETE');
-    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 });
