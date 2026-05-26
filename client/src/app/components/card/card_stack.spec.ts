@@ -23,7 +23,9 @@ function makeScene(): any {
     getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     retractCardsExist: false,
-    time: { delayedCall: jasmine.createSpy('delayedCall') }
+    time: { delayedCall: jasmine.createSpy('delayedCall') },
+    add: jasmine.createSpyObj('add', ['image', 'text']),
+    tweens: jasmine.createSpyObj('tweens', ['add'])
   };
 }
 
@@ -32,6 +34,28 @@ function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
 }
 
 describe('CardStack', () => {
+  describe('constructor', () => {
+    it('does not touch the scene (no render side effects)', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+
+      expect(scene.add.image).not.toHaveBeenCalled();
+      expect(scene.add.text).not.toHaveBeenCalled();
+      expect(scene.tweens.add).not.toHaveBeenCalled();
+      // summaryBox is created by init(), not the constructor
+      expect(cs.summaryBox).toBeUndefined();
+    });
+
+    it('assigns data and uuid from the input ClientCardStack', () => {
+      const data = makeData({ uuid: 'abc-123', ownedByPlayer: false });
+      const cs = new CardStack(makeScene(), data);
+
+      expect(cs.uuid).toBe('abc-123');
+      expect(cs.data).toBe(data);
+      expect(cs.ownedByPlayer).toBeFalse();
+    });
+  });
+
   describe('ownedByPlayer', () => {
     it('reflects the value in data', () => {
       expect(makeCardStack({ ownedByPlayer: true }).ownedByPlayer).toBeTrue();

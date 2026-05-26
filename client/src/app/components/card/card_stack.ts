@@ -24,17 +24,18 @@ export default class CardStack {
   private scene: Game;
   private initialized = false;
 
-  constructor(scene: Game, data: ClientCardStack, origin?: CardImage) {
+  constructor(scene: Game, data: ClientCardStack) {
     this.scene = scene;
     this.uuid = data.uuid;
     this.data = data;
-    // Initialize immediately to maintain original behavior
-    this.createCards(origin);
-    this.summaryBox = new CardStackSummary(this.scene, this);
-    this.tween();
   }
 
-  // Separate init method for testing purposes
+  /**
+   * Performs the Phaser-side rendering for this stack: creates card sprites,
+   * the summary box and kicks off the placement tween. Kept separate from the
+   * constructor so the stack's pure data/derivations can be unit-tested
+   * without mocking the full Phaser scene surface. Idempotent.
+   */
   init(origin?: CardImage) {
     if (this.initialized) return;
     this.initialized = true;
