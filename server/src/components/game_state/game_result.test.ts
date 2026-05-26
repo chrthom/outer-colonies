@@ -27,7 +27,9 @@ function makeMatch() {
 
 function makeResult(match: any = makeMatch()) {
   const result = new GameResult(match as any);
-  jest.spyOn(result, 'applyEarnings' as any).mockImplementation(() => 0);
+  // Prevent the I/O method from issuing real DB calls during setter tests.
+  // No `as any` cast: `persistEarnings` is part of the public surface now.
+  jest.spyOn(result, 'persistEarnings').mockResolvedValue(undefined);
   return { result, match };
 }
 
@@ -225,6 +227,79 @@ describe('GameResult', () => {
 
     test('Login is never achieved through shouldAchieveDaily', () => {
       expect(check(DailyType.Login, player(), player(), true)).toBe(false);
+    });
+  });
+
+  describe('computeEarnings (pure)', () => {
+    const makePlayer = (over: any = {}) => ({
+      colonyCardStack: { damage: 0, profile: { energy: 0 }, cards: [] },
+      cardStacks: [],
+      discardPile: [],
+      ...over
+    });
+
+    test('pays for discard pile, in-game cards and opponent colony damage', () => {
+      // No DB-stubbing spy here — proves computeEarnings is side-effect-free.
+      const result = new GameResult(makeMatch() as any);
+      const player = makePlayer({
+        discardPile: new Array(4).fill({}), // 4 * 1 = 4
+        cardStacks: [
+          // ingameCards = total cards across stacks - 1 (the colony card itself)
+          // 3 stacks * 2 cards = 6, then -1 => 5 * 3 = 15
+          { cards: [{}, {}] },
+          { cards: [{}, {}] },
+          { cards: [{}, {}] }
+        ]
+      });
+      const opponent = makePlayer({
+        colonyCardStack: { damage: 7, profile: { energy: 0 }, cards: [] } // 7 * 1 = 7
+      });
+
+      // Non-surrender loss: no victory bonus, so 4 + 7 + 15 = 26.
+      result.type = GameResultType.Destruction;
+      expect(result.computeEarnings(player, opponent, false)).toBe(26);
+    });
+
+    test('adds the victory bonus when the player won a non-surrender game', () => {
+      const result = new GameResult(makeMatch() as any);
+      result.type = GameResultType.Destruction;
+      const player = makePlayer();
+      const opponent = makePlayer();
+
+      // discard 0, dmg 0, ingameCards = -1 -> sol = -3 + 50 (bonus) = 47.
+      // Math.max(0, ...) keeps it at 47.
+      expect(result.computeEarnings(player, opponent, true)).toBe(47);
+    });
+
+    test('withholds the victory bonus on surrender below minCardsForVictoryBonus', () => {
+      const result = new GameResult(makeMatch() as any);
+      result.type = GameResultType.Surrender;
+      // 2 discard cards + 0 ingame cards (after -1) -> 2 - 3 = -1 -> floored to 0.
+      const player = makePlayer({ discardPile: new Array(2).fill({}) });
+      const opponent = makePlayer();
+
+      expect(result.computeEarnings(player, opponent, true)).toBe(0);
+    });
+
+    test('grants the victory bonus on surrender once minCardsForVictoryBonus is reached', () => {
+      const result = new GameResult(makeMatch() as any);
+      result.type = GameResultType.Surrender;
+      // 7 discard cards + -1 ingameCards = 6, meets the threshold of 6.
+      // sol = 7 (discard) + -3 (ingameCards * 3) + 50 (bonus) = 54.
+      const player = makePlayer({ discardPile: new Array(7).fill({}) });
+      const opponent = makePlayer();
+
+      expect(result.computeEarnings(player, opponent, true)).toBe(54);
+    });
+
+    test('floors negative computations at 0', () => {
+      const result = new GameResult(makeMatch() as any);
+      result.type = GameResultType.Destruction;
+      // No discard, no opponent damage, no stacks -> ingameCards = -1 -> sol = -3.
+      const player = makePlayer();
+      const opponent = makePlayer();
+
+      expect(result.computeEarnings(player, opponent, false)).toBe(0);
     });
   });
 });

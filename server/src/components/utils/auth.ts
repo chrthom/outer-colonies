@@ -75,7 +75,11 @@ export default class Auth {
           ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
           : Promise.reject(APIRejectReason.NotFound)
     );
-    DBDailiesDAO.achieve(credential.userId, DailyType.Login);
+    try {
+      await DBDailiesDAO.achieve(credential.userId, DailyType.Login);
+    } catch (err) {
+      console.log(`ERROR: Failed to record login daily for user ${credential.userId}: ${err}`);
+    }
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
     credential.sessionToken = sessionToken;
     return <DBCredentialWithSessionToken>credential;
