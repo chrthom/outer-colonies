@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { CardType, RechargeRate, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import OrbCard from '../types/orb_card';
@@ -16,8 +16,8 @@ export class Card112 extends OrbCard {
     );
   }
   override onStartTurn() {}
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -64,8 +64,8 @@ export class Card301 extends OrbCard {
     });
   }
   override onStartTurn() {}
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -98,8 +98,8 @@ export class Card410 extends OrbCard {
   override onStartTurn(player: Player) {
     this.additionalCardWhenDrawing(player, TacticDiscipline.Military);
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 

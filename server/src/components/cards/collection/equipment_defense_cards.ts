@@ -1,3 +1,4 @@
+import { RechargeRate } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
@@ -24,8 +25,8 @@ export class Card115 extends EquipmentCard {
       omega: -1
     });
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -99,8 +100,8 @@ export class Card312 extends EquipmentCardRechargeable {
   override getValidTargets(player: Player): CardStack[] {
     return super.getValidTargets(player).filter(cs => cs.profile.shield == 0);
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 

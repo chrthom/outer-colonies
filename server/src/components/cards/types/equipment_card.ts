@@ -2,7 +2,7 @@ import Card, { AttackResult, CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { AttackProfile } from '../card_profile';
-import { CardType } from '../../../shared/config/enums';
+import { CardType, RechargeRate } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import TacticCard from './tactic_card';
 
@@ -70,13 +70,13 @@ export abstract class EquipmentCardColonyKiller extends EquipmentCard {
 }
 
 export abstract class EquipmentCardColonyKillerRechargeable extends EquipmentCardColonyKiller {
-  override get isRechargeable(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerRound;
   }
 }
 
 export abstract class EquipmentCardRechargeable extends EquipmentCard {
-  override get isRechargeable(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerRound;
   }
 }

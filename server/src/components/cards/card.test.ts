@@ -1,5 +1,5 @@
 import Card, { AttackResult } from './card';
-import { CardSubtype, CardType, TacticDiscipline } from '../../shared/config/enums';
+import { CardSubtype, CardType, RechargeRate, TacticDiscipline } from '../../shared/config/enums';
 import CardStack from './card_stack';
 import { AttackProfile } from './card_profile';
 import Player from '../game_state/player';
@@ -75,7 +75,7 @@ interface MockProfile {
 }
 
 interface MockDefender {
-  card: { profile: MockProfile; instantRecharge: boolean };
+  card: { profile: MockProfile; rechargeRate: RechargeRate };
   profile: MockProfile;
   canDefend: () => boolean;
   deactivationPriority: number;
@@ -88,8 +88,9 @@ const defender = (
   opts: { instantRecharge?: boolean; deactivationPriority?: number; defenseAvailable?: boolean } = {}
 ): MockDefender => {
   const profile: MockProfile = { armour: 0, shield: 0, pointDefense: 0, ...defense };
+  const rechargeRate = opts.instantRecharge ? RechargeRate.PerAttack : RechargeRate.PerBattle;
   const obj: MockDefender = {
-    card: { profile, instantRecharge: opts.instantRecharge ?? false },
+    card: { profile, rechargeRate },
     profile,
     canDefend: () => obj.defenseAvailable,
     deactivationPriority: opts.deactivationPriority ?? 10,

@@ -49,7 +49,7 @@ export default abstract class Card {
     return undefined;
   }
   deactivationPriority(cardStack: CardStack): number {
-    let priority = this.instantRecharge ? 0 : 15;
+    let priority = this.rechargeRate == RechargeRate.PerAttack ? 0 : 15;
     priority += Math.max(this.profile.armour, this.profile.shield, this.profile.pointDefense) * 4;
     priority += cardStack.zone == Zone.Colony ? 2 : 0;
     priority += this.isColonyDefense ? 0 : 1;
@@ -66,12 +66,6 @@ export default abstract class Card {
   }
   get rechargeRate(): RechargeRate {
     return RechargeRate.PerBattle;
-  }
-  get isRechargeable(): boolean {
-    return this.rechargeRate == RechargeRate.PerRound;
-  }
-  get instantRecharge(): boolean {
-    return this.rechargeRate == RechargeRate.PerAttack;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canBeRetracted(isRootCard: boolean): boolean {
@@ -165,7 +159,7 @@ export default abstract class Card {
         case DefenseType.Armour:
           defendingShips
             .flatMap(cs => cs.cardStacks)
-            .filter(cs => cs.card.instantRecharge)
+            .filter(cs => cs.card.rechargeRate == RechargeRate.PerAttack)
             .forEach(cs => (cs.defenseAvailable = true));
           return attackResult;
         case DefenseType.Shield:
