@@ -1,6 +1,13 @@
 import Card from './card';
 import CardProfile from './card_profile';
-import { BattleType, CardDurability, CardType, TurnPhase, Zone } from '../../shared/config/enums';
+import {
+  BattleType,
+  CardDurability,
+  CardType,
+  RechargeRate,
+  TurnPhase,
+  Zone
+} from '../../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -75,7 +82,7 @@ export default abstract class CardStack {
   }
   combatPhaseReset(initial: boolean) {
     this.attachedCardStacks.forEach(cs => cs.combatPhaseReset(initial));
-    if (initial || this.card.isRechargeable) {
+    if (initial || this.card.rechargeRate != RechargeRate.PerBattle) {
       if (this.card.canAttack) this.attackAvailable = true;
       if (this.card.canDefend) this.defenseAvailable = true;
     }

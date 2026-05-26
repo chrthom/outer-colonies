@@ -1,186 +1,317 @@
-import Card from './card';
-import CardProfile from './card_profile';
-import { CardType, InterventionType } from '../../shared/config/enums';
+import Card, { AttackResult } from './card';
+import { CardSubtype, CardType, RechargeRate, TacticDiscipline } from '../../shared/config/enums';
 import CardStack from './card_stack';
+import { AttackProfile } from './card_profile';
+import Player from '../game_state/player';
 
-// Mock abstract methods for testing
 class TestCard extends Card {
   getValidTargets(): CardStack[] {
     return [];
   }
+  onEnterGame(): void {}
+  onLeaveGame(): void {}
+  onStartTurn(): void {}
+  onEndTurn(): void {}
 
-  onEnterGame(): void {
-    // Mock implementation
+  // Expose protected helpers for testing.
+  public exposedAttackStep(
+    target: CardStack,
+    attackProfile: AttackProfile,
+    defendingShips: CardStack[],
+    initialDamage: number
+  ): AttackResult {
+    return this.attackStep(target, attackProfile, defendingShips, new AttackResult(initialDamage));
   }
-
-  onLeaveGame(): void {
-    // Mock implementation
+  public exposedRepairDamage(target: CardStack, amount: number) {
+    return this.repairDamage(target, amount);
   }
-
-  onStartTurn(): void {
-    // Mock implementation
+  public exposedAdditionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
+    return this.additionalCardWhenDrawing(player, ...cardTypes);
   }
-
-  onEndTurn(): void {
-    // Mock implementation
+  public exposedRechargePerAttackDefenders(defendingShips: CardStack[]) {
+    return this.rechargePerAttackDefenders(defendingShips);
   }
 }
 
-describe('Card', () => {
-  describe('constructor and basic properties', () => {
-    test('should create card with required properties', () => {
-      const card = new TestCard(1, 'Test Card', CardType.Equipment, 1);
-
-      expect(card.id).toBe(1);
-      expect(card.name).toBe('Test Card');
-      expect(card.type).toBe(CardType.Equipment);
-      expect(card.rarity).toBe(1);
-      expect(card.profile).toBeInstanceOf(CardProfile);
+describe('Card.canDefend', () => {
+  test('returns false when all defense values are 0', () => {
+    const card = new TestCard(1, 'No Defense', CardType.Equipment, 1, {
+      armour: 0,
+      shield: 0,
+      pointDefense: 0
     });
-
-    test('should create card with custom profile', () => {
-      const profileConfig = {
-        theta: 2,
-        xi: -1,
-        phi: 3,
-        armour: 10,
-        shield: 5,
-        pointDefense: 3
-      };
-
-      const card = new TestCard(2, 'Custom Profile Card', CardType.Hull, 2, profileConfig);
-
-      expect(card.profile.theta).toBe(2);
-      expect(card.profile.xi).toBe(-1);
-      expect(card.profile.phi).toBe(3);
-      expect(card.profile.armour).toBe(10);
-    });
-
-    test('should use default profile when no profile provided', () => {
-      const card = new TestCard(3, 'Default Profile Card', CardType.Infrastructure, 3);
-
-      expect(card.profile.theta).toBe(0);
-      expect(card.profile.xi).toBe(0);
-      expect(card.profile.phi).toBe(0);
-      expect(card.profile.omega).toBe(0);
-      expect(card.profile.delta).toBe(0);
-      expect(card.profile.psi).toBe(0);
-    });
+    expect(card.canDefend).toBe(false);
   });
 
-  describe('attack method', () => {
-    test('should return default attack result for non-attacking cards', () => {
-      const card = new TestCard(4, 'Non-Attack Card', CardType.Infrastructure, 1);
-      const mockCardStack = {} as CardStack;
-      const mockTarget = {} as CardStack;
-
-      const result = card.attack(mockCardStack, mockTarget);
-
-      expect(result).toBeDefined();
-      expect(result.damage).toBe(0);
+  test('returns false when defense values are negative', () => {
+    const card = new TestCard(2, 'Negative Defense', CardType.Equipment, 1, {
+      armour: -1,
+      shield: -2,
+      pointDefense: -3
     });
+    expect(card.canDefend).toBe(false);
   });
 
-  describe('canAttack property', () => {
-    test('should return false by default for abstract card', () => {
-      const card = new TestCard(6, 'Basic Card', CardType.Hull, 1);
-      expect(card.canAttack).toBe(false);
+  test('returns true when any single defense value is positive', () => {
+    const card = new TestCard(3, 'Armour Only', CardType.Hull, 1, {
+      armour: 5,
+      shield: 0,
+      pointDefense: 0
     });
+    expect(card.canDefend).toBe(true);
   });
 
-  describe('canDefend property', () => {
-    test('should return false when all defense values are 0 or negative', () => {
-      const card = new TestCard(7, 'No Defense Card', CardType.Equipment, 1, {
-        armour: 0,
-        shield: 0,
-        pointDefense: 0
-      });
-      expect(card.canDefend).toBe(false);
+  test('returns true when multiple defense values are positive', () => {
+    const card = new TestCard(4, 'Multi Defense', CardType.Infrastructure, 1, {
+      armour: 2,
+      shield: 3,
+      pointDefense: 1
     });
+    expect(card.canDefend).toBe(true);
+  });
+});
 
-    test('should return true when any defense value is positive', () => {
-      const card = new TestCard(8, 'Defense Card', CardType.Hull, 1, {
-        armour: 5,
-        shield: 0,
-        pointDefense: 0
-      });
-      expect(card.canDefend).toBe(true);
-    });
+interface MockProfile {
+  armour: number;
+  shield: number;
+  pointDefense: number;
+}
 
-    test('should return true when multiple defense values are positive', () => {
-      const card = new TestCard(9, 'Multi Defense Card', CardType.Infrastructure, 1, {
-        armour: 2,
-        shield: 3,
-        pointDefense: 1
-      });
-      expect(card.canDefend).toBe(true);
-    });
+interface MockDefender {
+  card: { profile: MockProfile; rechargeRate: RechargeRate };
+  profile: MockProfile;
+  canDefend: () => boolean;
+  deactivationPriority: number;
+  defenseAvailable: boolean;
+  cardStacks: MockDefender[];
+}
 
-    test('should return false when defense values are negative', () => {
-      const card = new TestCard(10, 'Negative Defense Card', CardType.Equipment, 1, {
-        armour: -1,
-        shield: -2,
-        pointDefense: -3
-      });
-      expect(card.canDefend).toBe(false);
-    });
+const defender = (
+  defense: { armour?: number; shield?: number; pointDefense?: number },
+  opts: { instantRecharge?: boolean; deactivationPriority?: number; defenseAvailable?: boolean } = {}
+): MockDefender => {
+  const profile: MockProfile = { armour: 0, shield: 0, pointDefense: 0, ...defense };
+  const rechargeRate = opts.instantRecharge ? RechargeRate.PerAttack : RechargeRate.PerBattle;
+  const obj: MockDefender = {
+    card: { profile, rechargeRate },
+    profile,
+    canDefend: () => obj.defenseAvailable,
+    deactivationPriority: opts.deactivationPriority ?? 10,
+    defenseAvailable: opts.defenseAvailable ?? true,
+    cardStacks: []
+  };
+  obj.cardStacks = [obj];
+  return obj;
+};
+
+const ship = (...defenders: MockDefender[]) => ({ cardStacks: defenders }) as unknown as CardStack;
+
+const attacker = new TestCard(99, 'Attacker', CardType.Equipment, 1);
+const target = {} as CardStack;
+
+const attack = (overrides: Partial<AttackProfile> = {}): AttackProfile => ({
+  range: 0,
+  damage: 0,
+  pointDefense: 0,
+  shield: 0,
+  armour: 0,
+  ...overrides
+});
+
+describe('Card.attackStep', () => {
+  test('returns the input result unchanged when starting damage is 0', () => {
+    const def = defender({ pointDefense: 2 });
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 0);
+
+    expect(result.damage).toBe(0);
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(0);
+    expect(def.defenseAvailable).toBe(true);
   });
 
-  describe('canIntervene method', () => {
-    test('should return false by default for cards that cannot intervene', () => {
-      const card = new TestCard(11, 'Basic Card', CardType.Hull, 1);
-      expect(card.canIntervene(InterventionType.Attack)).toBe(false);
-      expect(card.canIntervene(InterventionType.BattleRoundEnd)).toBe(false);
-    });
+  test('passes through all three phases when no defenders match, damage unchanged', () => {
+    const result = attacker.exposedAttackStep(
+      target,
+      attack({ pointDefense: -3, shield: -3, armour: -3 }),
+      [],
+      10
+    );
 
-    test('should accept different intervention types', () => {
-      const card = new TestCard(12, 'Test Card', CardType.Tactic, 1);
-
-      // Should not throw for any intervention type
-      expect(card.canIntervene(InterventionType.Attack)).toBeDefined();
-      expect(card.canIntervene(InterventionType.BattleRoundEnd)).toBeDefined();
-      expect(card.canIntervene(InterventionType.TacticCard)).toBeDefined();
-    });
+    expect(result.damage).toBe(10);
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(0);
   });
 
-  describe('deactivationPriority method', () => {
-    test('should return a number for deactivation priority', () => {
-      const card = new TestCard(13, 'Priority Card', CardType.Equipment, 1);
-      const mockCardStack = {} as CardStack;
+  test('point-defender absorbs damage and deactivates when damage >= reduction', () => {
+    const def = defender({ pointDefense: 2 });
+    // reduction = (-3) * -(2) = 6, damage = 10 → defender deactivates, 4 damage passes
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
 
-      const priority = card.deactivationPriority(mockCardStack);
-      expect(typeof priority).toBe('number');
-    });
-
-    test('should return same priority for same card stack', () => {
-      const card = new TestCard(14, 'Consistent Priority Card', CardType.Hull, 1);
-      const mockCardStack = { uuid: 'test-uuid' } as CardStack;
-
-      const priority1 = card.deactivationPriority(mockCardStack);
-      const priority2 = card.deactivationPriority(mockCardStack);
-
-      expect(priority1).toBe(priority2);
-    });
+    expect(result.pointDefense).toBe(6);
+    expect(result.damage).toBe(4);
+    expect(def.defenseAvailable).toBe(false);
   });
 
-  describe('card comparison and equality', () => {
-    test('should have consistent ID for same card instance', () => {
-      const card = new TestCard(15, 'Consistent ID Card', CardType.Infrastructure, 1);
-      expect(card.id).toBe(15);
-    });
+  test('partial absorption: defender stays available when damage < reduction', () => {
+    const def = defender({ pointDefense: 2 });
+    // reduction = 6, damage = 4 → fully absorbed but defender NOT deactivated
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 4);
 
-    test('should maintain immutable properties', () => {
-      const card = new TestCard(16, 'Immutable Card', CardType.Equipment, 2);
-      const originalId = card.id;
-      const originalName = card.name;
-      const originalType = card.type;
-      const originalRarity = card.rarity;
+    expect(result.pointDefense).toBe(4);
+    expect(result.damage).toBe(0);
+    expect(def.defenseAvailable).toBe(true);
+  });
 
-      // Properties should not change
-      expect(card.id).toBe(originalId);
-      expect(card.name).toBe(originalName);
-      expect(card.type).toBe(originalType);
-      expect(card.rarity).toBe(originalRarity);
-    });
+  test('recursion walks PointDefense → Shield → Armour when earlier phases have no defenders', () => {
+    const armourDef = defender({ armour: 2 });
+    const result = attacker.exposedAttackStep(
+      target,
+      attack({ pointDefense: -3, shield: -3, armour: -3 }),
+      [ship(armourDef)],
+      10
+    );
+
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(6);
+    expect(result.damage).toBe(4);
+    expect(armourDef.defenseAvailable).toBe(false);
+  });
+
+  test('selects the highest-priority defender first', () => {
+    const low = defender({ pointDefense: 2 }, { deactivationPriority: 5 });
+    const high = defender({ pointDefense: 2 }, { deactivationPriority: 20 });
+    // damage = 6 → exactly absorbs one defender. The high-priority one should be picked.
+    attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(low, high)], 6);
+
+    expect(high.defenseAvailable).toBe(false);
+    expect(low.defenseAvailable).toBe(true);
+  });
+
+  test('skips defenders that report canDefend = false', () => {
+    const blocked = defender({ pointDefense: 2 });
+    blocked.canDefend = () => false;
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(blocked)], 10);
+
+    expect(result.pointDefense).toBe(0);
+    expect(result.damage).toBe(10);
+    expect(blocked.defenseAvailable).toBe(true);
+  });
+
+  test('does NOT re-arm any defender on its own — that is the caller responsibility', () => {
+    const instant = defender({ pointDefense: 1 }, { instantRecharge: true });
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(instant)], 10);
+
+    expect(result.pointDefense).toBe(3);
+    expect(result.damage).toBe(7);
+    expect(instant.defenseAvailable).toBe(false);
+  });
+});
+
+describe('Card.rechargePerAttackDefenders', () => {
+  test('flips defenseAvailable back to true on PerAttack defenders', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: true, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('does not touch defenders whose rechargeRate is not PerAttack', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: false, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
+    expect(def.defenseAvailable).toBe(false);
+  });
+
+  test('leaves already-active PerAttack defenders alone (idempotent)', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: true, defenseAvailable: true });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('re-arms across multiple ships', () => {
+    const def1 = defender({ pointDefense: 1 }, { instantRecharge: true, defenseAvailable: false });
+    const def2 = defender({ shield: 1 }, { instantRecharge: true, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def1), ship(def2)]);
+    expect(def1.defenseAvailable).toBe(true);
+    expect(def2.defenseAvailable).toBe(true);
+  });
+});
+
+describe('Card.repairDamage', () => {
+  test('reduces damage by the given amount', () => {
+    const stack = { damage: 8 } as CardStack;
+    attacker.exposedRepairDamage(stack, 5);
+    expect(stack.damage).toBe(3);
+  });
+
+  test('clamps at 0 when amount exceeds existing damage', () => {
+    const stack = { damage: 3 } as CardStack;
+    attacker.exposedRepairDamage(stack, 10);
+    expect(stack.damage).toBe(0);
+  });
+
+  test('no-op when damage is already 0', () => {
+    const stack = { damage: 0 } as CardStack;
+    attacker.exposedRepairDamage(stack, 5);
+    expect(stack.damage).toBe(0);
+  });
+});
+
+// rules.cardsToDrawPerTurn is 2, so `getDrawnCards` returns the last two hand entries.
+const handCard = (type: CardType, discipline?: TacticDiscipline) => ({
+  card: { type, discipline }
+});
+
+const playerWithHand = (hand: ReturnType<typeof handCard>[]) =>
+  ({ hand, drawCards: jest.fn() }) as unknown as Player;
+
+describe('Card.additionalCardWhenDrawing', () => {
+  test('no drawn card matches any filter: drawCards is NOT called', () => {
+    const player = playerWithHand([handCard(CardType.Equipment), handCard(CardType.Equipment)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).not.toHaveBeenCalled();
+  });
+
+  test('drawn card matches a CardType filter: drawCards(1) is called', () => {
+    const player = playerWithHand([handCard(CardType.Equipment), handCard(CardType.Hull)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).toHaveBeenCalledWith(1);
+    expect(player.drawCards).toHaveBeenCalledTimes(1);
+  });
+
+  test('drawn Tactic card with matching discipline: drawCards(1) is called', () => {
+    const player = playerWithHand([
+      handCard(CardType.Equipment),
+      handCard(CardType.Tactic, TacticDiscipline.Military)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, TacticDiscipline.Military);
+    expect(player.drawCards).toHaveBeenCalledWith(1);
+  });
+
+  test('drawn Tactic card with non-matching discipline: drawCards is NOT called', () => {
+    const player = playerWithHand([
+      handCard(CardType.Equipment),
+      handCard(CardType.Tactic, TacticDiscipline.Military)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, TacticDiscipline.Science);
+    expect(player.drawCards).not.toHaveBeenCalled();
+  });
+
+  test('multiple matching drawn cards: drawCards(1) is called exactly once', () => {
+    const player = playerWithHand([handCard(CardType.Hull), handCard(CardType.Hull)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).toHaveBeenCalledTimes(1);
+  });
+
+  test('matching card is older than the draw window: drawCards is NOT called', () => {
+    // rules.cardsToDrawPerTurn = 2 → only the last two entries count.
+    const player = playerWithHand([
+      handCard(CardType.Hull), // older than the draw window
+      handCard(CardType.Equipment),
+      handCard(CardType.Equipment)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).not.toHaveBeenCalled();
   });
 });

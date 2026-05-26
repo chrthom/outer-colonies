@@ -7,7 +7,8 @@ import {
   InterventionType,
   CardSubtype,
   TacticDiscipline,
-  DefenseType
+  DefenseType,
+  RechargeRate
 } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -48,7 +49,7 @@ export default abstract class Card {
     return undefined;
   }
   deactivationPriority(cardStack: CardStack): number {
-    let priority = this.instantRecharge ? 0 : 15;
+    let priority = this.rechargeRate == RechargeRate.PerAttack ? 0 : 15;
     priority += Math.max(this.profile.armour, this.profile.shield, this.profile.pointDefense) * 4;
     priority += cardStack.zone == Zone.Colony ? 2 : 0;
     priority += this.isColonyDefense ? 0 : 1;
@@ -63,11 +64,8 @@ export default abstract class Card {
   get isAttachSelfManaging(): boolean {
     return false;
   }
-  get isRechargeable(): boolean {
-    return false;
-  }
-  get instantRecharge(): boolean {
-    return false;
+  get rechargeRate(): RechargeRate {
+    return RechargeRate.PerBattle;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canBeRetracted(isRootCard: boolean): boolean {
@@ -111,6 +109,9 @@ export default abstract class Card {
   protected removeFromActionPool(player: Player) {
     player.actionPool.remove(...this.actionPool.pool);
   }
+  protected repairDamage(target: CardStack, amount: number) {
+    target.damage -= Math.min(amount, target.damage);
+  }
   protected additionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
     const relevantCardDrawn = this.getDrawnCards(player).some(c =>
       cardTypes.some(
@@ -128,6 +129,12 @@ export default abstract class Card {
   }
   protected getDrawnCards(player: Player) {
     return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
+  }
+  protected rechargePerAttackDefenders(defendingShips: CardStack[]) {
+    defendingShips
+      .flatMap(cs => cs.cardStacks)
+      .filter(cs => cs.card.rechargeRate == RechargeRate.PerAttack)
+      .forEach(cs => (cs.defenseAvailable = true));
   }
   protected attackStep(
     target: CardStack,
@@ -156,10 +163,6 @@ export default abstract class Card {
     } else if (fromProfile(attackProfile) == 0 || !bestDefense) {
       switch (defenseType) {
         case DefenseType.Armour:
-          defendingShips
-            .flatMap(cs => cs.cardStacks)
-            .filter(cs => cs.card.instantRecharge)
-            .forEach(cs => (cs.defenseAvailable = true));
           return attackResult;
         case DefenseType.Shield:
           return this.attackStep(target, attackProfile, defendingShips, attackResult, DefenseType.Armour);

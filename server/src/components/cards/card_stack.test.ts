@@ -1,322 +1,180 @@
 import CardStack, { RootCardStack } from './card_stack';
 import Card from './card';
-import { CardType, Zone } from '../../shared/config/enums';
-import ActionPool from './action_pool';
+import { CardDurability, CardType, Zone } from '../../shared/config/enums';
 
-// Mock classes for testing
 class MockCard extends Card {
   getValidTargets(): CardStack[] {
     return [];
   }
-
-  onEnterGame(): void {
-    // Mock implementation
-  }
-
-  onLeaveGame(): void {
-    // Mock implementation
-  }
-
-  onStartTurn(): void {
-    // Mock implementation
-  }
-
-  onEndTurn(): void {
-    // Mock implementation
-  }
+  onEnterGame(): void {}
+  onLeaveGame(): void {}
+  onStartTurn(): void {}
+  onEndTurn(): void {}
 }
 
 class MockPlayer {
   socketId = 'test-player';
-  name = 'Test Player';
-  match = {
-    battle: {
-      recentAttack: null,
-      range: 1
-    }
-  };
   no = 1;
-  ready = false;
-  deck: any[] = [];
-  discardPile: any[] = [];
-  hand: any[] = [];
-  cardStacks: any[] = [];
-  actionPool: any = {};
-
-  constructor() {
-    // Simple mock player that doesn't require real dependencies
-  }
+  match = { battle: { recentAttack: null as unknown, range: 1 } };
+  cardStacks: CardStack[] = [];
+  discardCards = jest.fn();
 }
 
-describe('CardStack', () => {
-  describe('constructor and basic properties', () => {
-    test('should create card stack with card and generate UUID', () => {
-      const card = new MockCard(1, 'Test Card', CardType.Hull, 1);
-      const player = new MockPlayer() as any;
-      const cardStack = new RootCardStack(card, Zone.Hand, player);
+const newStack = (id: number, name: string, type: CardType = CardType.Hull) =>
+  new RootCardStack(new MockCard(id, name, type, 1), Zone.Hand, new MockPlayer() as any);
 
-      expect(cardStack.card).toBe(card);
-      expect(cardStack.uuid).toBeDefined();
-      expect(cardStack.uuid.length).toBeGreaterThan(0);
-      expect(cardStack.attachedCardStacks).toEqual([]);
-      expect(cardStack.damage).toBe(0);
-      expect(cardStack.attackAvailable).toBe(false);
-      expect(cardStack.defenseAvailable).toBe(false);
-    });
+describe('CardStack.attach', () => {
+  test('appends the child to attachedCardStacks and clears its zone', () => {
+    const parent = newStack(1, 'Parent');
+    const child = newStack(2, 'Child', CardType.Equipment);
 
-    test('should create card stacks with unique UUIDs', () => {
-      const card1 = new MockCard(2, 'Card 1', CardType.Hull, 1);
-      const card2 = new MockCard(3, 'Card 2', CardType.Hull, 1);
+    parent.attach(child);
 
-      const stack1 = new RootCardStack(card1, Zone.Hand, new MockPlayer() as any);
-      const stack2 = new RootCardStack(card2, Zone.Hand, new MockPlayer() as any);
-
-      expect(stack1.uuid).not.toBe(stack2.uuid);
-    });
+    expect(parent.attachedCardStacks).toContain(child);
+    expect(child.zone).toBeUndefined();
   });
 
-  describe('actionPool property', () => {
-    test('should combine action pools from all cards in stack', () => {
-      // This is a complex test that would require mocking the cards array
-      // and actionPool properties, so we'll test the basic functionality
-      const card = new MockCard(4, 'Action Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+  test('preserves order when attaching multiple children', () => {
+    const parent = newStack(3, 'Parent');
+    const child1 = newStack(4, 'Child 1', CardType.Equipment);
+    const child2 = newStack(5, 'Child 2', CardType.Equipment);
 
-      // Should return an ActionPool instance
-      expect(cardStack.actionPool).toBeInstanceOf(ActionPool);
-    });
+    parent.attach(child1);
+    parent.attach(child2);
+
+    expect(parent.attachedCardStacks).toEqual([child1, child2]);
+  });
+});
+
+describe('CardStack.rootCardStack', () => {
+  test('returns itself when there is no parent', () => {
+    const stack = newStack(6, 'Root');
+    expect(stack.rootCardStack).toBe(stack);
   });
 
-  describe('attach method', () => {
-    test('should attach card stack to parent', () => {
-      const parentCard = new MockCard(5, 'Parent Card', CardType.Hull, 1);
-      const childCard = new MockCard(6, 'Child Card', CardType.Equipment, 1);
-
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack = new RootCardStack(childCard, Zone.Hand, new MockPlayer() as any);
-
-      parentStack.attach(childStack);
-
-      expect(parentStack.attachedCardStacks).toContain(childStack);
-      // parentCardStack is protected, so we test the attachment indirectly
-      expect(childStack.zone).toBeUndefined();
-    });
-
-    test('should maintain multiple attached card stacks', () => {
-      const parentCard = new MockCard(7, 'Parent Card', CardType.Hull, 1);
-      const childCard1 = new MockCard(8, 'Child Card 1', CardType.Equipment, 1);
-      const childCard2 = new MockCard(9, 'Child Card 2', CardType.Equipment, 1);
-
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack1 = new RootCardStack(childCard1, Zone.Hand, new MockPlayer() as any);
-      const childStack2 = new RootCardStack(childCard2, Zone.Hand, new MockPlayer() as any);
-
-      parentStack.attach(childStack1);
-      parentStack.attach(childStack2);
-
-      expect(parentStack.attachedCardStacks).toContain(childStack1);
-      expect(parentStack.attachedCardStacks).toContain(childStack2);
-      expect(parentStack.attachedCardStacks.length).toBe(2);
-    });
+  test('returns the direct parent when attached one level', () => {
+    const parent = newStack(7, 'Parent');
+    const child = newStack(8, 'Child', CardType.Equipment);
+    parent.attach(child);
+    expect(child.rootCardStack).toBe(parent);
   });
 
-  describe('attack method', () => {
-    test('should call card attack method and update battle state', () => {
-      const attackingCard = new MockCard(10, 'Attacking Card', CardType.Hull, 1);
-      const targetCard = new MockCard(11, 'Target Card', CardType.Hull, 1);
+  test('walks up multiple levels to the topmost ancestor', () => {
+    const grandparent = newStack(9, 'Grandparent');
+    const parent = newStack(10, 'Parent', CardType.Equipment);
+    const child = newStack(11, 'Child', CardType.Equipment);
 
-      const attackingStack = new RootCardStack(attackingCard, Zone.Hand, new MockPlayer() as any);
-      const targetStack = new RootCardStack(targetCard, Zone.Hand, new MockPlayer() as any);
+    grandparent.attach(parent);
+    parent.attach(child);
 
-      // Mock the card's attack method
-      const mockAttackResult = {
-        pointDefense: 2,
-        shield: 3,
-        armour: 5,
-        damage: 10
-      };
+    expect(child.rootCardStack).toBe(grandparent);
+  });
+});
 
-      jest.spyOn(attackingCard, 'attack').mockReturnValue(mockAttackResult);
+describe('CardStack.attack', () => {
+  test('sets attackAvailable to false after attacking', () => {
+    const attacker = newStack(12, 'Attacker');
+    const target = newStack(13, 'Target');
 
-      // This would normally require a proper match setup, so we'll test the basic call
-      expect(() => {
-        attackingStack.attack(targetStack);
-      }).not.toThrow();
+    jest.spyOn(attacker.card, 'attack').mockReturnValue({
+      pointDefense: 0,
+      shield: 0,
+      armour: 0,
+      damage: 0
     });
 
-    test('should set attackAvailable to false after attack', () => {
-      const attackingCard = new MockCard(12, 'Attacking Card', CardType.Hull, 1);
-      const targetCard = new MockCard(13, 'Target Card', CardType.Hull, 1);
+    attacker.attackAvailable = true;
+    attacker.attack(target);
 
-      const attackingStack = new RootCardStack(attackingCard, Zone.Hand, new MockPlayer() as any);
-      const targetStack = new RootCardStack(targetCard, Zone.Hand, new MockPlayer() as any);
+    expect(attacker.attackAvailable).toBe(false);
+  });
+});
 
-      // Mock the attack method to avoid match requirements
-      jest.spyOn(attackingCard, 'attack').mockReturnValue({
-        pointDefense: 0,
-        shield: 0,
-        armour: 0,
-        damage: 0
-      });
+describe('CardStack.playHandCard', () => {
+  const setup = (
+    sourceType: CardType,
+    targetType: CardType,
+    opts: { durability?: CardDurability; isAttachSelfManaging?: boolean } = {}
+  ) => {
+    const player = new MockPlayer();
+    const source = new RootCardStack(new MockCard(1, 'Source', sourceType, 1), Zone.Hand, player as any);
+    const target = new RootCardStack(new MockCard(2, 'Target', targetType, 1), Zone.Hand, player as any);
+    if (opts.durability !== undefined) {
+      jest.spyOn(source.card, 'durability', 'get').mockReturnValue(opts.durability);
+    }
+    if (opts.isAttachSelfManaging !== undefined) {
+      jest
+        .spyOn(source.card, 'isAttachSelfManaging', 'get')
+        .mockReturnValue(opts.isAttachSelfManaging);
+    }
+    const onEnterGameSpy = jest.spyOn(source.card, 'onEnterGame');
+    const attachSpy = jest.spyOn(target, 'attach').mockImplementation(() => {});
+    return { player, source, target, onEnterGameSpy, attachSpy };
+  };
 
-      attackingStack.attackAvailable = true;
-      attackingStack.attack(targetStack);
+  test('no-op when the source is not in the Hand zone', () => {
+    const { player, source, target, onEnterGameSpy, attachSpy } = setup(CardType.Hull, CardType.Colony);
+    source.zone = Zone.Colony;
 
-      expect(attackingStack.attackAvailable).toBe(false);
-    });
+    source.playHandCard(target);
+
+    expect(onEnterGameSpy).not.toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
   });
 
-  describe('canAttack property', () => {
-    test('should return false when attack not available', () => {
-      const card = new MockCard(14, 'Non-Attacking Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      cardStack.attackAvailable = false;
-      expect(cardStack.canAttack).toBe(false);
+  test('Instant durability: discards source card, no attach, no push', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Tactic, CardType.Hull, {
+      durability: CardDurability.Instant
     });
 
-    test('should consider multiple factors for attack availability', () => {
-      const card = new MockCard(15, 'Potential Attacking Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+    source.playHandCard(target);
 
-      // canAttack depends on multiple factors that we can't easily mock
-      // so we test that it returns a boolean value
-      const canAttack = cardStack.canAttack;
-      expect(typeof canAttack).toBe('boolean');
-    });
+    expect(player.discardCards).toHaveBeenCalledWith(source.card);
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
   });
 
-  describe('canBeAttachedTo method', () => {});
+  test('non-Orb card targeting Colony: pushed to player.cardStacks with zone = Colony', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Infrastructure, CardType.Colony);
 
-  describe('rootCardStack property', () => {
-    test('should return itself when no parent', () => {
-      const card = new MockCard(18, 'Root Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+    source.playHandCard(target);
 
-      expect(cardStack.rootCardStack).toBe(cardStack);
-    });
-
-    test('should return parent when parent exists', () => {
-      const parentCard = new MockCard(19, 'Parent Card', CardType.Hull, 1);
-      const childCard = new MockCard(20, 'Child Card', CardType.Equipment, 1);
-
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack = new RootCardStack(childCard, Zone.Hand, new MockPlayer() as any);
-
-      parentStack.attach(childStack);
-      expect(childStack.rootCardStack).toBe(parentStack);
-    });
-
-    test('should return top-level parent in nested hierarchy', () => {
-      const grandparentCard = new MockCard(21, 'Grandparent Card', CardType.Hull, 1);
-      const parentCard = new MockCard(22, 'Parent Card', CardType.Equipment, 1);
-      const childCard = new MockCard(23, 'Child Card', CardType.Equipment, 1);
-
-      const grandparentStack = new RootCardStack(grandparentCard, Zone.Hand, new MockPlayer() as any);
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack = new RootCardStack(childCard, Zone.Hand, new MockPlayer() as any);
-
-      grandparentStack.attach(parentStack);
-      parentStack.attach(childStack);
-
-      expect(childStack.rootCardStack).toBe(grandparentStack);
-    });
+    expect(player.cardStacks).toContain(source);
+    expect(source.zone).toBe(Zone.Colony);
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
   });
 
-  describe('cards property', () => {
-    test('should return array containing itself when no attachments', () => {
-      const card = new MockCard(24, 'Single Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+  test('Orb card targeting Colony: attached to the target', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Orb, CardType.Colony);
 
-      const cards = cardStack.cards;
-      expect(Array.isArray(cards)).toBe(true);
-      expect(cards.length).toBeGreaterThan(0);
-    });
+    source.playHandCard(target);
 
-    test('should include attached cards in cards array', () => {
-      const parentCard = new MockCard(25, 'Parent Card', CardType.Hull, 1);
-      const childCard = new MockCard(26, 'Child Card', CardType.Equipment, 1);
-
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack = new RootCardStack(childCard, Zone.Hand, new MockPlayer() as any);
-
-      parentStack.attach(childStack);
-
-      const cards = parentStack.cards;
-      expect(cards.length).toBeGreaterThan(1); // Should include both parent and child
-    });
+    expect(attachSpy).toHaveBeenCalledWith(source);
+    expect(player.cardStacks).toHaveLength(0);
   });
 
-  describe('zone management', () => {
-    test('should have zone set by constructor', () => {
-      const card = new MockCard(27, 'Zone Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+  test('targeting a non-Colony stack: attached to the target', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Equipment, CardType.Hull);
 
-      expect(cardStack.zone).toBe(Zone.Hand);
-    });
+    source.playHandCard(target);
 
-    test('should allow zone to be set', () => {
-      const card = new MockCard(28, 'Zone Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      cardStack.zone = Zone.Hand;
-      expect(cardStack.zone).toBe(Zone.Hand);
-    });
-
-    test('should set zone to undefined when attached', () => {
-      const parentCard = new MockCard(29, 'Parent Card', CardType.Hull, 1);
-      const childCard = new MockCard(30, 'Child Card', CardType.Equipment, 1);
-
-      const parentStack = new RootCardStack(parentCard, Zone.Hand, new MockPlayer() as any);
-      const childStack = new RootCardStack(childCard, Zone.Hand, new MockPlayer() as any);
-
-      childStack.zone = Zone.Hand;
-      parentStack.attach(childStack);
-
-      expect(childStack.zone).toBeUndefined();
-    });
+    expect(attachSpy).toHaveBeenCalledWith(source);
+    expect(player.cardStacks).toHaveLength(0);
   });
 
-  describe('damage tracking', () => {
-    test('should start with 0 damage', () => {
-      const card = new MockCard(31, 'Damage Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      expect(cardStack.damage).toBe(0);
+  test('isAttachSelfManaging: onEnterGame fires but discard / push / attach do not', () => {
+    const { player, source, target, onEnterGameSpy, attachSpy } = setup(CardType.Tactic, CardType.Colony, {
+      isAttachSelfManaging: true
     });
 
-    test('should allow damage to be set', () => {
-      const card = new MockCard(32, 'Damage Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
+    source.playHandCard(target);
 
-      cardStack.damage = 5;
-      expect(cardStack.damage).toBe(5);
-    });
-  });
-
-  describe('attack and defense availability', () => {
-    test('should start with attack and defense unavailable', () => {
-      const card = new MockCard(33, 'Availability Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      expect(cardStack.attackAvailable).toBe(false);
-      expect(cardStack.defenseAvailable).toBe(false);
-    });
-
-    test('should allow attack availability to be set', () => {
-      const card = new MockCard(34, 'Availability Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      cardStack.attackAvailable = true;
-      expect(cardStack.attackAvailable).toBe(true);
-    });
-
-    test('should allow defense availability to be set', () => {
-      const card = new MockCard(35, 'Availability Test Card', CardType.Hull, 1);
-      const cardStack = new RootCardStack(card, Zone.Hand, new MockPlayer() as any);
-
-      cardStack.defenseAvailable = true;
-      expect(cardStack.defenseAvailable).toBe(true);
-    });
+    expect(onEnterGameSpy).toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
   });
 });
