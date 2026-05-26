@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginPage } from './login.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import AuthService from 'src/app/auth.service';
 import { of } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +14,7 @@ describe('LoginPage', () => {
   let component: LoginPage;
   let fixture: ComponentFixture<LoginPage>;
   let authSpy: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj('AuthService', ['login'], { isLoggedIn: false });
@@ -34,6 +36,7 @@ describe('LoginPage', () => {
 
     fixture = TestBed.createComponent(LoginPage);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -97,5 +100,32 @@ describe('LoginPage', () => {
 
     component.submit();
     expect(component.loginFailed).toBeTrue();
+  });
+
+  it('should navigate to / on successful login', () => {
+    const navigateSpy = spyOn(router, 'navigate');
+    component.loginForm.setValue({
+      username: 'testuser',
+      password: 'password123',
+      remember: false
+    });
+
+    component.submit();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should not navigate on failed login', () => {
+    authSpy.login.and.returnValue(of(false));
+    const navigateSpy = spyOn(router, 'navigate');
+    component.loginForm.setValue({
+      username: 'testuser',
+      password: 'wrongpassword',
+      remember: false
+    });
+
+    component.submit();
+
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 });
