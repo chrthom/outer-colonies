@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
@@ -14,7 +14,7 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
   styleUrls: ['./home.page.scss'],
   imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   authService = inject(AuthService);
   private dailyApiService = inject(DailyApiService);
 
@@ -25,6 +25,13 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.reload();
     this.startAutoAdvance();
+  }
+
+  ngOnDestroy() {
+    if (this.autoAdvanceInterval) {
+      clearInterval(this.autoAdvanceInterval);
+      this.autoAdvanceInterval = undefined;
+    }
   }
 
   reload() {
