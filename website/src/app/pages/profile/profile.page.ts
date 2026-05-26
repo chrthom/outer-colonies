@@ -79,7 +79,7 @@ export class ProfilePage implements OnInit {
     this.emailForm.markAllAsTouched();
     if (this.emailForm.valid) {
       this.emailResetFailed = false;
-      this.authAPIService.resetEmail(this.authService.token, this.emailForm.value.email).subscribe({
+      this.authAPIService.resetEmail(this.emailForm.value.email).subscribe({
         next: () => (this.emailResetSuccessful = true),
         error: () => (this.emailResetFailed = true)
       });
@@ -89,7 +89,7 @@ export class ProfilePage implements OnInit {
     this.passwordForm.markAllAsTouched();
     if (this.passwordForm.valid) {
       this.passwordResetFailed = false;
-      this.authAPIService.resetPassword(this.authService.token, this.passwordForm.value.password).subscribe({
+      this.authAPIService.resetPassword(this.passwordForm.value.password).subscribe({
         next: () => (this.passwordResetSuccessful = true),
         error: () => (this.passwordResetFailed = true)
       });

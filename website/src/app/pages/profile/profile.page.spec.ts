@@ -109,7 +109,7 @@ describe('ProfilePage', () => {
   it('should change email on valid form submit', () => {
     component.emailForm.setValue({ email: 'new@example.com' });
     component.changeEmail();
-    expect(authApiSpy.resetEmail).toHaveBeenCalledWith('test-token', 'new@example.com');
+    expect(authApiSpy.resetEmail).toHaveBeenCalledWith('new@example.com');
     expect(component.emailResetSuccessful).toBeTrue();
   });
 
@@ -123,7 +123,7 @@ describe('ProfilePage', () => {
   it('should change password on valid form submit', () => {
     component.passwordForm.setValue({ password: 'newpassword123' });
     component.changePassword();
-    expect(authApiSpy.resetPassword).toHaveBeenCalledWith('test-token', 'newpassword123');
+    expect(authApiSpy.resetPassword).toHaveBeenCalledWith('newpassword123');
     expect(component.passwordResetSuccessful).toBeTrue();
   });
 
