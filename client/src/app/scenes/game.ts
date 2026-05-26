@@ -3,6 +3,7 @@ import ContinueButton from '../components/buttons/continue_button';
 import RaidButton from '../components/buttons/raid_button';
 import MissionButton from '../components/buttons/mission_button';
 import {
+  ClientGameResult,
   ClientHandCard,
   ClientPlayer,
   ClientState,
@@ -10,10 +11,12 @@ import {
 } from '../../../../server/src/shared/interfaces/client_state';
 import {
   BattleType,
+  GameResultType,
   MsgTypeInbound,
   MsgTypeOutbound,
   TurnPhase
 } from '../../../../server/src/shared/config/enums';
+import GameOverIndicator from '../components/indicators/game_over_indicator';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
@@ -92,6 +95,10 @@ export default class Game extends Phaser.Scene {
   init(data: InitData) {
     this.socket = data.socket;
     this.gameParams = data.gameParams;
+    // The server treats any in-game disconnect as a surrender, so a reconnected
+    // socket would no longer be bound to this match. Disable further reconnect
+    // attempts to keep client and server state consistent.
+    this.socket.io.reconnection(false);
     this.background = new Background(this);
   }
 
@@ -108,6 +115,9 @@ export default class Game extends Phaser.Scene {
     this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
       (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
       (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
+    });
+    this.socket.on('disconnect', () => {
+      this.showSurrenderOnDisconnect();
     });
     this.background.initInterface();
     this.opponent = {
@@ -133,6 +143,24 @@ export default class Game extends Phaser.Scene {
       missionButton: new MissionButton(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
+  }
+
+  showSurrenderOnDisconnect() {
+    // The server treats disconnect-during-game as surrender but cannot deliver
+    // the final state to the dropped socket. Synthesise the loss locally so
+    // the user sees the same defeat screen the opponent does. `sol` is left at
+    // 0 because the client cannot know the server-side earnings; the indicator
+    // hides the sol line when the value is non-positive.
+    if (this.state.gameResult) return;
+    const result: ClientGameResult = {
+      won: false,
+      type: GameResultType.Surrender,
+      sol: 0
+    };
+    // Avoid mutating the shared `emptyClientState` constant if no State
+    // message has arrived yet.
+    this.state = { ...this.state, gameResult: result };
+    new GameOverIndicator(this, result);
   }
 
   updateState(state: ClientState) {
