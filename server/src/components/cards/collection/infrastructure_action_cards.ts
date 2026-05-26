@@ -6,7 +6,6 @@ import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { ActionInfrastructureCard } from '../types/infrastructure_card';
 
-
 export class Card135 extends ActionInfrastructureCard {
   constructor() {
     super(
