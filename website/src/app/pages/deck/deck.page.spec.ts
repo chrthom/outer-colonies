@@ -3,6 +3,7 @@ import { DeckPage } from './deck.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { of } from 'rxjs';
+import { TacticDiscipline } from '../../../../../server/src/shared/config/enums';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -124,6 +125,97 @@ describe('DeckPage', () => {
     expect(component.cardIdToEditionName(301)).toBe('Marsianische Hegemonie');
     expect(component.cardIdToEditionName(401)).toBe('Kuiper-Gürtel');
     expect(component.cardIdToEditionName(99)).toBe('');
+  });
+
+  describe('label mappings', () => {
+    it('disciplineToText maps every TacticDiscipline to a German label', () => {
+      expect(component.disciplineToText(TacticDiscipline.Intelligence)).toBe('Information');
+      expect(component.disciplineToText(TacticDiscipline.Military)).toBe('Militär');
+      expect(component.disciplineToText(TacticDiscipline.Science)).toBe('Wissenschaft');
+      expect(component.disciplineToText(TacticDiscipline.Trade)).toBe('Wirtschaft');
+      expect(component.disciplineToText(undefined)).toBe('');
+    });
+
+    it('typeTooltip maps every card type to a German tooltip', () => {
+      expect(component.typeTooltip('hull')).toBe('Rumpf');
+      expect(component.typeTooltip('equipment')).toBe('Ausrüstung');
+      expect(component.typeTooltip('infrastructure')).toBe('Infrastruktur');
+      expect(component.typeTooltip('orb')).toBe('Himmelskörper');
+      expect(component.typeTooltip('tactic')).toBe('Taktik');
+      expect(component.typeTooltip('unknown')).toBe('');
+    });
+
+    it('defenseTooltip maps each defense token to its German variant', () => {
+      expect(component.defenseTooltip('armour_1')).toBe('1x Panzerung');
+      expect(component.defenseTooltip('armour_2')).toBe('2x Panzerung');
+      expect(component.defenseTooltip('armour_3')).toBe('3x Panzerung');
+      expect(component.defenseTooltip('shield_1')).toBe('1x Schild');
+      expect(component.defenseTooltip('shield_2')).toBe('2x Schild');
+      expect(component.defenseTooltip('point_defense_1')).toBe('1x Punktabwehr');
+      expect(component.defenseTooltip('point_defense_2')).toBe('2x Punktabwehr');
+      expect(component.defenseTooltip('unknown')).toBe('');
+    });
+
+    it('rarityTooltip maps each rarity tier to its German label', () => {
+      expect(component.rarityTooltip(0)).toBe('Häufig');
+      expect(component.rarityTooltip(1)).toBe('Gewöhnlich');
+      expect(component.rarityTooltip(2)).toBe('Ungewöhnlich');
+      expect(component.rarityTooltip(3)).toBe('Selten');
+      expect(component.rarityTooltip(4)).toBe('Außergewöhnlich');
+      expect(component.rarityTooltip(5)).toBe('Legendär');
+      expect(component.rarityTooltip(99)).toBe('');
+    });
+  });
+
+  describe('capacity guards', () => {
+    function loadActiveDeck(component: DeckPage, size: number) {
+      const cards = Array.from({ length: size }, (_, i) => ({
+        id: i,
+        cardId: 100 + i,
+        inUse: true,
+        numOfCards: 1,
+        profile: { delta: 0, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 0 }
+      })) as any;
+      component['activeCards$'].next(cards);
+    }
+
+    it('canActivate is true below the maximum and false at the maximum', () => {
+      loadActiveDeck(component, 99);
+      expect(component.canActivateDeckCard).toBeTrue();
+
+      loadActiveDeck(component, 100);
+      expect(component.canActivateDeckCard).toBeFalse();
+    });
+
+    it('canDeactivate is true above the minimum and false at the minimum', () => {
+      loadActiveDeck(component, 61);
+      expect(component.canDeactivateDeckCard).toBeTrue();
+
+      loadActiveDeck(component, 60);
+      expect(component.canDeactivateDeckCard).toBeFalse();
+    });
+
+    it('activateCard hits the API when below max and skips it at max', () => {
+      loadActiveDeck(component, 99);
+      component.activateCard({ id: 999, cardId: 999, inUse: false } as any);
+      expect(deckApiSpy.activateCard).toHaveBeenCalledWith(999);
+
+      deckApiSpy.activateCard.calls.reset();
+      loadActiveDeck(component, 100);
+      component.activateCard({ id: 999, cardId: 999, inUse: false } as any);
+      expect(deckApiSpy.activateCard).not.toHaveBeenCalled();
+    });
+
+    it('deactivateCard hits the API when above min and skips it at min', () => {
+      loadActiveDeck(component, 61);
+      component.deactivateCard({ id: 999, cardId: 999, inUse: true } as any);
+      expect(deckApiSpy.deactivateCard).toHaveBeenCalledWith(999);
+
+      deckApiSpy.deactivateCard.calls.reset();
+      loadActiveDeck(component, 60);
+      component.deactivateCard({ id: 999, cardId: 999, inUse: true } as any);
+      expect(deckApiSpy.deactivateCard).not.toHaveBeenCalled();
+    });
   });
 
   it('should compute provided/used columns from the active card profiles', () => {
