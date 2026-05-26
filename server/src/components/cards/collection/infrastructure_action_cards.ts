@@ -18,15 +18,12 @@ abstract class ActionInfrastructureCard extends InfrastructureCard {
     super(id, name, rarity, profile);
     this.actionPoolCardTypes = actionPool;
   }
-  onEnterGame(player: Player) {
+  override onEnterGame(player: Player) {
     this.addToActionPool(player);
   }
-  onLeaveGame(player: Player) {
+  override onLeaveGame(player: Player) {
     this.removeFromActionPool(player);
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onStartTurn(player: Player, cardStack: CardStack) {}
-  onEndTurn() {}
   override get actionPool(): ActionPool {
     return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
   }
