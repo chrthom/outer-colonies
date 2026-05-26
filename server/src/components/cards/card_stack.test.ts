@@ -1,6 +1,6 @@
 import CardStack, { RootCardStack } from './card_stack';
 import Card from './card';
-import { CardType, Zone } from '../../shared/config/enums';
+import { CardDurability, CardType, Zone } from '../../shared/config/enums';
 
 class MockCard extends Card {
   getValidTargets(): CardStack[] {
@@ -16,6 +16,8 @@ class MockPlayer {
   socketId = 'test-player';
   no = 1;
   match = { battle: { recentAttack: null as unknown, range: 1 } };
+  cardStacks: CardStack[] = [];
+  discardCards = jest.fn();
 }
 
 const newStack = (id: number, name: string, type: CardType = CardType.Hull) =>
@@ -85,5 +87,94 @@ describe('CardStack.attack', () => {
     attacker.attack(target);
 
     expect(attacker.attackAvailable).toBe(false);
+  });
+});
+
+describe('CardStack.playHandCard', () => {
+  const setup = (
+    sourceType: CardType,
+    targetType: CardType,
+    opts: { durability?: CardDurability; isAttachSelfManaging?: boolean } = {}
+  ) => {
+    const player = new MockPlayer();
+    const source = new RootCardStack(new MockCard(1, 'Source', sourceType, 1), Zone.Hand, player as any);
+    const target = new RootCardStack(new MockCard(2, 'Target', targetType, 1), Zone.Hand, player as any);
+    if (opts.durability !== undefined) {
+      jest.spyOn(source.card, 'durability', 'get').mockReturnValue(opts.durability);
+    }
+    if (opts.isAttachSelfManaging !== undefined) {
+      jest
+        .spyOn(source.card, 'isAttachSelfManaging', 'get')
+        .mockReturnValue(opts.isAttachSelfManaging);
+    }
+    const onEnterGameSpy = jest.spyOn(source.card, 'onEnterGame');
+    const attachSpy = jest.spyOn(target, 'attach').mockImplementation(() => {});
+    return { player, source, target, onEnterGameSpy, attachSpy };
+  };
+
+  test('no-op when the source is not in the Hand zone', () => {
+    const { player, source, target, onEnterGameSpy, attachSpy } = setup(CardType.Hull, CardType.Colony);
+    source.zone = Zone.Colony;
+
+    source.playHandCard(target);
+
+    expect(onEnterGameSpy).not.toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
+  });
+
+  test('Instant durability: discards source card, no attach, no push', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Tactic, CardType.Hull, {
+      durability: CardDurability.Instant
+    });
+
+    source.playHandCard(target);
+
+    expect(player.discardCards).toHaveBeenCalledWith(source.card);
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
+  });
+
+  test('non-Orb card targeting Colony: pushed to player.cardStacks with zone = Colony', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Infrastructure, CardType.Colony);
+
+    source.playHandCard(target);
+
+    expect(player.cardStacks).toContain(source);
+    expect(source.zone).toBe(Zone.Colony);
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
+  });
+
+  test('Orb card targeting Colony: attached to the target', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Orb, CardType.Colony);
+
+    source.playHandCard(target);
+
+    expect(attachSpy).toHaveBeenCalledWith(source);
+    expect(player.cardStacks).toHaveLength(0);
+  });
+
+  test('targeting a non-Colony stack: attached to the target', () => {
+    const { player, source, target, attachSpy } = setup(CardType.Equipment, CardType.Hull);
+
+    source.playHandCard(target);
+
+    expect(attachSpy).toHaveBeenCalledWith(source);
+    expect(player.cardStacks).toHaveLength(0);
+  });
+
+  test('isAttachSelfManaging: onEnterGame fires but discard / push / attach do not', () => {
+    const { player, source, target, onEnterGameSpy, attachSpy } = setup(CardType.Tactic, CardType.Colony, {
+      isAttachSelfManaging: true
+    });
+
+    source.playHandCard(target);
+
+    expect(onEnterGameSpy).toHaveBeenCalled();
+    expect(player.discardCards).not.toHaveBeenCalled();
+    expect(attachSpy).not.toHaveBeenCalled();
+    expect(player.cardStacks).toHaveLength(0);
   });
 });
