@@ -335,22 +335,10 @@ export default function restAPI(app: Express) {
 
   // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
-    const sendDailyResponse = (daily: DBDaily) => {
-      const dailiesOfDay = getDailiesOfDay();
-      // Generate payload dynamically from daily definitions
-      const typedPayload: DailyGetResponse = {} as DailyGetResponse;
-      DAILY_DEFINITIONS.forEach(dailyDef => {
-        const dailyValue = daily[dailyDef.dbColumn];
-        typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
-          ? dailyValue
-          : null;
-      });
-
-      res.status(200).send(typedPayload);
-    };
     performWithSessionTokenCheck(req, res, u => {
-      DBDailiesDAO.getByUserId(u.userId).then(sendDailyResponse, reason =>
-        sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
+      DBDailiesDAO.getByUserId(u.userId).then(
+        daily => res.status(200).send(getDailiesResponse(daily)),
+        reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
       );
     });
   });
@@ -460,11 +448,10 @@ export default function restAPI(app: Express) {
     });
   });
 }
-// Export the daily response function for testing
-export async function getDailies(userId: number): Promise<DailyGetResponse> {
-  const daily = await DBDailiesDAO.getByUserId(userId);
+// Single source of truth for projecting a DB daily row into the wire payload:
+// values for dailies active today are preserved, the rest are nulled out.
+export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
   const dailiesOfDay = getDailiesOfDay();
-  // Generate payload dynamically from daily definitions
   const typedPayload: DailyGetResponse = {} as DailyGetResponse;
   DAILY_DEFINITIONS.forEach(dailyDef => {
     const dailyValue = daily[dailyDef.dbColumn];
@@ -472,20 +459,11 @@ export async function getDailies(userId: number): Promise<DailyGetResponse> {
       ? dailyValue
       : null;
   });
-
   return typedPayload;
 }
 
-export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
-  const dailiesOfDay = getDailiesOfDay();
-  // Generate payload dynamically from daily definitions
-  const typedPayload: DailyGetResponse = {} as DailyGetResponse;
-  DAILY_DEFINITIONS.forEach(dailyDef => {
-    const dailyValue = daily[dailyDef.dbColumn];
-    typedPayload[dailyDef.dbColumn as keyof DailyGetResponse] = dailiesOfDay.includes(dailyDef.type)
-      ? dailyValue
-      : null;
-  });
-
-  return typedPayload;
+// Thin wrapper that fetches and projects in one call; retained for tests.
+export async function getDailies(userId: number): Promise<DailyGetResponse> {
+  const daily = await DBDailiesDAO.getByUserId(userId);
+  return getDailiesResponse(daily);
 }
