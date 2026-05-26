@@ -1,11 +1,4 @@
-import InfrastructureCard from '../types/infrastructure_card';
-
-abstract class InfrastructureUtilCard extends InfrastructureCard {
-  onEnterGame() {}
-  onLeaveGame() {}
-  onStartTurn() {}
-  onEndTurn() {}
-}
+import { InfrastructureUtilCard } from '../types/infrastructure_card';
 
 export class Card172 extends InfrastructureUtilCard {
   constructor() {

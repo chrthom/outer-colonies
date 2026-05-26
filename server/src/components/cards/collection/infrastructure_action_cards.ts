@@ -4,33 +4,8 @@ import ActionPool, { CardAction } from '../action_pool';
 import { CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
-import InfrastructureCard from '../types/infrastructure_card';
+import { ActionInfrastructureCard } from '../types/infrastructure_card';
 
-abstract class ActionInfrastructureCard extends InfrastructureCard {
-  private actionPoolCardTypes!: CardSubtype[][];
-  constructor(
-    id: number,
-    name: string,
-    rarity: CardRarity,
-    profile: CardProfileConfig,
-    ...actionPool: CardSubtype[][]
-  ) {
-    super(id, name, rarity, profile);
-    this.actionPoolCardTypes = actionPool;
-  }
-  onEnterGame(player: Player) {
-    this.addToActionPool(player);
-  }
-  onLeaveGame(player: Player) {
-    this.removeFromActionPool(player);
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onStartTurn(player: Player, cardStack: CardStack) {}
-  onEndTurn() {}
-  override get actionPool(): ActionPool {
-    return new ActionPool(...this.actionPoolCardTypes.map(ct => new CardAction(...ct)));
-  }
-}
 
 export class Card135 extends ActionInfrastructureCard {
   constructor() {

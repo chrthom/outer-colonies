@@ -11,16 +11,10 @@ import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
-abstract class IntelligenceTacticCard extends TacticCard {
-  get discipline(): TacticDiscipline {
-    return TacticDiscipline.Intelligence;
-  }
-}
-
-export class Card149 extends IntelligenceTacticCard {
+export class Card149 extends TacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(149, 'Expertenkonferenz', 2);
+    super(149, 'Expertenkonferenz', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     this.drawSpecificCards(player, c => c.type == CardType.Tactic, this.cardsToDraw);
@@ -30,9 +24,9 @@ export class Card149 extends IntelligenceTacticCard {
   }
 }
 
-export class Card175 extends IntelligenceTacticCard {
+export class Card175 extends TacticCard {
   constructor() {
-    super(175, 'Spionagenetzwerk', 1);
+    super(175, 'Spionagenetzwerk', 1, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     if (optionalParameters && optionalParameters[0]) {
@@ -54,10 +48,10 @@ export class Card175 extends IntelligenceTacticCard {
   }
 }
 
-export class Card176 extends IntelligenceTacticCard {
+export class Card176 extends TacticCard {
   private readonly countersDisciplines = [TacticDiscipline.Intelligence, TacticDiscipline.Military];
   constructor() {
-    super(176, 'Gegenspionage', 1);
+    super(176, 'Gegenspionage', 1, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     this.onEnterGameInterventionTacticCard(player);
@@ -70,9 +64,9 @@ export class Card176 extends IntelligenceTacticCard {
   }
 }
 
-export class Card205 extends IntelligenceTacticCard {
+export class Card205 extends TacticCard {
   constructor() {
-    super(205, 'Der große Coup', 4, {
+    super(205, 'Der große Coup', 4, TacticDiscipline.Intelligence, {
       control: 5
     });
   }
@@ -88,14 +82,14 @@ export class Card205 extends IntelligenceTacticCard {
   }
 }
 
-export class Card208 extends IntelligenceTacticCard {
+export class Card208 extends TacticCard {
   private readonly oneTimeActionPool = new ActionPool(
     new CardAction(TacticDiscipline.Intelligence),
     new CardAction(TacticDiscipline.Science),
     new CardAction(TacticDiscipline.Trade)
   );
   constructor() {
-    super(208, 'Informationshändler', 4);
+    super(208, 'Informationshändler', 4, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
@@ -106,12 +100,13 @@ export class Card208 extends IntelligenceTacticCard {
   }
 }
 
-export class Card214 extends IntelligenceTacticCard {
+export class Card214 extends TacticCard {
   constructor() {
     super(
       214,
       'Bombenanschlag',
       3,
+      TacticDiscipline.Intelligence,
       {},
       {
         range: 0,
@@ -130,10 +125,10 @@ export class Card214 extends IntelligenceTacticCard {
   }
 }
 
-export class Card222 extends IntelligenceTacticCard {
+export class Card222 extends TacticCard {
   private readonly cardsToRestore = 3;
   constructor() {
-    super(222, 'Wracks plündern', 2);
+    super(222, 'Wracks plündern', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     optionalParameters
@@ -154,12 +149,12 @@ export class Card222 extends IntelligenceTacticCard {
   }
 }
 
-export class Card231 extends IntelligenceTacticCard {
+export class Card231 extends TacticCard {
   private readonly removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(
     ct => new CardAction(ct)
   );
   constructor() {
-    super(231, 'Unruhen schüren', 2);
+    super(231, 'Unruhen schüren', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
@@ -172,12 +167,13 @@ export class Card231 extends IntelligenceTacticCard {
   }
 }
 
-export class Card323 extends IntelligenceTacticCard {
+export class Card323 extends TacticCard {
   constructor() {
     super(
       323,
       'Sabotage',
       2,
+      TacticDiscipline.Intelligence,
       {},
       {
         range: 0,
@@ -196,9 +192,9 @@ export class Card323 extends IntelligenceTacticCard {
   }
 }
 
-export class Card330 extends IntelligenceTacticCard {
+export class Card330 extends TacticCard {
   constructor() {
-    super(330, 'Tiefeninfiltration', 2);
+    super(330, 'Tiefeninfiltration', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     player.gainControl(1);
@@ -210,10 +206,10 @@ export class Card330 extends IntelligenceTacticCard {
   }
 }
 
-export class Card416 extends IntelligenceTacticCard {
+export class Card416 extends TacticCard {
   private readonly speedLimit = 0;
   constructor() {
-    super(416, 'Lücke im Verteidigungsnetz', 3);
+    super(416, 'Lücke im Verteidigungsnetz', 3, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack) {
     spliceCardStackByUUID(player.match.battle.ships[opponentPlayerNo(player.no)], target.uuid);
@@ -228,12 +224,13 @@ export class Card416 extends IntelligenceTacticCard {
   }
 }
 
-export class Card417 extends IntelligenceTacticCard {
+export class Card417 extends TacticCard {
   constructor() {
     super(
       417,
       'Kritischer Treffer',
       3,
+      TacticDiscipline.Intelligence,
       {},
       {
         range: 0,
@@ -255,11 +252,11 @@ export class Card417 extends IntelligenceTacticCard {
   }
 }
 
-export class Card430 extends IntelligenceTacticCard {
+export class Card430 extends TacticCard {
   private readonly cardsToDiscard = 3;
   private readonly cardsToDraw = 1;
   constructor() {
-    super(430, 'Informant auf Ganymed', 2);
+    super(430, 'Informant auf Ganymed', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     player.drawCards(this.cardsToDraw);
@@ -272,9 +269,9 @@ export class Card430 extends IntelligenceTacticCard {
   }
 }
 
-export class Card517 extends IntelligenceTacticCard {
+export class Card517 extends TacticCard {
   constructor() {
-    super(517, 'Diasporabewegung', 3);
+    super(517, 'Diasporabewegung', 3, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     if (optionalParameters && optionalParameters[0]) {
@@ -296,12 +293,13 @@ export class Card517 extends IntelligenceTacticCard {
   }
 }
 
-export class Card528 extends IntelligenceTacticCard {
+export class Card528 extends TacticCard {
   constructor() {
     super(
       528,
       'Verräter an Bord',
       2,
+      TacticDiscipline.Intelligence,
       {},
       {
         range: 0,
@@ -323,12 +321,12 @@ export class Card528 extends IntelligenceTacticCard {
   }
 }
 
-export class Card529 extends IntelligenceTacticCard {
+export class Card529 extends TacticCard {
   private readonly removeActions: CardAction[] = [CardType.Tactic, CardType.Infrastructure].map(
     ct => new CardAction(ct)
   );
   constructor() {
-    super(529, 'Fake-News verbreiten', 2);
+    super(529, 'Fake-News verbreiten', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player) {
     this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);

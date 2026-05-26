@@ -1,17 +1,4 @@
-import InfrastructureCard from '../types/infrastructure_card';
-
-abstract class InfrastructureDefenseCard extends InfrastructureCard {
-  onEnterGame() {}
-  onLeaveGame() {}
-  onStartTurn() {}
-  onEndTurn() {}
-  override get isColonyDefense(): boolean {
-    return true;
-  }
-  protected override get onlyAttachableToColony(): boolean {
-    return true;
-  }
-}
+import { InfrastructureDefenseCard } from '../types/infrastructure_card';
 
 export class Card156 extends InfrastructureDefenseCard {
   constructor() {
