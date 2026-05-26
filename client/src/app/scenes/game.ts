@@ -256,7 +256,9 @@ export default class Game extends Phaser.Scene {
           origin = this.getPlayerUI(cs.ownedByPlayer).hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
         }
         origin?.destroy();
-        return new CardStack(this, cs, origin);
+        const cardStack = new CardStack(this, cs);
+        cardStack.init(origin);
+        return cardStack;
       }, this)
       .forEach(cs => this.cardStacks.push(cs), this);
     this.cardStacks = this.cardStacks.filter(
