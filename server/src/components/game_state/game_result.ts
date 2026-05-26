@@ -93,15 +93,19 @@ export default class GameResult {
       sol += rules.gameEarnings.victory;
     }
     sol = Math.max(0, sol);
-    DBCredentialsDAO.getByUsername(player.name).then(c => {
+    DBCredentialsDAO.getByUsername(player.name).then(async c => {
       if (c) {
         DBProfilesDAO.increaseSol(c.userId, sol);
         // Check all dailies using centralized logic
-        Object.values(DailyType).forEach(dailyType => {
+        for (const dailyType of Object.values(DailyType)) {
           if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
-            DBDailiesDAO.achieve(c.userId, dailyType);
+            try {
+              await DBDailiesDAO.achieve(c.userId, dailyType);
+            } catch (err) {
+              console.log(`ERROR: Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
+            }
           }
-        });
+        }
       } else {
         console.log(`ERROR: Could not find user ${player.name} in database`);
       }
