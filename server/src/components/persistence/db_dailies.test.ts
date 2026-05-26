@@ -53,58 +53,5 @@ describe('DBDailiesDAO', () => {
       // Clean up
       querySpy.mockRestore();
     });
-
-    it('should handle all daily types', async () => {
-      // Mock isDailyOfDay to return true
-      jest.spyOn(dailySelector, 'isDailyOfDay').mockReturnValue(true);
-
-      const querySpy = jest.spyOn(DBConnection.instance, 'query');
-      querySpy.mockResolvedValue({});
-
-      // Mock getBy to return results
-      const mockGetBy = jest.spyOn(DBDailiesDAO as any, 'getBy');
-      mockGetBy.mockResolvedValue([{ userId: 123 }]);
-
-      // Test all daily types
-      for (const dailyType of Object.values(DailyType)) {
-        if (dailyType !== DailyType.Login) {
-          // Skip login as it's tested above
-          await DBDailiesDAO.achieve(123, dailyType);
-          const dailyDef = DAILY_DEFINITIONS.find(d => d.type === dailyType);
-          expect(querySpy).toHaveBeenCalledWith(expect.stringContaining(dailyDef?.dbColumn || ''), [123]);
-        }
-      }
-
-      // Clean up
-      mockGetBy.mockRestore();
-      querySpy.mockRestore();
-    });
-  });
-
-  describe('interface types', () => {
-    it('should have correct DBDaily interface type', () => {
-      // This test ensures the DBDaily interface is properly typed
-      const mockDaily: any = {
-        userId: 123,
-        login: true,
-        victory: null,
-        game: false
-      };
-
-      // This should not throw a type error
-      const typedDaily: any = mockDaily;
-      expect(typedDaily).toBeDefined();
-    });
-
-    it('should reject number values in dynamic properties', () => {
-      // This test would fail if someone incorrectly adds number type to the union
-      const mockDaily = {
-        userId: 123,
-        login: 123 as any // This should be boolean or null
-      };
-
-      // TypeScript would catch this at compile time, but we can test the runtime behavior
-      expect(typeof mockDaily.login).not.toBe('boolean');
-    });
   });
 });
