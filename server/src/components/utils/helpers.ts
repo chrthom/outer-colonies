@@ -31,7 +31,7 @@ export function opponentPlayerNo(playerNo: number): number {
 }
 
 export function pickRandom<T>(array: T[]): T {
-  return array[Math.random() * array.length];
+  return array[Math.floor(Math.random() * array.length)];
 }
 
 export function shuffle<T>(array: T[]): T[] {

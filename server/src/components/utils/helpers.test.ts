@@ -6,6 +6,7 @@ import {
   combineAttackResults,
   getCardStackByUUID,
   opponentPlayerNo,
+  pickRandom,
   spliceCardById,
   spliceCardStackByUUID,
   spliceFrom
@@ -122,6 +123,32 @@ describe('spliceCardById', () => {
 
     expect(spliceCardById(cards, 99)).toBeUndefined();
     expect(cards).toHaveLength(1);
+  });
+});
+
+describe('pickRandom', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    [0, 'a'],
+    [0.24, 'a'],
+    [0.49, 'b'],
+    [0.74, 'c'],
+    [0.999, 'd']
+  ])('returns the element at the floored index for Math.random() == %p', (rand, expected) => {
+    jest.spyOn(Math, 'random').mockReturnValue(rand);
+
+    expect(pickRandom(['a', 'b', 'c', 'd'])).toBe(expected);
+  });
+
+  it('returns a real element (never undefined) across many calls on a non-empty array', () => {
+    const items = ['a', 'b', 'c'];
+
+    for (let i = 0; i < 100; i++) {
+      expect(items).toContain(pickRandom(items));
+    }
   });
 });
 
