@@ -1,15 +1,7 @@
-import HullCard, { HullMultipart } from '../types/hull_card';
+import HullCard, { toHullMultipart } from '../types/hull_card';
 
-function toMultipart(...neededPartIds: number[]): HullMultipart {
-  return {
-    numberOfRequiredParts: 3,
-    neededPartIds: neededPartIds,
-    duplicatesAllowed: false
-  };
-}
-
-const battleshipMultipart = toMultipart(306, 308, 309, 313, 314, 315);
-const cruiserMultipart = toMultipart(116, 117, 120, 121, 122, 133, 134);
+const battleshipMultipart = toHullMultipart(3, false, 306, 308, 309, 313, 314, 315);
+const cruiserMultipart = toHullMultipart(3, false, 116, 117, 120, 121, 122, 133, 134);
 
 export class Card116 extends HullCard {
   constructor() {
