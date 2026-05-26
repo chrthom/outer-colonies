@@ -38,8 +38,10 @@ export default class GameResult {
     this.gameOver = true;
     this.winnerNo = opponentPlayerNo(loser.no);
     const winner = this.match.players[this.winnerNo];
-    this.winnerSol = this.applyEarnings(winner, loser, true);
-    this.loserSol = this.applyEarnings(loser, winner, false);
+    this.winnerSol = this.computeEarnings(winner, loser, true);
+    this.loserSol = this.computeEarnings(loser, winner, false);
+    void this.persistEarnings(winner, loser, true, this.winnerSol);
+    void this.persistEarnings(loser, winner, false, this.loserSol);
   }
   private shouldAchieveDaily(dailyType: DailyType, player: Player, opponent: Player, won: boolean): boolean {
     const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
@@ -79,7 +81,7 @@ export default class GameResult {
     }
   }
 
-  private applyEarnings(player: Player, opponent: Player, won: boolean): number {
+  computeEarnings(player: Player, opponent: Player, won: boolean): number {
     let sol = 0;
     sol += player.discardPile.length * rules.gameEarnings.discardPile;
     sol += opponent.colonyCardStack.damage * rules.gameEarnings.dealtColonyDamage;
@@ -92,24 +94,29 @@ export default class GameResult {
     ) {
       sol += rules.gameEarnings.victory;
     }
-    sol = Math.max(0, sol);
-    DBCredentialsDAO.getByUsername(player.name).then(async c => {
-      if (c) {
-        DBProfilesDAO.increaseSol(c.userId, sol);
-        // Check all dailies using centralized logic
-        for (const dailyType of Object.values(DailyType)) {
-          if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
-            try {
-              await DBDailiesDAO.achieve(c.userId, dailyType);
-            } catch (err) {
-              console.log(`ERROR: Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
-            }
+    return Math.max(0, sol);
+  }
+
+  async persistEarnings(player: Player, opponent: Player, won: boolean, sol: number): Promise<void> {
+    try {
+      const c = await DBCredentialsDAO.getByUsername(player.name);
+      if (!c) {
+        console.log(`ERROR: Could not find user ${player.name} in database`);
+        return;
+      }
+      DBProfilesDAO.increaseSol(c.userId, sol);
+      // Check all dailies using centralized logic
+      for (const dailyType of Object.values(DailyType)) {
+        if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
+          try {
+            await DBDailiesDAO.achieve(c.userId, dailyType);
+          } catch (err) {
+            console.log(`ERROR: Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
           }
         }
-      } else {
-        console.log(`ERROR: Could not find user ${player.name} in database`);
       }
-    });
-    return sol;
+    } catch (err) {
+      console.log(`ERROR: Failed to persist earnings for user ${player.name}: ${err}`);
+    }
   }
 }
