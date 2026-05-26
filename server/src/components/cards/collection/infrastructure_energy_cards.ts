@@ -31,10 +31,12 @@ abstract class SolarPanelCard extends InfrastructureCard {
   }
   override getValidTargets(player: Player): CardStack[] {
     let validTargets = super.getValidTargets(player);
-    if (player.colonyCardStack.cards.some(c => c.id == 433)) { // Triton
+    if (player.colonyCardStack.cards.some(c => c.id == 433)) {
+      // Triton
       // TODO: Refactor as part of #283
       validTargets = validTargets.filter(cs => cs.card.type != CardType.Colony);
-    } else if (player.colonyCardStack.cards.some(c => c.id == 403)) { // Pluto
+    } else if (player.colonyCardStack.cards.some(c => c.id == 403)) {
+      // Pluto
       validTargets = [];
     }
     return validTargets;

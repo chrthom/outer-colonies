@@ -149,9 +149,7 @@ export class Card334 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.match.battle.range == 1
-      ? this.onlyOpponentColonyTarget(player)
-      : [];
+    return player.match.battle.range == 1 ? this.onlyOpponentColonyTarget(player) : [];
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundEnd;
@@ -298,9 +296,7 @@ export class Card504 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentCardStacks(player).filter(
-      cs => cs.zone == Zone.Orbital && cs.profile.speed == 0
-    );
+    return this.getOpponentCardStacks(player).filter(cs => cs.zone == Zone.Orbital && cs.profile.speed == 0);
   }
 }
 

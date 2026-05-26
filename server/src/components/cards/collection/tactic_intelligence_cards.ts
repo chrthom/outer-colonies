@@ -200,9 +200,7 @@ export class Card330 extends TacticCard {
     player.gainControl(1);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).control > 0
-      ? this.onlyOpponentColonyTarget(player)
-      : [];
+    return this.getOpponentPlayer(player).control > 0 ? this.onlyOpponentColonyTarget(player) : [];
   }
 }
 
