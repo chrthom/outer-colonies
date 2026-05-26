@@ -45,7 +45,7 @@ export class Card110 extends TacticCard {
       .filter(cs => cs.type == CardType.Hull)
       .forEach(cs => {
         const numOfHullCards = cs.cards.filter(c => c.type == CardType.Hull).length;
-        cs.damage -= Math.min(this.damageToRepair * numOfHullCards, cs.damage);
+        this.repairDamage(cs, this.damageToRepair * numOfHullCards);
       });
   }
   getValidTargets(player: Player): CardStack[] {

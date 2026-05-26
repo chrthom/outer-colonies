@@ -85,7 +85,7 @@ export class Card174 extends TacticCard {
     super(174, 'Feldreperaturen', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
-    target.damage -= Math.min(this.damageToRepair, target.damage);
+    this.repairDamage(target, this.damageToRepair);
   }
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
@@ -118,7 +118,7 @@ export class Card331 extends TacticCard {
     super(331, 'Schadenskontrolle', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
-    target.damage -= Math.min(this.damageToRepair, target.damage);
+    this.repairDamage(target, this.damageToRepair);
   }
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
