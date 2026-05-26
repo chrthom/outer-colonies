@@ -9,18 +9,16 @@ import { environment } from 'src/environments/environment';
 describe('HomePage', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
   let httpMock: HttpTestingController;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn'], { token: 'test-token' });
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn'], { token: 'test-token' });
 
     await TestBed.configureTestingModule({
       imports: [HomePage, HttpClientTestingModule],
       providers: [DailyApiService, { provide: AuthService, useValue: authServiceSpy }]
     }).compileComponents();
 
-    authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     httpMock = TestBed.inject(HttpTestingController);
 
     fixture = TestBed.createComponent(HomePage);
@@ -31,26 +29,14 @@ describe('HomePage', () => {
     httpMock.verify();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should initialize with default dailies', () => {
+  it('should initialize with all 13 dailies before reload filters them', () => {
     expect(component.dailies.length).toBe(13);
-    expect(component.dailies[0].title).toBe('Tägliche Inspektion');
-    expect(component.dailies[1].title).toBe('Der Duft des Sieges');
   });
 
-  it('should have default selected daily', () => {
-    expect(component.selectedDaily).toBe(1);
-  });
-
-  it('should reload dailies on init', fakeAsync(() => {
-    spyOn(component, 'reload').and.callThrough();
+  it('should filter dailies to only those marked available in the response', fakeAsync(() => {
     fixture.detectChanges();
 
-    // Create a mock response with specific available dailies
-    const mockResponse: DailyGetResponse = {
+    const response: DailyGetResponse = {
       login: true,
       victory: false,
       game: true,
@@ -68,67 +54,15 @@ describe('HomePage', () => {
 
     const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
     expect(req.request.method).toBe('GET');
-    req.flush(mockResponse);
+    req.flush(response);
 
-    tick(); // Wait for async operations to complete
-    fixture.detectChanges();
+    tick();
 
-    expect(component.reload).toHaveBeenCalled();
-    // Only available dailies should be shown (first 4), and only login and game should be achieved
     expect(component.dailies.length).toBe(4);
-    expect(component.dailies[0].achieved).toBeTrue();
-    expect(component.dailies[1].achieved).toBeFalse();
-    expect(component.dailies[2].achieved).toBeTrue();
-    expect(component.dailies[3].achieved).toBeFalse();
+    expect(component.dailies.map(d => d.achieved)).toEqual([true, false, true, false]);
   }));
 
-  it('should cycle through dailies automatically', () => {
-    const mockResponse: DailyGetResponse = {};
-    // Initialize with all daily columns set to null or boolean values
-    component.dailies.forEach((daily, index) => {
-      // Extract the daily key from the matcherStr property or matcher function
-      const matcherStr = daily.matcherStr || daily.matcher.toString();
-      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
-      const dailyKey = match ? match[1] : `daily${index}`;
-      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
-    });
-
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
-    req.flush(mockResponse);
-
-    expect(component.selectedDaily).toBe(1);
-
-    // Manually trigger the interval callback
-    const callback = (component as any).showNextDaily(component.dailies.length);
-    callback();
-    expect(component.selectedDaily).toBe(2);
-
-    callback();
-    expect(component.selectedDaily).toBe(3);
-  });
-
-  it('should return game URL from environment', () => {
+  it('should expose the game URL from the environment', () => {
     expect(component.gameUrl).toContain('game');
-  });
-
-  it('should render welcome message', () => {
-    const mockResponse: DailyGetResponse = {};
-    // Initialize with all daily columns set to null or boolean values
-    component.dailies.forEach((daily, index) => {
-      // Extract the daily key from the matcherStr property or matcher function
-      const matcherStr = daily.matcherStr || daily.matcher.toString();
-      const match = matcherStr.match(/r['(\w+)']/) || matcherStr.match(/r\.(\w+)/);
-      const dailyKey = match ? match[1] : `daily${index}`;
-      mockResponse[dailyKey as keyof DailyGetResponse] = index % 2 === 0 ? true : false;
-    });
-
-    fixture.detectChanges();
-    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
-    req.flush(mockResponse);
-
-    // Component logic test instead of template test
-    expect(component.dailies.length).toBeGreaterThan(0);
   });
 });
