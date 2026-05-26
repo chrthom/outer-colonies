@@ -3,14 +3,7 @@ import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import InfrastructureCard from '../types/infrastructure_card';
 
-abstract class InfrastructureEnergyCard extends InfrastructureCard {
-  onEnterGame() {}
-  onLeaveGame() {}
-  onStartTurn() {}
-  onEndTurn() {}
-}
-
-abstract class CardPowerPlant extends InfrastructureEnergyCard {
+abstract class CardPowerPlant extends InfrastructureCard {
   constructor(id: number) {
     super(id, 'Kraftwerk', 0, {
       energy: 5
@@ -21,7 +14,7 @@ abstract class CardPowerPlant extends InfrastructureEnergyCard {
   }
 }
 
-abstract class NuclearReactorCard extends InfrastructureEnergyCard {
+abstract class NuclearReactorCard extends InfrastructureCard {
   constructor(id: number) {
     super(id, 'Atomreaktor', 0, {
       energy: 2,
@@ -30,25 +23,24 @@ abstract class NuclearReactorCard extends InfrastructureEnergyCard {
   }
 }
 
-abstract class SolarPanelCard extends InfrastructureEnergyCard {
+abstract class SolarPanelCard extends InfrastructureCard {
   constructor(id: number) {
     super(id, 'Solarpanele', 0, {
       energy: 1
     });
   }
   override getValidTargets(player: Player): CardStack[] {
-    let validTargets = super.getValidTargets(player);
-    if (player.colonyCardStack.cards.some(c => c.id == 433)) {
-      // TODO: Refactor as part of #283
-      validTargets = validTargets.filter(cs => cs.card.type != CardType.Colony);
-    } else if (player.colonyCardStack.cards.some(c => c.id == 403)) {
-      validTargets = [];
+    const colonyCards = player.colonyCardStack.cards;
+    if (colonyCards.some(c => c.name == 'Pluto')) return [];
+    const validTargets = super.getValidTargets(player);
+    if (colonyCards.some(c => c.name == 'Triton')) {
+      return validTargets.filter(cs => cs.card.type != CardType.Colony);
     }
     return validTargets;
   }
 }
 
-export class Card105 extends InfrastructureEnergyCard {
+export class Card105 extends InfrastructureCard {
   constructor() {
     super(105, 'Antimateriereaktor', 5, {
       energy: 10,
@@ -63,7 +55,7 @@ export class Card105 extends InfrastructureEnergyCard {
   }
 }
 
-export class Card145 extends InfrastructureEnergyCard {
+export class Card145 extends InfrastructureCard {
   constructor() {
     super(145, 'Fusionsreaktor', 2, {
       energy: 4,
@@ -143,3 +135,20 @@ export class Card453 extends CardPowerPlant {
     super(453);
   }
 }
+
+export const allCards = [
+  new Card105(),
+  new Card145(),
+  new Card185(),
+  new Card187(),
+  new Card188(),
+  new Card242(),
+  new Card244(),
+  new Card245(),
+  new Card350(),
+  new Card352(),
+  new Card353(),
+  new Card451(),
+  new Card452(),
+  new Card453()
+];

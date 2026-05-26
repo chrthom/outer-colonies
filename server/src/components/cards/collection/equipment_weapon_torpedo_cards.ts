@@ -258,3 +258,18 @@ export class Card555 extends EquipmentCard {
     return 1;
   }
 }
+
+export const allCards = [
+  new Card101(),
+  new Card127(),
+  new Card136(),
+  new Card150(),
+  new Card167(),
+  new Card216(),
+  new Card304(),
+  new Card318(),
+  new Card412(),
+  new Card422(),
+  new Card554(),
+  new Card555()
+];
