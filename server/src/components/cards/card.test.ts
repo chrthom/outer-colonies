@@ -1,6 +1,7 @@
-import Card from './card';
+import Card, { AttackResult } from './card';
 import { CardType } from '../../shared/config/enums';
 import CardStack from './card_stack';
+import { AttackProfile } from './card_profile';
 
 class TestCard extends Card {
   getValidTargets(): CardStack[] {
@@ -10,6 +11,19 @@ class TestCard extends Card {
   onLeaveGame(): void {}
   onStartTurn(): void {}
   onEndTurn(): void {}
+
+  // Expose protected helpers for testing.
+  public exposedAttackStep(
+    target: CardStack,
+    attackProfile: AttackProfile,
+    defendingShips: CardStack[],
+    initialDamage: number
+  ): AttackResult {
+    return this.attackStep(target, attackProfile, defendingShips, new AttackResult(initialDamage));
+  }
+  public exposedRepairDamage(target: CardStack, amount: number) {
+    return this.repairDamage(target, amount);
+  }
 }
 
 describe('Card.canDefend', () => {
@@ -47,5 +61,174 @@ describe('Card.canDefend', () => {
       pointDefense: 1
     });
     expect(card.canDefend).toBe(true);
+  });
+});
+
+interface MockProfile {
+  armour: number;
+  shield: number;
+  pointDefense: number;
+}
+
+interface MockDefender {
+  card: { profile: MockProfile; instantRecharge: boolean };
+  profile: MockProfile;
+  canDefend: () => boolean;
+  deactivationPriority: number;
+  defenseAvailable: boolean;
+  cardStacks: MockDefender[];
+}
+
+const defender = (
+  defense: { armour?: number; shield?: number; pointDefense?: number },
+  opts: { instantRecharge?: boolean; deactivationPriority?: number; defenseAvailable?: boolean } = {}
+): MockDefender => {
+  const profile: MockProfile = { armour: 0, shield: 0, pointDefense: 0, ...defense };
+  const obj: MockDefender = {
+    card: { profile, instantRecharge: opts.instantRecharge ?? false },
+    profile,
+    canDefend: () => obj.defenseAvailable,
+    deactivationPriority: opts.deactivationPriority ?? 10,
+    defenseAvailable: opts.defenseAvailable ?? true,
+    cardStacks: []
+  };
+  obj.cardStacks = [obj];
+  return obj;
+};
+
+const ship = (...defenders: MockDefender[]) => ({ cardStacks: defenders }) as unknown as CardStack;
+
+const attacker = new TestCard(99, 'Attacker', CardType.Equipment, 1);
+const target = {} as CardStack;
+
+const attack = (overrides: Partial<AttackProfile> = {}): AttackProfile => ({
+  range: 0,
+  damage: 0,
+  pointDefense: 0,
+  shield: 0,
+  armour: 0,
+  ...overrides
+});
+
+describe('Card.attackStep', () => {
+  test('returns the input result unchanged when starting damage is 0', () => {
+    const def = defender({ pointDefense: 2 });
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 0);
+
+    expect(result.damage).toBe(0);
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(0);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('passes through all three phases when no defenders match, damage unchanged', () => {
+    const result = attacker.exposedAttackStep(
+      target,
+      attack({ pointDefense: -3, shield: -3, armour: -3 }),
+      [],
+      10
+    );
+
+    expect(result.damage).toBe(10);
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(0);
+  });
+
+  test('point-defender absorbs damage and deactivates when damage >= reduction', () => {
+    const def = defender({ pointDefense: 2 });
+    // reduction = (-3) * -(2) = 6, damage = 10 → defender deactivates, 4 damage passes
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
+
+    expect(result.pointDefense).toBe(6);
+    expect(result.damage).toBe(4);
+    expect(def.defenseAvailable).toBe(false);
+  });
+
+  test('partial absorption: defender stays available when damage < reduction', () => {
+    const def = defender({ pointDefense: 2 });
+    // reduction = 6, damage = 4 → fully absorbed but defender NOT deactivated
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 4);
+
+    expect(result.pointDefense).toBe(4);
+    expect(result.damage).toBe(0);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('recursion walks PointDefense → Shield → Armour when earlier phases have no defenders', () => {
+    const armourDef = defender({ armour: 2 });
+    const result = attacker.exposedAttackStep(
+      target,
+      attack({ pointDefense: -3, shield: -3, armour: -3 }),
+      [ship(armourDef)],
+      10
+    );
+
+    expect(result.pointDefense).toBe(0);
+    expect(result.shield).toBe(0);
+    expect(result.armour).toBe(6);
+    expect(result.damage).toBe(4);
+    expect(armourDef.defenseAvailable).toBe(false);
+  });
+
+  test('selects the highest-priority defender first', () => {
+    const low = defender({ pointDefense: 2 }, { deactivationPriority: 5 });
+    const high = defender({ pointDefense: 2 }, { deactivationPriority: 20 });
+    // damage = 6 → exactly absorbs one defender. The high-priority one should be picked.
+    attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(low, high)], 6);
+
+    expect(high.defenseAvailable).toBe(false);
+    expect(low.defenseAvailable).toBe(true);
+  });
+
+  test('skips defenders that report canDefend = false', () => {
+    const blocked = defender({ pointDefense: 2 });
+    blocked.canDefend = () => false;
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(blocked)], 10);
+
+    expect(result.pointDefense).toBe(0);
+    expect(result.damage).toBe(10);
+    expect(blocked.defenseAvailable).toBe(true);
+  });
+
+  test('re-arms instant-recharge defenders at the Armour terminal', () => {
+    const def = defender({ pointDefense: 1 }, { instantRecharge: true });
+    // reduction = (-3) * -(1) = 3, damage = 10 → defender deactivates, 7 damage continues
+    // recursion exhausts PD, Shield, Armour with no further defenders → armour terminal re-arms
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
+
+    expect(result.pointDefense).toBe(3);
+    expect(result.damage).toBe(7);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('non-instant-recharge defender stays deactivated through the Armour terminal', () => {
+    const def = defender({ pointDefense: 1 }, { instantRecharge: false });
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
+
+    expect(result.pointDefense).toBe(3);
+    expect(result.damage).toBe(7);
+    expect(def.defenseAvailable).toBe(false);
+  });
+});
+
+describe('Card.repairDamage', () => {
+  test('reduces damage by the given amount', () => {
+    const stack = { damage: 8 } as CardStack;
+    attacker.exposedRepairDamage(stack, 5);
+    expect(stack.damage).toBe(3);
+  });
+
+  test('clamps at 0 when amount exceeds existing damage', () => {
+    const stack = { damage: 3 } as CardStack;
+    attacker.exposedRepairDamage(stack, 10);
+    expect(stack.damage).toBe(0);
+  });
+
+  test('no-op when damage is already 0', () => {
+    const stack = { damage: 0 } as CardStack;
+    attacker.exposedRepairDamage(stack, 5);
+    expect(stack.damage).toBe(0);
   });
 });
