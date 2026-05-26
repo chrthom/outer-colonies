@@ -1,10 +1,6 @@
 import InfrastructureCard from '../types/infrastructure_card';
 
 abstract class InfrastructureDefenseCard extends InfrastructureCard {
-  onEnterGame() {}
-  onLeaveGame() {}
-  onStartTurn() {}
-  onEndTurn() {}
   override get isColonyDefense(): boolean {
     return true;
   }

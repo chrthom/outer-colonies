@@ -14,15 +14,18 @@ import CardStack from '../card_stack';
 
 export default abstract class TacticCard extends Card {
   readonly attackProfile?: AttackProfile;
+  readonly discipline: TacticDiscipline;
   constructor(
     id: number,
     name: string,
     rarity: CardRarity,
+    discipline: TacticDiscipline,
     profile?: CardProfileConfig,
     attackProfile?: AttackProfile
   ) {
     super(id, name, CardType.Tactic, rarity, profile);
     this.attackProfile = attackProfile;
+    this.discipline = discipline;
   }
   onLeaveGame() {}
   onStartTurn() {}
@@ -36,9 +39,17 @@ export default abstract class TacticCard extends Card {
   override get durability(): CardDurability {
     return CardDurability.Instant;
   }
-  abstract get discipline(): TacticDiscipline;
   protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {
     return playersCardStacks.filter(cs => cs.card.type == CardType.Colony);
+  }
+  protected onlyOpponentColonyTarget(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  protected onlyOpponentHullTarget(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.card.type == CardType.Hull);
+  }
+  protected getOpponentCardStacks(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks;
   }
   protected getOpponentPlayer(player: Player): Player {
     return player.match.players[opponentPlayerNo(player.no)];

@@ -5,15 +5,9 @@ import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
-abstract class MilitaryTacticCard extends TacticCard {
-  get discipline(): TacticDiscipline {
-    return TacticDiscipline.Military;
-  }
-}
-
-export class Card129 extends MilitaryTacticCard {
+export class Card129 extends TacticCard {
   constructor() {
-    super(129, 'Planetarer Verteidigungsplan', 3);
+    super(129, 'Planetarer Verteidigungsplan', 3, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
     this.onEnterGameAttackIntervention(player, target);
@@ -30,10 +24,10 @@ export class Card129 extends MilitaryTacticCard {
   }
 }
 
-export class Card139 extends MilitaryTacticCard {
+export class Card139 extends TacticCard {
   private readonly deactivations = 4;
   constructor() {
-    super(139, 'ECM-Emitter', 2);
+    super(139, 'ECM-Emitter', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     this.deactivatePointDefense(player.match.battle.ships[player.match.waitingPlayerNo], this.deactivations);
@@ -67,9 +61,9 @@ export class Card139 extends MilitaryTacticCard {
   }
 }
 
-export class Card173 extends MilitaryTacticCard {
+export class Card173 extends TacticCard {
   constructor() {
-    super(173, 'Ausweichmanöver', 1);
+    super(173, 'Ausweichmanöver', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
     this.onEnterGameAttackIntervention(player, target);
@@ -85,22 +79,22 @@ export class Card173 extends MilitaryTacticCard {
   }
 }
 
-export class Card174 extends MilitaryTacticCard {
+export class Card174 extends TacticCard {
   private readonly damageToRepair = 8;
   constructor() {
-    super(174, 'Feldreperaturen', 1);
+    super(174, 'Feldreperaturen', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
-    target.damage -= Math.min(this.damageToRepair, target.damage);
+    this.repairDamage(target, this.damageToRepair);
   }
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
   }
 }
 
-export class Card319 extends MilitaryTacticCard {
+export class Card319 extends TacticCard {
   constructor() {
-    super(319, 'Zusatztorpedos', 2);
+    super(319, 'Zusatztorpedos', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
     target.cardStacks.filter(cs => cs.card.profile.phi).forEach(cs => (cs.attackAvailable = true));
@@ -118,13 +112,13 @@ export class Card319 extends MilitaryTacticCard {
   }
 }
 
-export class Card331 extends MilitaryTacticCard {
+export class Card331 extends TacticCard {
   private readonly damageToRepair = 3;
   constructor() {
-    super(331, 'Schadenskontrolle', 2);
+    super(331, 'Schadenskontrolle', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
-    target.damage -= Math.min(this.damageToRepair, target.damage);
+    this.repairDamage(target, this.damageToRepair);
   }
   getValidTargets(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.type == CardType.Hull && cs.damage > 0);
@@ -134,12 +128,13 @@ export class Card331 extends MilitaryTacticCard {
   }
 }
 
-export class Card334 extends MilitaryTacticCard {
+export class Card334 extends TacticCard {
   constructor() {
     super(
       334,
       'Planetare Invasion',
       2,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -155,7 +150,7 @@ export class Card334 extends MilitaryTacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return player.match.battle.range == 1
-      ? this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks)
+      ? this.onlyOpponentColonyTarget(player)
       : [];
   }
   protected override get interventionType(): InterventionType | undefined {
@@ -163,13 +158,13 @@ export class Card334 extends MilitaryTacticCard {
   }
 }
 
-export class Card337 extends MilitaryTacticCard {
+export class Card337 extends TacticCard {
   private readonly oneTimeActionPool = new ActionPool(
     new CardAction(CardType.Equipment),
     new CardAction(CardType.Hull)
   );
   constructor() {
-    super(337, 'Militärpioniere', 1);
+    super(337, 'Militärpioniere', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     player.actionPool.push(...this.oneTimeActionPool.pool);
@@ -179,10 +174,10 @@ export class Card337 extends MilitaryTacticCard {
   }
 }
 
-export class Card338 extends MilitaryTacticCard {
+export class Card338 extends TacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(338, 'Nachschub', 1);
+    super(338, 'Nachschub', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     player.drawCards(this.cardsToDraw);
@@ -192,10 +187,10 @@ export class Card338 extends MilitaryTacticCard {
   }
 }
 
-export class Card346 extends MilitaryTacticCard {
+export class Card346 extends TacticCard {
   private readonly countersDisciplines = [TacticDiscipline.Military, TacticDiscipline.Trade];
   constructor() {
-    super(346, 'Space Marines', 1);
+    super(346, 'Space Marines', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     this.onEnterGameInterventionTacticCard(player);
@@ -208,13 +203,14 @@ export class Card346 extends MilitaryTacticCard {
   }
 }
 
-export class Card419 extends MilitaryTacticCard {
+export class Card419 extends TacticCard {
   private speedLimitation = 3;
   constructor() {
     super(
       419,
       'Kritischer Treffer',
       2,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -229,7 +225,7 @@ export class Card419 extends MilitaryTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(
+    return this.getOpponentCardStacks(player).filter(
       cs => cs.type == CardType.Hull && cs.profile.speed <= this.speedLimitation
     );
   }
@@ -238,10 +234,10 @@ export class Card419 extends MilitaryTacticCard {
   }
 }
 
-export class Card428 extends MilitaryTacticCard {
+export class Card428 extends TacticCard {
   private readonly speedLimit = 2;
   constructor() {
-    super(428, 'Ausmanövriert', 2);
+    super(428, 'Ausmanövriert', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
     target.cardStacks.forEach(cs => (cs.attackAvailable = false));
@@ -256,12 +252,13 @@ export class Card428 extends MilitaryTacticCard {
   }
 }
 
-export class Card501 extends MilitaryTacticCard {
+export class Card501 extends TacticCard {
   constructor() {
     super(
       501,
       'Nukleare Apokalypse',
       5,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -276,16 +273,17 @@ export class Card501 extends MilitaryTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
 
-export class Card504 extends MilitaryTacticCard {
+export class Card504 extends TacticCard {
   constructor() {
     super(
       504,
       'Interplanetares Geschütz',
       4,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -300,16 +298,16 @@ export class Card504 extends MilitaryTacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(
+    return this.getOpponentCardStacks(player).filter(
       cs => cs.zone == Zone.Orbital && cs.profile.speed == 0
     );
   }
 }
 
-export class Card531 extends MilitaryTacticCard {
+export class Card531 extends TacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
-    super(531, 'Umbau ziviler Werften', 2);
+    super(531, 'Umbau ziviler Werften', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     this.drawSpecificCards(player, c => c.type == CardType.Hull, this.cardsToDraw);
@@ -319,12 +317,13 @@ export class Card531 extends MilitaryTacticCard {
   }
 }
 
-export class Card532 extends MilitaryTacticCard {
+export class Card532 extends TacticCard {
   constructor() {
     super(
       532,
       'Angriffsdrohnengeschwader',
       2,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -346,12 +345,13 @@ export class Card532 extends MilitaryTacticCard {
   }
 }
 
-export class Card533 extends MilitaryTacticCard {
+export class Card533 extends TacticCard {
   constructor() {
     super(
       533,
       'Kamikaze-Drohnengeschwader',
       2,
+      TacticDiscipline.Military,
       {},
       {
         range: 0,
@@ -373,10 +373,10 @@ export class Card533 extends MilitaryTacticCard {
   }
 }
 
-export class Card550 extends MilitaryTacticCard {
+export class Card550 extends TacticCard {
   private readonly cardsToDiscard = 2;
   constructor() {
-    super(550, 'Nachschublinien überfallen', 1);
+    super(550, 'Nachschublinien überfallen', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
     const p = this.getOpponentPlayer(player);
@@ -387,6 +387,6 @@ export class Card550 extends MilitaryTacticCard {
     }
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
