@@ -53,8 +53,8 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
     expect(game.state.gameResult?.sol).toBe(0);
     // The GameOverIndicator constructor renders three text labels and one image.
-    expect(((game as any).add.image as jasmine.Spy)).toHaveBeenCalled();
-    expect(((game as any).add.text as jasmine.Spy)).toHaveBeenCalled();
+    expect((game as any).add.image as jasmine.Spy).toHaveBeenCalled();
+    expect((game as any).add.text as jasmine.Spy).toHaveBeenCalled();
   });
 
   it('does not mutate the shared emptyClientState constant', () => {
@@ -74,6 +74,6 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
 
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
-    expect(((game as any).add.image as jasmine.Spy)).not.toHaveBeenCalled();
+    expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
   });
 });
