@@ -1,7 +1,8 @@
 import Card, { AttackResult } from './card';
-import { CardType } from '../../shared/config/enums';
+import { CardSubtype, CardType, TacticDiscipline } from '../../shared/config/enums';
 import CardStack from './card_stack';
 import { AttackProfile } from './card_profile';
+import Player from '../game_state/player';
 
 class TestCard extends Card {
   getValidTargets(): CardStack[] {
@@ -23,6 +24,9 @@ class TestCard extends Card {
   }
   public exposedRepairDamage(target: CardStack, amount: number) {
     return this.repairDamage(target, amount);
+  }
+  public exposedAdditionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
+    return this.additionalCardWhenDrawing(player, ...cardTypes);
   }
 }
 
@@ -230,5 +234,63 @@ describe('Card.repairDamage', () => {
     const stack = { damage: 0 } as CardStack;
     attacker.exposedRepairDamage(stack, 5);
     expect(stack.damage).toBe(0);
+  });
+});
+
+// rules.cardsToDrawPerTurn is 2, so `getDrawnCards` returns the last two hand entries.
+const handCard = (type: CardType, discipline?: TacticDiscipline) => ({
+  card: { type, discipline }
+});
+
+const playerWithHand = (hand: ReturnType<typeof handCard>[]) =>
+  ({ hand, drawCards: jest.fn() }) as unknown as Player;
+
+describe('Card.additionalCardWhenDrawing', () => {
+  test('no drawn card matches any filter: drawCards is NOT called', () => {
+    const player = playerWithHand([handCard(CardType.Equipment), handCard(CardType.Equipment)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).not.toHaveBeenCalled();
+  });
+
+  test('drawn card matches a CardType filter: drawCards(1) is called', () => {
+    const player = playerWithHand([handCard(CardType.Equipment), handCard(CardType.Hull)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).toHaveBeenCalledWith(1);
+    expect(player.drawCards).toHaveBeenCalledTimes(1);
+  });
+
+  test('drawn Tactic card with matching discipline: drawCards(1) is called', () => {
+    const player = playerWithHand([
+      handCard(CardType.Equipment),
+      handCard(CardType.Tactic, TacticDiscipline.Military)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, TacticDiscipline.Military);
+    expect(player.drawCards).toHaveBeenCalledWith(1);
+  });
+
+  test('drawn Tactic card with non-matching discipline: drawCards is NOT called', () => {
+    const player = playerWithHand([
+      handCard(CardType.Equipment),
+      handCard(CardType.Tactic, TacticDiscipline.Military)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, TacticDiscipline.Science);
+    expect(player.drawCards).not.toHaveBeenCalled();
+  });
+
+  test('multiple matching drawn cards: drawCards(1) is called exactly once', () => {
+    const player = playerWithHand([handCard(CardType.Hull), handCard(CardType.Hull)]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).toHaveBeenCalledTimes(1);
+  });
+
+  test('matching card is older than the draw window: drawCards is NOT called', () => {
+    // rules.cardsToDrawPerTurn = 2 → only the last two entries count.
+    const player = playerWithHand([
+      handCard(CardType.Hull), // older than the draw window
+      handCard(CardType.Equipment),
+      handCard(CardType.Equipment)
+    ]);
+    attacker.exposedAdditionalCardWhenDrawing(player, CardType.Hull);
+    expect(player.drawCards).not.toHaveBeenCalled();
   });
 });
