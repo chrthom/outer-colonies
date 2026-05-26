@@ -45,7 +45,12 @@ export default abstract class EquipmentCard extends Card {
       damage = Math.round(damage / 2);
     }
     const defendingShips = match.battle.ships[match.waitingPlayerNo];
-    const attackResult = this.attackStep(target, this.attackProfile, defendingShips, new AttackResult(damage));
+    const attackResult = this.attackStep(
+      target,
+      this.attackProfile,
+      defendingShips,
+      new AttackResult(damage)
+    );
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
     this.rechargePerAttackDefenders(defendingShips);

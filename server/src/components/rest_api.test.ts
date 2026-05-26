@@ -11,9 +11,7 @@ describe('RESTAPI Daily Endpoints', () => {
 
   describe('getDailiesResponse', () => {
     it('should preserve values for available dailies and null out the rest', () => {
-      jest
-        .spyOn(dailySelector, 'getDailiesOfDay')
-        .mockReturnValue([DailyType.Login, DailyType.Victory]);
+      jest.spyOn(dailySelector, 'getDailiesOfDay').mockReturnValue([DailyType.Login, DailyType.Victory]);
 
       const daily: any = { userId: 1, login: true, victory: false, game: true, energy: false };
 

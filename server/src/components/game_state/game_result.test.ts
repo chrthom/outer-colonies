@@ -102,14 +102,7 @@ describe('GameResult', () => {
 
     test('Ships requires at least 5 flight-ready stacks', () => {
       const ready = player({
-        cardStacks: [
-          stack(),
-          stack(),
-          stack(),
-          stack(),
-          stack(),
-          stack({ isFlightReady: false })
-        ]
+        cardStacks: [stack(), stack(), stack(), stack(), stack(), stack({ isFlightReady: false })]
       });
       const notEnough = player({
         cardStacks: [stack(), stack(), stack(), stack()]
