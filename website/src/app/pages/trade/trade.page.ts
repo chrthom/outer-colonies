@@ -131,11 +131,9 @@ export class TradePage implements OnInit {
       },
       error: () => {
         this.actionFailed = true;
-        this.snackBar.open(
-          'Das Item konnte nicht geöffnet werden. Bitte versuche es später erneut.',
-          'OK',
-          { duration: 5000 }
-        );
+        this.snackBar.open('Das Item konnte nicht geöffnet werden. Bitte versuche es später erneut.', 'OK', {
+          duration: 5000
+        });
       }
     });
   }

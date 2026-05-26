@@ -19,7 +19,10 @@
         } @if (emailResetSuccessful) {
         <mat-hint>Eine Best&auml;tigungs-E-Mail wurde versandt</mat-hint>
         } @if (emailResetFailed) {
-        <mat-error>Beim &Auml;ndern der E-Mail Adresse ist ein Fehler aufgetreten. Bitte versuche es sp&auml;ter erneut.</mat-error>
+        <mat-error
+          >Beim &Auml;ndern der E-Mail Adresse ist ein Fehler aufgetreten. Bitte versuche es sp&auml;ter
+          erneut.</mat-error
+        >
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="emailForm.valid ? 'primary' : 'warn'">
@@ -43,7 +46,10 @@
         } @if (passwordResetSuccessful) {
         <mat-hint>Dein Passwort wurde erfolgreich ge&auml;ndert</mat-hint>
         } @if (passwordResetFailed) {
-        <mat-error>Beim &Auml;ndern des Passworts ist ein Fehler aufgetreten. Bitte versuche es sp&auml;ter erneut.</mat-error>
+        <mat-error
+          >Beim &Auml;ndern des Passworts ist ein Fehler aufgetreten. Bitte versuche es sp&auml;ter
+          erneut.</mat-error
+        >
         }
       </mat-form-field>
       <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
