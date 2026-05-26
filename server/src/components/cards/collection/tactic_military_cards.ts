@@ -150,7 +150,7 @@ export class Card334 extends TacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return player.match.battle.range == 1
-      ? this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks)
+      ? this.onlyOpponentColonyTarget(player)
       : [];
   }
   protected override get interventionType(): InterventionType | undefined {
@@ -225,7 +225,7 @@ export class Card419 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(
+    return this.getOpponentCardStacks(player).filter(
       cs => cs.type == CardType.Hull && cs.profile.speed <= this.speedLimitation
     );
   }
@@ -273,7 +273,7 @@ export class Card501 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
 
@@ -298,7 +298,7 @@ export class Card504 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(
+    return this.getOpponentCardStacks(player).filter(
       cs => cs.zone == Zone.Orbital && cs.profile.speed == 0
     );
   }
@@ -387,6 +387,6 @@ export class Card550 extends TacticCard {
     }
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }

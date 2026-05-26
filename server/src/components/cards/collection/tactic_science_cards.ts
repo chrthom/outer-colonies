@@ -31,7 +31,7 @@ export class Card108 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
 

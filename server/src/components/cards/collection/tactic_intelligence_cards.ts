@@ -38,7 +38,7 @@ export class Card175 extends TacticCard {
     }
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
   override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
     return this.getOpponentPlayer(player).hand.map(c => c.card.id);
@@ -121,7 +121,7 @@ export class Card214 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.zone == Zone.Colony);
+    return this.getOpponentCardStacks(player).filter(cs => cs.zone == Zone.Colony);
   }
 }
 
@@ -160,7 +160,7 @@ export class Card231 extends TacticCard {
     this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
   }
   getValidTargets(player: Player): CardStack[] {
-    return player.isActivePlayer ? [] : this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return player.isActivePlayer ? [] : this.onlyOpponentColonyTarget(player);
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;
@@ -188,7 +188,7 @@ export class Card323 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks;
+    return this.getOpponentCardStacks(player);
   }
 }
 
@@ -201,7 +201,7 @@ export class Card330 extends TacticCard {
   }
   getValidTargets(player: Player): CardStack[] {
     return this.getOpponentPlayer(player).control > 0
-      ? this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks)
+      ? this.onlyOpponentColonyTarget(player)
       : [];
   }
 }
@@ -265,7 +265,7 @@ export class Card430 extends TacticCard {
     );
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
 
@@ -332,7 +332,7 @@ export class Card529 extends TacticCard {
     this.getOpponentPlayer(player).actionPool.remove(...this.removeActions);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;

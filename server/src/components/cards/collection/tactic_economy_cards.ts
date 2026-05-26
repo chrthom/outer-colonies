@@ -216,7 +216,7 @@ export class Card509 extends TacticCard {
     target.retract();
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.type == CardType.Hull);
+    return this.onlyOpponentHullTarget(player);
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.OpponentTurnStart;
@@ -234,7 +234,7 @@ export class Card534 extends TacticCard {
     );
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+    return this.onlyOpponentColonyTarget(player);
   }
 }
 
