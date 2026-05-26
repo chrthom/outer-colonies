@@ -130,6 +130,7 @@ import {
   Card325,
   Card434,
   Card449,
+  Card537,
   Card545
 } from './equipment_util_cards';
 import { Card118, Card125, Card157, Card209, Card303, Card409 } from './equipment_weapon_plasma_cards';
@@ -498,7 +499,7 @@ export default class CardCollection {
     532: <Card>new Card532(),
     533: <Card>new Card533(),
     534: <Card>new Card534(),
-    537: <Card>new Card534(),
+    537: <Card>new Card537(),
     542: <Card>new Card542(),
     545: <Card>new Card545(),
     550: <Card>new Card550(),
