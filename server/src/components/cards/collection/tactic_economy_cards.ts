@@ -1,6 +1,6 @@
 import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { removeFirstMatchingElement, spliceCardById, spliceFrom } from '../../utils/helpers';
+import { removeFirstMatchingElement } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -11,14 +11,11 @@ export class Card123 extends TacticCard {
     super(123, 'Handelsabkommen', 3, TacticDiscipline.Trade);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    if (optionalParameters && optionalParameters[0]) {
-      const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
-      if (card) {
-        player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
-        player.shuffleDeck();
-        player.deck.unshift(card);
-      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
-    }
+    this.tributeCardFromPile(optionalParameters, player.deck, card => {
+      player.discardCards(...player.pickCardsFromDeck(this.cardsToDiscard));
+      player.shuffleDeck();
+      player.deck.unshift(card);
+    });
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyColonyTarget(player.cardStacks);
@@ -92,15 +89,10 @@ export class Card210 extends TacticCard {
     super(210, 'Schwarzmarkthandel', 4, TacticDiscipline.Trade);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    if (optionalParameters && optionalParameters[0]) {
-      // TODO: Unify in tribute method - Make sure to limit number of cards, print warning if no card found
-      const handCardUUID = player.hand.find(cs => cs.card.id == optionalParameters[0])?.uuid;
-      if (handCardUUID) {
-        player.discardHandCards(handCardUUID);
-        this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
-        player.shuffleDeck();
-      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
-    }
+    this.tributeHandCard(player, optionalParameters, uuid => {
+      player.discardHandCards(uuid);
+      this.drawSpecificCards(player, c => c.type == CardType.Equipment, this.cardsToDraw);
+    });
   }
   getValidTargets(player: Player): CardStack[] {
     return player.hand.length > 1 ? this.onlyColonyTarget(player.cardStacks) : [];
@@ -119,9 +111,7 @@ export class Card217 extends TacticCard {
     super(217, 'Schrottsammler', 2, TacticDiscipline.Trade);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters
-      ?.map(cardId => spliceCardById(player.discardPile, cardId))
-      .forEach(c => (c ? player.deck.push(c) : {}));
+    this.tributeMultipleFromPile(optionalParameters, player.discardPile, c => player.deck.push(c));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {

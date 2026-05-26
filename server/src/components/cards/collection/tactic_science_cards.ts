@@ -1,11 +1,6 @@
 import { CardType, TacticDiscipline, CardDurability, InterventionType } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import {
-  pickRandom,
-  removeFirstMatchingElement,
-  spliceCardById,
-  spliceCardStackByUUID
-} from '../../utils/helpers';
+import { pickRandom, removeFirstMatchingElement, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -258,10 +253,7 @@ export class Card423 extends TacticCard {
     super(423, 'Wissenschaftlicher Durchbruch', 2, TacticDiscipline.Science);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    // TODO: Unifiy in one method - make sure to limit number of cards, print warning if no card found
-    optionalParameters
-      ?.map(cardId => spliceCardById(player.deck, cardId))
-      .forEach(c => (c ? player.takeCard(c) : {}));
+    this.tributeMultipleFromPile(optionalParameters, player.deck, c => player.takeCard(c));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {

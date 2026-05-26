@@ -6,7 +6,7 @@ import {
   Zone
 } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceCardById, spliceCardStackByUUID, spliceFrom } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardStackByUUID } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
@@ -29,13 +29,8 @@ export class Card175 extends TacticCard {
     super(175, 'Spionagenetzwerk', 1, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    if (optionalParameters && optionalParameters[0]) {
-      const handCardUUID = this.getOpponentPlayer(player).hand.find(
-        cs => cs.card.id == optionalParameters[0]
-      )?.uuid;
-      if (handCardUUID) this.getOpponentPlayer(player).discardHandCards(handCardUUID);
-      else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
-    }
+    const opponent = this.getOpponentPlayer(player);
+    this.tributeHandCard(opponent, optionalParameters, uuid => opponent.discardHandCards(uuid));
   }
   getValidTargets(player: Player): CardStack[] {
     return this.onlyOpponentColonyTarget(player);
@@ -131,9 +126,7 @@ export class Card222 extends TacticCard {
     super(222, 'Wracks plündern', 2, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    optionalParameters
-      ?.map(cardId => spliceCardById(player.discardPile, cardId))
-      .forEach(c => (c ? player.deck.push(c) : {}));
+    this.tributeMultipleFromPile(optionalParameters, player.discardPile, c => player.deck.push(c));
     player.shuffleDeck();
   }
   getValidTargets(player: Player): CardStack[] {
@@ -272,13 +265,10 @@ export class Card517 extends TacticCard {
     super(517, 'Diasporabewegung', 3, TacticDiscipline.Intelligence);
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    if (optionalParameters && optionalParameters[0]) {
-      const card = spliceFrom(player.deck, c => c.id == optionalParameters[0]);
-      if (card) {
-        player.deck.unshift(card);
-        player.shuffleDeck();
-      } else console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
-    }
+    this.tributeCardFromPile(optionalParameters, player.deck, card => {
+      player.deck.unshift(card);
+      player.shuffleDeck();
+    });
   }
   getValidTargets(player: Player): CardStack[] {
     return player.deck.find(c => c.type == CardType.Orb) ? this.onlyColonyTarget(player.cardStacks) : [];

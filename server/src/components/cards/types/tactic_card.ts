@@ -7,7 +7,7 @@ import {
 } from '../../../shared/config/enums';
 import { InterventionAttack, InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceFrom } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardById, spliceFrom } from '../../utils/helpers';
 import Card, { AttackResult, CardRarity } from '../card';
 import { AttackProfile, CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
@@ -88,6 +88,41 @@ export default abstract class TacticCard extends Card {
         : [];
     }
     return [];
+  }
+  protected tributeCardFromPile(
+    optionalParameters: number[] | undefined,
+    pile: Card[],
+    action: (card: Card) => void
+  ) {
+    const cardId = optionalParameters?.[0];
+    if (cardId === undefined) return;
+    const card = spliceCardById(pile, cardId);
+    if (card) action(card);
+    else this.warnTributeNotFound();
+  }
+  protected tributeHandCard(
+    player: Player,
+    optionalParameters: number[] | undefined,
+    action: (uuid: string) => void
+  ) {
+    const cardId = optionalParameters?.[0];
+    if (cardId === undefined) return;
+    const handCardUUID = player.hand.find(cs => cs.card.id == cardId)?.uuid;
+    if (handCardUUID) action(handCardUUID);
+    else this.warnTributeNotFound();
+  }
+  protected tributeMultipleFromPile(
+    optionalParameters: number[] | undefined,
+    pile: Card[],
+    action: (card: Card) => void
+  ) {
+    optionalParameters?.forEach(cardId => {
+      const card = spliceCardById(pile, cardId);
+      if (card) action(card);
+    });
+  }
+  private warnTributeNotFound() {
+    console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
   }
   protected drawSpecificCards(
     player: Player,
