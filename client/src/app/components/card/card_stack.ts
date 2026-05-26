@@ -30,12 +30,6 @@ export default class CardStack {
     this.data = data;
   }
 
-  /**
-   * Performs the Phaser-side rendering for this stack: creates card sprites,
-   * the summary box and kicks off the placement tween. Kept separate from the
-   * constructor so the stack's pure data/derivations can be unit-tested
-   * without mocking the full Phaser scene surface. Idempotent.
-   */
   init(origin?: CardImage) {
     if (this.initialized) return;
     this.initialized = true;
