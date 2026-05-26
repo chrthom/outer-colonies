@@ -7,7 +7,8 @@ import {
   InterventionType,
   CardSubtype,
   TacticDiscipline,
-  DefenseType
+  DefenseType,
+  RechargeRate
 } from '../../shared/config/enums';
 import ActionPool from './action_pool';
 import Player from '../game_state/player';
@@ -63,11 +64,14 @@ export default abstract class Card {
   get isAttachSelfManaging(): boolean {
     return false;
   }
+  get rechargeRate(): RechargeRate {
+    return RechargeRate.PerBattle;
+  }
   get isRechargeable(): boolean {
-    return false;
+    return this.rechargeRate == RechargeRate.PerRound;
   }
   get instantRecharge(): boolean {
-    return false;
+    return this.rechargeRate == RechargeRate.PerAttack;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canBeRetracted(isRootCard: boolean): boolean {
