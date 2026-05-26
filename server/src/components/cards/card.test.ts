@@ -28,6 +28,9 @@ class TestCard extends Card {
   public exposedAdditionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
     return this.additionalCardWhenDrawing(player, ...cardTypes);
   }
+  public exposedRechargePerAttackDefenders(defendingShips: CardStack[]) {
+    return this.rechargePerAttackDefenders(defendingShips);
+  }
 }
 
 describe('Card.canDefend', () => {
@@ -197,24 +200,41 @@ describe('Card.attackStep', () => {
     expect(blocked.defenseAvailable).toBe(true);
   });
 
-  test('re-arms instant-recharge defenders at the Armour terminal', () => {
-    const def = defender({ pointDefense: 1 }, { instantRecharge: true });
-    // reduction = (-3) * -(1) = 3, damage = 10 → defender deactivates, 7 damage continues
-    // recursion exhausts PD, Shield, Armour with no further defenders → armour terminal re-arms
-    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
+  test('does NOT re-arm any defender on its own — that is the caller responsibility', () => {
+    const instant = defender({ pointDefense: 1 }, { instantRecharge: true });
+    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(instant)], 10);
 
     expect(result.pointDefense).toBe(3);
     expect(result.damage).toBe(7);
+    expect(instant.defenseAvailable).toBe(false);
+  });
+});
+
+describe('Card.rechargePerAttackDefenders', () => {
+  test('flips defenseAvailable back to true on PerAttack defenders', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: true, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
     expect(def.defenseAvailable).toBe(true);
   });
 
-  test('non-instant-recharge defender stays deactivated through the Armour terminal', () => {
-    const def = defender({ pointDefense: 1 }, { instantRecharge: false });
-    const result = attacker.exposedAttackStep(target, attack({ pointDefense: -3 }), [ship(def)], 10);
-
-    expect(result.pointDefense).toBe(3);
-    expect(result.damage).toBe(7);
+  test('does not touch defenders whose rechargeRate is not PerAttack', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: false, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
     expect(def.defenseAvailable).toBe(false);
+  });
+
+  test('leaves already-active PerAttack defenders alone (idempotent)', () => {
+    const def = defender({ pointDefense: 2 }, { instantRecharge: true, defenseAvailable: true });
+    attacker.exposedRechargePerAttackDefenders([ship(def)]);
+    expect(def.defenseAvailable).toBe(true);
+  });
+
+  test('re-arms across multiple ships', () => {
+    const def1 = defender({ pointDefense: 1 }, { instantRecharge: true, defenseAvailable: false });
+    const def2 = defender({ shield: 1 }, { instantRecharge: true, defenseAvailable: false });
+    attacker.exposedRechargePerAttackDefenders([ship(def1), ship(def2)]);
+    expect(def1.defenseAvailable).toBe(true);
+    expect(def2.defenseAvailable).toBe(true);
   });
 });
 

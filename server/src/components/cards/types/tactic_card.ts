@@ -162,10 +162,11 @@ export default abstract class TacticCard extends Card {
   }
   protected attackByTactic(player: Player, target: CardStack) {
     if (this.attackProfile) {
+      const defendingShips = target.player.cardStacks.filter(cs => cs.zone != Zone.Neutral);
       const attackResult = this.attackStep(
         target,
         this.attackProfile,
-        target.player.cardStacks.filter(cs => cs.zone != Zone.Neutral),
+        defendingShips,
         new AttackResult(this.attackProfile.damage)
       );
       target.damage += attackResult.damage;
@@ -178,6 +179,7 @@ export default abstract class TacticCard extends Card {
         armour: attackResult.armour,
         damage: attackResult.damage
       };
+      this.rechargePerAttackDefenders(defendingShips);
       player.match.removeDestroyedCardStacks();
     }
   }

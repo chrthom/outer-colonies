@@ -44,14 +44,11 @@ export default abstract class EquipmentCard extends Card {
     if (target.isFlightReady && attackingShip.profile.speed + match.battle.range < target.profile.speed) {
       damage = Math.round(damage / 2);
     }
-    const attackResult = this.attackStep(
-      target,
-      this.attackProfile,
-      match.battle.ships[match.waitingPlayerNo],
-      new AttackResult(damage)
-    );
+    const defendingShips = match.battle.ships[match.waitingPlayerNo];
+    const attackResult = this.attackStep(target, this.attackProfile, defendingShips, new AttackResult(damage));
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
+    this.rechargePerAttackDefenders(defendingShips);
     return attackResult;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

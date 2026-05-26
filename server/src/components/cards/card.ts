@@ -130,6 +130,12 @@ export default abstract class Card {
   protected getDrawnCards(player: Player) {
     return player.hand.slice(-rules.cardsToDrawPerTurn).map(c => c.card);
   }
+  protected rechargePerAttackDefenders(defendingShips: CardStack[]) {
+    defendingShips
+      .flatMap(cs => cs.cardStacks)
+      .filter(cs => cs.card.rechargeRate == RechargeRate.PerAttack)
+      .forEach(cs => (cs.defenseAvailable = true));
+  }
   protected attackStep(
     target: CardStack,
     attackProfile: AttackProfile,
@@ -157,10 +163,6 @@ export default abstract class Card {
     } else if (fromProfile(attackProfile) == 0 || !bestDefense) {
       switch (defenseType) {
         case DefenseType.Armour:
-          defendingShips
-            .flatMap(cs => cs.cardStacks)
-            .filter(cs => cs.card.rechargeRate == RechargeRate.PerAttack)
-            .forEach(cs => (cs.defenseAvailable = true));
           return attackResult;
         case DefenseType.Shield:
           return this.attackStep(target, attackProfile, defendingShips, attackResult, DefenseType.Armour);
