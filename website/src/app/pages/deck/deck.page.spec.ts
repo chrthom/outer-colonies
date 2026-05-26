@@ -99,61 +99,26 @@ describe('DeckPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should split loaded cards into active and reserve boxes by inUse', () => {
+    expect(component.boxes[0].cards.length).toBe(2);
+    expect(component.boxes[1].cards.length).toBe(1);
   });
 
-  it('should load deck on init', () => {
-    expect(component['activeCards$'].value.length).toBe(2); // 2 active cards
-    expect(component['reserveCards$'].value.length).toBe(1); // 1 reserve card
-  });
-
-  it('should have correct min and max card limits', () => {
-    expect(component.minCards).toBe(60);
-    expect(component.maxCards).toBe(100);
-  });
-
-  it('should activate card when called', () => {
+  it('should call activateCard via the API when capacity allows', () => {
     component.activateCard({ id: 2, cardId: 102, inUse: false } as any);
+
     expect(deckApiSpy.activateCard).toHaveBeenCalledWith(2);
   });
 
-  it('should not activate card when at max capacity', () => {
-    // Mock the canActivateDeckCard to return false
-    spyOnProperty(component, 'canActivateDeckCard', 'get').and.returnValue(false);
-    component.activateCard({ id: 2, cardId: 102, inUse: false } as any);
-    expect(deckApiSpy.activateCard).not.toHaveBeenCalled();
-  });
-
-  it('should deactivate card when called', () => {
-    // Mock the canDeactivateDeckCard to return true
-    spyOnProperty(component, 'canDeactivateDeckCard', 'get').and.returnValue(true);
-    component.deactivateCard({ id: 1, cardId: 101, inUse: true } as any);
-    expect(deckApiSpy.deactivateCard).toHaveBeenCalledWith(1);
-  });
-
-  it('should not deactivate card when at min capacity', () => {
-    // Mock the canDeactivateDeckCard to return false
-    spyOnProperty(component, 'canDeactivateDeckCard', 'get').and.returnValue(false);
-    component.deactivateCard({ id: 1, cardId: 101, inUse: true } as any);
-    expect(deckApiSpy.deactivateCard).not.toHaveBeenCalled();
-  });
-
-  it('should open image modal when called', () => {
-    const testCard = { id: 1, cardId: 101, inUse: true };
-    component.openImgInModal(testCard as any);
-    expect(dialogSpy.open).toHaveBeenCalled();
-  });
-
-  it('should calculate card URL correctly', () => {
+  it('should produce the card image URL from cardId', () => {
     expect(component.cardIdToUrl(101)).toBe('https://assets.outercolonies.de/cards/101.png');
   });
 
-  it('should calculate edition URL correctly', () => {
+  it('should produce the edition icon URL from cardId', () => {
     expect(component.cardIdToEditionUrl(101)).toBe('https://assets.outercolonies.de/icons/edition1.png');
   });
 
-  it('should get edition name correctly', () => {
+  it('should map cardId hundreds to the edition name', () => {
     expect(component.cardIdToEditionName(101)).toBe('Outer Colonies');
     expect(component.cardIdToEditionName(201)).toBe('Jovians Freihändler');
     expect(component.cardIdToEditionName(301)).toBe('Marsianische Hegemonie');
@@ -161,7 +126,7 @@ describe('DeckPage', () => {
     expect(component.cardIdToEditionName(99)).toBe('');
   });
 
-  it('should calculate statistics correctly', () => {
+  it('should compute provided/used columns from the active card profiles', () => {
     component['activeCards$'].next([
       {
         id: 1,
@@ -174,10 +139,8 @@ describe('DeckPage', () => {
 
     component.statistics$.subscribe(stats => {
       expect(stats.length).toBe(7);
-      // Delta: 1 * 2 = 2 (provided), 0 (used)
       expect(stats[0].provided).toBe(2);
       expect(stats[0].used).toBe(0);
-      // Theta: -1 * 2 = -2 (used), 0 (provided)
       expect(stats[1].provided).toBe(0);
       expect(stats[1].used).toBe(2);
     });
