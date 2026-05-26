@@ -83,9 +83,7 @@ export class Card403 extends OrbCard {
     super(403, 'Pluto', 5, {}, [CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic]);
   }
   override getValidTargets(player: Player): CardStack[] {
-    const hasAnySolarPanel = player.cardStacks
-      .flatMap(cs => cs.cards)
-      .some(c => c.name == 'Solarpanele');
+    const hasAnySolarPanel = player.cardStacks.flatMap(cs => cs.cards).some(c => c.name == 'Solarpanele');
     return hasAnySolarPanel ? [] : super.getValidTargets(player);
   }
   override onStartTurn() {}
