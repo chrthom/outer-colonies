@@ -22,7 +22,7 @@ export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardS
 
 export function removeFirstMatchingElement<T>(array: T[], f: (o: T) => boolean): T[] {
   const index = array.findIndex(f);
-  if (index !== -1) array.splice(index);
+  if (index !== -1) array.splice(index, 1);
   return array;
 }
 

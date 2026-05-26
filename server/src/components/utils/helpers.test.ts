@@ -7,6 +7,7 @@ import {
   getCardStackByUUID,
   opponentPlayerNo,
   pickRandom,
+  removeFirstMatchingElement,
   spliceCardById,
   spliceCardStackByUUID,
   spliceFrom
@@ -123,6 +124,41 @@ describe('spliceCardById', () => {
 
     expect(spliceCardById(cards, 99)).toBeUndefined();
     expect(cards).toHaveLength(1);
+  });
+});
+
+describe('removeFirstMatchingElement', () => {
+  it('removes only the first matching element and returns the same array', () => {
+    const items = [1, 2, 3, 4, 5];
+
+    const result = removeFirstMatchingElement(items, e => e === 3);
+
+    expect(result).toBe(items);
+    expect(items).toEqual([1, 2, 4, 5]);
+  });
+
+  it('removes only the first occurrence when duplicates are present', () => {
+    const items = [1, 2, 2, 3];
+
+    removeFirstMatchingElement(items, e => e === 2);
+
+    expect(items).toEqual([1, 2, 3]);
+  });
+
+  it('removes the head when the first element matches', () => {
+    const items = [1, 2, 3];
+
+    removeFirstMatchingElement(items, e => e === 1);
+
+    expect(items).toEqual([2, 3]);
+  });
+
+  it('leaves the array untouched when no element matches', () => {
+    const items = [1, 2, 3];
+
+    removeFirstMatchingElement(items, e => e === 99);
+
+    expect(items).toEqual([1, 2, 3]);
   });
 });
 
