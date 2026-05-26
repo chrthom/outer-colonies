@@ -448,6 +448,7 @@ export default function restAPI(app: Express) {
     });
   });
 }
+
 // Single source of truth for projecting a DB daily row into the wire payload:
 // values for dailies active today are preserved, the rest are nulled out.
 export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
