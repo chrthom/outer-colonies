@@ -135,6 +135,31 @@ export default abstract class TacticCard extends Card {
     }
     player.shuffleDeck();
   }
+  protected togglePointDefense(targets: CardStack[], count: number, newState: boolean) {
+    let remaining = count;
+    while (remaining > 0) {
+      const pd2 = this.findPointDefense(targets, 2, !newState);
+      const pd1 = this.findPointDefense(targets, 1, !newState);
+      if (remaining >= 2 && pd2) {
+        pd2.defenseAvailable = newState;
+        remaining -= 2;
+      } else if (pd1) {
+        pd1.defenseAvailable = newState;
+        remaining -= 1;
+      } else {
+        break;
+      }
+    }
+  }
+  private findPointDefense(
+    targets: CardStack[],
+    level: number,
+    currentlyAvailable: boolean
+  ): CardStack | undefined {
+    return targets
+      .flatMap(cs => cs.cardStacks)
+      .find(cs => cs.defenseAvailable == currentlyAvailable && cs.card.profile.pointDefense == level);
+  }
   protected attackByTactic(player: Player, target: CardStack) {
     if (this.attackProfile) {
       const attackResult = this.attackStep(

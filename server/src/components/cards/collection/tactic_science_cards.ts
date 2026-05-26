@@ -126,7 +126,7 @@ export class Card233 extends TacticCard {
     super(233, 'ABM-KI', 1, TacticDiscipline.Science);
   }
   onEnterGame(player: Player, target: CardStack) {
-    this.activatePointDefense(target, this.activations);
+    this.togglePointDefense([target], this.activations, true);
     this.onEnterGameAttackIntervention(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
@@ -136,20 +136,6 @@ export class Card233 extends TacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.Attack;
-  }
-  private activatePointDefense(target: CardStack, remainingActivations: number) {
-    const pd2 = this.getPointDefense(target, 2);
-    const pd1 = this.getPointDefense(target, 1);
-    if (remainingActivations >= 2 && pd2) {
-      pd2.defenseAvailable = true;
-      this.activatePointDefense(target, remainingActivations - 2);
-    } else if (remainingActivations && pd1) {
-      pd1.defenseAvailable = true;
-      this.activatePointDefense(target, remainingActivations - 1);
-    }
-  }
-  private getPointDefense(target: CardStack, level: number): CardStack | undefined {
-    return target.cardStacks.find(cs => !cs.defenseAvailable && cs.card.profile.pointDefense == level);
   }
 }
 

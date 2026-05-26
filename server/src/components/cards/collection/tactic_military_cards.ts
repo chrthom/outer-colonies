@@ -30,7 +30,11 @@ export class Card139 extends TacticCard {
     super(139, 'ECM-Emitter', 2, TacticDiscipline.Military);
   }
   onEnterGame(player: Player) {
-    this.deactivatePointDefense(player.match.battle.ships[player.match.waitingPlayerNo], this.deactivations);
+    this.togglePointDefense(
+      player.match.battle.ships[player.match.waitingPlayerNo],
+      this.deactivations,
+      false
+    );
   }
   getValidTargets(player: Player): CardStack[] {
     return player.match.battle.ships[player.match.waitingPlayerNo].filter(
@@ -42,22 +46,6 @@ export class Card139 extends TacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundStart;
-  }
-  private deactivatePointDefense(targets: CardStack[], remainingDeactivations: number) {
-    const pd2 = this.getPointDefense(targets, 2);
-    const pd1 = this.getPointDefense(targets, 1);
-    if (remainingDeactivations >= 2 && pd2) {
-      pd2.defenseAvailable = false;
-      this.deactivatePointDefense(targets, remainingDeactivations - 2);
-    } else if (remainingDeactivations && pd1) {
-      pd1.defenseAvailable = false;
-      this.deactivatePointDefense(targets, remainingDeactivations - 1);
-    }
-  }
-  private getPointDefense(targets: CardStack[], level: number): CardStack | undefined {
-    return targets
-      .flatMap(cs => cs.cardStacks)
-      .find(cs => cs.defenseAvailable && cs.card.profile.pointDefense == level);
   }
 }
 
