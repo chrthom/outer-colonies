@@ -96,8 +96,7 @@ export default class Game extends Phaser.Scene {
     this.socket = data.socket;
     this.gameParams = data.gameParams;
     // The server treats any in-game disconnect as a surrender, so a reconnected
-    // socket would no longer be bound to this match. Disable further reconnect
-    // attempts to keep client and server state consistent.
+    // socket would no longer be bound to this match.
     this.socket.io.reconnection(false);
     this.background = new Background(this);
   }
@@ -146,11 +145,7 @@ export default class Game extends Phaser.Scene {
   }
 
   showSurrenderOnDisconnect() {
-    // The server treats disconnect-during-game as surrender but cannot deliver
-    // the final state to the dropped socket. Synthesise the loss locally so
-    // the user sees the same defeat screen the opponent does. `sol` is left at
-    // 0 because the client cannot know the server-side earnings; the indicator
-    // hides the sol line when the value is non-positive.
+    // The server treats disconnect-during-game as surrender
     if (this.state.gameResult) return;
     const result: ClientGameResult = {
       won: false,
