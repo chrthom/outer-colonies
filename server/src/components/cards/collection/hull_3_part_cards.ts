@@ -150,3 +150,19 @@ export class Card315 extends HullCard {
     });
   }
 }
+
+export const allCards = [
+  new Card116(),
+  new Card117(),
+  new Card120(),
+  new Card121(),
+  new Card122(),
+  new Card133(),
+  new Card134(),
+  new Card306(),
+  new Card308(),
+  new Card309(),
+  new Card313(),
+  new Card314(),
+  new Card315()
+];

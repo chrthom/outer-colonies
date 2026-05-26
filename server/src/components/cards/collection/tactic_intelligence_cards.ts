@@ -336,3 +336,22 @@ export class Card529 extends TacticCard {
     return InterventionType.OpponentTurnStart;
   }
 }
+
+export const allCards = [
+  new Card149(),
+  new Card175(),
+  new Card176(),
+  new Card205(),
+  new Card208(),
+  new Card214(),
+  new Card222(),
+  new Card231(),
+  new Card323(),
+  new Card330(),
+  new Card416(),
+  new Card417(),
+  new Card430(),
+  new Card517(),
+  new Card528(),
+  new Card529()
+];

@@ -60,3 +60,11 @@ export class Card448 extends InfrastructureDefenseCard {
     return false;
   }
 }
+
+export const allCards = [
+  new Card156(),
+  new Card169(),
+  new Card238(),
+  new Card345(),
+  new Card448()
+];

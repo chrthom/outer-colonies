@@ -130,3 +130,18 @@ export class Card545 extends EquipmentCard {
     });
   }
 }
+
+export const allCards = [
+  new Card104(),
+  new Card109(),
+  new Card124(),
+  new Card161(),
+  new Card211(),
+  new Card212(),
+  new Card241(),
+  new Card325(),
+  new Card434(),
+  new Card449(),
+  new Card537(),
+  new Card545()
+];

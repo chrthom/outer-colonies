@@ -386,3 +386,24 @@ export class Card550 extends TacticCard {
     return this.onlyOpponentColonyTarget(player);
   }
 }
+
+export const allCards = [
+  new Card129(),
+  new Card139(),
+  new Card173(),
+  new Card174(),
+  new Card319(),
+  new Card331(),
+  new Card334(),
+  new Card337(),
+  new Card338(),
+  new Card346(),
+  new Card419(),
+  new Card428(),
+  new Card501(),
+  new Card504(),
+  new Card531(),
+  new Card532(),
+  new Card533(),
+  new Card550()
+];

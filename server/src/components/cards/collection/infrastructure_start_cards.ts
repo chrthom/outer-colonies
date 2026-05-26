@@ -37,3 +37,5 @@ export class Card435 extends InfrastructureCard {
     this.additionalCardWhenDrawing(player, TacticDiscipline.Science, TacticDiscipline.Trade);
   }
 }
+
+export const allCards = [new Card230(), new Card333(), new Card435()];

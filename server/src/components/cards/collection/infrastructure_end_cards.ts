@@ -25,3 +25,5 @@ export class Card155 extends InfrastructureCard {
     if (player.discardPile.length > 0) player.deck.push(...player.pickCardsFromTopOfDiscardPile(1));
   }
 }
+
+export const allCards = [new Card114(), new Card155()];

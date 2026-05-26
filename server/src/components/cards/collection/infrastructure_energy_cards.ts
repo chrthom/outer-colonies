@@ -138,3 +138,20 @@ export class Card453 extends CardPowerPlant {
     super(453);
   }
 }
+
+export const allCards = [
+  new Card105(),
+  new Card145(),
+  new Card185(),
+  new Card187(),
+  new Card188(),
+  new Card242(),
+  new Card244(),
+  new Card245(),
+  new Card350(),
+  new Card352(),
+  new Card353(),
+  new Card451(),
+  new Card452(),
+  new Card453()
+];

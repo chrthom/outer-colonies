@@ -26,3 +26,5 @@ export class Card305 extends InfrastructureCard {
     }
   }
 }
+
+export const allCards = [new Card305()];

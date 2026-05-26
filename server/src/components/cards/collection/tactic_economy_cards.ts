@@ -252,3 +252,20 @@ export class Card542 extends TacticCard {
     return this.onlyColonyTarget(player.cardStacks);
   }
 }
+
+export const allCards = [
+  new Card123(),
+  new Card141(),
+  new Card142(),
+  new Card165(),
+  new Card210(),
+  new Card217(),
+  new Card232(),
+  new Card235(),
+  new Card236(),
+  new Card321(),
+  new Card427(),
+  new Card509(),
+  new Card534(),
+  new Card542()
+];

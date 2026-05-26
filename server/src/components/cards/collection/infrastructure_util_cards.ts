@@ -8,3 +8,5 @@ export class Card172 extends InfrastructureCard {
     });
   }
 }
+
+export const allCards = [new Card172()];

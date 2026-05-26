@@ -233,3 +233,19 @@ export class Card413 extends ActionInfrastructureCard {
     }
   }
 }
+
+export const allCards = [
+  new Card135(),
+  new Card137(),
+  new Card138(),
+  new Card147(),
+  new Card148(),
+  new Card154(),
+  new Card164(),
+  new Card183(),
+  new Card219(),
+  new Card239(),
+  new Card320(),
+  new Card336(),
+  new Card413()
+];

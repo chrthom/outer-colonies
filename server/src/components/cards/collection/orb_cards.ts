@@ -120,3 +120,16 @@ export class Card433 extends OrbCard {
   }
   override onStartTurn() {}
 }
+
+export const allCards = [
+  new Card112(),
+  new Card146(),
+  new Card159(),
+  new Card225(),
+  new Card301(),
+  new Card317(),
+  new Card403(),
+  new Card410(),
+  new Card432(),
+  new Card433()
+];
