@@ -119,7 +119,10 @@ describe('CardStack', () => {
     }
 
     it('returns the inputs unchanged when nothing overlaps', () => {
-      expect(arrayDiff([1, 2], [3, 4])).toEqual([[1, 2], [3, 4]]);
+      expect(arrayDiff([1, 2], [3, 4])).toEqual([
+        [1, 2],
+        [3, 4]
+      ]);
     });
 
     it('removes each shared element once from both sides', () => {
