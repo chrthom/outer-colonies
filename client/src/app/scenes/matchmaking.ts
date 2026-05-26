@@ -50,6 +50,9 @@ export default class Matchmaking extends Phaser.Scene {
         case 'start':
           this.socket.off(MsgTypeOutbound.Connect);
           this.socket.off(MsgTypeOutbound.Matchmaking);
+          this.socket.off('disconnect');
+          this.socket.off('connect_error');
+          this.socket.io.off('reconnect_failed');
           this.scene.start('Game', {
             socket: this.socket,
             gameParams: params
