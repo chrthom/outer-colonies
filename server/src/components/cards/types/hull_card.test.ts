@@ -36,8 +36,8 @@ describe('HullCard.isFlightReady', () => {
     expect(
       hull.isFlightReady([card(CardType.Hull), card(CardType.Equipment), card(CardType.Infrastructure)])
     ).toBe(false);
-    expect(
-      hull.isFlightReady([card(CardType.Hull), card(CardType.Hull), card(CardType.Equipment)])
-    ).toBe(true);
+    expect(hull.isFlightReady([card(CardType.Hull), card(CardType.Hull), card(CardType.Equipment)])).toBe(
+      true
+    );
   });
 });

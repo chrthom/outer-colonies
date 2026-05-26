@@ -103,9 +103,7 @@ describe('CardStack.playHandCard', () => {
       jest.spyOn(source.card, 'durability', 'get').mockReturnValue(opts.durability);
     }
     if (opts.isAttachSelfManaging !== undefined) {
-      jest
-        .spyOn(source.card, 'isAttachSelfManaging', 'get')
-        .mockReturnValue(opts.isAttachSelfManaging);
+      jest.spyOn(source.card, 'isAttachSelfManaging', 'get').mockReturnValue(opts.isAttachSelfManaging);
     }
     const onEnterGameSpy = jest.spyOn(source.card, 'onEnterGame');
     const attachSpy = jest.spyOn(target, 'attach').mockImplementation(() => {});
