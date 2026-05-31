@@ -14,7 +14,7 @@ abstract class CardPowerPlant extends InfrastructureCard {
   }
 }
 
-abstract class NuclearReactorCard extends InfrastructureCard {
+abstract class CardNuclearReactor extends InfrastructureCard {
   constructor(id: number) {
     super(id, 'Atomreaktor', 0, {
       energy: 2,
@@ -23,7 +23,7 @@ abstract class NuclearReactorCard extends InfrastructureCard {
   }
 }
 
-abstract class SolarPanelCard extends InfrastructureCard {
+abstract class CardSolarPanel extends InfrastructureCard {
   constructor(id: number) {
     super(id, 'Solarpanele', 0, {
       energy: 1
@@ -70,13 +70,13 @@ export class Card185 extends CardPowerPlant {
   }
 }
 
-export class Card187 extends NuclearReactorCard {
+export class Card187 extends CardNuclearReactor {
   constructor() {
     super(187);
   }
 }
 
-export class Card188 extends SolarPanelCard {
+export class Card188 extends CardSolarPanel {
   constructor() {
     super(188);
   }
@@ -88,13 +88,13 @@ export class Card242 extends CardPowerPlant {
   }
 }
 
-export class Card244 extends NuclearReactorCard {
+export class Card244 extends CardNuclearReactor {
   constructor() {
     super(244);
   }
 }
 
-export class Card245 extends SolarPanelCard {
+export class Card245 extends CardSolarPanel {
   constructor() {
     super(245);
   }
@@ -106,25 +106,25 @@ export class Card350 extends CardPowerPlant {
   }
 }
 
-export class Card352 extends NuclearReactorCard {
+export class Card352 extends CardNuclearReactor {
   constructor() {
     super(352);
   }
 }
 
-export class Card353 extends SolarPanelCard {
+export class Card353 extends CardSolarPanel {
   constructor() {
     super(353);
   }
 }
 
-export class Card451 extends NuclearReactorCard {
+export class Card451 extends CardNuclearReactor {
   constructor() {
     super(451);
   }
 }
 
-export class Card452 extends SolarPanelCard {
+export class Card452 extends CardSolarPanel {
   constructor() {
     super(452);
   }
@@ -133,6 +133,24 @@ export class Card452 extends SolarPanelCard {
 export class Card453 extends CardPowerPlant {
   constructor() {
     super(453);
+  }
+}
+
+export class Card558 extends CardSolarPanel {
+  constructor() {
+    super(558);
+  }
+}
+
+export class Card560 extends CardPowerPlant {
+  constructor() {
+    super(560);
+  }
+}
+
+export class Card561 extends CardNuclearReactor {
+  constructor() {
+    super(561);
   }
 }
 
@@ -150,5 +168,8 @@ export const allCards = [
   new Card353(),
   new Card451(),
   new Card452(),
-  new Card453()
+  new Card453(),
+  new Card558(),
+  new Card560(),
+  new Card561()
 ];
