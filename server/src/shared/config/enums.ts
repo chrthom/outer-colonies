@@ -9,7 +9,8 @@ export enum BattleType {
 export enum CardDurability {
   Instant = 'instant',
   Permanent = 'permanent',
-  Turn = 'turn'
+  Turn = 'turn',
+  CombatPhase = 'combat_phase'
 }
 
 export enum CardType {

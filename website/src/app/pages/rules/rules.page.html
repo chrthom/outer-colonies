@@ -14,6 +14,7 @@
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
             <mat-list-option value="victory"><h4>Siegbedingungen</h4></mat-list-option>
             <mat-list-option value="glossar"><h4>Glossar</h4></mat-list-option>
+            <mat-list-option value="online-game"><h4>Online-Spiel</h4></mat-list-option>
             <h5>Karten</h5>
             <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
             <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
@@ -247,13 +248,53 @@
               </li>
               <li>
                 <b>Ersch&ouml;pfung</b>: Eine Spieler:in scheidet aus dem Spiel aus, wenn sie eine Karte
-                ziehen m&uuml;sste, aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.
+                ziehen m&uuml;sste (zu Rundenbeginn oder durch Karteneffekte), aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.
               </li>
               <li>
                 <b>Kapitulation</b>: Eine Spieler:in kann freiwillig kapitulieren, wodurch die andere
                 Spieler:in gewinnt.
               </li>
             </ul>
+          </div>
+          } @case ('online-game') {
+          <div>
+            <h2>Online-Spiel</h2>
+            <p>
+              Das Online-Spiel basiert auf den hier beschriebenen Regeln. Neben den klassischen Regeln
+              gibt es einige online-spezifische Funktionen:
+            </p>
+            <h4>Spiel-Währung: Sol</h4>
+            <p>
+              Im Online-Spiel erhältst du nach jedem Spiel <b>Sol</b> basierend auf deiner Leistung.
+              Sol wird für folgende Aktionen gutgeschrieben:
+            </p>
+            <ul>
+              <li>Karten im Ablagestapel: 1 Sol pro Karte</li>
+              <li>Zugefügter Schaden an der gegnerischen Kolonie: 2 Sol pro Schadenspunkt</li>
+              <li>Karten im Spiel (außer Kolonie): 2 Sol pro Karte</li>
+              <li>Siegbonus: 50 Sol (wenn nicht durch Kapitulation gewonnen und mindestens 9 Karten im Spiel/ablagestapel)</li>
+            </ul>
+            <p>
+              Sol kann verwendet werden, um Booster zu kaufen und damit deine Sammlung zu erweitern.
+            </p>
+            <h4>Spielzeitlimit</h4>
+            <p>
+              Im Online-Spiel beträgt die Bedingungszeit für einen Spielzug <b>90 Sekunden</b>.
+              Wird diese Zeit überschritten, wird der Spielzug automatisch beendet.
+            </p>
+            <h4>Spielmodi</h4>
+            <p>
+              Im Online-Spiel stehen folgende Spielmodi zur Verfügung:
+            </p>
+            <ul>
+              <li><b>Schnellspiel</b>: Ein Spiel gegen einen zufälligen Gegner mit vorgefertigten Decks.</li>
+              <li><b>Freundschaftsspiel</b>: Ein Spiel gegen einen eingeladenen Gegner mit selbst erstellten Decks.</li>
+            </ul>
+            <h4>Tägliche Belohnungen</h4>
+            <p>
+              Für verschiedene tägliche Aufgaben (z.B. Anmeldung, Sieg, Kontrolle über Schiffe, etc.)
+              erhältst du nach Abschluss eine Belohnung. Die täglichen Aufgaben wechseln täglich.
+            </p>
           </div>
           } @case ('glossar') {
           <div>
@@ -560,7 +601,7 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> ben&ouml;tigt, damit
               diese ausgespielt / angelegt werden d&uuml;rfen.
               <span class="oc-icon" [innerHTML]="getIconHtml('hull')"></span> stellen Sockel zur
-              Verf&uuml;gung. Die Kolonie bietet alle Sockel in unbegrenzter Menge.
+              Verf&uuml;gung. Die Kolonie bietet die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum) in unbegrenzter Menge.
             </p>
             <h4>Spielzug</h4>
             <p>
@@ -647,6 +688,36 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> und
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span>).<br />
               7. Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.<br />
+              <table class="rules-table">
+                <tr>
+                  <th>Indikatorfelder</th>
+                  <th>Seltenheit</th>
+                </tr>
+                <tr>
+                  <td>0</td>
+                  <td>Basis</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>Gewöhnlich</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Ungewöhnlich</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Selten</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Episch</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Legendär</td>
+                </tr>
+              </table>
               8. Der kursive Text in der Textbox gibt dir Einblicke in die Welt von <i>Outer Colonies</i>. Auf
               das Spiel hat dieser Text keinen Effekt.
             </p>
@@ -796,8 +867,8 @@
             <ul>
               <li>Verschiebe alle deine Schiffe von der neutralen Zone in deine orbitale Zone.</li>
               <li>
-                Ziehe zwei Karten. Hast du weniger als zwei Karten in deinem Deck, scheidest du sofort aus dem
-                Spiel aus.
+                Ziehe zwei Karten. Wann immer du eine Karte ziehen m&uuml;sst aber keine Karten mehr im Deck hast,
+                scheidest du sofort aus dem Spiel aus.
               </li>
               <li>
                 Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.
@@ -903,14 +974,15 @@
               orbitalen Zone befinden und deren
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> mindestens so hoch ist wie der
               niedrigste <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> in der Flotte, die
-              die Mission durchführt. Die abfangende Spieler:in verschiebt diese Schiffe ebenfalls in die
-              neutrale Zone.
+              die Mission durchführt. Die abfangende Spieler:in verschiebt <b>nur die gewählten Abfangschiffe</b> in die
+              neutrale Zone, während der missiondurchführende Spieler seine Schiffe in der orbitalen Zone belässt.
             </p>
             <p>
               Im Falle eines Überfalls muss die angegriffene Spieler:in kämpfen und wählt Schiffe aus ihrer
               orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> nehmen nicht an der
-              Verteidigung teil und werden in die neutrale Zone verschoben.
+              Verteidigung teil und werden in die neutrale Zone verschoben. In der letzten Gefechtsphase (Reichweite 1)
+              eines Überfalls können die Kolonie und Karten in der Koloniezone des Verteidigers angegriffen werden.
             </p>
           </div>
           } @case ('battle-overview') {
