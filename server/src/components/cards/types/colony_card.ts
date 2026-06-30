@@ -9,10 +9,7 @@ export default class ColonyCard extends Card {
   constructor() {
     super(0, 'Colony', CardType.Colony, 0, {
       hp: rules.colonyHP,
-      xi: 999,
-      phi: 999,
       omega: 999,
-      delta: 999,
       psi: 999,
       handCardLimit: rules.maxHandCards
     });
