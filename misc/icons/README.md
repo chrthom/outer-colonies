@@ -19,6 +19,7 @@ Icons are downloaded from the official Outer Colonies assets server:
 | `damage.png` | Damage | Effect field |
 | `control.png` | Control | Effect field |
 | `energy.png` | Energy | Effect field |
+| `speed.png` | Speed | Effect field |
 
 ## Type Icons (icons/)
 
