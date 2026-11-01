@@ -211,9 +211,11 @@ export class Card419 extends TacticCard {
     this.attackByTactic(player, target);
   }
   getValidTargets(player: Player): CardStack[] {
-    return this.getOpponentCardStacks(player).filter(
-      cs => cs.type == CardType.Hull && cs.profile.speed <= this.speedLimitation
-    );
+    return player.match.battle.range == 1
+      ? player.match.battle.ships[player.match.waitingPlayerNo].filter(
+          cs => cs.type == CardType.Hull && cs.profile.speed <= this.speedLimitation
+        )
+      : [];
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundEnd;
