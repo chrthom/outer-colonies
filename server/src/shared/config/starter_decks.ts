@@ -10,7 +10,7 @@ export const starterDecks: MultipleCards[][] = [
     [2, 134], // Kreuzer
     [2, 446], // Außenposten
     // Equipment (21 - 13/14 Theta, 2/4 Xi)
-    [3, 441], // Flechettewerfer
+    [3, 441], // Flechette-Werfer
     [3, 234], // Punktabwehrlaser
     [4, 237], // Fokus-Laser
     [3, 157], // Plasmawerfer
@@ -76,7 +76,7 @@ export const starterDecks: MultipleCards[][] = [
     [2, 446], // Außenposten
     // Equipment (22 - 10/13 Theta, 2/3 Xi, 5/7 Phi)
     [2, 340], // Abfangraketenwerfer
-    [3, 167], // Atombombentorpedos
+    [3, 167], // Nukleare Torpedos
     [2, 182], // Dual-Lasergeschütz
     [3, 440], // Impulskanone
     [3, 168], // Automatikkanone

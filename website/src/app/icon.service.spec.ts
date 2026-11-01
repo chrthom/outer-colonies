@@ -31,6 +31,11 @@ describe('IconService', () => {
       expect(service.getIcon('shield_3')).toBe(shield);
     });
 
+    it('should map speed to its dedicated glyph instead of the control fallback', () => {
+      expect(service.getIcon('speed')).toBe('');
+      expect(service.getIcon('speed')).not.toBe(service.getIcon('control'));
+    });
+
     it('should return null for an unknown icon name', () => {
       expect(service.getIcon('not-an-icon')).toBeNull();
     });
@@ -40,6 +45,7 @@ describe('IconService', () => {
     it('should return the uppercase hex HTML entity for a known icon', () => {
       expect(service.getIconHtml('hp')).toBe('&#xEA06;');
       expect(service.getIconHtml('damage')).toBe('&#xEA03;');
+      expect(service.getIconHtml('speed')).toBe('&#xEA0D;');
     });
 
     it('should return null for an unknown icon', () => {
@@ -76,6 +82,7 @@ describe('IconService', () => {
       expect(icons).toContain('armour_3');
       expect(icons).toContain('shield_3');
       expect(icons).toContain('tactic');
+      expect(icons).toContain('speed');
     });
   });
 });

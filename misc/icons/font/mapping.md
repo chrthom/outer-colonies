@@ -11,7 +11,7 @@ This document maps icon names to their corresponding Unicode Private Use Area (P
 
 ## Icon to Character Mapping
 
-The `svgicons2svgfont` tool automatically assigns PUA codepoints starting from `U+E000` in alphabetical order of the input filenames.
+The `generate_font.js` script assigns PUA codepoints starting from `U+EA01` in the order of its `GLYPHS` list (see below). New glyphs must only ever be appended to the end of that list so that the codepoints of already published glyphs remain stable.
 
 | Icon Name | Filename | Unicode Codepoint | HTML Entity | CSS Class Suggestion |
 |-----------|----------|-------------------|-------------|---------------------|
@@ -27,6 +27,7 @@ The `svgicons2svgfont` tool automatically assigns PUA codepoints starting from `
 | point_defense | point_defense_1.svg | U+EA0A | `&#xEA0A;` | `.oc-icon-point-defense` |
 | shield | shield_1.svg | U+EA0B | `&#xEA0B;` | `.oc-icon-shield` |
 | tactic | tactic.svg | U+EA0C | `&#xEA0C;` | `.oc-icon-tactic` |
+| speed | speed.svg | U+EA0D | `&#xEA0D;` | `.oc-icon-speed` |
 
 ## Usage Examples
 
@@ -34,7 +35,7 @@ The `svgicons2svgfont` tool automatically assigns PUA codepoints starting from `
 
 ```html
 <!-- Direct character usage -->
-<span class="oc-icon">&#xE005;</span>  <!-- HP icon -->
+<span class="oc-icon">&#xEA06;</span>  <!-- HP icon -->
 
 <!-- With CSS class -->
 <span class="oc-icon oc-icon-hp"></span>
@@ -58,7 +59,7 @@ The `svgicons2svgfont` tool automatically assigns PUA codepoints starting from `
 ## Source Icons
 
 All source PNG icons are in the parent `misc/icons/` directory:
-- Stat icons: `hp.png`, `armour_1.png`, `shield_1.png`, `point_defense_1.png`, `damage.png`, `control.png`, `energy.png`
+- Stat icons: `hp.png`, `armour_1.png`, `shield_1.png`, `point_defense_1.png`, `damage.png`, `control.png`, `energy.png`, `speed.png`
 - Type icons: `hull.png`, `infrastructure.png`, `equipment.png`, `orb.png`, `tactic.png`
 
 ## Regenerating the Font
@@ -72,19 +73,31 @@ cd misc/icons
 # Step 1: Convert PNGs to SVGs (only include white/bright pixels)
 python3 png_to_svg_fixed.py . 150
 
-# Step 2: Generate all font formats using webfont
-npx webfont "*.svg" --dest font/ --fontName "outer-colonies-icons" \
-  --types ttf,woff,woff2,svg --fontHeight 1000 --descent 100 --normalize
+# Step 2: Install the font tooling (one-time, node_modules is not committed)
+npm install
 
-# Step 3: Clean up unnecessary files
-rm -f font/outer-colonies-icons.eot font/outer-colonies-icons.svg font/webfont.hash
+# Step 3: Generate all font formats and verify the codepoint mapping
+npm run build
 ```
+
+`generate_font.js` writes `outer-colonies-icons.ttf/.woff/.woff2` into `font/` and fails if the assigned codepoints do not match its `GLYPHS` list. When adding a new icon, append it to that list and to the table above.
+
+Afterwards, copy the generated font files to the website and update the glyph comments in both stylesheets:
+
+```bash
+cp font/outer-colonies-icons.{ttf,woff,woff2} ../../website/src/assets/fonts/
+```
+
+- `font/outer-colonies-icons.css` (comment mapping in this directory)
+- `website/src/style/outer-colonies-icons.css` (same comment mapping, website-relative font URLs)
 
 ## Notes
 
 - The icons are rendered at 50x50 pixels in the source SVGs
+- `speed.png` is the 25x25 assets server icon (`attribute/speed.png`) upscaled 2x to the common 50x50 source size (pixel art, nearest neighbor)
 - Font height is set to 1000 units with 100 units descent for proper scaling
 - All icons use white (`#ffffff`) as their fill color
-- The font uses the Unicode Private Use Area (U+EA01 to U+EA0C) to avoid conflicts
+- The font uses the Unicode Private Use Area (U+EA01 to U+EA0D) to avoid conflicts
 - SVG generation uses brightness threshold of 150 to filter out black/dark grey background pixels
 - See `png_to_svg_fixed.py` for the PNG to SVG conversion logic
+- The font also contains an OpenType `liga` feature that maps each icon name (e.g. `speed`) to its glyph
