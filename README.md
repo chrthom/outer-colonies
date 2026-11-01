@@ -6,10 +6,13 @@
 2. [Software Architecture](#software-architecture)
    - [High-Level Overview](#high-level-overview)
    - [Component Breakdown](#component-breakdown)
+   - [Server Game State and Matchmaking](#server-game-state-and-matchmaking)
+   - [Database Schema](#database-schema)
    - [Data Flow and Communication](#data-flow-and-communication)
 3. [Developer Documentation](#developer-documentation)
    - [Setup and Installation](#setup-and-installation)
    - [Development Workflow](#development-workflow)
+   - [AI Agent Development Loop](#ai-agent-development-loop)
    - [Testing and Deployment](#testing-and-deployment)
 4. [Technologies and Frameworks](#technologies-and-frameworks)
 
@@ -138,6 +141,13 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/rest_api.ts`: REST API endpoints for the website
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
+  - `components/game_state/`: In-memory game state
+    - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
+    - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
+    - `battle.ts`: Battle state, mission and raid resolution
+    - `intervention.ts`: Intervention mechanic (turn start, battle rounds, attacks, tactic cards)
+    - `game_result.ts`: Win conditions, Sol earnings and daily achievements
+    - `socket_data.ts`: Per-socket user and deck data
   - `components/cards/`: Card-related logic and data
     - `action_pool.ts`: Action pool logic
     - `action_pool.test.ts`: Action pool tests
@@ -219,6 +229,35 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeInbound.Discard`: Discard a card
   - `MsgTypeInbound.Attack`: Attack with a card
   - `MsgTypeOutbound.Matchmaking`: Matchmaking updates
+
+### Server Game State and Matchmaking
+
+Game state is kept in memory only; matches are not persisted to the database. Core classes:
+
+- **`Match`** (`server/src/components/game_state/match.ts`): Central state of a running match. Holds both players, the active and pending-action player, the current turn phase (`Init` → `Start` → `Build` → `Combat` → `End`), the `Battle` object, countdown timer, control points and the `GameResult`. Drives the turn lifecycle (`prepareStartPhase` → `prepareBuildPhase` → `prepareCombatPhase` → `prepareEndPhase`).
+- **`Player`** (`player.ts`): Deck, hand, discard pile and in-play card stacks (the colony is a root card stack). Manages drawing, discarding, zones (`Hand`, `Colony`, `Orbital`, `Neutral`) and control gains.
+- **`Battle`** (`battle.ts`): Created from a client-planned battle; resolves battle rounds from max range down to 1. Mission results grant cards and control; raids pull colony cards into the battle at range 1.
+- **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
+- **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
+
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+
+**Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
+
+### Database Schema
+
+Persistence uses MariaDB (schema definition: `misc/outercolonies.sql`):
+
+| Table | Purpose | Key Columns |
+| --- | --- | --- |
+| `credentials` | User accounts and sessions | `user_id` (PK, auto-increment), `username`, `password`, `email`, `created`, `last_login`, `session_token`, `session_valid_until`, `activated` |
+| `dailies` | Daily achievement progress per user (one date column per daily type) | `user_id` (PK), `login`, `victory`, `game`, `energy`, `ships`, `domination`, `destruction`, `control`, `juggernaut`, `stations`, `discard`, `colony`, `colossus` |
+| `decks` | Card instances owned by a user | `card_instance_id` (PK, auto-increment), `card_id`, `user_id`, `in_use` (card is in the active deck), `tradeable` |
+| `items` | Items, e.g. unopened booster packs | `item_id` (PK, auto-increment), `user_id`, `type`, `message`, `content` (JSON) |
+| `magic_links` | One-time links (account activation, password/email change) | `id` (PK, UUID), `user_id`, `type`, `value`, `valid_until` |
+| `profiles` | User profile and currency | `user_id` (PK), `newsletter`, `sol` |
+
+`dailies`, `decks`, `items`, `magic_links` and `profiles` reference `credentials.user_id` via foreign keys with `ON DELETE CASCADE ON UPDATE CASCADE`.
 
 ## Developer Documentation
 
@@ -398,6 +437,16 @@ cd ..
    ```bash
    npm run version
    ```
+
+### AI Agent Development Loop
+
+The repository contains an event-driven agent workflow on GitHub Actions for unattended issue implementation, PR review and review fixes. The three roles — **implementer**, **reviewer** and **fixer** — run a headless coding agent (Mistral GLM via OpenCode) on the workflow runner:
+
+- **Trigger**: `dev-loop` label on an issue (implementer opens a ready PR), review comments on agent PRs (reviewer), or failing checks (fixer)
+- **Escalation**: the loop stops and labels the issue/PR `needs-human` when an agent cannot proceed (budgets for time, steps and tokens are capped)
+- **Automation**: GitHub is the source of truth — the chain is driven by the GitHub events each role fires, with a manual `workflow_dispatch` backstop for retries
+
+The full design, budgets and the role chain are documented in [docs/dev-loop.md](docs/dev-loop.md). Contribution guidance for AI agents (project context, conventional commits, skills) is in [AGENTS.md](AGENTS.md).
 
 ## Technologies and Frameworks
 
