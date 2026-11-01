@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -26,6 +27,14 @@ describe('RulesPage', () => {
   it('should have default active chapter', () => {
     const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
     expect(selectedValue).toBe('setup');
+  });
+
+  it('should register every sidebar chapter in the chapters array', () => {
+    const optionValues = fixture.debugElement
+      .queryAll(By.css('mat-list-option'))
+      .map(option => option.nativeElement.getAttribute('value'));
+    expect(optionValues.length).toBeGreaterThan(0);
+    optionValues.forEach(value => expect(component.chapters).toContain(value));
   });
 
   it('should generate correct image URL', () => {
