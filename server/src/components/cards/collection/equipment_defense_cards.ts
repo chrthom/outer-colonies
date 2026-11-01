@@ -61,7 +61,7 @@ export class Card170 extends ShieldDefenseCard {
 
 export class Card171 extends EquipmentCard {
   constructor() {
-    super(171, 'Titanplattenplanzer', 1, {
+    super(171, 'Titanplattenpanzer', 1, {
       armour: 2,
       hp: -1,
       omega: -1

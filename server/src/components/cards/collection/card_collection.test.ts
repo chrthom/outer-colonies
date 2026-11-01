@@ -16,6 +16,11 @@ test('no two registered cards should share the same id', () => {
   expect(new Set(ids).size).toBe(ids.length);
 });
 
+test('card names should match the names defined in misc/cards.csv (see issue #776)', () => {
+  expect(CardCollection.cards[104].name).toBe('Reparaturnaniten');
+  expect(CardCollection.cards[171].name).toBe('Titanplattenpanzer');
+});
+
 const equipmentCards = allCards.filter(c => c.type == CardType.Equipment);
 const infrastructureCards = allCards.filter(c => c.type == CardType.Infrastructure);
 const weaponCards = equipmentCards.map(c => <EquipmentCard>c).filter(c => c.canAttack);
