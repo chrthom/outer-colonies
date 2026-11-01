@@ -152,3 +152,5 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 442 | tags | Halbarkeit | Haltbarkeit | Typo fix |
 | 443 | tags | Intervention (Taktik - Information, Wissenschaft) | Intervention ({ICON:tactic} Information, {ICON:tactic} Wissenschaft) | Added tactic icon placeholders for disciplines |
 | 452 | effect | unversiegbaren | unerschöpflichen | Wrong word - "unversiegbaren" (unsealable) → "unerschöpflichen" (inexhaustible) |
+| 216 | tags |  | Einmalige Verwendung | Single-use printed as effect text on the card; tag keyword missed by XCF extraction |
+| 304 | tags |  | Einmalige Verwendung | Single-use printed as effect text on the card; tag keyword missed by XCF extraction |
