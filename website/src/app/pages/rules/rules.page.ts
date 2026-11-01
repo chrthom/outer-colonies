@@ -22,6 +22,7 @@ export class RulesPage implements OnInit {
     'symbols',
     'victory',
     'glossar',
+    'online-game',
     'cards',
     'hull-cards',
     'equipment-cards',
