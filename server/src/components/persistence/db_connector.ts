@@ -1,9 +1,9 @@
-import mariadb, { SqlError } from 'mariadb';
+import mariadb, { SqlError, Pool, PoolConnection } from 'mariadb';
 import config from 'config';
 
 export default class DBConnection {
   private static con: DBConnection;
-  pool: mariadb.Pool;
+  pool: Pool;
   private constructor() {
     this.pool = mariadb.createPool({
       host: config.get('database.host'),
@@ -15,7 +15,7 @@ export default class DBConnection {
     });
   }
   async query(query: string, params: any[], noRetry?: boolean): Promise<any> {
-    let conn: mariadb.PoolConnection | undefined;
+    let conn: PoolConnection | undefined;
     try {
       conn = await this.pool.getConnection();
       return conn.prepare(query).then(q => q.execute(params));
