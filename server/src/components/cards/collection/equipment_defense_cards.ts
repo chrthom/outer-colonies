@@ -1,3 +1,4 @@
+import { RechargeRate } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_card';
@@ -24,8 +25,8 @@ export class Card115 extends EquipmentCard {
       omega: -1
     });
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -99,8 +100,8 @@ export class Card312 extends EquipmentCardRechargeable {
   override getValidTargets(player: Player): CardStack[] {
     return super.getValidTargets(player).filter(cs => cs.profile.shield == 0);
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -161,3 +162,32 @@ export class Card447 extends ShieldDefenseCard {
     });
   }
 }
+
+export class Card522 extends ShieldDefenseCard {
+  constructor() {
+    super(522, 'Heckdeflektor', 2, {
+      energy: -1,
+      shield: 2,
+      delta: -1,
+      omega: -1
+    });
+  }
+}
+
+export const allCards = [
+  new Card103(),
+  new Card115(),
+  new Card140(),
+  new Card163(),
+  new Card170(),
+  new Card171(),
+  new Card184(),
+  new Card240(),
+  new Card312(),
+  new Card341(),
+  new Card349(),
+  new Card406(),
+  new Card426(),
+  new Card447(),
+  new Card522()
+];

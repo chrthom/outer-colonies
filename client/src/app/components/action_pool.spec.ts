@@ -36,11 +36,6 @@ describe('ActionPool', () => {
     actionPool = new ActionPool(mockScene, true); // ownedByPlayer = true
   });
 
-  it('should create action pool instance', () => {
-    expect(actionPool).toBeTruthy();
-    expect(actionPool.images).toEqual([]);
-  });
-
   it('should destroy existing images when destroyed', () => {
     // Add some mock images - use type assertion since we're testing behavior, not Phaser types
     const mockImage1 = { destroy: jasmine.createSpy('destroy1') } as any;

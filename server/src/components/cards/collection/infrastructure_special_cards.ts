@@ -18,14 +18,13 @@ export class Card305 extends InfrastructureCard {
       psi: -2
     });
   }
-  onEnterGame() {}
-  onLeaveGame() {}
-  onStartTurn(player: Player) {
+  override onStartTurn(player: Player) {
     const relevantCardDrawn = this.getDrawnCards(player).some(c => c.type == CardType.Orb);
     if (relevantCardDrawn) {
       player.drawCards(this.multiplicatorFactor);
       player.actionPool.push(...this.multiplicatorActionPool.pool);
     }
   }
-  onEndTurn() {}
 }
+
+export const allCards = [new Card305()];

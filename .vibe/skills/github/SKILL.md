@@ -10,12 +10,12 @@ user-invocable: false
 
 Load all utility scripts:
 ```bash
-source .vibe/skills/github/scripts/config.sh
-source .vibe/skills/github/scripts/api.sh
-source .vibe/skills/github/scripts/branch.sh
-source .vibe/skills/github/scripts/quality.sh
-source .vibe/skills/github/scripts/issue.sh
-source .vibe/skills/github/scripts/pr.sh
+source "$SKILL_DIR/scripts/config.sh"
+source "$SKILL_DIR/scripts/api.sh"
+source "$SKILL_DIR/scripts/branch.sh"
+source "$SKILL_DIR/scripts/quality.sh"
+source "$SKILL_DIR/scripts/issue.sh"
+source "$SKILL_DIR/scripts/pr.sh"
 
 # Validate token
 validate_github_token

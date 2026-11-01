@@ -38,8 +38,11 @@ export default class AuthService {
 
   logout() {
     if (this.sessionToken) {
-      this.authAPIService.logout(this.sessionToken).subscribe(() => {
-        /* Do nothing */
+      this.authAPIService.logout().subscribe({
+        next: () => {
+          /* Do nothing */
+        },
+        error: err => console.error('Logout API call failed', err)
       });
     }
     this.username = undefined;
@@ -56,7 +59,7 @@ export default class AuthService {
         password: password
       });
     } else if (this.sessionToken) {
-      res = this.authAPIService.checkSessionToken(this.sessionToken);
+      res = this.authAPIService.checkSessionToken();
     } else if (this.cookieService.get('u')) {
       res = this.authAPIService.login({
         username: this.cookieService.get('u'),

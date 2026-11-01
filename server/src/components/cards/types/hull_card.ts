@@ -51,3 +51,13 @@ export interface HullMultipart {
   neededPartIds: number[];
   duplicatesAllowed: boolean;
 }
+
+export function toHullMultipart(
+  numberOfRequiredParts: number,
+  duplicatesAllowed: boolean,
+  ...neededPartIds: number[]
+): HullMultipart {
+  return { numberOfRequiredParts, neededPartIds, duplicatesAllowed };
+}
+
+export const noMultipart: HullMultipart = toHullMultipart(1, false);

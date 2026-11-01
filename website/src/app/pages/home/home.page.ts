@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
@@ -14,7 +14,7 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
   styleUrls: ['./home.page.scss'],
   imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   authService = inject(AuthService);
   private dailyApiService = inject(DailyApiService);
 
@@ -27,25 +27,35 @@ export class HomePage implements OnInit {
     this.startAutoAdvance();
   }
 
+  ngOnDestroy() {
+    if (this.autoAdvanceInterval) {
+      clearInterval(this.autoAdvanceInterval);
+      this.autoAdvanceInterval = undefined;
+    }
+  }
+
   reload() {
-    this.dailyApiService.dailies.subscribe(res => {
-      const availableDailyKeys = this.getAvailableDailyKeys(res);
+    this.dailyApiService.dailies.subscribe({
+      next: res => {
+        const availableDailyKeys = this.getAvailableDailyKeys(res);
 
-      // Filter dailies to only show those that are available today
-      this.dailies = this.dailies
-        .map(daily => {
-          const achieved = daily.matcher(res);
-          return { ...daily, achieved };
-        })
-        .filter(daily => {
-          // Extract the daily key from the matcherStr property
-          const matcherStr = daily.matcherStr || daily.matcher.toString();
-          const match = matcherStr.match(/r\.(\w+)/);
-          const dailyKey = match ? match[1] : null;
+        // Filter dailies to only show those that are available today
+        this.dailies = this.dailies
+          .map(daily => {
+            const achieved = daily.matcher(res);
+            return { ...daily, achieved };
+          })
+          .filter(daily => {
+            // Extract the daily key from the matcherStr property
+            const matcherStr = daily.matcherStr || daily.matcher.toString();
+            const match = matcherStr.match(/r\.(\w+)/);
+            const dailyKey = match ? match[1] : null;
 
-          // Show daily if it's available today (not null)
-          return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
-        });
+            // Show daily if it's available today (not null)
+            return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
+          });
+      },
+      error: err => console.error('Failed to load dailies', err)
     });
   }
 

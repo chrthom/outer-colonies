@@ -45,7 +45,10 @@ export class ProfilePage implements OnInit {
 
   newsletterSubscription!: boolean;
   passwordResetSuccessful = false;
+  passwordResetFailed = false;
   emailResetSuccessful = false;
+  emailResetFailed = false;
+  newsletterUpdateFailed = false;
   emailForm: FormGroup = new FormGroup({
     email: new FormControl(
       '',
@@ -58,7 +61,10 @@ export class ProfilePage implements OnInit {
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   ngOnInit(): void {
-    this.profileAPIService.profile.subscribe(profile => (this.newsletterSubscription = profile.newsletter));
+    this.profileAPIService.profile.subscribe({
+      next: profile => (this.newsletterSubscription = profile.newsletter),
+      error: err => console.error('Failed to load profile', err)
+    });
   }
   get email(): AbstractControl | null {
     return this.emailForm.get('email');
@@ -72,22 +78,30 @@ export class ProfilePage implements OnInit {
   changeEmail() {
     this.emailForm.markAllAsTouched();
     if (this.emailForm.valid) {
-      this.authAPIService
-        .resetEmail(this.authService.token, this.emailForm.value.email)
-        .subscribe(() => (this.emailResetSuccessful = true));
+      this.emailResetFailed = false;
+      this.authAPIService.resetEmail(this.emailForm.value.email).subscribe({
+        next: () => (this.emailResetSuccessful = true),
+        error: () => (this.emailResetFailed = true)
+      });
     }
   }
   changePassword() {
     this.passwordForm.markAllAsTouched();
     if (this.passwordForm.valid) {
-      this.authAPIService
-        .resetPassword(this.authService.token, this.passwordForm.value.password)
-        .subscribe(() => (this.passwordResetSuccessful = true));
+      this.passwordResetFailed = false;
+      this.authAPIService.resetPassword(this.passwordForm.value.password).subscribe({
+        next: () => (this.passwordResetSuccessful = true),
+        error: () => (this.passwordResetFailed = true)
+      });
     }
   }
   changeNewsletter() {
-    this.profileAPIService.setNewsletter(this.newsletterSubscription).subscribe(() => {
-      /* Do nothing */
+    this.newsletterUpdateFailed = false;
+    this.profileAPIService.setNewsletter(this.newsletterSubscription).subscribe({
+      next: () => {
+        /* Do nothing */
+      },
+      error: () => (this.newsletterUpdateFailed = true)
     });
   }
   private get emailExistsValidator(): AsyncValidatorFn {

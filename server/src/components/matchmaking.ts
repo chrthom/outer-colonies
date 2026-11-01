@@ -5,23 +5,31 @@ import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
 import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
+import DBDecksDAO from './persistence/db_decks';
+import CardCollection from './cards/collection/card_collection';
 
 export const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
 
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
-  socket.on(MsgTypeInbound.Login, (sessionToken: string) => {
-    if (sessionToken) {
-      DBCredentialsDAO.getBySessionToken(sessionToken).then(user => {
-        if (user) {
-          console.log(`Player logged in: ${user.username}`);
-          socket.data = new SocketData(user);
-          socket.join(matchmakingRoom);
-          socket.emit(MsgTypeOutbound.Matchmaking, 'search', clientsInMatchMaking(io).size - 1);
-        } else {
-          console.log(`WARN: Invalid session token ${sessionToken} provided`);
-        }
-      });
+  socket.on(MsgTypeInbound.Login, async (sessionToken: string) => {
+    if (!sessionToken) return;
+    try {
+      const user = await DBCredentialsDAO.getBySessionToken(sessionToken);
+      if (!user) {
+        console.log(`WARN: Invalid session token ${sessionToken} provided`);
+        return;
+      }
+      const deckCards = await DBDecksDAO.getByUserId(user.userId);
+      const activeDeck = deckCards
+        .filter(c => c.inUse)
+        .map(c => CardCollection.cards[c.cardId as keyof typeof CardCollection.cards]);
+      console.log(`Player logged in: ${user.username}`);
+      socket.data = new SocketData(user, activeDeck);
+      socket.join(matchmakingRoom);
+      socket.emit(MsgTypeOutbound.Matchmaking, 'search', clientsInMatchMaking(io).size - 1);
+    } catch (err) {
+      console.log(`ERROR: Login failed for session token ${sessionToken}: ${err}`);
     }
   });
 }

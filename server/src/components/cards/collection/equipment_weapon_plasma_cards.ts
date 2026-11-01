@@ -122,3 +122,12 @@ export class Card409 extends EquipmentCardRechargeable {
     );
   }
 }
+
+export const allCards = [
+  new Card118(),
+  new Card125(),
+  new Card157(),
+  new Card209(),
+  new Card303(),
+  new Card409()
+];

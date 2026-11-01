@@ -2,7 +2,7 @@ import Card, { AttackResult, CardRarity } from '../card';
 import { CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 import { AttackProfile } from '../card_profile';
-import { CardType } from '../../../shared/config/enums';
+import { CardType, RechargeRate } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import TacticCard from './tactic_card';
 
@@ -44,14 +44,16 @@ export default abstract class EquipmentCard extends Card {
     if (target.isFlightReady && attackingShip.profile.speed + match.battle.range < target.profile.speed) {
       damage = Math.round(damage / 2);
     }
+    const defendingShips = match.battle.ships[match.waitingPlayerNo];
     const attackResult = this.attackStep(
       target,
       this.attackProfile,
-      match.battle.ships[match.waitingPlayerNo],
+      defendingShips,
       new AttackResult(damage)
     );
     attackResult.damage = this.attackDamageAfterReductions(target, attackResult.damage);
     target.damage += attackResult.damage;
+    this.rechargePerAttackDefenders(defendingShips);
     return attackResult;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,13 +72,13 @@ export abstract class EquipmentCardColonyKiller extends EquipmentCard {
 }
 
 export abstract class EquipmentCardColonyKillerRechargeable extends EquipmentCardColonyKiller {
-  override get isRechargeable(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerRound;
   }
 }
 
 export abstract class EquipmentCardRechargeable extends EquipmentCard {
-  override get isRechargeable(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerRound;
   }
 }

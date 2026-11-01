@@ -28,10 +28,19 @@ export default class Matchmaking extends Phaser.Scene {
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
     new ExitButton(this);
-    this.socket = io(environment.urls.api);
+    this.socket = io(environment.urls.api, { reconnectionAttempts: 5 });
     this.socket.on(MsgTypeOutbound.Connect, () => {
       this.status.setText('Authentifiziere Nutzer...');
       this.socket.emit(MsgTypeInbound.Login, this.sessionToken);
+    });
+    this.socket.on('disconnect', () => {
+      this.status.setText('Verbindung verloren. Versuche erneut...');
+    });
+    this.socket.on('connect_error', () => {
+      this.status.setText('Verbindung verloren. Versuche erneut...');
+    });
+    this.socket.io.on('reconnect_failed', () => {
+      this.status.setText('Verbindung fehlgeschlagen. Bitte Seite neu laden.');
     });
     this.socket.on(MsgTypeOutbound.Matchmaking, (status, params) => {
       switch (status) {
@@ -41,6 +50,9 @@ export default class Matchmaking extends Phaser.Scene {
         case 'start':
           this.socket.off(MsgTypeOutbound.Connect);
           this.socket.off(MsgTypeOutbound.Matchmaking);
+          this.socket.off('disconnect');
+          this.socket.off('connect_error');
+          this.socket.io.off('reconnect_failed');
           this.scene.start('Game', {
             socket: this.socket,
             gameParams: params

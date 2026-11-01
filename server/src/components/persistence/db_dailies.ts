@@ -48,23 +48,22 @@ export default class DBDailiesDAO {
   }
 
   // Generic achieve method that works for any daily type
-  static async achieve(userId: number, dailyType: DailyType) {
+  static async achieve(userId: number, dailyType: DailyType): Promise<void> {
     const dailyDef = DAILY_DEFINITIONS.find(d => d.type === dailyType);
 
     // Early return if daily definition not found or not available today
     if (!dailyDef || !isDailyOfDay(dailyType)) return;
 
-    await this.getBy(
+    const rows = await this.getBy(
       `user_id = ? AND (${dailyDef.dbColumn} < current_date() OR ${dailyDef.dbColumn} IS NULL)`,
       [userId]
-    ).then(b => {
-      if (b.length) {
-        DBConnection.instance.query(
-          `UPDATE dailies SET ${dailyDef.dbColumn} = current_date() WHERE user_id = ?`,
-          [userId]
-        );
-        DBProfilesDAO.increaseSol(userId, dailyDef.solReward);
-      }
-    });
+    );
+    if (rows.length) {
+      await DBConnection.instance.query(
+        `UPDATE dailies SET ${dailyDef.dbColumn} = current_date() WHERE user_id = ?`,
+        [userId]
+      );
+      await DBProfilesDAO.increaseSol(userId, dailyDef.solReward);
+    }
   }
 }

@@ -1,16 +1,8 @@
-import HullCard from '../types/hull_card';
-import { HullMultipart } from '../types/hull_card';
+import HullCard, { toHullMultipart } from '../types/hull_card';
 
-function toMultipart(numberOfRequiredParts: number, ...neededpartIds: number[]): HullMultipart {
-  return {
-    numberOfRequiredParts: numberOfRequiredParts,
-    neededPartIds: neededpartIds,
-    duplicatesAllowed: true
-  };
-}
-
-const spaceStation = toMultipart(2, 111, 158, 227);
-const starFortress = toMultipart(3, 102, 113, 128, 311);
+const spaceStation = toHullMultipart(2, true, 111, 158, 227);
+const starFortress = toHullMultipart(3, true, 102, 113, 128, 311);
+const orbitalOutpost = toHullMultipart(1, true);
 
 export class Card102 extends HullCard {
   constructor() {
@@ -48,7 +40,7 @@ export class Card113 extends HullCard {
 
 export class Card119 extends HullCard {
   constructor() {
-    super(119, 'Orbitaler Außenposten', 3, toMultipart(1), {
+    super(119, 'Orbitaler Außenposten', 3, orbitalOutpost, {
       hp: 11,
       theta: 1,
       xi: 2,
@@ -70,7 +62,7 @@ export class Card128 extends HullCard {
 
 export class Card152 extends HullCard {
   constructor() {
-    super(152, 'Orbitaler Außenposten', 2, toMultipart(1), {
+    super(152, 'Orbitaler Außenposten', 2, orbitalOutpost, {
       hp: 10,
       theta: 1,
       phi: 1,
@@ -82,7 +74,7 @@ export class Card152 extends HullCard {
 
 export class Card153 extends HullCard {
   constructor() {
-    super(153, 'Orbitaler Außenposten', 2, toMultipart(1), {
+    super(153, 'Orbitaler Außenposten', 2, orbitalOutpost, {
       hp: 10,
       theta: 1,
       xi: 1,
@@ -117,7 +109,7 @@ export class Card227 extends HullCard {
 
 export class Card228 extends HullCard {
   constructor() {
-    super(228, 'Orbitaler Außenposten', 2, toMultipart(1), {
+    super(228, 'Orbitaler Außenposten', 2, orbitalOutpost, {
       hp: 10,
       theta: 1,
       omega: 2,
@@ -140,7 +132,7 @@ export class Card311 extends HullCard {
 
 export class Card446 extends HullCard {
   constructor() {
-    super(446, 'Orbitaler Außenposten', 1, toMultipart(1), {
+    super(446, 'Orbitaler Außenposten', 1, orbitalOutpost, {
       hp: 9,
       theta: 2,
       omega: 2,
@@ -148,3 +140,18 @@ export class Card446 extends HullCard {
     });
   }
 }
+
+export const allCards = [
+  new Card102(),
+  new Card111(),
+  new Card113(),
+  new Card119(),
+  new Card128(),
+  new Card152(),
+  new Card153(),
+  new Card158(),
+  new Card227(),
+  new Card228(),
+  new Card311(),
+  new Card446()
+];

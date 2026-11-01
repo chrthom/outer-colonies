@@ -7,22 +7,25 @@ import {
 } from '../../../shared/config/enums';
 import { InterventionAttack, InterventionTacticCard } from '../../game_state/intervention';
 import Player from '../../game_state/player';
-import { opponentPlayerNo, spliceFrom } from '../../utils/helpers';
+import { opponentPlayerNo, spliceCardById, spliceFrom } from '../../utils/helpers';
 import Card, { AttackResult, CardRarity } from '../card';
 import { AttackProfile, CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
 
 export default abstract class TacticCard extends Card {
   readonly attackProfile?: AttackProfile;
+  readonly discipline: TacticDiscipline;
   constructor(
     id: number,
     name: string,
     rarity: CardRarity,
+    discipline: TacticDiscipline,
     profile?: CardProfileConfig,
     attackProfile?: AttackProfile
   ) {
     super(id, name, CardType.Tactic, rarity, profile);
     this.attackProfile = attackProfile;
+    this.discipline = discipline;
   }
   onLeaveGame() {}
   onStartTurn() {}
@@ -36,9 +39,17 @@ export default abstract class TacticCard extends Card {
   override get durability(): CardDurability {
     return CardDurability.Instant;
   }
-  abstract get discipline(): TacticDiscipline;
   protected onlyColonyTarget(playersCardStacks: CardStack[]): CardStack[] {
     return playersCardStacks.filter(cs => cs.card.type == CardType.Colony);
+  }
+  protected onlyOpponentColonyTarget(player: Player): CardStack[] {
+    return this.onlyColonyTarget(this.getOpponentPlayer(player).cardStacks);
+  }
+  protected onlyOpponentHullTarget(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks.filter(cs => cs.card.type == CardType.Hull);
+  }
+  protected getOpponentCardStacks(player: Player): CardStack[] {
+    return this.getOpponentPlayer(player).cardStacks;
   }
   protected getOpponentPlayer(player: Player): Player {
     return player.match.players[opponentPlayerNo(player.no)];
@@ -78,6 +89,41 @@ export default abstract class TacticCard extends Card {
     }
     return [];
   }
+  protected tributeCardFromPile(
+    optionalParameters: number[] | undefined,
+    pile: Card[],
+    action: (card: Card) => void
+  ) {
+    const cardId = optionalParameters?.[0];
+    if (cardId === undefined) return;
+    const card = spliceCardById(pile, cardId);
+    if (card) action(card);
+    else this.warnTributeNotFound();
+  }
+  protected tributeHandCard(
+    player: Player,
+    optionalParameters: number[] | undefined,
+    action: (uuid: string) => void
+  ) {
+    const cardId = optionalParameters?.[0];
+    if (cardId === undefined) return;
+    const handCardUUID = player.hand.find(cs => cs.card.id == cardId)?.uuid;
+    if (handCardUUID) action(handCardUUID);
+    else this.warnTributeNotFound();
+  }
+  protected tributeMultipleFromPile(
+    optionalParameters: number[] | undefined,
+    pile: Card[],
+    action: (card: Card) => void
+  ) {
+    optionalParameters?.forEach(cardId => {
+      const card = spliceCardById(pile, cardId);
+      if (card) action(card);
+    });
+  }
+  private warnTributeNotFound() {
+    console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+  }
   protected drawSpecificCards(
     player: Player,
     matchFunction: (card: Card, player: Player) => boolean,
@@ -89,12 +135,38 @@ export default abstract class TacticCard extends Card {
     }
     player.shuffleDeck();
   }
+  protected togglePointDefense(targets: CardStack[], count: number, newState: boolean) {
+    let remaining = count;
+    while (remaining > 0) {
+      const pd2 = this.findPointDefense(targets, 2, !newState);
+      const pd1 = this.findPointDefense(targets, 1, !newState);
+      if (remaining >= 2 && pd2) {
+        pd2.defenseAvailable = newState;
+        remaining -= 2;
+      } else if (pd1) {
+        pd1.defenseAvailable = newState;
+        remaining -= 1;
+      } else {
+        break;
+      }
+    }
+  }
+  private findPointDefense(
+    targets: CardStack[],
+    level: number,
+    currentlyAvailable: boolean
+  ): CardStack | undefined {
+    return targets
+      .flatMap(cs => cs.cardStacks)
+      .find(cs => cs.defenseAvailable == currentlyAvailable && cs.card.profile.pointDefense == level);
+  }
   protected attackByTactic(player: Player, target: CardStack) {
     if (this.attackProfile) {
+      const defendingShips = target.player.cardStacks.filter(cs => cs.zone != Zone.Neutral);
       const attackResult = this.attackStep(
         target,
         this.attackProfile,
-        target.player.cardStacks.filter(cs => cs.zone != Zone.Neutral),
+        defendingShips,
         new AttackResult(this.attackProfile.damage)
       );
       target.damage += attackResult.damage;
@@ -107,6 +179,7 @@ export default abstract class TacticCard extends Card {
         armour: attackResult.armour,
         damage: attackResult.damage
       };
+      this.rechargePerAttackDefenders(defendingShips);
       player.match.removeDestroyedCardStacks();
     }
   }

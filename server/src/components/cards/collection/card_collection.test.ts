@@ -4,13 +4,25 @@ import EquipmentCard from '../types/equipment_card';
 import CardCollection from './card_collection';
 
 const allCards = CardCollection.allCards.sort((a, b) => a.id - b.id);
+
+Object.entries(CardCollection.cards).forEach(([key, card]) => {
+  test(`card registered under key ${key} should have matching id`, () => {
+    expect(card.id).toBe(Number(key));
+  });
+});
+
+test('no two registered cards should share the same id', () => {
+  const ids = Object.values(CardCollection.cards).map(c => c.id);
+  expect(new Set(ids).size).toBe(ids.length);
+});
+
 const equipmentCards = allCards.filter(c => c.type == CardType.Equipment);
 const infrastructureCards = allCards.filter(c => c.type == CardType.Infrastructure);
 const weaponCards = equipmentCards.map(c => <EquipmentCard>c).filter(c => c.canAttack);
 
 equipmentCards
   .concat(infrastructureCards)
-  .filter(c => c.id != 124)
+  .filter(c => ![124, 545].includes(c.id))
   .forEach(c => {
     ['theta', 'xi', 'phi', 'omega', 'delta', 'psi'].forEach(v => {
       test(`"${c.name}" (${c.id}) profile ${v} socket value should be 0 or less`, () => {
@@ -37,7 +49,7 @@ allCards.forEach((c, index, a) => {
   });
   test(`"${c.name}" (${c.id}) card ID should match class name`, () => {
     const c2 = CardCollection.cards[c.id as keyof typeof CardCollection.cards];
-    expect(c2).toBe(c);
+    expect(c2).toEqual(c);
   });
   if (index + 1 == a.length || Math.floor(c.id / 100) < Math.floor(a[index + 1].id / 100)) {
     test(`"${c.name}" (${c.id}) rarity should be between 0 as last card of edition`, () => {

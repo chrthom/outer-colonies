@@ -51,3 +51,5 @@ export class Card401 extends EquipmentCardRechargeable {
     return target.zone == Zone.Colony ? 0 : damage;
   }
 }
+
+export const allCards = [new Card302(), new Card401()];

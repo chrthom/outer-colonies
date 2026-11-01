@@ -2,19 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { DeckApiService } from './deck-api.service';
 import { environment } from 'src/environments/environment';
-import AuthService from '../auth.service';
 
 describe('DeckApiService', () => {
   let service: DeckApiService;
   let httpMock: HttpTestingController;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [DeckApiService, { provide: AuthService, useValue: authServiceSpy }]
+      providers: [DeckApiService]
     });
     service = TestBed.inject(DeckApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -29,7 +25,6 @@ describe('DeckApiService', () => {
   });
 
   it('should list deck', () => {
-    const testToken = 'test-token';
     const mockDeck = {
       cards: [
         {
@@ -63,12 +58,10 @@ describe('DeckApiService', () => {
 
     const req = httpMock.expectOne(`${environment.url.api}/api/deck`);
     expect(req.request.method).toBe('GET');
-    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush(mockDeck);
   });
 
   it('should activate card', () => {
-    const testToken = 'test-token';
     const cardInstanceId = 1;
 
     service.activateCard(cardInstanceId).subscribe(() => {
@@ -77,12 +70,10 @@ describe('DeckApiService', () => {
 
     const req = httpMock.expectOne(`${environment.url.api}/api/deck/${cardInstanceId}`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 
   it('should deactivate card', () => {
-    const testToken = 'test-token';
     const cardInstanceId = 1;
 
     service.deactivateCard(cardInstanceId).subscribe(() => {
@@ -91,7 +82,6 @@ describe('DeckApiService', () => {
 
     const req = httpMock.expectOne(`${environment.url.api}/api/deck/${cardInstanceId}`);
     expect(req.request.method).toBe('DELETE');
-    expect(req.request.headers.get('session-token')).toBe(testToken);
     req.flush({});
   });
 });

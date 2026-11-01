@@ -3,9 +3,10 @@
 # Dependencies: config.sh (sets GITHUB_BASE_URL)
 
 # Token Validation
+# Validates that GITHUB_TOKEN environment variable is set
 validate_github_token() {
   if [ -z "$GITHUB_TOKEN" ]; then
-    echo "ERROR: GITHUB_TOKEN environment variable is not set"
+    echo "ERROR: GITHUB_TOKEN environment variable is not set" >&2
     exit 1
   fi
 }
@@ -14,20 +15,33 @@ validate_github_token() {
 # Usage: github_api <method> <endpoint> [<data>]
 # Example: github_api GET "/issues/123"
 # Example: github_api POST "/pulls" '{"title":"foo","body":"bar","head":"branch","base":"main"}'
+# @param method - HTTP method (GET, POST, PUT, DELETE)
+# @param endpoint - API endpoint path (will be appended to GITHUB_BASE_URL)
+# @param data - Optional JSON data for POST/PUT requests
+# @returns API response as string, or exits on curl error
 github_api() {
   local method=${1:-GET}
   local endpoint="${GITHUB_BASE_URL}${2}"
   local data=${3:-''}
-  
+
+  local response
   if [ "$method" = "GET" ]; then
-    curl -s -H "Authorization: token $GITHUB_TOKEN" \
+    response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
       -H "Accept: application/vnd.github.v3+json" \
-      "$endpoint"
+      "$endpoint")
   else
-    curl -s -X "$method" -H "Authorization: token $GITHUB_TOKEN" \
+    response=$(curl -s -X "$method" -H "Authorization: token $GITHUB_TOKEN" \
       -H "Accept: application/vnd.github.v3+json" \
       -H "Content-Type: application/json" \
       -d "$data" \
-      "$endpoint"
+      "$endpoint")
   fi
+
+  # Check for curl errors
+  if [ $? -ne 0 ]; then
+    echo "ERROR: API request failed for ${method} ${endpoint}" >&2
+    return 1
+  fi
+
+  echo "$response"
 }

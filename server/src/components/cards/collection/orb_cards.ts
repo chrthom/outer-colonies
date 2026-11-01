@@ -1,4 +1,4 @@
-import { CardType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import { CardType, RechargeRate, TacticDiscipline, Zone } from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import CardStack from '../card_stack';
 import OrbCard from '../types/orb_card';
@@ -16,8 +16,8 @@ export class Card112 extends OrbCard {
     );
   }
   override onStartTurn() {}
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -64,8 +64,8 @@ export class Card301 extends OrbCard {
     });
   }
   override onStartTurn() {}
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -83,7 +83,8 @@ export class Card403 extends OrbCard {
     super(403, 'Pluto', 5, {}, [CardType.Equipment, CardType.Hull, CardType.Infrastructure, CardType.Tactic]);
   }
   override getValidTargets(player: Player): CardStack[] {
-    return player.cardStacks.some(cs => cs.card.name == 'Solarpanele') ? [] : super.getValidTargets(player);
+    const hasAnySolarPanel = player.cardStacks.flatMap(cs => cs.cards).some(c => c.name == 'Solarpanele');
+    return hasAnySolarPanel ? [] : super.getValidTargets(player);
   }
   override onStartTurn() {}
 }
@@ -97,8 +98,8 @@ export class Card410 extends OrbCard {
   override onStartTurn(player: Player) {
     this.additionalCardWhenDrawing(player, TacticDiscipline.Military);
   }
-  override get instantRecharge(): boolean {
-    return true;
+  override get rechargeRate(): RechargeRate {
+    return RechargeRate.PerAttack;
   }
 }
 
@@ -120,3 +121,16 @@ export class Card433 extends OrbCard {
   }
   override onStartTurn() {}
 }
+
+export const allCards = [
+  new Card112(),
+  new Card146(),
+  new Card159(),
+  new Card225(),
+  new Card301(),
+  new Card317(),
+  new Card403(),
+  new Card410(),
+  new Card432(),
+  new Card433()
+];

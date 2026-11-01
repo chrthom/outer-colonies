@@ -14,7 +14,7 @@ Maintain consistency across the three subprojects
 
 ## Working with Git
 - Use conventional commits (see `commit` skill for details)
-- Skills available: `commit`, `github`, `github-check-pr`, `github-work-on-issue`, `release-version`
+- Skills available: `commit`, `github`, `check-pr`, `start-issue`, `release-oc`
 
 ## Documentation Requirements
 - Update README.md for significant changes

@@ -210,3 +210,16 @@ export class Card441 extends EquipmentCardRechargeable {
     );
   }
 }
+
+export const allCards = [
+  new Card130(),
+  new Card168(),
+  new Card181(),
+  new Card234(),
+  new Card237(),
+  new Card339(),
+  new Card340(),
+  new Card424(),
+  new Card440(),
+  new Card441()
+];

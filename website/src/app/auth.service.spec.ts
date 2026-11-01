@@ -114,4 +114,36 @@ describe('AuthService', () => {
       expect(success).toBeFalse();
     });
   });
+
+  it('should fall back to cookie credentials when session-token check fails', () => {
+    service['sessionToken'] = 'stale-token';
+    cookieSpy.get.and.callFake((key: string) => {
+      if (key === 'u') return 'cookieuser';
+      if (key === 'p') return 'cookiepass';
+      return '';
+    });
+    authApiSpy.checkSessionToken.and.returnValue(
+      throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' }))
+    );
+    const mockResponse = { sessionToken: 'new-token', username: 'cookieuser', email: 'c@example.com' };
+    authApiSpy.login.and.returnValue(of(mockResponse));
+
+    service.check().subscribe(success => {
+      expect(success).toBeTrue();
+      expect(authApiSpy.login).toHaveBeenCalledWith({ username: 'cookieuser', password: 'cookiepass' });
+      expect(service.isLoggedIn).toBeTrue();
+    });
+  });
+
+  it('should not retry when no session token was set and no cookies are available', () => {
+    cookieSpy.get.and.returnValue('');
+    authApiSpy.login.and.returnValue(
+      throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' }))
+    );
+
+    service.login('user', 'badpass', false).subscribe(success => {
+      expect(success).toBeFalse();
+      expect(authApiSpy.login).toHaveBeenCalledTimes(1);
+    });
+  });
 });

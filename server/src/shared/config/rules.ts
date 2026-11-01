@@ -14,7 +14,7 @@ class OCRules {
     dealtColonyDamage: 1
   };
   readonly minCardsForVictoryBonus = 6;
-  readonly boosterCosts = [Infinity, 920, 1045, 1045, 1045];
+  readonly boosterCosts = [Infinity, 920, 1045, 1045, 1045, 1105];
 }
 
 export const rules = new OCRules();

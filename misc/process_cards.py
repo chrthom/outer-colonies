@@ -8,7 +8,7 @@ Usage:
      exec(open("/home/christopher/Dokumente/outer-colonies/misc/process_cards.py").read())'
 
 CSV Output:
-  id;type;title;effect;tags;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hull;armour;shield;abm;damage;control
+  id;type;title;effect;tags;conditional_tags;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hp;armour;shield;abm;damage;control;damage_abm;damage_shield;damage_armour
 
 Columns:
 - ID: numeric part of filename before first "_"
@@ -19,9 +19,10 @@ Columns:
   * "Hull" if header_left_icon_hull OR header_left_icon_ship is visible
   * "Infrastructure" if header_left_icon_planetary OR header_left_icon_infrastructure is visible
 - title: text from card/header/header_title/header title_text layer
-- Effect: normal text from card/textbox/textbox_text_rule (non-italic parts)
-- Tags: italic text from card/textbox/textbox_text_rule (italic parts)
-- Lore: text from card/textbox/textbox_text_lore
+- Effect: bold text from card/textbox/textbox_text_rule
+- Tags: bold+italic text from card/textbox/textbox_text_rule
+- Conditional Tags: additional conditional tags (from pattern: italic, bold, italic)
+- Lore: italic-only text from textbox_text_rule + text from card/textbox/textbox_text_lore
 - Discipline: text from card/textbox/textbox_tag/textbox_tag_text (only if textbox_tag group is visible)
 - Rarity: highest visible rarity<value>_red layer (5-0), defaults to 0
 - Author: text from card/footer/footer_illustration or card/footer-Kopie/footer_illustration
@@ -271,36 +272,171 @@ def get_title(img):
 
 
 def extract_effect_parts(layer):
-    """Extract effect text and tags (italic part) from a text layer.
-    Returns (effect_text, tags_text) tuple.
-    Italic parts (wrapped in <i> tags) are extracted as tags.
+    """Extract effect text, tags, and conditional_tags from a text layer.
+    Returns (effect_text, tags_text, conditional_tags_text, lore_text) tuple.
+    Note: lore_text is always empty as lore ONLY comes from textbox_text_lore layer.
+
+    Bold parts (wrapped in <b>, <span weight=...> etc.) are extracted as effect (rule text).
+    Bold+Italic parts are extracted as tags.
+    Italic-only and normal parts in rule layer are treated as effect.
+    If there are multiple italic sections separated by normal text,
+    the first italic section is tags, and subsequent ones are conditional_tags.
     """
     try:
         if hasattr(layer, 'get_markup'):
             markup = layer.get_markup()
             if markup:
-                # Split by <i> and </i> tags to separate italic from normal text
-                parts = re.split(r'(<i[^>]*>|</i>)', markup)
-                normal_parts = []
-                italic_parts = []
+                # Patterns for bold tags
+                bold_open_pattern = re.compile(r'<b(?:[^>]*)?>|<span[^>]*weight\s*=\s*["\']?(?:bold|700|[7-9]00)["\']?[^>]*>')
+                bold_close_pattern = re.compile(r'</b>|</span>')
+                italic_open_pattern = re.compile(r'<i(?:[^>]*)?>|<span[^>]*style\s*=\s*["\']?italic["\']?[^>]*>')
+                italic_close_pattern = re.compile(r'</i>|</span>')
+
+                # Tokenize the markup
+                tokens = re.split(r'(<[^>]+>)', markup)
+
+                # Parse into content blocks with styling info
+                content_blocks = []
+                current_block = {'type': 'normal', 'text': ''}
+                in_bold = False
                 in_italic = False
-                for p in parts:
-                    if p.startswith('<i') or p.startswith('</i'):
-                        in_italic = p.startswith('<i')
-                    elif in_italic:
-                        italic_parts.append(p)
+
+                for token in tokens:
+                    if not token:
+                        continue
+
+                    if token.startswith('<'):
+                        # Flush current block
+                        if current_block['text']:
+                            content_blocks.append(current_block)
+                            current_block = {'type': 'normal', 'text': ''}
+
+                        # Determine tag type and update state
+                        if bold_open_pattern.match(token):
+                            in_bold = True
+                        elif bold_close_pattern.match(token):
+                            in_bold = False
+                        elif italic_open_pattern.match(token):
+                            in_italic = True
+                        elif italic_close_pattern.match(token):
+                            in_italic = False
+
+                        # Update current block type based on state
+                        if in_bold and in_italic:
+                            current_block['type'] = 'bold_italic'
+                        elif in_bold:
+                            current_block['type'] = 'bold'
+                        elif in_italic:
+                            current_block['type'] = 'italic'
+                        else:
+                            current_block['type'] = 'normal'
                     else:
-                        normal_parts.append(p)
-                # Join parts and strip HTML tags
-                effect = re.sub(r'<[^>]+>', '', ''.join(normal_parts))
-                tags = re.sub(r'<[^>]+>', '', ''.join(italic_parts))
-                # Decode HTML entities
-                effect = html.unescape(effect)
-                tags = html.unescape(tags)
-                return effect, tags.strip()
-    except Exception:
+                        current_block['text'] += token
+
+                if current_block['text']:
+                    content_blocks.append(current_block)
+
+                # Clean HTML tags from blocks and decode entities
+                for block in content_blocks:
+                    block['text'] = re.sub(r'<[^>]+>', '', block['text'])
+                    block['text'] = html.unescape(block['text'])
+                    block['text'] = block['text'].strip()
+
+                # Separate blocks by type
+                # Rule layer: normal/bold = effect, italic/bold_italic = tags/conditional_tags
+                # - Italic text at the beginning = tags
+                # - Italic text after normal text = conditional_tags
+                effect_parts = []
+                tags_parts = []
+                conditional_tags_parts = []
+
+                found_normal = False
+
+                for block in content_blocks:
+                    block_type = block['type']
+                    text = block['text']
+                    if not text:
+                        continue
+                    # In rule layer: italic = tags/conditional_tags, everything else = effect
+                    if block_type == 'italic' or block_type == 'bold_italic':
+                        if found_normal:
+                            conditional_tags_parts.append(text)
+                        else:
+                            tags_parts.append(text)
+                    else:  # bold or normal
+                        found_normal = True
+                        effect_parts.append(text)
+
+                # Join parts
+                effect = ' '.join(effect_parts)
+                tags = ' '.join(tags_parts)
+                conditional_tags = ' '.join(conditional_tags_parts)
+
+                # If there are no italic or bold_italic blocks (all text is normal),
+                # we need to parse the plain text to extract tags from the beginning
+                # This handles edition 5 XCF files which have plain text without Pango markup
+                has_italic = any(block['type'] in ('italic', 'bold_italic') for block in content_blocks)
+                if not has_italic and effect:
+                    # All text is normal - parse plain text for tags and effect
+                    # Tags typically appear at the beginning with specific patterns
+                    plain_text = effect
+                    effect = ""
+                    tags = ""
+
+                    # Pattern 1: "Intervention (...)" at the start
+                    intervention_match = re.match(r'^(\s*Intervention\s*\([^)]*\))\s*', plain_text, re.IGNORECASE)
+                    if intervention_match:
+                        tags = intervention_match.group(1).strip()
+                        plain_text = plain_text[intervention_match.end():].strip()
+
+                    # Pattern 2: "Tribut X" at the start
+                    # Tribut tags look like: "Tribut 1", "Tribut 1 Aktion (...)"
+                    # The tag ends at the closing paren of the action description
+                    tribut_match = re.match(r'^(\s*Tribut\s+\d+\s+(?:Aktion\s*\([^)]*\))\s*)', plain_text, re.IGNORECASE)
+                    if tribut_match:
+                        if tags:
+                            tags = f"{tags} {tribut_match.group(1).strip()}"
+                        else:
+                            tags = tribut_match.group(1).strip()
+                        plain_text = plain_text[tribut_match.end():].strip()
+                    elif re.match(r'^(\s*Tribut\s+\d+)\s+', plain_text, re.IGNORECASE):
+                        # Just "Tribut X" - treat as tag, rest as effect
+                        tribut_simple = re.match(r'^(\s*Tribut\s+\d+)\s+', plain_text, re.IGNORECASE)
+                        if tribut_simple:
+                            if tags:
+                                tags = f"{tags} {tribut_simple.group(1).strip()}"
+                            else:
+                                tags = tribut_simple.group(1).strip()
+                            plain_text = plain_text[tribut_simple.end():].strip()
+
+                    # Pattern 3: "Einmalige Verwendung" at the start
+                    if re.match(r'^(\s*Einmalige\s+Verwendung)\b', plain_text, re.IGNORECASE):
+                        einmalige_match = re.match(r'^(\s*Einmalige\s+Verwendung)\W*', plain_text, re.IGNORECASE)
+                        if tags:
+                            tags = f"{tags} Einmalige Verwendung"
+                        else:
+                            tags = "Einmalige Verwendung"
+                        plain_text = re.sub(r'^\s*Einmalige\s+Verwendung\W*', '', plain_text, flags=re.IGNORECASE).strip()
+
+                    # Pattern 4: "Aktion (...)" at the start
+                    action_match = re.match(r'^(\s*Aktion\s*\([^)]*\))\s*', plain_text, re.IGNORECASE)
+                    if action_match:
+                        if tags:
+                            tags = f"{tags} {action_match.group(1).strip()}"
+                        else:
+                            tags = action_match.group(1).strip()
+                        plain_text = plain_text[action_match.end():].strip()
+
+                    # Remaining text is effect
+                    effect = plain_text
+
+                # Default: return effect, tags, conditional_tags, empty lore
+                return effect.strip(), tags.strip(), conditional_tags.strip(), ""
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         pass
-    return "", ""
+    return "", "", "", ""
 
 
 def get_effect(img):
@@ -464,7 +600,11 @@ def get_modules_data(img):
         # Extract column name: text after '_icon_' up to first ' ', '-', or end
         rest = icon_layer.get_name().split('_icon_', 1)[1]
         column_name = re.split(r'[ -]', rest)[0]
-        
+
+        # Map American 'armor' to British 'armour'
+        if column_name == 'armor':
+            column_name = 'armour'
+
         if column_name not in result:
             continue
         
@@ -541,24 +681,29 @@ def process_file(filepath, folder_prefix=""):
         # Get and sanitize all text fields
         title = get_title(img)
 
-        # Extract effect and tags (italic part) separately
+        # Extract effect, tags, conditional_tags, and lore from rule layer
         textbox_text_rule = navigate_to_layer(img, ["card", "textbox", "textbox_text_rule"])
         if textbox_text_rule and textbox_text_rule.get_visible():
-            effect, tags = extract_effect_parts(textbox_text_rule)
+            effect, tags, conditional_tags, lore_in_rule = extract_effect_parts(textbox_text_rule)
         else:
             effect = ""
             tags = ""
+            conditional_tags = ""
+            lore_in_rule = ""
 
         # Replace icon placeholders (multiple spaces) with {ICON:type} tokens
         # This must be done BEFORE sanitization to preserve the placeholders
         title = replace_icon_placeholders(title, card_type)
         effect = replace_icon_placeholders(effect, card_type)
         tags = replace_icon_placeholders(tags, card_type)
+        conditional_tags = replace_icon_placeholders(conditional_tags, card_type)
 
         title = sanitize_text(title)
         effect = sanitize_text(effect)
         tags = sanitize_text(tags)
+        conditional_tags = sanitize_text(conditional_tags)
 
+        # Lore ONLY comes from the dedicated lore layer (textbox_text_lore)
         lore = sanitize_text(get_lore(img))
         discipline = sanitize_text(get_discipline(img))
         rarity = sanitize_text(get_rarity(img))
@@ -576,25 +721,25 @@ def process_file(filepath, folder_prefix=""):
         shield_val = modules_data.get('shield', '')
         abm_val = modules_data.get('abm', '')
 
-        # Calculate damage_* columns: if value is negative, put it in damage_* column
+        # Calculate damage_* columns: if value is negative or 'X', put it in damage_* column
         # and empty the positive column
         damage_abm = ''
         damage_shield = ''
         damage_armour = ''
 
-        if abm_val and abm_val.startswith('-'):
+        if abm_val and (abm_val.startswith('-') or abm_val == 'X'):
             damage_abm = abm_val
             abm_val = ''
-        if shield_val and shield_val.startswith('-'):
+        if shield_val and (shield_val.startswith('-') or shield_val == 'X'):
             damage_shield = shield_val
             shield_val = ''
-        if armour_val and armour_val.startswith('-'):
+        if armour_val and (armour_val.startswith('-') or armour_val == 'X'):
             damage_armour = armour_val
             armour_val = ''
 
-        print(f"  Result: type={card_type_lower}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
+        print(f"  Result: type={card_type_lower}, title='{title}', effect={effect[:20]}..., tags={tags[:20]}..., conditional_tags={conditional_tags[:20]}..., lore={lore[:20]}..., discipline={discipline}, rarity={rarity}, author={author}")
         print(f"  Modules: {modules_data}")
-        return (card_id, card_type_lower, title, effect, tags, lore, discipline, rarity, author,
+        return (card_id, card_type_lower, title, effect, tags, conditional_tags, lore, discipline, rarity, author,
                 modules_data.get('socket_a', ''), modules_data.get('socket_b', ''),
                 modules_data.get('socket_d', ''), modules_data.get('socket_e', ''),
                 modules_data.get('socket_f', ''), modules_data.get('socket_g', ''),
@@ -644,7 +789,7 @@ def main():
     # Use QUOTE_ALL to ensure fields with newlines/special chars are properly quoted
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_ALL)
-        writer.writerow(['id', 'type', 'title', 'effect', 'tags', 'lore', 'discipline', 'rarity', 'author',
+        writer.writerow(['id', 'type', 'title', 'effect', 'tags', 'conditional_tags', 'lore', 'discipline', 'rarity', 'author',
                          'socket_a', 'socket_b', 'socket_d', 'socket_e', 'socket_f', 'socket_g',
                          'energy', 'speed', 'hp', 'armour', 'shield', 'abm', 'damage', 'control',
                          'damage_abm', 'damage_shield', 'damage_armour'])

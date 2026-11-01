@@ -22,7 +22,7 @@ export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardS
 
 export function removeFirstMatchingElement<T>(array: T[], f: (o: T) => boolean): T[] {
   const index = array.findIndex(f);
-  if (index !== -1) array.splice(index);
+  if (index !== -1) array.splice(index, 1);
   return array;
 }
 
@@ -31,11 +31,15 @@ export function opponentPlayerNo(playerNo: number): number {
 }
 
 export function pickRandom<T>(array: T[]): T {
-  return array[Math.random() * array.length];
+  return array[Math.floor(Math.random() * array.length)];
 }
 
 export function shuffle<T>(array: T[]): T[] {
-  return array.sort(() => Math.random() - 0.5);
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 export function spliceCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack | undefined {

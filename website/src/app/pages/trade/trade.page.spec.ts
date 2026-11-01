@@ -90,7 +90,7 @@ describe('TradePage', () => {
   });
 
   it('should have correct available boosters', () => {
-    expect(component.availableBoosters.length).toBe(4);
+    expect(component.availableBoosters.length).toBe(5);
     expect(component.availableBoosters[0].no).toBe(1);
     expect(component.availableBoosters[0].title).toBe('Outer Colonies');
   });

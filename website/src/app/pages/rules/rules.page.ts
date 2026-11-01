@@ -4,6 +4,7 @@ import { ContentBoxComponent } from '../../components/content-box/content-box.co
 import { MatSelectionList, MatListOption } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IconService } from '../../icon.service';
 
 @Component({
   selector: 'oc-page-rules',
@@ -13,6 +14,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class RulesPage implements OnInit {
   @ViewChild('activeChapter') activeChapterList!: MatSelectionList;
+
+  private iconService = inject(IconService);
 
   chapters = [
     'setup',
@@ -51,8 +54,12 @@ export class RulesPage implements OnInit {
   imgUrl(imgName: string): string {
     return `${this.assetUrl}/rules/${imgName}.png`;
   }
-  iconUrl(iconName: string): string {
-    return `${this.assetUrl}/icons/${iconName}.png`;
+  iconUrl(iconName: string): string | null {
+    return this.iconService.getIcon(iconName);
+  }
+
+  getIconHtml(iconName: string): string | null {
+    return this.iconService.getIconHtml(iconName);
   }
 
   previousChapter(): void {

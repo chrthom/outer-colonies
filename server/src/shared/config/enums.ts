@@ -87,6 +87,12 @@ export enum Rarity {
   Rare = 'rare'
 }
 
+export enum RechargeRate {
+  PerBattle = 'per_battle',
+  PerRound = 'per_round',
+  PerAttack = 'per_attack'
+}
+
 export enum TacticDiscipline {
   Intelligence = 'intelligence',
   Military = 'military',

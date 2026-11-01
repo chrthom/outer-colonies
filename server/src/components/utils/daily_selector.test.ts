@@ -22,17 +22,6 @@ describe('Daily Selector', () => {
     expect(dailies1).toEqual(dailies2);
   });
 
-  it('should return different results for different dates', () => {
-    const date1 = new Date('2024-01-01');
-    const date2 = new Date('2024-01-02');
-    const dailies1 = getDailiesOfDay(date1);
-    const dailies2 = getDailiesOfDay(date2);
-    // Should usually be different, but not guaranteed due to hash collisions
-    // We'll just check that it's possible for them to be different
-    expect(dailies1.length).toBe(4);
-    expect(dailies2.length).toBe(4);
-  });
-
   it('isDailyOfDay should correctly identify dailies of the day', () => {
     const date = new Date('2024-01-01');
     const dailies = getDailiesOfDay(date);

@@ -6,6 +6,7 @@ import * as _ from 'lodash-es';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardType, TacticDiscipline } from '../../../../../server/src/shared/config/enums';
+import { IconService } from '../../icon.service';
 import { Sort, MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
@@ -59,9 +60,12 @@ import { CommonModule } from '@angular/common';
 export class DeckPage implements OnInit {
   private deckApiService = inject(DeckApiService);
   private dialog = inject(MatDialog);
+  private iconService = inject(IconService);
 
   readonly minCards = 60;
   readonly maxCards = 100;
+  loadFailed = false;
+  actionFailed = false;
   filterFormControl = new FormControl('');
   viewFormControl = new FormControl('list');
   private activeCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
@@ -117,19 +121,31 @@ export class DeckPage implements OnInit {
     this.update();
   }
   update() {
-    this.deckApiService.listDeck().subscribe(res => {
-      this.activeCards$.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
-      this.reserveCards$.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
+    this.loadFailed = false;
+    this.deckApiService.listDeck().subscribe({
+      next: res => {
+        this.activeCards$.next(this.groupDeckCards(res.cards.filter(dc => dc.inUse)));
+        this.reserveCards$.next(this.groupDeckCards(res.cards.filter(dc => !dc.inUse)));
+      },
+      error: () => (this.loadFailed = true)
     });
   }
   activateCard(card: DeckCard) {
     if (this.canActivateDeckCard) {
-      this.deckApiService.activateCard(card.id).subscribe(() => this.update());
+      this.actionFailed = false;
+      this.deckApiService.activateCard(card.id).subscribe({
+        next: () => this.update(),
+        error: () => (this.actionFailed = true)
+      });
     }
   }
   deactivateCard(card: DeckCard) {
     if (this.canDeactivateDeckCard) {
-      this.deckApiService.deactivateCard(card.id).subscribe(() => this.update());
+      this.actionFailed = false;
+      this.deckApiService.deactivateCard(card.id).subscribe({
+        next: () => this.update(),
+        error: () => (this.actionFailed = true)
+      });
     }
   }
   openImgInModal(card: DeckCard) {
@@ -142,7 +158,7 @@ export class DeckPage implements OnInit {
     return `${environment.url.assets}/cards/${cardId}.png`;
   }
   cardIdToEditionUrl(cardId: number): string {
-    return this.toIconUrl(`edition${Math.floor(cardId / 100)}`);
+    return `${environment.url.assets}/icons/edition${Math.floor(cardId / 100)}.png`;
   }
   cardIdToEditionName(cardId: number): string {
     switch (Math.floor(cardId / 100)) {
@@ -158,14 +174,18 @@ export class DeckPage implements OnInit {
         return '';
     }
   }
-  cardTypeToUrl(cardType: CardType): string {
-    return this.toIconUrl(cardType);
+  cardTypeToUrl(cardType: CardType): string | null {
+    return this.iconService.getIconHtml(cardType);
   }
   rangeToUrl(range: number): string {
     return `${environment.url.assets}/utils/range${range}.png`;
   }
-  toIconUrl(name: string): string {
-    return `${environment.url.assets}/icons/${name}.png`;
+  toIconUrl(name: string): string | null {
+    return this.iconService.getIconHtml(name);
+  }
+
+  getIconHtml(name: string): string | null {
+    return this.iconService.getIconHtml(name);
   }
   disciplineToText(discipline?: TacticDiscipline): string {
     switch (discipline) {
