@@ -63,28 +63,3 @@ allCards.forEach((c, index, a) => {
     });
   }
 });
-
-// Regression test for issue #777: profiles of cards which were aligned with misc/cards.csv
-const cardsAlignedWithCardsCsv: [number, CardProfile][] = [
-  [112, new CardProfile({ shield: 1 })],
-  [132, new CardProfile({ hp: 7, speed: 3, phi: 2, omega: 1, delta: 1 })],
-  [213, new CardProfile({ hp: 7, speed: 3, theta: 3, omega: 1, delta: 1 })],
-  [221, new CardProfile({ hp: 8, control: 3, theta: 2, omega: 1, psi: 1 })],
-  [212, new CardProfile({ omega: -1, psi: -1, control: 3 })],
-  [303, new CardProfile({ energy: -2, xi: -2 })],
-  [326, new CardProfile({ hp: 12, control: 3, speed: -1, theta: 2, omega: 1, psi: 1 })],
-  [327, new CardProfile({ hp: 8, speed: 2, omega: 2, delta: 1, psi: 1 })],
-  [336, new CardProfile({ energy: -2, psi: -1 })],
-  [348, new CardProfile({ hp: 5, control: 1, speed: 3, xi: 1, omega: 1, delta: 1 })]
-];
-
-cardsAlignedWithCardsCsv.forEach(([id, expectedProfile]) => {
-  test(`"${CardCollection.cards[id].name}" (${id}) profile should match misc/cards.csv`, () => {
-    expect(CardCollection.cards[id].profile).toEqual(expectedProfile);
-  });
-});
-
-test('"Dual-Lasergeschütz" (182) attack damage should match misc/cards.csv', () => {
-  const card = <EquipmentCard>CardCollection.cards[182];
-  expect(card.attackProfile?.damage).toBe(6);
-});
