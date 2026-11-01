@@ -8,6 +8,7 @@
    - [Component Breakdown](#component-breakdown)
    - [Server Game State and Matchmaking](#server-game-state-and-matchmaking)
    - [Database Schema](#database-schema)
+   - [Asset and Icon Pipeline](#asset-and-icon-pipeline)
    - [Data Flow and Communication](#data-flow-and-communication)
 3. [Developer Documentation](#developer-documentation)
    - [Setup and Installation](#setup-and-installation)
@@ -258,6 +259,37 @@ Persistence uses MariaDB (schema definition: `misc/outercolonies.sql`):
 | `profiles` | User profile and currency | `user_id` (PK), `newsletter`, `sol` |
 
 `dailies`, `decks`, `items`, `magic_links` and `profiles` reference `credentials.user_id` via foreign keys with `ON DELETE CASCADE ON UPDATE CASCADE`.
+
+### Asset and Icon Pipeline
+
+The `misc` directory contains the pipeline that turns the designed cards into data and runtime assets:
+
+#### Card Data Extraction (GIMP)
+
+- Cards are designed as GIMP XCF files using a layer-based template, organized in edition subfolders (`1`–`5`).
+- `misc/process_cards.py` runs inside GIMP (python-fu batch) and extracts per card: type (via visible header icon layers), title, effect (bold text), tags (bold+italic), conditional tags, lore (italic), discipline, rarity (highest visible `rarity<n>_red` layer, 5–0), author and socket/stat values from the module layers. Results are written to `misc/cards.csv`.
+- Sequences of 2–6 spaces in the template text are converted to `{ICON:<type>}` placeholders using context heuristics; ambiguous cases are flagged with `?` for manual review.
+- `misc/card_bulk_analyze.sh` runs the extraction over all edition subfolders and merges the results into `misc/cards.csv`; `misc/card_text_corrections.md` logs manual text and placeholder corrections.
+
+#### Card Images
+
+- Card PNGs are renamed by `misc/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/card_bulk_resize.sh` to 411×561 px (ImageMagick).
+- The client loads card images per match from `<apiURL>/assets/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
+
+#### Client Runtime Assets
+
+The client loads all runtime assets from the assets web space under `<apiURL>/assets/` (see `resource-loader.ts`):
+
+- `background/`: starfields, sun, orbs, rings and vessel sprites
+- `attribute/`: stat icons (`damage`, `hp`, `control`, `speed`, `energy`, `armour`, `shield`, `point_defense`) and socket glyphs (`theta`, `xi`, `phi`, `omega`, `delta`, `psi`)
+- `icons/`: card type and discipline icons plus UI icons (`retract_card`, `mission`, `raid`, `exit`, combo type icons)
+- `utils/`: card masks and glow, stack piles, range indicators, buttons, game over screens
+
+#### Icon Font (Website)
+
+- `misc/icons/` contains the source SVG/PNG stat and type icons (fetched from the assets server) plus `png_to_svg_fixed.py`; the generated `outer-colonies-icons` font (TTF/WOFF/WOFF2, CSS and `mapping.md`) lives in `misc/icons/font/`.
+- The font currently provides 12 glyphs (U+EA01–U+EA0C): armour, control, damage, energy, equip, hp, hull, infra, orb, point_def, shield and tactic.
+- `website/src/app/icon.service.ts` maps icon names to the font's Unicode Private Use Area code points and renders `{ICON:<name>}` placeholders in card texts on the deck and rules pages. Note: there is no dedicated speed glyph yet — `speed` currently falls back to the control glyph.
 
 ## Developer Documentation
 
