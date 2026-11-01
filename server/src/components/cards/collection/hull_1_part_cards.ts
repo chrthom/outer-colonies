@@ -71,7 +71,8 @@ export class Card348 extends HullCard {
       control: 1,
       speed: 3,
       xi: 1,
-      omega: 1
+      omega: 1,
+      delta: 1
     });
   }
 }

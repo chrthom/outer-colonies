@@ -62,7 +62,7 @@ export class Card212 extends EquipmentCard {
   constructor() {
     super(212, 'Black Ops Team', 3, {
       omega: -1,
-      delta: -1,
+      psi: -1,
       control: 3
     });
   }
