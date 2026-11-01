@@ -281,8 +281,10 @@
             <p>Sol kann verwendet werden, um Booster zu kaufen und damit deine Sammlung zu erweitern.</p>
             <h4>Spielzeitlimit</h4>
             <p>
-              Im Online-Spiel beträgt die Bedenkzeit für einen Spielzug <b>90 Sekunden</b>. Wird diese Zeit
-              überschritten, wird der Spielzug automatisch beendet.
+              Im Online-Spiel beträgt die Bedenkzeit für jede ausstehende Handlung <b>90 Sekunden</b> - auch
+              für Abfang- und Gefechtsreaktionen außerhalb des eigenen Spielzugs. Wird diese Zeit
+              überschritten, wird die ausstehende Handlung automatisch abgeschlossen: Dein Spielzug endet bzw.
+              eine Reaktion wird ohne von dir gewählte Schiffe fortgesetzt.
             </p>
             <h4>Spielmodi</h4>
             <p>Im Online-Spiel gibt es folgende Spielmodi:</p>
@@ -445,8 +447,9 @@
             </h4>
             <p>
               Ein Kartentyp, der sowohl an <span class="oc-icon" [innerHTML]="getIconHtml('hull')"></span> als
-              auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt k&ouml;nnen
-              alle Sockel-Anforderungen ignoriert werden.
+              auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt, stellt diese
+              nur die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum) bereit; andere
+              Sockel-Anforderungen k&ouml;nnen an der Kolonie nicht erf&uuml;llt werden.
             </p>
             <h4>Intervention <i>(Spielphase)</i></h4>
             <p>
@@ -696,7 +699,7 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span>).<br />
               7. Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.
             </p>
-            <table class="rules-table">
+            <table>
               <tr>
                 <th>Indikatorfelder</th>
                 <th>Seltenheit</th>
@@ -794,8 +797,9 @@
               Kolonie anlegen, platzierst du sie in deiner Koloniezone.
             </p>
             <p>
-              Die Kolonie stellt die benötigten Sockel bereit, aber die Energieanforderungen müssen ebenfalls
-              erfüllt sein, um die Karte in der Koloniezone zu platzieren. Hierfür addierst du die
+              Die Kolonie stellt nur die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum) bereit, aber
+              die Energieanforderungen müssen ebenfalls erfüllt sein, um die Karte in der Koloniezone zu
+              platzieren. Hierfür addierst du die
               <span class="oc-icon" [innerHTML]="getIconHtml('energy')"></span> aller
               <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> in deiner Koloniezone.
             </p>
