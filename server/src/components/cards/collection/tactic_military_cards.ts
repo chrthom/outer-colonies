@@ -194,7 +194,7 @@ export class Card419 extends TacticCard {
   constructor() {
     super(
       419,
-      'Kritischer Treffer',
+      'Entermanöver',
       2,
       TacticDiscipline.Military,
       {},

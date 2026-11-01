@@ -90,7 +90,7 @@ export class Card167 extends EquipmentCardColonyKiller {
   constructor() {
     super(
       167,
-      'Atombombentorpedos',
+      'Nukleare Torpedos',
       1,
       {
         phi: -1
