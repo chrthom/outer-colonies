@@ -32,7 +32,7 @@ export class Card115 extends EquipmentCard {
 
 export class Card140 extends ShieldDefenseCard {
   constructor() {
-    super(140, 'Deflektorschilde', 2, {
+    super(140, 'Deflektorschild', 2, {
       energy: -2,
       shield: 2,
       omega: -1
@@ -116,7 +116,7 @@ export class Card341 extends EquipmentCard {
 
 export class Card349 extends EquipmentCard {
   constructor() {
-    super(349, 'Dura-Stahl', 1, {
+    super(349, 'Dura-Stahl Platten', 1, {
       hp: 4,
       armour: 2,
       omega: -2
