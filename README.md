@@ -287,9 +287,9 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
 
 #### Icon Font (Website)
 
-- `misc/icons/` contains the source SVG/PNG stat and type icons (fetched from the assets server) plus `png_to_svg_fixed.py`; the generated `outer-colonies-icons` font (TTF/WOFF/WOFF2, CSS and `mapping.md`) lives in `misc/icons/font/`.
-- The font currently provides 12 glyphs (U+EA01–U+EA0C): armour, control, damage, energy, equip, hp, hull, infra, orb, point_def, shield and tactic.
-- `website/src/app/icon.service.ts` maps icon names to the font's Unicode Private Use Area code points and renders `{ICON:<name>}` placeholders in card texts on the deck and rules pages. Note: there is no dedicated speed glyph yet — `speed` currently falls back to the control glyph.
+- `misc/icons/` contains the source SVG/PNG stat and type icons (fetched from the assets server) plus `png_to_svg_fixed.py` and `generate_font.js`; the generated `outer-colonies-icons` font (TTF/WOFF/WOFF2, CSS and `mapping.md`) lives in `misc/icons/font/`.
+- The font provides 13 glyphs (U+EA01–U+EA0D): armour, control, damage, energy, equip, hp, hull, infra, orb, point_def, shield, tactic and speed.
+- `website/src/app/icon.service.ts` maps icon names to the font's Unicode Private Use Area code points and renders `{ICON:<name>}` placeholders in card texts on the deck and rules pages.
 
 ## Developer Documentation
 
