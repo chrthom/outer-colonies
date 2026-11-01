@@ -1,0 +1,13 @@
+{
+  "name": "outer-colonies-icons",
+  "description": "Tooling to regenerate the outer-colonies-icons webfont from the source SVG icons (see font/mapping.md)",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "node generate_font.js"
+  },
+  "devDependencies": {
+    "globby": "12.2.0",
+    "webfont": "11.1.1"
+  }
+}
