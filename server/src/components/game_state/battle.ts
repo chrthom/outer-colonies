@@ -4,7 +4,7 @@ import { BattleType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
-import { getCardStackByUUID, spliceCardStackByUUID } from '../utils/helpers';
+import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';
 import Player from './player';
 import { AttackProfile } from '../cards/card_profile';
@@ -91,11 +91,13 @@ export default class Battle {
   }
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;
-    if (this.ships[match.activePlayerNo].length > 0) {
+    const ownShips = this.ships[match.activePlayerNo];
+    const opposingShips = this.ships[opponentPlayerNo(match.activePlayerNo)];
+    if (ownShips.length > 0) {
       player.deck.push(...match.activePlayer.pickCardsFromTopOfDiscardPile(1));
       player.drawCards(1);
-      this.ships[0].forEach(cs => cs.onMissionCompletion());
-      const controlSurplus = this.sumControl(this.ships[0]) - this.sumControl(this.ships[1]);
+      ownShips.forEach(cs => cs.onMissionCompletion());
+      const controlSurplus = this.sumControl(ownShips) - this.sumControl(opposingShips);
       player.gainControl(Math.max(controlSurplus, 0));
     }
   }
