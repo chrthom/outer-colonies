@@ -20,6 +20,7 @@ export class Card132 extends HullCard {
       hp: 7,
       speed: 3,
       phi: 2,
+      omega: 1,
       delta: 1
     });
   }
@@ -54,6 +55,7 @@ export class Card213 extends HullCard {
       hp: 7,
       speed: 3,
       theta: 3,
+      omega: 1,
       delta: 1
     });
   }
@@ -64,7 +66,7 @@ export class Card221 extends HullCard {
     super(221, 'Schwerer Frachter (Bug)', 2, freighterMultipart, {
       hp: 8,
       control: 3,
-      theta: 1,
+      theta: 2,
       omega: 1,
       psi: 1
     });
@@ -88,7 +90,7 @@ export class Card326 extends HullCard {
       hp: 12,
       control: 3,
       speed: -1,
-      theta: 1,
+      theta: 2,
       omega: 1,
       psi: 1
     });
@@ -100,7 +102,7 @@ export class Card327 extends HullCard {
     super(327, 'Schwerer Frachter (Heck)', 2, freighterMultipart, {
       hp: 8,
       speed: 2,
-      omega: 1,
+      omega: 2,
       delta: 1,
       psi: 1
     });
