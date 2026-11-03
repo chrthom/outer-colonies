@@ -28,7 +28,13 @@ Rahmen (Christopher, 3.11.2026, Runde-6-Review + Entscheidungen 3+5):
     Sternbasis 3-teilig; speed 0 - koennen nicht ausweichen, ihre
     Angriffe auf schnelle Schiffe werden paargenau halbiert).
   - Missions-Gefechte (50 %): Spiegel beider Flotten, nur Schiffe
-    mit speed >= 1 (Abfangflotte).
+    mit speed >= 1 (Abfangflotte). Abfang-Ausduennung (Runde 12c,
+    Christopher): Abfaenger-Schiffe (Seite 1) mit speed < langsamstem
+    Schiff der Kartenflotte NACH Karten-Bonus kommen nicht mit
+    (Abfangregel: Speed >= langsamstem Missions-Schiff; Spiegel-
+    Baseline bleibt 3v3, Gleichstand qualifiziert). Kein Abfaenger
+    schnell genug = NICHT abgefangen: Gefecht entfaellt, Missionslohn
+    = volle Flotten-Kontrolle (CTRL_W x Summe control, Gegner 0).
   - Focus Fire, PD schiffsuebergreifend (verfaellt mit Schiffstod),
     Feuereihenfolge alterniert, Einmalwaffen 1x in min(range, 4).
   - Halbierung deterministisch je Paar (eigene speed + Phasen-
@@ -60,8 +66,10 @@ Playtest zu justieren). Platzierung je Verteidiger-Schiff 1 Instanz
 ("3x Defense"), Wert-Gewinn /3 normalisiert; gepaarte Zuege (Common
 Random Numbers). Prevented nur Diagnose-Spalte.
 
-Score = (Wert-Gewinn + Missionswert-Korrektur [Option B, nur Speed-Karten,
-Abfang-Vermeidung]) / Einsatzkosten v3.
+Score = Wert-Gewinn / Einsatzkosten v3. Missionswert-Korrektur Option B v1
+(5,45 Marker je Speed-Punkt) ENTFALLEN (Runde 12c, Christophers Beschluss):
+Abfang-Ausduennung und Lohn des nicht abgefangenen Gefechts sind jetzt
+endogen im Frame; der Formel-Credit waere eine Doppelbuchung.
 
 Aufruf: python3 balancing_metric_v11.py [N_GEFECHTE]   (inkrementell, Cache)
 """
@@ -97,10 +105,12 @@ COLONY_HP = 50.0     # Kolonie-HP (rules.ts: colonyHP = 50)
 # >= 1 ueberlebendem eigenen Schiff; Kontrolle = max(0, Summe control der
 # eigenen ueberlebenden - der gegnerischen ueberlebenden Schiffe).
 CTRL_W = 50.0 / 15.0
-# Zielkurve v13 (3.11.2026, Runde 11b): Gemeinsamer Anker Waffen+Karten im
-# Differenz-Rahmen v3 = Mediane der 50 FINAL-Waffen-Scores je Raritaet
-# (check9, N=3000). Unverglaettet (Christophers (b)-Beschluss: spaeter).
-TARGETS_V13 = {1: 2.26, 2: 2.67, 3: 2.88, 4: 3.29, 5: 2.93}
+# Zielkurve v14 (3.11.2026, Runde 12c): r1-r4 = Mediane der 50 FINAL-
+# Waffen-Scores je Raritaet im Rahmen v3 (check9, N=10.000); r5 =
+# Trend-Extrapolation 3,55 statt Messwert 2,88 (Christophers Beschluss:
+# strenge Monotonie - seltenere Raritaet performt stets besser; der
+# gemessene r5-Median lag UNTER r4 3,25, Inversion robust in N=3k/10k).
+TARGETS_V14 = {1: 2.23, 2: 2.62, 3: 2.83, 4: 3.25, 5: 3.55}
 
 
 def weapon_units(w):
@@ -118,7 +128,10 @@ def value(dealt, taken, colony, loot):
 
 
 def mission_credit(c, loot_intercept):
-    """Option-B-Korrektur (Abfang-Vermeidung, nur Speed-Karten): Der Frame
+    """(Runde 12c: IM OFFIZIELLEN SCORE ENTFALLEN - die Abfang-Ausduennung
+    zahlt den Speed-Mechanismus jetzt endogen; Funktion bleibt NUR fuer
+    diag_frame_compare.py (Runde-11-Diagnose) erhalten.)
+    Option-B-Korrektur (Abfang-Vermeidung, nur Speed-Karten): Der Frame
     simuliert immer das ABGEFANGENE Gefecht und zahlt dort den Missionslohn.
     Dieser Kredit korrigiert um die Wahrscheinlichkeitsverschiebung Richtung
     'nicht abgefangen': delta_P je +1 Speed x (voller Flotten-Lohn ohne
@@ -334,7 +347,10 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
     Diagnose, nicht mehr im Wert-Konto),
     loot = Missionslohn in Markern (nur Mission: CTRL_W x max(0,
     control eigene ueberlebende - control gegnerische ueberlebende
-    Schiffe), battle.ts: applyMissionResult)."""
+    Schiffe), battle.ts: applyMissionResult). Missionen mit Abfang-
+    Ausduennung (Runde 12c); bei Nicht-Abfangen (kein Abfaenger
+    schnell genug): Rueckgabe (0, 0, 0, 0, 0, 0, CTRL_W x Flotten-
+    Kontrolle)."""
     colony = 0.0
     fleet = []
     fleet_pd = {}
@@ -363,9 +379,22 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             cards_nopd = [dict(c) for c in cpool if c['type'] != 'pd']
             ships.append(dict(cards=cards_nopd, taken=0.0, dead=False,
                               hp=ship_hp, s=b['s'] + s_bonus,
+                              ctrl=b['ctrl'],
                               carrier=compatible(w, b)))
         fleet.append(ships)
         fleet_pd[side] = side_pd
+    # --- Abfang-Ausduennung (Runde 12c, nur Mission, s. Docstring) ---
+    if not raid:
+        s0min = min(sh['s'] for sh in fleet[0])
+        kept = [(i, sh) for i, sh in enumerate(fleet[1]) if sh['s'] >= s0min]
+        if not kept:
+            # Nicht abgefangen: kein Gefecht, volle Flotten-Kontrolle
+            own_c = sum(b['ctrl'] for b in deff)
+            return 0.0, 0.0, 0, 0, 0.0, 0.0, CTRL_W * own_c
+        remap = {old: new for new, (old, _) in enumerate(kept)}
+        fleet[1] = [sh for _, sh in kept]
+        fleet_pd[1] = [(c, remap[oi]) for c, oi in fleet_pd[1]
+                       if oi in remap]
     dealt = [0.0, 0.0]
     for p in PHASES:
         for u in order:
@@ -442,8 +471,8 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
     if raid:
         loot = 0.0
     else:
-        own_c = sum(deff[i]['ctrl'] for i in range(N_SHIPS) if not fleet[0][i]['dead'])
-        enemy_c = sum(att[i]['ctrl'] for i in range(N_SHIPS) if not fleet[1][i]['dead'])
+        own_c = sum(sh['ctrl'] for sh in fleet[0] if not sh['dead'])
+        enemy_c = sum(sh['ctrl'] for sh in fleet[1] if not sh['dead'])
         loot = CTRL_W * max(0.0, own_c - enemy_c)
     return taken, dealt[0], dead[0], dead[1], colony, eq, loot
 
@@ -452,6 +481,7 @@ def run(n_battles, seed=23):
     random.seed(seed)
     gain = {c['id']: 0.0 for c in cards}
     prev = {c['id']: 0.0 for c in cards}
+    inter = {c['id']: 0 for c in cards}
     t0s = d0s = col0s = eq0s = loot0s = 0.0
     n_mission = 0
     losses = wipes0 = wipes1 = 0
@@ -487,6 +517,9 @@ def run(n_battles, seed=23):
                 spec=c, ship=ship, raid=raid, colpool=colpool)
             gain[c['id']] += value(dealt1, take1, col1, loot1) - v0
             prev[c['id']] += take0 - take1
+            # Diagnose Nicht-Abfangen: voller Lohn >> abgefangener Lohn
+            # (Ø 0,53); abgefangen > 10 praktisch ausgeschlossen.
+            inter[c['id']] += 1 if loot1 > 10.0 else 0
     norm = 3.0 if SPEC_ALL3 else 1.0
     return dict(n=n_battles, taken=t0s / n_battles, dealt=d0s / n_battles,
                 col=col0s / n_battles, eq=eq0s / n_battles,
@@ -494,7 +527,8 @@ def run(n_battles, seed=23):
                 loss=losses / n_battles, wipe0=wipes0 / n_battles,
                 wipe1=wipes1 / n_battles,
                 gain={k: v / n_battles / norm for k, v in gain.items()},
-                prev={k: v / n_battles for k, v in prev.items()})
+                prev={k: v / n_battles for k, v in prev.items()},
+                inter={k: v / n_battles for k, v in inter.items()})
 
 
 def main():
@@ -518,8 +552,9 @@ def main():
                      'loss', 'wipe0', 'wipe1')}
     gain = {c['id']: sum(r['gain'][c['id']] * r['n'] for r in runs) / n for c in cards}
     prev = {c['id']: sum(r['prev'][c['id']] * r['n'] for r in runs) / n for c in cards}
-    targets = TARGETS_V13 or v9.TARGETS
-    tname = 'v13 (gemeinsamer Anker, Rahmen v3)' if TARGETS_V13 else 'v9 (alt)'
+    inter = {c['id']: sum(r['inter'][c['id']] * r['n'] for r in runs) / n for c in cards}
+    targets = TARGETS_V14 or v9.TARGETS
+    tname = 'v14 (gemeinsamer Anker, Rahmen v3; r5 Trend 3,55)' if TARGETS_V14 else 'v9 (alt)'
     out = []
     print(f'=== Defense-Metrik v11 (gemischte Flotten 3v3, Rahmen v3, N={n}) ===')
     print('Karten-Platzierung: 3x Defense (je Schiff 1 Instanz, Gain/3)'
@@ -530,19 +565,19 @@ def main():
           f' | P(Verteidiger verliert >=1 Schiff) {agg["loss"]*100:.0f} %'
           f' | Verteidiger vernichtet {agg["wipe0"]*100:.0f} % | Angreifer vernichtet {agg["wipe1"]*100:.0f} %')
     print(f'Zielkurve: {tname}')
-    print(f'{"id":>4} {"Karte":<28} {"Score":>6} {"Wert-Gew":>8} {"Mission":>7} {"prev":>6} {"ΔKurve":>7}')
+    print(f'{"id":>4} {"Karte":<28} {"Score":>6} {"Wert-Gew":>8} {"oAbf%":>6} {"prev":>6} {"ΔKurve":>7}')
     for c in cards:
-        mc = mission_credit(c, agg['loot'])
-        score = (gain[c['id']] + mc) / c['units']
+        score = gain[c['id']] / c['units']
         out.append(dict(id=c['id'], rarity=c['rarity'], title=c['title'],
-                        gain=round(gain[c['id']], 3), mission=round(mc, 2),
+                        gain=round(gain[c['id']], 3),
+                        nointercept=round(inter[c['id']], 3),
                         prevented=round(prev[c['id']], 3),
                         units=c['units'], score=round(score, 2)))
     for o in sorted(out, key=lambda x: x['score']):
         tgt = targets.get(o['rarity'])
         d = o['score'] - tgt if tgt else 0.0
         print(f'{o["id"]:>4} r{o["rarity"]} {o["title"][:26]:<26} {o["score"]:6.2f}'
-              f' {o["gain"]:8.2f} {o["mission"]:7.2f} {o["prevented"]:6.2f} {d:+7.2f}')
+              f' {o["gain"]:8.2f} {o["nointercept"]*100:6.1f} {o["prevented"]:6.2f} {d:+7.2f}')
     for rar in (5, 4, 3, 2, 1):
         grp = [o for o in out if o['rarity'] == rar]
         if grp:

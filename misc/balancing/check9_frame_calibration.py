@@ -8,7 +8,8 @@ Schiff 1 zusaetzliche Instanz der bewerteten Waffe (abstrakt ohne
 Sockel-Check, analog zur Karten-Platzierung), Wert = Rahmen-v3-Konto-
 Gewinn (Output - Gegner-Output/taken - Kolonie + Missionslohn) / 3
 (Karten-Platzierung) / Einsatzkosten v3. Gepaarte Zuege (Common Random
-Numbers).
+Numbers). Karten-Schleife inkl. Abfang-Ausduennung (Runde 12c, Credit
+entfallen); Waffen unberuehrt (kein Speed-Bonus).
 
 Zusaetzlich: Sanitaet der Feuerquote (E[Angriffe] je Waffe vs. v9-k=1,59),
 Rang-Korrelation der Waffen-Scores gegen v9-FINAL und Aufschluesselung
@@ -144,9 +145,7 @@ rows_c = [dict(id=c['id'], title=c['title'], rarity=c['rarity'],
                take=round(acc_c[c['id']]['take'] / N / 3, 3),
                col=round(acc_c[c['id']]['col'] / N / 3, 3),
                loot=round(acc_c[c['id']]['loot'] / N / 3, 3),
-               mission_credit=round(v11.mission_credit(c, LOOT_INT), 2),
-               score=round((total(acc_c[c['id']]) / N / 3
-                            + v11.mission_credit(c, LOOT_INT)) / c['units'], 3))
+               score=round(total(acc_c[c['id']]) / N / 3 / c['units'], 3))
           for c in v11.cards]
 
 print(f'\n=== Gemeinsamer v11-Rahmen v3 (N={N}), Wert = Konto-Gewinn/3 je Einheiten ===')
@@ -184,13 +183,13 @@ for label, rows in (('Waffen', rows_w), ('Statkarten', rows_c)):
                    ('col', 'Kolonie'), ('loot', 'Missionslohn')):
         print(f'  {label:<10} {lab:<13} {statistics.median(r[k] for r in rows):+.3f}')
 
-print(f'\nVorschlag TARGETS_V13 (Anker = Waffen-Mediane im Rahmen v3): {targets}')
+print(f'\nVorschlag TARGETS_V14 (Messung; r5 offiziell = Trend 3,55): {targets}')
 json.dump(dict(n=N, e_attacks=e_att, take_weight=TAKE_WEIGHT,
                ctrl_w=v11.CTRL_W,
                loot_intercept=round(LOOT_INT, 3),
                loot_no_intercept=round(v11.LOOT_NO_INTERCEPT, 3),
                e_fleet_ctrl=round(v11.E_FLEET_CTRL, 3),
-               targets_v13=targets, weapons=rows_w, cards=rows_c),
+               targets_v14=targets, weapons=rows_w, cards=rows_c),
           open(os.path.join(HERE, 'frame_calibration.json'), 'w',
                encoding='utf-8'), ensure_ascii=False, indent=1)
 print('-> frame_calibration.json geschrieben')
