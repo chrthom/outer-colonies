@@ -18,9 +18,9 @@ class MockCard extends Card {
 }
 
 class MockPlayer extends Player {
-  constructor() {
+  constructor(playerNo: number) {
     const mockMatch = new MockMatch() as any as Match;
-    super('test-socket', 'Test Player', mockMatch, 1, []);
+    super('test-socket', 'Test Player', mockMatch, playerNo, []);
   }
 }
 
@@ -35,12 +35,12 @@ class MockMatch {
 
 describe('Battle', () => {
   let battle: Battle;
+  let player0: MockPlayer;
   let player1: MockPlayer;
-  let player2: MockPlayer;
 
   beforeEach(() => {
-    player1 = new MockPlayer();
-    player2 = new MockPlayer();
+    player0 = new MockPlayer(0);
+    player1 = new MockPlayer(1);
     battle = new Battle(BattleType.Mission, 1);
   });
 
@@ -68,35 +68,86 @@ describe('Battle', () => {
       expect(sumControl).toBe(0);
     });
 
-    test('should grant control surplus on successful mission', () => {
-      battle = new Battle(BattleType.Mission, 1);
+    describe('applyMissionResult', () => {
+      const createMissionShip = (player: Player, control: number): RootCardStack => {
+        const card = new MockCard(1, 'MissionShip', CardType.Hull, 1);
+        card.profile.control = control;
+        return new RootCardStack(card, Zone.Neutral, player);
+      };
+      const createInterceptingShip = (player: Player, control: number): RootCardStack => {
+        const card = new MockCard(2, 'Interceptor', CardType.Hull, 1);
+        card.profile.control = control;
+        return new RootCardStack(card, Zone.Neutral, player);
+      };
+      const mockMatchFor = (activePlayerNo: number, players: Player[]): Match =>
+        ({
+          activePlayer: players[activePlayerNo],
+          activePlayerNo,
+          players,
+          gameResult: { setWinnerByDeckDepletion: jest.fn() }
+        }) as any as Match;
+      const stubMissionLoot = (player: Player) => {
+        player.gainControl = jest.fn();
+        player.drawCards = jest.fn();
+        player.pickCardsFromTopOfDiscardPile = jest.fn().mockReturnValue([]);
+      };
 
-      const mockGameResult = { setWinnerByDeckDepletion: jest.fn() };
-      const mockMatch = {
-        activePlayer: player1,
-        activePlayerNo: 1,
-        players: [player1, player2],
-        gameResult: mockGameResult
-      } as any as Match;
+      test('should grant control surplus to player 0 on successful mission', () => {
+        battle = new Battle(BattleType.Mission, 0);
+        const mockMatch = mockMatchFor(0, [player0, player1]);
+        battle.ships[0] = [createMissionShip(player0, 3)];
+        battle.ships[1] = [createInterceptingShip(player1, 2)];
+        stubMissionLoot(player0);
 
-      const attackerCard = new MockCard(1, 'Ship1', CardType.Hull, 1);
-      attackerCard.profile.control = 3;
-      const defenderCard = new MockCard(2, 'Ship2', CardType.Hull, 1);
-      defenderCard.profile.control = 2;
+        (battle as any).applyMissionResult(mockMatch);
 
-      battle.ships[0] = [new RootCardStack(attackerCard, Zone.Hand, player1)];
-      battle.ships[1] = [new RootCardStack(defenderCard, Zone.Hand, player1)];
+        expect(player0.gainControl).toHaveBeenCalledWith(1);
+        expect(player0.drawCards).toHaveBeenCalledWith(1);
+      });
 
-      const gainControlSpy = jest.fn();
-      const drawCardsSpy = jest.fn();
-      player1.gainControl = gainControlSpy;
-      player1.drawCards = drawCardsSpy;
-      player1.pickCardsFromTopOfDiscardPile = jest.fn().mockReturnValue([]);
+      test('should grant control surplus to player 1 on successful mission', () => {
+        battle = new Battle(BattleType.Mission, 1);
+        const mockMatch = mockMatchFor(1, [player0, player1]);
+        battle.ships[1] = [createMissionShip(player1, 3)];
+        battle.ships[0] = [createInterceptingShip(player0, 2)];
+        stubMissionLoot(player1);
 
-      (battle as any).applyMissionResult(mockMatch);
+        (battle as any).applyMissionResult(mockMatch);
 
-      expect(gainControlSpy).toHaveBeenCalledWith(1);
-      expect(drawCardsSpy).toHaveBeenCalledWith(1);
+        expect(player1.gainControl).toHaveBeenCalledWith(1);
+        expect(player1.drawCards).toHaveBeenCalledWith(1);
+      });
+
+      test('should not grant control on failed mission', () => {
+        battle = new Battle(BattleType.Mission, 1);
+        const mockMatch = mockMatchFor(1, [player0, player1]);
+        battle.ships[1] = [];
+        battle.ships[0] = [createInterceptingShip(player0, 2)];
+        stubMissionLoot(player1);
+
+        (battle as any).applyMissionResult(mockMatch);
+
+        expect(player1.gainControl).not.toHaveBeenCalled();
+        expect(player1.drawCards).not.toHaveBeenCalled();
+      });
+
+      test('should fire onMissionCompletion only on active player ships', () => {
+        battle = new Battle(BattleType.Mission, 1);
+        const mockMatch = mockMatchFor(1, [player0, player1]);
+        const missionShip = createMissionShip(player1, 3);
+        const interceptingShip = createInterceptingShip(player0, 2);
+        battle.ships[1] = [missionShip];
+        battle.ships[0] = [interceptingShip];
+        stubMissionLoot(player1);
+        const missionShipSpy = jest.spyOn(missionShip.card, 'onMissionCompletion');
+        const interceptingShipSpy = jest.spyOn(interceptingShip.card, 'onMissionCompletion');
+
+        (battle as any).applyMissionResult(mockMatch);
+
+        expect(missionShipSpy).toHaveBeenCalledTimes(1);
+        expect(missionShipSpy).toHaveBeenCalledWith(player1);
+        expect(interceptingShipSpy).not.toHaveBeenCalled();
+      });
     });
   });
 });
