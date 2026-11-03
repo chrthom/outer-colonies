@@ -5,13 +5,14 @@ Christophers Ziel: Waffen und Nicht-Waffen GLEICHWERTIG, gemeinsame
 Zielkurve. Dazu werden ALLE 50 FINAL-Waffen im SELBEN v11-Flotten-Frame
 gemessen wie die 19 Statkarten: je Gefecht bekommt jedes Verteidiger-
 Schiff 1 zusaetzliche Instanz der bewerteten Waffe (abstrakt ohne
-Sockel-Check, analog zur Karten-Platzierung), Wert = Frame-v2-Konto-
-Gewinn (Output - Kolonie - Waffenverlust + Missionslohn) / 3 (Karten-
-platzierung) / Einsatzkosten v3. Gepaarte Zuege (Common Random Numbers).
+Sockel-Check, analog zur Karten-Platzierung), Wert = Rahmen-v3-Konto-
+Gewinn (Output - Gegner-Output/taken - Kolonie + Missionslohn) / 3
+(Karten-Platzierung) / Einsatzkosten v3. Gepaarte Zuege (Common Random
+Numbers).
 
 Zusaetzlich: Sanitaet der Feuerquote (E[Angriffe] je Waffe vs. v9-k=1,59),
 Rang-Korrelation der Waffen-Scores gegen v9-FINAL und Aufschluesselung
-des Wert-Gewinns nach Konten (out/col/eq/loot) fuer die Transparenz.
+des Wert-Gewinns nach Konten (out/take/col/loot) fuer die Transparenz.
 
 Aufruf: python3 check9_frame_calibration.py [N]   (Default 3000)
 Ergebnis: frame_calibration.json
@@ -29,7 +30,7 @@ import balancing_metric_v9 as v9
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
-EQ = v11.EQ_RATE
+TAKE_WEIGHT = 1.0   # Rahmen v3: Gegner-Output (taken) mit Gewicht 1.0
 
 V9_SCORES = {w['id']: w['scored'] for w in json.load(
     open(os.path.join(HERE, 'weapons_v9_final.json'), encoding='utf-8'))}
@@ -66,9 +67,9 @@ def spearman(xs, ys):
     return cov / (vx * vy)
 
 
-def accounts(dealt, colony, eq, loot):
+def accounts(dealt, taken, colony, loot):
     """Wert-Konto zerlegt in Beitraege (Vorzeichen: mehr = mehr Wert)."""
-    return dict(out=dealt, col=-colony, eq=-EQ * eq, loot=loot)
+    return dict(out=dealt, take=-TAKE_WEIGHT * taken, col=-colony, loot=loot)
 
 
 # --- Sanitaet 1: Feuerquote vs v9-k ---
@@ -81,8 +82,8 @@ print(f'E[Angriffe je Waffe/Gefecht] rarity-gewichtet: {e_att:.2f} '
 
 # --- Gemeinsamer Frame ---
 random.seed(42)
-acc_w = {w['id']: dict(out=0.0, col=0.0, eq=0.0, loot=0.0) for w in ws}
-acc_c = {c['id']: dict(out=0.0, col=0.0, eq=0.0, loot=0.0) for c in v11.cards}
+acc_w = {w['id']: dict(out=0.0, take=0.0, col=0.0, loot=0.0) for w in ws}
+acc_c = {c['id']: dict(out=0.0, take=0.0, col=0.0, loot=0.0) for c in v11.cards}
 loot0s, n_mission = 0.0, 0
 t0 = time.time()
 for b in range(N):
@@ -98,23 +99,23 @@ for b in range(N):
     wspec_fire = [[random.random() < v10.ATTACK_PROB[p] for p in v11.PHASES]
                   for _ in range(3)]
     order = (0, 1) if b % 2 == 0 else (1, 0)
-    _, dealt0, dead0, _, col0, eq0, loot0 = v11.battle(
+    take0, dealt0, dead0, _, col0, eq0, loot0 = v11.battle(
         w, att, deff, pool_cards, fire, order, raid=raid, colpool=colpool)
     if not raid:
         loot0s += loot0
         n_mission += 1
-    base = accounts(dealt0, col0, eq0, loot0)
+    base = accounts(dealt0, take0, col0, loot0)
     for w2 in ws:
-        _, d1, dd0, _, c1, e1, l1 = v11.battle(
+        t1, d1, dd0, _, c1, e1, l1 = v11.battle(
             w, att, deff, pool_cards, fire, order, raid=raid,
             wspec=w2, wspec_fire=wspec_fire, colpool=colpool)
-        for k, v in accounts(d1, c1, e1, l1).items():
+        for k, v in accounts(d1, t1, c1, l1).items():
             acc_w[w2['id']][k] += v - base[k]
     for c in v11.cards:
-        _, d1, dd0, _, c1, e1, l1 = v11.battle(
+        t1, d1, dd0, _, c1, e1, l1 = v11.battle(
             w, att, deff, pool_cards, fire, order, raid=raid,
             spec=c, colpool=colpool)
-        for k, v in accounts(d1, c1, e1, l1).items():
+        for k, v in accounts(d1, t1, c1, l1).items():
             acc_c[c['id']][k] += v - base[k]
     if (b + 1) % 500 == 0:
         print(f'  {b + 1}/{N} Gefechte ({time.time() - t0:.0f}s)', flush=True)
@@ -130,8 +131,8 @@ rows_w = [dict(id=w['id'], title=w['title'], rarity=w['rarity'],
                units=v11.weapon_units(w),
                gain=round(total(acc_w[w['id']]) / N / 3, 3),
                out=round(acc_w[w['id']]['out'] / N / 3, 3),
+               take=round(acc_w[w['id']]['take'] / N / 3, 3),
                col=round(acc_w[w['id']]['col'] / N / 3, 3),
-               eq=round(acc_w[w['id']]['eq'] / N / 3, 3),
                loot=round(acc_w[w['id']]['loot'] / N / 3, 3),
                score=round(total(acc_w[w['id']]) / N / 3 / v11.weapon_units(w), 3),
                v9=V9_SCORES.get(w['id']), e_att=round(e_attacks(w), 2))
@@ -140,15 +141,15 @@ rows_c = [dict(id=c['id'], title=c['title'], rarity=c['rarity'],
                units=c['units'],
                gain=round(total(acc_c[c['id']]) / N / 3, 3),
                out=round(acc_c[c['id']]['out'] / N / 3, 3),
+               take=round(acc_c[c['id']]['take'] / N / 3, 3),
                col=round(acc_c[c['id']]['col'] / N / 3, 3),
-               eq=round(acc_c[c['id']]['eq'] / N / 3, 3),
                loot=round(acc_c[c['id']]['loot'] / N / 3, 3),
                mission_credit=round(v11.mission_credit(c, LOOT_INT), 2),
                score=round((total(acc_c[c['id']]) / N / 3
                             + v11.mission_credit(c, LOOT_INT)) / c['units'], 3))
           for c in v11.cards]
 
-print(f'\n=== Gemeinsamer v11-Frame v2 (N={N}), Wert = Konto-Gewinn/3 je Einheiten ===')
+print(f'\n=== Gemeinsamer v11-Rahmen v3 (N={N}), Wert = Konto-Gewinn/3 je Einheiten ===')
 print('Waffen je Raritaet (Median) vs v9-FINAL vs Statkarten:')
 targets = {}
 for rar in (1, 2, 3, 4, 5):
@@ -179,16 +180,17 @@ print(f'\nØ Missionslohn im abgefangenen Gefecht (Baseline): {LOOT_INT:.2f} Mar
       f' (E[Flotten-Kontrolle] {v11.E_FLEET_CTRL:.2f})')
 print('Konto-Aufschluesselung des Wert-Gewinns/3 (Mediane):')
 for label, rows in (('Waffen', rows_w), ('Statkarten', rows_c)):
-    for k, lab in (('out', 'Output'), ('col', 'Kolonie'),
-                   ('eq', 'Waffenverlust'), ('loot', 'Missionslohn')):
+    for k, lab in (('out', 'Output'), ('take', 'Verhinderung (taken)'),
+                   ('col', 'Kolonie'), ('loot', 'Missionslohn')):
         print(f'  {label:<10} {lab:<13} {statistics.median(r[k] for r in rows):+.3f}')
 
-print(f'\nVorschlag TARGETS_V12 (Anker = Waffen-Mediane im Frame v2): {targets}')
-json.dump(dict(n=N, e_attacks=e_att, eq_rate=EQ, ctrl_w=v11.CTRL_W,
+print(f'\nVorschlag TARGETS_V13 (Anker = Waffen-Mediane im Rahmen v3): {targets}')
+json.dump(dict(n=N, e_attacks=e_att, take_weight=TAKE_WEIGHT,
+               ctrl_w=v11.CTRL_W,
                loot_intercept=round(LOOT_INT, 3),
                loot_no_intercept=round(v11.LOOT_NO_INTERCEPT, 3),
                e_fleet_ctrl=round(v11.E_FLEET_CTRL, 3),
-               targets_v12=targets, weapons=rows_w, cards=rows_c),
+               targets_v13=targets, weapons=rows_w, cards=rows_c),
           open(os.path.join(HERE, 'frame_calibration.json'), 'w',
                encoding='utf-8'), ensure_ascii=False, indent=1)
 print('-> frame_calibration.json geschrieben')

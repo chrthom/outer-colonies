@@ -39,18 +39,26 @@ Rahmen (Christopher, 3.11.2026, Runde-6-Review + Entscheidungen 3+5):
     identisch auf alle Schiffe beider Seiten (v9.SHIP-Pools: nur
     S/P/PD, keine hp-/speed-Ausruestung - bewusste Vereinfachung).
 
-Wertdefinition = OUTPUT-FRAME v2 (Runde 9/10, Christophers Beschluss zu
-(a)+(c)): Erwarteter Mehr-Wert des Verteidigers durch die Karte, Wert-
-Konto je Gefecht = Output-Marker (dealt) - Kolonie-Marker (Kap 50 HP,
-Raid) - EQ_RATE x verlorene Waffen-Kosteneinheiten (je totem eigenen
-Traeger) + Missionslohn (Kontrolle: CTRL_W x max(0, control eigene
+Wertdefinition = DIFFERENZ-RAHMEN v3 (Runde 11b, Christophers Beschluss):
+Erwarteter Mehr-Wert des Verteidigers durch die Karte, Wert-Konto je
+Gefecht = Output-Marker (dealt, nach Abzuegen) - erlittene Marker auf
+eigenen Schiffen (taken = Gegner-Output) - Kolonie-Marker (Kap 50 HP,
+Raid) + Missionslohn (Kontrolle: CTRL_W x max(0, control eigene
 ueberlebende - control gegnerische ueberlebende Schiffe), code-
 verankert: rules.ts controlLimit 15 == colonyHP 50 -> 1 Kontrolle =
-50/15 Marker). Nicht erfasst (dokumentiert): abstrakte Pool-Ausruestung
-(keine belastbare Kostenbasis), Rumpfwert, Kartenziehen-Loot. Platzierung
-je Verteidiger-Schiff 1 Instanz ("3x Defense"), Wert-Gewinn /3
-normalisiert; gepaarte Zuege (Common Random Numbers). Prevented nur
-Diagnose-Spalte.
+50/15 Marker). Die bilaterale Differenz ist unter Schadensmarker-
+Persistenz (Heilung nur via Zurueck-auf-Hand, Regeln: Aufbauphase) die
+HP-Materiell-Bilanz: dealt - taken = (gegnerische HP zerstoert UND
+beschaedigt) - (eigene). EQ-Konto ENTFALLEN (Christophers Runde-11-
+Argument: Karten sind die knappe Ressource, Anzahl im Szenario konstant
+1/Schiff; Messung +-0,07 bei Rang-Korrelation +1,00); Tod laeuft ueber
+taken + Output intern. Nicht erfasst (dokumentiert): abstrakte Pool-
+Ausruestung (keine belastbare Kostenbasis), Tod-Zuschlag ueber HP hinaus
+(Schiffs-/Ausruestungskarten, symmetrisch gekuerzt), Kartenziehen-Loot.
+Take-Gewicht 1,0 (Obergrenze; Heilungs-Tempo-Kosten -> Regler, per
+Playtest zu justieren). Platzierung je Verteidiger-Schiff 1 Instanz
+("3x Defense"), Wert-Gewinn /3 normalisiert; gepaarte Zuege (Common
+Random Numbers). Prevented nur Diagnose-Spalte.
 
 Score = (Wert-Gewinn + Missionswert-Korrektur [Option B, nur Speed-Karten,
 Abfang-Vermeidung]) / Einsatzkosten v3.
@@ -77,8 +85,10 @@ PHASES = (4, 3, 2, 1)
 # Defense"): True = je Verteidiger-Schiff 1 Instanz, Gain/3 normalisiert.
 # False (Diagnose): uniform zufaellig auf EINEM Schiff, ohne Normalisierung.
 SPEC_ALL3 = True
-# --- Asset-Konto (Runde 9, Frame-Erweiterung zu Christophers (c)-Befund) ---
-EQ_RATE = 1.0        # Regler: Marker je verlorener Kosteneinheit Waffe
+# --- Rahmen v3 (Runde 11b): Differenz-Rahmen, EQ-Konto entfallen ---
+# EQ_RATE (Frame v2, Runde 9/10) ENTFALLEN: Tode laufen ueber taken/Output
+# intern; ein Karten-Anzahl-Malus waere konstant 1/Schiff (Christophers
+# Karten-Argument) und brachte nur +-0,07 bei Rang-Korrelation +1,00.
 COLONY_HP = 50.0     # Kolonie-HP (rules.ts: colonyHP = 50)
 # Missionslohn (Runde 10, Christophers Vorgabe): Vorherrschaft-Sieg bei 15
 # control (rules.ts: controlLimit = 15) == Zerstoerungs-Sieg bei 50 Kolonie-
@@ -87,11 +97,10 @@ COLONY_HP = 50.0     # Kolonie-HP (rules.ts: colonyHP = 50)
 # >= 1 ueberlebendem eigenen Schiff; Kontrolle = max(0, Summe control der
 # eigenen ueberlebenden - der gegnerischen ueberlebenden Schiffe).
 CTRL_W = 50.0 / 15.0
-# Zielkurve v12 (3.11.2026, Runde 10): Gemeinsamer Anker Waffen+Karten im
-# Frame v2 (inkl. kontrollbasiertem Missionslohn) = Mediane der 50 FINAL-
-# Waffen-Scores je Raritaet (check9, N=3000). Unverglaettet (Christophers
-# (b)-Beschluss: Form/Sortierung spaeter).
-TARGETS_V12 = {1: 2.06, 2: 2.57, 3: 2.63, 4: 3.02, 5: 2.74}
+# Zielkurve v13 (3.11.2026, Runde 11b): Gemeinsamer Anker Waffen+Karten im
+# Differenz-Rahmen v3 = Mediane der 50 FINAL-Waffen-Scores je Raritaet
+# (check9, N=3000). Unverglaettet (Christophers (b)-Beschluss: spaeter).
+TARGETS_V13 = {1: 2.26, 2: 2.67, 3: 2.88, 4: 3.29, 5: 2.93}
 
 
 def weapon_units(w):
@@ -101,10 +110,11 @@ def weapon_units(w):
     return (w['socket_cost'] + e_cost) or 0.5
 
 
-def value(dealt, colony, eq, loot):
-    """Wert-Konto je Gefecht (Seite 0 / Verteidiger), Frame v2:
-    Output - Kolonie-Marker - Waffenverlust + Missionslohn (Kontrolle)."""
-    return dealt - colony - EQ_RATE * eq + loot
+def value(dealt, taken, colony, loot):
+    """Wert-Konto je Gefecht (Seite 0 / Verteidiger), Rahmen v3
+    (Differenz): Output - Gegner-Output (taken = Marker auf eigenen
+    Schiffen) - Kolonie-Marker + Missionslohn (Kontrolle)."""
+    return dealt - taken - colony + loot
 
 
 def mission_credit(c, loot_intercept):
@@ -320,7 +330,8 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
     Schiffs-Defense, unhalbiert, Kolonie-Killer x2; Kap COLONY_HP).
     Rueckgabe (taken_def, dealt_def, dead_def, dead_att, colony, eq,
     loot): colony = Kolonie-Marker (Seite 0), eq = Kosteneinheiten der
-    Waffen-Instanzen toter eigener Traeger (Seite 0, Asset-Konto),
+    Waffen-Instanzen toter eigener Traeger (Seite 0, seit Rahmen v3 nur
+    Diagnose, nicht mehr im Wert-Konto),
     loot = Missionslohn in Markern (nur Mission: CTRL_W x max(0,
     control eigene ueberlebende - control gegnerische ueberlebende
     Schiffe), battle.ts: applyMissionResult)."""
@@ -468,13 +479,13 @@ def run(n_battles, seed=23):
         losses += 1 if dead0 >= 1 else 0
         wipes0 += 1 if dead0 == 3 else 0
         wipes1 += 1 if dead1 == 3 else 0
-        v0 = value(dealt0, col0, eq0, loot0)
+        v0 = value(dealt0, take0, col0, loot0)
         for c in cards:
             ship = None if SPEC_ALL3 else random.randrange(N_SHIPS)
             take1, dealt1, cd0, cd1, col1, eq1, loot1 = battle(
                 w, att, deff, pool_cards, fire, order,
                 spec=c, ship=ship, raid=raid, colpool=colpool)
-            gain[c['id']] += value(dealt1, col1, eq1, loot1) - v0
+            gain[c['id']] += value(dealt1, take1, col1, loot1) - v0
             prev[c['id']] += take0 - take1
     norm = 3.0 if SPEC_ALL3 else 1.0
     return dict(n=n_battles, taken=t0s / n_battles, dealt=d0s / n_battles,
@@ -507,10 +518,10 @@ def main():
                      'loss', 'wipe0', 'wipe1')}
     gain = {c['id']: sum(r['gain'][c['id']] * r['n'] for r in runs) / n for c in cards}
     prev = {c['id']: sum(r['prev'][c['id']] * r['n'] for r in runs) / n for c in cards}
-    targets = TARGETS_V12 or v9.TARGETS
-    tname = 'v12 (gemeinsamer Anker)' if TARGETS_V12 else 'v9 (alt)'
+    targets = TARGETS_V13 or v9.TARGETS
+    tname = 'v13 (gemeinsamer Anker, Rahmen v3)' if TARGETS_V13 else 'v9 (alt)'
     out = []
-    print(f'=== Defense-Metrik v11 (gemischte Flotten 3v3, Frame v2, N={n}) ===')
+    print(f'=== Defense-Metrik v11 (gemischte Flotten 3v3, Rahmen v3, N={n}) ===')
     print('Karten-Platzierung: 3x Defense (je Schiff 1 Instanz, Gain/3)'
           if SPEC_ALL3 else '1x auf zufaelligem Schiff')
     print(f'Baseline: Ø taken {agg["taken"]:.2f} | Ø dealt {agg["dealt"]:.2f} je Gefecht'
