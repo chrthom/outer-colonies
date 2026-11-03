@@ -23,7 +23,7 @@ Maintain consistency across the three subprojects
 - Only the game and the cards themselves are German for now (bilingual support is planned)
 
 ### Branches & Merges
-- Only these branch types exist: `main`, `release/<x.x>`, `feature/<name>` and `fix/<name>`
+- Only these branch types exist: `main`, `release/<x.x>`, `feature/<name>` and `fix/<name>` (the dev-loop automation additionally generates `vibe/issue-<N>-*` branches for its PRs, see `docs/dev-loop.md`)
 - Squash merges only; no direct pushes to `main` (both enforced via GitHub branch protection)
 - PRs are always reviewed and merged by the maintainer
 
@@ -38,7 +38,7 @@ Maintain consistency across the three subprojects
 - `dev-loop` is the default label if the task can be fully implemented by the AI dev loop; use `needs-human` instead if human work is required (especially adjusting card graphics)
 
 ### Milestones, Versions & Releases
-- Each milestone matches exactly one tag and one release and contains all issues for developing that release
+- Each milestone matches exactly one major/minor tag and release and contains all issues for developing that release; hotfix patch tags and releases are additionally assigned to the productive milestone
 - Tags and releases are semantically versioned
 - Milestones only cover major/minor versions; patches (hotfixes) belong to the milestone of the currently productive version
 - The currently productive milestone stays open so productive bugs can be assigned to it; new features and enhancements go to the next milestone
