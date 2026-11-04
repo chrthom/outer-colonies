@@ -170,8 +170,12 @@ for w in weapons:
 # wechselt POOL_SHIFT der Faelle deterministisch zur Haelfte zur Schild- bzw.
 # Panzerungskarte mit GLEICHEN Punkten (PD1->S1/A1, PD2->S2/A2).
 # Shift 25 %: P(PD) 46,4 -> ~34 %, P(Schild) 20 -> ~30 %, P(Panzerung)
-# 22,7 -> ~25 % (Koloniezonen-Pools unveraendert). ---
-POOL_SHIFT = 0.25
+# 22,7 -> ~25 % (Koloniezonen-Pools unveraendert).
+# --- Runde 13l (Christophers Beschluss 4.11.2026): ZURUECK auf 0.0 —
+# Original-Verteilung (46,4 % PD); shift0-Probe zeigte, dass die
+# Umschichtung den Torpedo-Flip nicht erklaert (412 blieb +4,49), und
+# der Zielframe wird ohnehin neu verankert. ---
+POOL_SHIFT = 0.0
 
 def _shifted_pools(shift=POOL_SHIFT):
     if shift <= 0:
@@ -380,7 +384,7 @@ def draw_battle(rng=random):
 
 def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
            raid=False, spread=False, wspec=None, wspec_fire=None,
-           colpool=None):
+           colpool=None, wspec_side=0, ret='legacy'):
     """Ein Gefecht. Seite 0 = Verteidiger (deff, bewertete Karte),
     Seite 1 = Angreifer (att; im Raid ueberfaellt er die Kolonie von
     Seite 0). fire[u][i][p] je Seite u, Schiff i, Phase p.
@@ -430,7 +434,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             ships.append(dict(cards=cards_nopd, taken=0.0, dead=False,
                               hp=ship_hp, s=b['s'] + s_bonus,
                               ctrl=b['ctrl'],
-                              n_inst=(1 if b['parts'] == 1 else 2),
+                              n_inst=(2 if b['parts'] == 3 else 1),
                               carrier=compatible(w, b)))
         fleet.append(ships)
         fleet_pd[side] = side_pd
@@ -509,14 +513,23 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             # ebenfalls feuerte (Range-4-Feuerung wurde dadurch fast nie
             # erreicht; 13i-Befund '412 range 4 = exakt 0,0' war dieses
             # Artefakt, nicht der apply-Bug allein). ---
-            if u == 0 and wspec is not None:
+            if u == wspec_side and wspec is not None:
+                # --- Runde 13m (Christophers Beschluss 4.11.2026): die
+                # bewertete Waffe wird je Gefecht in BEIDEN Rollen
+                # gemessen (Seite 0 = Verteidiger, Seite 1 = Raid-
+                # Angreifer mit vollstaendiger R1-Kolonie-Logik und
+                # Verheerend (Kolonie) = x2); Score = Rollenmittel. ---
                 for i, sh in enumerate(own):
                     if sh['dead']:
                         continue
                     ok = (p == wspec['fire_phase']) if wspec['single'] \
                         else (p <= wspec['range'])
                     if ok and wspec_fire[i][4 - p]:
-                        for _inst in range(sh['n_inst']):
+                        # --- Runde 13l (Christophers Beschluss 4.11.2026):
+                        # bewertete Karte nur 1x je Schiff (kein Stack-
+                        # Bonus durch n_inst; Combo-Stacks bleiben
+                        # gewollter Spiel-Effekt, kein Kartenwert) ---
+                        for _inst in range(1):
                             tgt_i = next((j for j, e in enumerate(enemy)
                                           if not e['dead']), None)
                             if tgt_i is None:
@@ -525,10 +538,24 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                             base = max(0, wspec['damage']
                                        - (6 * tgt['s'] if wspec['id'] == '401' else 0))
                             d = v9.half(base) if sh['s'] + p < tgt['s'] else base
+                            if raid and wspec_side == 1 and p == 1 \
+                                    and wspec['r1_col'] > d:
+                                # Raid-Angreiferrolle: R1-Angriff auf die
+                                # Kolonie (Beute-Konto, x2 bei Kolonie-
+                                # Killer); toter Traeger vor R1 feuert
+                                # nicht mehr (dead-Check oben) —
+                                # Christophers Regelpraezisierung 13m.
+                                if colpool is not None and colony < COLONY_HP:
+                                    cd = v9.resolve_attack(
+                                        wspec, [dict(c) for c in colpool],
+                                        wspec['damage']) \
+                                        * (2 if wspec['colony_killer'] else 1)
+                                    colony = min(COLONY_HP, colony + cd)
+                                continue
                             pool = tgt['cards'] + [c for c, _ in e_pd]
                             dmg = v9.resolve_attack(wspec, pool, d)
                             tgt['taken'] += dmg
-                            dealt[0] += dmg
+                            dealt[u] += dmg
                             if tgt['taken'] >= tgt['hp']:
                                 tgt['dead'] = True
         for side in (0, 1):
@@ -543,16 +570,24 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                         c['used'] = False
     dead = [sum(1 for s in fleet[u] if s['dead']) for u in (0, 1)]
     taken = sum(s['taken'] for s in fleet[0])
+    taken1 = sum(s['taken'] for s in fleet[1])
     # Asset-Konto: verlorene Waffen-Instanzen eigener toter Traeger (Seite 0)
     eq = weapon_units(w) * sum(1 for sh in fleet[0] if sh['dead'] and sh['carrier'])
     # Missionslohn (battle.ts: applyMissionResult): Kontrolle der
     # ueberlebenden Schiffe, max(0, eigene - gegnerische), nur Mission.
     if raid:
         loot = 0.0
+        loot1 = 0.0
     else:
         own_c = sum(sh['ctrl'] for sh in fleet[0] if not sh['dead'])
         enemy_c = sum(sh['ctrl'] for sh in fleet[1] if not sh['dead'])
         loot = CTRL_W * max(0.0, own_c - enemy_c)
+        loot1 = CTRL_W * max(0.0, enemy_c - own_c)
+    if ret == 'full':
+        # Runde 13m: Konten BEIDER Seiten (Rollenmittel-Messung)
+        return dict(taken0=taken, taken1=taken1, dealt0=dealt[0],
+                    dealt1=dealt[1], dead0=dead[0], dead1=dead[1],
+                    colony=colony, eq0=eq, loot0=loot, loot1=loot1)
     return taken, dealt[0], dead[0], dead[1], colony, eq, loot
 
 
