@@ -45,7 +45,7 @@ import balancing_metric_v9 as v9
 HERE = os.path.dirname(os.path.abspath(__file__))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
 TAKE_WEIGHT = 1.0
-T = dict(v11.TARGETS_V14)          # v18-Kurve (offiziell, 4.11.2026)
+T = dict(v11.TARGETS_V14)          # v19-Kurve (offiziell, Runde 13p, 4.11.2026)
 HP_STATIC = v11.HP_STATIC
 CKPT = os.path.join(HERE, 'check10_ckpt.json')
 CKPT_1V1 = os.path.join(HERE, 'check10_1v1.json')
@@ -342,9 +342,9 @@ for rar in (1, 2, 3, 4, 5):
     print(f'  r{rar}: Waffen {m["weapons"]:.2f} (Fl {m["weapons_fleet"]:.2f} '
           f'/ Du {m["weapons_duel"]:.2f}) | Karten {m["cards"]:.2f} '
           f'(Fl {m["cards_fleet"]:.2f} / Du {m["cards_duel"]:.2f}) | '
-          f'v18 {T[rar]:.2f} | Luecke {m["weapons"] / m["cards"]:.1f}x')
+          f'v19 {T[rar]:.2f} | Luecke {m["weapons"] / m["cards"]:.1f}x')
 print(f'Spearman Waffen: Duel↔Flotte {rho_fd:+.2f}, kombi↔v9 {rho_v9:+.2f}')
-print(f'\nOutlier |Δ|>1.0 gegen v18 (offizielle Kurve): '
+print(f'\nOutlier |Δ|>1.0 gegen v19 (offizielle Kurve): '
       f'{len(outlier)} Waffen')
 for r in outlier:
     print(f"  {r['id']:>3} r{r['rarity']} {r['title'][:24]:<24} "
@@ -362,7 +362,7 @@ out = dict(frame='check10: n1+c3+shift0, Flotte+Duell 50/50, Rollenmittel',
                                       fleet['acc0'].items()},
                                 acc1={k: round(v, 2) for k, v in
                                       fleet['acc1'].items()}),
-           targets_v18=T, medians=med,
+           targets_v19=T, medians=med,
            spearman=dict(duel_fleet=round(rho_fd, 3), kombi_v9=round(rho_v9, 3)),
            weapons=rows_w, cards=rows_c,
            outliers=[r['id'] for r in outlier])

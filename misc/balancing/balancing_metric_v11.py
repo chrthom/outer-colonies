@@ -115,7 +115,14 @@ CTRL_W = 50.0 / 15.0
 # Muenz-/wspec-Bugfix, HP ×0,5): 7,8/8,0/8,4/9,0/9,8 — streng monoton mit
 # deutlich mehr Abstand am oberen Ende (Design-Regel: seltenere Raritaet
 # performt stets besser; r4/r5 liegen bewusst ueber den Messwerten).
-TARGETS_V14 = {1: 4.7, 2: 5.0, 3: 5.8, 4: 6.6, 5: 7.4}
+# Zielkurve v18 (Christophers Beschluss Runde 13n, 4.11.2026, geglaettet
+# ueber den 13n-Messmedianen 4,77/4,78/6,09/6,54/7,23): 4,7/5,0/5,8/6,6/7,4.
+# Zielkurve v19 (Christophers Beschluss Runde 13p, 4.11.2026, geglaettet
+# ueber den 13p-Messmedianen 4,77/4,99/6,09/6,54/7,23 — Frame mit
+# PD-Bezahlung): 4,7/5,0/5,9/6,9/8,0 — r4/r5 bewusst ueber den Messwerten
+# (Design-Regel: seltenere Raritaet performt stets besser, mehr Abstand
+# am oberen Ende).
+TARGETS_V14 = {1: 4.7, 2: 5.0, 3: 5.9, 4: 6.9, 5: 8.0}
 
 
 def weapon_units(w):
@@ -428,6 +435,24 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                             side_pd.append((dict(c), i))
                         else:
                             cpool.append(dict(c))
+            if side == wspec_side and wspec is not None \
+                    and wspec.get('def_pts', 0) > 0:
+                # --- Runde 13p (Christophers Beschluss 4.11.2026): die
+                # bewertete Waffe zahlt ihre Defensivpunkte (abm u. a.)
+                # je Traeger-Schiff in den Flotten-Defense-Pool ein —
+                # analog zur Karten-Platzierung (spec-Block oben) und
+                # serverkonform (card.ts attackStep: Defense-Karten der
+                # verteidigenden Flotte wirken kumulativ; Reduktion =
+                # Abzug x Defensivpunkte; point_defense_cards.ts:
+                # EquipmentCardRechargeable = RechargeRate.PerRound ->
+                # recharge 'phase'; PD wirkt nur gegen Angreifer mit
+                # eigenem PD-Abzug = Torpedos). Nur die BEWERTETE Waffe
+                # zahlt; die abstrakte Gefechtswaffe der Umgebung bleibt
+                # unbezahlt (Frame-Philosophie: Umgebung = Lieferant,
+                # Deltamessung nur ueber die bewertete Karte). ---
+                for t, pts in wspec['def_types'].items():
+                    side_pd.append((dict(type=t, points=pts, used=False,
+                                         recharge=v9.RECHARGE[t]), i))
             pds = [(dict(c), i) for c in cpool if c['type'] == 'pd']
             side_pd.extend(pds)
             cards_nopd = [dict(c) for c in cpool if c['type'] != 'pd']
