@@ -117,12 +117,14 @@ CTRL_W = 50.0 / 15.0
 # performt stets besser; r4/r5 liegen bewusst ueber den Messwerten).
 # Zielkurve v18 (Christophers Beschluss Runde 13n, 4.11.2026, geglaettet
 # ueber den 13n-Messmedianen 4,77/4,78/6,09/6,54/7,23): 4,7/5,0/5,8/6,6/7,4.
-# Zielkurve v19 (Christophers Beschluss Runde 13p, 4.11.2026, geglaettet
-# ueber den 13p-Messmedianen 4,77/4,99/6,09/6,54/7,23 — Frame mit
-# PD-Bezahlung): 4,7/5,0/5,9/6,9/8,0 — r4/r5 bewusst ueber den Messwerten
-# (Design-Regel: seltenere Raritaet performt stets besser, mehr Abstand
-# am oberen Ende).
-TARGETS_V14 = {1: 4.7, 2: 5.0, 3: 5.9, 4: 6.9, 5: 8.0}
+# Zielkurve v20 (Christophers Beschluss Runde 13q, 4.11.2026, geglaettet
+# ueber den v20-Messmedianen 4,11/4,18/5,54/5,88/6,38 — Frame 13q:
+# Referenz-Nachfrage M=2, Statkarten n_inst je Kopie) — GEMEINSAME
+# Kurve fuer Waffen UND Statkarten (alte Runde-8-Praemisse wieder
+# aktiv, Christophers Beschluss 4.11.2026): 4,0/4,3/5,1/6,0/7,0.
+# r1 unter / r5 weit ueber dem Messmedian (Design-Regel: seltenere
+# Raritaet performt stets besser).
+TARGETS_V14 = {1: 4.0, 2: 4.3, 3: 5.1, 4: 6.0, 5: 7.0}
 
 
 def weapon_units(w):

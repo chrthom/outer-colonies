@@ -62,7 +62,8 @@ import balancing_metric_v9 as v9
 HERE = os.path.dirname(os.path.abspath(__file__))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
 TAKE_WEIGHT = 1.0
-T = dict(v11.TARGETS_V14)          # v19-Kurve (Referenz bis v20-Glaettung)
+T = dict(v11.TARGETS_V14)          # v20-Kurve (offiziell, GEMEINSAM fuer
+                                   # Waffen+Karten, Christophers Beschluss)
 HP_STATIC = v11.HP_STATIC
 # --- Runde 13q (Christophers Beschluss): Referenz-Nachfrage M=2 ---
 DMG_SCALE = (2.0, 2.0)
@@ -365,6 +366,10 @@ rho_v9 = spearman([a for a, _ in _v9p], [b for _, b in _v9p])
 
 outlier = sorted((r for r in rows_w if abs(r['delta']) > 1.0),
                  key=lambda r: -abs(r['delta']))
+# --- 13q: GEMEINSAME Kurve fuer Waffen UND Karten (Christophers
+# Beschluss v20) -> Karten-Outlier gegen dieselbe Zielkurve ---
+outlier_c = sorted((r for r in rows_c if abs(r['delta']) > 1.0),
+                   key=lambda r: -abs(r['delta']))
 
 print(f'\n=== check10 Gesamt-Frame (N={N}): Flotte+Duell 50/50, '
       f'Rollenmittel ===')
@@ -377,11 +382,16 @@ for rar in (1, 2, 3, 4, 5):
     print(f'  r{rar}: Waffen {m["weapons"]:.2f} (Fl {m["weapons_fleet"]:.2f} '
           f'/ Du {m["weapons_duel"]:.2f}) | Karten {m["cards"]:.2f} '
           f'(Fl {m["cards_fleet"]:.2f} / Du {m["cards_duel"]:.2f}) | '
-          f'v19 {T[rar]:.2f} | Luecke {m["weapons"] / m["cards"]:.1f}x')
+          f'v20 {T[rar]:.2f} | Luecke {m["weapons"] / m["cards"]:.1f}x')
 print(f'Spearman Waffen: Duel↔Flotte {rho_fd:+.2f}, kombi↔v9 {rho_v9:+.2f}')
-print(f'\nOutlier |Δ|>1.0 gegen v19 (offizielle Kurve): '
+print(f'\nOutlier |Δ|>1,0 gegen v20 (GEMEINSAME Kurve Waffen+Karten): '
       f'{len(outlier)} Waffen')
 for r in outlier:
+    print(f"  {r['id']:>3} r{r['rarity']} {r['title'][:24]:<24} "
+          f"kombi {r['score']:6.2f} Δ{r['delta']:+5.2f} "
+          f"(Fl {r['fleet']:5.2f} / Du {r['duel']:5.2f})")
+print(f'Outlier |Δ|>1,0 Karten: {len(outlier_c)} (gemeinsame Kurve)')
+for r in outlier_c:
     print(f"  {r['id']:>3} r{r['rarity']} {r['title'][:24]:<24} "
           f"kombi {r['score']:6.2f} Δ{r['delta']:+5.2f} "
           f"(Fl {r['fleet']:5.2f} / Du {r['duel']:5.2f})")
@@ -397,10 +407,11 @@ out = dict(frame='check10: n1+c3+shift0, Flotte+Duell 50/50, Rollenmittel',
                                       fleet['acc0'].items()},
                                 acc1={k: round(v, 2) for k, v in
                                       fleet['acc1'].items()}),
-           targets_v19=T, medians=med,
+           targets_v20=T, medians=med,
            spearman=dict(duel_fleet=round(rho_fd, 3), kombi_v9=round(rho_v9, 3)),
            weapons=rows_w, cards=rows_c,
-           outliers=[r['id'] for r in outlier])
+           outliers=[r['id'] for r in outlier],
+           outliers_cards=[r['id'] for r in outlier_c])
 if os.path.exists(FC_PATH) and not os.path.exists(FC_BAK):
     shutil.copy(FC_PATH, FC_BAK)
 json.dump(out, open(FC_PATH, 'w', encoding='utf-8'),
