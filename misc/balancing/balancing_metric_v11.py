@@ -115,7 +115,7 @@ CTRL_W = 50.0 / 15.0
 # Muenz-/wspec-Bugfix, HP ×0,5): 7,8/8,0/8,4/9,0/9,8 — streng monoton mit
 # deutlich mehr Abstand am oberen Ende (Design-Regel: seltenere Raritaet
 # performt stets besser; r4/r5 liegen bewusst ueber den Messwerten).
-TARGETS_V14 = {1: 7.8, 2: 8.0, 3: 8.4, 4: 9.0, 5: 9.8}
+TARGETS_V14 = {1: 4.7, 2: 5.0, 3: 5.8, 4: 6.6, 5: 7.4}
 
 
 def weapon_units(w):
