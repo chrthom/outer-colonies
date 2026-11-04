@@ -384,7 +384,7 @@ def draw_battle(rng=random):
 
 def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
            raid=False, spread=False, wspec=None, wspec_fire=None,
-           colpool=None, wspec_side=0, ret='legacy'):
+           colpool=None, wspec_side=0, spec_side=0, ret='legacy'):
     """Ein Gefecht. Seite 0 = Verteidiger (deff, bewertete Karte),
     Seite 1 = Angreifer (att; im Raid ueberfaellt er die Kolonie von
     Seite 0). fire[u][i][p] je Seite u, Schiff i, Phase p.
@@ -415,7 +415,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             cpool = [dict(c) for c in pool_cards]
             s_bonus = 0
             ship_hp = b['hp']
-            if side == 0 and spec is not None and (ship is None or i == ship):
+            if side == spec_side and spec is not None and (ship is None or i == ship):
                 bad = (spec['cond'] == 'no_shield'
                        and any(c['type'] == 'shield' for c in cpool)) or \
                       (spec['cond'] == 'need_shield'
@@ -445,6 +445,10 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
         if not kept:
             # Nicht abgefangen: kein Gefecht, volle Flotten-Kontrolle
             own_c = sum(b['ctrl'] for b in deff)
+            if ret == 'full':
+                return dict(taken0=0.0, taken1=0.0, dealt0=0.0, dealt1=0.0,
+                            dead0=0, dead1=0, colony=0.0, eq0=0.0,
+                            loot0=CTRL_W * own_c, loot1=0.0)
             return 0.0, 0.0, 0, 0, 0.0, 0.0, CTRL_W * own_c
         remap = {old: new for new, (old, _) in enumerate(kept)}
         fleet[1] = [sh for _, sh in kept]
