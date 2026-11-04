@@ -45,6 +45,26 @@ frueher), Karten-Mediane steigen -> NEUANKERUNG v20 auf den neuen
 Medianen (Christophers Glaettung), Waffen UND erste Karten-Kurve
 auf gemeinsamer Basis.
 
+--- FEATURE SCORE-ZERLEGUNG (Christophers Anfrage 4.11.2026): ---
+frame_calibration.json enthaelt fuer jede Statkarte die Zerlegung
+des Scores in seine Konten (comp, je Kopie / units):
+- out   = Output-Marker (zusaetzlicher Schaden der eigenen Flotte)
+- take  = verhinderter Schaden (Weniger erlittene Marker; positive
+  Zahl = Gewinn durch Verhinderung, TAKE_WEIGHT bereits drin)
+- col   = Kolonieschaden (Sicht 0 = eigener Verlust negativ,
+  Sicht 1 = Beute positiv; Rollenmittel)
+- loot  = Missions-Credit: CTRL_W x Missions-Punkte-Differenz
+  (Kontrolle-Surplus mit/ohne Karte) — code-verankert 50/15 je
+  Punkt: rules.ts controlLimit 15 == colonyHP 50 (Sieg-Aequi-
+  valenz, Christophers Beschluss 4.11.2026), Zahlung server-
+  konform zu battle.ts applyMissionResult (gainControl(max(0,
+  Kontrolle eigene ueberlebende - gegnerische ueberlebende
+  Schiffe)); MISS-Verifikation @ cff12e1 bestaetigt.
+- hp_static = statisches HP-Konto (HP_STATIC x hp, 1x im
+  Frame-Mittel)
+Summe(comp) == Score. comp_cells liefert zustzlich die 4
+Messzellen (fleet0/fleet1/duel0/duel1) je Konto.
+
 Aufruf: python3 check10_frame_calibration.py [N]   (Default 10000)
 """
 import json
@@ -339,13 +359,32 @@ for c in cs:
     fsc = (fm + HP_STATIC * c['hp']) / units
     dsc = (dm + HP_STATIC * c['hp']) / units
     k = (fsc + dsc) / 2
+    # --- Zerlegung (Christophers Anfrage 4.11.2026): Score je
+    # Karte nach Konten, Rollen-/Frame-Mittel analog oben. take =
+    # verhinderter Schaden (positiv = Gewinn), col = Kolonie
+    # (Sicht 1 = Beute), loot = Missions-Credit (50/15 je
+    # Missions-Punkte-Differenz). Summe == Score. ---
+    acf = fleet['accC'][c['id']]
+    acd = duel[f'c:{c["id"]}']['acc']
+    comp, cells = {}, {}
+    for acc_name in ('out', 'take', 'col', 'loot'):
+        cf0 = acf[0][acc_name] / (N * 4) / units
+        cf1 = acf[1][acc_name] / (N * 4) / units
+        cd0 = acd[0][acc_name] / N / units
+        cd1 = acd[1][acc_name] / N / units
+        cells[acc_name] = dict(fleet0=round(cf0, 2), fleet1=round(cf1, 2),
+                               duel0=round(cd0, 2), duel1=round(cd1, 2))
+        comp[acc_name] = round((cf0 + cf1 + cd0 + cd1) / 4, 2)
+    comp['hp_static'] = round(HP_STATIC * c['hp'] / units, 2)
+    assert abs(sum(comp.values()) - k) < 0.03, (c['id'], sum(comp.values()), k)
     rows_c.append(dict(id=c['id'], title=c['title'], rarity=c['rarity'],
                        units=units, hp=c['hp'],
                        fleet0=round(f0 / units, 2), fleet1=round(f1 / units, 2),
                        fleet=round(fsc, 2), duel0=round(d0 / units, 2),
                        duel1=round(d1 / units, 2), duel=round(dsc, 2),
                        score=round(k, 2),
-                       delta=round(k - T[c['rarity']], 2)))
+                       delta=round(k - T[c['rarity']], 2),
+                       comp=comp, comp_cells=cells))
 
 med = {}
 for rar in (1, 2, 3, 4, 5):
@@ -395,6 +434,13 @@ for r in outlier_c:
     print(f"  {r['id']:>3} r{r['rarity']} {r['title'][:24]:<24} "
           f"kombi {r['score']:6.2f} Δ{r['delta']:+5.2f} "
           f"(Fl {r['fleet']:5.2f} / Du {r['duel']:5.2f})")
+print('\nStatkarten-Score-Zerlegung (je Kopie / units): Score = Output '
+      '+ verh. Schaden + Kolonie + Mission + HP-Konto')
+for r in rows_c:
+    p = r['comp']
+    print(f"  {r['id']:>3} r{r['rarity']} {r['title'][:24]:<24} "
+          f"{r['score']:6.2f} = {p['out']:+5.2f} + {p['take']:+5.2f} "
+          f"+ {p['col']:+5.2f} + {p['loot']:+5.2f} + {p['hp_static']:+5.2f}")
 _curve = ', '.join(str(r) + ': ' + str(med[r]['weapons']) for r in (1, 2, 3, 4, 5))
 print('\nKurven-Neuanker-Vorschlag (Messmediane Waffen): {' + _curve + '}')
 
