@@ -110,7 +110,11 @@ CTRL_W = 50.0 / 15.0
 # Trend-Extrapolation 3,55 statt Messwert 2,88 (Christophers Beschluss:
 # strenge Monotonie - seltenere Raritaet performt stets besser; der
 # gemessene r5-Median lag UNTER r4 3,25, Inversion robust in N=3k/10k).
-TARGETS_V14 = {1: 2.23, 2: 2.62, 3: 2.83, 4: 3.25, 5: 3.55}
+# Zielkurve v15 (Christophers Beschluss Runde 13e, geglaettet ueber den
+# Shift-25 %-Messwerten 2,32/2,58/2,96/3,00/3,11 mit mehr Abstand am
+# oberen Ende): r5 3,4 liegt ueber dem Messwert 3,11 (Design-Regel:
+# seltenere Raritaet performt stets besser).
+TARGETS_V14 = {1: 2.3, 2: 2.5, 3: 2.8, 4: 3.1, 5: 3.4}
 
 
 def weapon_units(w):
@@ -125,6 +129,18 @@ def value(dealt, taken, colony, loot):
     (Differenz): Output - Gegner-Output (taken = Marker auf eigenen
     Schiffen) - Kolonie-Marker + Missionslohn (Kontrolle)."""
     return dealt - taken - colony + loot
+
+
+# --- HP-Konto (Christophers Beschluss 4.11.2026, Runde 13i): statischer
+# Zuschlag 0,5 x hp je Gefecht aufs Karten-Konto (Mitte zwischen rein
+# dynamischer Buchung ~0,16 Auslastung und vollem 1:1-Konto). ---
+HP_STATIC = 0.5
+
+
+def card_score(c, gain):
+    """Karten-Score im Rahmen v16: dynamischer gain je Gefecht
+    (3x Platzierung, /3 normiert) + statisches HP-Konto, / units."""
+    return (gain + HP_STATIC * c['hp']) / c['units']
 
 
 def mission_credit(c, loot_intercept):
@@ -148,7 +164,40 @@ for w in weapons:
     w['fire_phase'] = min(w['range'], 4)
     w['r1_col'] = v10.colony_r1(w)
 
-pools = [(cards, prob) for cards, prob in v9.SHIP]
+# --- Runde 13e (Christophers Beschluss): PD-Anteil der Baseline-Ausruestung
+# senken, Schild/Panzerung dafuer erhoehen. Je PD-Karte einer Pool-Ziehung
+# wechselt POOL_SHIFT der Faelle deterministisch zur Haelfte zur Schild- bzw.
+# Panzerungskarte mit GLEICHEN Punkten (PD1->S1/A1, PD2->S2/A2).
+# Shift 25 %: P(PD) 46,4 -> ~34 %, P(Schild) 20 -> ~30 %, P(Panzerung)
+# 22,7 -> ~25 % (Koloniezonen-Pools unveraendert). ---
+POOL_SHIFT = 0.25
+
+def _shifted_pools(shift=POOL_SHIFT):
+    if shift <= 0:
+        return list(v9.SHIP)
+    agg = {}
+    for cards, prob in v9.SHIP:
+        states = [([dict(c) for c in cards], 1.0)]
+        for i, c in enumerate(cards):
+            if c['type'] != 'pd':
+                continue
+            nxt = []
+            for cs, pr in states:
+                keep = [dict(x) for x in cs]
+                nxt.append((keep, pr * (1 - shift)))
+                for t in ('shield', 'armour'):
+                    nc = [dict(x) for x in cs]
+                    nc[i] = {'type': t, 'points': c['points'],
+                             'recharge': v9.RECHARGE[t]}
+                    nxt.append((nc, pr * shift / 2.0))
+            states = nxt
+        for cs, pr in states:
+            key = tuple(sorted((c['type'], c['points']) for c in cs))
+            a = agg.setdefault(key, [cs, 0.0])
+            a[1] += prob * pr
+    return [entry for entry in agg.values() if entry[1] > 0]
+
+pools = _shifted_pools()
 ptot = sum(p for _, p in pools)
 pprob = [p / ptot for _, p in pools]
 
@@ -380,6 +429,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             ships.append(dict(cards=cards_nopd, taken=0.0, dead=False,
                               hp=ship_hp, s=b['s'] + s_bonus,
                               ctrl=b['ctrl'],
+                              n_inst=(1 if b['parts'] == 1 else 2),
                               carrier=compatible(w, b)))
         fleet.append(ships)
         fleet_pd[side] = side_pd
@@ -404,44 +454,72 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             for i, sh in enumerate(own):
                 if sh['dead'] or not sh['carrier']:
                     continue
+                # --- Runde 13j-Fix (2 Bugs, 4.11.2026): ---
+                # (a) Muenz-Index: fire-Listen werden in PHASES-Ordnung
+                #     (4,3,2,1) aufgebaut -> Index 4-p, NICHT p-1 (davor
+                #     feuerte Phase 4 mit 70 % statt 100 % und Phase 1 mit
+                #     100 % statt 70 % — Christopchers User-Vorgabe
+                #     ATTACK_PROB = {4: 1.00, ...} war verletzt).
                 if w['single']:
-                    if p != w['fire_phase'] or not fire[u][i][p - 1]:
+                    if p != w['fire_phase'] or not fire[u][i][4 - p]:
                         continue
-                elif p > w['range'] or not fire[u][i][p - 1]:
+                elif p > w['range'] or not fire[u][i][4 - p]:
                     continue   # Regel: Waffenreichweite >= Phasenreichweite
-                if spread:
-                    tgt_i = i if not enemy[i]['dead'] else next(
-                        (j for j, e in enumerate(enemy) if not e['dead']), None)
-                else:
-                    tgt_i = next((j for j, e in enumerate(enemy) if not e['dead']), None)
-                if tgt_i is None:
-                    break
-                tgt = enemy[tgt_i]
-                base = max(0, w['damage'] - (6 * tgt['s'] if w['id'] == '401' else 0))
-                halved = sh['s'] + p < tgt['s']    # Server-Code equipment_card.ts:44 (<)
-                d = v9.half(base) if halved else base
-                if raid and u == 1 and p == 1 and w['r1_col'] > d:
-                    # Raid: R1-Angriff geht auf die Kolonie (Asset-Konto)
-                    if colpool is not None and colony < COLONY_HP:
-                        cd = v9.resolve_attack(
-                            w, [dict(c) for c in colpool], w['damage']) \
-                            * (2 if w['colony_killer'] else 1)
-                        colony = min(COLONY_HP, colony + cd)
-                    continue
-                pool = tgt['cards'] + [c for c, _ in e_pd]
-                dmg = v9.resolve_attack(w, pool, d)
-                tgt['taken'] += dmg
-                dealt[u] += dmg
-                if tgt['taken'] >= tgt['hp']:
-                    tgt['dead'] = True
-                # --- Kalibrierungs-Frame: bewertete Waffe (nur Seite 0) ---
-                if u == 0 and wspec is not None and not sh['dead']:
+                # --- Frame v16 (Christophers Beschluss 4.11.2026, Runde 13i):
+                # 2-/3-teilige Schiffe tragen IMMER 2 Waffen (1-teilige 1);
+                # 2 Schuesse a dmg sind NICHT 1 Schuss a 2xdmg (Abzuege/
+                # Deaktivierung wirken je Schuss). Gefechts- und bewertete
+                # Waffe feuern je n_inst Instanzen auf dieselbe Feuermuenze. ---
+                col_shot = False
+                for _inst in range(sh['n_inst']):
+                    if spread:
+                        tgt_i = i if not enemy[i]['dead'] else next(
+                            (j for j, e in enumerate(enemy) if not e['dead']), None)
+                    else:
+                        tgt_i = next((j for j, e in enumerate(enemy) if not e['dead']), None)
+                    if tgt_i is None:
+                        break
+                    tgt = enemy[tgt_i]
+                    base = max(0, w['damage'] - (6 * tgt['s'] if w['id'] == '401' else 0))
+                    halved = sh['s'] + p < tgt['s']    # Server-Code equipment_card.ts:44 (<)
+                    d = v9.half(base) if halved else base
+                    if raid and u == 1 and p == 1 and w['r1_col'] > d:
+                        # Raid: R1-Angriff geht auf die Kolonie (Asset-Konto)
+                        if colpool is not None and colony < COLONY_HP:
+                            cd = v9.resolve_attack(
+                                w, [dict(c) for c in colpool], w['damage']) \
+                                * (2 if w['colony_killer'] else 1)
+                            colony = min(COLONY_HP, colony + cd)
+                        col_shot = True
+                        continue
+                    pool = tgt['cards'] + [c for c, _ in e_pd]
+                    dmg = v9.resolve_attack(w, pool, d)
+                    tgt['taken'] += dmg
+                    dealt[u] += dmg
+                    if tgt['taken'] >= tgt['hp']:
+                        tgt['dead'] = True
+            # --- Kalibrierungs-Frame: bewertete Waffe (nur Seite 0),
+            # ebenfalls n_inst Instanzen je Schiff (Frame v16).
+            # (b) Runde 13j-Fix: EIGENE Schleife, unabhaengig von der
+            # zufaelligen Gefechtswaffe — davor stand der Block im
+            # Koerper der Gefechtswaffen-Schleife HINTER deren
+            # continue-Guards, d.h. die bewertete Waffe feuerte nur in
+            # Phasen, in denen die Gefechtswaffe desselben Traegers
+            # ebenfalls feuerte (Range-4-Feuerung wurde dadurch fast nie
+            # erreicht; 13i-Befund '412 range 4 = exakt 0,0' war dieses
+            # Artefakt, nicht der apply-Bug allein). ---
+            if u == 0 and wspec is not None:
+                for i, sh in enumerate(own):
+                    if sh['dead']:
+                        continue
                     ok = (p == wspec['fire_phase']) if wspec['single'] \
                         else (p <= wspec['range'])
-                    if ok and wspec_fire[i][p - 1]:
-                        tgt_i = next((j for j, e in enumerate(enemy)
-                                      if not e['dead']), None)
-                        if tgt_i is not None:
+                    if ok and wspec_fire[i][4 - p]:
+                        for _inst in range(sh['n_inst']):
+                            tgt_i = next((j for j, e in enumerate(enemy)
+                                          if not e['dead']), None)
+                            if tgt_i is None:
+                                break
                             tgt = enemy[tgt_i]
                             base = max(0, wspec['damage']
                                        - (6 * tgt['s'] if wspec['id'] == '401' else 0))
@@ -554,7 +632,7 @@ def main():
     prev = {c['id']: sum(r['prev'][c['id']] * r['n'] for r in runs) / n for c in cards}
     inter = {c['id']: sum(r['inter'][c['id']] * r['n'] for r in runs) / n for c in cards}
     targets = TARGETS_V14 or v9.TARGETS
-    tname = 'v14 (gemeinsamer Anker, Rahmen v3; r5 Trend 3,55)' if TARGETS_V14 else 'v9 (alt)'
+    tname = 'v15 (Shift-25 %-Anker, Christophers Kurve 2,3/2,5/2,8/3,1/3,4)' if TARGETS_V14 else 'v9 (alt)'
     out = []
     print(f'=== Defense-Metrik v11 (gemischte Flotten 3v3, Rahmen v3, N={n}) ===')
     print('Karten-Platzierung: 3x Defense (je Schiff 1 Instanz, Gain/3)'
@@ -567,7 +645,7 @@ def main():
     print(f'Zielkurve: {tname}')
     print(f'{"id":>4} {"Karte":<28} {"Score":>6} {"Wert-Gew":>8} {"oAbf%":>6} {"prev":>6} {"ΔKurve":>7}')
     for c in cards:
-        score = gain[c['id']] / c['units']
+        score = card_score(c, gain[c['id']])
         out.append(dict(id=c['id'], rarity=c['rarity'], title=c['title'],
                         gain=round(gain[c['id']], 3),
                         nointercept=round(inter[c['id']], 3),

@@ -5,7 +5,9 @@ Paket A = Christophers Erstwahl je Waffe (in-place auf v11.weapons, wirkt
 damit auch als Gefechts-Waffe im Feld). Alternativ-Varianten (157/166/409/
 118/106/405/318/150) werden zusaetzlich als wspec-Kopien im selben Lauf
 gemessen (Common Random Numbers, identische Gefechte wie check9 N=10k,
-seed 42). Auswertung gegen die FIXE Zielkurve v15 (2,3/2,5/2,8/3,1/3,4).
+seed 42). Auswertung gegen die PROVISORISCHE Referenzkurve = frische
+Messmediane im sauberen Frame (Runde 13j: 8,54/7,77/8,96/7,53/8,56);
+Christophers Glaettung ersetzt diese Werte, sobald beschlossen.
 
 Zusaetzlich wird die Baseline-Verlustrate gezaehlt (fuer die HP-Konto-
 Diskussion Runde 13h: wie oft stirbt ueberhaupt ein Verteidiger-Schiff,
@@ -27,7 +29,10 @@ import balancing_metric_v9 as v9
 HERE = os.path.dirname(os.path.abspath(__file__))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
 TAKE_WEIGHT = 1.0
-T = {0: 2.0, 1: 2.3, 2: 2.5, 3: 2.8, 4: 3.1, 5: 3.4}   # fixe Kurve v15
+# Provisorische Referenz = frische Messmediane im sauberen Frame v16
+# (Runde 13j, N=10k nach Muenz-/Schatten-Bugfix; Christophers Glaettung
+# ersetzt diese Werte, sobald beschlossen):
+T = {0: 6.5, 1: 8.54, 2: 7.77, 3: 8.96, 4: 7.53, 5: 8.56}
 
 # --- Christophers Paket A (Runde 13g): in-place Patch der FINAL-Waffen ---
 # abz-Eintraege sind UPDATES auf die bestehenden Abzuege (Basis bleibt).
@@ -58,6 +63,8 @@ def apply(w, ch):
         w['damage'] = ch['dmg']
     if 'e' in ch:
         w['energy'] = ch['e']
+    if 'range' in ch:
+        w['range'] = ch['range']
     if 'abz' in ch:
         w['abz'].update(ch['abz'])
     w['fire_phase'] = min(w['range'], 4)
@@ -97,6 +104,11 @@ ALT = [
     ('C', '310', dict(e=1, abz={'armour': 1})),         # E 1 + PzAbz 3->1
     ('D', '310', dict(dmg=8, e=1)),                     # E 1 + dmg 8 (falls doch dmg)
     ('B', '347', dict(dmg=4)),                          # SAbz X ist bereits aktiv; dmg-Option
+    # --- Runde 13i (Christophers Rueckfragen 4.11.2026) ---
+    ('C', '318', dict(dmg=16, abz={'pd': 8, 'shield': 3, 'armour': 2})),  # Abzuege -1
+    ('D', '318', dict(dmg=18, abz={'pd': 9, 'shield': 3, 'armour': 2})),  # + dmg 18
+    ('B', '412', dict(range=4)),                        # Reichweite 3->4 (sonst Paket A)
+    ('C', '412', dict(dmg=14, abz={'pd': 7}, range=4)),  # Reichweite 4 + dmg 14
 ]
 for lbl, wid, ch in ALT:
     specs.append((lbl, wid, variant(wid, **ch)))
@@ -172,4 +184,5 @@ for r in rows:
     print(f"{r['label']:3} {r['id']:>4} {r['title'][:24]:24} {r['rarity']} "
           f"{r['dmg']:>3} {r['e']:>2} {r['units']:>5} {r['score']:6.2f} "
           f"{r['delta']:+.2f}{alt}")
-print('\nZielkurve v15 (fix): r1 2,3 / r2 2,5 / r3 2,8 / r4 3,1 / r5 3,4')
+print('\nReferenz (Runde 13j, provisorisch = Messmediane): '
+      'r1 8,54 / r2 7,77 / r3 8,96 / r4 7,53 / r5 8,56')
