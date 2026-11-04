@@ -22,11 +22,28 @@ Christophers Beschluesse 13l/13m:
 - Statkarten-Score zusaetzlich statisches HP-Konto (HP_STATIC x hp,
   Runde 13i), 1x im Rollenmittel.
 
-Output: frame_calibration.json (ersetzt die v16-Messung als offizielle
-Neuankrungs-Basis; alte Datei wird als frame_calibration_v16.json
-gesichert). Checkpoint check10_ckpt.json (Flotte, alle 500 Gefechte),
-1v1-Einzelergebnisse in check10_1v1.json (je Karte eigener Strom,
-seed 42, N=10k je Karte).
+Output: frame_calibration.json (13p-Messung gesichert als
+frame_calibration_r13p.json). Checkpoints check10_ckpt_v20.json
+(Flotte, alle 500 Gefechte), 1v1-Einzelergebnisse in
+check10_1v1_v20.json (je Karte eigener Strom, seed 42, N je Karte).
+
+--- FRAME-UPDATE 13q (Christophers Beschluesse 4.11.2026, nach
+Saettigungs-Diagnose diag_saturation_r13q.py): ---
+1. REFERENZ-NACHFRAGE M=2: Umgebungs-Bewaffnung beider Seiten
+   permanent dmg_scale=(2.0, 2.0) — Gefechte verzehren ~46 % des
+   HP-Pools (vorher ~20 %); Schild-/Panzerungs-/Speed-Karten waren
+   nachfragelimitiert (Elastizitaet 1,3-1,6 bei M2). Die bewertete
+   Karte (wspec/spec) wird NICHT skaliert (Deltamessung).
+2. STATKARTEN n_inst-PLATZIERUNG: bewertete Karte analog c3 2 Kopien
+   auf dem 3-teiligen Schiff (Flotte: 1+1+2 = 4 Kopien, jede Flotte
+   hat exakt 1x 3-teilig -> gain/N/4; Duell: je Build n_pl = 2 bei
+   3-teilig sonst 1, Gain je Gefecht /n_pl) — Normierung JE KOPIE,
+   basisgleich mit Waffen (gain/N/3 bei 3 Platzierungen).
+   Umgebungspool bleibt 1x je Schiff (Beschluss: nur bewertete Karte).
+Erwartung: Waffen-Mediane sinken leicht (eigenes Fleet stirbt
+frueher), Karten-Mediane steigen -> NEUANKERUNG v20 auf den neuen
+Medianen (Christophers Glaettung), Waffen UND erste Karten-Kurve
+auf gemeinsamer Basis.
 
 Aufruf: python3 check10_frame_calibration.py [N]   (Default 10000)
 """
@@ -45,12 +62,14 @@ import balancing_metric_v9 as v9
 HERE = os.path.dirname(os.path.abspath(__file__))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
 TAKE_WEIGHT = 1.0
-T = dict(v11.TARGETS_V14)          # v19-Kurve (offiziell, Runde 13p, 4.11.2026)
+T = dict(v11.TARGETS_V14)          # v19-Kurve (Referenz bis v20-Glaettung)
 HP_STATIC = v11.HP_STATIC
-CKPT = os.path.join(HERE, 'check10_ckpt.json')
-CKPT_1V1 = os.path.join(HERE, 'check10_1v1.json')
+# --- Runde 13q (Christophers Beschluss): Referenz-Nachfrage M=2 ---
+DMG_SCALE = (2.0, 2.0)
+CKPT = os.path.join(HERE, 'check10_ckpt_v20.json')
+CKPT_1V1 = os.path.join(HERE, 'check10_1v1_v20.json')
 FC_PATH = os.path.join(HERE, 'frame_calibration.json')
-FC_BAK = os.path.join(HERE, 'frame_calibration_v16.json')
+FC_BAK = os.path.join(HERE, 'frame_calibration_r13p.json')
 
 V9_SCORES = {w['id']: w['scored'] for w in json.load(
     open(os.path.join(HERE, 'weapons_v9_final.json'), encoding='utf-8'))}
@@ -141,7 +160,7 @@ def run_fleet():
                       for _ in range(3)]
         order = (0, 1) if b % 2 == 0 else (1, 0)
         r = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
-                       colpool=colpool, ret='full')
+                       colpool=colpool, dmg_scale=DMG_SCALE, ret='full')
         a0, a1 = acc_side(r, 0), acc_side(r, 1)
         base0 += total(a0)
         base1 += total(a1)
@@ -151,24 +170,31 @@ def run_fleet():
         for w2 in ws:
             r0 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             wspec=w2, wspec_fire=wspec_fire, colpool=colpool,
-                            wspec_side=0, ret='full')
+                            wspec_side=0, dmg_scale=DMG_SCALE, ret='full')
             m = acc_side(r0, 0)
             for k in m:
                 accW[w2['id']][0][k] += m[k] - a0[k]
             r1 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             wspec=w2, wspec_fire=wspec_fire, colpool=colpool,
-                            wspec_side=1, ret='full')
+                            wspec_side=1, dmg_scale=DMG_SCALE, ret='full')
             m = acc_side(r1, 1)
             for k in m:
                 accW[w2['id']][1][k] += m[k] - a1[k]
         for c in cs:
+            # --- 13q: n_inst-Platzierung (2 Kopien auf 3-teiligem
+            # Schiff, 4 Kopien gesamt) — Normierung je Kopie via
+            # N*4 in der Auswertung ---
             r0 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
-                            spec=c, spec_side=0, colpool=colpool, ret='full')
+                            spec=c, spec_side=0, colpool=colpool,
+                            dmg_scale=DMG_SCALE, spec_n_inst=True,
+                            ret='full')
             m = acc_side(r0, 0)
             for k in m:
                 accC[c['id']][0][k] += m[k] - a0[k]
             r1 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
-                            spec=c, spec_side=1, colpool=colpool, ret='full')
+                            spec=c, spec_side=1, colpool=colpool,
+                            dmg_scale=DMG_SCALE, spec_n_inst=True,
+                            ret='full')
             m = acc_side(r1, 1)
             for k in m:
                 accC[c['id']][1][k] += m[k] - a1[k]
@@ -202,7 +228,8 @@ def draw_duel_build(spec):
 def duel_battle(w2, b, pool_cards, fire, wf, order, raid, colpool,
                 side_kw):
     return v11.battle(w2, [b], [b], pool_cards, fire, order, raid=raid,
-                      colpool=colpool, **side_kw, ret='full')
+                      colpool=colpool, dmg_scale=DMG_SCALE, **side_kw,
+                      ret='full')
 
 
 def run_duel_one(kind, spec, n):
@@ -232,6 +259,7 @@ def run_duel_one(kind, spec, n):
         r = duel_battle(w2, b, pool_cards, fire, wf, order, raid, colpool, {})
         a0, a1 = acc_side(r, 0), acc_side(r, 1)
         if kind == 'w':
+            n_pl = 1.0
             r0 = duel_battle(w2, b, pool_cards, fire, wf, order, raid,
                              colpool, dict(wspec=spec, wspec_fire=wf,
                                             wspec_side=0))
@@ -239,13 +267,18 @@ def run_duel_one(kind, spec, n):
                              colpool, dict(wspec=spec, wspec_fire=wf,
                                             wspec_side=1))
         else:
+            # --- 13q: n_inst-Platzierung, Normierung je Kopie ->
+            # Gain je Gefecht / n_pl (2 bei 3-teiligem Build) ---
+            n_pl = 2.0 if b['parts'] == 3 else 1.0
             r0 = duel_battle(w2, b, pool_cards, fire, wf, order, raid,
-                             colpool, dict(spec=spec, spec_side=0))
+                             colpool, dict(spec=spec, spec_side=0,
+                                            spec_n_inst=True))
             r1 = duel_battle(w2, b, pool_cards, fire, wf, order, raid,
-                             colpool, dict(spec=spec, spec_side=1))
+                             colpool, dict(spec=spec, spec_side=1,
+                                            spec_n_inst=True))
         for k in a0:
-            acc[0][k] += acc_side(r0, 0)[k] - a0[k]
-            acc[1][k] += acc_side(r1, 1)[k] - a1[k]
+            acc[0][k] += (acc_side(r0, 0)[k] - a0[k]) / n_pl
+            acc[1][k] += (acc_side(r1, 1)[k] - a1[k]) / n_pl
     return acc, raid_n / n
 
 
@@ -297,7 +330,9 @@ for w in ws:
                        sockets=w.get('sockets', '')))
 for c in cs:
     units = c['units']
-    f0, f1, fm = scores_from(fleet['accC'][c['id']], N * 3)
+    # --- 13q: Normierung je Kopie — Flotte hat 4 Platzierungen
+    # (1+1+2 Kopien), Duell per Gefecht bereits /n_pl normiert ---
+    f0, f1, fm = scores_from(fleet['accC'][c['id']], N * 4)
     d0, d1, dm = scores_from(duel[f'c:{c["id"]}']['acc'], N * 1)
     # Score-Formel 13i: (gain-Rollenmittel + HP_STATIC x hp) / units
     fsc = (fm + HP_STATIC * c['hp']) / units

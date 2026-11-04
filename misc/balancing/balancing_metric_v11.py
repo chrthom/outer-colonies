@@ -391,7 +391,8 @@ def draw_battle(rng=random):
 
 def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
            raid=False, spread=False, wspec=None, wspec_fire=None,
-           colpool=None, wspec_side=0, spec_side=0, ret='legacy'):
+           colpool=None, wspec_side=0, spec_side=0, ret='legacy',
+           spec_n_inst=False, dmg_scale=None):
     """Ein Gefecht. Seite 0 = Verteidiger (deff, bewertete Karte),
     Seite 1 = Angreifer (att; im Raid ueberfaellt er die Kolonie von
     Seite 0). fire[u][i][p] je Seite u, Schiff i, Phase p.
@@ -428,13 +429,22 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                       (spec['cond'] == 'need_shield'
                        and not any(c['type'] == 'shield' for c in cpool))
                 if not bad:
-                    ship_hp += spec['hp']
-                    s_bonus = spec['speed']
+                    # --- Runde 13q (Christophers Beschluss 4.11.2026):
+                    # Statkarten-Platzierung analog c3/n_inst — die
+                    # bewertete Karte erhaelt auf 3-teiligen Schiffen
+                    # 2 Kopien (1x auf 1-/2-teiligen), Normierung dann
+                    # auf JE KOPIE (Flotte: 4 Platzierungen -> gain/4
+                    # statt /3). Default spec_n_inst=False = 1x je
+                    # Schiff (bisheriges Verhalten, check10). ---
+                    n = (2 if b['parts'] == 3 else 1) if spec_n_inst else 1
+                    ship_hp += n * spec['hp']
+                    s_bonus = n * spec['speed']
                     for c in spec['added']:
-                        if c['type'] == 'pd':
-                            side_pd.append((dict(c), i))
-                        else:
-                            cpool.append(dict(c))
+                        for _k in range(n):
+                            if c['type'] == 'pd':
+                                side_pd.append((dict(c), i))
+                            else:
+                                cpool.append(dict(c))
             if side == wspec_side and wspec is not None \
                     and wspec.get('def_pts', 0) > 0:
                 # --- Runde 13p (Christophers Beschluss 4.11.2026): die
@@ -483,6 +493,13 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
     for p in PHASES:
         for u in order:
             own, enemy = fleet[u], fleet[1 - u]
+            # --- Runde 13q: Nachfrage-Skalierung der UMGBUNGS-
+            # Bewaffnung je Seite (Diagnose): dmg_scale = (s0, s1)
+            # multipliziert den Waffenschaden der Seite u. Nur fuer
+            # die Saettigungs-Diagnose (diag_saturation_r13q.py),
+            # Standard None = unveraendert. Die bewertete Karte
+            # (wspec/spec) wird NICHT skaliert. ---
+            wd = w['damage'] * (dmg_scale[u] if dmg_scale else 1.0)
             e_pd = [(c, oi) for c, oi in fleet_pd[1 - u]
                     if not enemy[oi]['dead']]
             for i, sh in enumerate(own):
@@ -514,14 +531,14 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                     if tgt_i is None:
                         break
                     tgt = enemy[tgt_i]
-                    base = max(0, w['damage'] - (6 * tgt['s'] if w['id'] == '401' else 0))
+                    base = max(0, wd - (6 * tgt['s'] if w['id'] == '401' else 0))
                     halved = sh['s'] + p < tgt['s']    # Server-Code equipment_card.ts:44 (<)
                     d = v9.half(base) if halved else base
                     if raid and u == 1 and p == 1 and w['r1_col'] > d:
                         # Raid: R1-Angriff geht auf die Kolonie (Asset-Konto)
                         if colpool is not None and colony < COLONY_HP:
                             cd = v9.resolve_attack(
-                                w, [dict(c) for c in colpool], w['damage']) \
+                                w, [dict(c) for c in colpool], wd) \
                                 * (2 if w['colony_killer'] else 1)
                             colony = min(COLONY_HP, colony + cd)
                         col_shot = True
