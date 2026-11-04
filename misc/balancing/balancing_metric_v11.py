@@ -110,11 +110,12 @@ CTRL_W = 50.0 / 15.0
 # Trend-Extrapolation 3,55 statt Messwert 2,88 (Christophers Beschluss:
 # strenge Monotonie - seltenere Raritaet performt stets besser; der
 # gemessene r5-Median lag UNTER r4 3,25, Inversion robust in N=3k/10k).
-# Zielkurve v15 (Christophers Beschluss Runde 13e, geglaettet ueber den
-# Shift-25 %-Messwerten 2,32/2,58/2,96/3,00/3,11 mit mehr Abstand am
-# oberen Ende): r5 3,4 liegt ueber dem Messwert 3,11 (Design-Regel:
-# seltenere Raritaet performt stets besser).
-TARGETS_V14 = {1: 2.3, 2: 2.5, 3: 2.8, 4: 3.1, 5: 3.4}
+# Zielkurve v17 (Christophers Beschluss Runde 13j, 4.11.2026, geglaettet
+# ueber den sauberen v16-Messwerten 8,54/7,77/8,96/7,53/8,56 — Frame nach
+# Muenz-/wspec-Bugfix, HP ×0,5): 7,8/8,0/8,4/9,0/9,8 — streng monoton mit
+# deutlich mehr Abstand am oberen Ende (Design-Regel: seltenere Raritaet
+# performt stets besser; r4/r5 liegen bewusst ueber den Messwerten).
+TARGETS_V14 = {1: 7.8, 2: 8.0, 3: 8.4, 4: 9.0, 5: 9.8}
 
 
 def weapon_units(w):
@@ -632,7 +633,7 @@ def main():
     prev = {c['id']: sum(r['prev'][c['id']] * r['n'] for r in runs) / n for c in cards}
     inter = {c['id']: sum(r['inter'][c['id']] * r['n'] for r in runs) / n for c in cards}
     targets = TARGETS_V14 or v9.TARGETS
-    tname = 'v15 (Shift-25 %-Anker, Christophers Kurve 2,3/2,5/2,8/3,1/3,4)' if TARGETS_V14 else 'v9 (alt)'
+    tname = 'v17 (sauberer v16-Frame, Christophers Kurve 7,8/8,0/8,4/9,0/9,8)' if TARGETS_V14 else 'v9 (alt)'
     out = []
     print(f'=== Defense-Metrik v11 (gemischte Flotten 3v3, Rahmen v3, N={n}) ===')
     print('Karten-Platzierung: 3x Defense (je Schiff 1 Instanz, Gain/3)'

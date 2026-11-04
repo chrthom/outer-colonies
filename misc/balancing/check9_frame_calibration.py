@@ -145,7 +145,10 @@ rows_c = [dict(id=c['id'], title=c['title'], rarity=c['rarity'],
                take=round(acc_c[c['id']]['take'] / N / 3, 3),
                col=round(acc_c[c['id']]['col'] / N / 3, 3),
                loot=round(acc_c[c['id']]['loot'] / N / 3, 3),
-               score=round(total(acc_c[c['id']]) / N / 3 / c['units'], 3))
+               # Rahmen v16 (Runde 13i): dynamischer gain + statisches
+               # HP-Konto 0,5 x hp (Christophers Beschluss 4.11.2026)
+               score=round((total(acc_c[c['id']]) / N / 3
+                            + v11.HP_STATIC * c['hp']) / c['units'], 3))
           for c in v11.cards]
 
 print(f'\n=== Gemeinsamer v11-Rahmen v3 (N={N}), Wert = Konto-Gewinn/3 je Einheiten ===')
@@ -183,13 +186,15 @@ for label, rows in (('Waffen', rows_w), ('Statkarten', rows_c)):
                    ('col', 'Kolonie'), ('loot', 'Missionslohn')):
         print(f'  {label:<10} {lab:<13} {statistics.median(r[k] for r in rows):+.3f}')
 
-print(f'\nVorschlag TARGETS_V14 (Messung; r5 offiziell = Trend 3,55): {targets}')
+print(f'\nMessung (Mediane): {targets}')
+print(f'Offizielle Zielkurve v17 (Christophers Beschluss Runde 13j): '
+      f'{v11.TARGETS_V14}')
 json.dump(dict(n=N, e_attacks=e_att, take_weight=TAKE_WEIGHT,
                ctrl_w=v11.CTRL_W,
                loot_intercept=round(LOOT_INT, 3),
                loot_no_intercept=round(v11.LOOT_NO_INTERCEPT, 3),
                e_fleet_ctrl=round(v11.E_FLEET_CTRL, 3),
-               targets_v14=targets, weapons=rows_w, cards=rows_c),
+               targets_v14=v11.TARGETS_V14, weapons=rows_w, cards=rows_c),
           open(os.path.join(HERE, 'frame_calibration.json'), 'w',
                encoding='utf-8'), ensure_ascii=False, indent=1)
 print('-> frame_calibration.json geschrieben')
