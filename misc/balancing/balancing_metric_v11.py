@@ -394,7 +394,7 @@ def draw_battle(rng=random):
 def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
            raid=False, spread=False, wspec=None, wspec_fire=None,
            colpool=None, wspec_side=0, spec_side=0, ret='legacy',
-           spec_n_inst=False, dmg_scale=None):
+           spec_n_inst=False, dmg_scale=None, col_rule='std'):
     """Ein Gefecht. Seite 0 = Verteidiger (deff, bewertete Karte),
     Seite 1 = Angreifer (att; im Raid ueberfaellt er die Kolonie von
     Seite 0). fire[u][i][p] je Seite u, Schiff i, Phase p.
@@ -426,27 +426,31 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
             s_bonus = 0
             ship_hp = b['hp']
             if side == spec_side and spec is not None and (ship is None or i == ship):
-                bad = (spec['cond'] == 'no_shield'
-                       and any(c['type'] == 'shield' for c in cpool)) or \
-                      (spec['cond'] == 'need_shield'
-                       and not any(c['type'] == 'shield' for c in cpool))
-                if not bad:
-                    # --- Runde 13q (Christophers Beschluss 4.11.2026):
-                    # Statkarten-Platzierung analog c3/n_inst — die
-                    # bewertete Karte erhaelt auf 3-teiligen Schiffen
-                    # 2 Kopien (1x auf 1-/2-teiligen), Normierung dann
-                    # auf JE KOPIE (Flotte: 4 Platzierungen -> gain/4
-                    # statt /3). Default spec_n_inst=False = 1x je
-                    # Schiff (bisheriges Verhalten, check10). ---
-                    n = (2 if b['parts'] == 3 else 1) if spec_n_inst else 1
-                    ship_hp += n * spec['hp']
-                    s_bonus = n * spec['speed']
-                    for c in spec['added']:
-                        for _k in range(n):
-                            if c['type'] == 'pd':
-                                side_pd.append((dict(c), i))
-                            else:
-                                cpool.append(dict(c))
+                # --- Runde 13r (Christophers Beschluss 4.11.2026): die
+                # Bedingung (cond) der bewerteten Karte wird in der
+                # SIMULATION GESTRICHEN — sie wird IMMER platziert
+                # ("Wir simulieren den Fall, dass sie wirklich eingesetzt
+                # wird"). Die ECHTE Karte behaelt ihre Bedingung (Effekt-
+                # text, v10.COND: 426 need_shield / 312 no_shield). Der
+                # bisherige bad-Block liess 426 in 96,5 % und 312 in
+                # 69 % der Gefechte unplatziert; fuer Karten OHNE cond
+                # ist die Aenderung bit-identisch. ---
+                # --- Runde 13q (Christophers Beschluss 4.11.2026):
+                # Statkarten-Platzierung analog c3/n_inst — die
+                # bewertete Karte erhaelt auf 3-teiligen Schiffen
+                # 2 Kopien (1x auf 1-/2-teiligen), Normierung dann
+                # auf JE KOPIE (Flotte: 4 Platzierungen -> gain/4
+                # statt /3). Default spec_n_inst=False = 1x je
+                # Schiff (bisheriges Verhalten, check10). ---
+                n = (2 if b['parts'] == 3 else 1) if spec_n_inst else 1
+                ship_hp += n * spec['hp']
+                s_bonus = n * spec['speed']
+                for c in spec['added']:
+                    for _k in range(n):
+                        if c['type'] == 'pd':
+                            side_pd.append((dict(c), i))
+                        else:
+                            cpool.append(dict(c))
             if side == wspec_side and wspec is not None \
                     and wspec.get('def_pts', 0) > 0:
                 # --- Runde 13p (Christophers Beschluss 4.11.2026): die
@@ -536,17 +540,60 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                     base = max(0, wd - (6 * tgt['s'] if w['id'] == '401' else 0))
                     halved = sh['s'] + p < tgt['s']    # Server-Code equipment_card.ts:44 (<)
                     d = v9.half(base) if halved else base
-                    if raid and u == 1 and p == 1 and w['r1_col'] > d:
-                        # Raid: R1-Angriff geht auf die Kolonie (Asset-Konto)
-                        if colpool is not None and colony < COLONY_HP:
+                    pool = tgt['cards'] + [c for c, _ in e_pd]
+                    # --- Runde 13r (Kolonie-Zielwahl, Christopher): col_rule
+                    # steuert die R1-Zielwahl im Raid. 'std' (Default) =
+                    # alter Vergleich w['r1_col'] (0,7-diskontierter
+                    # Erwartungswert) > Brutto-Schiffschuss d VOR Schiff-
+                    # Defense — regressionsneutral. 'eff' = rationaler
+                    # Vergleich des NUTZBAREN Schadens: Kolonie-Effektiv-
+                    # schaden (nach Koloniezonen-Defense, x2 bei Kolonie-
+                    # Killern; die 70 %-Feuer-Muenze ist bei der Zielwahl
+                    # schon gefallen, KEIN weiteres 0,7) vs. Schiffschaden
+                    # nach Defense, auf die verbleibende Ziel-HP gedeckelt
+                    # (Overkill zaehlt bei der Wahl nicht). 'always' =
+                    # R1 im Raid immer Kolonie (Obergrenze). Die BUCHUNG
+                    # bleibt in allen Regeln unveraendert ( voller Schaden,
+                    # Overkill wird nicht gekappt — Wertdefinitionsthema,
+                    # nur mit Beschluss). ---
+                    col_dec = False
+                    dmg = None
+                    cd = None
+                    if raid and u == 1 and p == 1:
+                        if col_rule == 'std':
+                            if w['r1_col'] > d:
+                                col_dec = True
+                        elif w['r1_col'] > 0 and colpool is not None \
+                                and colony < COLONY_HP:
+                            # --- Christophers Beschluss 13r: 'always' =
+                            # R1 im Raid IMMER Kolonie, AUSSER Kolonie-
+                            # wirkungslose Waffen (no_colony: 203/401/438,
+                            # r1_col == 0 -> Schiffschuss). Gilt analog
+                            # fuer 'eff' (wirkt sonst faelschlich Kolonie-
+                            # schaden bei no_colony). ---
                             cd = v9.resolve_attack(
                                 w, [dict(c) for c in colpool], wd) \
                                 * (2 if w['colony_killer'] else 1)
+                            if col_rule == 'always':
+                                col_dec = True
+                            else:   # 'eff'
+                                dmg = v9.resolve_attack(w, pool, d)
+                                ship_util = min(dmg, max(0.0,
+                                              tgt['hp'] - tgt['taken']))
+                                col_dec = cd >= ship_util
+                    if col_dec:
+                        if cd is None:   # 'std': Buchung wie bisher
+                            if colpool is not None and colony < COLONY_HP:
+                                cd = v9.resolve_attack(
+                                    w, [dict(c) for c in colpool], wd) \
+                                    * (2 if w['colony_killer'] else 1)
+                                colony = min(COLONY_HP, colony + cd)
+                        elif colony < COLONY_HP:
                             colony = min(COLONY_HP, colony + cd)
                         col_shot = True
                         continue
-                    pool = tgt['cards'] + [c for c, _ in e_pd]
-                    dmg = v9.resolve_attack(w, pool, d)
+                    if dmg is None:
+                        dmg = v9.resolve_attack(w, pool, d)
                     tgt['taken'] += dmg
                     dealt[u] += dmg
                     if tgt['taken'] >= tgt['hp']:
@@ -586,22 +633,46 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                             base = max(0, wspec['damage']
                                        - (6 * tgt['s'] if wspec['id'] == '401' else 0))
                             d = v9.half(base) if sh['s'] + p < tgt['s'] else base
-                            if raid and wspec_side == 1 and p == 1 \
-                                    and wspec['r1_col'] > d:
-                                # Raid-Angreiferrolle: R1-Angriff auf die
-                                # Kolonie (Beute-Konto, x2 bei Kolonie-
-                                # Killer); toter Traeger vor R1 feuert
-                                # nicht mehr (dead-Check oben) —
-                                # Christophers Regelpraezisierung 13m.
-                                if colpool is not None and colony < COLONY_HP:
+                            pool = tgt['cards'] + [c for c, _ in e_pd]
+                            # --- Runde 13r: col_rule auch fuer die bewertete
+                            # Waffe (s.o., identische Regeln; 'std' =
+                            # regressionsneutral). ---
+                            col_dec = False
+                            dmg = None
+                            cd = None
+                            if raid and wspec_side == 1 and p == 1:
+                                if col_rule == 'std':
+                                    if wspec['r1_col'] > d:
+                                        col_dec = True
+                                elif wspec['r1_col'] > 0 and colpool is not None \
+                                        and colony < COLONY_HP:
+                                    # --- Christophers Beschluss 13r:
+                                    # 'always' + no_colony-Ausnahme,
+                                    # s.o. (Gefechtswaffen-Block). ---
                                     cd = v9.resolve_attack(
                                         wspec, [dict(c) for c in colpool],
                                         wspec['damage']) \
                                         * (2 if wspec['colony_killer'] else 1)
+                                    if col_rule == 'always':
+                                        col_dec = True
+                                    else:   # 'eff'
+                                        dmg = v9.resolve_attack(wspec, pool, d)
+                                        ship_util = min(dmg, max(0.0,
+                                                      tgt['hp'] - tgt['taken']))
+                                        col_dec = cd >= ship_util
+                            if col_dec:
+                                if cd is None:   # 'std': Buchung wie bisher
+                                    if colpool is not None and colony < COLONY_HP:
+                                        cd = v9.resolve_attack(
+                                            wspec, [dict(c) for c in colpool],
+                                            wspec['damage']) \
+                                            * (2 if wspec['colony_killer'] else 1)
+                                        colony = min(COLONY_HP, colony + cd)
+                                elif colony < COLONY_HP:
                                     colony = min(COLONY_HP, colony + cd)
                                 continue
-                            pool = tgt['cards'] + [c for c, _ in e_pd]
-                            dmg = v9.resolve_attack(wspec, pool, d)
+                            if dmg is None:
+                                dmg = v9.resolve_attack(wspec, pool, d)
                             tgt['taken'] += dmg
                             dealt[u] += dmg
                             if tgt['taken'] >= tgt['hp']:

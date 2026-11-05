@@ -65,6 +65,16 @@ des Scores in seine Konten (comp, je Kopie / units):
 Summe(comp) == Score. comp_cells liefert zustzlich die 4
 Messzellen (fleet0/fleet1/duel0/duel1) je Konto.
 
+--- FRAME-UPDATE 13r (Christophers Beschluss 4.11.2026): cond der
+bewerteten Statkarte in der Simulation GESTRICHEN (nur betroffen:
+426 Schildbooster need_shield, 312 Refraktorfeld no_shield) — die
+Karte wird immer platziert: "Wir simulieren den Fall, dass sie
+wirklich eingesetzt wird." Die echten Karten behalten ihre
+Bedingung (Effekttext). Alle Karten ohne cond bit-identisch;
+341 Koedersystem: BEWUSST UNTER KURVE dokumentiert (PD wirkt nur
+gegen die 13 Torpedo-Waffen, 85,8 % der Gefechte ohne Nachfrage —
+Christophers Beschluss, kein Hebel). Zielkurve v20 bleibt FIX. ---
+
 Aufruf: python3 check10_frame_calibration.py [N]   (Default 10000)
 """
 import json
@@ -87,6 +97,13 @@ T = dict(v11.TARGETS_V14)          # v20-Kurve (offiziell, GEMEINSAM fuer
 HP_STATIC = v11.HP_STATIC
 # --- Runde 13q (Christophers Beschluss): Referenz-Nachfrage M=2 ---
 DMG_SCALE = (2.0, 2.0)
+# --- Runde 13r (Christophers Beschluss 5.11.2026): R1-Kolonie-Zielwahl
+# im Raid = IMMER Kolonie, Ausnahme koloniewirkungslose Waffen
+# (no_colony: 203/401/438, r1_col == 0 -> Schiffschuss). battle()
+# col_rule='always'; 'std' = alter 0,7-doppelt-diskontierter Vergleich
+# (r13s-Verifikation: P(Kolonieangriff) 0,4 % -> 50,8 %, col 0,175 ->
+# 9,5 je Raid). ---
+COL_RULE = 'always'
 CKPT = os.path.join(HERE, 'check10_ckpt_v20.json')
 CKPT_1V1 = os.path.join(HERE, 'check10_1v1_v20.json')
 FC_PATH = os.path.join(HERE, 'frame_calibration.json')
@@ -181,7 +198,7 @@ def run_fleet():
                       for _ in range(3)]
         order = (0, 1) if b % 2 == 0 else (1, 0)
         r = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
-                       colpool=colpool, dmg_scale=DMG_SCALE, ret='full')
+                       colpool=colpool, dmg_scale=DMG_SCALE, col_rule=COL_RULE, ret='full')
         a0, a1 = acc_side(r, 0), acc_side(r, 1)
         base0 += total(a0)
         base1 += total(a1)
@@ -191,13 +208,13 @@ def run_fleet():
         for w2 in ws:
             r0 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             wspec=w2, wspec_fire=wspec_fire, colpool=colpool,
-                            wspec_side=0, dmg_scale=DMG_SCALE, ret='full')
+                            wspec_side=0, dmg_scale=DMG_SCALE, col_rule=COL_RULE, ret='full')
             m = acc_side(r0, 0)
             for k in m:
                 accW[w2['id']][0][k] += m[k] - a0[k]
             r1 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             wspec=w2, wspec_fire=wspec_fire, colpool=colpool,
-                            wspec_side=1, dmg_scale=DMG_SCALE, ret='full')
+                            wspec_side=1, dmg_scale=DMG_SCALE, col_rule=COL_RULE, ret='full')
             m = acc_side(r1, 1)
             for k in m:
                 accW[w2['id']][1][k] += m[k] - a1[k]
@@ -207,14 +224,14 @@ def run_fleet():
             # N*4 in der Auswertung ---
             r0 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             spec=c, spec_side=0, colpool=colpool,
-                            dmg_scale=DMG_SCALE, spec_n_inst=True,
+                            dmg_scale=DMG_SCALE, col_rule=COL_RULE, spec_n_inst=True,
                             ret='full')
             m = acc_side(r0, 0)
             for k in m:
                 accC[c['id']][0][k] += m[k] - a0[k]
             r1 = v11.battle(w, att, deff, pool_cards, fire, order, raid=raid,
                             spec=c, spec_side=1, colpool=colpool,
-                            dmg_scale=DMG_SCALE, spec_n_inst=True,
+                            dmg_scale=DMG_SCALE, col_rule=COL_RULE, spec_n_inst=True,
                             ret='full')
             m = acc_side(r1, 1)
             for k in m:
@@ -249,7 +266,7 @@ def draw_duel_build(spec):
 def duel_battle(w2, b, pool_cards, fire, wf, order, raid, colpool,
                 side_kw):
     return v11.battle(w2, [b], [b], pool_cards, fire, order, raid=raid,
-                      colpool=colpool, dmg_scale=DMG_SCALE, **side_kw,
+                      colpool=colpool, dmg_scale=DMG_SCALE, col_rule=COL_RULE, **side_kw,
                       ret='full')
 
 
@@ -330,6 +347,15 @@ def scores_from(accs, div):
     g1 = total(accs[1]) / div
     return g0, g1, (g0 + g1) / 2
 
+
+# --- Import-Schutz (Runde 13r): check10 top-level ab hier die MESSUNG.
+# Ein versehentliches `import check10` (z.B. Syntax-Check) startete die
+# komplette Messung und vermischte Resume-Checkpoints (5.11.2026).
+# Beim Import: sauber beenden OHNE Messung/Dateischreiben. ---
+if __name__ != '__main__':
+    import sys as _sys
+    print('check10: import ohne __main__ -- Messung nicht gestartet')
+    _sys.exit(0)
 
 fleet = run_fleet()
 duel = run_duel(N)
