@@ -41,7 +41,7 @@ N = int(os.environ.get('DIAG_N', '10000'))
 CKPT_EVERY = 2000
 CKPT_PATH = 'diag_revert_ckpt_v23d_r13t.json'
 OUT_PATH = 'diag_revert_v23d_r13t.json'
-THRESH = 0.6
+THRESH = 0.5
 
 t0 = time.time()
 SRC = open('diag_random_r13t.py', encoding='utf-8').read()
@@ -59,7 +59,10 @@ draw_random_battle = G['draw_random_battle']
 acc_side = G['acc_side']
 CREQ = G['CREQ']
 HP_STATIC = v11.HP_STATIC                                  # 1.0
-TARGETS = {1: 1.6, 2: 1.9, 3: 2.3, 4: 2.9, 5: 3.6}
+# Christophers Zielkurve v23e (8.11.2026, eigene Glaettung der v23d-Mediane
+# 1,82/1,63/1,88/2,60/2,95): r1 1,6 / r2 1,8 / r3 2,1 / r4 2,5 / r5 3,0,
+# Band zurueck auf +-0,5 (wie die fruehere Outlier-Analyse).
+TARGETS = {1: 1.6, 2: 1.8, 3: 2.1, 4: 2.5, 5: 3.0}
 WCSV = {w['id']: w for w in v10.load_attackers(final=False)}
 
 # ------------------------------------------------- Soll-Konfiguration ---
