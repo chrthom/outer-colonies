@@ -2,7 +2,9 @@
 # GEMEINSAME Zielkurve v23c (Beschluss 6.11.2026, Runde 13t):
 #   r1 1,6 / r2 1,9 / r3 2,3 / r4 2,9 / r5 3,6
 # EINE Kurve fuer Waffen UND Statkarten (Faktor-2-Lücke als zu
-# schliessendes Balancing-Ziel). Outlier-Kriterium |Delta| > 1,0.
+# schliessendes Balancing-Ziel). Outlier-Kriterium |Delta| > 0,5
+# (Christophers Beschluss 6.11.2026: von ±1,0 verfeinert, da die
+# v23c-Zielwerte niedriger sind als die frühere v18-Kurve).
 # Waffen: v23b-Offizialmessung (diag_random_v23_r13t.json).
 # Statkarten: HP_STATIC-1,0-Recompute aus dem v23b-Checkpoint
 # (gleiche Kontokanaele, nur Formelterm geaendert — kein Re-Run).
@@ -13,6 +15,7 @@ import statistics as st
 
 import balancing_metric_v11 as v11
 
+THRESH = 0.5          # Grenzwert (Christophers Beschluss: >±0,5)
 TARGETS = {1: 1.6, 2: 1.9, 3: 2.3, 4: 2.9, 5: 3.6}   # Zielkurve v23c
 
 d = json.load(open('diag_random_v23_r13t.json'))
@@ -52,9 +55,9 @@ for rar in range(1, 6):
              sum(1 for x in sub if x['kind'] == 'W'),
              sum(1 for x in sub if x['kind'] == 'S')))
     for x in sub:
-        if abs(x['delta']) > 1.0:
+        if abs(x['delta']) > THRESH:
             flag = 'OUTLIER '
-        elif abs(x['delta']) > 0.85:
+        elif abs(x['delta']) > THRESH * 0.8:
             flag = 'knapp    '
         else:
             flag = '         '
@@ -62,18 +65,20 @@ for rar in range(1, 6):
               % (flag, x['id'], x['title'][:26], x['score'], x['delta']))
     print()
 
-out = sorted([x for x in rows if abs(x['delta']) > 1.0],
+out = sorted([x for x in rows if abs(x['delta']) > THRESH],
              key=lambda x: -x['delta'])
-print('=== OUTLIER |Delta| > 1,0: %d von %d Karten ===' % (len(out), len(rows)))
+print('=== OUTLIER |Delta| > %.1f: %d von %d Karten ==='
+      % (THRESH, len(out), len(rows)))
 for x in out:
     print('%-4s %-26s r%d %-9s Score %6.2f  Ziel %.1f  Delta %+5.2f'
           % (x['id'], x['title'][:26], x['rarity'],
              'Waffe' if x['kind'] == 'W' else 'Statkarte',
              x['score'], TARGETS[x['rarity']], x['delta']))
 print()
-knapp = sorted([x for x in rows if 0.85 < abs(x['delta']) <= 1.0],
+knapp = sorted([x for x in rows if THRESH * 0.8 < abs(x['delta']) <= THRESH],
                key=lambda x: -abs(x['delta']))
-print('=== Knapp im Band (0,85 < |Delta| <= 1,0): %d ===' % len(knapp))
+print('=== Knapp im Band (%.2f < |Delta| <= %.1f): %d ==='
+      % (THRESH * 0.8, THRESH, len(knapp)))
 for x in knapp:
     print('%-4s %-26s r%d %-9s Score %6.2f  Delta %+5.2f'
           % (x['id'], x['title'][:26], x['rarity'],
