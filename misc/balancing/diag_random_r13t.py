@@ -57,10 +57,12 @@ import balancing_metric_v10 as v10
 import balancing_metric_v11 as v11
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CKPT_PATH = os.path.join(HERE, 'diag_random_ckpt_r13t.json')
-OUT_PATH = os.path.join(HERE, 'diag_random_r13t.json')
-N = 10000   # v21-Ankuerung (Christophers Beschluss 5.11.2026): v5-Frame
-            # (PAY-Fix) abgenommen, Offizialmessung N=10k
+CKPT_PATH = os.path.join(HERE, 'diag_random_ckpt_v23_r13t.json')
+OUT_PATH = os.path.join(HERE, 'diag_random_v23_r13t.json')
+N = 10000   # v23-Ankuerung (Christophers Beschluesse 6.11.2026):
+            # v22-Frame (>=-Regel) + Spielkosten +1 auf ALLE Karten +
+            # Draw-v2 (Pflichtwaffe je Schiff, Re-draw, b_lo-Fix) +
+            # Flotte 1-4 Schiffe; Offizialmessung N=10k, seed 42
 CKPT_EVERY = 50
 HP_STATIC = v11.HP_STATIC
 CTRL_W = v11.CTRL_W
@@ -99,6 +101,10 @@ POOL = ([dict(w, kind='w', req=v11.WREQ.get(w['id'], {})) for w in ws]
 # rarity-Gewicht je Pool-Karte
 TOT = sum(v10.RARITY_W[p['rarity']] for p in POOL)
 PPROB = [v10.RARITY_W[p['rarity']] / TOT for p in POOL]
+# Waffenpool fuer Draw-v2-Pflichtwaffe (Christophers Vorgabe 6.11.2026)
+WPIDX = [i for i, p in enumerate(POOL) if p['kind'] == 'w']
+_WPT = sum(PPROB[i] for i in WPIDX)
+WPPROB = [PPROB[i] / _WPT for i in WPIDX]
 
 cpools = [(cpl, p) for cpl, p in v9.COLONY]
 cptot = sum(p for _, p in cpools)
@@ -114,7 +120,8 @@ def draw_random_fleet(types_by_n, rng):
     entstehen endogen (kleinere Flotte -> mehr Ausruestung, die
     Karten-SUMME bleibt ueber B gleich)."""
     fleet = []
-    for _ in range(rng.randint(1, 3)):
+    for _ in range(rng.randint(1, 4)):   # v23: Flotte 1-4 Schiffe
+        # (Christophers Beschluss 6.11.2026: Gefechte "eins groesser")
         n = rng.randint(1, 3)
         types = types_by_n[n]
         t = rng.choices(types, weights=[v11.TYPE_BEST[(n, t)]
@@ -139,8 +146,16 @@ def place(card_req, free):
 
 
 def draw_loadout(fleet, e, rng):
-    """Zieht E Ausruestungskarten (rarity-gewichtet) auf freie,
-    typpassende Sockel; bis zu 20*e Zuege, danach weniger platziert."""
+    """Draw-v2 (Christophers Vorgaben 6.11.2026):
+    (1) JEDES Schiff bekommt zunaechst 1 PFLICHTWAFFE (rarity-gewichtet
+        aus dem Waffenpool, Re-draw bis anlegbar, Sanity-Deckel 300
+        Zuege) — "in Realitaet nimmt niemals ein Schiff ohne Waffe an
+        einem Gefecht teil". Builds, die keine POOL-Waffe tragen
+        koennen (<1 %), bleiben waffenlos.
+    (2) danach bis E eingesetzte Karten gesamt (Pflichtwaffen zaehlen
+        mit), nicht-anlegbare Zuege verfallen NICHT (Re-draw im Sinne
+        "Karte bleibt auf der Hand, naechste Karte"), Sanity-Deckel
+        60*e Zuege wie bisher."""
     free = {}
     ships = []
     for b in fleet:
@@ -148,6 +163,15 @@ def draw_loadout(fleet, e, rng):
         ships.append(dict(build=b, weapons=[], cards=[], pdc=[],
                           hp_add=0, sp_add=0))
     placed = 0
+    for i in range(len(fleet)):
+        for _ in range(300):
+            w = POOL[rng.choices(WPIDX, weights=WPPROB)[0]]
+            if all(free[id(fleet[i])].get(t, 0) >= n
+                   for t, n in w['req'].items()):
+                place(w['req'], free[id(fleet[i])])
+                ships[i]['weapons'].append(dict(w))
+                placed += 1
+                break
     tries = 0
     while placed < e and tries < 60 * e:
         tries += 1
@@ -160,7 +184,7 @@ def draw_loadout(fleet, e, rng):
                 s = ships[i]
                 if card['kind'] == 'w':
                     s['weapons'].append(dict(card))
-                elif card['id'] in card.get('added', []) or True:
+                else:
                     # Statkarte: pts -> Defense/PD, hp/speed -> Schiff
                     s['cards'].append(dict(card))
                     s['hp_add'] += card['hp']
@@ -186,7 +210,10 @@ def draw_random_battle(rng):
     h1 = sum(b['parts'] for b in att_b)
     s0 = sum(sum(b['socks'].values()) for b in deff_b)
     s1 = sum(sum(b['socks'].values()) for b in att_b)
-    b_lo = max(h0, h1)
+    # v23 (6.11.2026): b_lo um max. Schiffe je Seite angehoben, damit
+    # jede Seite die Pflichtwaffen (Huellen + je Schiff 1 Waffe) tragen
+    # kann — Spiegel B bleibt gewahrt (b_tot identisch fuer beide Seiten)
+    b_lo = max(h0, h1) + max(len(deff_b), len(att_b))
     b_hi = min(h0 + s0, h1 + s1)
     b_tot = rng.randint(b_lo, b_hi) if b_hi > b_lo else b_lo
     e0 = b_tot - h0
@@ -555,10 +582,13 @@ for it in range(start, N):
             for k in m:
                 accC[x['id']][side][k] += m[k]
     if (it + 1) % CKPT_EVERY == 0 or it == N - 1:
-        json.dump(dict(iter=it + 1, base=base, accW=accW, accC=accC,
-                       accWn=accWn, accCn=accCn, placedW=placedW,
-                       placedC=placedC),
-                  open(CKPT_PATH, 'w', encoding='utf-8'))
+        # v23-Robustheitsfix (6.11.2026): with-Block statt offenem
+        # Handler — ohne explizites close blieb der letzte Checkpoint
+        # im Datei-Buffer und wurde bei Timeout-Kill abgeschnitten
+        with open(CKPT_PATH, 'w', encoding='utf-8') as f:
+            json.dump(dict(iter=it + 1, base=base, accW=accW, accC=accC,
+                           accWn=accWn, accCn=accCn, placedW=placedW,
+                           placedC=placedC), f)
         print(f'Gefecht {it + 1}/{N} (Checkpoint)', flush=True)
 
 # ---------------- Auswertung ----------------
@@ -571,7 +601,11 @@ def score_of(acc, n, card, hp=0, units=None):
           + acc[s]['loot'] + acc[s]['prevent']) / n[s]
          for s in (0, 1) if n[s] > 0]
     gain = sum(g) / len(g)
-    return (gain + HP_STATIC * hp) / units
+    # v23-Spielkosten (Christophers Beschluss 6.11.2026): statische
+    # Kosten +1 auf ALLE Karten (Waffen UND Statkarten) — das Ausspielen
+    # kostet die Karte selbst (1 Karte pro Typ pro Zug); ersetzt den
+    # frueheren 0,5-Floor in weapon_units (raw+1 >= 1 immer).
+    return (gain + HP_STATIC * hp) / (units + 1.0)
 
 
 rows_w, rows_c = [], []
@@ -635,7 +669,9 @@ for rar in (1, 2, 3, 4, 5):
         cards=round(cv[len(cv) // 2], 2) if cv else None)
 
 n_taken = []
-out = dict(frame='v22: random battles (r13t probe v5, PAY-fix, >=-halved), '
+out = dict(frame='v23: random battles (r13t probe v6, >=-halved, '
+                 'Spielkosten +1 auf alle Karten, Draw-v2 '
+                 '(Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-4), '
                  'card-count mirror, one battle type, col_rule always',
            n=N, baseline=dict(
                taken0=round(base['tk0'] / N, 2),
@@ -659,8 +695,9 @@ out = dict(frame='v22: random battles (r13t probe v5, PAY-fix, >=-halved), '
                                       cards_v20=round(sc_r, 3) if sc_r
                                       else None),
            weapons=rows_w, cards=rows_c)
-json.dump(out, open(OUT_PATH, 'w', encoding='utf-8'),
-          ensure_ascii=False, indent=1)
+# v23-Robustheitsfix (6.11.2026): with-Block statt offenem Handler
+with open(OUT_PATH, 'w', encoding='utf-8') as f:
+    json.dump(out, f, ensure_ascii=False, indent=1)
 
 print(f"\n=== Zufallsgefechte-Sonde r13t (N={N}, M1, Kartenbudget-Spiegel, "
       f"1 Gefechtstyp) ===")
