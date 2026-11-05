@@ -7,6 +7,9 @@
 #      gegen das neue Zielband bei Score-Invarianz (Naeherung: Ziehungs-
 #      haeufigkeit aendert nur das Umfeld, nicht den Rollen-Score;
 #      Rest-Effekt in der Variablen-Runde messbar).
+#      ACHTUNG Erst-Interpretation (EINZEL-Tausch): Christophers
+#      Korrektur 6.11.2026 — richtig ist PAAR-Tausch (zwei Karten einer
+#      Edition tauschen Raritaet UND ID), siehe diag_swap_r13t.py.
 # Achtung: KEIN Import-Schutz — nie importieren! CWD = knowledge-Ordner.
 
 import csv
