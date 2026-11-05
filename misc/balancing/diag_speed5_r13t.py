@@ -75,7 +75,7 @@ POOL, PPROB, place = G['POOL'], G['PPROB'], G['place']
 WPIDX = [i for i, p in enumerate(POOL) if p['kind'] == 'w']
 _WPT = sum(PPROB[i] for i in WPIDX)
 WPPROB = [PPROB[i] / _WPT for i in WPIDX]
-NMAX = 4   # Christophers Beschluss: Flotte 1-4
+NMAX = 5   # Christophers Beschluss: Flotte 1-5 (v23b, 6.11.2026)
 
 C161 = [c for c in v11.cards if c['id'] == '161'][0]
 
