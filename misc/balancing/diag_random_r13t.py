@@ -673,7 +673,8 @@ for rar in (1, 2, 3, 4, 5):
 n_taken = []
 out = dict(frame='v23: random battles (r13t probe v6, >=-halved, '
                  'Spielkosten +1 auf alle Karten, Draw-v2 '
-                 '(Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-4), '
+                 '(Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-5, '
+                 'HP_STATIC 1.0), '
                  'card-count mirror, one battle type, col_rule always',
            n=N, baseline=dict(
                taken0=round(base['tk0'] / N, 2),

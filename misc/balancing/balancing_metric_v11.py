@@ -141,10 +141,14 @@ def value(dealt, taken, colony, loot):
     return dealt - taken - colony + loot
 
 
-# --- HP-Konto (Christophers Beschluss 4.11.2026, Runde 13i): statischer
-# Zuschlag 0,5 x hp je Gefecht aufs Karten-Konto (Mitte zwischen rein
-# dynamischer Buchung ~0,16 Auslastung und vollem 1:1-Konto). ---
-HP_STATIC = 0.5
+# --- HP-Konto (Christophers Beschluss 4.11.2026, Runde 13i, ERHOEHT
+# 6.11.2026 Runde 13t): statischer Zuschlag x hp je Gefecht aufs
+# Karten-Konto. 13i: 0,5 (Mitte zwischen rein dynamischer Buchung ~0,16
+# Auslastung und vollem 1:1-Konto). 13t: 1,0 — volles HP-Konto, weil
+# die Faktor-2-Analyse zeigte, dass +hp-Karten den Trager laenger am
+# Leben halten und damit MEHR Schaden einstecken (take negativ), was
+# nur das volle Konto ausgleicht. ---
+HP_STATIC = 1.0
 
 
 def card_score(c, gain):
