@@ -39,8 +39,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 N = int(os.environ.get('DIAG_N', '10000'))
 CKPT_EVERY = 2000
-CKPT_PATH = 'diag_revert_ckpt_r13t.json'
-OUT_PATH = 'diag_revert_v23_r13t.json'
+CKPT_PATH = 'diag_revert_ckpt_v23d_r13t.json'
+OUT_PATH = 'diag_revert_v23d_r13t.json'
 THRESH = 0.6
 
 t0 = time.time()
@@ -170,8 +170,14 @@ JOBS = []
 
 
 def add_job(label, kind, spec, part, rarity):
+    # key MUSS die Abzuege enthalten: 157-X vs. 157-csvnum (sh=7) hatten
+    # denselben key und buchten in EIN Konto -> X-Divergenz war ein
+    # Artefakt (Mittelwert, diff exakt 0.0). Bugfix 8.11.2026.
+    abzs = '%s/%s/%s' % ((spec.get('abz') or {}).get('pd'),
+                         (spec.get('abz') or {}).get('shield'),
+                         (spec.get('abz') or {}).get('armour'))
     key = (part, spec['id'], kind, spec.get('damage'), spec.get('energy'),
-           spec.get('hp'), spec.get('speed'), spec.get('units'))
+           spec.get('hp'), spec.get('speed'), spec.get('units'), abzs)
     JOBS.append(dict(label=label, kind=kind, spec=spec, part=part,
                      rarity=rarity, key=key))
 
@@ -382,7 +388,7 @@ try:
 except Exception:
     sp = None
 
-result = dict(N=N, seed=42, frame='v23b-revert-soll', hp_static=HP_STATIC,
+result = dict(N=N, seed=42, frame='v23d-revert-soll (wspec feuert zuerst je Phase, >=-Halved-Fix im wspec-Pfad)', hp_static=HP_STATIC,
               targets=TARGETS, thresh=THRESH, revert=sorted(REVERT),
               medians_weapons=med_w, medians_cards=med_c,
               spearman_weapons_vs_v23b=sp, rows=rows, swap=swap_rows,

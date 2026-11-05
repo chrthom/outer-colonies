@@ -380,6 +380,53 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
             wspec_owner = remap.get(wspec_owner, -1)
 
     for p in PHASES:
+        # v23d (Christophers Beschluss 8.11.2026): die bewertete Waffe
+        # feuert als ERSTE der Phase, VOR allen Umgebungsschuessen
+        # (vorher eigene Schleife NACH den Umgebungswaffen) — bei Abzug X
+        # bleibt die Defense-Karte aktiv, und die Umgebungsschuesse
+        # derselben Phase treffen dann auf die aktive Karte (Christophers
+        # X-Semantik wird damit metrisch wirksam). Ausserdem >=-Fix im
+        # wspec-Pfad: die v22->=-Umstellung war hier uebersehen worden
+        # (alte >-Regel "<" statt "<=" — bewertete Waffen seit v22 zu
+        # selten halbiert, Scores leicht ueberhoeht).
+        if wspec is not None:
+            own, enemy = fleet[spec_side], fleet[1 - spec_side]
+            e_pd = [(c, oi) for c, oi in side_pd[1 - spec_side]
+                    if not enemy[oi]['dead']]
+            for i, sh in enumerate(own):
+                if i != wspec_owner or sh['dead']:
+                    continue
+                ok = (p == wspec['fire_phase']) if wspec['single'] \
+                    else (p <= wspec['range'])
+                if ok and wf[i][4 - p]:
+                    tgt_i = next((j for j, e in enumerate(enemy)
+                                  if not e['dead']), None)
+                    if tgt_i is None:
+                        continue
+                    tgt = enemy[tgt_i]
+                    base = max(0, wspec['damage']
+                               - (6 * tgt['s']
+                                  if wspec['id'] == '401' else 0))
+                    d = v9.half(base) if sh['s'] + p <= tgt['s'] else base
+                    pool = tgt['cards'] + [c for c, _ in e_pd]
+                    col_dec = False
+                    if raid and spec_side == 1 and p == 1 \
+                            and wspec['r1_col'] > 0 \
+                            and colpool is not None \
+                            and colony < COLONY_HP:
+                        col_dec = True
+                    if col_dec:
+                        cd = v9.resolve_attack(
+                            wspec, [dict(c) for c in colpool],
+                            wspec['damage']) \
+                            * (2 if wspec['colony_killer'] else 1)
+                        colony = min(COLONY_HP, colony + cd)
+                        continue
+                    dmg = v9.resolve_attack(wspec, pool, d)
+                    tgt['taken'] += dmg
+                    dealt[spec_side] += dmg
+                    if tgt['taken'] >= tgt['hp']:
+                        tgt['dead'] = True
         for u in sc['order']:
             own, enemy = fleet[u], fleet[1 - u]
             e_pd = [(c, oi) for c, oi in side_pd[1 - u]
@@ -424,47 +471,6 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
                     dealt[u] += dmg
                     if tgt['taken'] >= tgt['hp']:
                         tgt['dead'] = True
-            # bewertete Waffe (Delta) eigene Schleife je Phase.
-            # v3-Fix (5.11.2026, Christophers 13l-Design-Punkt): die
-            # bewertete Waffe feuert NUR vom Traeger-Schiff (1 Instanz)
-            # — v2 feuerte je Schiff mit eigener Muenze (ueberhoeht die
-            # Waffen-Scores um E[Schiffe je Seite] ~2x gegenueber Karten,
-            # die korrekt 1 Platzierung messen).
-            if wspec is not None and u == spec_side:
-                for i, sh in enumerate(own):
-                    if i != wspec_owner or sh['dead']:
-                        continue
-                    ok = (p == wspec['fire_phase']) if wspec['single'] \
-                        else (p <= wspec['range'])
-                    if ok and wf[i][4 - p]:
-                        tgt_i = next((j for j, e in enumerate(enemy)
-                                      if not e['dead']), None)
-                        if tgt_i is None:
-                            continue
-                        tgt = enemy[tgt_i]
-                        base = max(0, wspec['damage']
-                                   - (6 * tgt['s']
-                                      if wspec['id'] == '401' else 0))
-                        d = v9.half(base) if sh['s'] + p < tgt['s'] else base
-                        pool = tgt['cards'] + [c for c, _ in e_pd]
-                        col_dec = False
-                        if raid and u == 1 and p == 1 \
-                                and wspec['r1_col'] > 0 \
-                                and colpool is not None \
-                                and colony < COLONY_HP:
-                            col_dec = True
-                        if col_dec:
-                            cd = v9.resolve_attack(
-                                wspec, [dict(c) for c in colpool],
-                                wspec['damage']) \
-                                * (2 if wspec['colony_killer'] else 1)
-                            colony = min(COLONY_HP, colony + cd)
-                            continue
-                        dmg = v9.resolve_attack(wspec, pool, d)
-                        tgt['taken'] += dmg
-                        dealt[u] += dmg
-                        if tgt['taken'] >= tgt['hp']:
-                            tgt['dead'] = True
         # Recharge PerRound/phase
         for side in (0, 1):
             for sh in fleet[side]:
@@ -671,7 +677,9 @@ for rar in (1, 2, 3, 4, 5):
         cards=round(cv[len(cv) // 2], 2) if cv else None)
 
 n_taken = []
-out = dict(frame='v23: random battles (r13t probe v6, >=-halved, '
+out = dict(frame='v23d: random battles (r13t probe v6, >=-halved '
+                 'AUCH im wspec-Pfad (Bugfix), wspec feuert ERSTE je '
+                 'Phase (Christophers X-Beschluss 8.11.), '
                  'Spielkosten +1 auf alle Karten, Draw-v2 '
                  '(Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-5, '
                  'HP_STATIC 1.0), '
