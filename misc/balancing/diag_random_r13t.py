@@ -373,7 +373,10 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
                     tgt = enemy[tgt_i]
                     base = max(0, w['damage']
                                - (6 * tgt['s'] if w['id'] == '401' else 0))
-                    halved = sh['s'] + p < tgt['s']
+                    # v22 (Christophers Beschluss 5.11.2026): halved
+                    # >=-Regel statt > (Spielmechanik: Zielspeed >=
+                    # Angreiferspeed + Phase) — halved-Rate 14,0 -> 25,8 %
+                    halved = sh['s'] + p <= tgt['s']
                     d = v9.half(base) if halved else base
                     pool = tgt['cards'] + [c for c, _ in e_pd]
                     # --- R1-Kolonie-Zielwahl: 13r 'always' + Ausnahme ---
@@ -632,7 +635,7 @@ for rar in (1, 2, 3, 4, 5):
         cards=round(cv[len(cv) // 2], 2) if cv else None)
 
 n_taken = []
-out = dict(frame='v21: random battles (r13t probe v5, PAY-fix), M1, '
+out = dict(frame='v22: random battles (r13t probe v5, PAY-fix, >=-halved), '
                  'card-count mirror, one battle type, col_rule always',
            n=N, baseline=dict(
                taken0=round(base['tk0'] / N, 2),
