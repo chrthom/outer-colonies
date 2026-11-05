@@ -1,0 +1,324 @@
+# ============================================================================
+# diag_v23g_r13t.py — Neu-Simulation im v23f-Soll-Frame (Christophers
+# Beschlusspaket 8.11.2026) auf Frame v23d (wspec-first, >=-Halved-Fix)
+# ----------------------------------------------------------------------------
+# Waffen-Soll (Abweichungen vs. FIN):
+#   - Ruecknahmen Kat. A/C (csv): 106 107 303 343 405 125 127 167 168 203 224
+#     234 339 340 409 420 421 424 441 (+ 310/343 mit Raritaetstausch)
+#   - 302 csv-Ruecknahme (dmg 50, E 6) — war B-Override
+#   - 438 csv-Ruecknahme (dmg 2) — war B-Override
+#   - 101 FIN-Override WIEDER aktiv (dmg 28, TAbz 14, E 0) — C.-Beschluss
+#   - 126 FIN (dmg 7) + E 0->1 (Empfehlung uebernommen)
+#   - 304 csv-Werte (dmg 22, TAbz 11) + E 1 statt csv E 2 ("nur E1")
+#   - 150 NEU: dmg 14, TAbz -7, SAbz -4 (statt csv-Ruecknahme)
+#   - 555 dmg 8->6; 182 dmg 6->5; 318 dmg 16/TAbz -8 (bleibt); 412 dmg 10;
+#     347 dmg 4/X (bleibt)
+#   - 223 E 1->2 + Raritaet r2->r3 (Tausch mit 312 wieder aktiv)
+#   - Raritaeten: 310->r5, 103->r4, 223->r3, 312->r2, 343->r2, 344->r2
+#     (522 und 537 bleiben r2, kein Tausch)
+# Statkarten-Soll:
+#   - 171 hp -1->0 ("HP raus"); 184 hp 4->3; 240 hp 3->4
+#   - 140 E0 (units 1.2), 161 E0 (units 0.7), 522 E0 (units 1.2), 109 E-1
+#     (units 1.7, bewusst), 406 hp 4, 349 hp 1, 434 hp 0, 103 hp +2 + Rar. 4
+# X-Karten (157/166/179/344/347): X-Form bleibt.
+# Auswertung: Mediane je Raritaet + alle Outlier gegen v23e (±0,5).
+# Sonde wird NICHT importiert: exec bis Marker mit G-dict.
+# ============================================================================
+import json
+import os
+import random
+import statistics
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(HERE)
+N = int(os.environ.get('DIAG_N', '10000'))
+CKPT_EVERY = 2000
+CKPT_PATH = 'diag_v23g_ckpt_r13t.json'
+OUT_PATH = 'diag_v23g_r13t.json'
+THRESH = 0.5
+TARGETS = {1: 1.5, 2: 1.7, 3: 2.0, 4: 2.5, 5: 3.0}   # v23g-Kurve
+HP_STATIC = 1.0
+
+t0 = time.time()
+SRC = open('diag_random_r13t.py', encoding='utf-8').read()
+CUT = SRC.index('# ---------------- Messung mit Checkpoint')
+G = {'__name__': 'r13t_defs', '__file__': os.path.join(HERE, 'diag_random_r13t.py')}
+exec(compile(SRC[:CUT], 'diag_random_r13t.py', 'exec'), G)
+
+v11, v10 = G['v11'], G['v10']
+ws, cs = G['ws'], G['cs']
+W = {w['id']: w for w in ws}
+C = {c['id']: c for c in cs}
+WCSV = {w['id']: w for w in v10.load_attackers(final=False)}
+battle_r = G['battle_r']
+draw = G['draw_random_battle']
+acc_side = G['acc_side']
+CREQ = G['CREQ']
+
+REVERT = {'106', '107', '303', '310', '343', '405',
+          '125', '127', '167', '168', '203', '224',
+          '234', '339', '340', '409', '420', '421', '424', '441'}
+B_FIN = {'101', '126', '151', '180', '207', '304'}    # FIN-Overrides aktiv
+RARITY = {'310': 5, '223': 3, '343': 2, '344': 2, '101': 4}
+
+
+def wcsv_spec(cid):
+    s = dict(W[cid])
+    wc = WCSV[cid]
+    s['damage'] = wc['damage']
+    s['energy'] = wc['energy']
+    s['abz'] = dict(wc['abz'])
+    s['r1_col'] = v10.colony_r1(s)
+    return s
+
+
+def wvar(base, dmg=None, pd_=None, sh=None, e=None, rar=None):
+    s = dict(base)
+    if (dmg, pd_, sh) != (None, None, None):
+        s['abz'] = dict(base['abz'])
+        if pd_ is not None:
+            s['abz']['pd'] = pd_
+        if sh is not None:
+            s['abz']['shield'] = sh
+    if dmg is not None:
+        s['damage'] = dmg
+    if e is not None:
+        s['energy'] = e
+    if dmg is not None or pd_ is not None or sh is not None:
+        s['r1_col'] = v10.colony_r1(s)
+    if rar is not None:
+        s['rarity'] = rar
+    return s
+
+
+WSOLL = {}
+for w in ws:
+    cid = w['id']
+    if cid in REVERT:
+        WSOLL[cid] = wcsv_spec(cid)
+    elif cid in B_FIN:
+        WSOLL[cid] = dict(w)                     # FIN-Override aktiv
+    elif cid == '302' or cid == '438':
+        WSOLL[cid] = wcsv_spec(cid)              # csv-Ruecknahme
+    elif cid == '150':
+        WSOLL[cid] = wvar(w, dmg=14, pd_=7, sh=4)   # Beschluss: 14/TAbz7/SAbz4
+    elif cid == '555':
+        WSOLL[cid] = wvar(w, dmg=6)
+    elif cid == '182':
+        WSOLL[cid] = wvar(w, dmg=5)
+    elif cid == '318':
+        WSOLL[cid] = wvar(w, dmg=16, pd_=8)
+    elif cid == '412':
+        WSOLL[cid] = wvar(w, dmg=10)
+    elif cid == '347':
+        WSOLL[cid] = wvar(w, dmg=4)              # X bleibt
+    elif cid == '223':
+        WSOLL[cid] = wvar(w, e=2, rar=3)        # E2 + Tausch r3
+    elif cid == '126':
+        WSOLL[cid] = wvar(w, e=1)               # FIN dmg 7 + E+1
+    else:
+        WSOLL[cid] = dict(w)
+for cid, rar in RARITY.items():
+    if cid in WSOLL:
+        WSOLL[cid]['rarity'] = rar
+
+CSOLL = {}
+for c in cs:
+    cid = c['id']
+    if cid == '171':
+        CSOLL[cid] = dict(c, hp=0)              # "HP raus" (csv -1 -> 0)
+    elif cid == '184':
+        CSOLL[cid] = dict(c, hp=3)
+    elif cid == '240':
+        CSOLL[cid] = dict(c, hp=4)
+    elif cid == '406':
+        CSOLL[cid] = dict(c, hp=4, rarity=5)  # Tausch mit 101 (406->r5)
+    elif cid == '349':
+        CSOLL[cid] = dict(c, hp=1)
+    elif cid == '434':
+        CSOLL[cid] = dict(c, hp=0)
+    elif cid == '103':
+        CSOLL[cid] = dict(c, hp=c['hp'] + 2, rarity=4)
+    elif cid == '312':
+        CSOLL[cid] = dict(c, rarity=1)   # Tausch nach r1 (C.-Beschluss)
+    elif cid == '140':
+        CSOLL[cid] = dict(c, units=1.2)         # E0 (1.7 bei E-1, -0.5/Stufe)
+    elif cid == '161':
+        CSOLL[cid] = dict(c, units=0.7)         # E0 (1.7 - 1.0 E-Anteil)
+    elif cid == '522':
+        CSOLL[cid] = dict(c, units=1.2)         # E0 (2.2 - 1.0, 2 negative Stufen)
+    elif cid == '109':
+        CSOLL[cid] = dict(c, units=1.7)         # E-1 (bewusst)
+    else:
+        CSOLL[cid] = dict(c)
+
+POOL = [dict(WSOLL[w['id']], kind='w', req=v11.WREQ.get(w['id'], {}))
+        for w in ws] \
+    + [dict(CSOLL[c['id']], kind='c', req=CREQ.get(c['id'], {})) for c in cs]
+G['POOL'] = POOL
+G['TOT'] = tot = sum(v10.RARITY_W[p['rarity']] for p in POOL)
+G['PPROB'] = [v10.RARITY_W[p['rarity']] / tot for p in POOL]
+wpidx = [i for i, p in enumerate(POOL) if p['kind'] == 'w']
+G['WPIDX'] = wpidx
+G['_WPT'] = wpt = sum(G['PPROB'][i] for i in wpidx)
+G['WPPROB'] = [G['PPROB'][i] / wpt for i in wpidx]
+
+# ------------------------------------------------------------- Jobs ---
+JOBS = []
+
+
+def add_job(cid, kind, spec, rarity):
+    JOBS.append(dict(label=cid, id=cid, kind=kind, spec=spec, rarity=rarity))
+
+
+for w in ws:
+    add_job(w['id'], 'w', dict(WSOLL[w['id']]), WSOLL[w['id']]['rarity'])
+for c in cs:
+    add_job(c['id'], 'c', dict(CSOLL[c['id']]), CSOLL[c['id']]['rarity'])
+
+blank = lambda: [dict(out=0.0, take=0.0, col=0.0, loot=0.0, prevent=0.0)
+                 for _ in range(2)]
+acc = {j['id']: blank() for j in JOBS}
+accn = {j['id']: [0, 0] for j in JOBS}
+
+start = 0
+if os.path.exists(CKPT_PATH):
+    try:
+        ck = json.load(open(CKPT_PATH, encoding='utf-8'))
+        start = ck['iter']
+        for k, v in ck['acc'].items():
+            acc[k][0].update(v[0]); acc[k][1].update(v[1])
+        for k, v in ck['accn'].items():
+            accn[k] = v
+        print('Resume bei Gefecht %d/%d' % (start, N))
+    except Exception as ex:
+        print('Kaputter Checkpoint, Neustart:', ex)
+        start = 0
+        acc = {j['id']: blank() for j in JOBS}
+        accn = {j['id']: [0, 0] for j in JOBS}
+
+random.seed(42)
+for it in range(start, N):
+    sc = draw(random)
+    r0 = battle_r(sc)
+    a0, a1 = acc_side(r0, 0), acc_side(r0, 1)
+    for j in JOBS:
+        for side in (0, 1):
+            if j['kind'] == 'w':
+                r = battle_r(sc, spin=it % 3, wspec=dict(j['spec']),
+                             wf=sc['wf'][side], spec_side=side)
+            else:
+                r = battle_r(sc, spin=it % 3, spec=dict(j['spec']),
+                             spec_side=side)
+            if r is None:
+                continue
+            a = acc_side(r, side)
+            b = a0 if side == 0 else a1
+            accn[j['id']][side] += 1
+            for ch in a:
+                acc[j['id']][side][ch] += a[ch] - b[ch]
+    if (it + 1) % CKPT_EVERY == 0 or it == N - 1:
+        with open(CKPT_PATH, 'w', encoding='utf-8') as f:
+            json.dump(dict(iter=it + 1, acc=acc, accn=accn), f)
+        print('Gefecht %d/%d (%.0fs)' % (it + 1, N, time.time() - t0),
+              flush=True)
+if os.path.exists(CKPT_PATH):
+    os.remove(CKPT_PATH)
+print('Messung fertig: %.0fs' % (time.time() - t0), flush=True)
+
+# ---------------------------------------------------------- Auswertung ---
+def score_of(j):
+    gains = []
+    for s in (0, 1):
+        n = accn[j['id']][s]
+        if n > 0:
+            gains.append(sum(acc[j['id']][s].values()) / n)
+    gain = sum(gains) / len(gains)
+    hp = j['spec']['hp'] if j['kind'] == 'c' else 0
+    units = (j['spec']['units'] if j['kind'] == 'c'
+             else v11.weapon_units(j['spec']))
+    return (gain + HP_STATIC * hp) / (units + 1.0)
+
+
+rows = []
+for j in JOBS:
+    s_ = score_of(j)
+    tgt = TARGETS[j['rarity']]
+    rows.append(dict(label=j['label'], id=j['id'], kind=j['kind'],
+                     rarity=j['rarity'], score=round(s_, 2),
+                     target=tgt, delta=round(s_ - tgt, 2)))
+
+def medians(kind):
+    out = {}
+    for rar in (1, 2, 3, 4, 5):
+        vals = [x['score'] for x in rows
+                if x['kind'] == kind and x['rarity'] == rar]
+        if vals:
+            out[str(rar)] = round(statistics.median(vals), 3)
+    return out
+
+med_w, med_c = medians('w'), medians('c')
+
+spear = None
+try:
+    fc = json.load(open('diag_random_v23_r13t.json', encoding='utf-8'))
+    old = {c['id']: c['score'] for c in fc['cards']}
+    pairs = [(x['score'], old[x['id']]) for x in rows
+             if x['kind'] == 'c' and x['id'] in old]
+
+    def rank(v):
+        order = sorted(range(len(v)), key=lambda i: v[i])
+        r = [0.0] * len(v)
+        i = 0
+        while i < len(order):
+            j = i
+            while j + 1 < len(order) and v[order[j + 1]] == v[order[i]]:
+                j += 1
+            avg = (i + j) / 2 + 1
+            for k in range(i, j + 1):
+                r[order[k]] = avg
+            i = j + 1
+        return r
+
+    n_ = len(pairs)
+    d2 = sum((a - b) ** 2 for a, b in zip(rank([p[0] for p in pairs]),
+                                          rank([p[1] for p in pairs])))
+    spear = 1 - 6 * d2 / (n_ * (n_ * n_ - 1))
+    spear = round(spear, 3)
+except Exception as ex:
+    print('Spearman nicht verfuegbar:', ex)
+
+outliers = [x for x in rows if abs(x['delta']) > THRESH]
+outliers.sort(key=lambda x: -x['delta'])
+knapp = [x for x in rows if THRESH >= abs(x['delta']) > 0.4]
+knapp.sort(key=lambda x: -abs(x['delta']))
+
+result = dict(N=N, seed=42,
+              frame='v23g-soll auf Frame v23d (wspec-first, >=-fix), '
+                    'v23g-Kurve, 304 FIN, 312->r1, 101<->406-Tausch',
+              targets=TARGETS, thresh=THRESH, hp_static=HP_STATIC,
+              medians_weapons=med_w, medians_cards=med_c,
+              spearman_cards_vs_v23b=spear,
+              rows=rows, outliers=outliers, knapp=knapp,
+              elapsed=round(time.time() - t0, 1))
+with open(OUT_PATH, 'w', encoding='utf-8') as f:
+    json.dump(result, f, ensure_ascii=False, indent=1)
+
+print('\n===== v23f-Soll-Messung (N=%d, %.0fs) =====' % (N, time.time() - t0))
+print('Mediane Waffen:', med_w)
+print('Mediane Karten:', med_c)
+if spear is not None:
+    print('Spearman Karten vs. v23b: %.3f' % spear)
+print('\n===== Outlier gegen v23e (|%s|>%.1f): %d ====='
+      % ('\u0394', THRESH, len(outliers)))
+for x in outliers:
+    print('%-5s %-26s %s r%d  Score %5.2f  Ziel %.1f  Delta %+5.2f'
+          % (x['id'], x['label'], x['kind'], x['rarity'], x['score'],
+             x['target'], x['delta']))
+print('\n===== Knapp im Band (0.4<|d|<=%.1f): %d =====' % (THRESH, len(knapp)))
+for x in knapp:
+    print('%-5s %-26s %s r%d  Score %5.2f  Ziel %.1f  Delta %+5.2f'
+          % (x['id'], x['label'], x['kind'], x['rarity'], x['score'],
+             x['target'], x['delta']))
+print('\nErgebnis: %s' % OUT_PATH)

@@ -1,0 +1,836 @@
+{
+ "N": 10000,
+ "seed": 42,
+ "frame": "v23g-soll auf Frame v23d (wspec-first, >=-fix), v23g-Kurve, 304 FIN, 312->r1, 101<->406-Tausch",
+ "targets": {
+  "1": 1.5,
+  "2": 1.7,
+  "3": 2.0,
+  "4": 2.5,
+  "5": 3.0
+ },
+ "thresh": 0.5,
+ "hp_static": 1.0,
+ "medians_weapons": {
+  "1": 1.51,
+  "2": 1.685,
+  "3": 1.885,
+  "4": 2.34,
+  "5": 2.9
+ },
+ "medians_cards": {
+  "1": 1.625,
+  "2": 1.12,
+  "4": 2.34,
+  "5": 2.98
+ },
+ "spearman_cards_vs_v23b": 0.648,
+ "rows": [
+  {
+   "label": "101",
+   "id": "101",
+   "kind": "w",
+   "rarity": 4,
+   "score": 1.73,
+   "target": 2.5,
+   "delta": -0.77
+  },
+  {
+   "label": "106",
+   "id": "106",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.92,
+   "target": 3.0,
+   "delta": -0.08
+  },
+  {
+   "label": "107",
+   "id": "107",
+   "kind": "w",
+   "rarity": 4,
+   "score": 2.47,
+   "target": 2.5,
+   "delta": -0.03
+  },
+  {
+   "label": "118",
+   "id": "118",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.88,
+   "target": 2.0,
+   "delta": -0.12
+  },
+  {
+   "label": "125",
+   "id": "125",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.89,
+   "target": 2.0,
+   "delta": -0.11
+  },
+  {
+   "label": "126",
+   "id": "126",
+   "kind": "w",
+   "rarity": 3,
+   "score": 2.61,
+   "target": 2.0,
+   "delta": 0.61
+  },
+  {
+   "label": "127",
+   "id": "127",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.76,
+   "target": 2.0,
+   "delta": -0.24
+  },
+  {
+   "label": "130",
+   "id": "130",
+   "kind": "w",
+   "rarity": 2,
+   "score": 2.13,
+   "target": 1.7,
+   "delta": 0.43
+  },
+  {
+   "label": "136",
+   "id": "136",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.79,
+   "target": 1.7,
+   "delta": 0.09
+  },
+  {
+   "label": "150",
+   "id": "150",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.24,
+   "target": 1.7,
+   "delta": -0.46
+  },
+  {
+   "label": "151",
+   "id": "151",
+   "kind": "w",
+   "rarity": 2,
+   "score": 2.03,
+   "target": 1.7,
+   "delta": 0.33
+  },
+  {
+   "label": "157",
+   "id": "157",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.47,
+   "target": 1.7,
+   "delta": -0.23
+  },
+  {
+   "label": "166",
+   "id": "166",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.84,
+   "target": 1.5,
+   "delta": 0.34
+  },
+  {
+   "label": "167",
+   "id": "167",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.35,
+   "target": 1.5,
+   "delta": -0.15
+  },
+  {
+   "label": "168",
+   "id": "168",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.44,
+   "target": 1.5,
+   "delta": -0.06
+  },
+  {
+   "label": "179",
+   "id": "179",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.81,
+   "target": 1.5,
+   "delta": 0.31
+  },
+  {
+   "label": "180",
+   "id": "180",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.83,
+   "target": 1.5,
+   "delta": 0.33
+  },
+  {
+   "label": "181",
+   "id": "181",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.63,
+   "target": 1.5,
+   "delta": 0.13
+  },
+  {
+   "label": "182",
+   "id": "182",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.86,
+   "target": 1.5,
+   "delta": 0.36
+  },
+  {
+   "label": "203",
+   "id": "203",
+   "kind": "w",
+   "rarity": 5,
+   "score": 3.04,
+   "target": 3.0,
+   "delta": 0.04
+  },
+  {
+   "label": "207",
+   "id": "207",
+   "kind": "w",
+   "rarity": 4,
+   "score": 2.21,
+   "target": 2.5,
+   "delta": -0.29
+  },
+  {
+   "label": "209",
+   "id": "209",
+   "kind": "w",
+   "rarity": 4,
+   "score": 2.56,
+   "target": 2.5,
+   "delta": 0.06
+  },
+  {
+   "label": "216",
+   "id": "216",
+   "kind": "w",
+   "rarity": 3,
+   "score": 2.38,
+   "target": 2.0,
+   "delta": 0.38
+  },
+  {
+   "label": "223",
+   "id": "223",
+   "kind": "w",
+   "rarity": 3,
+   "score": 2.48,
+   "target": 2.0,
+   "delta": 0.48
+  },
+  {
+   "label": "224",
+   "id": "224",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.52,
+   "target": 1.7,
+   "delta": -0.18
+  },
+  {
+   "label": "234",
+   "id": "234",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.35,
+   "target": 1.5,
+   "delta": -0.15
+  },
+  {
+   "label": "237",
+   "id": "237",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.58,
+   "target": 1.5,
+   "delta": 0.08
+  },
+  {
+   "label": "302",
+   "id": "302",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.57,
+   "target": 3.0,
+   "delta": -0.43
+  },
+  {
+   "label": "303",
+   "id": "303",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.9,
+   "target": 3.0,
+   "delta": -0.1
+  },
+  {
+   "label": "304",
+   "id": "304",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.03,
+   "target": 3.0,
+   "delta": -0.97
+  },
+  {
+   "label": "310",
+   "id": "310",
+   "kind": "w",
+   "rarity": 5,
+   "score": 3.14,
+   "target": 3.0,
+   "delta": 0.14
+  },
+  {
+   "label": "318",
+   "id": "318",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.25,
+   "target": 2.0,
+   "delta": -0.75
+  },
+  {
+   "label": "339",
+   "id": "339",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.44,
+   "target": 1.5,
+   "delta": -0.06
+  },
+  {
+   "label": "340",
+   "id": "340",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.06,
+   "target": 1.5,
+   "delta": -0.44
+  },
+  {
+   "label": "343",
+   "id": "343",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.69,
+   "target": 1.7,
+   "delta": -0.01
+  },
+  {
+   "label": "344",
+   "id": "344",
+   "kind": "w",
+   "rarity": 2,
+   "score": 2.03,
+   "target": 1.7,
+   "delta": 0.33
+  },
+  {
+   "label": "347",
+   "id": "347",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.32,
+   "target": 1.5,
+   "delta": -0.18
+  },
+  {
+   "label": "401",
+   "id": "401",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.42,
+   "target": 3.0,
+   "delta": -0.58
+  },
+  {
+   "label": "405",
+   "id": "405",
+   "kind": "w",
+   "rarity": 4,
+   "score": 2.17,
+   "target": 2.5,
+   "delta": -0.33
+  },
+  {
+   "label": "409",
+   "id": "409",
+   "kind": "w",
+   "rarity": 4,
+   "score": 2.64,
+   "target": 2.5,
+   "delta": 0.14
+  },
+  {
+   "label": "412",
+   "id": "412",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.69,
+   "target": 2.0,
+   "delta": -0.31
+  },
+  {
+   "label": "420",
+   "id": "420",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.73,
+   "target": 1.7,
+   "delta": 0.03
+  },
+  {
+   "label": "421",
+   "id": "421",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.68,
+   "target": 1.7,
+   "delta": -0.02
+  },
+  {
+   "label": "422",
+   "id": "422",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.36,
+   "target": 1.7,
+   "delta": -0.34
+  },
+  {
+   "label": "424",
+   "id": "424",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.56,
+   "target": 1.7,
+   "delta": -0.14
+  },
+  {
+   "label": "438",
+   "id": "438",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.25,
+   "target": 1.5,
+   "delta": -0.25
+  },
+  {
+   "label": "440",
+   "id": "440",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.37,
+   "target": 1.5,
+   "delta": -0.13
+  },
+  {
+   "label": "441",
+   "id": "441",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.91,
+   "target": 1.5,
+   "delta": 0.41
+  },
+  {
+   "label": "554",
+   "id": "554",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.51,
+   "target": 1.5,
+   "delta": 0.01
+  },
+  {
+   "label": "555",
+   "id": "555",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.63,
+   "target": 1.5,
+   "delta": 0.13
+  },
+  {
+   "label": "103",
+   "id": "103",
+   "kind": "c",
+   "rarity": 4,
+   "score": 2.53,
+   "target": 2.5,
+   "delta": 0.03
+  },
+  {
+   "label": "109",
+   "id": "109",
+   "kind": "c",
+   "rarity": 4,
+   "score": 0.85,
+   "target": 2.5,
+   "delta": -1.65
+  },
+  {
+   "label": "115",
+   "id": "115",
+   "kind": "c",
+   "rarity": 4,
+   "score": 2.34,
+   "target": 2.5,
+   "delta": -0.16
+  },
+  {
+   "label": "140",
+   "id": "140",
+   "kind": "c",
+   "rarity": 2,
+   "score": 1.35,
+   "target": 1.7,
+   "delta": -0.35
+  },
+  {
+   "label": "161",
+   "id": "161",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.77,
+   "target": 1.5,
+   "delta": -0.73
+  },
+  {
+   "label": "163",
+   "id": "163",
+   "kind": "c",
+   "rarity": 1,
+   "score": 2.05,
+   "target": 1.5,
+   "delta": 0.55
+  },
+  {
+   "label": "170",
+   "id": "170",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.14,
+   "target": 1.5,
+   "delta": -0.36
+  },
+  {
+   "label": "171",
+   "id": "171",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.66,
+   "target": 1.5,
+   "delta": 0.16
+  },
+  {
+   "label": "184",
+   "id": "184",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.87,
+   "target": 1.5,
+   "delta": 0.37
+  },
+  {
+   "label": "240",
+   "id": "240",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.65,
+   "target": 1.5,
+   "delta": 0.15
+  },
+  {
+   "label": "312",
+   "id": "312",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.76,
+   "target": 1.5,
+   "delta": -0.74
+  },
+  {
+   "label": "341",
+   "id": "341",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.9,
+   "target": 1.5,
+   "delta": -0.6
+  },
+  {
+   "label": "349",
+   "id": "349",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.6,
+   "target": 1.5,
+   "delta": 0.1
+  },
+  {
+   "label": "406",
+   "id": "406",
+   "kind": "c",
+   "rarity": 5,
+   "score": 2.98,
+   "target": 3.0,
+   "delta": -0.02
+  },
+  {
+   "label": "426",
+   "id": "426",
+   "kind": "c",
+   "rarity": 2,
+   "score": 1.75,
+   "target": 1.7,
+   "delta": 0.05
+  },
+  {
+   "label": "434",
+   "id": "434",
+   "kind": "c",
+   "rarity": 2,
+   "score": 0.77,
+   "target": 1.7,
+   "delta": -0.93
+  },
+  {
+   "label": "449",
+   "id": "449",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.93,
+   "target": 1.5,
+   "delta": 0.43
+  },
+  {
+   "label": "522",
+   "id": "522",
+   "kind": "c",
+   "rarity": 2,
+   "score": 1.12,
+   "target": 1.7,
+   "delta": -0.58
+  },
+  {
+   "label": "537",
+   "id": "537",
+   "kind": "c",
+   "rarity": 2,
+   "score": 0.62,
+   "target": 1.7,
+   "delta": -1.08
+  }
+ ],
+ "outliers": [
+  {
+   "label": "126",
+   "id": "126",
+   "kind": "w",
+   "rarity": 3,
+   "score": 2.61,
+   "target": 2.0,
+   "delta": 0.61
+  },
+  {
+   "label": "163",
+   "id": "163",
+   "kind": "c",
+   "rarity": 1,
+   "score": 2.05,
+   "target": 1.5,
+   "delta": 0.55
+  },
+  {
+   "label": "401",
+   "id": "401",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.42,
+   "target": 3.0,
+   "delta": -0.58
+  },
+  {
+   "label": "522",
+   "id": "522",
+   "kind": "c",
+   "rarity": 2,
+   "score": 1.12,
+   "target": 1.7,
+   "delta": -0.58
+  },
+  {
+   "label": "341",
+   "id": "341",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.9,
+   "target": 1.5,
+   "delta": -0.6
+  },
+  {
+   "label": "161",
+   "id": "161",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.77,
+   "target": 1.5,
+   "delta": -0.73
+  },
+  {
+   "label": "312",
+   "id": "312",
+   "kind": "c",
+   "rarity": 1,
+   "score": 0.76,
+   "target": 1.5,
+   "delta": -0.74
+  },
+  {
+   "label": "318",
+   "id": "318",
+   "kind": "w",
+   "rarity": 3,
+   "score": 1.25,
+   "target": 2.0,
+   "delta": -0.75
+  },
+  {
+   "label": "101",
+   "id": "101",
+   "kind": "w",
+   "rarity": 4,
+   "score": 1.73,
+   "target": 2.5,
+   "delta": -0.77
+  },
+  {
+   "label": "434",
+   "id": "434",
+   "kind": "c",
+   "rarity": 2,
+   "score": 0.77,
+   "target": 1.7,
+   "delta": -0.93
+  },
+  {
+   "label": "304",
+   "id": "304",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.03,
+   "target": 3.0,
+   "delta": -0.97
+  },
+  {
+   "label": "537",
+   "id": "537",
+   "kind": "c",
+   "rarity": 2,
+   "score": 0.62,
+   "target": 1.7,
+   "delta": -1.08
+  },
+  {
+   "label": "109",
+   "id": "109",
+   "kind": "c",
+   "rarity": 4,
+   "score": 0.85,
+   "target": 2.5,
+   "delta": -1.65
+  }
+ ],
+ "knapp": [
+  {
+   "label": "223",
+   "id": "223",
+   "kind": "w",
+   "rarity": 3,
+   "score": 2.48,
+   "target": 2.0,
+   "delta": 0.48
+  },
+  {
+   "label": "150",
+   "id": "150",
+   "kind": "w",
+   "rarity": 2,
+   "score": 1.24,
+   "target": 1.7,
+   "delta": -0.46
+  },
+  {
+   "label": "340",
+   "id": "340",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.06,
+   "target": 1.5,
+   "delta": -0.44
+  },
+  {
+   "label": "130",
+   "id": "130",
+   "kind": "w",
+   "rarity": 2,
+   "score": 2.13,
+   "target": 1.7,
+   "delta": 0.43
+  },
+  {
+   "label": "302",
+   "id": "302",
+   "kind": "w",
+   "rarity": 5,
+   "score": 2.57,
+   "target": 3.0,
+   "delta": -0.43
+  },
+  {
+   "label": "449",
+   "id": "449",
+   "kind": "c",
+   "rarity": 1,
+   "score": 1.93,
+   "target": 1.5,
+   "delta": 0.43
+  },
+  {
+   "label": "441",
+   "id": "441",
+   "kind": "w",
+   "rarity": 1,
+   "score": 1.91,
+   "target": 1.5,
+   "delta": 0.41
+  }
+ ],
+ "elapsed": 55.9
+}
