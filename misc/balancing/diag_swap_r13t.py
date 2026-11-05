@@ -1,13 +1,8 @@
 # diag_swap_r13t.py — Paar-Tausch-Check (Christophers Korrektur
-# 6.11.2026): KEIN Einzel-Rarity-Tausch, sondern ZWEI Karten INNERHALB
-# EINER Edition tauschen Raritaet (und ID) — die Kartenwerte bleiben
-# bei der jeweiligen Karte, nur Seltenheit/Zielband wandern, die
-# Raritaetsverteilung der Edition bleibt erhalten. Erlaubt: Raritaets-
-# abstand max 1 (z.B. r2 <-> r3). Gueltig, wenn BEIDE Karten nach dem
-# Tausch im ±0,5-Band der Zielkurve v23c (1,6/1,9/2,3/2,9/3,6) liegen.
-# Partner duerfen ALLE 69 FINAL-Karten sein (nicht nur Outlier).
-# Score-invariante Naeherung (Ziehungshaeufigkeit aendert nur das
-# Umfeld; Resteffekt in der Variablen-Runde messbar).
+# 6.11.2026; Ergebnis VOM CHRISTOPHER VERWORFEN — alle Tausch-Optionen
+# abgelehnt, Outlier-Analyse laeuft mit reinen Attribut-Hebeln und
+# Grenzwert |Delta|>0,6 weiter; siehe diag_outlier_r13t.py).
+# Historische Dokumentation:
 # Achtung: KEIN Import-Schutz — nie importieren! CWD = knowledge-Ordner.
 
 import csv

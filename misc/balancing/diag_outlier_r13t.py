@@ -2,9 +2,9 @@
 # GEMEINSAME Zielkurve v23c (Beschluss 6.11.2026, Runde 13t):
 #   r1 1,6 / r2 1,9 / r3 2,3 / r4 2,9 / r5 3,6
 # EINE Kurve fuer Waffen UND Statkarten (Faktor-2-Lücke als zu
-# schliessendes Balancing-Ziel). Outlier-Kriterium |Delta| > 0,5
-# (Christophers Beschluss 6.11.2026: von ±1,0 verfeinert, da die
-# v23c-Zielwerte niedriger sind als die frühere v18-Kurve).
+# schliessendes Balancing-Ziel). Outlier-Kriterium |Delta| > 0,6
+# (Christophers Beschluss 6.11.2026: ±1,0 -> ±0,5 -> ±0,6 final;
+# Rarity-Tausch verworfen).
 # Waffen: v23b-Offizialmessung (diag_random_v23_r13t.json).
 # Statkarten: HP_STATIC-1,0-Recompute aus dem v23b-Checkpoint
 # (gleiche Kontokanaele, nur Formelterm geaendert — kein Re-Run).
@@ -15,7 +15,7 @@ import statistics as st
 
 import balancing_metric_v11 as v11
 
-THRESH = 0.5          # Grenzwert (Christophers Beschluss: >±0,5)
+THRESH = 0.6          # Grenzwert (Christophers Beschluss: >±0,6 final)
 TARGETS = {1: 1.6, 2: 1.9, 3: 2.3, 4: 2.9, 5: 3.6}   # Zielkurve v23c
 
 d = json.load(open('diag_random_v23_r13t.json'))

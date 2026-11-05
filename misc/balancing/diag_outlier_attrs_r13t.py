@@ -18,7 +18,8 @@ import json
 import balancing_metric_v11 as v11
 
 TARGETS = {1: 1.6, 2: 1.9, 3: 2.3, 4: 2.9, 5: 3.6}   # Zielkurve v23c
-THRESH = 0.5
+THRESH = 0.6   # Grenzwert final (Christophers Beschluss 6.11.2026;
+               # Paar-Tausch verworfen, nur Attribut-Hebel)
 
 d = json.load(open('diag_random_v23_r13t.json'))
 ck = json.load(open('diag_random_ckpt_v23_r13t.json'))
