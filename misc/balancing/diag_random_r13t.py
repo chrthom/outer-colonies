@@ -59,7 +59,8 @@ import balancing_metric_v11 as v11
 HERE = os.path.dirname(os.path.abspath(__file__))
 CKPT_PATH = os.path.join(HERE, 'diag_random_ckpt_r13t.json')
 OUT_PATH = os.path.join(HERE, 'diag_random_r13t.json')
-N = 5000
+N = 10000   # v21-Ankuerung (Christophers Beschluss 5.11.2026): v5-Frame
+            # (PAY-Fix) abgenommen, Offizialmessung N=10k
 CKPT_EVERY = 50
 HP_STATIC = v11.HP_STATIC
 CTRL_W = v11.CTRL_W
@@ -223,8 +224,6 @@ def sock_free(build, weapons, cards, extra_req=None):
     return free
 
 
-PAY = []   # (side, ship_idx, def_types) der bewerteten Waffe
-
 
 def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
     """Gefecht im Zufalls-Frame. Seite 0 = deff (Verteidiger),
@@ -239,8 +238,13 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
     sides = [cp_list(sc['deff']), cp_list(sc['att'])]
     raid = sc['raid']
     colpool = sc['colpool']
-    pay = list(PAY)
-    PAY.clear()
+    # 13p-PD-Bezahlung der bewerteten Waffe (LOKAL je battle_r-Aufruf,
+    # v5-Fix 5.11.2026: PAY war global und wurde VOR dem eigenen Append
+    # gelesen -> eigene Zahlung landete erst im NAECHSTEN battle_r-Aufruf
+    # (Cross-Kontamination zwischen Messzellen, TAKE der bewerteten
+    # PD-Waffen -0,00, r0-Baselines des Folgeschachts verfaelscht;
+    # entlarvt durch Christophers PD-Gutschrift-Nachfrage 5.11.2026).
+    pay = []
     colony = 0.0
     dealt = [0.0, 0.0]
     taken = [0.0, 0.0]
@@ -283,7 +287,7 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
         # verloren ihre PD-Wirkung komplett, Christophers Nachfrage
         # 5.11.2026 entlarvte es). ---
         if wspec is not None and wspec.get('def_pts', 0) > 0:
-            PAY.append((spec_side, wspec_owner, wspec['def_types']))
+            pay.append((spec_side, wspec_owner, wspec['def_types']))
 
     # Flotte aufbauen
     fleet = []
@@ -628,8 +632,8 @@ for rar in (1, 2, 3, 4, 5):
         cards=round(cv[len(cv) // 2], 2) if cv else None)
 
 n_taken = []
-out = dict(frame='r13t: random battles, M1, card-count mirror, one '
-                 'battle type, col_rule always',
+out = dict(frame='v21: random battles (r13t probe v5, PAY-fix), M1, '
+                 'card-count mirror, one battle type, col_rule always',
            n=N, baseline=dict(
                taken0=round(base['tk0'] / N, 2),
                taken1=round(base['tk1'] / N, 2),
