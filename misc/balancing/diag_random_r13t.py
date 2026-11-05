@@ -120,8 +120,10 @@ def draw_random_fleet(types_by_n, rng):
     entstehen endogen (kleinere Flotte -> mehr Ausruestung, die
     Karten-SUMME bleibt ueber B gleich)."""
     fleet = []
-    for _ in range(rng.randint(1, 4)):   # v23: Flotte 1-4 Schiffe
-        # (Christophers Beschluss 6.11.2026: Gefechte "eins groesser")
+    for _ in range(rng.randint(1, 5)):   # v23b: Flotte 1-5 Schiffe
+        # (Christophers Beschluss 6.11.2026: Playtest-Dichte — Tote/
+        # Schaden/Angriffe je Schiff lagen bei 1-4 noch unter der
+        # wahrgenommenen Spielrealitaet)
         n = rng.randint(1, 3)
         types = types_by_n[n]
         t = rng.choices(types, weights=[v11.TYPE_BEST[(n, t)]
