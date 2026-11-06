@@ -406,8 +406,8 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span>, sowie beim Abfangen relevant,
               um zu ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an
               und die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> plus die Reichweite der
-              aktuellen Gefechtsphase sind kleiner oder gleich der
-              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziel, so wir der vom
+              aktuellen Gefechtsphase sind kleiner als die
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels, so wir der vom
               Angriff verursachte <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> halbiert
               (aufgerundet und vor allen anderen Abzügen).
             </p>
@@ -1067,6 +1067,11 @@
               </tr>
             </table>
             <p>
+              Ausnahme: Einige Karten ohne diese Schlagwörter werden ebenfalls erst am Ende des Gefechts
+              wieder aktiviert (z. B. Ködersystem und die planetaren Verteidigungsinfrastrukturen wie
+              Planetarer Schild, Verteidigungsnetz, Schmugglernest und Autonomer Stützpunkt).
+            </p>
+            <p>
               Zu Beginn jedes Gefechts sind alle Karten wieder aktiv, auch Karten mit dem Schlagwort
               <i>Einmalige Verwendung</i>. Ein Gefecht dauert nie über den laufenden Spielzug hinaus:
               Verwendest du eine Karte im Gefecht deines Spielzugs (z. B. eine
@@ -1243,21 +1248,23 @@
                 <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> zur Verfügung.
                 Beide bieten gleich viele Defensivpunkte: Der Besitzer der Verteidigungskarten entscheidet und
                 setzt die <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des
-                befreundeten Schiffs ein: 6 - 3 = 3. Die Karte wird deaktiviert und am Ende der Gefechtsphase
+                befreundeten Schiffs ein: 6 - 3 = 3. Anschließend wird auch die
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des Ziels
+                eingesetzt: 3 - 3 = 0. Beide Karten werden deaktiviert und am Ende der Gefechtsphase
                 reaktiviert.
               </li>
               <li>
-                <b>Schild:</b> 2 <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> des
-                Ziels: Abzug 2 je Defensivpunkt = 4. Da 3 &lt; 4, wird der
-                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> auf 0 reduziert; die Karte
-                bleibt aktiv, da der Abzug nicht durch den Schaden erreicht wurde.
+                <b>Schild:</b> Da der <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>
+                bereits auf 0 reduziert wurde, kommt die Karte mit 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> des Ziels nicht zum
+                Einsatz; sie bleibt aktiv.
               </li>
               <li>
                 <b>Ergebnis:</b> 0 <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker.
-                Ohne die Halbierung wären es 12 - 3 = 9, dann 9 - 4 = 5
-                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker geworden und die
-                Karte mit <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> wäre deaktiviert
-                worden.
+                Ohne die Halbierung wären es 12 - 3 - 3 = 6, dann 6 - 4 = 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker geworden und
+                zusätzlich wäre die Karte mit
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> deaktiviert worden.
               </li>
             </ol>
           </div>
