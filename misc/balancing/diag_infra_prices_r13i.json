@@ -1,0 +1,456 @@
+{
+ "frame": "I1 Spur W Preisliste MODELL v9 (I1w): Dual-Profile 50/50 Schiff (Psi-Sockel + E-Schiffskurs) / Kolonie (Psi frei, E-Koloniekurs) fuer alle Nicht-Planetar-Karten (beschlossen, generalisiert I1i); E-Ortskurs Kolonie 0,5/0,3 (Christophers Werte, I1r); P_planetar 1,5 (bestaetigt I1r, war 2,5); I1w: PI_PLAY = 0,75 (war 0,5, Playtest-Anker); I1q: Deck-Gleichverteilung 25 % je Typ, 183 Code-Lesart je +1 E/I/H (CSV-PR #808); I1o: ALPHA_E = 0,5; I1h: u (hull 1,0 / equip 0,8 / infra 0,8 / tactic 0,8)",
+ "anchors": {
+  "c_ex": 1.65,
+  "pv_equip": 3.145,
+  "pv_infra": 1.397,
+  "deck": {
+   "hull": 0.25,
+   "equipment": 0.25,
+   "infrastructure": 0.25,
+   "tactic": 0.25
+  },
+  "deck_starter": {
+   "hull": 0.29444444444444445,
+   "equipment": 0.35555555555555557,
+   "infrastructure": 0.17222222222222222,
+   "tactic": 0.17777777777777778
+  },
+  "burst": {
+   "hull": 0.5550537109375,
+   "equipment": 0.5550537109375,
+   "infrastructure": 0.5550537109375,
+   "tactic": 0.5550537109375
+  },
+  "burst_disc": [
+   0.243,
+   0.416
+  ]
+ },
+ "regler": {
+  "P_planetar": 1.5,
+  "u": {
+   "hull": 1.0,
+   "equipment": 0.8,
+   "infrastructure": 0.8,
+   "tactic": 0.8
+  },
+  "alpha_e": 0.5,
+  "e_kolonie": [
+   0.5,
+   0.3
+  ],
+  "pi_play": 0.75,
+  "phi_flex": 0.15,
+  "h_limit": 0.12,
+  "sub_e": 0.7,
+  "pv_parity": {
+   "hull": 1.0,
+   "tactic": 1.0
+  },
+  "disc_frac": 0.25
+ },
+ "prices": {
+  "P_E1": 1.65,
+  "P_E5": 6.27,
+  "P_E_col1": 0.825,
+  "P_E_col5": 2.805,
+  "A_hull": 1.746,
+  "A_equip": 1.397,
+  "A_tact_disc": 0.611,
+  "A_tact_2disc": 1.222,
+  "A_infra": 0.62,
+  "A_flex": 2.901,
+  "A_183": 3.762,
+  "M_infra": 0.889,
+  "M_2disc": 0.476,
+  "H1": 0.377
+ },
+ "objects": [
+  {
+   "id": "185",
+   "title": "Kraftwerk (r0 x5)",
+   "rarity": 0,
+   "tier": "T1",
+   "units": 1.5,
+   "costs": 2.5,
+   "gain": 1.402,
+   "score": 0.561,
+   "calc": "P_E_col(5) x a = 1.402",
+   "place": "Kolonie (planetar)",
+   "note": "E+5; KOLONIE-Ortskurs 0,5/0,3 (I1r, Christophers Werte); Saettigungs-Kandidat -> ALPHA_E-Bewertung (I1n/I1o), Nachfrage-Anker ~3-8 E/Partie"
+  },
+  {
+   "id": "187",
+   "title": "Atomreaktor (r0 x5)",
+   "rarity": 0,
+   "tier": "T1",
+   "units": 0.7,
+   "costs": 1.7,
+   "gain": 1.402,
+   "score": 0.825,
+   "calc": "P_E(2) x a = 1.402",
+   "place": "Schiff (Omega-1)",
+   "note": "E+2; mit Solarpanele exakt pari (Spiegel-Konstruktion)"
+  },
+  {
+   "id": "188",
+   "title": "Solarpanele (r0 x4)",
+   "rarity": 0,
+   "tier": "T1",
+   "units": 0.0,
+   "costs": 1.0,
+   "gain": 0.825,
+   "score": 0.825,
+   "calc": "P_E(1) x a = 0.825",
+   "place": "Schiff (sockelfrei)",
+   "note": "E+1; Floor entfallen (I1c) -> units 0"
+  },
+  {
+   "id": "448",
+   "title": "Schildkuppel",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 0.5,
+   "costs": 1.5,
+   "gain": 1.844,
+   "score": 1.229,
+   "calc": "Spur K gemessen (ispec) = 1.844",
+   "place": "Kolonie (planetar)",
+   "note": "S1 E-1 (Kolonie-Kurs); schuetzt NUR die Kolonie (Regelergaenzung)"
+  },
+  {
+   "id": "169",
+   "title": "Verteidigungsnetz",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 0.0,
+   "costs": 1.0,
+   "gain": 0.204,
+   "score": 0.204,
+   "calc": "Spur K gemessen (ispec) = 0.204",
+   "place": "Kolonie (planetar)",
+   "note": "PD2 E0; Floor entfallen -> units 0; schwach wegen PD-Nachfrage 4,3 %"
+  },
+  {
+   "id": "183",
+   "title": "Industriekomplex",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 3.2,
+   "costs": 4.2,
+   "gain": 3.762,
+   "score": 0.896,
+   "calc": "Aktion = 3.762",
+   "place": "Kolonie (planetar)",
+   "note": "Code-Lesart (I1q, beschlossen): je +1 Ausruestung/Infra/Huelle, E-5 Kolonie-Kurs; CSV-Tag-Fix als PR eingereicht (hull|hull|hull war falsch)"
+  },
+  {
+   "id": "164",
+   "title": "Ruestungsschmiede",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 1.75,
+   "costs": 2.75,
+   "gain": 1.397,
+   "score": 0.577,
+   "calc": "Aktion = 1.397 | Dual 50/50: Schiff 0.377 + Kolonie 0.776",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "DUAL I1r: Schiff Psi-1 + E-2 Schiffskurs / Kolonie Psi frei + E-2 Koloniekurs; Gain ortsunabhaengig"
+  },
+  {
+   "id": "345",
+   "title": "Autonomer Stuetzpunkt",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 1.5,
+   "costs": 2.5,
+   "gain": 0.532,
+   "score": 0.213,
+   "calc": "P_E_col(1) x a = 0.412 + K 0.120",
+   "place": "Kolonie (planetar)",
+   "note": "E+1 planetar (Kolonie-Kurs) + PD1 (K-Anteil)"
+  },
+  {
+   "id": "172",
+   "title": "Ressourcensilo",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 0.5,
+   "costs": 1.5,
+   "gain": 0.755,
+   "score": 0.566,
+   "calc": "2xH = 0.755 | Dual 50/50: Schiff 0.377 + Kolonie 0.755",
+   "place": "50 % Schiff (Psi-1) / 50 % Kolonie (Psi frei)",
+   "note": "+2 Handlimit, E0; DUAL I1r: Schiff Psi-1 / Kolonie Psi frei; Floor entfallen -> units 0"
+  },
+  {
+   "id": "239",
+   "title": "Horchposten",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 1.75,
+   "costs": 2.75,
+   "gain": 0.938,
+   "score": 0.341,
+   "calc": "Aktion = 0.611 + K 0.655 | Dual 50/50: Schiff 0.342 + Kolonie 0.339",
+   "place": "50 % Schiff (Psi-1, ctrl) / 50 % Kolonie (Psi frei)",
+   "note": "Aktion Info (global); DUAL I1i, durch I1r generalisiert: 50 % Schiff (ctrl 1 relevant, Gefechtssim, Psi-1 + E-2 Schiffskurs) + 50 % Kolonie (Psi frei, E-2 Koloniekurs, ctrl verfaellt, kein K)"
+  },
+  {
+   "id": "238",
+   "title": "Schmugglernest",
+   "rarity": 1,
+   "tier": "T1",
+   "units": 1.5,
+   "costs": 2.5,
+   "gain": 0.497,
+   "score": 0.199,
+   "calc": "1xH = 0.377 + K 0.120",
+   "place": "Kolonie (planetar)",
+   "note": "+1 Handlimit planetar + PD1 (K-Anteil)"
+  },
+  {
+   "id": "145",
+   "title": "Fusionsreaktor",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.2,
+   "costs": 2.2,
+   "gain": 2.557,
+   "score": 1.162,
+   "calc": "P_E(4) x a = 2.557",
+   "place": "Schiff (Omega-2)",
+   "note": "E+4"
+  },
+  {
+   "id": "156",
+   "title": "Planetarer Schild",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 0.8,
+   "costs": 1.8,
+   "gain": 1.844,
+   "score": 1.024,
+   "calc": "Spur K gemessen (ispec) = 1.844",
+   "place": "Kolonie (planetar)",
+   "note": "S1 E-2 (Kolonie-Kurs); schuetzt auch andere Karten der Koloniezone (Regelergaenzung, unbezahlt)"
+  },
+  {
+   "id": "135",
+   "title": "Schiffswerft",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.75,
+   "costs": 2.75,
+   "gain": 1.746,
+   "score": 0.721,
+   "calc": "Aktion = 1.746 | Dual 50/50: Schiff 0.472 + Kolonie 0.970",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion hull, E-2; DUAL I1r (Gain ortsunabhaengig)"
+  },
+  {
+   "id": "320",
+   "title": "Legierungsgiesserei",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 2.25,
+   "costs": 3.25,
+   "gain": 2.901,
+   "score": 1.02,
+   "calc": "Aktion = 2.901 | Dual 50/50: Schiff 0.659 + Kolonie 1.381",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion hull|equipment (dynamische Wahl) + Optionswert phi; DUAL I1r"
+  },
+  {
+   "id": "336",
+   "title": "Militaerakademie",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.75,
+   "costs": 2.75,
+   "gain": 1.222,
+   "score": 0.505,
+   "calc": "Aktion = 1.222 | Dual 50/50: Schiff 0.330 + Kolonie 0.679",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Militaer + Wissenschaft (\"+\" = je Disziplin +1); DUAL I1r"
+  },
+  {
+   "id": "219",
+   "title": "Freihaendlerkontor",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 2.6,
+   "costs": 3.6,
+   "gain": 1.222,
+   "score": 0.411,
+   "calc": "Aktion = 1.222 | Dual 50/50: Schiff 0.240 + Kolonie 0.582",
+   "place": "50 % Schiff (Psi-2, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Info + Wirtschaft; E-3/Psi-2 -> strikt teurer als 336 (Outlier-Hebel E-3->-2); DUAL I1r: Schiff Psi-2 = 1,7 Socket"
+  },
+  {
+   "id": "137",
+   "title": "Rechenzentrum",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.611,
+   "score": 0.305,
+   "calc": "Aktion = 0.611 | Dual 50/50: Schiff 0.204 + Kolonie 0.407",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Information (disziplinbeschraenkt); DUAL I1r"
+  },
+  {
+   "id": "138",
+   "title": "Handelsunternehmen",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.611,
+   "score": 0.305,
+   "calc": "Aktion = 0.611 | Dual 50/50: Schiff 0.204 + Kolonie 0.407",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Wirtschaft; DUAL I1r"
+  },
+  {
+   "id": "147",
+   "title": "Kommandozentrale",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.611,
+   "score": 0.305,
+   "calc": "Aktion = 0.611 | Dual 50/50: Schiff 0.204 + Kolonie 0.407",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Militaer; DUAL I1r"
+  },
+  {
+   "id": "148",
+   "title": "Forschungslabor",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.611,
+   "score": 0.305,
+   "calc": "Aktion = 0.611 | Dual 50/50: Schiff 0.204 + Kolonie 0.407",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion Wissenschaft; DUAL I1r"
+  },
+  {
+   "id": "154",
+   "title": "Bergbauaussenposten",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.62,
+   "score": 0.31,
+   "calc": "Aktion = 0.620 | Dual 50/50: Schiff 0.207 + Kolonie 0.414",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Aktion infra; Wert < Aktion Taktik, weil PV(infra) < PV(taktik); DUAL I1r"
+  },
+  {
+   "id": "230",
+   "title": "Verwaltungsbueros",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 2.1,
+   "costs": 3.1,
+   "gain": 0.889,
+   "score": 0.348,
+   "calc": "M(infrastructure) = 0.889 | Dual 50/50: Schiff 0.202 + Kolonie 0.494",
+   "place": "50 % Schiff (Psi-2, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Multiplikator infra (Rundenbeginn-Ziehung), E-2; DUAL I1r: Schiff Psi-2 = 1,7 Socket"
+  },
+  {
+   "id": "333",
+   "title": "Marsianisches Konsulat",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.476,
+   "score": 0.238,
+   "calc": "M(2 Disz.) = 0.476 | Dual 50/50: Schiff 0.159 + Kolonie 0.317",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Multiplikator Info+Militaer, E-1; DUAL I1r"
+  },
+  {
+   "id": "435",
+   "title": "Gewerbegebiet",
+   "rarity": 2,
+   "tier": "T2",
+   "units": 1.25,
+   "costs": 2.25,
+   "gain": 0.476,
+   "score": 0.238,
+   "calc": "M(2 Disz.) = 0.476 | Dual 50/50: Schiff 0.159 + Kolonie 0.317",
+   "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
+   "note": "Multiplikator Wirtschaft+Wissenschaft, E-1; DUAL I1r"
+  }
+ ],
+ "tier_median": {
+  "T1": 0.566,
+  "T2": 0.329
+ },
+ "absorption": {
+  "note": "I1n/I1o (Beschluss Option A): Produzenten-Gains x ALPHA_E (Default 0,5, Playtest-Regler: Nachfrage je Runde / Kapazitaet; Kurs je Punkt: Schiff 1,65/1,155, Kolonie 0,825/0,495 (I1r). alpha_1.0 = historische v6-Obergrenze.",
+  "producers": {
+   "185": {
+    "cap": 5,
+    "other_gain": 0.0,
+    "course": "col",
+    "score_a10": 1.122,
+    "score_a05": 0.561,
+    "score_a075": 0.841,
+    "score_a025": 0.28,
+    "eq_alpha_320": 0.909
+   },
+   "187": {
+    "cap": 2,
+    "other_gain": 0.0,
+    "course": "ship",
+    "score_a10": 1.65,
+    "score_a05": 0.825,
+    "score_a075": 1.237,
+    "score_a025": 0.412,
+    "eq_alpha_320": 0.618
+   },
+   "188": {
+    "cap": 1,
+    "other_gain": 0.0,
+    "course": "ship",
+    "score_a10": 1.65,
+    "score_a05": 0.825,
+    "score_a075": 1.237,
+    "score_a025": 0.412,
+    "eq_alpha_320": 0.618
+   },
+   "145": {
+    "cap": 4,
+    "other_gain": 0.0,
+    "course": "ship",
+    "score_a10": 2.325,
+    "score_a05": 1.162,
+    "score_a075": 1.744,
+    "score_a025": 0.581,
+    "eq_alpha_320": 0.439
+   },
+   "345": {
+    "cap": 1,
+    "other_gain": 0.12,
+    "course": "col",
+    "score_a10": 0.378,
+    "score_a05": 0.213,
+    "score_a075": 0.295,
+    "score_a025": 0.131,
+    "eq_alpha_320": 2.945
+   }
+  }
+ },
+ "t_win_fixiert": "I1g: T_win = 1 (per-Runde-Frame), Szenarien 2/3 obsolet"
+}

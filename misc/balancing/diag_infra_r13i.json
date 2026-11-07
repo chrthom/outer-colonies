@@ -1,0 +1,151 @@
+{
+ "frame": "I1 Spur K: v23i-Sonde + ispec_col (Koloniezone Seite 0, Raid-Zellen) + ctrl-Spec (239, Schiff, beide Rollen); Kolonie-Karten in ALLEN Zellen gezaehlt (Mission = 0-Gain, Koedersystem-Präzedenz); N, seed 42, CRN-gepaart; hp der Defensivkarten bewusst unbezahlt",
+ "n": 10000,
+ "seed": 42,
+ "baseline": {
+  "taken0": 12.09,
+  "taken1": 16.45,
+  "dealt0": 16.45,
+  "dealt1": 12.09,
+  "colony": 6.127,
+  "loot0": 6.62,
+  "raid_share": 0.503,
+  "raid_col_hit_share": 0.831,
+  "mission_loot_share": 0.685
+ },
+ "cards": [
+  {
+   "id": "156",
+   "title": "Planetarer Schild",
+   "rarity": 2,
+   "tier": "T2",
+   "kind": "col",
+   "units": 1.7,
+   "hybrid": null,
+   "n": 10000,
+   "n_gain": 2695,
+   "gain_share": 0.27,
+   "gain_cond_raid": 3.6638,
+   "gain": 1.844,
+   "score_k": 0.683,
+   "channels": {
+    "out": 0.0008,
+    "take": 0.0116,
+    "col": 1.8316,
+    "loot": 0.0,
+    "prevent": 0.0
+   }
+  },
+  {
+   "id": "448",
+   "title": "Schildkuppel",
+   "rarity": 1,
+   "tier": "T1",
+   "kind": "col",
+   "units": 1.0,
+   "hybrid": null,
+   "n": 10000,
+   "n_gain": 2695,
+   "gain_share": 0.27,
+   "gain_cond_raid": 3.6638,
+   "gain": 1.844,
+   "score_k": 0.922,
+   "channels": {
+    "out": 0.0008,
+    "take": 0.0116,
+    "col": 1.8316,
+    "loot": 0.0,
+    "prevent": 0.0
+   }
+  },
+  {
+   "id": "169",
+   "title": "Verteidigungsnetz",
+   "rarity": 1,
+   "tier": "T1",
+   "kind": "col",
+   "units": 0.5,
+   "hybrid": null,
+   "n": 10000,
+   "n_gain": 432,
+   "gain_share": 0.043,
+   "gain_cond_raid": 0.4061,
+   "gain": 0.2044,
+   "score_k": 0.136,
+   "channels": {
+    "out": 0.0,
+    "take": 0.0013,
+    "col": 0.2031,
+    "loot": 0.0,
+    "prevent": 0.0
+   }
+  },
+  {
+   "id": "238",
+   "title": "Schmugglernest",
+   "rarity": 1,
+   "tier": "T1",
+   "kind": "col",
+   "units": 0.5,
+   "hybrid": "+1 Handlimit (W-Anteil Preisrunde, P_planetar in units_W)",
+   "n": 10000,
+   "n_gain": 427,
+   "gain_share": 0.043,
+   "gain_cond_raid": 0.238,
+   "gain": 0.1198,
+   "score_k": 0.08,
+   "channels": {
+    "out": 0.0,
+    "take": 0.0006,
+    "col": 0.1192,
+    "loot": 0.0,
+    "prevent": 0.0
+   }
+  },
+  {
+   "id": "345",
+   "title": "Autonomer Stuetzpunkt",
+   "rarity": 1,
+   "tier": "T1",
+   "kind": "col",
+   "units": 0.5,
+   "hybrid": "E+1 (W-Anteil Preisrunde, P_planetar in units_W)",
+   "n": 10000,
+   "n_gain": 427,
+   "gain_share": 0.043,
+   "gain_cond_raid": 0.238,
+   "gain": 0.1198,
+   "score_k": 0.08,
+   "channels": {
+    "out": 0.0,
+    "take": 0.0006,
+    "col": 0.1192,
+    "loot": 0.0,
+    "prevent": 0.0
+   }
+  },
+  {
+   "id": "239",
+   "title": "Horchposten",
+   "rarity": 1,
+   "tier": "T1",
+   "kind": "ship",
+   "units": 2.7,
+   "hybrid": "Aktion Information (W-Anteil Preisrunde)",
+   "n": 9757,
+   "n_gain": 1917,
+   "gain_share": 0.196,
+   "gain_cond_raid": null,
+   "gain": 0.6549,
+   "score_k": 0.177,
+   "channels": {
+    "out": 0.0,
+    "take": 0.0,
+    "col": 0.0,
+    "loot": 0.4633,
+    "prevent": 0.1917
+   }
+  }
+ ],
+ "runtime_s": 17.9
+}
