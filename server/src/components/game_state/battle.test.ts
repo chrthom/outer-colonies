@@ -1,10 +1,13 @@
 import Battle from './battle';
 import CardStack from '../cards/card_stack';
-import { RootCardStack } from '../cards/card_stack';
+import { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import Card from '../cards/card';
 import Player from './player';
 import Match from './match';
-import { CardType, Zone, BattleType } from '../../shared/config/enums';
+import EquipmentCard from '../cards/types/equipment_card';
+import { BattleType, CardType, TurnPhase, Zone } from '../../shared/config/enums';
+import { rules } from '../../shared/config/rules';
+import { Socket } from 'socket.io';
 
 class MockCard extends Card {
   getValidTargets(): CardStack[] {
@@ -15,6 +18,12 @@ class MockCard extends Card {
   onLeaveGame(): void {}
   onStartTurn(): void {}
   onEndTurn(): void {}
+}
+
+class MockWeaponCard extends EquipmentCard {
+  constructor(id: number, range: number) {
+    super(id, `Weapon ${id}`, 1, {}, { range, damage: 1, pointDefense: 0, shield: 0, armour: 0 });
+  }
 }
 
 class MockPlayer extends Player {
@@ -32,6 +41,27 @@ class MockMatch {
   inactivePlayerNo = 2;
   pendingActionPlayerNo = 1;
 }
+
+const createShip = (player: Player, weaponRanges: number[]): RootCardStack => {
+  const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player);
+  weaponRanges.forEach((range, i) =>
+    ship.attach(new AttachmentCardStack(new MockWeaponCard(100 + i, range), ship))
+  );
+  return ship;
+};
+
+const createMatch = (): Match => {
+  const socket = (playerNo: number): Socket =>
+    ({
+      id: `socket-${playerNo}`,
+      join: jest.fn(),
+      data: {
+        user: { username: `Player ${playerNo}` },
+        activeDeck: [1, 2, 3, 4].map(i => new MockCard(i, `Deck Card ${i}`, CardType.Hull, 1))
+      }
+    }) as unknown as Socket;
+  return new Match('test-room', socket(0), socket(1));
+};
 
 describe('Battle', () => {
   let battle: Battle;
@@ -148,6 +178,119 @@ describe('Battle', () => {
         expect(missionShipSpy).toHaveBeenCalledWith(player1);
         expect(interceptingShipSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('maxWeaponRange', () => {
+    test('should return the highest weapon range across both fleets', () => {
+      battle.ships[0] = [createShip(player0, [1, 3])];
+      battle.ships[1] = [createShip(player1, [2])];
+
+      expect(battle.maxWeaponRange).toBe(3);
+    });
+
+    test('should return 1 if no participating ship carries a weapon', () => {
+      battle.ships[0] = [createShip(player0, [])];
+      battle.ships[1] = [createShip(player1, [])];
+
+      expect(battle.maxWeaponRange).toBe(1);
+    });
+
+    test('should return 1 for battles without participating ships', () => {
+      battle.ships[0] = [];
+      battle.ships[1] = [];
+
+      expect(battle.maxWeaponRange).toBe(1);
+    });
+  });
+
+  describe('prepareCombatPhase', () => {
+    let match: Match;
+
+    const setupRaid = (attackerWeaponRanges: number[], defenderWeaponRanges: number[]): string => {
+      match = createMatch();
+      match.activePlayerNo = 0;
+      match.pendingActionPlayerNo = 1;
+      match.battle = new Battle(BattleType.Raid, 0);
+      const attackerShip = createShip(match.players[0], attackerWeaponRanges);
+      attackerShip.zone = Zone.Neutral;
+      match.players[0].cardStacks.push(attackerShip);
+      match.battle.ships[0] = [attackerShip];
+      const defenderShip = createShip(match.players[1], defenderWeaponRanges);
+      match.players[1].cardStacks.push(defenderShip);
+      return defenderShip.uuid;
+    };
+
+    test('should start the battle at the highest weapon range present in the battle', () => {
+      const defenderShipId = setupRaid([2], [1]);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(2);
+      expect(match.turnPhase).toBe(TurnPhase.Combat);
+      expect(match.pendingActionPlayerNo).toBe(0);
+      expect(match.battle.ships[1]).not.toContain(match.players[1].colonyCardStack);
+    });
+
+    test('should consider weapons of both fleets for the start range', () => {
+      const defenderShipId = setupRaid([], [3]);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(3);
+      expect(match.turnPhase).toBe(TurnPhase.Combat);
+    });
+
+    test('should start at rules.maxRange for battles involving a range 4 weapon', () => {
+      const defenderShipId = setupRaid([rules.maxRange], []);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(rules.maxRange);
+      expect(match.turnPhase).toBe(TurnPhase.Combat);
+    });
+
+    test('should clamp the start range to rules.maxRange', () => {
+      const defenderShipId = setupRaid([rules.maxRange + 1], []);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(rules.maxRange);
+    });
+
+    test('should run only the range 1 phase and end the battle without any weapons', () => {
+      const defenderShipId = setupRaid([], []);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.type).toBe(BattleType.None);
+      expect(match.turnPhase).toBe(TurnPhase.Build);
+    });
+
+    test('should push the defending colony card stack into the battle when the range 1 phase begins', () => {
+      const defenderShipId = setupRaid([1], []);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(1);
+      expect(match.battle.ships[1]).toContain(match.players[1].colonyCardStack);
+    });
+
+    test('should auto-resolve a mission battle without interceptors via applyMissionResult', () => {
+      match.activePlayerNo = 0;
+      match.pendingActionPlayerNo = 1;
+      match.battle = new Battle(BattleType.Mission, 0);
+      const missionShip = createShip(match.players[0], []);
+      missionShip.zone = Zone.Neutral;
+      missionShip.card.profile.control = 2;
+      match.players[0].cardStacks.push(missionShip);
+      match.battle.ships[0] = [missionShip];
+
+      match.prepareCombatPhase([]);
+
+      expect(match.battle.type).toBe(BattleType.None);
+      expect(match.turnPhase).toBe(TurnPhase.Build);
+      expect(match.control).toBe(2);
     });
   });
 });
