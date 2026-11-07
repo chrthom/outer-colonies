@@ -71,8 +71,8 @@ describe('RulesPage', () => {
     const chapterText = fixture.debugElement.nativeElement.textContent;
     expect(chapterText).toContain('Missionsbelohnung');
     expect(chapterText).toContain('Eine Mission ist erfolgreich');
-    expect(chapterText).toContain('ziehst du 1 Karte und legst die');
-    expect(chapterText).toContain('oberste Karte deines Ablagestapels unter dein Deck');
+    expect(chapterText).toContain('legst du die oberste Karte deines Ablagestapels unter dein Deck');
+    expect(chapterText).toContain('unter dein Deck und ziehst 1 Karte');
     expect(chapterText).toContain('mindestens jedoch 0');
     expect(chapterText).not.toContain('Missionskarte');
   });
