@@ -1,7 +1,7 @@
 {
  "frame": "I1x Kurven-Ankerung + Outlier-Detection im Soll-Zustand (Projektion: I1w-Beschluesse als umgesetzt angenommen)",
  "issue": "chrthom/outer-colonies#815",
- "model": "MODELL v9, PI_PLAY 0,75; Re-Exec diag_infra_prices_r13i.py mit Buff-Overrides (230 E-1, 219 E-1/Psi-1)",
+ "model": "MODELL v9, PI_PLAY 0,75, ALPHA_E 0,25 (I1y Pfad A); Re-Exec diag_infra_prices_r13i.py mit Buff-Overrides (230 E-1, 219 E-1/Psi-1)",
  "swap": {
   "to_R2": [
    "448",
@@ -18,34 +18,43 @@
   ]
  },
  "validation": {
-  "expected_T1": 0.31,
+  "expected_T1": 0.28,
   "expected_T2": 0.505,
-  "expected_ratio": 1.63,
+  "expected_ratio": 1.8,
+  "i1x_anker_alpha_05": {
+   "T1": 0.31,
+   "T2": 0.505,
+   "ratio": 1.63
+  },
+  "kurve_beschlossen": {
+   "T1": 0.3,
+   "T2": 0.5
+  },
   "buff_scores": {
    "id230": 0.416,
    "id219": 0.505
   },
   "tier_median": {
-   "T1": 0.31,
+   "T1": 0.28,
    "T2": 0.505
   },
   "ok": true
  },
  "curve_candidates": {
   "anchor": {
-   "T1": 0.31,
+   "T1": 0.28,
    "T2": 0.505
   },
   "rounded": {
    "T1": 0.3,
    "T2": 0.5
   },
-  "ratio": 1.629
+  "ratio": 1.804
  },
  "band": {
   "band_abs": 0.5,
   "band_rel": 0.5,
-  "empfehlung": "relativ (BAND_REL), Skala ~6x kleiner als Waffen-v23g; Entscheidung Christopher"
+  "beschluss": "relativ (BAND_REL) BESCHLOSSEN (I1y): T1 0,15-0,45, T2 0,25-0,75"
  },
  "objects": [
   {
@@ -55,14 +64,14 @@
    "tier": "T1",
    "units": 1.5,
    "costs": 2.5,
-   "gain": 1.402,
-   "score": 0.561,
-   "calc": "P_E_col(5) x a = 1.402",
+   "gain": 0.701,
+   "score": 0.28,
+   "calc": "P_E_col(5) x a = 0.701",
    "place": "Kolonie (planetar)",
    "note": "E+5; KOLONIE-Ortskurs 0,5/0,3 (I1r, Christophers Werte); Saettigungs-Kandidat -> ALPHA_E-Bewertung (I1n/I1o), Nachfrage-Anker ~3-8 E/Partie",
-   "delta": 0.251,
+   "delta": 0.0,
    "flag_abs": false,
-   "flag_rel": true
+   "flag_rel": false
   },
   {
    "id": "187",
@@ -71,14 +80,14 @@
    "tier": "T1",
    "units": 0.7,
    "costs": 1.7,
-   "gain": 1.402,
-   "score": 0.825,
-   "calc": "P_E(2) x a = 1.402",
+   "gain": 0.701,
+   "score": 0.412,
+   "calc": "P_E(2) x a = 0.701",
    "place": "Schiff (Omega-1)",
    "note": "E+2; mit Solarpanele exakt pari (Spiegel-Konstruktion)",
-   "delta": 0.515,
-   "flag_abs": true,
-   "flag_rel": true
+   "delta": 0.132,
+   "flag_abs": false,
+   "flag_rel": false
   },
   {
    "id": "188",
@@ -87,14 +96,14 @@
    "tier": "T1",
    "units": 0.0,
    "costs": 1.0,
-   "gain": 0.825,
-   "score": 0.825,
-   "calc": "P_E(1) x a = 0.825",
+   "gain": 0.412,
+   "score": 0.412,
+   "calc": "P_E(1) x a = 0.412",
    "place": "Schiff (sockelfrei)",
    "note": "E+1; Floor entfallen (I1c) -> units 0",
-   "delta": 0.515,
-   "flag_abs": true,
-   "flag_rel": true
+   "delta": 0.132,
+   "flag_abs": false,
+   "flag_rel": false
   },
   {
    "id": "448",
@@ -124,7 +133,7 @@
    "calc": "Spur K gemessen (ispec) = 0.204",
    "place": "Kolonie (planetar)",
    "note": "PD2 E0; Floor entfallen -> units 0; schwach wegen PD-Nachfrage 4,3 %",
-   "delta": -0.106,
+   "delta": -0.076,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -167,14 +176,14 @@
    "tier": "T1",
    "units": 1.5,
    "costs": 2.5,
-   "gain": 0.532,
-   "score": 0.213,
-   "calc": "P_E_col(1) x a = 0.412 + K 0.120",
+   "gain": 0.326,
+   "score": 0.13,
+   "calc": "P_E_col(1) x a = 0.206 + K 0.120",
    "place": "Kolonie (planetar)",
    "note": "E+1 planetar (Kolonie-Kurs) + PD1 (K-Anteil)",
-   "delta": -0.097,
+   "delta": -0.15,
    "flag_abs": false,
-   "flag_rel": false
+   "flag_rel": true
   },
   {
    "id": "172",
@@ -188,7 +197,7 @@
    "calc": "2xH = 0.755 | Dual 50/50: Schiff 0.377 + Kolonie 0.755",
    "place": "50 % Schiff (Psi-1) / 50 % Kolonie (Psi frei)",
    "note": "+2 Handlimit, E0; DUAL I1r: Schiff Psi-1 / Kolonie Psi frei; Floor entfallen -> units 0",
-   "delta": 0.256,
+   "delta": 0.286,
    "flag_abs": false,
    "flag_rel": true
   },
@@ -204,7 +213,7 @@
    "calc": "Aktion = 0.611 + K 0.655 | Dual 50/50: Schiff 0.342 + Kolonie 0.339",
    "place": "50 % Schiff (Psi-1, ctrl) / 50 % Kolonie (Psi frei)",
    "note": "Aktion Info (global); DUAL I1i, durch I1r generalisiert: 50 % Schiff (ctrl 1 relevant, Gefechtssim, Psi-1 + E-2 Schiffskurs) + 50 % Kolonie (Psi frei, E-2 Koloniekurs, ctrl verfaellt, kein K)",
-   "delta": 0.031,
+   "delta": 0.061,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -220,7 +229,7 @@
    "calc": "1xH = 0.377 + K 0.120",
    "place": "Kolonie (planetar)",
    "note": "+1 Handlimit planetar + PD1 (K-Anteil)",
-   "delta": -0.111,
+   "delta": -0.081,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -231,14 +240,14 @@
    "tier": "T2",
    "units": 1.2,
    "costs": 2.2,
-   "gain": 2.557,
-   "score": 1.162,
-   "calc": "P_E(4) x a = 2.557",
+   "gain": 1.279,
+   "score": 0.581,
+   "calc": "P_E(4) x a = 1.279",
    "place": "Schiff (Omega-2)",
    "note": "E+4",
-   "delta": 0.657,
-   "flag_abs": true,
-   "flag_rel": true
+   "delta": 0.076,
+   "flag_abs": false,
+   "flag_rel": false
   },
   {
    "id": "156",
@@ -393,7 +402,7 @@
    "calc": "Aktion = 0.620 | Dual 50/50: Schiff 0.207 + Kolonie 0.414",
    "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
    "note": "Aktion infra; Wert < Aktion Taktik, weil PV(infra) < PV(taktik); DUAL I1r",
-   "delta": 0.0,
+   "delta": 0.03,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -425,7 +434,7 @@
    "calc": "M(2 Disz.) = 0.476 | Dual 50/50: Schiff 0.159 + Kolonie 0.317",
    "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
    "note": "Multiplikator Info+Militaer, E-1; DUAL I1r",
-   "delta": -0.072,
+   "delta": -0.042,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -441,7 +450,7 @@
    "calc": "M(2 Disz.) = 0.476 | Dual 50/50: Schiff 0.159 + Kolonie 0.317",
    "place": "50 % Schiff (Psi-1, E-Schiffskurs) / 50 % Kolonie (Psi frei, E-Koloniekurs)",
    "note": "Multiplikator Wirtschaft+Wissenschaft, E-1; DUAL I1r",
-   "delta": -0.072,
+   "delta": -0.042,
    "flag_abs": false,
    "flag_rel": false
   },
@@ -482,26 +491,18 @@
    "title": "Antimateriereaktor",
    "rarity": 5,
    "score": 0.446,
-   "note": "d=1-Schaetzung; alpha 0,5 -> 2,231 (2x ueber Spitze); alpha-Wirklichkeitstest, E+5 waere 145-pari"
+   "note": "d=1-Schaetzung; alpha 0,25 -> 1,116 (ueber 448-Spitze 1,02); alpha-Wirklichkeitstest, E+5 waere 145-pari"
   }
  ],
  "outliers_rel": {
   "T1": [
    {
-    "id": "185",
-    "delta": 0.251
+    "id": "345",
+    "delta": -0.15
    },
    {
     "id": "172",
-    "delta": 0.256
-   },
-   {
-    "id": "187",
-    "delta": 0.515
-   },
-   {
-    "id": "188",
-    "delta": 0.515
+    "delta": 0.286
    }
   ],
   "T2": [
@@ -514,34 +515,17 @@
     "delta": 0.519
    },
    {
-    "id": "145",
-    "delta": 0.657
-   },
-   {
     "id": "448",
     "delta": 0.724
    }
   ]
  },
  "outliers_abs": {
-  "T1": [
-   {
-    "id": "187",
-    "delta": 0.515
-   },
-   {
-    "id": "188",
-    "delta": 0.515
-   }
-  ],
+  "T1": [],
   "T2": [
    {
     "id": "156",
     "delta": 0.519
-   },
-   {
-    "id": "145",
-    "delta": 0.657
    },
    {
     "id": "448",
@@ -556,7 +540,12 @@
   "413": "M2-Kern + Speed-1+-Klausel; Effekt-Buff statt Preis (E-1 brachte nur 0,260)",
   "105": "alpha-Anker / Kapazitaetsentscheidung",
   "114": "pi-Realisierungs-Bracket, Playtest-Anker",
-  "230": "Buff umgesetzt (E-1, 0,416); bewusst unter T2-Median"
+  "230": "Buff umgesetzt (E-1, 0,416); bewusst unter T2-Median",
+  "448": "Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-2 nur 1,024)",
+  "156": "Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-3 nur 0,878)",
+  "183": "Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-6 nur 0,836)",
+  "172": "Bewusst ueber Bande (I1y Pfad A: +2 belassen, I1p; +1-Option 0,283 dokumentiert)",
+  "345": "Bewusst unter Bande (I1y Pfad A, alpha 0,25: 0,130; Known Flag seit I1x)"
  },
- "struktur_befund": "T1 bimodal: Produzenten/Basisversorgung (187/188/172/185, 0,56-0,83) vs Basis-/Down-Swap-Cluster (0,20-0,31); 239 Horchposten (0,341) in der Luecke zwischen den Clustern; Median 0,310 am oberen Rand des unteren Clusters"
+ "struktur_befund": "Bei alpha 0,25 (I1y Pfad A) loest sich die I1x-Bimodalitaet auf: Produzenten ruecken in die Bande (185 0,280 = Median, 187/188 0,412), T1 homogener (0,13-0,41); verbleibende REL-Outlier nur bewusste Faelle: 172 +0,286 (I1p), 345 -0,150 (Known Flag)"
 }

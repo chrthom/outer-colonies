@@ -2,9 +2,14 @@
 # diag_infra_outlier_r13i.py — Infrastruktur-Balancing Runde I1y
 # UEBER-OUTLIER: konkrete Hebel-Messung im SOLL-ZUSTAND (Projektion wie
 # I1x: I1w-Buffs + Swap-Tier-Remap, Issue #815 noch nicht umgesetzt).
-# Christophers Entscheidungen (7.11.): KURVE 0,3/0,5 (gerundeter Anker)
+# Christophers Entscheidungen (10.11.): KURVE 0,3/0,5 (gerundeter Anker)
 # + BANDE RELATIV +-50 % des Kurvenwerts (T1 0,15-0,45, T2 0,25-0,75);
 # fuer die 8 UEBER-Outlier konkrete Vorschlaege.
+# BESCHLUSS (11.11., PFAD A): ALPHA_E 0,25 als Modell-Default (deckt
+# 187/188/185/145); 172 +2 belassen (I1p); 448/156/183 bewusste
+# Tier-Spitzen (Preis-Hebel ausgeschoepft); 345 Known Flag. Re-Run
+# 11.11. auf ALPHA_E 0,25 (BASE = Soll bei Modell-Default; der
+# alpha-Sweep dokumentiert die I1y-Messung bei 0,5/0,375/0,25).
 # Hebel: (a) je Karte E-/Handlimit-Kappen, (b) globaler ALPHA_E-Regler
 # (E-Produzenten-Absorption, I1n/I1o) als EIN Hebel fuer alle vier
 # Produzenten-Outlier 145/187/188/185. Kurve bleibt FIX 0,3/0,5
@@ -61,7 +66,6 @@ def run(overrides=(), alpha=None):
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'outlier_variant', 'exec'), ns)
-    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     return {e['id']: e for e in ns['out']['objects']}
 
 
@@ -157,7 +161,7 @@ base = tier_rows(base_sc)
 print('%-38s %-8s %-8s %-24s %-24s'
       % ('Szenario', '187/188', '185', '145/156/448/183', 'Outlier (Delta vs Kurve)'))
 print('%-38s %-8s %-8s %-24s T1: %s | T2: %s'
-      % ('BASE (Soll, alpha 0,5)',
+      % ('BASE (Soll, alpha 0,25 = Default)',
          '%.3f' % base_sc['187']['score'],
          '%.3f' % base_sc['185']['score'],
          '%.3f %.3f %.3f %.3f' % (base_sc['145']['score'],
@@ -214,10 +218,11 @@ for a in (0.5, 0.375, 0.25):
           % (', '.join(alpha_res[a]['outliers']['T1']) or 'keine',
              ', '.join(alpha_res[a]['outliers']['T2']) or 'keine'))
 print()
-print('EMPFEHLUNG: alpha 0,25 deckt 187/188/185/145 ab (kein Einzelhebel '
-      'fuer 188 existiert); 448/156/183 bleiben strukturelle Tier-Spitzen '
-      '(Preis-Hebel ausgeschoepft, s.o.); 172 einziger verbleibender '
-      'T1-UEBER-Outlier (+0,266; Hebel +1 -> siehe oben, I1p: +2 belassen).')
+print('BESCHLUSS (PFAD A, 11.11.): alpha 0,25 deckt 187/188/185/145 ab '
+      '(kein Einzelhebel fuer 188 existiert); 448/156/183 bleiben '
+      'strukturelle Tier-Spitzen (Preis-Hebel ausgeschoepft, s.o.); '
+      '172 einziger verbleibender T1-UEBER-Outlier (+0,266; Hebel +1 '
+      '-> siehe oben, I1p: +2 BELASSEN).')
 print('Anker-Stabilitaet: gerundete Kurve 0,3/0,5 bleibt bei alpha 0,25 '
       'gueltig (Roh-Median T1 0,280 -> rundet auf 0,3; T2 unverändert '
       '0,505 -> 0,5, Median-Paar 336/219 haelt).')
@@ -236,12 +241,13 @@ out_json = dict(
                          med=alpha_res[a]['med'],
                          outliers=alpha_res[a]['outliers'])
            for a in alpha_res},
-    empfehlung='ALPHA_E 0,25 als Modell-Default (deckt 187/188/185/145; '
-               '345 faellt auf 0,131 leicht unter die T1-Kante, Known '
-               'Flag); 448/156/183 bewusst als Tier-Spitzen akzeptiert '
-               '(Preis-Hebel ausgeschoepft: E-2/E-3/E-6 nur 1,02/0,88/'
-               '0,84); 172 +2 belassen (I1p) oder +1-Option; '
-               'alpha bleibt Playtest-Regler',
+    beschluss='PFAD A BESCHLOSSEN (11.11.): ALPHA_E 0,25 als Modell-'
+              'Default (deckt 187/188/185/145; 345 faellt auf 0,131 '
+              'leicht unter die T1-Kante, Known Flag); 448/156/183 '
+              'bewusst als Tier-Spitzen akzeptiert (Preis-Hebel '
+              'ausgeschoepft: E-2/E-3/E-6 nur 1,02/0,88/0,84); 172 +2 '
+              'BELASSEN (I1p; +1-Option 0,283 dokumentiert); alpha '
+              'bleibt Playtest-Regler',
 )
 json.dump(out_json, open(os.path.join(HERE, 'diag_infra_outlier_r13i.json'),
                         'w', encoding='utf-8'), ensure_ascii=False, indent=1)

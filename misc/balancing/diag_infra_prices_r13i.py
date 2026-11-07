@@ -1,6 +1,6 @@
 # ============================================================================
 # diag_infra_prices_r13i.py — Infrastruktur-Balancing Runde I1, SPUR W
-# Analytische Preisliste, MODELL v9 (I1r, 7.11.2026: Christophers
+# Analytische Preisliste, MODELL v9 (I1r, 8.11.2026: Christophers
 # DUAL-PROFIL-BESCHLUSS — "Die Sockel sind bei Anlage an die Kolonie
 # egal, bei Anlage an ein Schiff nicht": Jede nicht-planetare Karte
 # wird als ZWEI Profile je 50 % gewichtet, Schiff (Psi-Sockel in den
@@ -12,9 +12,10 @@
 # ----------------------------------------------------------------------------
 # Christophers Beschluesse/Regler bislang: P_E-Symmetriekurs FIXIERT ·
 # P_planetar = 1,5 BESTAETIGT (I1r, war 2,5 I1b) · PI_PLAY = 0,75
-# BESCHLOSSEN (I1w, 7.11., Playtest-Anker Extra-Ziehung -> zusaetzliche
+# BESCHLOSSEN (I1w, 9.11., Playtest-Anker Extra-Ziehung -> zusaetzliche
 # Ausspielung; war 0,5) · Tier-Inversion via paarierte Rarity-Swaps
-# geloest (Umsetzung Issue #815) · ALPHA_E = 0,5 (I1o) · E-Ortskurs
+# geloest (Umsetzung Issue #815) · ALPHA_E = 0,25 (I1y Pfad A, war 0,5
+# I1o) · E-Ortskurs
 # Kolonie 0,5/0,3
 # (I1r, Christophers Werte; Playtest) · Dual-Profile 50/50 BESCHLOSSEN
 # (I1r, generalisiert I1i) · Deck-Gleichverteilung 25 % BESCHLOSSEN
@@ -90,10 +91,8 @@ os.chdir(HERE)
 P_PLANETAR = 1.5     # BESTAETIGT I1r (war 2,5 I1b; Christophers "beim
                     # 1,5 belassen" nach v8-Durchsicht; Sockel-\
                     # Aequivalenz 1,0 + Sicherheitspraemie 0,5; Cross-\
-                    # Anker Kraftwerk==Atomreaktor bei P_planetar 0,7\
-                    # (Sweep-Gesetz P = E1 + 4*SUB - 1 mit E-Kurs\
-                    # 0,5/0,3, I1s; 1,7 galt nur fuer den I1q-Kurs\
-                    # 0,7/0,5); Playtest-kalibrierbar)
+                    # Anker Kraftwerk==Atomreaktor bei 1,7; Playtest-\
+                    # kalibrierbar)
 # T_win ENTFERNT (I1h, Christophers Rueckfrage): war seit I1g nur noch
 # Faktor 1,0 — Huelle/Ausruestung/Infra werden VOR dem Gefecht gespielt,
 # Wertung je Runde; keine Gefechtsfenster-Skalierung mehr im Modell.
@@ -108,7 +107,7 @@ U = {'hull': 1.0, 'equipment': 0.8, 'infrastructure': 0.8, 'tactic': 0.8}
 # (s.o.), ersetzt ihn NICHT: Die Disziplin-Beschraenkung bindet weiter
 # ueber b_disc (Handverfuegbarkeit), Fokus-Deck-Incentive bleibt.
 PI_PLAY = 0.75       # Extra-Ziehung -> zusaetzliche Ausspielung (Beschluss
-                     # I1w, 7.11.; war 0,5; Playtest-Anker)
+                     # I1w, 9.11.; war 0,5; Playtest-Anker)
 PHI_FLEX = 0.15      # Optionswert flexible Auswahl "|"-Form (Regler)
 H_LIMIT = 0.12       # Optionwert +1 Handkarte (x PV_equip)
 SUB_E = 0.7          # degressiver E-Kurs (FIXIERT, Spiegel Einsatzkosten v3)
@@ -126,7 +125,12 @@ E_DEMAND_W = {0: 32, 1: 16, 2: 8}
 # Verbraucher-Belastung intakt); ALPHA_E dämpft nur die MENGE (Anteil der
 # E-Punkte mit Abnehmer je Runde). Playtest misst: Nachfrage je Runde /
 # Kapazitaet, ggf. groessenabhaengig je Produzent (kleinster zuerst).
-ALPHA_E = 0.5        # Startwert (konservative Mitte der I1n-Sensitivitaet)
+# I1y-BESCHLUSS PFAD A (11.11.): ALPHA_E 0,25 — deckt 187/188/185/145
+# in der Tier-Bande (Kurve 0,3/0,5, Bande relativ +-50 %); 448/156/183
+# bleiben bewusste Tier-Spitzen. Roh-Median T1 sinkt 0,310 -> 0,280,
+# gerundete Kurve 0,3 bleibt gueltig, T2 0,505 haelt (Median-Paar 336/
+# 219). ALPHA_E bleibt Playtest-Regler.
+ALPHA_E = 0.25       # I1y-Beschluss Pfad A (war 0,5; I1n-Sensitivitaet)
 # E-ORTSKURS (I1q eingefuehrt mit 0,7/0, I1r REDUZIERT auf 0,5/0,3 —
 # Christophers Werte: "E-Wert Kolonie weiter reduzieren (0,5 und 0,3)"):
 # Die E-Pools sind getrennt (Schiffe: eigene Reaktoren; Kolonie: eigener
@@ -662,8 +666,8 @@ print('  -> Gleichverteilung (b je %.3f) ist der saubere Kalkulations-'
 
 print()
 print('=' * 108)
-print('Absorptions-Sensitivitaet E-Produzenten (I1n/I1o: ALPHA_E = %.2f '
-      'BESCHLOSSEN, v9-Default):' % ALPHA_E)
+print('Absorptions-Sensitivitaet E-Produzenten (I1n/I1o-Regler; I1y-'
+      'BESCHLUSS PFAD A: ALPHA_E = %.2f, v9-Default):' % ALPHA_E)
 print('  Realisierungs-Symmetrie: Aktionen b x u, Multiplikatoren pi_play, '
       'Energie ALPHA_E (ehemals einziger Gain ohne Realisierungs-')
 print('  Faktor -> Produzenten-Scores der v6 waren Obergrenzen). Kurs je '
@@ -709,7 +713,7 @@ def alpha_eq(pid, anchor_score):
 
 
 print('  %-6s %-12s %10s %9s %9s   Alpha zum Angleich an:'
-      % ('id', 'Objekt', 'a=1,0 (v6)', 'a=0,5 (v9)', 'a=0,25'))
+      % ('id', 'Objekt', 'a=1,0 (v6)', 'a=0,5 (I1o)', 'a=0,25 (v9)'))
 for pid, cap, other, course in PRODS:
     s = prod_scores(1.0)[pid]
     eq = ', '.join('%s %.2f' % (lbl, alpha_eq(pid, a))
@@ -752,7 +756,8 @@ out = dict(
           'Werte, I1r); P_planetar 1,5 (bestaetigt I1r, war 2,5); I1w: '
           'PI_PLAY = 0,75 (war 0,5, Playtest-Anker); I1q: '
           'Deck-Gleichverteilung 25 % je Typ, 183 Code-Lesart je +1 '
-          'E/I/H (CSV-PR #808); I1o: ALPHA_E = 0,5; I1h: u (hull 1,0 / '
+          'E/I/H (CSV-PR #808); I1y: ALPHA_E = 0,25 (Pfad A, war 0,5 '
+          'I1o); I1h: u (hull 1,0 / '
           'equip 0,8 / infra 0,8 / tactic 0,8)',
     anchors=dict(c_ex=round(c_ex, 3), pv_equip=round(pv_equip, 3),
                  pv_infra=round(pv_infra, 3), deck=DECK,
@@ -788,9 +793,9 @@ out = dict(
         for t in ('T1', 'T2')},
     absorption=dict(
         note='I1n/I1o (Beschluss Option A): Produzenten-Gains x ALPHA_E '
-             '(Default 0,5, Playtest-Regler: Nachfrage je Runde / '
-             'Kapazitaet; Kurs je Punkt: Schiff 1,65/1,155, Kolonie '
-             '0,825/0,495 (I1r). '
+             '(Default 0,25 seit I1y Pfad A, war 0,5; Playtest-Regler: '
+             'Nachfrage je Runde / Kapazitaet; Kurs je Punkt: Schiff '
+             '1,65/1,155, Kolonie 0,825/0,495 (I1r). '
              'alpha_1.0 = historische v6-Obergrenze.',
         producers={pid: dict(cap=cap, other_gain=other, course=course,
                              score_a10=round(prod_scores(1.0)[pid], 3),
