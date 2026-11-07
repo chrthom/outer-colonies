@@ -17,6 +17,7 @@ Simulation-based balancing toolkit for the equipment cards of Outer Colonies. St
 | `diag_infra_r13i.py` / `.json` | Infrastructure combat-track measurement (round I1): colony-zone defense cards (156/169/448/238/345) and the 239 control spec placed marginally into the random-battle probe (N=10000, CRN) |
 | `diag_infra_prices_r13i.py` / `.json` | Infrastructure pricing model v9 (round I1, economy track): analytic prices for actions, extra draws, energy and hand limit; dual 50/50 ship/colony cost profiles, π_play 0.75 |
 | `diag_infra_sweep_r13i.py` / `.json` | Regulator sensitivity sweep: colony energy course × planetary surcharge (cross-anchor law); re-runs the pricing script per variant |
+| `diag_infra_curve_r13i.py` / `.json` | Curve anchoring + outlier detection for the post-swap target state (projection of issue #815): re-runs the pricing model with the decided buffs (230 E−1, 219 E−2/Ψ−1), remaps tiers to the swap structure, anchor medians T1 0.310 / T2 0.505 |
 | `balancing.md`, `KNOWLEDGE.md` | Round log and project knowledge entrypoint (German) |
 
 ## Running
@@ -26,6 +27,7 @@ python3 diag_v23i_r13t.py     # full v23i measurement; env DIAG_N sets N (defaul
 python3 diag_random_r13t.py   # bare probe; note: overwrites diag_random_v23_r13t.json and its checkpoint
 python3 diag_infra_prices_r13i.py  # infrastructure pricing model v9 (analytic, fast, no simulation)
 python3 diag_infra_sweep_r13i.py   # regulator sweep (re-runs the pricing script per variant)
+python3 diag_infra_curve_r13i.py   # curve anchor + outliers in the post-swap target state (projection of issue #815)
 python3 diag_infra_r13i.py         # infrastructure combat-track measurement (battle sim, N=10000, checkpoint diag_infra_ckpt_r13i.json)
 ```
 
@@ -48,6 +50,7 @@ Requirements: Python 3, no third-party dependencies. Needs `../cards.csv` (i.e. 
 - **Cost model v9:** units = 1 (static play cost) + energy + sockets on ships; non-planetary cards are scored as **dual profiles 50/50 ship/colony** (ship: full socket costs, energy course 1.0/0.7; colony: sockets free, cheaper energy course 0.5/0.3); planetary cards pay the surcharge P_planetar = 1.5. Energy producers do not pay energy costs (production is the gain), damped by ALPHA_E = 0.5.
 - **Draw pricing:** extra draws are worth π_play × PV_DECK with **π_play = 0.75** (decided in I1w, was 0.5; playtest anchor: share of extra draws that turn into an extra play before game end).
 - **Result (v9, π 0.75, pre-swap):** tier medians T1 (R0+R1) 0.566 / T2 (R2) 0.329 — the tier inversion is resolved off-model via **paired rarity swaps** (448+183+164 → R2, 333+435+154 → R1, 320 ⇄ 413) plus price buffs on 230 (E−1) and 219 (E−1, Ψ−1); tracked in issue #815. Expected post-swap state: T1 0.310 / T2 0.505 = 1.63×.
+- **Curve anchor (I1x, projection of #815):** post-swap tier medians T1 0.310 / T2 0.505 (validated against the I1w documentation to three decimals); outliers vs. the anchor are tracked in `diag_infra_curve_r13i.json` (relative band ±50 % of the tier median recommended, absolute ±0.5 kept as reference).
 - **Regulators (all per playtest):** π_play, ALPHA_E, colony energy course, P_planetar; `diag_infra_sweep_r13i.py` maps their interaction space (cross-anchor law: Kraftwerk == Atomreaktor ⇔ P_planetar = E1 + 4·SUB − 1).
 
 ## Conventions
