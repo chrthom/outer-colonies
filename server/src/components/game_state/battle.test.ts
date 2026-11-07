@@ -229,6 +229,7 @@ describe('Battle', () => {
       expect(match.battle.range).toBe(2);
       expect(match.turnPhase).toBe(TurnPhase.Combat);
       expect(match.pendingActionPlayerNo).toBe(0);
+      expect(match.battle.ships[1]).not.toContain(match.players[1].colonyCardStack);
     });
 
     test('should consider weapons of both fleets for the start range', () => {
@@ -264,6 +265,32 @@ describe('Battle', () => {
 
       expect(match.battle.type).toBe(BattleType.None);
       expect(match.turnPhase).toBe(TurnPhase.Build);
+    });
+
+    test('should push the defending colony card stack into the battle when the range 1 phase begins', () => {
+      const defenderShipId = setupRaid([1], []);
+
+      match.prepareCombatPhase([defenderShipId]);
+
+      expect(match.battle.range).toBe(1);
+      expect(match.battle.ships[1]).toContain(match.players[1].colonyCardStack);
+    });
+
+    test('should auto-resolve a mission battle without interceptors via applyMissionResult', () => {
+      match.activePlayerNo = 0;
+      match.pendingActionPlayerNo = 1;
+      match.battle = new Battle(BattleType.Mission, 0);
+      const missionShip = createShip(match.players[0], []);
+      missionShip.zone = Zone.Neutral;
+      missionShip.card.profile.control = 2;
+      match.players[0].cardStacks.push(missionShip);
+      match.battle.ships[0] = [missionShip];
+
+      match.prepareCombatPhase([]);
+
+      expect(match.battle.type).toBe(BattleType.None);
+      expect(match.turnPhase).toBe(TurnPhase.Build);
+      expect(match.control).toBe(2);
     });
   });
 });
