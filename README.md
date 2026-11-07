@@ -336,6 +336,8 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
 
 ### Development Workflow
 
+The repository working rules — repository language, branches and merges, issue labels, milestones, versions and releases, and the deployment cadence — are documented in [AGENTS.md](AGENTS.md).
+
 #### Running the Projects
 
 1. **Start the Server**:
