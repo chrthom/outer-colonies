@@ -1,6 +1,6 @@
 # ============================================================================
 # diag_v23i_r13t.py — Neu-Simulation mit Christophers Feinkorrekturen
-# (8.11.2026) auf Frame v23d (wspec-first, >=-Halved-Fix)
+# (5.11.2026) auf Frame v23d (wspec-first, >=-Halved-Fix)
 # ----------------------------------------------------------------------------
 # Aenderungen vs. v23h:
 #   - 101: TAbz -14 -> -11 (auf FIN dmg 28)
@@ -296,7 +296,7 @@ result = dict(N=N, seed=42,
                     '140 units 0.7, 240 csv, 349 hp2, 406 hp5',
               targets=TARGETS, thresh=THRESH, hp_static=HP_STATIC,
               medians_weapons=med_w, medians_cards=med_c,
-              spearman_cards_vs_v23b=spear,
+              spearman_cards_vs_v23=spear,
               rows=rows, outliers=outliers, knapp=knapp,
               elapsed=round(time.time() - t0, 1))
 with open(OUT_PATH, 'w', encoding='utf-8') as f:

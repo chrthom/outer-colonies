@@ -13,7 +13,7 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
    Kombinationen). Kalibrierung: R4 0 % (Christoph), R3 10 %, R2 20 %, R1 25 %.
    Zwei-Zweig-Approximation: Zweig "voller Schaden" vs. Zweig "halber Schaden"
    ((d+1)//2 wie JS Math.round), Mischung je Phase.
-3. Mission vs. Raid (85/15, v8-Kalibrierung, MISSION_SHARE anpassbar):
+3. Mission vs. Raid (MISSION_SHARE 0.50 = RAID_SHARE 0.50, seit v23b; die 85/15 war die v8-Kalibrierung):
    - Mission: reines Schiffsgefecht, KEIN Angriff auf die Kolonie moeglich.
    - Raid: Gefecht gegen Verteidigerschiffe; die Kolonie ist erst ab
      Reichweite 1 angreifbar (battle.ts: Kolonie-Stacks werden bei range==1
@@ -94,7 +94,6 @@ FINAL = {
     # Kandidaten-Runde nach Kostenmodell v2 + Kurve 4,5/4,75/5,0/6,0/6,5
     # (Christopher, 2.11.2026):
     '101': dict(dmg=28, e=1,  abz={'pd': 14}),        # Buff: dmg 24->28, PD-Abzug 9->14
-    '106': dict(dmg=11, e=4,  abz=None),             # E-Reduktion zurueckgenommen (Kostenmodell v2)
     '107': dict(dmg=9,  e=1,  abz={'shield': 9}),    # Runde 3: SAbz 8->9 (bei dmg 9 faktisch
     #                                                     wirkungslos gg. Schild; Saettigung danach)
     '125': dict(dmg=17, e=1,  abz={'shield': 7}),    # Buff: dmg 14->17, Schildabzug 6->7
@@ -117,7 +116,6 @@ FINAL = {
     '405': dict(dmg=7,  e=1,  abz=None),
     '409': dict(dmg=26, e=1,  abz=None),             # Buff: dmg 27->26, E 2->1
     '421': dict(dmg=9,  e=1,  abz={'shield': 5}),    # Buff: dmg 8->9; Runde 3: SAbz 4->5
-    '424': dict(dmg=10, e=1,  abz={'armour': 5}),     # Buff: dmg 8->10, Panzerungsabzug 4->5
     '180': dict(dmg=2,  e=0,  abz=None),             # Nerf: dmg 3->2 (Pz-Abzug 2 bleibt)
     '420': dict(dmg=13, e=1,  abz=None),             # Buff: dmg 11->13 (kein CK - Christopher hat die
     #                                                     gedruckte Karte geprueft, 2.11.2026)
@@ -127,14 +125,14 @@ FINAL = {
     # --- Runde 3 (3.11.2026, Christopher): dynamischer PD-Credit (pd 0,84/1,16,
     # k-verrechnet) + Schildabzug-Erhoehungen ueberstarker Waffen (SAbz macht
     # Waffe schwaecher und Schildpunkte im Feld staerker):
-    '106': dict(dmg=11, e=4,  abz={'shield': 6}),    # Runde 3: SAbz 5->6
+    '106': dict(dmg=11, e=4,  abz={'shield': 6}),    # E-Reduktion zurueckgenommen (Kostenmodell v2); Runde 3: SAbz 5->6
     '150': dict(dmg=12, e=0,  abz={'shield': 4}),    # Runde 3: SAbz 3->4
     '168': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (halber Schritt,
     #                                                     PD schiffsuebergreifend/Torpedos)
     '234': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (dito)
     '339': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (dito)
     '340': dict(dmg=7,  e=0,  abz=None),             # Runde 3: dmg 6->7 (dito)
-    '424': dict(dmg=12, e=1,  abz={'armour': 5}),    # Runde 2 Buff dmg 8->10; Runde 3: 10->12
+    '424': dict(dmg=12, e=1,  abz={'armour': 5}),    # Runde 2 Buff dmg 8->10, Panzerungsabzug 4->5; Runde 3: dmg 10->12
     # --- X-Switch (Christopher, 3.11.2026): SAbz == dmg -> 'wirkungslos gegen
     # Schild' (X) statt numerisch. Metrikneutral (Score identisch: der Schuss
     # geht gegen 1 Schildpunkt in beiden Varianten auf 0 net); in-game bleibt

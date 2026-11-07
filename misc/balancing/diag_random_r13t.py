@@ -19,11 +19,16 @@ Frame-Aenderungen gegen 13q/13r:
    passende Sockel (Waffen: v11.WREQ; Statkarten: cards.csv socket_
    Spalten, Betrag = Anzahl). Bunte Umgebungen = Christophers
    Waffen-Mix-Punkt.
-2. Flotten UNABHAENGIG gezogen (kein Spiegel): att = draw_fleet(
-   MISSION_TYPES), deff = draw_fleet(RAID_TYPES im Raid sonst
-   MISSION_TYPES), je 1x 1-/2-/3-teilig (6 Huellen-Karten je Seite).
-3. Kartenbudget B je Gefecht (uniform 11..17); Ausruestungszahl
-   E = B - 6 BEIDERSEITS gleich -> gleiche Kartenzahl (Christophers
+2. Flotten UNABHAENGIG gezogen (kein Spiegel): draw_random_fleet
+   zieht je Seite 1-5 Schiffe (v23b, Christophers Playtest-Dichte),
+   Schiffsgroesse je Schiff uniform 1-3 Sektionen, Typ zweistufig
+   wie v11 (TYPE_BEST x Build-Gewicht); ungleiche Flotten entstehen
+   endogen (kleinere Flotte -> mehr Ausruestung).
+3. Draw-v2 (v23): JEDES Schiff zieht zuerst 1 PFLICHTWAFFE
+   (rarity-gewichtet, Re-draw bis anlegbar, Deckel 300 Ziehungen;
+   <1 % der Builds bleiben waffenlos), danach bis E Karten gesamt
+   (Pflichtwaffen zaehlen mit); Budget B endogen aus Rumpf-Sockeln
+   (b_lo/b_hi), BEIDERSEITS gleiche Kartenzahl (Christophers
    Spiegel-Faktor; Huellen-Sektionen zaehlen als Karten).
 4. n_inst-Verdopplung ENTFaELLT: jede gezogene Karte ist EINE
    Instanz (Stacks entstehen nur durch real gezogene 2. Karte,
@@ -59,7 +64,7 @@ import balancing_metric_v11 as v11
 HERE = os.path.dirname(os.path.abspath(__file__))
 CKPT_PATH = os.path.join(HERE, 'diag_random_ckpt_v23_r13t.json')
 OUT_PATH = os.path.join(HERE, 'diag_random_v23_r13t.json')
-N = 10000   # v23-Ankuerung (Christophers Beschluesse 6.11.2026):
+N = 10000   # v23-Ankuerung (Christophers Beschluesse 5.11.2026):
             # v22-Frame (>=-Regel) + Spielkosten +1 auf ALLE Karten +
             # Draw-v2 (Pflichtwaffe je Schiff, Re-draw, b_lo-Fix) +
             # Flotte 1-4 Schiffe; Offizialmessung N=10k, seed 42
@@ -101,15 +106,13 @@ POOL = ([dict(w, kind='w', req=v11.WREQ.get(w['id'], {})) for w in ws]
 # rarity-Gewicht je Pool-Karte
 TOT = sum(v10.RARITY_W[p['rarity']] for p in POOL)
 PPROB = [v10.RARITY_W[p['rarity']] / TOT for p in POOL]
-# Waffenpool fuer Draw-v2-Pflichtwaffe (Christophers Vorgabe 6.11.2026)
+# Waffenpool fuer Draw-v2-Pflichtwaffe (Christophers Vorgabe 5.11.2026)
 WPIDX = [i for i, p in enumerate(POOL) if p['kind'] == 'w']
 _WPT = sum(PPROB[i] for i in WPIDX)
 WPPROB = [PPROB[i] / _WPT for i in WPIDX]
 
 cpools = [(cpl, p) for cpl, p in v9.COLONY]
 cptot = sum(p for _, p in cpools)
-
-STAT = dict(n=0, hulls_per_side=6, equip_min=5, equip_max=11)
 
 
 def draw_random_fleet(types_by_n, rng):
@@ -121,7 +124,7 @@ def draw_random_fleet(types_by_n, rng):
     Karten-SUMME bleibt ueber B gleich)."""
     fleet = []
     for _ in range(rng.randint(1, 5)):   # v23b: Flotte 1-5 Schiffe
-        # (Christophers Beschluss 6.11.2026: Playtest-Dichte — Tote/
+        # (Christophers Beschluss 5.11.2026: Playtest-Dichte — Tote/
         # Schaden/Angriffe je Schiff lagen bei 1-4 noch unter der
         # wahrgenommenen Spielrealitaet)
         n = rng.randint(1, 3)
@@ -148,7 +151,7 @@ def place(card_req, free):
 
 
 def draw_loadout(fleet, e, rng):
-    """Draw-v2 (Christophers Vorgaben 6.11.2026):
+    """Draw-v2 (Christophers Vorgaben 5.11.2026):
     (1) JEDES Schiff bekommt zunaechst 1 PFLICHTWAFFE (rarity-gewichtet
         aus dem Waffenpool, Re-draw bis anlegbar, Sanity-Deckel 300
         Zuege) — "in Realitaet nimmt niemals ein Schiff ohne Waffe an
@@ -212,7 +215,7 @@ def draw_random_battle(rng):
     h1 = sum(b['parts'] for b in att_b)
     s0 = sum(sum(b['socks'].values()) for b in deff_b)
     s1 = sum(sum(b['socks'].values()) for b in att_b)
-    # v23 (6.11.2026): b_lo um max. Schiffe je Seite angehoben, damit
+    # v23 (5.11.2026): b_lo um max. Schiffe je Seite angehoben, damit
     # jede Seite die Pflichtwaffen (Huellen + je Schiff 1 Waffe) tragen
     # kann — Spiegel B bleibt gewahrt (b_tot identisch fuer beide Seiten)
     b_lo = max(h0, h1) + max(len(deff_b), len(att_b))
@@ -397,7 +400,7 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None,
             wspec_owner = remap.get(wspec_owner, -1)
 
     for p in PHASES:
-        # v23d (Christophers Beschluss 8.11.2026): die bewertete Waffe
+        # v23d (Christophers Beschluss 5.11.2026): die bewertete Waffe
         # feuert als ERSTE der Phase, VOR allen Umgebungsschuessen
         # (vorher eigene Schleife NACH den Umgebungswaffen) — bei Abzug X
         # bleibt die Defense-Karte aktiv, und die Umgebungsschuesse
@@ -607,7 +610,7 @@ for it in range(start, N):
             for k in m:
                 accC[x['id']][side][k] += m[k]
     if (it + 1) % CKPT_EVERY == 0 or it == N - 1:
-        # v23-Robustheitsfix (6.11.2026): with-Block statt offenem
+        # v23-Robustheitsfix (5.11.2026): with-Block statt offenem
         # Handler — ohne explizites close blieb der letzte Checkpoint
         # im Datei-Buffer und wurde bei Timeout-Kill abgeschnitten
         with open(CKPT_PATH, 'w', encoding='utf-8') as f:
@@ -626,7 +629,7 @@ def score_of(acc, n, card, hp=0, units=None):
           + acc[s]['loot'] + acc[s]['prevent']) / n[s]
          for s in (0, 1) if n[s] > 0]
     gain = sum(g) / len(g)
-    # v23-Spielkosten (Christophers Beschluss 6.11.2026): statische
+    # v23-Spielkosten (Christophers Beschluss 5.11.2026): statische
     # Kosten +1 auf ALLE Karten (Waffen UND Statkarten) — das Ausspielen
     # kostet die Karte selbst (1 Karte pro Typ pro Zug); ersetzt den
     # frueheren 0,5-Floor in weapon_units (raw+1 >= 1 immer).
@@ -723,7 +726,7 @@ out = dict(frame='v23d: random battles (r13t probe v6, >=-halved '
                                       cards_v20=round(sc_r, 3) if sc_r
                                       else None),
            weapons=rows_w, cards=rows_c)
-# v23-Robustheitsfix (6.11.2026): with-Block statt offenem Handler
+# v23-Robustheitsfix (5.11.2026): with-Block statt offenem Handler
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
     json.dump(out, f, ensure_ascii=False, indent=1)
 
