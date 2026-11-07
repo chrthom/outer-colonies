@@ -395,7 +395,9 @@
             <h4>Gefechtsphase</h4>
             <p>
               Spielrunde eines Gefechts gemessen in der aktuellen Reichweite. Es werden bis zu 4 Phasen
-              gespielt. Jede Gefechtsphase hat eine Reichweite, beginnend bei 4, dann 3, 2 und zuletzt 1.
+              gespielt. Das Gefecht beginnt bei der höchsten Reichweite einer Offensivwaffe im Gefecht und
+              jede weitere Gefechtsphase hat eine um 1 verringerte Reichweite, bis zuletzt die Gefechtsphase
+              mit Reichweite 1 gespielt wird.
             </p>
             <h4>Geschwindigkeit <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span></h4>
             <p>
@@ -1005,11 +1007,14 @@
           <div>
             <img [src]="imgUrl('battle_overview')" class="right size-30" />
             <p>
-              Es werden nacheinander bis zu <b>4 Gefechtsphasen</b> durchgeführt. Die Gefechtsphasen
-              repräsentieren das Gefecht auf einer bestimmten Distanz. Es wird mit Reichweite 4 begonnen, die
-              nächste Gefechtsphase mit Reichweite 3, dann 2 und zuletzt 1.
+              Die Gefechtsphasen repräsentieren das Gefecht auf einer bestimmten Distanz. Das Gefecht beginnt
+              in der Gefechtsphase, deren Reichweite der höchsten Reichweite entspricht, die eine
+              Offensivwaffe eines am Gefecht teilnehmenden Schiffs hat. Anschließend wird die Reichweite mit
+              jeder weiteren Gefechtsphase um 1 verringert, bis abschließend die Gefechtsphase mit Reichweite
+              1 durchgeführt wurde. Hat kein am Gefecht teilnehmendes Schiff eine Offensivwaffe, wird nur die
+              Gefechtsphase mit Reichweite 1 durchgeführt.
             </p>
-            <p>Folgende Schritte werden in jeder der bis zu 4 Gefechtsphasen durchgeführt:</p>
+            <p>Folgende Schritte werden in jeder Gefechtsphase durchgeführt:</p>
             <ol>
               <li>
                 Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit
