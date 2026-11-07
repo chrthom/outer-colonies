@@ -8,6 +8,8 @@ Create a release by following this workflow. The canonical source of truth is `R
 
 **Phase logic:** Phases 0, 1 and 3 are performed by the agent; Phase 2 is the **manual step of the user** (checkout, build, deployment). The build must happen **before** the version bump, otherwise the deployed artifact carries the next development version. The version bump always happens only **after** successful deployment.
 
+**Scope:** This skill covers major/minor releases only. Hotfix releases (patch versions of the productive version, assigned to the productive milestone per AGENTS.md) are handled separately; only the hotfix naming under "Formats for tag and GitHub release" applies to them.
+
 ## Phase 0 - Preparation (read-only)
 
 1. The working tree must be clean and `main` in sync with `origin/main`.
@@ -60,14 +62,14 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
 
 ## Phase 3 - Completion (only after the user confirmed the deployment)
 
-1. Close the **release issue** ("Create release <x.x> and perform deployment") and, if applicable, the milestone. The milestone of the *next* version stays open; new features go there.
+1. Close the **release issue** ("Create release <x.x> and perform deployment"). Keep the released milestone open - it is now the productive milestone and receives productive bug reports per AGENTS.md; close the previously productive milestone now that the new version is productive. The milestone of the *next* version stays open; new features go there.
 2. **Increment the version** to the next development version; version and name come from the next milestone verified in Phase 0 (e.g. after 3.1 Pandora -> 3.2 Pan). If that milestone does not exist yet, create it first after user approval:
    ```bash
    gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
    npm run version   # interactively asks for version (x.x.x) and name
    ```
    `misc/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
-3. Direct pushes to `main` are forbidden by branch protection (squash merges only): bring the version bump to `main` via a PR (branch type `fix/` or `feature/`, e.g. `fix/version-bump-<x.x>`), conventional commit message ("chore: bump version to v<x.x.x> (<Name>)"). The maintainer merges it.
+3. Direct pushes to `main` are forbidden by branch protection (squash merges only): bring the version bump to `main` via a PR (branch type `fix/` or `feature/`, e.g. `fix/version-bump-<x.x>`), conventional commit message ("chore: bump version to v<x.x.x> - <Name>", as in d5b95632). The maintainer merges it.
 4. Optional: after deployment, verify that the productive website/client shows the new version (website footer, client version indicator).
 
 ## Formats for tag and GitHub release
