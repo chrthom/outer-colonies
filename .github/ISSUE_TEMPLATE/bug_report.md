@@ -2,7 +2,7 @@
 name: Bug report
 about: Something is not working as expected
 title: ''
-labels: bug
+type: Bug
 assignees: chrthom
 
 ---
@@ -17,7 +17,7 @@ Game / Web portal
 Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
-3. Scroll down to '....'
+3. Scroll to '....'
 4. See error
 
 **Additional information**
