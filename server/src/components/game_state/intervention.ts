@@ -14,6 +14,16 @@ export default abstract class Intervention {
     if (this.switchPendingPlayerOnInit) this.switchPendingPlayer();
     this.checkSkip();
   }
+  /**
+   * Root of the pending intervention chain. Interventions nested into another intervention
+   * (e.g. a tactic card played during an intervention window) resolve first; their parent
+   * intervention is restored only afterwards.
+   */
+  get root(): Intervention {
+    return this instanceof InterventionTacticCard && this.parentIntervention
+      ? this.parentIntervention.root
+      : this;
+  }
   abstract skip(): void;
   get hasValidTargets() {
     return this.match.pendingActionPlayer.hand.some(cs => cs.hasValidTargets);

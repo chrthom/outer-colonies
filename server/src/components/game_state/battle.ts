@@ -84,6 +84,21 @@ export default class Battle {
   resetRecentAttack() {
     this.recentAttack = undefined;
   }
+  /**
+   * Highest range of any offensive weapon equipped to a participating ship of either fleet.
+   * Defaults to 1, so battles without any offensive weapon start with the range 1 phase.
+   */
+  get maxWeaponRange(): number {
+    return Math.max(
+      1,
+      ...this.ships
+        .flatMap(fleet => fleet)
+        .flatMap(cs => cs.cardStacks)
+        .map(cs => (<EquipmentCard>cs.card).attackProfile)
+        .filter((ap): ap is AttackProfile => !!ap)
+        .map(ap => ap.range)
+    );
+  }
   get missionSpeedRequirement(): number {
     return this.type == BattleType.Mission
       ? this.ships[this.activePlayerNo].map(cs => cs.profile.speed).reduce((a, b) => Math.min(a, b))
