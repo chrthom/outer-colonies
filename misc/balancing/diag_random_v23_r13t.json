@@ -1,0 +1,666 @@
+{
+ "frame": "v23: random battles (r13t probe v6, >=-halved, Spielkosten +1 auf alle Karten, Draw-v2 (Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-4), card-count mirror, one battle type, col_rule always",
+ "n": 10000,
+ "baseline": {
+  "taken0": 12.09,
+  "taken1": 16.45,
+  "dealt0": 16.45,
+  "dealt1": 12.09,
+  "dead0": 0.43,
+  "dead1": 0.75,
+  "colony": 6.127,
+  "loot0": 6.62,
+  "raid_share": 0.503,
+  "equip_per_side": 8.67,
+  "fill_ratio": 0.418,
+  "ships_per_side": 3.0,
+  "hulls_per_side": 6.01,
+  "cards_b_per_side": 15.68,
+  "unequal_share": 0.912,
+  "cards_gap_avg": 1.913
+ },
+ "medians": {
+  "1": {
+   "weapons": 1.73,
+   "cards": 1.34
+  },
+  "2": {
+   "weapons": 2.1,
+   "cards": 0.96
+  },
+  "3": {
+   "weapons": 1.85,
+   "cards": 0.96
+  },
+  "4": {
+   "weapons": 3.51,
+   "cards": 2.76
+  },
+  "5": {
+   "weapons": 3.68,
+   "cards": 1.95
+  }
+ },
+ "spearman": {
+  "weapons_v20": 0.48,
+  "cards_v20": 0.595
+ },
+ "weapons": [
+  {
+   "id": "101",
+   "title": "Quantentorpedos",
+   "rarity": 5,
+   "score": 3.12,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "106",
+   "title": "Tachyonlanze",
+   "rarity": 5,
+   "score": 4.39,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "107",
+   "title": "Partikellanze",
+   "rarity": 4,
+   "score": 3.92,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "118",
+   "title": "Ionendisruptor",
+   "rarity": 3,
+   "score": 1.75,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "125",
+   "title": "Plasmakanone",
+   "rarity": 3,
+   "score": 2.3,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "126",
+   "title": "Kinetische Artillerie",
+   "rarity": 3,
+   "score": 2.87,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "127",
+   "title": "Protontorpedos",
+   "rarity": 3,
+   "score": 2.11,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "130",
+   "title": "Flakartillerie",
+   "rarity": 2,
+   "score": 2.19,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "136",
+   "title": "Plasmatorpedos",
+   "rarity": 2,
+   "score": 2.1,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "150",
+   "title": "Fusionsbombentorpedos",
+   "rarity": 2,
+   "score": 1.46,
+   "n_pl": [
+    3126,
+    2846
+   ]
+  },
+  {
+   "id": "151",
+   "title": "Kinetikwaffenbatterie",
+   "rarity": 2,
+   "score": 2.24,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "157",
+   "title": "Plasmawerfer",
+   "rarity": 2,
+   "score": 1.46,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "166",
+   "title": "Laserkanone",
+   "rarity": 1,
+   "score": 1.83,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "167",
+   "title": "Nukleare Torpedos",
+   "rarity": 1,
+   "score": 1.39,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "168",
+   "title": "Automatikkanone",
+   "rarity": 1,
+   "score": 1.73,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "179",
+   "title": "Pulskanone",
+   "rarity": 1,
+   "score": 2.08,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "180",
+   "title": "Railgun",
+   "rarity": 1,
+   "score": 1.98,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "181",
+   "title": "Flugabwehrkanone",
+   "rarity": 1,
+   "score": 1.59,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "182",
+   "title": "Dual-Lasergeschütz",
+   "rarity": 1,
+   "score": 2.16,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "203",
+   "title": "Leerenfeld",
+   "rarity": 5,
+   "score": 3.94,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "207",
+   "title": "Materiedesintegrator",
+   "rarity": 4,
+   "score": 2.54,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "209",
+   "title": "Phasendisruptor",
+   "rarity": 4,
+   "score": 2.68,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "216",
+   "title": "Schwarmraketensystem",
+   "rarity": 3,
+   "score": 1.85,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "223",
+   "title": "Massebeschleuniger",
+   "rarity": 2,
+   "score": 3.06,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "224",
+   "title": "Bergbaulaser",
+   "rarity": 2,
+   "score": 1.62,
+   "n_pl": [
+    3625,
+    3379
+   ]
+  },
+  {
+   "id": "234",
+   "title": "Punktabwehrlaser",
+   "rarity": 1,
+   "score": 1.54,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "237",
+   "title": "Mini-Railgun",
+   "rarity": 1,
+   "score": 1.67,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "302",
+   "title": "Götterdämmerung",
+   "rarity": 5,
+   "score": 3.68,
+   "n_pl": [
+    2983,
+    2829
+   ]
+  },
+  {
+   "id": "303",
+   "title": "Archenemitter",
+   "rarity": 5,
+   "score": 4.77,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "304",
+   "title": "Antimaterietorpedos",
+   "rarity": 5,
+   "score": 3.28,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "310",
+   "title": "Gauss Kanone",
+   "rarity": 4,
+   "score": 4.82,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "318",
+   "title": "Nova-Torpedos",
+   "rarity": 3,
+   "score": 1.55,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "339",
+   "title": "Gatling",
+   "rarity": 1,
+   "score": 1.73,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "340",
+   "title": "Abfangraketenwerfer",
+   "rarity": 1,
+   "score": 1.27,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "343",
+   "title": "Laserphalanx",
+   "rarity": 1,
+   "score": 2.35,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "344",
+   "title": "Fokuslaser",
+   "rarity": 1,
+   "score": 2.21,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "347",
+   "title": "Impulslaser",
+   "rarity": 1,
+   "score": 2.23,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "401",
+   "title": "Guillotine",
+   "rarity": 5,
+   "score": 3.09,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "405",
+   "title": "Thermallanze",
+   "rarity": 4,
+   "score": 3.51,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "409",
+   "title": "Plasmabeschleuniger",
+   "rarity": 4,
+   "score": 3.01,
+   "n_pl": [
+    3927,
+    3781
+   ]
+  },
+  {
+   "id": "412",
+   "title": "Langstreckentorpedos",
+   "rarity": 3,
+   "score": 1.17,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "420",
+   "title": "Donnerkanone",
+   "rarity": 2,
+   "score": 1.99,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "421",
+   "title": "Salvenlaser",
+   "rarity": 2,
+   "score": 2.46,
+   "n_pl": [
+    1273,
+    796
+   ]
+  },
+  {
+   "id": "422",
+   "title": "Feuersturmtorpedos",
+   "rarity": 2,
+   "score": 1.45,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "424",
+   "title": "Sturmgeschütz",
+   "rarity": 2,
+   "score": 2.14,
+   "n_pl": [
+    5210,
+    5146
+   ]
+  },
+  {
+   "id": "438",
+   "title": "Feldannihilator",
+   "rarity": 1,
+   "score": 1.62,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "440",
+   "title": "Impulskanone",
+   "rarity": 1,
+   "score": 1.59,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "441",
+   "title": "Flechette-Werfer",
+   "rarity": 1,
+   "score": 1.59,
+   "n_pl": [
+    3840,
+    3636
+   ]
+  },
+  {
+   "id": "554",
+   "title": "Pegasus-Torpedos",
+   "rarity": 1,
+   "score": 1.71,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  },
+  {
+   "id": "555",
+   "title": "Penetrator-Torpedos",
+   "rarity": 1,
+   "score": 1.78,
+   "n_pl": [
+    3397,
+    3202
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "103",
+   "title": "Adamantiumpanzer",
+   "rarity": 5,
+   "score": 1.95
+  },
+  {
+   "id": "109",
+   "title": "Plasmanachbrenner",
+   "rarity": 4,
+   "score": 0.63
+  },
+  {
+   "id": "115",
+   "title": "Ablative Magnetpanzerung",
+   "rarity": 4,
+   "score": 2.76
+  },
+  {
+   "id": "140",
+   "title": "Deflektorschild",
+   "rarity": 2,
+   "score": 1.04
+  },
+  {
+   "id": "161",
+   "title": "Ionenschubdüsen",
+   "rarity": 1,
+   "score": 0.55
+  },
+  {
+   "id": "163",
+   "title": "Verbundpanzerung",
+   "rarity": 1,
+   "score": 1.55
+  },
+  {
+   "id": "170",
+   "title": "Strahlenschilde",
+   "rarity": 1,
+   "score": 1.43
+  },
+  {
+   "id": "171",
+   "title": "Titanplattenpanzer",
+   "rarity": 1,
+   "score": 1.53
+  },
+  {
+   "id": "184",
+   "title": "Rumpferweiterung",
+   "rarity": 1,
+   "score": 1.34
+  },
+  {
+   "id": "240",
+   "title": "Ceramo-Stahl",
+   "rarity": 1,
+   "score": 0.01
+  },
+  {
+   "id": "312",
+   "title": "Refraktorfeld",
+   "rarity": 3,
+   "score": 0.96
+  },
+  {
+   "id": "341",
+   "title": "Ködersystem",
+   "rarity": 1,
+   "score": 0.91
+  },
+  {
+   "id": "349",
+   "title": "Dura-Stahl Platten",
+   "rarity": 1,
+   "score": 2.2
+  },
+  {
+   "id": "406",
+   "title": "Kohlenstoffsilikatpanzer",
+   "rarity": 4,
+   "score": 2.91
+  },
+  {
+   "id": "426",
+   "title": "Schildbooster",
+   "rarity": 2,
+   "score": 2.08
+  },
+  {
+   "id": "434",
+   "title": "Leichtbauweise",
+   "rarity": 2,
+   "score": -0.3
+  },
+  {
+   "id": "449",
+   "title": "Schwerer Rumpf",
+   "rarity": 1,
+   "score": 0.41
+  },
+  {
+   "id": "522",
+   "title": "Heckdeflektor",
+   "rarity": 2,
+   "score": 0.96
+  },
+  {
+   "id": "537",
+   "title": "Quantenmechanischer Antrieb",
+   "rarity": 2,
+   "score": 0.68
+  }
+ ]
+}
