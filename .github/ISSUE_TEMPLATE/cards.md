@@ -2,7 +2,7 @@
 name: Cards
 about: Spelling, proposed changes and problems with game cards
 title: ''
-type: Cards
+labels: cards
 assignees: chrthom
 
 ---
