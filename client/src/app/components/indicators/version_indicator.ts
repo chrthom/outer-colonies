@@ -8,7 +8,7 @@ export default class VersonIndicator {
       .text(
         layoutConfig.load.version.x,
         layoutConfig.load.version.y,
-        `Pandora (v3.1.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
+        `Pan (v3.2.0)${environment.stage != 'production' ? `\nenv: ${environment.stage}` : ''}`
       )
       .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.caption)
