@@ -18,7 +18,7 @@ export default class CombatRangeIndicator {
     this.hide();
     if (
       this.scene.state.battle?.range < 5 &&
-      this.scene.state.intervention?.type != InterventionType.BattleRoundEnd
+      this.scene.state.intervention?.rootType != InterventionType.BattleRoundEnd
     ) {
       this.show(this.scene.state.battle.range);
     }
