@@ -67,7 +67,13 @@ export default class Match {
     this.battle.resetRecentAttack();
     this.highlightCard = undefined;
   }
-  setStartPlayer() {
+  /**
+   * Marks the player who will NOT take the first turn: the player with the larger deck,
+   * or a random player on equal deck sizes. initMatch() calls prepareStartPhase() right
+   * after, which flips activePlayerNo, so the player with the smaller deck takes the
+   * first turn.
+   */
+  setSecondPlayer() {
     if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
     else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
     else this.activePlayerNo = Math.round(Math.random());
