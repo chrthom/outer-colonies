@@ -70,6 +70,10 @@
             </p>
             <p>Vor dem Spielbeginn mischen beide Spieler:innen ihr Deck und ziehen <b>7 Karten</b>.</p>
             <p>
+              Die Spieler:in mit dem kleineren Deck wird zur aktiven Spieler:in und beginnt das Spiel. Haben
+              beide Decks gleich viele Karten, wird der Beginn zuf&auml;llig ermittelt.
+            </p>
+            <p>
               W&auml;hrend des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbildung links).
             </p>
           </div>
@@ -487,8 +491,8 @@
             <h4>Kontrolle <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span></h4>
             <p>
               Ein Ma&szlig; f&uuml;r den Einfluss und die Dominanz einer Spieler:in &uuml;ber das Spielgebiet.
-              Kontrolle wird durch das erfolgreiche Durchf&uuml;hren von Missionen und das Besiegen von
-              gegner:inischen Schiffen erworben. Eine Spieler:in gewinnt das Spiel, wenn sie 15
+              Kontrolle wird durch das erfolgreiche Durchf&uuml;hren von Missionen erworben. Eine Spieler:in
+              gewinnt das Spiel, wenn sie 15
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> mehr als ihre Gegner:in
               besitzt.
             </p>
@@ -926,9 +930,17 @@
             </ul>
             <h2>3. Gefechtsphase</h2>
             <p>
-              Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift
-              oder ein anderer Spieler eine deiner Mission abfängt. Es nehmen alle zugewiesenen Schiffe teil,
-              bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
+              Ein Gefecht wird jedesmal abgehandelt, wenn du die Kolonie eines anderen Spielers angreifst oder
+              ein anderer Spieler eine deiner Missionen abf&auml;ngt. Die betroffene Spieler:in w&auml;hlt,
+              welche ihrer Schiffe am Gefecht teilnehmen. Ausw&auml;hlbar sind nur eigene Schiffe in der
+              orbitalen Zone. Anschlie&szlig;end werden die Schiffe je nach Gefechtsart zugewiesen: Bei einer
+              Mission wechseln die teilnehmenden Schiffe in die neutrale Zone, und die nicht teilnehmenden
+              Schiffe bleiben in der orbitalen Zone. Bei einem &Uuml;berfall ist es genau umgekehrt: Die
+              teilnehmenden Schiffe bleiben in der orbitalen Zone, und die nicht teilnehmenden Schiffe
+              wechseln in die neutrale Zone. Schiffe mit 0
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> k&ouml;nnen die orbitale Zone
+              nicht verlassen: Sie d&uuml;rfen an der Verteidigung einer Mission nicht teilnehmen, m&uuml;ssen
+              aber an der Verteidigung eines &Uuml;berfalls teilnehmen.
             </p>
             <h2>4. Rundenende</h2>
             <ul>
