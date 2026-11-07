@@ -65,4 +65,32 @@ describe('RulesPage', () => {
     // iconUrl now returns icon font characters, not PNG URLs
     expect(component.iconUrl('test')).toBeNull();
   });
+
+  it('should describe the mission reward instead of mission cards', () => {
+    selectChapter('missions');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('Missionsbelohnung');
+    expect(chapterText).toContain('Eine Mission ist erfolgreich');
+    expect(chapterText).toContain('ziehst du 1 Karte und legst die');
+    expect(chapterText).toContain('oberste Karte deines Ablagestapels unter dein Deck');
+    expect(chapterText).toContain('mindestens jedoch 0');
+    expect(chapterText).not.toContain('Missionskarte');
+  });
+
+  it('should not mention mission cards in the glossary', () => {
+    selectChapter('glossar');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  it('should not mention mission cards in the turn overview', () => {
+    selectChapter('turn-overview');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  function selectChapter(chapter: string): void {
+    component.activeChapterList.selectedOptions.select(
+      component.activeChapterList.options.find(option => option.value === chapter)!
+    );
+    fixture.detectChanges();
+  }
 });
