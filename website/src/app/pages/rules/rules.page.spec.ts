@@ -77,6 +77,20 @@ describe('RulesPage', () => {
     expect(chapterText).not.toContain('Missionskarte');
   });
 
+  it('should halve attacks also on speed ties in the glossary', () => {
+    selectChapter('glossar');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('sind kleiner oder gleich der');
+    expect(chapterText).not.toContain('sind kleiner als die');
+  });
+
+  it('should show a speed tie in the second damage calculation example', () => {
+    selectChapter('attacks');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('= 5 ≤ 5');
+    expect(chapterText).not.toContain('nicht halbiert');
+  });
+
   it('should not mention mission cards in the glossary', () => {
     selectChapter('glossar');
     expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');

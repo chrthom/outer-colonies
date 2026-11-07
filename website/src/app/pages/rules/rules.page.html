@@ -412,7 +412,7 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span>, sowie beim Abfangen relevant,
               um zu ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an
               und die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> plus die Reichweite der
-              aktuellen Gefechtsphase sind kleiner als die
+              aktuellen Gefechtsphase sind kleiner oder gleich der
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels, so wir der vom
               Angriff verursachte <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> halbiert
               (aufgerundet und vor allen anderen Abzügen).
@@ -1235,7 +1235,7 @@
               Angenommen, ein Schiff mit
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 2 greift in der Gefechtsphase
               mit Reichweite 3 ein Schiff mit
-              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 6 an. Die
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 5 an. Die
               <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> verursacht 12
               <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> und hat Abzüge von 3 für
               <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> und 2 für
@@ -1248,14 +1248,10 @@
             <ol>
               <li>
                 <b>Halbierung:</b> 2 <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> + 3
-                (Phasenreichweite) = 5 &lt; 6
+                (Phasenreichweite) = 5 &le; 5
                 <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels. Der
                 <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> wird vor allen anderen
-                Abzügen aufgerundet halbiert: 12 → 6. Wäre das Ziel nur 5
-                <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> schnell, würde der
-                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> nicht halbiert, da die Summe
-                nicht kleiner als die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des
-                Ziels ist.
+                Abzügen aufgerundet halbiert: 12 → 6.
               </li>
               <li>
                 <b>Punktabwehr:</b> Alle
