@@ -15,7 +15,12 @@ import { Card509 } from '../cards/collection/tactic_economy_cards';
 import { Card231, Card529 } from '../cards/collection/tactic_intelligence_cards';
 import { Card346 } from '../cards/collection/tactic_military_cards';
 import TacticCard from '../cards/types/tactic_card';
-import { InterventionOpponentRaidStart, InterventionTacticCard } from './intervention';
+import {
+  InterventionAttack,
+  InterventionBattleRoundEnd,
+  InterventionOpponentRaidStart,
+  InterventionTacticCard
+} from './intervention';
 import Match from './match';
 import Player from './player';
 
@@ -255,6 +260,48 @@ describe('InterventionOpponentRaidStart', () => {
       expect(match.intervention).toBeUndefined();
       expect(match.turnPhase).toBe(TurnPhase.Build);
       expect(match.pendingActionPlayerNo).toBe(match.activePlayerNo);
+    });
+  });
+});
+
+const createMockMatch = (): Match => ({ intervention: undefined }) as unknown as Match;
+const createTacticCard = (match: Match): InterventionTacticCard =>
+  new InterventionTacticCard(match, {} as CardStack, {} as CardStack);
+
+describe('Intervention', () => {
+  describe('root', () => {
+    test('should be the intervention itself when it is not nested', () => {
+      const match = createMockMatch();
+      const intervention = new InterventionAttack(match, {} as CardStack, {} as CardStack);
+
+      expect(intervention.root).toBe(intervention);
+    });
+
+    test('should be the parent intervention of a nested tactic card', () => {
+      const match = createMockMatch();
+      const roundEnd = new InterventionBattleRoundEnd(match);
+      match.intervention = roundEnd;
+      const tacticCard = createTacticCard(match);
+
+      expect(tacticCard.root).toBe(roundEnd);
+    });
+
+    test('should be the root of a chain of nested tactic cards', () => {
+      const match = createMockMatch();
+      const roundEnd = new InterventionBattleRoundEnd(match);
+      match.intervention = roundEnd;
+      const tacticCard = createTacticCard(match);
+      match.intervention = tacticCard;
+      const counterTacticCard = createTacticCard(match);
+
+      expect(counterTacticCard.root).toBe(roundEnd);
+    });
+
+    test('should be a tactic card itself when played without a parent intervention', () => {
+      const match = createMockMatch();
+      const tacticCard = createTacticCard(match);
+
+      expect(tacticCard.root).toBe(tacticCard);
     });
   });
 });

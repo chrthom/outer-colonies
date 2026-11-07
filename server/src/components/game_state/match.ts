@@ -110,6 +110,7 @@ export default class Match {
   prepareCombatPhase(interceptingShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
     this.battle.assignInterceptingShips(this.inactivePlayer, interceptingShipIds);
+    this.battle.range = Math.min(this.battle.maxWeaponRange, rules.maxRange) + 1;
     this.reactivateAllCardStacks();
     this.processBattleRound();
   }
