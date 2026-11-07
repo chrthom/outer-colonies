@@ -89,6 +89,6 @@ Arbeitsregeln für Branches, Squash-Merges, GitHub Issue-Typen (Bug/Feature; Car
 ## Verwandte Topics
 
 - Hosting, Domain, Tech-Stack, Deployment und Codebase-Deployment: siehe [IT-Heimsetup](knowledge://knowledge/it-heimsetup/KNOWLEDGE.md)
-- Zusammenarbeitsschwerpunkte: siehe [Präferenzen](knowledge://knowledge/praeferenzen/KNOWLINGE.md)
+- Zusammenarbeitsschwerpunkte: siehe [Präferenzen](knowledge://knowledge/praeferenzen/KNOWLEDGE.md)
 
 <!-- Reparatur 7.11.2026: Das Dateiende war nach einem Schreibvorgang einer parallelen Session (~100k-Zeichen-Grenze) mitten im Praeferenzen-Link abgeschnitten; dieser Bullet wurde minimal wiederhergestellt. Falls weitere Bullets folgten, sind sie nicht rekonstruierbar (die lokale Quelle war selbst abgeschnitten). -->
