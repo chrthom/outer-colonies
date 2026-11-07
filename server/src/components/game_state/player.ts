@@ -1,6 +1,6 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, TurnPhase, BattleType } from '../../shared/config/enums';
+import { CardType, Zone, TurnPhase, BattleType, InterventionType } from '../../shared/config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -139,10 +139,20 @@ export default class Player {
     const match = this.match;
     if (match.turnPhase == TurnPhase.Build) {
       if (match.pendingActionPlayerNo == this.no) {
-        if (match.pendingActionPlayerNo == match.activePlayerNo) {
+        if (match.intervention?.type == InterventionType.TacticCard) {
+          // Timeout on an open tactic card counter window (e.g. after the
+          // defender played a raid reaction card): resolve the reaction like
+          // a manual ready instead of advancing the phase, which would
+          // discard the announced battle plan and strand the played card
+          match.skipIntervention();
+        } else if (match.pendingActionPlayerNo == match.activePlayerNo) {
           // For automatic ready, create an empty battle plan
           match.prepareBuildPhaseReaction({ type: BattleType.None, shipIds: [] });
         } else {
+          // Explicitly close the raid start window on timeout: inaction
+          // forfeits the defense fleet nomination, so the intervention is
+          // removed instead of being silently discarded later
+          if (match.intervention?.type == InterventionType.OpponentRaidStart) match.skipIntervention();
           // For automatic ready, provide empty array for intercepting ships
           match.prepareCombatPhase([]);
         }
