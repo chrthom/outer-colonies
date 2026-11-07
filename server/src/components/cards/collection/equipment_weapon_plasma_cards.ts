@@ -89,7 +89,7 @@ export class Card303 extends EquipmentCardRechargeable {
       5,
       {
         energy: -2,
-        theta: -2
+        xi: -2
       },
       {
         range: 3,

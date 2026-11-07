@@ -39,6 +39,7 @@ export enum InterventionType {
   Attack = 'attack',
   BattleRoundEnd = 'battle_round_end',
   BattleRoundStart = 'battle_round_start',
+  OpponentRaidStart = 'raid_start',
   OpponentTurnStart = 'turn_start',
   TacticCard = 'tactic_card'
 }

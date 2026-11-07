@@ -10,7 +10,7 @@ export class Card112 extends OrbCard {
       'Titan',
       4,
       {
-        armour: 1
+        shield: 1
       },
       [CardType.Hull, CardType.Infrastructure]
     );

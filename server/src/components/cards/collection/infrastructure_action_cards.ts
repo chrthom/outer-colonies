@@ -189,8 +189,8 @@ export class Card336 extends ActionInfrastructureCard {
       'Militärakademie',
       2,
       {
-        energy: -3,
-        psi: -2
+        energy: -2,
+        psi: -1
       },
       [TacticDiscipline.Military],
       [TacticDiscipline.Science]
