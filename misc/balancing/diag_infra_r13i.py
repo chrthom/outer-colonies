@@ -192,7 +192,7 @@ def score_k(st):
     if not gains:
         return None
     gain = sum(g * n for g, n in zip(gains, ns)) / sum(ns)
-    return (gain + 0.0) / (c['units'] + 1.0), gain
+    return gain / (c['units'] + 1.0), gain
 
 
 rows = []

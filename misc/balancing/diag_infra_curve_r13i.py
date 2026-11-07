@@ -11,7 +11,7 @@
 #   - 219 Freihaendlerkontor: E-3 -> E-2 UND Psi-2 -> Psi-1 (Christophers
 #     Ergaenzung; exakt 336 Militaerakademie-aequivalent)
 # Methode: Re-Exec des diag_infra_prices_r13i.py (MODELL v9, PI_PLAY 0,75,
-# ALPHA_E 0,25 seit I1y Pfad A — Re-Run 11.11.)
+# ALPHA_E 0,25 seit I1y Pfad A — Re-Run 7.11.)
 # mit Buff-Overrides; Tier-Remap auf die Swap-Struktur; KURVEN-ANKER =
 # Tier-Mediane der Soll-Struktur (Christopher glaettet); Outlier gegen
 # den Anker mit zwei Banden-Optionen (absolut 0,5 wie Waffen-v23g UND
@@ -67,6 +67,7 @@ def run_soll():
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'curve_soll', 'exec'), ns)
+    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     return ns['out']
 
 
@@ -125,9 +126,10 @@ PROG = [dict(id='320', title='Legierungsgiesserei', rarity=3,
              note='pi 0,75 (Bracket 0,399-0,798); pi-Playtest-Anker'),
         dict(id='105', title='Antimateriereaktor', rarity=5,
              score=0.446,
-             note='d=1-Schaetzung; alpha 0,25 -> 1,116 (ueber 448-'
-                  'Spitze 1,02); alpha-Wirklichkeitstest, E+5 waere '
-                  '145-pari')]
+             note='d=1-Schaetzung; alpha 0,25 -> 1,116 (unter der '
+                  '448-Spitze 1,229, knapp ueber deren ausgeschoepften '
+                  'Preis-Hebel 1,024); alpha-Wirklichkeitstest, E+5 '
+                  'waere 145-pari')]
 
 KNOWN = {  # Outlier-Runden-Kandidaten unabhaengig von der Bande (I1t/I1u/I1w/I1y)
     '333': 'M2-Trigger-Fraktion 0,234 vs M(infra) 0,4375 — Design-Frage',
@@ -191,11 +193,17 @@ print('Struktur-Befund bei alpha 0,25: Die I1x-Bimodalitaet (alpha 0,5: '
       'Produzenten 0,56-0,83 vs Basis-Cluster 0,20-0,31, Median 0,310) '
       'loest sich AUF — die Produzenten ruecken in die Bande (185 0,280 '
       'auf dem Median, 187/188 0,412), T1 wird homogener (0,13-0,41); '
-      'verbleibende REL-Outlier nur noch bewusste Faelle: 172 +0,286 '
-      '(I1p) und 345 -0,150 (Known Flag).')
+      'verbleibende REL-Outlier nur noch bewusste Faelle: in T1 172 '
+      '+0,286 (I1p) und 345 -0,150 (Known Flag), in T2 183 +0,391, '
+      '156 +0,519, 448 +0,724 (bewusste Spitzen).')
 print('KURVE BESCHLOSSEN (I1x/I1y): gerundet %.1f/%.1f | Ratio %.2fx | '
       'Bande relativ +-50 %% (T1 0,15-0,45, T2 0,25-0,75).'
       % (rounded['T1'], rounded['T2'], med['T2'] / med['T1']))
+
+# validation.ok berechnen (wie die 230/219-Asserts): Soll-Tier-Mediane
+# gegen die I1y-Pfad-A-Erwartung pruefen, damit das JSON bei Regler-
+# Veraenderungen nicht weiterhin ok=true behaupten wuerde.
+ok = abs(med['T1'] - 0.280) < 5e-4 and abs(med['T2'] - 0.505) < 5e-4
 
 out_json = dict(
     frame='I1x Kurven-Ankerung + Outlier-Detection im Soll-Zustand '
@@ -213,7 +221,7 @@ out_json = dict(
                     kurve_beschlossen=dict(T1=0.3, T2=0.5),
                     buff_scores=dict(id230=VAL['id230'],
                                      id219=VAL['id219']),
-                    tier_median=med, ok=True),
+                    tier_median=med, ok=ok),
     curve_candidates=dict(anchor=med, rounded=rounded,
                           ratio=round(med['T2'] / med['T1'], 3)),
     band=dict(band_abs=BAND_ABS, band_rel=BAND_REL,
@@ -230,8 +238,9 @@ out_json = dict(
                     'Bimodalitaet auf: Produzenten ruecken in die '
                     'Bande (185 0,280 = Median, 187/188 0,412), T1 '
                     'homogener (0,13-0,41); verbleibende REL-Outlier '
-                    'nur bewusste Faelle: 172 +0,286 (I1p), '
-                    '345 -0,150 (Known Flag)',
+                    'nur bewusste Faelle: in T1 172 +0,286 (I1p), '
+                    '345 -0,150 (Known Flag); in T2 183 +0,391, '
+                    '156 +0,519, 448 +0,724 (bewusste Spitzen)',
 )
 json.dump(out_json, open(os.path.join(HERE, 'diag_infra_curve_r13i.json'),
                         'w', encoding='utf-8'), ensure_ascii=False, indent=1)

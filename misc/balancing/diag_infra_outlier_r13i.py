@@ -2,13 +2,13 @@
 # diag_infra_outlier_r13i.py — Infrastruktur-Balancing Runde I1y
 # UEBER-OUTLIER: konkrete Hebel-Messung im SOLL-ZUSTAND (Projektion wie
 # I1x: I1w-Buffs + Swap-Tier-Remap, Issue #815 noch nicht umgesetzt).
-# Christophers Entscheidungen (10.11.): KURVE 0,3/0,5 (gerundeter Anker)
+# Christophers Entscheidungen (7.11.): KURVE 0,3/0,5 (gerundeter Anker)
 # + BANDE RELATIV +-50 % des Kurvenwerts (T1 0,15-0,45, T2 0,25-0,75);
 # fuer die 8 UEBER-Outlier konkrete Vorschlaege.
-# BESCHLUSS (11.11., PFAD A): ALPHA_E 0,25 als Modell-Default (deckt
+# BESCHLUSS (7.11., PFAD A): ALPHA_E 0,25 als Modell-Default (deckt
 # 187/188/185/145); 172 +2 belassen (I1p); 448/156/183 bewusste
 # Tier-Spitzen (Preis-Hebel ausgeschoepft); 345 Known Flag. Re-Run
-# 11.11. auf ALPHA_E 0,25 (BASE = Soll bei Modell-Default; der
+# 7.11. auf ALPHA_E 0,25 (BASE = Soll bei Modell-Default; der
 # alpha-Sweep dokumentiert die I1y-Messung bei 0,5/0,375/0,25).
 # Hebel: (a) je Karte E-/Handlimit-Kappen, (b) globaler ALPHA_E-Regler
 # (E-Produzenten-Absorption, I1n/I1o) als EIN Hebel fuer alle vier
@@ -21,6 +21,7 @@ import io
 import json
 import os
 import re
+import statistics
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)  # Re-Exec liest diag_v23i_r13t.json / diag_infra_r13i.json
@@ -40,18 +41,22 @@ def run(overrides=(), alpha=None):
     """v9-Soll-Lauf (230 E-1, 219 E-2/Psi-1) + zusaetzliche Overrides."""
     s = SRC
     # --- Soll-Buffs (I1w) ---
-    s = s.replace("obj('230', 'Verwaltungsbueros', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-2), 'M',\n"
-                  "    'infrastructure', units2=e_cost_col(-2),",
-                  "obj('230', 'Verwaltungsbueros', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-1), 'M',\n"
-                  "    'infrastructure', units2=e_cost_col(-1),")
-    s = s.replace("obj('219', 'Freihaendlerkontor', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-3), 'A2d', 2,\n"
-                  "    units2=e_cost_col(-3),",
-                  "obj('219', 'Freihaendlerkontor', 2, 'T2', "
-                  "SHIP_P1 + e_cost(-2), 'A2d', 2,\n"
-                  "    units2=e_cost_col(-2),")
+    old230 = ("obj('230', 'Verwaltungsbueros', 2, 'T2', "
+              "SHIP_P2 + e_cost(-2), 'M',\n"
+              "    'infrastructure', units2=e_cost_col(-2),")
+    new230 = ("obj('230', 'Verwaltungsbueros', 2, 'T2', "
+              "SHIP_P2 + e_cost(-1), 'M',\n"
+              "    'infrastructure', units2=e_cost_col(-1),")
+    assert old230 in s, '230-Soll-Buff: Muster nicht gefunden'
+    s = s.replace(old230, new230)
+    old219 = ("obj('219', 'Freihaendlerkontor', 2, 'T2', "
+              "SHIP_P2 + e_cost(-3), 'A2d', 2,\n"
+              "    units2=e_cost_col(-3),")
+    new219 = ("obj('219', 'Freihaendlerkontor', 2, 'T2', "
+              "SHIP_P1 + e_cost(-2), 'A2d', 2,\n"
+              "    units2=e_cost_col(-2),")
+    assert old219 in s, '219-Soll-Buff: Muster nicht gefunden'
+    s = s.replace(old219, new219)
     # --- Hebel-Overrides ---
     for old, new in overrides:
         assert old in s, 'Override-Muster nicht gefunden: %r' % old[:60]
@@ -66,6 +71,7 @@ def run(overrides=(), alpha=None):
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'outlier_variant', 'exec'), ns)
+    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     return {e['id']: e for e in ns['out']['objects']}
 
 
@@ -143,8 +149,6 @@ def outliers(rows, side='both'):
     return out
 
 
-import statistics
-
 def med_of(rows, t):
     return round(statistics.median([r['score'] for r in rows
                                     if r['tier'] == t]), 3)
@@ -218,7 +222,7 @@ for a in (0.5, 0.375, 0.25):
           % (', '.join(alpha_res[a]['outliers']['T1']) or 'keine',
              ', '.join(alpha_res[a]['outliers']['T2']) or 'keine'))
 print()
-print('BESCHLUSS (PFAD A, 11.11.): alpha 0,25 deckt 187/188/185/145 ab '
+print('BESCHLUSS (PFAD A, 7.11.): alpha 0,25 deckt 187/188/185/145 ab '
       '(kein Einzelhebel fuer 188 existiert); 448/156/183 bleiben '
       'strukturelle Tier-Spitzen (Preis-Hebel ausgeschoepft, s.o.); '
       '172 einziger verbleibender T1-UEBER-Outlier (+0,266; Hebel +1 '
@@ -241,8 +245,8 @@ out_json = dict(
                          med=alpha_res[a]['med'],
                          outliers=alpha_res[a]['outliers'])
            for a in alpha_res},
-    beschluss='PFAD A BESCHLOSSEN (11.11.): ALPHA_E 0,25 als Modell-'
-              'Default (deckt 187/188/185/145; 345 faellt auf 0,131 '
+    beschluss='PFAD A BESCHLOSSEN (7.11.): ALPHA_E 0,25 als Modell-'
+              'Default (deckt 187/188/185/145; 345 faellt auf 0,130 '
               'leicht unter die T1-Kante, Known Flag); 448/156/183 '
               'bewusst als Tier-Spitzen akzeptiert (Preis-Hebel '
               'ausgeschoepft: E-2/E-3/E-6 nur 1,02/0,88/0,84); 172 +2 '
