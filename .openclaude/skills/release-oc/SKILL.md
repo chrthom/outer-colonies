@@ -20,8 +20,9 @@ Create a release by following this workflow. The canonical source of truth is `R
    gh issue list --repo chrthom/outer-colonies --milestone "<x.x> <Name>" --state all
    gh api repos/chrthom/outer-colonies/milestones --jq '.[] | {title, description}'
    ```
-4. Check open PRs: `gh pr list --repo chrthom/outer-colonies --state open` - DRAFT PRs on other topics do not block; ask the user about open ones belonging to the milestone.
-5. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests require Chromium (in containers: `apt update && apt install -y chromium`).
+4. **Next milestone check**: verify that a milestone for the **next** version (`<major>.<minor+1>` with the next Saturn moon name, strictly sequential) already exists - its name is the release name for the version bump in Phase 3. If it does not exist yet, ask the user whether to create it before starting the release.
+5. Check open PRs: `gh pr list --repo chrthom/outer-colonies --state open` - DRAFT PRs on other topics do not block; ask the user about open ones belonging to the milestone.
+6. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests require Chromium (in containers: `apt update && apt install -y chromium`).
 
 ## Phase 1 - Create the release (write operations, after user approval)
 
@@ -60,8 +61,9 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
 ## Phase 3 - Completion (only after the user confirmed the deployment)
 
 1. Close the **release issue** ("Create release <x.x> and perform deployment") and, if applicable, the milestone. The milestone of the *next* version stays open; new features go there.
-2. **Increment the version** to the next development version (see milestone planning, e.g. after 3.1 Pandora -> 3.2 Pan):
+2. **Increment the version** to the next development version; version and name come from the next milestone verified in Phase 0 (e.g. after 3.1 Pandora -> 3.2 Pan). If that milestone does not exist yet, create it first after user approval:
    ```bash
+   gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
    npm run version   # interactively asks for version (x.x.x) and name
    ```
    `misc/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
