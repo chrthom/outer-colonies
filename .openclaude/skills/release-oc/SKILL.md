@@ -4,183 +4,122 @@ description: Create a release by creating release branch, tag, GitHub release, a
 user-invocable: true
 ---
 
-Create a release by following this workflow:
+Create a release by following this workflow. The canonical source of truth is `README.md` (section "Creating a Release") and `AGENTS.md` ("Repository Working Rules"); this skill mirrors them.
 
-## Phase 1: Read-Only Operations (Information Gathering)
+**Phase logic:** Phases 0, 1 and 3 are performed by the agent; Phase 2 is the **manual step of the user** (checkout, build, deployment). The build must happen **before** the version bump, otherwise the deployed artifact carries the next development version. The version bump always happens only **after** successful deployment.
 
-All operations in this phase only read data and do not modify anything.
+## Phase 0 - Preparation (read-only)
 
-### Step 1: Load GitHub Skill and Validate
-Load `github` skill for shared utilities and API functions, then validate token:
-```bash
-source "$SKILL_DIR/../github/scripts/config.sh"
-source "$SKILL_DIR/../github/scripts/api.sh"
-source "$SKILL_DIR/../github/scripts/branch.sh"
-source "$SKILL_DIR/../github/scripts/quality.sh"
+1. The working tree must be clean and `main` in sync with `origin/main`.
+2. Determine the upcoming release from the current state:
+   - Version from all three `client/server/website/package.json` (must be identical).
+   - Release name from `client/src/app/components/indicators/version_indicator.ts` or `website/src/app/app.component.html` (format `<Name> (v<x.x.x>)`).
+   - The upcoming release is the version already present in the package.json files that does **not** yet have a tag/GitHub release (latest tags: `git ls-remote --tags origin`, releases: `gh release list`).
+3. Milestone check: all issues of the corresponding milestone (name = `<major.minor> <moon name>`) are closed except the release issue ("Create release <x.x> and perform deployment"). Also read the **milestone description** - it is the tag description.
+   ```bash
+   gh issue list --repo chrthom/outer-colonies --milestone "<x.x> <Name>" --state all
+   gh api repos/chrthom/outer-colonies/milestones --jq '.[] | {title, description}'
+   ```
+4. Check open PRs: `gh pr list --repo chrthom/outer-colonies --state open` - DRAFT PRs on other topics do not block; ask the user about open ones belonging to the milestone.
+5. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests require Chromium (in containers: `apt update && apt install -y chromium`).
 
-validate_github_token
+## Phase 1 - Create the release (write operations, after user approval)
+
+Present the concrete plan to the user for approval before every write operation.
+
+1. **Release branch** (major/minor only, no `v`, no patch number):
+   ```bash
+   git checkout main
+   git checkout -b release/<x.x>
+   git push --set-upstream origin release/<x.x>
+   ```
+2. **Tag** on the release branch (annotation: milestone description, see formats below):
+   ```bash
+   git tag -a v<x.x.x> -m "<milestone description>"
+   git push origin v<x.x.x>
+   ```
+3. **GitHub release** referring to the existing tag; title and body see formats below. Generate the release notes from the closed issues of the milestone.
+4. Hand the **checkout and build commands for Phase 2** to the user (see below) and wait for the deployment confirmation.
+
+## Phase 2 - Build & deployment (manually by the user)
+
+The agent does **not** execute these steps; it provides the user with these commands:
+
+1. **Checkout of the tagged release state and build** - strictly from the tag `v<x.x.x>` (or branch `release/<x.x>`), **not** from `main` if it already contains newer commits:
+   ```bash
+   git checkout v<x.x.x>   # or: git checkout release/<x.x>
+   npm run build:prod      # calls misc/release.sh -p; for staging: npm run build:staging
+   ```
+   Produces `server.zip`, `client.zip`, `website.zip` (in the directory where `npm run` was started).
+2. **Upload** the zips to the hosting (target directories `server`, `client`, `website`) and **unzip** them there.
+3. **Container restart**: restart the `outercolonies_server` container.
+4. The user confirms the completed deployment to the agent.
+
+Prod deployment happens **only** after tag and GitHub release exist (staging on demand at any time).
+
+## Phase 3 - Completion (only after the user confirmed the deployment)
+
+1. Close the **release issue** ("Create release <x.x> and perform deployment") and, if applicable, the milestone. The milestone of the *next* version stays open; new features go there.
+2. **Increment the version** to the next development version (see milestone planning, e.g. after 3.1 Pandora -> 3.2 Pan):
+   ```bash
+   npm run version   # interactively asks for version (x.x.x) and name
+   ```
+   `misc/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
+3. Direct pushes to `main` are forbidden by branch protection (squash merges only): bring the version bump to `main` via a PR (branch type `fix/` or `feature/`, e.g. `fix/version-bump-<x.x>`), conventional commit message ("chore: bump version to v<x.x.x> (<Name>)"). The maintainer merges it.
+4. Optional: after deployment, verify that the productive website/client shows the new version (website footer, client version indicator).
+
+## Formats for tag and GitHub release
+
+Oriented at the existing style (reference: release v3.0.0 Prometheus).
+
+**Tag annotation** (`git tag -a ... -m ...`): the milestone description, a one-sentence summary of the release content.
+- Example v2.4.0: "Enable advanced tactic cards that need additional options to be chosen from when played or can perform attacks."
+- Example 3.1 Pandora (milestone description): "Introduce cards of 5th edition and redesign card appearance"
+- Hotfixes: `<moon name> - Hotfix <n>` (see v2.3.1-v2.3.3).
+
+**Release title**: `<x.x.x> <moon name>`, for hotfixes `<x.x.x> <moon name> (Hotfix <n>)`.
+- Examples: "3.0.0 Prometheus", "2.4.0 Atlas", "2.3.3 Calypso (Hotfix 3)"
+
+**Release body** (template, oriented at v3.0.0):
+
+```
+# Outer Colonies v<x.x.x> - <moon name>
+
+<milestone description>
+
+## Closed Issues
+
+### Features
+- #<N> - <issue title> (size - L|M|S)
+
+### Enhancements
+- #<N> - <issue title> (size - L|M|S)
+
+### Cards
+- #<N> - <issue title> (size - L|M|S)
+
+### Internal
+- #<N> - <issue title> (size - L|M|S)
+
+### Bugs
+- #<N> - <issue title> (bug)
+
+---
+
+*Generated automatically from milestone <x.x> <moon name>*
 ```
 
-### Step 2: Validate and Sync Main Branch
-Check if the working directory is dirty, abort if so, then sync main:
-```bash
-if ! git diff --quiet || ! git diff --cached --quiet; then
-  echo "ERROR: Git state is dirty. Please commit or stash your changes first."
-  exit 1
-fi
-sync_main
-```
-
-### Step 3: Extract Current Version and Name
-Get version from package.json and name from version indicator files:
-```bash
-CURRENT_VERSION=$(grep '"version"' client/package.json | head -1 | sed -E 's/.*"version": "([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
-
-if [ -z "$CURRENT_VERSION" ]; then
-  echo "ERROR: Could not extract version from client/package.json" >&2
-  exit 1
-fi
-
-CURRENT_NAME=$(grep -oP '[A-Z][a-z]+' client/src/app/components/indicators/version_indicator.ts | head -1)
-
-if [ -z "$CURRENT_NAME" ]; then
-  echo "ERROR: Could not extract version name from version_indicator.ts" >&2
-  exit 1
-fi
-
-MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
-MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
-PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
-
-echo "Current version: v${CURRENT_VERSION} (${CURRENT_NAME})"
-```
-
-### Step 4: Determine Release Type
-If patch version > 0, it's a patch release; otherwise it's a major/minor release:
-```bash
-if [ "$PATCH" -gt 0 ]; then
-  IS_PATCH=true
-  NEW_VERSION="${MAJOR}.${MINOR}.0"
-  VERSION_NAME="$(echo "$CURRENT_NAME" | sed 's/.$/&X/')"  # Append X to name
-else
-  IS_PATCH=false
-  NEW_VERSION="${MAJOR}.$((MINOR + 1)).0"
-  VERSION_NAME="$(echo "$CURRENT_NAME" | sed 's/.$/&X/')"
-fi
-
-echo "Next version: v${NEW_VERSION} (${VERSION_NAME})"
-```
-
-### Step 5: Check for Unmerged PRs
-```bash
-UNMERGED_PR_COUNT=$(github_api GET "/pulls?state=open&base=main" | jq 'length')
-if [ "$UNMERGED_PR_COUNT" -gt 0 ]; then
-  echo "WARNING: There are ${UNMERGED_PR_COUNT} unmerged PRs targeting main"
-  github_api GET "/pulls?state=open&base=main" | jq -r '.[].html_url'
-  read -p "Continue with release? (y/n): " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
-fi
-```
-
-### Step 6: Check Quality Gates
-```bash
-check_all_affected
-```
-
-## Phase 2: Write Operations (Creating Release)
-
-### Step 7: Create Release Branch
-```bash
-RELEASE_BRANCH="release/v${NEW_VERSION}"
-git checkout -b "$RELEASE_BRANCH"
-```
-
-### Step 8: Update Version Files
-Update all subproject package.json files and version indicator:
-```bash
-for SUBPROJECT in client server website; do
-  if [ -f "$SUBPROJECT/package.json" ]; then
-    sed -i "s/\"version\": \"${CURRENT_VERSION}\"/\"version\": \"${NEW_VERSION}\"/g" "$SUBPROJECT/package.json"
-  fi
-done
-
-sed -i "s/${CURRENT_NAME}/${VERSION_NAME}/g" client/src/app/components/indicators/version_indicator.ts
-```
-
-### Step 9: Commit Version Updates
-```bash
-git add --all
-git commit -m "chore: bump version to v${NEW_VERSION} (${VERSION_NAME})"
-```
-
-### Step 10: Create Git Tag
-```bash
-GIT_TAG="v${NEW_VERSION}"
-git tag -a "$GIT_TAG" -m "Release v${NEW_VERSION} (${VERSION_NAME})"
-```
-
-### Step 11: Push Release Branch and Tag
-```bash
-git push origin "$RELEASE_BRANCH"
-git push origin "$GIT_TAG"
-```
-
-### Step 12: Create GitHub Release
-```bash
-RELEASE_BODY="$(cat <<EOF
-# Outer Colonies v${NEW_VERSION} (${VERSION_NAME})
-
-## Changes
-
-- Full changelog available in commit history
-
-## Assets
-
-- Game client builds
-- Server distribution
-EOF
-)"
-
-create_github_release "$GIT_TAG" "v${NEW_VERSION} (${VERSION_NAME})" "$RELEASE_BODY"
-```
-
-### Step 13: Merge Release Branch to Main
-```bash
-git checkout main
-git merge --no-ff "$RELEASE_BRANCH" -m "chore: merge release v${NEW_VERSION}"
-git push origin main
-```
-
-## Phase 3: Post-Release (Optional - Next Version Setup)
-
-### Step 14: Create Next Development Version
-```bash
-if [ "$IS_PATCH" = false ]; then
-  NEXT_VERSION="${MAJOR}.$((MINOR + 1)).0"
-  NEXT_NAME="$(echo "$VERSION_NAME" | sed 's/X$//')"  # Remove trailing X
-  
-  git checkout -b "dev/v${NEXT_VERSION}"
-  
-  for SUBPROJECT in client server website; do
-    if [ -f "$SUBPROJECT/package.json" ]; then
-      sed -i "s/\"version\": \"${NEW_VERSION}\"/\"version\": \"${NEXT_VERSION}-dev\" /g" "$SUBPROJECT/package.json"
-    fi
-  done
-  
-  git add --all
-git commit -m "chore: start development for v${NEXT_VERSION}"
-git push origin "dev/v${NEXT_VERSION}"
-fi
-```
+- Categories according to the issue type labels (`feature`, `enhancement`, `cards`, `internal`, `bug`); only list non-empty categories.
+- Append the size label in parentheses (bugs have no size label, use "(bug)").
+- Do **not** include the release issue itself ("Create release <x.x> and perform deployment") in the notes.
 
 ## Rules
-- ALWAYS load the github skill before using its functions
-- ALWAYS validate git state is clean before starting
-- ALWAYS sync main before creating release branch
-- ALWAYS use semantic versioning
-- NEVER release from a dirty working directory
-- ALWAYS create a GitHub release with proper tag
-- ALWAYS verify all PRs are merged before releasing
+
+- Semantic versioning: milestones/releases major/minor only; hotfix patches (v<x.x.<n+1>>) belong to the milestone of the productive version.
+- Milestone names are Saturn moons, ascending by the "Nr." column of the German Wikipedia list of Saturn's moons; strictly sequential - after Pan (XVIII) comes Ymir (XIX).
+- Repository language is English: commits, PRs, release notes, descriptions.
+- Present the concrete plan to the user for approval before every write operation (branch/tag/release).
+- Never push directly to `main`; everything via PRs, the maintainer merges.
+- Checkout, build and deployment are manual steps of the user (Phase 2); the agent only provides the commands and waits for confirmation.
+- Version bump only after confirmed deployment.
+- Always verify the git state is clean before starting.
