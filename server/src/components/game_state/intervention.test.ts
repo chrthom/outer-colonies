@@ -160,6 +160,44 @@ describe('InterventionOpponentRaidStart', () => {
     });
   });
 
+  describe('defender timeout (Player.handleAutomaticReady)', () => {
+    test('explicitly closes the raid start window and nominates an empty defense fleet', () => {
+      const ship = addOrbitalShip(match.players[0], 1);
+      addHandCard(match.players[1], new RaidReactionCard());
+      match.prepareBuildPhaseReaction({ type: BattleType.Raid, shipIds: [ship.uuid] });
+      expect(match.intervention).toBeInstanceOf(InterventionOpponentRaidStart);
+
+      const prepareCombatPhase = jest.spyOn(match, 'prepareCombatPhase').mockImplementation(() => undefined);
+
+      match.inactivePlayer.handleAutomaticReady();
+
+      // Inaction forfeits the nomination: the window is removed explicitly
+      // (not silently discarded) and the defense fleet is nominated empty
+      expect(prepareCombatPhase).toHaveBeenCalledTimes(1);
+      expect(prepareCombatPhase).toHaveBeenCalledWith([]);
+      expect(match.intervention).toBeUndefined();
+    });
+
+    test('resolves the raid without the defender acting and continues the match', () => {
+      const ship = addOrbitalShip(match.players[0], 1);
+      const reactionCard = addHandCard(match.players[1], new RaidReactionCard());
+      match.prepareBuildPhaseReaction({ type: BattleType.Raid, shipIds: [ship.uuid] });
+      expect(match.intervention).toBeInstanceOf(InterventionOpponentRaidStart);
+
+      const defender = match.inactivePlayer;
+      defender.handleAutomaticReady();
+
+      // No stuck state: the raid resolves with the forfeited (empty) defense
+      // fleet and the match continues into the defender's next turn
+      expect(match.intervention).toBeUndefined();
+      expect(match.battle.type).toBe(BattleType.None);
+      expect(match.turnPhase).toBe(TurnPhase.Build);
+      expect(match.activePlayerNo).toBe(1);
+      // The defender never got to play their raid reaction card
+      expect(match.players[1].hand).toContain(reactionCard);
+    });
+  });
+
   describe('OpponentTurnStart regression (cards 231 / 509 / 529)', () => {
     test.each([
       ['231 Unruhen schüren', () => new Card231()],
