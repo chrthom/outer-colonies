@@ -10,6 +10,7 @@ import GameResult from './game_result';
 import Intervention, {
   InterventionAttack,
   InterventionBattleRoundEnd,
+  InterventionOpponentRaidStart,
   InterventionOpponentTurnStart
 } from './intervention';
 import SocketData from './socket_data';
@@ -101,7 +102,10 @@ export default class Match {
   prepareBuildPhaseReaction(plannedBattle: ClientPlannedBattle) {
     this.battle = Battle.fromClientPlannedBattle(this, plannedBattle);
     if (this.battle.type == BattleType.None) this.prepareEndPhase();
-    else this.pendingActionPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    else {
+      this.pendingActionPlayerNo = opponentPlayerNo(this.activePlayerNo);
+      if (this.battle.type == BattleType.Raid) new InterventionOpponentRaidStart(this).init();
+    }
   }
   prepareCombatPhase(interceptingShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
