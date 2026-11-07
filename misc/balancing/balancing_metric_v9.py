@@ -381,7 +381,7 @@ def colony_attack(w, cards):
 def effective(w):
     wts = sum(wt for _, wt in SHIP)
     slow = SLOW_TARGET_FACTOR if w['id'] == '224' else 1.0   # 'Wirkungslos (3+ speed)'
-    # --- Mission (85 %): reines Schiffsgefecht, KEIN Kolonie-Angriff moeglich ---
+    # --- Mission (50 %): reines Schiffsgefecht, KEIN Kolonie-Angriff moeglich ---
     if w['single']:
         # Einmalverwendung: 1 Schuss zum besten Zeitpunkt (max. Reichweite optimal)
         mission = sum(wt * single_ship_best(w, c) for c, wt in SHIP) / wts * slow
@@ -392,7 +392,7 @@ def effective(w):
                 ph[p] += wt * v
         for p in ph: ph[p] = ph[p] / wts * slow
         mission = sum(ph.values())
-    # --- Raid (15 %): Kolonie erst ab R1 angreifbar, dort Zielwahl ---
+    # --- Raid (50 %): Kolonie erst ab R1 angreifbar, dort Zielwahl ---
     colony_avg = 0.0
     if not w['no_colony']:
         cw = sum(wt for _, wt in COLONY)

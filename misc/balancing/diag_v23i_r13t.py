@@ -306,8 +306,8 @@ print('\n===== v23i-Soll-Messung (N=%d, %.0fs) =====' % (N, time.time() - t0))
 print('Mediane Waffen:', med_w)
 print('Mediane Karten:', med_c)
 if spear is not None:
-    print('Spearman Karten vs. v23b: %.3f' % spear)
-print('\n===== Outlier gegen v23e (|%s|>%.1f): %d ====='
+    print('Spearman Karten vs. v23: %.3f' % spear)
+print('\n===== Outlier gegen v23g (|%s|>%.1f): %d ====='
       % ('\u0394', THRESH, len(outliers)))
 for x in outliers:
     print('%-5s %-26s %s r%d  Score %5.2f  Ziel %.1f  Delta %+5.2f'
