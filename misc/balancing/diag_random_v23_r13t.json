@@ -1,5 +1,5 @@
 {
- "frame": "v23: random battles (r13t probe v6, >=-halved, Spielkosten +1 auf alle Karten, Draw-v2 (Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-4), card-count mirror, one battle type, col_rule always",
+ "frame": "v23: random battles (r13t probe v6, >=-halved, Spielkosten +1 auf alle Karten, Draw-v2 (Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-5), card-count mirror, one battle type, col_rule always",
  "n": 10000,
  "baseline": {
   "taken0": 12.09,

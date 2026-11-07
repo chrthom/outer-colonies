@@ -1,6 +1,6 @@
 # Balancing Toolkit
 
-Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 8, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795.
+Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 5, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795.
 
 ## Contents
 
@@ -27,11 +27,11 @@ Requirements: Python 3, no third-party dependencies. Needs `../cards.csv` (i.e. 
 
 ## Model (frame v23d)
 
-- **Battle:** one battle type (mission 50 % / raid 50 %); fleets drawn independently (one 1-part, one 2-part and one 3-part ship per side; hull sections count as cards); both sides always receive the same number of equipment cards (mirror factor = card count).
-- **Loadouts:** per-ship rarity-weighted draw from all 69 FINAL cards (50 weapons + 19 stat cards), placed only on free, type-matching sockets.
+- **Battle:** one battle type (mission 50 % / raid 50 %); fleets drawn independently with **1–5 ships per side** (v23b playtest density), each ship 1–3 hull sections (sections count as cards); both sides always receive the same number of equipment cards (mirror factor = card count); unequal fleets arise endogenously (smaller fleet → more equipment).
+- **Loadouts (Draw-v2):** every ship first draws **one mandatory weapon** (rarity-weighted, re-drawn until placeable, cap 300 draws; < 1 % of builds stay weaponless), then cards up to a per-battle equipment budget E derived from hulls and sockets (b_lo/b_hi); draw from all 69 FINAL cards (50 weapons + 19 stat cards), placed only on free, type-matching sockets.
 - **Value frame v3 (bilateral difference):** gain = dealt − taken ± colony + mission loot, measured for the card under test in both roles (defender / raid attacker) on identical battle scenes (paired via common random numbers).
 - **Score:** (role-averaged gain + 1.0 × hp) / (units + 1); units = socket costs (first socket 1.0 normal / 0.7 cheap, further sockets 0.7 / 0.5) + energy cost (0 if energy < 1, else 1 + 0.7 × (energy − 1)).
-- **Halving rule:** an attack is halved if attacker speed + phase range < target speed (strict `<`, exactly the server rule, rounds up, before reductions).
+- **Halving rule:** the probe halves an attack if `attacker speed + phase range <= target speed` — **ties included** (decided >= rule, halved rate 25.8 % vs. 14.0 % under strict `<`). The server still implements strict `<` (rounds up, before reductions); the `<=` server change and rules-page wording are tracked in issue #812.
 - **Target curve v23g:** r1 1.5 / r2 1.7 / r3 2.0 / r4 2.5 / r5 3.0, tolerance band ±0.5, one shared curve for weapons and stat cards.
 - Conditionally usable cards are valued by deployment only → deliberate outliers (v23i: 9 remaining, only open case: 163).
 
