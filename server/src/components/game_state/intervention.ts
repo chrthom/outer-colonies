@@ -56,6 +56,27 @@ export class InterventionOpponentTurnStart extends Intervention {
   }
 }
 
+/**
+ * Intervention window for the defender between the announcement of a raid and
+ * the nomination of the defense fleet. The defender is already the pending
+ * action player when this is initialized (set by
+ * Match.prepareBuildPhaseReaction), so the pending player is not switched on
+ * init. Skipping the window just removes the intervention, leaving the match
+ * in the build phase with the defender pending, i.e. the regular
+ * prepareCombatPhase flow for the defense fleet nomination continues.
+ */
+export class InterventionOpponentRaidStart extends Intervention {
+  constructor(match: Match) {
+    super(InterventionType.OpponentRaidStart, match);
+  }
+  skip() {
+    this.remove();
+  }
+  protected override get switchPendingPlayerOnInit() {
+    return false;
+  }
+}
+
 export class InterventionBattleRoundEnd extends Intervention {
   constructor(match: Match) {
     super(InterventionType.BattleRoundEnd, match);

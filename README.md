@@ -146,7 +146,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
     - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
     - `battle.ts`: Battle state, mission and raid resolution
-    - `intervention.ts`: Intervention mechanic (turn start, battle rounds, attacks, tactic cards)
+    - `intervention.ts`: Intervention mechanic (turn start, raid announcement, battle rounds, attacks, tactic cards)
     - `game_result.ts`: Win conditions, Sol earnings and daily achievements
     - `socket_data.ts`: Per-socket user and deck data
   - `components/cards/`: Card-related logic and data
@@ -238,7 +238,7 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 - **`Match`** (`server/src/components/game_state/match.ts`): Central state of a running match. Holds both players, the active and pending-action player, the current turn phase (`Init` → `Start` → `Build` → `Combat` → `End`), the `Battle` object, countdown timer, control points and the `GameResult`. Drives the turn lifecycle (`prepareStartPhase` → `prepareBuildPhase` → `prepareCombatPhase` → `prepareEndPhase`).
 - **`Player`** (`player.ts`): Deck, hand, discard pile and in-play card stacks (the colony is a root card stack). Manages drawing, discarding, zones (`Hand`, `Colony`, `Orbital`, `Neutral`) and control gains.
 - **`Battle`** (`battle.ts`): Created from a client-planned battle; resolves battle rounds from the highest weapon range present in the battle (capped at max range) down to 1. Mission results grant cards and control; raids pull colony cards into the battle at range 1.
-- **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
+- **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
 - **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
 
 **Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
