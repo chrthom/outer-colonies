@@ -10,6 +10,7 @@ import GameResult from './game_result';
 import Intervention, {
   InterventionAttack,
   InterventionBattleRoundEnd,
+  InterventionOpponentRaidStart,
   InterventionOpponentTurnStart
 } from './intervention';
 import SocketData from './socket_data';
@@ -67,7 +68,13 @@ export default class Match {
     this.battle.resetRecentAttack();
     this.highlightCard = undefined;
   }
-  setStartPlayer() {
+  /**
+   * Marks the player who will NOT take the first turn: the player with the larger deck,
+   * or a random player on equal deck sizes. initMatch() calls prepareStartPhase() right
+   * after, which flips activePlayerNo, so the player with the smaller deck takes the
+   * first turn.
+   */
+  setSecondPlayer() {
     if (this.players[0].deck.length > this.players[1].deck.length) this.activePlayerNo = 0;
     else if (this.players[0].deck.length < this.players[1].deck.length) this.activePlayerNo = 1;
     else this.activePlayerNo = Math.round(Math.random());
@@ -95,11 +102,15 @@ export default class Match {
   prepareBuildPhaseReaction(plannedBattle: ClientPlannedBattle) {
     this.battle = Battle.fromClientPlannedBattle(this, plannedBattle);
     if (this.battle.type == BattleType.None) this.prepareEndPhase();
-    else this.pendingActionPlayerNo = opponentPlayerNo(this.activePlayerNo);
+    else {
+      this.pendingActionPlayerNo = opponentPlayerNo(this.activePlayerNo);
+      if (this.battle.type == BattleType.Raid) new InterventionOpponentRaidStart(this).init();
+    }
   }
   prepareCombatPhase(interceptingShipIds: string[]) {
     this.turnPhase = TurnPhase.Combat;
     this.battle.assignInterceptingShips(this.inactivePlayer, interceptingShipIds);
+    this.battle.range = Math.min(this.battle.maxWeaponRange, rules.maxRange) + 1;
     this.reactivateAllCardStacks();
     this.processBattleRound();
   }

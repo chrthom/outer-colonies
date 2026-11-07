@@ -14,6 +14,16 @@ export default abstract class Intervention {
     if (this.switchPendingPlayerOnInit) this.switchPendingPlayer();
     this.checkSkip();
   }
+  /**
+   * Root of the pending intervention chain. Interventions nested into another intervention
+   * (e.g. a tactic card played during an intervention window) resolve first; their parent
+   * intervention is restored only afterwards.
+   */
+  get root(): Intervention {
+    return this instanceof InterventionTacticCard && this.parentIntervention
+      ? this.parentIntervention.root
+      : this;
+  }
   abstract skip(): void;
   get hasValidTargets() {
     return this.match.pendingActionPlayer.hand.some(cs => cs.hasValidTargets);
@@ -43,6 +53,27 @@ export class InterventionOpponentTurnStart extends Intervention {
     this.switchPendingPlayer();
     this.remove();
     this.match.prepareBuildPhase();
+  }
+}
+
+/**
+ * Intervention window for the defender between the announcement of a raid and
+ * the nomination of the defense fleet. The defender is already the pending
+ * action player when this is initialized (set by
+ * Match.prepareBuildPhaseReaction), so the pending player is not switched on
+ * init. Skipping the window just removes the intervention, leaving the match
+ * in the build phase with the defender pending, i.e. the regular
+ * prepareCombatPhase flow for the defense fleet nomination continues.
+ */
+export class InterventionOpponentRaidStart extends Intervention {
+  constructor(match: Match) {
+    super(InterventionType.OpponentRaidStart, match);
+  }
+  skip() {
+    this.remove();
+  }
+  protected override get switchPendingPlayerOnInit() {
+    return false;
   }
 }
 

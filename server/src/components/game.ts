@@ -220,7 +220,7 @@ function emitState(io: Server, match: Match) {
 }
 
 function initMatch(io: Server, match: Match) {
-  match.setStartPlayer();
+  match.setSecondPlayer();
   match.players.forEach(player => {
     player.shuffleDeck();
     player.drawCards(rules.initialCardsToDraw);

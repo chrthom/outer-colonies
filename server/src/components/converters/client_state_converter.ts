@@ -133,6 +133,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   const intervention: ClientIntervention | undefined = match.intervention
     ? {
         type: match.intervention.type,
+        rootType: match.intervention.root.type,
         attack:
           match.intervention.type == InterventionType.Attack
             ? {

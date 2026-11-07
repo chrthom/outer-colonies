@@ -6,10 +6,14 @@
 2. [Software Architecture](#software-architecture)
    - [High-Level Overview](#high-level-overview)
    - [Component Breakdown](#component-breakdown)
+   - [Server Game State and Matchmaking](#server-game-state-and-matchmaking)
+   - [Database Schema](#database-schema)
+   - [Asset and Icon Pipeline](#asset-and-icon-pipeline)
    - [Data Flow and Communication](#data-flow-and-communication)
 3. [Developer Documentation](#developer-documentation)
    - [Setup and Installation](#setup-and-installation)
    - [Development Workflow](#development-workflow)
+   - [AI Agent Development Loop](#ai-agent-development-loop)
    - [Testing and Deployment](#testing-and-deployment)
 4. [Technologies and Frameworks](#technologies-and-frameworks)
 
@@ -138,6 +142,13 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/rest_api.ts`: REST API endpoints for the website
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
+  - `components/game_state/`: In-memory game state
+    - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
+    - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
+    - `battle.ts`: Battle state, mission and raid resolution
+    - `intervention.ts`: Intervention mechanic (turn start, raid announcement, battle rounds, attacks, tactic cards)
+    - `game_result.ts`: Win conditions, Sol earnings and daily achievements
+    - `socket_data.ts`: Per-socket user and deck data
   - `components/cards/`: Card-related logic and data
     - `action_pool.ts`: Action pool logic
     - `action_pool.test.ts`: Action pool tests
@@ -220,6 +231,66 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeInbound.Attack`: Attack with a card
   - `MsgTypeOutbound.Matchmaking`: Matchmaking updates
 
+### Server Game State and Matchmaking
+
+Game state is kept in memory only; matches are not persisted to the database. Core classes:
+
+- **`Match`** (`server/src/components/game_state/match.ts`): Central state of a running match. Holds both players, the active and pending-action player, the current turn phase (`Init` → `Start` → `Build` → `Combat` → `End`), the `Battle` object, countdown timer, control points and the `GameResult`. Drives the turn lifecycle (`prepareStartPhase` → `prepareBuildPhase` → `prepareCombatPhase` → `prepareEndPhase`).
+- **`Player`** (`player.ts`): Deck, hand, discard pile and in-play card stacks (the colony is a root card stack). Manages drawing, discarding, zones (`Hand`, `Colony`, `Orbital`, `Neutral`) and control gains.
+- **`Battle`** (`battle.ts`): Created from a client-planned battle; resolves battle rounds from the highest weapon range present in the battle (capped at max range) down to 1. Mission results grant cards and control; raids pull colony cards into the battle at range 1.
+- **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
+- **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
+
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+
+**Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
+
+### Database Schema
+
+Persistence uses MariaDB (schema definition: `misc/outercolonies.sql`):
+
+| Table | Purpose | Key Columns |
+| --- | --- | --- |
+| `credentials` | User accounts and sessions | `user_id` (PK, auto-increment), `username`, `password`, `email`, `created`, `last_login`, `session_token`, `session_valid_until`, `activated` |
+| `dailies` | Daily achievement progress per user (one date column per daily type) | `user_id` (PK), `login`, `victory`, `game`, `energy`, `ships`, `domination`, `destruction`, `control`, `juggernaut`, `stations`, `discard`, `colony`, `colossus` |
+| `decks` | Card instances owned by a user | `card_instance_id` (PK, auto-increment), `card_id`, `user_id`, `in_use` (card is in the active deck), `tradeable` |
+| `items` | Items, e.g. unopened booster packs | `item_id` (PK, auto-increment), `user_id`, `type`, `message`, `content` (JSON) |
+| `magic_links` | One-time links (account activation, password/email change) | `id` (PK, UUID), `user_id`, `type`, `value`, `valid_until` |
+| `profiles` | User profile and currency | `user_id` (PK), `newsletter`, `sol` |
+
+`dailies`, `decks`, `items`, `magic_links` and `profiles` reference `credentials.user_id` via foreign keys with `ON DELETE CASCADE ON UPDATE CASCADE`.
+
+### Asset and Icon Pipeline
+
+The `misc` directory contains the pipeline that turns the designed cards into data and runtime assets:
+
+#### Card Data Extraction (GIMP)
+
+- Cards are designed as GIMP XCF files using a layer-based template, organized in edition subfolders (`1`–`5`).
+- `misc/process_cards.py` runs inside GIMP (python-fu batch) and extracts per card: type (via visible header icon layers), title, effect (bold text), tags (bold+italic), conditional tags, lore (italic), discipline, rarity (highest visible `rarity<n>_red` layer, 5–0), author and socket/stat values from the module layers. Results are written to `misc/cards.csv`.
+- Sequences of 2–6 spaces in the template text are converted to `{ICON:<type>}` placeholders using context heuristics; ambiguous cases are flagged with `?` for manual review.
+- `misc/card_bulk_analyze.sh` runs the extraction over all edition subfolders and merges the results into `misc/cards.csv`; `misc/card_text_corrections.md` logs manual text and placeholder corrections.
+
+#### Card Images
+
+- Card PNGs are renamed by `misc/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/card_bulk_resize.sh` to 411×561 px (ImageMagick).
+- The client loads card images per match from `<apiURL>/assets/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
+
+#### Client Runtime Assets
+
+The client loads all runtime assets from the assets web space under `<apiURL>/assets/` (see `resource-loader.ts`):
+
+- `background/`: starfields, sun, orbs, rings and vessel sprites
+- `attribute/`: stat icons (`damage`, `hp`, `control`, `speed`, `energy`, `armour`, `shield`, `point_defense`) and socket glyphs (`theta`, `xi`, `phi`, `omega`, `delta`, `psi`)
+- `icons/`: card type and discipline icons plus UI icons (`retract_card`, `mission`, `raid`, `exit`, combo type icons)
+- `utils/`: card masks and glow, stack piles, range indicators, buttons, game over screens
+
+#### Icon Font (Website)
+
+- `misc/icons/` contains the source SVG/PNG stat and type icons (fetched from the assets server) plus `png_to_svg_fixed.py` and `generate_font.js`; the generated `outer-colonies-icons` font (TTF/WOFF/WOFF2, CSS and `mapping.md`) lives in `misc/icons/font/`.
+- The font provides 13 glyphs (U+EA01–U+EA0D): armour, control, damage, energy, equip, hp, hull, infra, orb, point_def, shield, tactic and speed.
+- `website/src/app/icon.service.ts` maps icon names to the font's Unicode Private Use Area code points and renders `{ICON:<name>}` placeholders in card texts on the deck and rules pages.
+
 ## Developer Documentation
 
 ### Setup and Installation
@@ -264,6 +335,8 @@ The server provides the following WebSocket events for the game client:
      - `MAIL_PASSWORD`: Mail service password (optional for development)
 
 ### Development Workflow
+
+The repository working rules — repository language, branches and merges, issue labels, milestones, versions and releases, and the deployment cadence — are documented in [AGENTS.md](AGENTS.md).
 
 #### Running the Projects
 
@@ -398,6 +471,16 @@ cd ..
    ```bash
    npm run version
    ```
+
+### AI Agent Development Loop
+
+The repository contains an event-driven agent workflow on GitHub Actions for unattended issue implementation, PR review and review fixes. The three roles — **implementer**, **reviewer** and **fixer** — run a headless coding agent (Mistral GLM via OpenCode) on the workflow runner:
+
+- **Trigger**: `dev-loop` label on an issue (implementer opens a ready PR), review comments on agent PRs (reviewer), or failing checks (fixer)
+- **Escalation**: the loop stops and labels the issue/PR `needs-human` when an agent cannot proceed (budgets for time, steps and tokens are capped)
+- **Automation**: GitHub is the source of truth — the chain is driven by the GitHub events each role fires, with a manual `workflow_dispatch` backstop for retries
+
+The full design, budgets and the role chain are documented in [docs/dev-loop.md](docs/dev-loop.md). Contribution guidance for AI agents (project context, conventional commits, skills) is in [AGENTS.md](AGENTS.md).
 
 ## Technologies and Frameworks
 

@@ -14,6 +14,7 @@
             <mat-list-option value="symbols"><h4>Symbole</h4></mat-list-option>
             <mat-list-option value="victory"><h4>Siegbedingungen</h4></mat-list-option>
             <mat-list-option value="glossar"><h4>Glossar</h4></mat-list-option>
+            <mat-list-option value="online-game"><h4>Online-Spiel</h4></mat-list-option>
             <h5>Karten</h5>
             <mat-list-option value="cards"><h4>Aufbau einer Karte</h4></mat-list-option>
             <mat-list-option value="hull-cards"><h4>Rumpfkarten</h4></mat-list-option>
@@ -68,6 +69,10 @@
               du, wie eine Partie <i>Outer Colonies</i> abl&auml;uft und wie du deine Karten einsetzt.
             </p>
             <p>Vor dem Spielbeginn mischen beide Spieler:innen ihr Deck und ziehen <b>7 Karten</b>.</p>
+            <p>
+              Die Spieler:in mit dem kleineren Deck wird zur aktiven Spieler:in und beginnt das Spiel. Haben
+              beide Decks gleich viele Karten, wird der Beginn zuf&auml;llig ermittelt.
+            </p>
             <p>
               W&auml;hrend des Spiels legst du Karten in einer der drei Spielzonen ab (siehe Abbildung links).
             </p>
@@ -247,7 +252,9 @@
               </li>
               <li>
                 <b>Ersch&ouml;pfung</b>: Eine Spieler:in scheidet aus dem Spiel aus, wenn sie eine Karte
-                ziehen m&uuml;sste, aber keine Karten mehr im Deck hat. Die verbleibende Spieler:in gewinnt.
+                ziehen m&uuml;sste (z.B. zu Rundenbeginn, durch Karteneffekte oder Missionsbelohnungen), aber
+                weniger Karten im Deck hat als gezogen werden m&uuml;ssen. Die verbleibende Spieler:in
+                gewinnt.
               </li>
               <li>
                 <b>Kapitulation</b>: Eine Spieler:in kann freiwillig kapitulieren, wodurch die andere
@@ -255,13 +262,60 @@
               </li>
             </ul>
           </div>
+          } @case ('online-game') {
+          <div>
+            <h2>Online-Spiel</h2>
+            <p>
+              Das Online-Spiel basiert auf den hier beschriebenen Regeln. Neben den klassischen Regeln gibt es
+              einige online-spezifische Funktionen:
+            </p>
+            <h4>Spiel-Währung: Sol</h4>
+            <p>
+              Im Online-Spiel erhältst du nach jedem Spiel <b>Sol</b> basierend auf deiner Leistung. Sol wird
+              für folgende Aktionen gutgeschrieben:
+            </p>
+            <ul>
+              <li>Karten im Ablagestapel: 1 Sol pro Karte</li>
+              <li>Zugefügter Schaden an der gegnerischen Kolonie: 1 Sol pro Schadenspunkt</li>
+              <li>Karten im Spiel (außer Kolonie): 3 Sol pro Karte</li>
+              <li>
+                Siegbonus: 50 Sol (immer außer bei Kapitulation; bei Kapitulation nur wenn mindestens 6 Karten
+                im Spiel/Ablagestapel liegen)
+              </li>
+            </ul>
+            <p>Sol kann verwendet werden, um Booster zu kaufen und damit deine Sammlung zu erweitern.</p>
+            <h4>Spielzeitlimit</h4>
+            <p>
+              Im Online-Spiel beträgt die Bedenkzeit für jede ausstehende Handlung <b>90 Sekunden</b> - auch
+              für Abfang- und Gefechtsreaktionen außerhalb des eigenen Spielzugs. Wird diese Zeit
+              überschritten, wird die ausstehende Handlung automatisch abgeschlossen: Dein Spielzug endet bzw.
+              eine Reaktion wird ohne von dir gewählte Schiffe fortgesetzt.
+            </p>
+            <h4>Spielmodi</h4>
+            <p>Im Online-Spiel gibt es folgende Spielmodi:</p>
+            <ul>
+              <li>
+                <b>Schnellspiel</b>: Ein Spiel gegen einen zufälligen Gegner. Du spielst dabei dein eigenes,
+                im Deck-Manager zusammengestelltes Deck.
+              </li>
+              <li>
+                <b>Freundschaftsspiel</b>: Ein Spiel gegen einen eingeladenen Gegner. Dieser Spielmodus ist
+                noch nicht verfügbar.
+              </li>
+            </ul>
+            <h4>Tägliche Belohnungen</h4>
+            <p>
+              Für verschiedene tägliche Aufgaben (z.B. Anmeldung, Sieg, Kontrolle über Schiffe, etc.) erhältst
+              du nach Abschluss eine Belohnung. Die täglichen Aufgaben wechseln täglich.
+            </p>
+          </div>
           } @case ('glossar') {
           <div>
             <h4>Abfangen</h4>
             <p>
               Ein Spieler:in der nicht der aktive Spieler:in ist kann entscheiden Schiffe zu entsenden, um zu
-              verhindern, dass der aktive Spieler:in eine Mission durchführt und die Missionskarten ziehen
-              darf.
+              verhindern, dass die aktive Spieler:in ihre Mission erfolgreich abschließt und dafür die
+              Missionsbelohnung erhält.
             </p>
             <h4>Ablagestapel</h4>
             <p>
@@ -345,7 +399,9 @@
             <h4>Gefechtsphase</h4>
             <p>
               Spielrunde eines Gefechts gemessen in der aktuellen Reichweite. Es werden bis zu 4 Phasen
-              gespielt. Jede Gefechtsphase hat eine Reichweite, beginnend bei 4, dann 3, 2 und zuletzt 1.
+              gespielt. Das Gefecht beginnt bei der höchsten Reichweite einer Offensivwaffe im Gefecht und
+              jede weitere Gefechtsphase hat eine um 1 verringerte Reichweite, bis zuletzt die Gefechtsphase
+              mit Reichweite 1 gespielt wird.
             </p>
             <h4>Geschwindigkeit <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span></h4>
             <p>
@@ -356,8 +412,8 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span>, sowie beim Abfangen relevant,
               um zu ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an
               und die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> plus die Reichweite der
-              aktuellen Gefechtsphase sind kleiner oder gleich der
-              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziel, so wir der vom
+              aktuellen Gefechtsphase sind kleiner als die
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels, so wir der vom
               Angriff verursachte <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> halbiert
               (aufgerundet und vor allen anderen Abzügen).
             </p>
@@ -398,8 +454,9 @@
             </h4>
             <p>
               Ein Kartentyp, der sowohl an <span class="oc-icon" [innerHTML]="getIconHtml('hull')"></span> als
-              auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt k&ouml;nnen
-              alle Sockel-Anforderungen ignoriert werden.
+              auch an die Kolonie angelegt werden kann. Wird die Karte an die Kolonie angelegt, stellt diese
+              nur die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum) bereit; andere
+              Sockel-Anforderungen k&ouml;nnen an der Kolonie nicht erf&uuml;llt werden.
             </p>
             <h4>Intervention <i>(Spielphase)</i></h4>
             <p>
@@ -436,8 +493,8 @@
             <h4>Kontrolle <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span></h4>
             <p>
               Ein Ma&szlig; f&uuml;r den Einfluss und die Dominanz einer Spieler:in &uuml;ber das Spielgebiet.
-              Kontrolle wird durch das erfolgreiche Durchf&uuml;hren von Missionen und das Besiegen von
-              gegner:inischen Schiffen erworben. Eine Spieler:in gewinnt das Spiel, wenn sie 15
+              Kontrolle wird durch das erfolgreiche Durchf&uuml;hren von Missionen erworben. Eine Spieler:in
+              gewinnt das Spiel, wenn sie 15
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> mehr als ihre Gegner:in
               besitzt.
             </p>
@@ -446,7 +503,7 @@
               Der aktive Spieler:in kann pro Zug eine Mission (oder einen &Uuml;berfall) durchf&uuml;hren.
               Einer Mission muss mindestens ein Schiff zugewiesen werden. Ist die Mission erfolgreich (kein
               Abfangversuch oder mindestens ein &uuml;berlebendes Schiff), zieht die Spieler:in eine Karte vom
-              Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck.
+              Deck auf die Hand und legt die oberste Karte von ihrem Ablagestapel unter ihr Deck.
               Zus&auml;tzlich erh&auml;lt die Spieler:in f&uuml;r die eigene Kolonie
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in H&ouml;he der Differenz
               aller <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> der eigenen
@@ -470,9 +527,10 @@
             </p>
             <h4>Neutrale Zone</h4>
             <p>
-              Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden Missionskarten
-              platziert und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn der
-              Spieler:innen in dieser Zone und k&ouml;nnen bis dahin an keinen anderen Gefechten teilnehmen.
+              Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden die Flotten von
+              Missionen und &Uuml;berf&auml;llen stationiert und die Gefechte ausgetragen. Die Schiffe
+              verbleiben bis zu Rundenbeginn der Spieler:innen in dieser Zone und k&ouml;nnen bis dahin an
+              keinen anderen Gefechten teilnehmen.
             </p>
             <h4>Orbitale Zone</h4>
             <p>
@@ -489,7 +547,7 @@
               <b>NICHT</b> wieder aktiviert, wenn sie einmal deaktiviert wurden. Einige Karten stellen auch
               doppelte <span class="oc-icon" [innerHTML]="getIconHtml('armour_2')"></span> und dreifache
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_3')"></span> bereit. Diese werden vor der
-              einfachen <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> eingesetzt.
+              einfachen <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> eingesetzt.
             </p>
             <h4>Paralysierend</h4>
             <p>
@@ -560,7 +618,8 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> ben&ouml;tigt, damit
               diese ausgespielt / angelegt werden d&uuml;rfen.
               <span class="oc-icon" [innerHTML]="getIconHtml('hull')"></span> stellen Sockel zur
-              Verf&uuml;gung. Die Kolonie bietet alle Sockel in unbegrenzter Menge.
+              Verf&uuml;gung. Die Kolonie bietet die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum)
+              in unbegrenzter Menge.
             </p>
             <h4>Spielzug</h4>
             <p>
@@ -646,7 +705,39 @@
               (gelbe <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>,
               <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> und
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span>).<br />
-              7. Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.<br />
+              7. Je mehr dieser 5 Indikatorfelder rot sind, desto seltener ist die Karte.
+            </p>
+            <table>
+              <tr>
+                <th>Indikatorfelder</th>
+                <th>Seltenheit</th>
+              </tr>
+              <tr>
+                <td>0</td>
+                <td>Häufig</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Gewöhnlich</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Ungewöhnlich</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Selten</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Außergewöhnlich</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Legendär</td>
+              </tr>
+            </table>
+            <p>
               8. Der kursive Text in der Textbox gibt dir Einblicke in die Welt von <i>Outer Colonies</i>. Auf
               das Spiel hat dieser Text keinen Effekt.
             </p>
@@ -714,8 +805,9 @@
               Kolonie anlegen, platzierst du sie in deiner Koloniezone.
             </p>
             <p>
-              Die Kolonie stellt die benötigten Sockel bereit, aber die Energieanforderungen müssen ebenfalls
-              erfüllt sein, um die Karte in der Koloniezone zu platzieren. Hierfür addierst du die
+              Die Kolonie stellt nur die Sockel &Omega; (Defensivsysteme) und &Psi; (Frachtraum) bereit, aber
+              die Energieanforderungen müssen ebenfalls erfüllt sein, um die Karte in der Koloniezone zu
+              platzieren. Hierfür addierst du die
               <span class="oc-icon" [innerHTML]="getIconHtml('energy')"></span> aller
               <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> in deiner Koloniezone.
             </p>
@@ -796,8 +888,8 @@
             <ul>
               <li>Verschiebe alle deine Schiffe von der neutralen Zone in deine orbitale Zone.</li>
               <li>
-                Ziehe zwei Karten. Hast du weniger als zwei Karten in deinem Deck, scheidest du sofort aus dem
-                Spiel aus.
+                Ziehe zwei Karten. Wann immer du eine Karte ziehen m&uuml;sst aber weniger Karten im Deck hast
+                als gezogen werden m&uuml;ssen, scheidest du sofort aus dem Spiel aus.
               </li>
               <li>
                 Führe Aktionen und Fähigkeiten von Karten aus, die zu Rundenbeginn ausgeführt werden sollen.
@@ -841,17 +933,24 @@
             </ul>
             <h2>3. Gefechtsphase</h2>
             <p>
-              Ein Gefecht wird jedesmal abgehandelt, wenn der du die Kolonie eines anderen Spielers angreift
-              oder ein anderer Spieler eine deiner Mission abfängt. Es nehmen alle zugewiesenen Schiffe teil,
-              bzw. bei einem Überfall nehmen alle Schiffe des Verteidigers in der orbitalen Zone teil.
+              Ein Gefecht wird jedesmal abgehandelt, wenn du die Kolonie eines anderen Spielers angreifst oder
+              ein anderer Spieler eine deiner Missionen abf&auml;ngt. Die betroffene Spieler:in w&auml;hlt,
+              welche ihrer Schiffe am Gefecht teilnehmen. Ausw&auml;hlbar sind nur eigene Schiffe in der
+              orbitalen Zone. Anschlie&szlig;end werden die Schiffe je nach Gefechtsart zugewiesen: Bei einer
+              Mission wechseln die teilnehmenden Schiffe in die neutrale Zone, und die nicht teilnehmenden
+              Schiffe bleiben in der orbitalen Zone. Bei einem &Uuml;berfall ist es genau umgekehrt: Die
+              teilnehmenden Schiffe bleiben in der orbitalen Zone, und die nicht teilnehmenden Schiffe
+              wechseln in die neutrale Zone. Schiffe mit 0
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> k&ouml;nnen die orbitale Zone
+              nicht verlassen: Sie d&uuml;rfen an der Verteidigung einer Mission nicht teilnehmen, m&uuml;ssen
+              aber an der Verteidigung eines &Uuml;berfalls teilnehmen.
             </p>
             <h2>4. Rundenende</h2>
             <ul>
               <li>
                 Für jede Mission, bei der kein Abfangversuch unternommen wurde, sowie für jede Mission, in der
-                du nach dem Gefecht noch mindestens ein Schiff besitzt, nimmst du die verdeckte Missionskarte
-                auf die Hand bzw. legst die offene Missionskarte unter dein Deck. Die anderen Missionskarten
-                werden auf den Ablagestapel gelegt.
+                du nach dem Gefecht noch mindestens ein Schiff besitzt, legst du die oberste Karte deines
+                Ablagestapels unter dein Deck und ziehst 1 Karte.
               </li>
               <li>Verschiebe alle vollständigen Schiffe aus deiner Koloniezone in deine orbitale Zone.</li>
               <li>
@@ -879,14 +978,14 @@
               Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission
               durchführen möchtest.
             </p>
-            <h2>Missionskarten</h2>
+            <h2>Missionsbelohnung</h2>
             <p>
-              Wenn du eine Mission durchführst, ziehe die Missionskarten. Überspringe diesen Schritt im Falle
-              eines Überfalls. Ziehe für eine Mission zwei Missionskarten und lege sie neben die neutrale
-              Zone. Missionskarten kannst du entweder von deinem Deck ziehen, dies sind verdeckte
-              Missionskarten, oder du kannst die obersten Karten von deinem Ablagestapel, dies sind offene
-              Missionskarten. Du kannst dich auch entscheiden eine offene und eine verdeckte Missionskarte
-              auszuwählen.
+              Eine Mission ist erfolgreich, wenn sie nicht abgefangen wurde oder du nach dem Gefecht noch
+              mindestens ein Schiff besitzt. Für jede erfolgreiche Mission legst du die oberste Karte deines
+              Ablagestapels unter dein Deck und ziehst 1 Karte. Zusätzlich erhältst du
+              <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in Höhe der Differenz der
+              <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span>-Werte deiner überlebenden
+              Schiffe und der überlebenden abfangenden Schiffe, mindestens jedoch 0.
             </p>
             <h2>Flotte zusammenstellen</h2>
             <p>
@@ -903,25 +1002,31 @@
               orbitalen Zone befinden und deren
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> mindestens so hoch ist wie der
               niedrigste <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> in der Flotte, die
-              die Mission durchführt. Die abfangende Spieler:in verschiebt diese Schiffe ebenfalls in die
-              neutrale Zone.
+              die Mission durchführt. Die abfangende Spieler:in verschiebt
+              <b>nur die gewählten Abfangschiffe</b> in die neutrale Zone; ihre übrigen Schiffe verbleiben in
+              der orbitalen Zone.
             </p>
             <p>
               Im Falle eines Überfalls muss die angegriffene Spieler:in kämpfen und wählt Schiffe aus ihrer
               orbitalen Zone zur Verteidigung aus. Alle nicht gewählten Schiffe mit 1+
               <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> nehmen nicht an der
-              Verteidigung teil und werden in die neutrale Zone verschoben.
+              Verteidigung teil und werden in die neutrale Zone verschoben. In der letzten Gefechtsphase
+              (Reichweite 1) eines Überfalls können die Kolonie und Karten in der Koloniezone des Verteidigers
+              angegriffen werden.
             </p>
           </div>
           } @case ('battle-overview') {
           <div>
             <img [src]="imgUrl('battle_overview')" class="right size-30" />
             <p>
-              Es werden nacheinander bis zu <b>4 Gefechtsphasen</b> durchgeführt. Die Gefechtsphasen
-              repräsentieren das Gefecht auf einer bestimmten Distanz. Es wird mit Reichweite 4 begonnen, die
-              nächste Gefechtsphase mit Reichweite 3, dann 2 und zuletzt 1.
+              Die Gefechtsphasen repräsentieren das Gefecht auf einer bestimmten Distanz. Das Gefecht beginnt
+              in der Gefechtsphase, deren Reichweite der höchsten Reichweite entspricht, die eine
+              Offensivwaffe eines am Gefecht teilnehmenden Schiffs hat. Anschließend wird die Reichweite mit
+              jeder weiteren Gefechtsphase um 1 verringert, bis abschließend die Gefechtsphase mit Reichweite
+              1 durchgeführt wurde. Hat kein am Gefecht teilnehmendes Schiff eine Offensivwaffe, wird nur die
+              Gefechtsphase mit Reichweite 1 durchgeführt.
             </p>
-            <p>Folgende Schritte werden in jeder der bis zu 4 Gefechtsphasen durchgeführt:</p>
+            <p>Folgende Schritte werden in jeder Gefechtsphase durchgeführt:</p>
             <ol>
               <li>
                 Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit
@@ -934,22 +1039,20 @@
                 durch.
               </li>
               <li>
-                Alle am Gefecht teilnehmenden Karten werden wieder aktiviert (außer
-                <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit dem Schlagwort
-                <i>Einmalige Verwendung</i>).
-              </li>
-              <li>
                 Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit
                 <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span> mit dem Schlagwort
                 <i>Intervention (Gefechtsphasenende)</i> auszuspielen.
               </li>
               <li>
                 Schiffe und an die Kolonie angelegte
-                <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> auf denen mindestens
-                genauso viele <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker liegen
-                wie sie <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> haben, werden
-                zerstört. Alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel
-                ihrer Besitzer:in gelegt.
+                <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span>, auf denen
+                mindestens genauso viele
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker liegen wie sie
+                <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> haben, werden zerstört;
+                alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel ihrer
+                Besitzer:in gelegt. Danach werden alle am Gefecht teilnehmenden Karten wieder aktiviert (außer
+                <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit dem Schlagwort
+                <i>Einmalige Verwendung</i>) und die Reichweite sinkt auf den Wert der nächsten Gefechtsphase.
               </li>
             </ol>
             <p>
@@ -957,6 +1060,45 @@
               Angaben zu den <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> gemacht,
               wird die Karte behandelt, als hätte sie 1
               <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span>.
+            </p>
+            <h4>Wann werden deaktivierte Karten wieder aktiviert?</h4>
+            <table>
+              <tr>
+                <th>Karten</th>
+                <th>Reaktivierung</th>
+              </tr>
+              <tr>
+                <td>Mit dem Schlagwort <i>Unerschöpflich</i></td>
+                <td>Sofort nach jeder Verwendung</td>
+              </tr>
+              <tr>
+                <td>Mit dem Schlagwort <i>Einmalige Verwendung</i> (z. B. Torpedos, Panzerungskarten)</td>
+                <td>Erst am Ende des Gefechts</td>
+              </tr>
+              <tr>
+                <td>Alle anderen am Gefecht teilnehmenden Karten</td>
+                <td>
+                  Erst nachdem beide Spieler:innen ihre Angriffe in der aktuellen Gefechtsphase durchgeführt
+                  haben
+                </td>
+              </tr>
+            </table>
+            <p>
+              Ausnahme: Einige Karten ohne diese Schlagwörter werden ebenfalls erst am Ende des Gefechts
+              wieder aktiviert (z. B. Ködersystem und die planetaren Verteidigungsinfrastrukturen wie
+              Planetarer Schild, Verteidigungsnetz, Schmugglernest und Autonomer Stützpunkt).
+            </p>
+            <p>
+              Zu Beginn jedes Gefechts sind alle Karten wieder aktiv, auch Karten mit dem Schlagwort
+              <i>Einmalige Verwendung</i>. Ein Gefecht dauert nie über den laufenden Spielzug hinaus:
+              Verwendest du eine Karte im Gefecht deines Spielzugs (z. B. eine
+              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> und
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> im Angriff), steht
+              sie im Gefecht des gegnerischen Spielzugs wieder vollständig zur Verfügung (z. B. mit ihrer
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>). Panzerungskarten
+              tragen in der Regel das Schlagwort <i>Einmalige Verwendung</i> und werden daher innerhalb eines
+              Gefechts nicht wieder aktiviert.
             </p>
           </div>
           } @case ('attacks') {
@@ -966,10 +1108,9 @@
               Ein Teil der taktischen Tiefe in <i>Outer Colonies</i> besteht in der Planung der Angriffe, um
               die größtmögliche Wirkung zu erzielen. Es kann nur jeweils ein Angriff mit jeder aktiven
               Offensivwaffe pro Gefechtsphase durchgeführt werden, sofern dessen Reichweite die
-              Reichweitenanforderung der Gefechtsphase erfüllt. In der zweiten Gefechtsphase (Reichweite 3)
-              können also nur Waffen mit Reichweite 3 oder 4 einen Angriff ausführen. Für einen Angriff wird
-              erst die Waffe gewählt, welche eingesetzt werden soll, sowie das Ziel auf das es eingesetzt
-              werden soll.
+              Reichweitenanforderung der Gefechtsphase erfüllt. In der Gefechtsphase mit Reichweite 3 können
+              also nur Waffen mit Reichweite 3 oder 4 einen Angriff ausführen. Für einen Angriff wird erst die
+              Waffe gewählt, welche eingesetzt werden soll, sowie das Ziel auf das es eingesetzt werden soll.
             </p>
             <p>
               Valide Ziele sind alle gegnerischen Schiffe, die am Gefecht teilnehmen. Sofern es die letzte
@@ -1003,12 +1144,15 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>,
               <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> oder
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> eingesetzt die die meisten
-              dieser Defensivpunkte bieten.
-              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit defensiven Systemen
-              haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der Textbox illustriert.
-              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit offensiven und
-              defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie in der selben
-              Gefechtsphase bereits angegriffen haben.
+              dieser Defensivpunkte bieten. Stehen mehrere Karten mit gleich vielen Defensivpunkten zur
+              Verfügung, entscheidet der Besitzer der Verteidigungskarten, welche davon zuerst eingesetzt
+              wird. Im Online-Spiel wird diese Auswahl automatisch vorgenommen, damit der Spielfluss nicht
+              unterbrochen wird; die Software setzt hierbei ebenfalls die Karte mit den meisten
+              Defensivpunkten ein. <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              defensiven Systemen haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der
+              Textbox illustriert. <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              offensiven und defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie
+              in der selben Gefechtsphase bereits angegriffen haben.
             </p>
             <p>
               Reduziere nun den <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> je
@@ -1086,6 +1230,59 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> und 2
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span>.
             </p>
+            <h4>Zweites Beispiel für Schadensberechnung</h4>
+            <p>
+              Angenommen, ein Schiff mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 2 greift in der Gefechtsphase
+              mit Reichweite 3 ein Schiff mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 6 an. Die
+              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> verursacht 12
+              <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> und hat Abzüge von 3 für
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> und 2 für
+              <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span>. Das Ziel hat je eine Karte
+              mit 1 <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> und 2
+              <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span>; ein befreundetes Schiff im
+              selben Gefecht hat ebenfalls eine Karte mit 1
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>.
+            </p>
+            <ol>
+              <li>
+                <b>Halbierung:</b> 2 <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> + 3
+                (Phasenreichweite) = 5 &lt; 6
+                <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels. Der
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> wird vor allen anderen
+                Abzügen aufgerundet halbiert: 12 → 6. Wäre das Ziel nur 5
+                <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> schnell, würde der
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> nicht halbiert, da die Summe
+                nicht kleiner als die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des
+                Ziels ist.
+              </li>
+              <li>
+                <b>Punktabwehr:</b> Alle
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> der am Gefecht
+                teilnehmenden Schiffe werden geteilt, daher stehen zwei Karten mit je 1
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> zur Verfügung.
+                Beide bieten gleich viele Defensivpunkte: Der Besitzer der Verteidigungskarten entscheidet und
+                setzt die <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des
+                befreundeten Schiffs ein: 6 - 3 = 3. Anschließend wird auch die
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des Ziels
+                eingesetzt: 3 - 3 = 0. Beide Karten werden deaktiviert und am Ende der Gefechtsphase
+                reaktiviert.
+              </li>
+              <li>
+                <b>Schild:</b> Da der <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>
+                bereits auf 0 reduziert wurde, kommt die Karte mit 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> des Ziels nicht zum
+                Einsatz; sie bleibt aktiv.
+              </li>
+              <li>
+                <b>Ergebnis:</b> 0 <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker.
+                Ohne die Halbierung wären es 12 - 3 - 3 = 6, dann 6 - 4 = 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker geworden und
+                zusätzlich wäre die Karte mit
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> deaktiviert worden.
+              </li>
+            </ol>
           </div>
           } @case ('battle-end') {
           <div>
@@ -1102,7 +1299,7 @@
               Am Ende eines Gefechts vom Typ <i>Mission</i> wird ermittelt, ob die Mission erfolgreich war.
               Eine Mission ist erfolgreich, wenn der aktive Spieler:in mindestens ein Schiff besitzt, welches
               zum Gefechtsende nicht zerstört wurde. Ist die Mission erfolgreich, zieht die Spieler:in eine
-              Karte vom Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck.
+              Karte vom Deck auf die Hand und legt die oberste Karte von ihrem Ablagestapel unter ihr Deck.
               Zusätzlich erhält die Spieler:in für die eigene Kolonie
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in Höhe der Differenz aller
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> der eigenen überlebenden

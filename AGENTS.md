@@ -16,6 +16,39 @@ Maintain consistency across the three subprojects
 - Use conventional commits (see `commit` skill for details)
 - Skills available: `commit`, `github`, `check-pr`, `start-issue`, `release-oc`
 
+## Repository Working Rules
+
+### Repository Language
+- Everything in the repository is English: commits, issues, PRs and documentation
+- Only the game and the cards themselves are German for now (bilingual support is planned)
+
+### Branches & Merges
+- Only these branch types exist: `main`, `release/<x.x>`, `feature/<name>` and `fix/<name>` (the dev-loop automation additionally generates `vibe/issue-<N>-*` branches for its PRs, see `docs/dev-loop.md`)
+- Squash merges only; no direct pushes to `main` (both enforced via GitHub branch protection)
+- PRs are always reviewed and merged by the maintainer
+
+### Issue Labels
+- Every issue has exactly one type label:
+  - `bug` – Something isn't working
+  - `cards` – Game cards to be added or adjusted and game card features to be implemented
+  - `internal` – Database, testing, deployment, refactorings and hosting
+  - `enhancement` – Feature improvements, design enhancements or website content additions
+  - `feature` – A new game or website feature
+- All types except `bug` additionally require exactly one size label: `size - S`, `size - M` or `size - L`
+- `dev-loop` is the default label if the task can be fully implemented by the AI dev loop; use `needs-human` instead if human work is required (especially adjusting card graphics)
+
+### Milestones, Versions & Releases
+- Each milestone matches exactly one major/minor tag and release and contains all issues for developing that release; hotfix patch tags and releases are additionally assigned to the productive milestone
+- Tags and releases are semantically versioned
+- Milestones only cover major/minor versions; patches (hotfixes) belong to the milestone of the currently productive version
+- The currently productive milestone stays open so productive bugs can be assigned to it; new features and enhancements go to the next milestone
+- Milestone planning: at most one `size - L` issue, few `size - M` issues and any number of `size - S` issues
+- Milestone names are solar system bodies: Saturn moons in ascending order of the "Nr." column of the German Wikipedia list of Saturn's moons (https://de.wikipedia.org/wiki/Liste_der_Saturnmonde); strictly sequential from now on, next after Pan (XVIII) is Ymir (XIX)
+
+### Deployment
+- Staging is deployed on demand
+- Prod is only deployed when a release is complete (tag and GitHub release created)
+
 ## Documentation Requirements
 - Update README.md for significant changes
 - Add JSDoc comments for new public or protected functions

@@ -10,6 +10,7 @@ export class IconService {
    * U+EA01 = armour, U+EA02 = control, U+EA03 = damage, U+EA04 = energy
    * U+EA05 = equip, U+EA06 = hp, U+EA07 = hull, U+EA08 = infra
    * U+EA09 = orb, U+EA0A = point_def, U+EA0B = shield, U+EA0C = tactic
+   * U+EA0D = speed
    */
   private readonly iconMap: Record<string, string> = {
     // Game resource icons - matching the font mapping
@@ -38,7 +39,7 @@ export class IconService {
     point_defense_1: '\uea0a',
     point_defense_2: '\uea0a',
     tactic: '\uea0c',
-    speed: '\uea02',
+    speed: '\uea0d',
     // Colony card type - maps to infrastructure icon as fallback
     colony: '\uea08'
   };

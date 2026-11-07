@@ -6,7 +6,7 @@ import EquipmentCard from '../types/equipment_card';
 export class Card104 extends EquipmentCard {
   private readonly damageToRepair = 10;
   constructor() {
-    super(104, 'Reperaturnaniten', 5, {
+    super(104, 'Reparaturnaniten', 5, {
       energy: -1,
       omega: -1
     });
@@ -62,7 +62,7 @@ export class Card212 extends EquipmentCard {
   constructor() {
     super(212, 'Black Ops Team', 3, {
       omega: -1,
-      delta: -1,
+      psi: -1,
       control: 3
     });
   }

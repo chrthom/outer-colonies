@@ -194,7 +194,7 @@ export class Card441 extends EquipmentCardRechargeable {
   constructor() {
     super(
       441,
-      'Flechettewerfer',
+      'Flechette-Werfer',
       1,
       {
         pointDefense: 1,

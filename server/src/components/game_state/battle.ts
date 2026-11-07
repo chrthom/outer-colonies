@@ -4,7 +4,7 @@ import { BattleType, Zone } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import toBattle from '../converters/client_planned_battle_converter';
-import { getCardStackByUUID, spliceCardStackByUUID } from '../utils/helpers';
+import { getCardStackByUUID, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
 import Match from './match';
 import Player from './player';
 import { AttackProfile } from '../cards/card_profile';
@@ -84,6 +84,21 @@ export default class Battle {
   resetRecentAttack() {
     this.recentAttack = undefined;
   }
+  /**
+   * Highest range of any offensive weapon equipped to a participating ship of either fleet.
+   * Defaults to 1, so battles without any offensive weapon start with the range 1 phase.
+   */
+  get maxWeaponRange(): number {
+    return Math.max(
+      1,
+      ...this.ships
+        .flatMap(fleet => fleet)
+        .flatMap(cs => cs.cardStacks)
+        .map(cs => (<EquipmentCard>cs.card).attackProfile)
+        .filter((ap): ap is AttackProfile => !!ap)
+        .map(ap => ap.range)
+    );
+  }
   get missionSpeedRequirement(): number {
     return this.type == BattleType.Mission
       ? this.ships[this.activePlayerNo].map(cs => cs.profile.speed).reduce((a, b) => Math.min(a, b))
@@ -91,11 +106,13 @@ export default class Battle {
   }
   private applyMissionResult(match: Match) {
     const player = match.activePlayer;
-    if (this.ships[match.activePlayerNo].length > 0) {
+    const ownShips = this.ships[match.activePlayerNo];
+    const opposingShips = this.ships[opponentPlayerNo(match.activePlayerNo)];
+    if (ownShips.length > 0) {
       player.deck.push(...match.activePlayer.pickCardsFromTopOfDiscardPile(1));
       player.drawCards(1);
-      this.ships[0].forEach(cs => cs.onMissionCompletion());
-      const controlSurplus = this.sumControl(this.ships[0]) - this.sumControl(this.ships[1]);
+      ownShips.forEach(cs => cs.onMissionCompletion());
+      const controlSurplus = this.sumControl(ownShips) - this.sumControl(opposingShips);
       player.gainControl(Math.max(controlSurplus, 0));
     }
   }

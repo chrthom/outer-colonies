@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -26,6 +27,14 @@ describe('RulesPage', () => {
   it('should have default active chapter', () => {
     const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
     expect(selectedValue).toBe('setup');
+  });
+
+  it('should register every sidebar chapter in the chapters array', () => {
+    const optionValues = fixture.debugElement
+      .queryAll(By.css('mat-list-option'))
+      .map(option => option.nativeElement.getAttribute('value'));
+    expect(optionValues.length).toBeGreaterThan(0);
+    optionValues.forEach(value => expect(component.chapters).toContain(value));
   });
 
   it('should generate correct image URL', () => {
@@ -56,4 +65,32 @@ describe('RulesPage', () => {
     // iconUrl now returns icon font characters, not PNG URLs
     expect(component.iconUrl('test')).toBeNull();
   });
+
+  it('should describe the mission reward instead of mission cards', () => {
+    selectChapter('missions');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('Missionsbelohnung');
+    expect(chapterText).toContain('Eine Mission ist erfolgreich');
+    expect(chapterText).toContain('legst du die oberste Karte deines Ablagestapels unter dein Deck');
+    expect(chapterText).toContain('unter dein Deck und ziehst 1 Karte');
+    expect(chapterText).toContain('mindestens jedoch 0');
+    expect(chapterText).not.toContain('Missionskarte');
+  });
+
+  it('should not mention mission cards in the glossary', () => {
+    selectChapter('glossar');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  it('should not mention mission cards in the turn overview', () => {
+    selectChapter('turn-overview');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  function selectChapter(chapter: string): void {
+    component.activeChapterList.selectedOptions.select(
+      component.activeChapterList.options.find(option => option.value === chapter)!
+    );
+    fixture.detectChanges();
+  }
 });

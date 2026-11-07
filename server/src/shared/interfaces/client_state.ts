@@ -25,6 +25,8 @@ export interface ClientAttack extends ClientPlannedAttack {
 
 export interface ClientIntervention {
   type: InterventionType;
+  /** Type of the root of the pending intervention chain; equal to `type` unless the intervention is nested. */
+  rootType: InterventionType;
   attack?: ClientPlannedAttack;
 }
 
