@@ -53,6 +53,18 @@ TARGETS = {1: 4.5, 2: 4.75, 3: 5.0, 4: 6.0, 5: 6.5}  # Zielkurve je Raritaet
 # Umstellung): 4,5/4,75/5,0/6,0/6,5 - streng monoton, liegt nahe an den
 # FINAL-Medianen unter dem neuen Einsatzkosten-Modell (4,65/4,86/4,33/6,08/6,56;
 # r3 sitzt 0,67 darunter -> r3-Torpedos brauchen Buffs). Ersetzt die Kurven
+
+# Überlebens-Credit λ (Christopher, 3.11.2026): zunächst symmetrisch bezahlt
+# mit x 1,15 geplant; nach Christophers Flottenmodell-Messung (kalibrierung_
+# check6.py: Output-Gewinn = 0,70-0,78 x verhinderte Marker, kein ADDITIVER
+# Bonus) Entscheidung 4 (3.11.2026): "verwerfen und auf 1,0 zurück" – der
+# Überlebens-Effekt ist bereits in der prevented-Marker-Währung enthalten,
+# wird nur dokumentiert. Faktor bleibt als Struktur-Schalter auf 1,0.
+SURV_CREDIT = 1.0
+TARGETS = {r: t * SURV_CREDIT for r, t in TARGETS.items()}
+THR_BACKLOG = 0.1 * SURV_CREDIT   # -0,115
+THR_WATCH = 1.0 * SURV_CREDIT     # +1,15
+THR_NERF = 1.5 * SURV_CREDIT      # +1,725
 # 3,75/4,0/4,5/5,5/6,5 (v9.3-Nackt-Kalibrierung) und 3,5/4,0/5,0/6,0/7,0 (v9.2).
 # Dual-Use-Guthaben (Christopher, 3.11.2026): dynamisch je Defensivpunkt-Typ,
 # gemessen als marginaler Verhinderungswert in v10 (synthetische Karten,
@@ -192,7 +204,10 @@ def resolve_attack(w, cards, dmg):
         if dmg <= 0: break
         if abz is None or abz == 0: continue  # abzugsfrei: kein Angriffsschritt gegen diesen Typ
         pool = [c for c in cards if c['type'] == dtype and c['points'] > 0 and not c.get('used', False)]
-        pool.sort(key=lambda c: -c['points'])
+        # Server card.ts deactivationPriority (Runde 13c): PerBattle/PerRound
+        # = 15 + 4*Punkte (+2 Colony-Zone, +0/+1 Kolonie-Defense), PerAttack
+        # = 0 + 4*Punkte; hoechste Prioritaet zuerst (sort().pop()).
+        pool.sort(key=lambda c: -((15 if c['recharge'] != 'attack' else 0) + 4 * c['points']))
         for c in pool:
             if dmg <= 0: break
             if abz == 'X': dmg = 0; break    # X: voll absorbiert, Defense bleibt aktiv
@@ -400,7 +415,7 @@ def scored(w):
     e_cost = 0 if w['energy'] < 1 else 1 + 0.7 * (w['energy'] - 1)
     units = (w['socket_cost'] + e_cost) or 0.5
     credit = sum(DEF_CREDIT[t][min(n, 3) - 1] for t, n in w.get('def_types', {}).items())
-    return effective(w) / units + credit
+    return (effective(w) / units + credit) * SURV_CREDIT
 
 def main():
     apply_final = '--final' in sys.argv
@@ -417,19 +432,19 @@ def main():
     for rar in range(1, 6):
         grp = [w['scored'] for w in weapons if w['rarity'] == rar]
         print(f"r{rar}: Median {statistics.median(grp):5.2f} vs Ziel {TARGETS[rar]} (n={len(grp)})")
-    print("\n-- Unter der Kurve (< -0.1) --")
+    print(f"\n-- Unter der Kurve (< -{THR_BACKLOG:.2f}) --")
     for w in sorted(weapons, key=lambda x: x['scored']):
-        if w['scored'] - TARGETS[w['rarity']] < -0.1:
+        if w['scored'] - TARGETS[w['rarity']] < -THR_BACKLOG:
             print(f"  {w['id']:>3} r{w['rarity']} {w['title'][:24]:<24} {w['scored']:5.2f} ({w['scored']-TARGETS[w['rarity']]:+.2f})")
-    print("\n-- Ueber der Kurve (> +1.5) --")
+    print(f"\n-- Ueber der Kurve (> +{THR_NERF:.2f}) --")
     for w in sorted(weapons, key=lambda x: -x['scored']):
-        if w['scored'] - TARGETS[w['rarity']] > 1.5:
+        if w['scored'] - TARGETS[w['rarity']] > THR_NERF:
             print(f"  {w['id']:>3} r{w['rarity']} {w['title'][:24]:<24} {w['scored']:5.2f} (+{w['scored']-TARGETS[w['rarity']]:.2f})")
-    # Watchlist (+1.0 .. +1.5)
-    print("\n-- Watchlist (+1.0 bis +1.5) --")
+    # Watchlist (+1.15 .. +1.725, skaliert mit lambda)
+    print(f"-- Watchlist (+{THR_WATCH:.2f} bis +{THR_NERF:.2f}) --")
     for w in sorted(weapons, key=lambda x: -x['scored']):
         d = w['scored'] - TARGETS[w['rarity']]
-        if 1.0 <= d <= 1.5:
+        if THR_WATCH <= d <= THR_NERF:
             print(f"  {w['id']:>3} r{w['rarity']} {w['title'][:24]:<24} {w['scored']:5.2f} (+{d:.2f})")
     # Manuelle Watchlist (Christopher, 3.11.2026): unterhalb der automatischen
     # Schwelle, aber beobachten; 347 erstmals +0.51 nach SAbz-Runde.

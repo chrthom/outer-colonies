@@ -254,11 +254,20 @@ def sock_free(build, weapons, cards, extra_req=None):
 
 
 
-def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
+def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None,
+             ispec_col=None):
     """Gefecht im Zufalls-Frame. Seite 0 = deff (Verteidiger),
     Seite 1 = att (Raid-Angreifer). spin = deterministische Trager-
     Rotation der bewerteten Karte (CRN-sicher, kein random im
-    Gefecht). Rueckgabe full-Konten."""
+    Gefecht). Rueckgabe full-Konten.
+    I1-ispec (6.11.2026, Infrastruktur Spur K): ispec_col = bewertete
+    Kolonie-Defensiv-Karte ({type,points,recharge}), angelegt an die
+    Koloniezone von Seite 0 (planetar, Sockel entfallen an der Kolonie);
+    nur in Raid-Zellen aktiv (Mission: colpool None, Karte sitzt
+    wirkungslos, Zaehlung bleibt — Koedersystem-Präzedenz).
+    Umgebungs-Abstraktion wie cpools: frische Kopie je Angriff, keine
+    Verbrauchs-/Deaktivierungs-Semantik (dokumentierte Frame-Grenze).
+    Default ohne ispec_col bit-identisch (optionaler Parameter)."""
     # deep-enough Kopie der Schiffs-Loadouts
     def cp_list(lst):
         return [dict(s, weapons=[dict(w) for w in s['weapons']],
@@ -267,6 +276,9 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
     sides = [cp_list(sc['deff']), cp_list(sc['att'])]
     raid = sc['raid']
     colpool = sc['colpool']
+    # I1-ispec: bewertete Kolonie-Defensiv-Karte an Koloniezone Seite 0
+    if ispec_col is not None and colpool is not None:
+        colpool = list(colpool) + [dict(ispec_col)]
     # 13p-PD-Bezahlung der bewerteten Waffe (LOKAL je battle_r-Aufruf,
     # v5-Fix 5.11.2026: PAY war global und wurde VOR dem eigenen Append
     # gelesen -> eigene Zahlung landete erst im NAECHSTEN battle_r-Aufruf
@@ -300,6 +312,10 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
                     s['cards'].append(dict(spec))
                     s['hp_add'] += spec['hp']
                     s['sp_add'] += spec['speed']
+                    # I1-ispec (6.11.2026): Spec darf ctrl mitbringen
+                    # (239 Horchposten: ctrl wirkt nur am Schiff).
+                    s['ctrl_add'] = s.get('ctrl_add', 0) \
+                        + spec.get('ctrl', 0)
                 else:
                     s['wspec'] = dict(wspec)   # separat: eigene Muenzen-
                     # Schleife (wf), NICHT in weapons (fire-Indizes)
@@ -352,7 +368,8 @@ def battle_r(sc, spin=0, spec=None, spec_side=0, wspec=None, wf=None):
                             type=t, points=pts, used=False,
                             recharge=v9.RECHARGE[t]), i))
             fl.append(dict(hp=hp, s=b['s'] + s['sp_add'],
-                           ctrl=b['ctrl'], dead=False, taken=0.0,
+                           ctrl=b['ctrl'] + s.get('ctrl_add', 0),
+                           dead=False, taken=0.0,
                            cards=cards, weapons=s['weapons']))
         fleet.append(fl)
 

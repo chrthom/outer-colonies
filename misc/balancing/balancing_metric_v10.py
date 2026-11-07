@@ -233,6 +233,22 @@ def deals_ship(w, cards, s):
 
 
 # --- Bewertete Defense-Karten ---
+# Missionswert Option B (Christopher, 3.11.2026, Entscheidung 2 "B"): bezahlter
+# Credit fuer die Abfangregel – Speed-Effekt auf Missions-Erfolg, einmalig je
+# Speed-Punkt (nicht x k), signed (sp-1-Karten erhalten den Malus).
+MISSION_SHARE = 0.5    # Missionsanteil der Gefechte (0,5/0,5-Mix wie Metrik)
+DELTA_P = 0.431        # E[P_abfang(s) - P_abfang(s+1)] ueber Missions-Hullen (kalibrierung_check3)
+MISSION_W = 4.0        # Regler: Missionsloot in Marker-Aequivalenten (interim, per Playtest zu verankern)
+# PD-Flottenbonus (Christopher, 3.11.2026, Entscheidung 3): PD wirkt schiffs-
+# uebergreifend gegen alle PAbz-Angiffe der Flotte -> Faktor n_fleet auf das
+# k der abgedeckten Einsaetze. Schild/Panzerung/hp/Speed bleiben Eigenschiff.
+PD_FLEET = 3.0
+
+
+def mission_credit(d):
+    return MISSION_SHARE * DELTA_P * MISSION_W * (d.get('speed') or 0)
+
+
 def load_defense():
     out = []
     with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
@@ -368,6 +384,8 @@ def main():
         if is_armour_never(d):
             n = sum(c['points'] for c in d['added'])
             d['abs_mult'] = 1 + (k_ship - 1) * ARM_S[n]
+        elif d['added'] and all(c['type'] == 'pd' for c in d['added']):
+            d['abs_mult'] = k_ship * PD_FLEET   # PD flottenweit (n_fleet = 3)
         else:
             d['abs_mult'] = k_ship
 
@@ -412,7 +430,8 @@ def main():
         # auf das Rumpfkonto (verbraucht sich), NICHT je Angreifer -> x 1.
         # AUSNAHME Panzerung (Christopher, 3.11.2026): deaktiviert sich beim
         # Blocken -> m = 1 + (k-1)*s (nackt gemessen) statt vollem k.
-        total = d['abs_mult'] * prev_base + k_ship * (prev_spd + off) + prev_hp
+        total = v9.SURV_CREDIT * (d['abs_mult'] * prev_base + k_ship * (prev_spd + off)
+                                  + prev_hp) + mission_credit(d)
         results.append(dict(d, prev_base=round(prev_base, 3), prev_hp=round(prev_hp, 3),
                             prev_spd=round(prev_spd, 3),
                             prevented_off=round(off, 3),
