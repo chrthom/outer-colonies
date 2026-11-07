@@ -314,8 +314,8 @@
             <h4>Abfangen</h4>
             <p>
               Ein Spieler:in der nicht der aktive Spieler:in ist kann entscheiden Schiffe zu entsenden, um zu
-              verhindern, dass der aktive Spieler:in eine Mission durchführt und die Missionskarten ziehen
-              darf.
+              verhindern, dass die aktive Spieler:in ihre Mission erfolgreich abschließt und dafür die
+              Missionsbelohnung erhält.
             </p>
             <h4>Ablagestapel</h4>
             <p>
@@ -503,7 +503,7 @@
               Der aktive Spieler:in kann pro Zug eine Mission (oder einen &Uuml;berfall) durchf&uuml;hren.
               Einer Mission muss mindestens ein Schiff zugewiesen werden. Ist die Mission erfolgreich (kein
               Abfangversuch oder mindestens ein &uuml;berlebendes Schiff), zieht die Spieler:in eine Karte vom
-              Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck.
+              Deck auf die Hand und legt die oberste Karte von ihrem Ablagestapel unter ihr Deck.
               Zus&auml;tzlich erh&auml;lt die Spieler:in f&uuml;r die eigene Kolonie
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in H&ouml;he der Differenz
               aller <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> der eigenen
@@ -527,9 +527,10 @@
             </p>
             <h4>Neutrale Zone</h4>
             <p>
-              Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden Missionskarten
-              platziert und Gefechte beim Abfangen ausgetragen. Die Schiffe verbleiben bis zu Rundenbeginn der
-              Spieler:innen in dieser Zone und k&ouml;nnen bis dahin an keinen anderen Gefechten teilnehmen.
+              Der Bereich des Spielfelds zwischen den Karten der Spieler:innen. Hier werden die Flotten von
+              Missionen und &Uuml;berf&auml;llen stationiert und die Gefechte ausgetragen. Die Schiffe
+              verbleiben bis zu Rundenbeginn der Spieler:innen in dieser Zone und k&ouml;nnen bis dahin an
+              keinen anderen Gefechten teilnehmen.
             </p>
             <h4>Orbitale Zone</h4>
             <p>
@@ -948,9 +949,8 @@
             <ul>
               <li>
                 Für jede Mission, bei der kein Abfangversuch unternommen wurde, sowie für jede Mission, in der
-                du nach dem Gefecht noch mindestens ein Schiff besitzt, nimmst du die verdeckte Missionskarte
-                auf die Hand bzw. legst die offene Missionskarte unter dein Deck. Die anderen Missionskarten
-                werden auf den Ablagestapel gelegt.
+                du nach dem Gefecht noch mindestens ein Schiff besitzt, legst du die oberste Karte deines
+                Ablagestapels unter dein Deck und ziehst 1 Karte.
               </li>
               <li>Verschiebe alle vollständigen Schiffe aus deiner Koloniezone in deine orbitale Zone.</li>
               <li>
@@ -978,14 +978,14 @@
               Sage an, ob du diese Runde einen Überfall auf eine feindliche Kolonie oder eine Mission
               durchführen möchtest.
             </p>
-            <h2>Missionskarten</h2>
+            <h2>Missionsbelohnung</h2>
             <p>
-              Wenn du eine Mission durchführst, ziehe die Missionskarten. Überspringe diesen Schritt im Falle
-              eines Überfalls. Ziehe für eine Mission zwei Missionskarten und lege sie neben die neutrale
-              Zone. Missionskarten kannst du entweder von deinem Deck ziehen, dies sind verdeckte
-              Missionskarten, oder du kannst die obersten Karten von deinem Ablagestapel, dies sind offene
-              Missionskarten. Du kannst dich auch entscheiden eine offene und eine verdeckte Missionskarte
-              auszuwählen.
+              Eine Mission ist erfolgreich, wenn sie nicht abgefangen wurde oder du nach dem Gefecht noch
+              mindestens ein Schiff besitzt. Für jede erfolgreiche Mission legst du die oberste Karte deines
+              Ablagestapels unter dein Deck und ziehst 1 Karte. Zusätzlich erhältst du
+              <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in Höhe der Differenz der
+              <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span>-Werte deiner überlebenden
+              Schiffe und der überlebenden abfangenden Schiffe, mindestens jedoch 0.
             </p>
             <h2>Flotte zusammenstellen</h2>
             <p>
@@ -1299,7 +1299,7 @@
               Am Ende eines Gefechts vom Typ <i>Mission</i> wird ermittelt, ob die Mission erfolgreich war.
               Eine Mission ist erfolgreich, wenn der aktive Spieler:in mindestens ein Schiff besitzt, welches
               zum Gefechtsende nicht zerstört wurde. Ist die Mission erfolgreich, zieht die Spieler:in eine
-              Karte vom Deck auf die Hand und mischt die oberste Karte von ihrem Ablagestapel in ihr Deck.
+              Karte vom Deck auf die Hand und legt die oberste Karte von ihrem Ablagestapel unter ihr Deck.
               Zusätzlich erhält die Spieler:in für die eigene Kolonie
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> in Höhe der Differenz aller
               <span class="oc-icon" [innerHTML]="getIconHtml('control')"></span> der eigenen überlebenden
