@@ -38,7 +38,10 @@ Rahmen (Christopher, 3.11.2026, Runde-6-Review + Entscheidungen 3+5):
   - Focus Fire, PD schiffsuebergreifend (verfaellt mit Schiffstod),
     Feuereihenfolge alterniert, Einmalwaffen 1x in min(range, 4).
   - Halbierung deterministisch je Paar (eigene speed + Phasen-
-    reichweite < Ziel-speed; Server-Code equipment_card.ts: streng <,
+    reichweite < Ziel-speed — historische Pre-v22-Regel, im Legacy-
+    Motor bewusst erhalten; der Server rechnet seit #813 (7.11.2026)
+    <= und die Sonde (diag_random_r13t.py) misst seit v22 ebenfalls
+    Tie-Halving, nur dieser v11-Motor bleibt bei <;
     Ziel muss isFlightReady sein; s. auch Waffen-Range-Check:
     Waffenreichweite >= Phasenreichweite); 401 Guillotine: -6 x konkreter Ziel-
     Speed; Hintergrund-Defense-Build je Gefecht einmal gezogen und
@@ -519,7 +522,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                 # (a) Muenz-Index: fire-Listen werden in PHASES-Ordnung
                 #     (4,3,2,1) aufgebaut -> Index 4-p, NICHT p-1 (davor
                 #     feuerte Phase 4 mit 70 % statt 100 % und Phase 1 mit
-                #     100 % statt 70 % — Christopchers User-Vorgabe
+                #     100 % statt 70 % — Christophers User-Vorgabe
                 #     ATTACK_PROB = {4: 1.00, ...} war verletzt).
                 if w['single']:
                     if p != w['fire_phase'] or not fire[u][i][4 - p]:
@@ -542,7 +545,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                         break
                     tgt = enemy[tgt_i]
                     base = max(0, wd - (6 * tgt['s'] if w['id'] == '401' else 0))
-                    halved = sh['s'] + p < tgt['s']    # Server-Code equipment_card.ts:44 (<)
+                    halved = sh['s'] + p < tgt['s']    # historische Pre-v22-Regel (<); Server seit #813 <=, Sonde >= (Tie-Halving)
                     d = v9.half(base) if halved else base
                     pool = tgt['cards'] + [c for c, _ in e_pd]
                     # --- Runde 13r (Kolonie-Zielwahl, Christopher): col_rule
@@ -636,7 +639,7 @@ def battle(w, att, deff, pool_cards, fire, order, spec=None, ship=None,
                             tgt = enemy[tgt_i]
                             base = max(0, wspec['damage']
                                        - (6 * tgt['s'] if wspec['id'] == '401' else 0))
-                            d = v9.half(base) if sh['s'] + p < tgt['s'] else base
+                            d = v9.half(base) if sh['s'] + p < tgt['s'] else base   # wie Umgebungspfad: historische <-Regel (Server/Sonde seit #813 <=)
                             pool = tgt['cards'] + [c for c, _ in e_pd]
                             # --- Runde 13r: col_rule auch fuer die bewertete
                             # Waffe (s.o., identische Regeln; 'std' =

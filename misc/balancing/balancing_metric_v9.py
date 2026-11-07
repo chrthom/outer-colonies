@@ -8,6 +8,11 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
    Geschwindigkeitsvorteil des Verteidigers (equipment_card.ts:44:
    target.isFlightReady && attacker.speed + range < target.speed ->
    Math.round(damage/2)). Kolonien sind nie flugbereit -> nie halbiert.
+   Historischer Stand: zitiert die Pre-#813-Serverregel (striktes <);
+   der Server rechnet seit #813 (7.11.2026) <= (Gleichstand wird
+   halbiert). v9-HALF_PROB (und die darauf aufbauenden half_prob-
+   Funktionen in v10) sind damit die historische Pre-v22-Herleitungs-
+   basis, abgeloest durch das Tie-Halving der Sonde (diag_random_r13t.py).
    Herleitung aus Speed-Verteilung der 50 implementierten Huellen:
    R4 2 %, R3 10 %, R2 19 %, R1 26 % (Paar-Rechnung ueber alle Angreifer/Ziel-
    Kombinationen). Kalibrierung: R4 0 % (Christoph), R3 10 %, R2 20 %, R1 25 %.

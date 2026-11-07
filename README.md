@@ -271,6 +271,10 @@ The `misc` directory contains the pipeline that turns the designed cards into da
 - Sequences of 2–6 spaces in the template text are converted to `{ICON:<type>}` placeholders using context heuristics; ambiguous cases are flagged with `?` for manual review.
 - `misc/card_bulk_analyze.sh` runs the extraction over all edition subfolders and merges the results into `misc/cards.csv`; `misc/card_text_corrections.md` logs manual text and placeholder corrections.
 
+#### Card Balancing Toolkit
+
+- `misc/balancing/` contains the simulation-based card balancing toolkit (metric modules, random-battle probe, measurement results and round log) that derives card value scores and target curves from `misc/cards.csv`; see `misc/balancing/README.md`.
+
 #### Card Images
 
 - Card PNGs are renamed by `misc/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/card_bulk_resize.sh` to 411×561 px (ImageMagick).

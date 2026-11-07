@@ -117,7 +117,8 @@ cptot = sum(p for _, p in cpools)
 
 def draw_random_fleet(types_by_n, rng):
     """Christophers Varianz-Auftrag (5.11.2026): Flottengroesse
-    UNABHAENGIG 1..3 Schiffe je Seite, Schiffsgröße je Schiff
+    UNABHAENGIG 1..5 Schiffe je Seite (v23b; urspruenglich 1..3,
+    Zwischenschritt 1..4), Schiffsgröße je Schiff
     uniform 1..3 Sektionen (Huellen-Karten 1..9), Typ zweistufig
     wie v11 (TYPE_BEST x Build-Gewicht). Ungleich grosse Flotten
     entstehen endogen (kleinere Flotte -> mehr Ausruestung, die
