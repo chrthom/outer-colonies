@@ -406,8 +406,8 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span>, sowie beim Abfangen relevant,
               um zu ermitteln, ob das Schiff betroffen ist bzw. eingesetzt werden kann. Greift ein Schiff an
               und die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> plus die Reichweite der
-              aktuellen Gefechtsphase sind kleiner oder gleich der
-              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziel, so wir der vom
+              aktuellen Gefechtsphase sind kleiner als die
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels, so wir der vom
               Angriff verursachte <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> halbiert
               (aufgerundet und vor allen anderen Abzügen).
             </p>
@@ -540,7 +540,7 @@
               <b>NICHT</b> wieder aktiviert, wenn sie einmal deaktiviert wurden. Einige Karten stellen auch
               doppelte <span class="oc-icon" [innerHTML]="getIconHtml('armour_2')"></span> und dreifache
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_3')"></span> bereit. Diese werden vor der
-              einfachen <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> eingesetzt.
+              einfachen <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> eingesetzt.
             </p>
             <h4>Paralysierend</h4>
             <p>
@@ -1022,22 +1022,20 @@
                 durch.
               </li>
               <li>
-                Alle am Gefecht teilnehmenden Karten werden wieder aktiviert (außer
-                <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit dem Schlagwort
-                <i>Einmalige Verwendung</i>).
-              </li>
-              <li>
                 Beide Spieler:innen (beginnend beim aktiven Spieler:in) haben die Möglichkeit
                 <span class="oc-icon" [innerHTML]="getIconHtml('tactic')"></span> mit dem Schlagwort
                 <i>Intervention (Gefechtsphasenende)</i> auszuspielen.
               </li>
               <li>
                 Schiffe und an die Kolonie angelegte
-                <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span> auf denen mindestens
-                genauso viele <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker liegen
-                wie sie <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> haben, werden
-                zerstört. Alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel
-                ihrer Besitzer:in gelegt.
+                <span class="oc-icon" [innerHTML]="getIconHtml('infrastructure')"></span>, auf denen
+                mindestens genauso viele
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker liegen wie sie
+                <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> haben, werden zerstört;
+                alle Karten des Schiffs (inklusive angelegter Karten) werden auf den Ablagestapel ihrer
+                Besitzer:in gelegt. Danach werden alle am Gefecht teilnehmenden Karten wieder aktiviert (außer
+                <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit dem Schlagwort
+                <i>Einmalige Verwendung</i>) und die Reichweite sinkt auf den Wert der nächsten Gefechtsphase.
               </li>
             </ol>
             <p>
@@ -1045,6 +1043,45 @@
               Angaben zu den <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span> gemacht,
               wird die Karte behandelt, als hätte sie 1
               <span class="oc-icon" [innerHTML]="getIconHtml('hitpoints')"></span>.
+            </p>
+            <h4>Wann werden deaktivierte Karten wieder aktiviert?</h4>
+            <table>
+              <tr>
+                <th>Karten</th>
+                <th>Reaktivierung</th>
+              </tr>
+              <tr>
+                <td>Mit dem Schlagwort <i>Unerschöpflich</i></td>
+                <td>Sofort nach jeder Verwendung</td>
+              </tr>
+              <tr>
+                <td>Mit dem Schlagwort <i>Einmalige Verwendung</i> (z. B. Torpedos, Panzerungskarten)</td>
+                <td>Erst am Ende des Gefechts</td>
+              </tr>
+              <tr>
+                <td>Alle anderen am Gefecht teilnehmenden Karten</td>
+                <td>
+                  Erst nachdem beide Spieler:innen ihre Angriffe in der aktuellen Gefechtsphase durchgeführt
+                  haben
+                </td>
+              </tr>
+            </table>
+            <p>
+              Ausnahme: Einige Karten ohne diese Schlagwörter werden ebenfalls erst am Ende des Gefechts
+              wieder aktiviert (z. B. Ködersystem und die planetaren Verteidigungsinfrastrukturen wie
+              Planetarer Schild, Verteidigungsnetz, Schmugglernest und Autonomer Stützpunkt).
+            </p>
+            <p>
+              Zu Beginn jedes Gefechts sind alle Karten wieder aktiv, auch Karten mit dem Schlagwort
+              <i>Einmalige Verwendung</i>. Ein Gefecht dauert nie über den laufenden Spielzug hinaus:
+              Verwendest du eine Karte im Gefecht deines Spielzugs (z. B. eine
+              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> und
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> im Angriff), steht
+              sie im Gefecht des gegnerischen Spielzugs wieder vollständig zur Verfügung (z. B. mit ihrer
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>). Panzerungskarten
+              tragen in der Regel das Schlagwort <i>Einmalige Verwendung</i> und werden daher innerhalb eines
+              Gefechts nicht wieder aktiviert.
             </p>
           </div>
           } @case ('attacks') {
@@ -1091,12 +1128,15 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>,
               <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> oder
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> eingesetzt die die meisten
-              dieser Defensivpunkte bieten.
-              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit defensiven Systemen
-              haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der Textbox illustriert.
-              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit offensiven und
-              defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie in der selben
-              Gefechtsphase bereits angegriffen haben.
+              dieser Defensivpunkte bieten. Stehen mehrere Karten mit gleich vielen Defensivpunkten zur
+              Verfügung, entscheidet der Besitzer der Verteidigungskarten, welche davon zuerst eingesetzt
+              wird. Im Online-Spiel wird diese Auswahl automatisch vorgenommen, damit der Spielfluss nicht
+              unterbrochen wird; die Software setzt hierbei ebenfalls die Karte mit den meisten
+              Defensivpunkten ein. <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              defensiven Systemen haben die Anzahl der entsprechenden Defensivpunkte auch nochmal groß in der
+              Textbox illustriert. <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> mit
+              offensiven und defensiven Eigenschaften können ihre Defensivpunkte auch dann einsetzen, wenn sie
+              in der selben Gefechtsphase bereits angegriffen haben.
             </p>
             <p>
               Reduziere nun den <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> je
@@ -1174,6 +1214,59 @@
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span> und 2
               <span class="oc-icon" [innerHTML]="getIconHtml('armour_1')"></span>.
             </p>
+            <h4>Zweites Beispiel für Schadensberechnung</h4>
+            <p>
+              Angenommen, ein Schiff mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 2 greift in der Gefechtsphase
+              mit Reichweite 3 ein Schiff mit
+              <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> 6 an. Die
+              <span class="oc-icon" [innerHTML]="getIconHtml('equipment')"></span> verursacht 12
+              <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> und hat Abzüge von 3 für
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> und 2 für
+              <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span>. Das Ziel hat je eine Karte
+              mit 1 <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> und 2
+              <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span>; ein befreundetes Schiff im
+              selben Gefecht hat ebenfalls eine Karte mit 1
+              <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span>.
+            </p>
+            <ol>
+              <li>
+                <b>Halbierung:</b> 2 <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> + 3
+                (Phasenreichweite) = 5 &lt; 6
+                <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des Ziels. Der
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> wird vor allen anderen
+                Abzügen aufgerundet halbiert: 12 → 6. Wäre das Ziel nur 5
+                <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> schnell, würde der
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span> nicht halbiert, da die Summe
+                nicht kleiner als die <span class="oc-icon" [innerHTML]="getIconHtml('speed')"></span> des
+                Ziels ist.
+              </li>
+              <li>
+                <b>Punktabwehr:</b> Alle
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> der am Gefecht
+                teilnehmenden Schiffe werden geteilt, daher stehen zwei Karten mit je 1
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> zur Verfügung.
+                Beide bieten gleich viele Defensivpunkte: Der Besitzer der Verteidigungskarten entscheidet und
+                setzt die <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des
+                befreundeten Schiffs ein: 6 - 3 = 3. Anschließend wird auch die
+                <span class="oc-icon" [innerHTML]="getIconHtml('point_defense_1')"></span> des Ziels
+                eingesetzt: 3 - 3 = 0. Beide Karten werden deaktiviert und am Ende der Gefechtsphase
+                reaktiviert.
+              </li>
+              <li>
+                <b>Schild:</b> Da der <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>
+                bereits auf 0 reduziert wurde, kommt die Karte mit 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> des Ziels nicht zum
+                Einsatz; sie bleibt aktiv.
+              </li>
+              <li>
+                <b>Ergebnis:</b> 0 <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker.
+                Ohne die Halbierung wären es 12 - 3 - 3 = 6, dann 6 - 4 = 2
+                <span class="oc-icon" [innerHTML]="getIconHtml('damage')"></span>-Marker geworden und
+                zusätzlich wäre die Karte mit
+                <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> deaktiviert worden.
+              </li>
+            </ol>
           </div>
           } @case ('battle-end') {
           <div>
