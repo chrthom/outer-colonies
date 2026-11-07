@@ -63,6 +63,7 @@ def run_soll():
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'curve_soll', 'exec'), ns)
+    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     return ns['out']
 
 
@@ -176,8 +177,10 @@ for t in TIERS:
 print()
 print('Struktur-Befund: T1 ist BIMODAL — Cluster der E-Produzenten/'
       'Basisversorgung (187/188/172/185 bei 0,56-0,83) vs R1-Basis-/'
-      'Down-Swap-Cluster (238/169/345/333/435/154 bei 0,20-0,31); der '
-      'Median 0,310 sitzt am oberen Rand des unteren Clusters.')
+      'Down-Swap-Cluster (238/169/345/333/435/154 bei 0,20-0,31); '
+      '239 Horchposten (0,341) liegt in der Luecke zwischen den '
+      'Clustern; der Median 0,310 sitzt am oberen Rand des unteren '
+      'Clusters.')
 print('Kurven-Kandidaten: Anker %.3f/%.3f | gerundet %.1f/%.1f | '
       'Ratio %.2fx — Christophers Glaettung offen, Bande zur Disposition.'
       % (med['T1'], med['T2'], rounded['T1'], rounded['T2'],
@@ -210,8 +213,9 @@ out_json = dict(
     known_flags=KNOWN,
     struktur_befund='T1 bimodal: Produzenten/Basisversorgung '
                     '(187/188/172/185, 0,56-0,83) vs Basis-/Down-Swap-'
-                    'Cluster (0,20-0,31); Median 0,310 am oberen Rand '
-                    'des unteren Clusters',
+                    'Cluster (0,20-0,31); 239 Horchposten (0,341) in '
+                    'der Luecke zwischen den Clustern; Median 0,310 am '
+                    'oberen Rand des unteren Clusters',
 )
 json.dump(out_json, open(os.path.join(HERE, 'diag_infra_curve_r13i.json'),
                         'w', encoding='utf-8'), ensure_ascii=False, indent=1)

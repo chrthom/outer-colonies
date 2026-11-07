@@ -1,6 +1,6 @@
 # ============================================================================
 # diag_infra_prices_r13i.py — Infrastruktur-Balancing Runde I1, SPUR W
-# Analytische Preisliste, MODELL v9 (I1r, 8.11.2026: Christophers
+# Analytische Preisliste, MODELL v9 (I1r, 7.11.2026: Christophers
 # DUAL-PROFIL-BESCHLUSS — "Die Sockel sind bei Anlage an die Kolonie
 # egal, bei Anlage an ein Schiff nicht": Jede nicht-planetare Karte
 # wird als ZWEI Profile je 50 % gewichtet, Schiff (Psi-Sockel in den
@@ -12,7 +12,7 @@
 # ----------------------------------------------------------------------------
 # Christophers Beschluesse/Regler bislang: P_E-Symmetriekurs FIXIERT ·
 # P_planetar = 1,5 BESTAETIGT (I1r, war 2,5 I1b) · PI_PLAY = 0,75
-# BESCHLOSSEN (I1w, 9.11., Playtest-Anker Extra-Ziehung -> zusaetzliche
+# BESCHLOSSEN (I1w, 7.11., Playtest-Anker Extra-Ziehung -> zusaetzliche
 # Ausspielung; war 0,5) · Tier-Inversion via paarierte Rarity-Swaps
 # geloest (Umsetzung Issue #815) · ALPHA_E = 0,5 (I1o) · E-Ortskurs
 # Kolonie 0,5/0,3
@@ -90,8 +90,10 @@ os.chdir(HERE)
 P_PLANETAR = 1.5     # BESTAETIGT I1r (war 2,5 I1b; Christophers "beim
                     # 1,5 belassen" nach v8-Durchsicht; Sockel-\
                     # Aequivalenz 1,0 + Sicherheitspraemie 0,5; Cross-\
-                    # Anker Kraftwerk==Atomreaktor bei 1,7; Playtest-\
-                    # kalibrierbar)
+                    # Anker Kraftwerk==Atomreaktor bei P_planetar 0,7\
+                    # (Sweep-Gesetz P = E1 + 4*SUB - 1 mit E-Kurs\
+                    # 0,5/0,3, I1s; 1,7 galt nur fuer den I1q-Kurs\
+                    # 0,7/0,5); Playtest-kalibrierbar)
 # T_win ENTFERNT (I1h, Christophers Rueckfrage): war seit I1g nur noch
 # Faktor 1,0 — Huelle/Ausruestung/Infra werden VOR dem Gefecht gespielt,
 # Wertung je Runde; keine Gefechtsfenster-Skalierung mehr im Modell.
@@ -106,7 +108,7 @@ U = {'hull': 1.0, 'equipment': 0.8, 'infrastructure': 0.8, 'tactic': 0.8}
 # (s.o.), ersetzt ihn NICHT: Die Disziplin-Beschraenkung bindet weiter
 # ueber b_disc (Handverfuegbarkeit), Fokus-Deck-Incentive bleibt.
 PI_PLAY = 0.75       # Extra-Ziehung -> zusaetzliche Ausspielung (Beschluss
-                     # I1w, 9.11.; war 0,5; Playtest-Anker)
+                     # I1w, 7.11.; war 0,5; Playtest-Anker)
 PHI_FLEX = 0.15      # Optionswert flexible Auswahl "|"-Form (Regler)
 H_LIMIT = 0.12       # Optionwert +1 Handkarte (x PV_equip)
 SUB_E = 0.7          # degressiver E-Kurs (FIXIERT, Spiegel Einsatzkosten v3)

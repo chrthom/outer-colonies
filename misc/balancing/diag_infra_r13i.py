@@ -236,8 +236,7 @@ out = dict(
         raid_share=round(base['raid'] / N, 3),
         raid_col_hit_share=round(base['col_hit'] / max(1, base['raid']), 3),
         mission_loot_share=round(base['loot_pos'] / max(1, N - base['raid']), 3)),
-    cards=rows,
-    runtime_s=round(time.time() - t0, 1))
+    cards=rows)
 
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
     json.dump(out, f, ensure_ascii=False, indent=1)
@@ -253,4 +252,4 @@ for r in sorted(rows, key=lambda x: -(x['score_k'] or -9)):
           f"{r['title'][:20]:20} units {r['units']:.1f} "
           f"gain {r['gain']:+.3f} (Kond. Raid {str(r['gain_cond_raid']):>7}) "
           f"Anzahl>0 {r['gain_share']:.1%} Score_K {r['score_k']:+.3f}")
-print(f"-> {OUT_PATH} ({out['runtime_s']} s)")
+print(f"-> {OUT_PATH} ({round(time.time() - t0, 1)} s)")

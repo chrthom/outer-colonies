@@ -14,7 +14,7 @@
 #   - PV_infra-Fixpunkt 1,397 bleibt in ALLEN Varianten erhalten
 #     (wird von 164 getragen, kursunabhaengig) — Methodik-Notiz I1r
 #     bestaetigt sich im Grid.
-# HINWEIS: Re-Run 10.11. auf PI_PLAY = 0,75 (Beschluss I1w) — T2-Mediane
+# HINWEIS: Re-Run 7.11. auf PI_PLAY = 0,75 (Beschluss I1w) — T2-Mediane
 #     inkl. Multiplikatoren verschieben sich leicht gegenueber den in
 #     balancing.md I1s dokumentierten pi-0,5-Zahlen; die I1s-Entscheidung
 #     (BEI v9 GEBLIEBEN: 0,5/0,3 + P_planetar 1,5) und das Cross-Anker-
@@ -30,6 +30,7 @@ import re
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = open(os.path.join(HERE, 'diag_infra_prices_r13i.py'),
            encoding='utf-8').read()
+TMP = os.path.join(HERE, '.sweep_out.tmp')
 
 
 def run_variant(e1, sub, pp):
@@ -41,11 +42,12 @@ def run_variant(e1, sub, pp):
     # Haupt-JSON der v9 nicht ueberschreiben:
     s = s.replace("json.dump(out, open('diag_infra_prices_r13i.json', "
                   "'w', encoding='utf-8'),",
-                  "json.dump(out, open('" + os.path.join(HERE, '.sweep_out.tmp') +
+                  "json.dump(out, open('" + TMP +
                   "', 'w', encoding='utf-8'),")
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'sweep_variant', 'exec'), ns)
+    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     out = ns['out']
     return dict(pv_infra=out['anchors']['pv_infra'],
                 med_t1=out['tier_median']['T1'], med_t2=out['tier_median']['T2'],

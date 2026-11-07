@@ -558,5 +558,5 @@
   "114": "pi-Realisierungs-Bracket, Playtest-Anker",
   "230": "Buff umgesetzt (E-1, 0,416); bewusst unter T2-Median"
  },
- "struktur_befund": "T1 bimodal: Produzenten/Basisversorgung (187/188/172/185, 0,56-0,83) vs Basis-/Down-Swap-Cluster (0,20-0,31); Median 0,310 am oberen Rand des unteren Clusters"
+ "struktur_befund": "T1 bimodal: Produzenten/Basisversorgung (187/188/172/185, 0,56-0,83) vs Basis-/Down-Swap-Cluster (0,20-0,31); 239 Horchposten (0,341) in der Luecke zwischen den Clustern; Median 0,310 am oberen Rand des unteren Clusters"
 }
