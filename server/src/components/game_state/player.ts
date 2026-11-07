@@ -139,7 +139,13 @@ export default class Player {
     const match = this.match;
     if (match.turnPhase == TurnPhase.Build) {
       if (match.pendingActionPlayerNo == this.no) {
-        if (match.pendingActionPlayerNo == match.activePlayerNo) {
+        if (match.intervention?.type == InterventionType.TacticCard) {
+          // Timeout on an open tactic card counter window (e.g. after the
+          // defender played a raid reaction card): resolve the reaction like
+          // a manual ready instead of advancing the phase, which would
+          // discard the announced battle plan and strand the played card
+          match.skipIntervention();
+        } else if (match.pendingActionPlayerNo == match.activePlayerNo) {
           // For automatic ready, create an empty battle plan
           match.prepareBuildPhaseReaction({ type: BattleType.None, shipIds: [] });
         } else {

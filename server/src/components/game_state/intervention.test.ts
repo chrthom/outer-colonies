@@ -13,8 +13,9 @@ import CardStack, { RootCardStack } from '../cards/card_stack';
 import { CardProfileConfig } from '../cards/card_profile';
 import { Card509 } from '../cards/collection/tactic_economy_cards';
 import { Card231, Card529 } from '../cards/collection/tactic_intelligence_cards';
+import { Card346 } from '../cards/collection/tactic_military_cards';
 import TacticCard from '../cards/types/tactic_card';
-import { InterventionOpponentRaidStart } from './intervention';
+import { InterventionOpponentRaidStart, InterventionTacticCard } from './intervention';
 import Match from './match';
 import Player from './player';
 
@@ -195,6 +196,39 @@ describe('InterventionOpponentRaidStart', () => {
       expect(match.activePlayerNo).toBe(1);
       // The defender never got to play their raid reaction card
       expect(match.players[1].hand).toContain(reactionCard);
+    });
+  });
+
+  describe('attacker timeout during counter window (Player.handleAutomaticReady)', () => {
+    test('resolves the raid reaction and proceeds to the defense fleet nomination', () => {
+      const ship = addOrbitalShip(match.players[0], 1);
+      const reactionCard = addHandCard(match.players[1], new RaidReactionCard());
+      const counterCard = addHandCard(match.players[0], new Card346());
+      match.prepareBuildPhaseReaction({ type: BattleType.Raid, shipIds: [ship.uuid] });
+      expect(match.intervention).toBeInstanceOf(InterventionOpponentRaidStart);
+
+      // The defender plays the raid reaction card, opening the tactic card
+      // counter window with the attacker pending (attacker holds Card346)
+      match.inactivePlayer.playHandCard(reactionCard, match.activePlayer.colonyCardStack);
+      expect(match.intervention).toBeInstanceOf(InterventionTacticCard);
+      expect(match.intervention?.type).toBe(InterventionType.TacticCard);
+      expect(match.pendingActionPlayerNo).toBe(match.activePlayerNo);
+
+      match.activePlayer.handleAutomaticReady();
+
+      // The timeout resolves the reaction instead of discarding the raid:
+      // the reaction card executed and reached the discard pile (not
+      // stranded), the counter window and the auto-skipped raid start
+      // window are gone, and the match stays in the build phase with the
+      // defender pending for the defense fleet nomination
+      expect(match.intervention).toBeUndefined();
+      expect(match.turnPhase).toBe(TurnPhase.Build);
+      expect(match.battle.type).toBe(BattleType.Raid);
+      expect(match.pendingActionPlayerNo).toBe(match.inactivePlayerNo);
+      expect(match.players[1].discardPile).toContain(reactionCard.card);
+      // The attacker never got to play their counter card
+      expect(match.players[0].hand).toContain(counterCard);
+      expect(() => match.prepareCombatPhase([])).not.toThrow();
     });
   });
 
