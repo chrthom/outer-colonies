@@ -19,7 +19,7 @@
 #     balancing.md I1s dokumentierten pi-0,5-Zahlen; die I1s-Entscheidung
 #     (BEI v9 GEBLIEBEN: 0,5/0,3 + P_planetar 1,5) und das Cross-Anker-
 #     Gesetz sind pi-unabhaengig.
-# RE-RUN 7.11. auf ALPHA_E = 0,25 (Beschluss I1y Pfad A, war 0,5): Das
+# RE-RUN 7.11. auf ALPHA_E = 0,25 (Beschluss I1z Pfad A, war 0,5): Das
 #     Cross-Anker-Gesetz ist alpha-UNABHAENGIG (185- und 187-Score
 #     skalieren beide linear mit alpha), die Paritaet halbiert sich
 #     0,825 -> 0,412; die I1s-Entscheidung bleibt unberuehrt.
@@ -116,7 +116,7 @@ out = dict(frame='I1s Kombi-Sweep E-Ortskurs Kolonie x P_planetar '
            cross_anker_gesetz='P_planetar = E1 + 4*SUB - 1 <=> '
                              'Kraftwerk == Atomreaktor (Paritaet '
                              'alpha-unabhaengig; 0.825 bei alpha 0.5, '
-                             '0.412 bei alpha 0.25 v9-Default I1y Pfad A)',
+                             '0.412 bei alpha 0.25 v9-Default I1z Pfad A)',
            grid=grid_rows, focus=focus_rows)
 json.dump(out, open(os.path.join(HERE, 'diag_infra_sweep_r13i.json'), 'w',
                     encoding='utf-8'), ensure_ascii=False, indent=1)

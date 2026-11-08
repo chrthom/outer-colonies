@@ -1,6 +1,6 @@
 {
  "frame": "I1s Kombi-Sweep E-Ortskurs Kolonie x P_planetar (Basis MODELL v9/I1r; kein Beschluss, Regler-Sensitivitaet fuer die Glaettung)",
- "cross_anker_gesetz": "P_planetar = E1 + 4*SUB - 1 <=> Kraftwerk == Atomreaktor (Paritaet alpha-unabhaengig; 0.825 bei alpha 0.5, 0.412 bei alpha 0.25 v9-Default I1y Pfad A)",
+ "cross_anker_gesetz": "P_planetar = E1 + 4*SUB - 1 <=> Kraftwerk == Atomreaktor (Paritaet alpha-unabhaengig; 0.825 bei alpha 0.5, 0.412 bei alpha 0.25 v9-Default I1z Pfad A)",
  "grid": [
   {
    "pv_infra": 1.397,

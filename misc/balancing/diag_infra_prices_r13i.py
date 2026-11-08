@@ -14,7 +14,7 @@
 # P_planetar = 1,5 BESTAETIGT (I1r, war 2,5 I1b) · PI_PLAY = 0,75
 # BESCHLOSSEN (I1w, 7.11., Playtest-Anker Extra-Ziehung -> zusaetzliche
 # Ausspielung; war 0,5) · Tier-Inversion via paarierte Rarity-Swaps
-# geloest (Umsetzung Issue #815) · ALPHA_E = 0,25 (I1y Pfad A, war 0,5
+# geloest (Umsetzung Issue #815) · ALPHA_E = 0,25 (I1z Pfad A, war 0,5
 # I1o) · E-Ortskurs
 # Kolonie 0,5/0,3
 # (I1r, Christophers Werte; Playtest) · Dual-Profile 50/50 BESCHLOSSEN
@@ -128,12 +128,12 @@ E_DEMAND_W = {0: 32, 1: 16, 2: 8}
 # Verbraucher-Belastung intakt); ALPHA_E dämpft nur die MENGE (Anteil der
 # E-Punkte mit Abnehmer je Runde). Playtest misst: Nachfrage je Runde /
 # Kapazitaet, ggf. groessenabhaengig je Produzent (kleinster zuerst).
-# I1y-BESCHLUSS PFAD A (7.11.): ALPHA_E 0,25 — deckt 187/188/185/145
+# I1z-BESCHLUSS PFAD A (7.11.): ALPHA_E 0,25 — deckt 187/188/185/145
 # in der Tier-Bande (Kurve 0,3/0,5, Bande relativ +-50 %); 448/156/183
 # bleiben bewusste Tier-Spitzen. Roh-Median T1 sinkt 0,310 -> 0,280,
 # gerundete Kurve 0,3 bleibt gueltig, T2 0,505 haelt (Median-Paar 336/
 # 219). ALPHA_E bleibt Playtest-Regler.
-ALPHA_E = 0.25       # I1y-Beschluss Pfad A (war 0,5; I1n-Sensitivitaet)
+ALPHA_E = 0.25       # I1z-Beschluss Pfad A (war 0,5; I1n-Sensitivitaet)
 # E-ORTSKURS (I1q eingefuehrt mit 0,7/0, I1r REDUZIERT auf 0,5/0,3 —
 # Christophers Werte: "E-Wert Kolonie weiter reduzieren (0,5 und 0,3)"):
 # Die E-Pools sind getrennt (Schiffe: eigene Reaktoren; Kolonie: eigener
@@ -540,7 +540,7 @@ print('Burst-Konversionen b_X = P(>=2 X in 7er Hand): hull %.3f | equip %.3f '
 print()
 # pr kommt aus run() (prices_t mit iteriertem Fixpunkt)
 
-print('Gueterpreise (je Runde, T_win ENTFERLEN; u: hull %.1f, '
+print('Gueterpreise (je Runde, T_win ENTFERNT; u: hull %.1f, '
       'equip %.1f, infra %.1f, tactic %.1f):'
       % (U['hull'], U['equipment'], U['infrastructure'], U['tactic']))
 print('  P_E(1) = %.3f | P_E(2) = %.3f | P_E(4) = %.3f | P_E(5) = %.3f '
@@ -758,7 +758,7 @@ out = dict(
           'Werte, I1r); P_planetar 1,5 (bestaetigt I1r, war 2,5); I1w: '
           'PI_PLAY = 0,75 (war 0,5, Playtest-Anker); I1q: '
           'Deck-Gleichverteilung 25 % je Typ, 183 Code-Lesart je +1 '
-          'E/I/H (CSV-PR #808); I1y: ALPHA_E = 0,25 (Pfad A, war 0,5 '
+          'E/I/H (CSV-PR #808); I1z: ALPHA_E = 0,25 (Pfad A, war 0,5 '
           'I1o); I1h: u (hull 1,0 / '
           'equip 0,8 / infra 0,8 / tactic 0,8)',
     anchors=dict(c_ex=round(c_ex, 3), pv_equip=round(pv_equip, 3),
@@ -795,7 +795,7 @@ out = dict(
         for t in ('T1', 'T2')},
     absorption=dict(
         note='I1n/I1o (Beschluss Option A): Produzenten-Gains x ALPHA_E '
-             '(Default 0,25 seit I1y Pfad A, war 0,5; Playtest-Regler: '
+             '(Default 0,25 seit I1z Pfad A, war 0,5; Playtest-Regler: '
              'Nachfrage je Runde / Kapazitaet; Kurs je Punkt: Schiff '
              '1,65/1,155, Kolonie 0,825/0,495 (I1r). '
              'alpha_1.0 = historische v6-Obergrenze.',

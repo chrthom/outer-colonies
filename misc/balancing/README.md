@@ -1,6 +1,6 @@
 # Balancing Toolkit
 
-Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 5, 2026); this snapshot adds the **infrastructure balancing round I1** (Nov 9, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795, the infrastructure card changes (paired rarity swaps and price buffs) in issue #815.
+Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 5, 2026); this snapshot adds the **infrastructure balancing round I1** (Nov 7-8, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795, the infrastructure card changes (paired rarity swaps and price buffs) in issue #815.
 
 ## Contents
 
@@ -15,7 +15,7 @@ Simulation-based balancing toolkit for the equipment cards of Outer Colonies. St
 | `diag_v23i_r13t.py` | Current full measurement (v23i value set on frame v23d) |
 | `diag_v23i_r13t.json` | v23i results: medians per rarity, outliers vs. target curve |
 | `diag_infra_r13i.py` / `.json` | Infrastructure combat-track measurement (round I1): colony-zone defense cards (156/169/448/238/345) and the 239 control spec placed marginally into the random-battle probe (N=10000, CRN) |
-| `diag_infra_prices_r13i.py` / `.json` | Infrastructure pricing model v9 (round I1, economy track): analytic prices for actions, extra draws, energy and hand limit; dual 50/50 ship/colony cost profiles, π_play 0.75, ALPHA_E 0.25 (I1y path A) |
+| `diag_infra_prices_r13i.py` / `.json` | Infrastructure pricing model v9 (round I1, economy track): analytic prices for actions, extra draws, energy and hand limit; dual 50/50 ship/colony cost profiles, π_play 0.75, ALPHA_E 0.25 (I1z path A) |
 | `diag_infra_sweep_r13i.py` / `.json` | Regulator sensitivity sweep: colony energy course × planetary surcharge (cross-anchor law, α-independent); re-runs the pricing script per variant |
 | `diag_infra_curve_r13i.py` / `.json` | Curve anchoring + outlier detection for the post-swap target state (projection of issue #815): re-runs the pricing model with the decided buffs (230 E−1, 219 E−2/Ψ−1), remaps tiers to the swap structure; anchor medians T1 0.280 / T2 0.505 at ALPHA_E 0.25 (I1x anchor at α 0.5: 0.310/0.505 — the decided curve 0.3/0.5 covers both) |
 | `diag_infra_outlier_r13i.py` / `.json` | Lever measurement for the over-outliers (rounds I1y/I1z): single-card levers (energy costs, hand limit) and the global ALPHA_E regulator against the fixed target curve T1 0.3 / T2 0.5 with a relative band of ±50 %; path A decided: ALPHA_E 0.25 model default, 172 stays +2, 448/156/183 deliberate tier tops |

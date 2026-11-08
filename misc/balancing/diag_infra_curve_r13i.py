@@ -11,12 +11,12 @@
 #   - 219 Freihaendlerkontor: E-3 -> E-2 UND Psi-2 -> Psi-1 (Christophers
 #     Ergaenzung; exakt 336 Militaerakademie-aequivalent)
 # Methode: Re-Exec des diag_infra_prices_r13i.py (MODELL v9, PI_PLAY 0,75,
-# ALPHA_E 0,25 seit I1y Pfad A — Re-Run 7.11.)
+# ALPHA_E 0,25 seit I1z Pfad A — Re-Run 7.11.)
 # mit Buff-Overrides; Tier-Remap auf die Swap-Struktur; KURVEN-ANKER =
 # Tier-Mediane der Soll-Struktur (Christopher glaettet); Outlier gegen
 # den Anker mit zwei Banden-Optionen (absolut 0,5 wie Waffen-v23g UND
 # relativ 50 % des Tier-Medians — Infra-Score-Skala ist ~6x kleiner).
-# Validierung: Soll-Mediane bei ALPHA_E 0,25 (I1y Pfad A): T1 0,280 /
+# Validierung: Soll-Mediane bei ALPHA_E 0,25 (I1z Pfad A): T1 0,280 /
 # T2 0,505 = 1,80x (I1x-Anker bei alpha 0,5: 0,310/0,505 = 1,63x; die
 # BESCHLOSSENE Kurve 0,3/0,5 deckt beide — gerundeter Anker stabil).
 # Bande BESCHLOSSEN (I1y): relativ +-50 % des Kurvenwerts.
@@ -141,12 +141,12 @@ KNOWN = {  # Outlier-Runden-Kandidaten unabhaengig von der Bande (I1t/I1u/I1w/I1
     '105': 'alpha-Anker / Kapazitaetsentscheidung',
     '114': 'pi-Realisierungs-Bracket, Playtest-Anker',
     '230': 'Buff umgesetzt (E-1, 0,416); bewusst unter T2-Median',
-    '448': 'Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-2 nur 1,024)',
-    '156': 'Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-3 nur 0,878)',
-    '183': 'Bewusste T2-Spitze (I1y Pfad A; Preis-Hebel E-6 nur 0,836)',
-    '172': 'Bewusst ueber Bande (I1y Pfad A: +2 belassen, I1p; '
+    '448': 'Bewusste T2-Spitze (I1z Pfad A; Preis-Hebel E-2 nur 1,024)',
+    '156': 'Bewusste T2-Spitze (I1z Pfad A; Preis-Hebel E-3 nur 0,878)',
+    '183': 'Bewusste T2-Spitze (I1z Pfad A; Preis-Hebel E-6 nur 0,836)',
+    '172': 'Bewusst ueber Bande (I1z Pfad A: +2 belassen, I1p; '
            '+1-Option 0,283 dokumentiert)',
-    '345': 'Bewusst unter Bande (I1y Pfad A, alpha 0,25: 0,130; '
+    '345': 'Bewusst unter Bande (I1z Pfad A, alpha 0,25: 0,130; '
            'Known Flag seit I1x)',
 }
 
@@ -156,7 +156,7 @@ print('=' * W)
 print('I1x KURVEN-ANKERUNG + OUTLIER-DETECTION IM SOLL-ZUSTAND '
       '(PROJEKTION, Issue #815 noch nicht umgesetzt)')
 print('=' * W)
-print('Modell v9, PI_PLAY 0,75, ALPHA_E 0,25 (I1y Pfad A) | Buffs: 230 E-1, '
+print('Modell v9, PI_PLAY 0,75, ALPHA_E 0,25 (I1z Pfad A) | Buffs: 230 E-1, '
       '219 E-1/Psi-1 | Swaps: 448+183+164->R2, 333+435+154->R1, 320<->413')
 print('Validierung: 230 = %.3f (Soll 0,416) | 219 = %.3f (Soll 0,505) | '
       'T1 = %.3f / T2 = %.3f = %.2fx (Soll bei alpha 0,25: 0,280/0,505 '
@@ -201,7 +201,7 @@ print('KURVE BESCHLOSSEN (I1x/I1y): gerundet %.1f/%.1f | Ratio %.2fx | '
       % (rounded['T1'], rounded['T2'], med['T2'] / med['T1']))
 
 # validation.ok berechnen (wie die 230/219-Asserts): Soll-Tier-Mediane
-# gegen die I1y-Pfad-A-Erwartung pruefen, damit das JSON bei Regler-
+# gegen die I1z-Pfad-A-Erwartung pruefen, damit das JSON bei Regler-
 # Veraenderungen nicht weiterhin ok=true behaupten wuerde.
 ok = abs(med['T1'] - 0.280) < 5e-4 and abs(med['T2'] - 0.505) < 5e-4
 
@@ -209,7 +209,7 @@ out_json = dict(
     frame='I1x Kurven-Ankerung + Outlier-Detection im Soll-Zustand '
           '(Projektion: I1w-Beschluesse als umgesetzt angenommen)',
     issue='chrthom/outer-colonies#815',
-    model='MODELL v9, PI_PLAY 0,75, ALPHA_E 0,25 (I1y Pfad A); Re-Exec '
+    model='MODELL v9, PI_PLAY 0,75, ALPHA_E 0,25 (I1z Pfad A); Re-Exec '
           'diag_infra_prices_r13i.py mit Buff-Overrides '
           '(230 E-1, 219 E-1/Psi-1)',
     swap={'to_R2': ['448', '183', '164'], 'to_R1': ['333', '435', '154'],
@@ -234,7 +234,7 @@ out_json = dict(
     outliers_abs={t: [dict(id=r['id'], delta=r['delta'])
                      for r in T[t] if r['flag_abs']] for t in TIERS},
     known_flags=KNOWN,
-    struktur_befund='Bei alpha 0,25 (I1y Pfad A) loest sich die I1x-'
+    struktur_befund='Bei alpha 0,25 (I1z Pfad A) loest sich die I1x-'
                     'Bimodalitaet auf: Produzenten ruecken in die '
                     'Bande (185 0,280 = Median, 187/188 0,412), T1 '
                     'homogener (0,13-0,41); verbleibende REL-Outlier '

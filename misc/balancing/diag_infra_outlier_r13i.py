@@ -116,6 +116,12 @@ TITLES = {'185': 'Kraftwerk (r0 x5)', '187': 'Atomreaktor (r0 x5)',
           '156': 'Planetarer Schild', '183': 'Industriekomplex',
           '413': 'Logistikknotenpunkt', '345': 'Autonomer Stuetzpunkt'}
 
+# Soll-T1-Objekte — EIN gemeinsamer Tuple fuer Delta- und Banden-Check,
+# damit ein neuer T1-Hebel nicht stillschweigend gegen die T2-Bande
+# geprueft wird.
+T1_IDS = ('187', '188', '185', '172', '169', '238', '239', '345',
+          '333', '435', '154')
+
 
 def tier_rows(sc):
     """Objektliste mit Soll-Tier + Delta gegen die FIXE Kurve 0,3/0,5."""
@@ -190,15 +196,12 @@ for oid, (label, (old, new)) in LEVER.items():
                                                     if r['tier'] == 'T1']),
                                     'T2': outliers([r for r in rows
                                                     if r['tier'] == 'T2'])})
+    tier = 'T1' if oid in T1_IDS else 'T2'
     print('%-38s %s -> %-7.3f (Delta %+0.3f, %s)'
           % (label, TITLES[oid], sc[oid]['score'],
-             sc[oid]['score'] - CURVE['T1' if oid in
-             ('187', '188', '185', '172', '169', '238', '239', '345',
-              '333', '435', '154') else 'T2'],
-             'IN BAND' if abs(sc[oid]['score'] - CURVE[
-                 'T1' if oid in ('187', '188', '185', '172') else 'T2'])
-             <= BAND * CURVE['T1' if oid in ('187', '188', '185', '172')
-                             else 'T2'] else 'ueber'))
+             sc[oid]['score'] - CURVE[tier],
+             'IN BAND' if abs(sc[oid]['score'] - CURVE[tier])
+             <= BAND * CURVE[tier] else 'ausserhalb der Bande'))
 print()
 
 print('--- Globaler ALPHA_E-Regler (E-Produzenten-Absorption, '
