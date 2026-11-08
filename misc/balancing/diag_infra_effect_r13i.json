@@ -1,0 +1,163 @@
+{
+ "frame": "I1aa Klassische Outlier-Runde: Effekt-Hebel 333/435 (M2), 413 (Aktion), 169 (PD), 105 (Kapazitaet) im Soll-Zustand (Projektion #815)",
+ "basis": {
+  "pi_play": 0.75,
+  "alpha_e": 0.25,
+  "curve": {
+   "T1": 0.3,
+   "T2": 0.5
+  },
+  "band": 0.5,
+  "p_speed": 0.875,
+  "tier_median": {
+   "T1": 0.28,
+   "T2": 0.505
+  },
+  "s413_L0": 0.281,
+  "s169": 0.204,
+  "k169_gain": 0.2044,
+  "pd_nachfrage": 0.043
+ },
+ "m2_variants": {
+  "status_quo": {
+   "label": "Status quo (2 Disziplinen)",
+   "p_trigger": 0.234,
+   "m2_gain": 0.476,
+   "s333_s435": 0.238,
+   "s413_L0": 0.281,
+   "s413_L1": 0.292,
+   "s413_L2": 0.462,
+   "med": {
+    "T1": 0.28,
+    "T2": 0.505
+   }
+  },
+  "disc3": {
+   "label": "3 Disziplinen",
+   "p_trigger": 0.34,
+   "m2_gain": 0.69,
+   "s333_s435": 0.345,
+   "s413_L0": 0.372,
+   "s413_L1": 0.383,
+   "s413_L2": 0.553,
+   "med": {
+    "T1": 0.341,
+    "T2": 0.505
+   }
+  },
+  "disc4": {
+   "label": "4 Disziplinen (= alle)",
+   "p_trigger": 0.438,
+   "m2_gain": 0.889,
+   "s333_s435": 0.444,
+   "s413_L0": 0.456,
+   "s413_L1": 0.468,
+   "s413_L2": 0.637,
+   "med": {
+    "T1": 0.341,
+    "T2": 0.505
+   }
+  },
+  "infra": {
+   "label": "Infrastruktur-Trigger (230-Klon)",
+   "p_trigger": 0.438,
+   "m2_gain": 0.889,
+   "s333_s435": 0.444,
+   "s413_L0": 0.456,
+   "s413_L1": 0.468,
+   "s413_L2": 0.637,
+   "med": {
+    "T1": 0.341,
+    "T2": 0.505
+   }
+  },
+  "pi_m2": {
+   "label": "separater pi_M2 = 1,0",
+   "p_trigger": 0.234,
+   "m2_gain": 0.635,
+   "s333_s435": 0.317,
+   "s413_L0": 0.348,
+   "s413_L1": 0.36,
+   "s413_L2": 0.529,
+   "med": {
+    "T1": 0.317,
+    "T2": 0.505
+   }
+  },
+  "draw2": {
+   "label": "Ziehung 2 Karten (drawCards(2))",
+   "p_trigger": 0.234,
+   "m2_gain": 0.952,
+   "s333_s435": 0.476,
+   "s413_L0": 0.483,
+   "s413_L1": 0.494,
+   "s413_L2": 0.664,
+   "med": {
+    "T1": 0.341,
+    "T2": 0.505
+   }
+  }
+ },
+ "lever_413": {
+  "L0": {
+   "label": "L0 Status quo (nur Schiff, Speed 1+, 21/24)",
+   "score": 0.281
+  },
+  "L1": {
+   "label": "L1 Speed-Klausel entfallen",
+   "score": 0.292
+  },
+  "L2": {
+   "label": "L2 Aktion ortsunabhaengig (Schiff+Kolonie)",
+   "score": 0.462
+  }
+ },
+ "combos_413": {
+  "disc3": {
+   "label": "L2 + 3 Disziplinen",
+   "score": 0.553
+  },
+  "pi_m2": {
+   "label": "L2 + pi_M2 1,0",
+   "score": 0.529
+  },
+  "disc4": {
+   "label": "L2 + 4 Disz./Infra-Trigger",
+   "score": 0.637
+  }
+ },
+ "szenarien_105": {
+  "p_e10": 12.045,
+  "p_e5": 6.27,
+  "kosten": 2.7,
+  "d_schwelle_r3": 2.29,
+  "szenarien": [
+   {
+    "label": "E+10, global alpha 0,25 (Default)",
+    "score": 1.115
+   },
+   {
+    "label": "E+10, size-dep. d=1 E/Runde",
+    "score": 0.446
+   },
+   {
+    "label": "E+10, size-dep. d=2 E/Runde",
+    "score": 0.892
+   },
+   {
+    "label": "E+10, size-dep. d=3 E/Runde",
+    "score": 1.338
+   },
+   {
+    "label": "E+5, global alpha 0,25 (145-pari)",
+    "score": 0.581
+   }
+  ]
+ },
+ "vorschlaege": [
+  "333/435 Status quo (pi_M2 1,0 als dokumentierter Spieltest-Hebel; Ziehung 2 und Trigger-Expansion verworfen)",
+  "413 L2: Aktion ortsunabhaengig (0,462 in den T2-Kern; Kartentext-Aenderung als #815-Ergaenzung)",
+  "169 akzeptieren (on-band, PD-Beobachtung dokumentiert)",
+  "105 E+10 behalten (Progression bei alpha 0,25 korrekt; Playtest-Anker E-Nachfrage je Runde)"
+ ]
+}

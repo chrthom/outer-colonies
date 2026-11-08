@@ -1,6 +1,6 @@
 # Balancing Toolkit
 
-Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 5, 2026); this snapshot adds the **infrastructure balancing round I1** (Nov 7, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795, the infrastructure card changes (paired rarity swaps and price buffs) in issue #815.
+Simulation-based balancing toolkit for the equipment cards of Outer Colonies. State: **round 13t / balancing v23i** (Nov 5, 2026); this snapshot adds the **infrastructure balancing round I1** (Nov 9, 2026). All combat mechanics are verified against the server code (defense cascade and reactivation, ranges, halving rule, mission/raid, colony attack). The complete round log with every decision and result is [balancing.md](balancing.md) (German); the pending `cards.csv` implementation of v23i is tracked in issue #795, the infrastructure card changes (paired rarity swaps and price buffs) in issue #815.
 
 ## Contents
 
@@ -19,6 +19,7 @@ Simulation-based balancing toolkit for the equipment cards of Outer Colonies. St
 | `diag_infra_sweep_r13i.py` / `.json` | Regulator sensitivity sweep: colony energy course × planetary surcharge (cross-anchor law, α-independent); re-runs the pricing script per variant |
 | `diag_infra_curve_r13i.py` / `.json` | Curve anchoring + outlier detection for the post-swap target state (projection of issue #815): re-runs the pricing model with the decided buffs (230 E−1, 219 E−2/Ψ−1), remaps tiers to the swap structure; anchor medians T1 0.280 / T2 0.505 at ALPHA_E 0.25 (I1x anchor at α 0.5: 0.310/0.505 — the decided curve 0.3/0.5 covers both) |
 | `diag_infra_outlier_r13i.py` / `.json` | Lever measurement for the over-outliers (rounds I1y/I1z): single-card levers (energy costs, hand limit) and the global ALPHA_E regulator against the fixed target curve T1 0.3 / T2 0.5 with a relative band of ±50 %; path A decided: ALPHA_E 0.25 model default, 172 stays +2, 448/156/183 deliberate tier tops |
+| `diag_infra_effect_r13i.py` / `.json` | Effect levers for the classic outlier round (I1aa): M2 trigger variants for 333/435 (discipline count, π_M2, draw 2), action levers for 413 (speed clause, place-independence), the PD report for 169 and capacity/α scenarios for 105 — no price levers, all four cases are on-band or progression questions |
 | `balancing.md`, `KNOWLEDGE.md` | Round log and project knowledge entrypoint (German) |
 
 ## Running
@@ -30,6 +31,7 @@ python3 diag_infra_prices_r13i.py  # infrastructure pricing model v9 (analytic, 
 python3 diag_infra_sweep_r13i.py   # regulator sweep (re-runs the pricing script per variant)
 python3 diag_infra_curve_r13i.py   # curve anchor + outliers in the post-swap target state (projection of issue #815)
 python3 diag_infra_outlier_r13i.py # lever measurement for the over-outliers against the fixed curve 0.3/0.5 (round I1y)
+python3 diag_infra_effect_r13i.py  # effect levers for the classic outliers 333/435, 413, 169, 105 (round I1aa)
 python3 diag_infra_r13i.py         # infrastructure combat-track measurement (battle sim, N=10000, checkpoint diag_infra_ckpt_r13i.json)
 ```
 
@@ -52,7 +54,7 @@ Requirements: Python 3, no third-party dependencies. Needs `../cards.csv` (i.e. 
 - **Cost model v9:** units = 1 (static play cost) + energy + sockets on ships; non-planetary cards are scored as **dual profiles 50/50 ship/colony** (ship: full socket costs, energy course 1.0/0.7; colony: sockets free, cheaper energy course 0.5/0.3); planetary cards pay the surcharge P_planetar = 1.5. Energy producers do not pay energy costs (production is the gain), damped by **ALPHA_E = 0.25** (decided I1z path A, was 0.5).
 - **Draw pricing:** extra draws are worth π_play × PV_DECK with **π_play = 0.75** (decided in I1w, was 0.5; playtest anchor: share of extra draws that turn into an extra play before game end).
 - **Result (v9, π 0.75, α 0.25, pre-swap):** tier medians T1 (R0+R1) 0.412 / T2 (R2) 0.329 — the tier inversion is resolved off-model via **paired rarity swaps** (448+183+164 → R2, 333+435+154 → R1, 320 ⇄ 413) plus price buffs on 230 (E−1) and 219 (E−1, Ψ−1); tracked in issue #815. Expected post-swap state: T1 0.280 / T2 0.505 = 1.80× (at α 0.5: 0.310/0.505 = 1.63×).
-- **Curve (decided I1x/I1y, fixed):** target curve **0.3 / 0.5** with a relative band of ±50 % (T1 0.15–0.45, T2 0.25–0.75). Post-swap anchors: T1 0.280 / T2 0.505 at ALPHA_E 0.25 (I1x at α 0.5: 0.310/0.505) — the rounded curve covers both, so the anchor is regulator-robust. Remaining outliers are deliberate: 172 +0.286 (I1p), 345 −0.150 (known flag), and the T2 tops 448/156/183 (price levers exhausted, I1y); 145 is in band at α 0.25. Outliers and lever measurements are tracked in `diag_infra_curve_r13i.json` and `diag_infra_outlier_r13i.json`.
+- **Curve (decided I1x/I1y, fixed):** target curve **0.3 / 0.5** with a relative band of ±50 % (T1 0.15–0.45, T2 0.25–0.75). Post-swap anchors: T1 0.280 / T2 0.505 at ALPHA_E 0.25 (I1x at α 0.5: 0.310/0.505) — the rounded curve covers both, so the anchor is regulator-robust. Remaining outliers are deliberate: 172 +0.286 (I1p), 345 −0.150 (known flag), and the T2 tops 448/156/183 (price levers exhausted, I1y); 145 is in band at α 0.25. Outliers and lever measurements are tracked in `diag_infra_curve_r13i.json` and `diag_infra_outlier_r13i.json`. The classic outlier round (effect levers, no price levers) for 333/435, 413, 169 and 105 is measured in `diag_infra_effect_r13i.json`.
 - **Regulators (all per playtest):** π_play (0.75), ALPHA_E (0.25, I1z path A), colony energy course (0.5/0.3), P_planetar (1.5); `diag_infra_sweep_r13i.py` maps their interaction space (cross-anchor law: Kraftwerk == Atomreaktor ⇔ P_planetar = E1 + 4·SUB − 1, α-independent, parity 0.412 at α 0.25).
 
 ## Conventions
