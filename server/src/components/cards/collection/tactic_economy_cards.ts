@@ -213,6 +213,27 @@ export class Card509 extends TacticCard {
   }
 }
 
+export class Card517 extends TacticCard {
+  constructor() {
+    super(517, 'Diasporabewegung', 3, TacticDiscipline.Trade);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    this.tributeCardFromPile(optionalParameters, player.deck, card => {
+      player.shuffleDeck();
+      player.deck.unshift(card);
+    });
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.deck.find(c => c.type == CardType.Orb) ? this.onlyColonyTarget(player.cardStacks) : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.deck.filter(c => c.type == CardType.Orb).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(): number {
+    return 1;
+  }
+}
+
 export class Card534 extends TacticCard {
   private readonly cardsToDiscard = 5;
   constructor() {
@@ -256,6 +277,7 @@ export const allCards = [
   new Card321(),
   new Card427(),
   new Card509(),
+  new Card517(),
   new Card534(),
   new Card542()
 ];
