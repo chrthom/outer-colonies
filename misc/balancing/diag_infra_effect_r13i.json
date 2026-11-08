@@ -13,7 +13,7 @@
    "T1": 0.28,
    "T2": 0.505
   },
-  "s413_L0": 0.281,
+  "s413_L0": 0.269,
   "s169": 0.204,
   "k169_gain": 0.2044,
   "pd_nachfrage": 0.043
@@ -24,9 +24,9 @@
    "p_trigger": 0.234,
    "m2_gain": 0.476,
    "s333_s435": 0.238,
-   "s413_L0": 0.281,
-   "s413_L1": 0.292,
-   "s413_L2": 0.462,
+   "s413_L0": 0.269,
+   "s413_L1": 0.279,
+   "s413_L2": 0.449,
    "med": {
     "T1": 0.28,
     "T2": 0.505
@@ -37,9 +37,9 @@
    "p_trigger": 0.34,
    "m2_gain": 0.69,
    "s333_s435": 0.345,
-   "s413_L0": 0.372,
-   "s413_L1": 0.383,
-   "s413_L2": 0.553,
+   "s413_L0": 0.357,
+   "s413_L1": 0.367,
+   "s413_L2": 0.537,
    "med": {
     "T1": 0.341,
     "T2": 0.505
@@ -50,9 +50,9 @@
    "p_trigger": 0.438,
    "m2_gain": 0.889,
    "s333_s435": 0.444,
-   "s413_L0": 0.456,
-   "s413_L1": 0.468,
-   "s413_L2": 0.637,
+   "s413_L0": 0.439,
+   "s413_L1": 0.45,
+   "s413_L2": 0.619,
    "med": {
     "T1": 0.341,
     "T2": 0.505
@@ -63,9 +63,9 @@
    "p_trigger": 0.438,
    "m2_gain": 0.889,
    "s333_s435": 0.444,
-   "s413_L0": 0.456,
-   "s413_L1": 0.468,
-   "s413_L2": 0.637,
+   "s413_L0": 0.439,
+   "s413_L1": 0.45,
+   "s413_L2": 0.619,
    "med": {
     "T1": 0.341,
     "T2": 0.505
@@ -76,9 +76,9 @@
    "p_trigger": 0.234,
    "m2_gain": 0.635,
    "s333_s435": 0.317,
-   "s413_L0": 0.348,
-   "s413_L1": 0.36,
-   "s413_L2": 0.529,
+   "s413_L0": 0.334,
+   "s413_L1": 0.345,
+   "s413_L2": 0.514,
    "med": {
     "T1": 0.317,
     "T2": 0.505
@@ -89,9 +89,9 @@
    "p_trigger": 0.234,
    "m2_gain": 0.952,
    "s333_s435": 0.476,
-   "s413_L0": 0.483,
-   "s413_L1": 0.494,
-   "s413_L2": 0.664,
+   "s413_L0": 0.465,
+   "s413_L1": 0.476,
+   "s413_L2": 0.645,
    "med": {
     "T1": 0.341,
     "T2": 0.505
@@ -101,29 +101,29 @@
  "lever_413": {
   "L0": {
    "label": "L0 Status quo (nur Schiff, Speed 1+, 21/24)",
-   "score": 0.281
+   "score": 0.269
   },
   "L1": {
    "label": "L1 Speed-Klausel entfallen",
-   "score": 0.292
+   "score": 0.279
   },
   "L2": {
    "label": "L2 Aktion ortsunabhaengig (Schiff+Kolonie)",
-   "score": 0.462
+   "score": 0.449
   }
  },
  "combos_413": {
   "disc3": {
    "label": "L2 + 3 Disziplinen",
-   "score": 0.553
+   "score": 0.537
   },
   "pi_m2": {
    "label": "L2 + pi_M2 1,0",
-   "score": 0.529
+   "score": 0.514
   },
   "disc4": {
    "label": "L2 + 4 Disz./Infra-Trigger",
-   "score": 0.637
+   "score": 0.619
   }
  },
  "szenarien_105": {
@@ -156,9 +156,9 @@
  },
  "vorschlaege": [
   "333/435 Status quo (pi_M2 1,0 als dokumentierter Spieltest-Hebel; Ziehung 2 und Trigger-Expansion verworfen)",
-  "413 L2: Aktion ortsunabhaengig (0,462 in den T2-Kern; Kartentext-Aenderung als #815-Ergaenzung)",
+  "413 L2: Aktion ortsunabhaengig (0,449 in den T2-Kern; Kartentext-Aenderung als #815-Ergaenzung)",
   "169 akzeptieren (on-band, PD-Beobachtung dokumentiert)",
   "105 E+10 behalten (Progression bei alpha 0,25 korrekt; Playtest-Anker E-Nachfrage je Runde)"
  ],
- "beschluss": "NICHTS UMSETZEN (Christopher, 12.11.): Alle vier Faelle bleiben Status quo / bewusst akzeptiert — 333/435 on-band R1, 413 bleibt T2-Schlusslicht 0,281 (in Bande, bewusst), 169 on-band, 105 E+10; keine Karten-aenderungen, Issue #815 unveraendert; Varianten bleiben als Playtest-Reopen-Katalog dokumentiert"
+ "beschluss": "NICHTS UMSETZEN (Christopher, 8.11.): Alle vier Faelle bleiben Status quo / bewusst akzeptiert — 333/435 on-band R1, 413 bleibt T2-Schlusslicht 0,269 (in Bande, bewusst), 169 on-band, 105 E+10; keine Karten-aenderungen, Issue #815 unveraendert; Varianten bleiben als Playtest-Reopen-Katalog dokumentiert"
 }

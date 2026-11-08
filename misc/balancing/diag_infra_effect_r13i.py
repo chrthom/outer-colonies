@@ -13,7 +13,7 @@
 #   105      Kapazitaet E+10 vs E+5, alpha-Wirklichkeit, R5-Progression
 # Kontext (fixiert I1x-I1z): Kurve 0,3/0,5, Bande relativ +-50 %,
 # PI_PLAY 0,75, ALPHA_E 0,25 (Pfad A).
-# BESCHLUSS (12.11., Christopher): NICHTS UMSETZEN — alle vier Faelle
+# BESCHLUSS (8.11., Christopher): NICHTS UMSETZEN — alle vier Faelle
 # bleiben Status quo / bewusst akzeptiert (333/435 on-band R1, 413 als
 # T2-Schlusslicht in Bande, 169 on-band, 105 E+10); keine Karten-
 # aenderungen, Issue #815 bleibt unveraendert. Die Varianten unten sind
@@ -51,18 +51,22 @@ def run_soll(m2_line=None):
     """v9-Soll-Lauf (230 E-1, 219 E-2/Psi-1) + optionale M2-Variante."""
     s = SRC
     # --- Soll-Buffs (I1w) ---
-    s = s.replace("obj('230', 'Verwaltungsbueros', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-2), 'M',\n"
-                  "    'infrastructure', units2=e_cost_col(-2),",
-                  "obj('230', 'Verwaltungsbueros', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-1), 'M',\n"
-                  "    'infrastructure', units2=e_cost_col(-1),")
-    s = s.replace("obj('219', 'Freihaendlerkontor', 2, 'T2', "
-                  "SHIP_P2 + e_cost(-3), 'A2d', 2,\n"
-                  "    units2=e_cost_col(-3),",
-                  "obj('219', 'Freihaendlerkontor', 2, 'T2', "
-                  "SHIP_P1 + e_cost(-2), 'A2d', 2,\n"
-                  "    units2=e_cost_col(-2),")
+    old230 = ("obj('230', 'Verwaltungsbueros', 2, 'T2', "
+              "SHIP_P2 + e_cost(-2), 'M',\n"
+              "    'infrastructure', units2=e_cost_col(-2),")
+    new230 = ("obj('230', 'Verwaltungsbueros', 2, 'T2', "
+              "SHIP_P2 + e_cost(-1), 'M',\n"
+              "    'infrastructure', units2=e_cost_col(-1),")
+    assert old230 in s, '230-Soll-Buff: Muster nicht gefunden'
+    s = s.replace(old230, new230)
+    old219 = ("obj('219', 'Freihaendlerkontor', 2, 'T2', "
+              "SHIP_P2 + e_cost(-3), 'A2d', 2,\n"
+              "    units2=e_cost_col(-3),")
+    new219 = ("obj('219', 'Freihaendlerkontor', 2, 'T2', "
+              "SHIP_P1 + e_cost(-2), 'A2d', 2,\n"
+              "    units2=e_cost_col(-2),")
+    assert old219 in s, '219-Soll-Buff: Muster nicht gefunden'
+    s = s.replace(old219, new219)
     # --- M2-Trigger-Variante ---
     if m2_line is not None:
         assert M2_ORIG in s, 'M2-Lambda: Muster nicht gefunden'
@@ -75,6 +79,7 @@ def run_soll(m2_line=None):
     ns = {'__file__': os.path.join(HERE, 'diag_infra_prices_r13i.py')}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(s, 'effect_variant', 'exec'), ns)
+    os.remove(TMP)  # Re-Exec-Artefakt entfernen (keine Droppings)
     return ns
 
 
@@ -88,7 +93,8 @@ def score_413(ns, lever='L0'):
     """
     m2gain = ns['out']['prices']['M_2disc']       # M2-Kern (variante)
     a_disc = ns['out']['prices']['A_tact_disc']   # Aktion (Wirtschaft)
-    u_ship = ns['soc_cost'](1) + ns['e_cost'](-2) + 1.0   # Psi-1, E-2, stat.
+    u_ship = ns['soc_cost'](1, cheap=False) + ns['e_cost'](-2) + 1.0
+    # ^ Psi-1 zum Normal-Kurs (SHIP_P1-Konvention), E-2, stat.
     u_kol = ns['e_cost_col'](-2) + 1.0                    # Psi frei, E-2 col
     if lever == 'L0':
         s_ship = (m2gain + a_disc * P_SPEED) / u_ship
@@ -267,20 +273,20 @@ print('  Schwelle: 105 >= R3-Niveau (1,020) erst ab d >= %.1f E/Runde '
 print()
 
 # ------------------------------------------------------------- Empfehlung --
-print('VORSCHLAEGE (Mess-Katalog; BESCHLUSS 12.11.: NICHTS UMSETZEN — '
+print('VORSCHLAEGE (Mess-Katalog; BESCHLUSS 8.11.: NICHTS UMSETZEN — '
       'alle vier Faelle Status quo / bewusst akzeptiert):')
 print('  (1) 333/435: STATUS QUO BEHALTEN — R1 on-band (0,238); die '
       'Disziplin-Paare sind Karten-Identitaet; M2 < M(infra) ist '
       'strukturell bewusst. Spieltest-Hebel dokumentiert: pi_M2 1,0 '
       '-> 0,317 (Kurve haelt, T1-Med 0,317 -> rundet 0,3). VERWORFEN: '
-      'Ziehung 2 (0,475 rauscht aus der T1-Bande und ueberfluegelt '
+      'Ziehung 2 (0,476 rauscht aus der T1-Bande und ueberfluegelt '
       '230 als R1-Karte), 4-Disz./Infra-Trigger (230-Klon, '
       'Flavor-Verwässerung).')
 print('  (2) 413: L2 EMPFEHLUNG (Aktion ortsunabhaengig, Speed-Klausel '
-      'und Schiff-Only weg) -> 0,462: T2-Kern statt Schlusslicht, '
+      'und Schiff-Only weg) -> 0,449: T2-Kern statt Schlusslicht, '
       'Bande komfortabel, Median 0,505 unberuehrt. Kartentext-Aenderung '
       '(conditional_tags/effect) gehoert zur #815-Umsetzung (neue '
-      'Zeile im Issue). L1 allein (+0,011) zu schwach; Kombination mit '
+      'Zeile im Issue). L1 allein (+0,010) zu schwach; Kombination mit '
       'M2-Hebeln nur falls (1) anders entschieden.')
 print('  (3) 169: AKZEPTIEREN — on-band (0,204), PD-Design-Beobachtung '
       'dokumentiert; Regel-Hebel nur bei Playtest-Befund.')
@@ -308,15 +314,15 @@ out_json = dict(
     vorschlaege=[
         '333/435 Status quo (pi_M2 1,0 als dokumentierter Spieltest-'
         'Hebel; Ziehung 2 und Trigger-Expansion verworfen)',
-        '413 L2: Aktion ortsunabhaengig (0,462 in den T2-Kern; '
+        '413 L2: Aktion ortsunabhaengig (0,449 in den T2-Kern; '
         'Kartentext-Aenderung als #815-Ergaenzung)',
         '169 akzeptieren (on-band, PD-Beobachtung dokumentiert)',
         '105 E+10 behalten (Progression bei alpha 0,25 korrekt; '
         'Playtest-Anker E-Nachfrage je Runde)',
     ],
-    beschluss='NICHTS UMSETZEN (Christopher, 12.11.): Alle vier Faelle '
+    beschluss='NICHTS UMSETZEN (Christopher, 8.11.): Alle vier Faelle '
               'bleiben Status quo / bewusst akzeptiert — 333/435 '
-              'on-band R1, 413 bleibt T2-Schlusslicht 0,281 (in '
+              'on-band R1, 413 bleibt T2-Schlusslicht 0,269 (in '
               'Bande, bewusst), 169 on-band, 105 E+10; keine Karten-'
               'aenderungen, Issue #815 unveraendert; Varianten bleiben '
               'als Playtest-Reopen-Katalog dokumentiert',
