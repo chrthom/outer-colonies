@@ -156,3 +156,4 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 216 | effect | Kann pro Gefecht nur einmal eingesetzt werden. |  | Redundant with tag; removed to match all other single-use torpedoes (card graphic rework tracked in #787) |
 | 304 | tags |  | Einmalige Verwendung | Single-use rule was printed as effect text on the card; tag keyword missed by XCF extraction |
 | 304 | effect | Kann pro Gefecht nur einmal eingesetzt werden. |  | Redundant with tag; removed to match all other single-use torpedoes (printed card verified via OCR: keyword line only) |
+| 423 | effect | Sieh dir die obersten 7 Karten seines Decks an. | Sieh dir die obersten 7 Karten deines Decks an. | Fixed pronoun: card searches the player's own deck (cf. Card423 server code); card graphic rework tracked in #819 |
