@@ -70,7 +70,7 @@ export class Card173 extends TacticCard {
 export class Card174 extends TacticCard {
   private readonly damageToRepair = 8;
   constructor() {
-    super(174, 'Feldreperaturen', 1, TacticDiscipline.Military);
+    super(174, 'Feldreparaturen', 1, TacticDiscipline.Military);
   }
   onEnterGame(player: Player, target: CardStack) {
     this.repairDamage(target, this.damageToRepair);

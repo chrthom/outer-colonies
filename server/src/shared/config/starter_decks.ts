@@ -32,7 +32,7 @@ export const starterDecks: MultipleCards[][] = [
     [2, 173], // Ausweichmanöver
     [2, 331], // Schadenskontrolle
     [1, 346], // Space Marines
-    [1, 174] // Feldreperaturen
+    [1, 174] // Feldreparaturen
   ],
 
   // Freihändler-Clans
