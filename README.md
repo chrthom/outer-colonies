@@ -238,7 +238,7 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeInbound.Surrender`: Surrender the match
   - `MsgTypeOutbound.Connect`: Confirm match connection
   - `MsgTypeOutbound.Countdown`: Countdown updates
-  - `MsgTypeOutbound.CardRequest`: Request card decisions (e.g. interventions)
+  - `MsgTypeOutbound.CardRequest`: Reserved enum value, currently unused (card decisions reach the client via `State`/`Countdown`)
   - `MsgTypeOutbound.State`: Full game state updates
 
 ### Server Game State and Matchmaking

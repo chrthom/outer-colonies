@@ -5,7 +5,7 @@ You are an AI coding agent for the Outer Colonies project.
 
 ## Project Context
 This repo is split into three subprojects:
-- **website**: Angular 20 frontend for user management and deck configuration
+- **website**: Angular 21 frontend for user management and deck configuration
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Express + Socket.IO backend with TypeScript
 - **misc**: Utility scripts, tools and documentation for development (see `misc/README.md`)

@@ -27,8 +27,11 @@ for i in 1 2 3 4 5; do
     SUBFOLDER="${BASE_DIR}/${i}"
     if [ -d "$SUBFOLDER" ]; then
         echo "  Processing subfolder ${i}..."
-        OC_CARDS_CSV="${FINAL_CSV}" flatpak run org.gimp.GIMP --batch-interpreter=python-fu-eval -b \
-            "import sys; sys.argv = ['process_cards.py', '${SUBFOLDER}']; exec(open('${SCRIPT_DIR}/process_cards.py').read())" 2>/dev/null
+        if ! OC_CARDS_CSV="${FINAL_CSV}" flatpak run org.gimp.GIMP --batch-interpreter=python-fu-eval -b \
+            "import sys; sys.argv = ['process_cards.py', '${SUBFOLDER}']; exec(open('${SCRIPT_DIR}/process_cards.py').read())" 2>/dev/null; then
+            echo "ERROR: extraction failed for subfolder ${i}" >&2
+            exit 1
+        fi
 
         # Copy result to temporary file
         if [ -f "${FINAL_CSV}" ]; then
@@ -42,9 +45,17 @@ done
 
 # Merge all temporary CSVs
 echo "Merging results..."
-# Write header from first file
-if [ -f "${SCRIPT_DIR}/cards_1.csv" ]; then
-    head -1 "${SCRIPT_DIR}/cards_1.csv" > "${FINAL_CSV}"
+# Write header from the first available file
+HEADER_FILE=""
+for i in 1 2 3 4 5; do
+    if [ -f "${SCRIPT_DIR}/cards_${i}.csv" ]; then
+        HEADER_FILE="${SCRIPT_DIR}/cards_${i}.csv"
+        break
+    fi
+done
+
+if [ -n "${HEADER_FILE}" ]; then
+    head -1 "${HEADER_FILE}" > "${FINAL_CSV}"
     # Append data rows from all files (skip headers)
     for i in 1 2 3 4 5; do
         if [ -f "${SCRIPT_DIR}/cards_${i}.csv" ]; then
