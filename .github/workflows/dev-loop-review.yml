@@ -32,7 +32,7 @@ concurrency:
 jobs:
   review:
     name: Reviewer
-    # Job-level event filter (docs/dev-loop.md): a labeled event for any label
+    # Job-level event filter (misc/dev-loop.md): a labeled event for any label
     # other than dev-loop, or an unlabeled event for any label other than
     # needs-human, can never start the reviewer - skip before a runner is
     # allocated. The gate below remains as defense in depth.
@@ -40,7 +40,7 @@ jobs:
       !(github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name != 'dev-loop') &&
       !(github.event_name == 'pull_request' && github.event.action == 'unlabeled' && github.event.label.name != 'needs-human')
     runs-on: ubuntu-latest
-    # 15 min above --time-limit (3600 s = 60 min), per docs/dev-loop.md budgets table
+    # 15 min above --time-limit (3600 s = 60 min), per misc/dev-loop.md budgets table
     timeout-minutes: 75
     env:
       GH_REPO: ${{ github.repository }}
@@ -118,7 +118,7 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Three gates, in order (docs/dev-loop.md): dev-loop label -> not draft
+          # Three gates, in order (misc/dev-loop.md): dev-loop label -> not draft
           # -> no needs-human. Draft is a human parking brake; the loop never
           # flips it and never touches a draft PR on any event.
           if ! printf '%s' "$pr_json" | jq -e 'any(.labels[]; .name == "dev-loop")' >/dev/null; then
@@ -138,7 +138,7 @@ jobs:
           fi
           head_sha="$(printf '%s' "$pr_json" | jq -r '.headRefOid')"
           if [ "$EVENT_ACTION" = "unlabeled" ]; then
-            # Resume path (docs/dev-loop.md event map): removing needs-human
+            # Resume path (misc/dev-loop.md event map): removing needs-human
             # re-reviews the PR with a fresh budget - the head-SHA dedupe and
             # the iteration cap are bypassed by design; a CHANGES_NEEDED
             # verdict re-chains the fixer from the new review.
@@ -167,7 +167,7 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # CI gate (docs/dev-loop.md): review only a CI-green, format-stable
+          # CI gate (misc/dev-loop.md): review only a CI-green, format-stable
           # head. The reviewer would otherwise burn a full review cycle on a
           # red head whose findings the fixer produces anyway, or race the
           # auto-formatter's push. Poll the head's check runs (bounded, fail
@@ -362,7 +362,7 @@ jobs:
           # source (stored auth would otherwise silently mask a rotated secret).
           OPENCODE_CONFIG_DIR: ${{ runner.temp }}/opencode-config
           OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          # Websearch provider (docs/dev-loop.md): opencode v2 routes websearch and
+          # Websearch provider (misc/dev-loop.md): opencode v2 routes websearch and
           # webfetch through a search provider; without a key every call errors (which
           # also flips the run's exit code - see the rc=1 contract fallback). Pinned in
           # the config below because headless --auto cannot answer the provider prompt.
@@ -476,7 +476,7 @@ jobs:
         with:
           # The PR number in the name associates the artifact with its dev-loop
           # issue (via the linked PR) for the cost report workflow
-          # (docs/dev-loop.md): artifact names are the only artifact metadata
+          # (misc/dev-loop.md): artifact names are the only artifact metadata
           # that can be filtered without a download. Runs whose artifacts
           # predate this naming scheme are not attributable and are skipped.
           name: opencode-reviewer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}

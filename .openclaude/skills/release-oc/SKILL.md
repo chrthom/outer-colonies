@@ -51,7 +51,7 @@ The agent does **not** execute these steps; it provides the user with these comm
 1. **Checkout of the tagged release state and build** - strictly from the tag `v<x.x.x>` (or branch `release/<x.x>`), **not** from `main` if it already contains newer commits:
    ```bash
    git checkout v<x.x.x>   # or: git checkout release/<x.x>
-   npm run build:prod      # calls misc/release.sh -p; for staging: npm run build:staging
+   npm run build:prod      # calls misc/release/release.sh -p; for staging: npm run build:staging
    ```
    Produces `server.zip`, `client.zip`, `website.zip` (in the directory where `npm run` was started).
 2. **Upload** the zips to the hosting (target directories `server`, `client`, `website`) and **unzip** them there.
@@ -68,7 +68,7 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
    gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
    npm run version   # interactively asks for version (x.x.x) and name
    ```
-   `misc/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
+   `misc/release/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
 3. Direct pushes to `main` are forbidden by branch protection (squash merges only): bring the version bump to `main` via a PR (branch type `fix/` or `feature/`, e.g. `fix/version-bump-<x.x>`), conventional commit message ("chore: bump version to v<x.x.x> - <Name>", as in d5b95632). The maintainer merges it.
 4. Optional: after deployment, verify that the productive website/client shows the new version (website footer, client version indicator).
 

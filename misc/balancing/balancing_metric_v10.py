@@ -69,7 +69,7 @@ Modell – exakte Umkehrung der v9-Sichtweise:
 - v9-Konsistenzkorrektur: der 224-Slow-Faktor gilt hier fuer ALLEN
   Schaden (v9 liess ihn im Raid-Zweig unberuecksichtigt – dort unbeabsichtigt).
 
-Datengrundlage: cards.csv (Repo: misc/cards.csv) im selben oder uebergeordneten Ordner (Aufloesung via v9.CARDS_CSV).
+Datengrundlage: cards.csv (Repo: misc/cards/cards.csv) im selben oder uebergeordneten Ordner (Aufloesung via v9.CARDS_CSV).
 Aufruf: python3 balancing_metric_v10.py [--repo]
 """
 import csv, json, statistics, sys

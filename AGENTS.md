@@ -8,7 +8,7 @@ This repo is split into three subprojects:
 - **website**: Angular 20 frontend for user management and deck configuration
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Express + Socket.IO backend with TypeScript
-- **misc**: Utility scripts for development
+- **misc**: Utility scripts, tools and documentation for development (see `misc/README.md`)
 Scan `README.md` to get further information on project background and structure.
 Maintain consistency across the three subprojects
 
@@ -23,7 +23,7 @@ Maintain consistency across the three subprojects
 - Only the game and the cards themselves are German for now (bilingual support is planned)
 
 ### Branches & Merges
-- Only these branch types exist: `main`, `release/<x.x>`, `feature/<name>` and `fix/<name>` (the dev-loop automation additionally generates `vibe/issue-<N>-*` branches for its PRs, see `docs/dev-loop.md`)
+- Only these branch types exist: `main`, `release/<x.x>`, `feature/<name>` and `fix/<name>` (the dev-loop automation additionally generates `vibe/issue-<N>-*` branches for its PRs, see `misc/dev-loop.md`)
 - Squash merges only; no direct pushes to `main` (both enforced via GitHub branch protection)
 - PRs are always reviewed and merged by the maintainer
 

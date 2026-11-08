@@ -3,9 +3,13 @@
 Process all XCF files in a directory and write visibility results to cards.csv.
 
 Usage:
+  OC_CARDS_CSV=/path/to/misc/cards/cards.csv \
   flatpak run org.gimp.GIMP --batch-interpreter=python-fu-eval -b \
     'import sys; sys.argv = ["process_cards.py", "/path/to/cards/dir"]; \
-     exec(open("/home/christopher/Dokumente/outer-colonies/misc/process_cards.py").read())'
+     exec(open("/path/to/misc/cards/process_cards.py").read())'
+
+The CSV output file is taken from the OC_CARDS_CSV environment variable
+(default: cards.csv in the current working directory).
 
 CSV Output:
   id;type;title;effect;tags;conditional_tags;lore;discipline;rarity;author;socket_a;socket_b;socket_d;socket_e;socket_f;socket_g;energy;speed;hp;armour;shield;abm;damage;control;damage_abm;damage_shield;damage_armour
@@ -755,9 +759,9 @@ def process_file(filepath, folder_prefix=""):
 def main():
     """Main function: process all XCF files in a directory and write CSV."""
     # Default directory
-    cards_dir = "/home/christopher/Dokumente/outer-colonies/misc/cards"
-    # Always write to ./misc/cards.csv
-    output_csv = "/home/christopher/Dokumente/outer-colonies/misc/cards.csv"
+    cards_dir = "."
+    # Output file (OC_CARDS_CSV env var, e.g. set by card_bulk_analyze.sh)
+    output_csv = os.environ.get("OC_CARDS_CSV", "cards.csv")
     
     # Accept directory as first argument
     if len(sys.argv) > 1:
