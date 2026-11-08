@@ -1,0 +1,1846 @@
+{
+ "frame": "check10: n1+c3+shift0, Flotte+Duell 50/50, Rollenmittel",
+ "n": 10000,
+ "hp_static": 0.5,
+ "take_weight": 1.0,
+ "fleet_baseline": {
+  "side0": -0.22,
+  "side1": 2.11,
+  "raid_share": 0.503,
+  "acc0": {
+   "out": 20.86,
+   "take": -21.99,
+   "col": -0.06,
+   "loot": 1.0
+  },
+  "acc1": {
+   "out": 21.99,
+   "take": -20.86,
+   "col": 0.06,
+   "loot": 0.97
+  }
+ },
+ "targets_v20": {
+  "1": 4.0,
+  "2": 4.3,
+  "3": 5.1,
+  "4": 6.0,
+  "5": 7.0
+ },
+ "medians": {
+  "1": {
+   "weapons": 4.11,
+   "cards": 3.15,
+   "n_w": 19,
+   "n_c": 9,
+   "weapons_fleet": 5.14,
+   "weapons_duel": 3.45,
+   "cards_fleet": 2.54,
+   "cards_duel": 4.37
+  },
+  "2": {
+   "weapons": 4.18,
+   "cards": 1.1,
+   "n_w": 11,
+   "n_c": 5,
+   "weapons_fleet": 5.12,
+   "weapons_duel": 3.69,
+   "cards_fleet": 1.05,
+   "cards_duel": 0.61
+  },
+  "3": {
+   "weapons": 5.54,
+   "cards": 0.83,
+   "n_w": 7,
+   "n_c": 1,
+   "weapons_fleet": 5.63,
+   "weapons_duel": 5.1,
+   "cards_fleet": 0.75,
+   "cards_duel": 0.9
+  },
+  "4": {
+   "weapons": 5.88,
+   "cards": 3.8,
+   "n_w": 6,
+   "n_c": 3,
+   "weapons_fleet": 6.53,
+   "weapons_duel": 5.18,
+   "cards_fleet": 3.35,
+   "cards_duel": 4.26
+  },
+  "5": {
+   "weapons": 6.38,
+   "cards": 3.43,
+   "n_w": 7,
+   "n_c": 1,
+   "weapons_fleet": 7.01,
+   "weapons_duel": 5.68,
+   "cards_fleet": 3.04,
+   "cards_duel": 3.82
+  }
+ },
+ "spearman": {
+  "duel_fleet": 0.869,
+  "kombi_v9": 0.588
+ },
+ "weapons": [
+  {
+   "id": "101",
+   "title": "Quantentorpedos",
+   "rarity": 5,
+   "units": 2.0,
+   "fleet0": 7.04,
+   "fleet1": 7.28,
+   "fleet": 7.16,
+   "duel0": 5.93,
+   "duel1": 5.92,
+   "duel": 5.93,
+   "score": 6.54,
+   "delta": -0.46,
+   "v9": 5.93,
+   "sockets": 1
+  },
+  {
+   "id": "106",
+   "title": "Tachyonlanze",
+   "rarity": 5,
+   "units": 4.8,
+   "fleet0": 4.69,
+   "fleet1": 4.76,
+   "fleet": 4.72,
+   "duel0": 4.0,
+   "duel1": 4.02,
+   "duel": 4.01,
+   "score": 4.37,
+   "delta": -2.63,
+   "v9": 6.49,
+   "sockets": 2
+  },
+  {
+   "id": "107",
+   "title": "Partikellanze",
+   "rarity": 4,
+   "units": 2.7,
+   "fleet0": 6.87,
+   "fleet1": 6.96,
+   "fleet": 6.92,
+   "duel0": 5.35,
+   "duel1": 5.41,
+   "duel": 5.38,
+   "score": 6.15,
+   "delta": 0.15,
+   "v9": 6.18,
+   "sockets": 2
+  },
+  {
+   "id": "118",
+   "title": "Ionendisruptor",
+   "rarity": 3,
+   "units": 0.7,
+   "fleet0": 4.27,
+   "fleet1": 4.59,
+   "fleet": 4.43,
+   "duel0": 3.17,
+   "duel1": 3.21,
+   "duel": 3.19,
+   "score": 3.81,
+   "delta": -1.29,
+   "v9": 5.62,
+   "sockets": 1
+  },
+  {
+   "id": "125",
+   "title": "Plasmakanone",
+   "rarity": 3,
+   "units": 2.0,
+   "fleet0": 3.72,
+   "fleet1": 4.02,
+   "fleet": 3.87,
+   "duel0": 2.94,
+   "duel1": 2.91,
+   "duel": 2.92,
+   "score": 3.4,
+   "delta": -1.7,
+   "v9": 4.83,
+   "sockets": 1
+  },
+  {
+   "id": "126",
+   "title": "Kinetische Artillerie",
+   "rarity": 3,
+   "units": 1.7,
+   "fleet0": 5.57,
+   "fleet1": 5.69,
+   "fleet": 5.63,
+   "duel0": 5.45,
+   "duel1": 5.44,
+   "duel": 5.44,
+   "score": 5.54,
+   "delta": 0.44,
+   "v9": 5.3,
+   "sockets": 2
+  },
+  {
+   "id": "127",
+   "title": "Protontorpedos",
+   "rarity": 3,
+   "units": 1.0,
+   "fleet0": 7.17,
+   "fleet1": 7.47,
+   "fleet": 7.32,
+   "duel0": 6.14,
+   "duel1": 6.12,
+   "duel": 6.13,
+   "score": 6.72,
+   "delta": 1.62,
+   "v9": 5.15,
+   "sockets": 1
+  },
+  {
+   "id": "130",
+   "title": "Flakartillerie",
+   "rarity": 2,
+   "units": 1.0,
+   "fleet0": 5.28,
+   "fleet1": 5.3,
+   "fleet": 5.29,
+   "duel0": 4.1,
+   "duel1": 4.0,
+   "duel": 4.05,
+   "score": 4.67,
+   "delta": 0.37,
+   "v9": 4.64,
+   "sockets": 1
+  },
+  {
+   "id": "136",
+   "title": "Plasmatorpedos",
+   "rarity": 2,
+   "units": 1.0,
+   "fleet0": 6.75,
+   "fleet1": 6.96,
+   "fleet": 6.86,
+   "duel0": 5.69,
+   "duel1": 5.67,
+   "duel": 5.68,
+   "score": 6.27,
+   "delta": 1.97,
+   "v9": 4.86,
+   "sockets": 1
+  },
+  {
+   "id": "150",
+   "title": "Fusionsbombentorpedos",
+   "rarity": 2,
+   "units": 1.5,
+   "fleet0": 4.58,
+   "fleet1": 4.75,
+   "fleet": 4.66,
+   "duel0": 3.69,
+   "duel1": 3.69,
+   "duel": 3.69,
+   "score": 4.18,
+   "delta": -0.12,
+   "v9": 4.72,
+   "sockets": 2
+  },
+  {
+   "id": "151",
+   "title": "Kinetikwaffenbatterie",
+   "rarity": 2,
+   "units": 1.0,
+   "fleet0": 5.63,
+   "fleet1": 5.76,
+   "fleet": 5.69,
+   "duel0": 4.67,
+   "duel1": 4.5,
+   "duel": 4.59,
+   "score": 5.14,
+   "delta": 0.84,
+   "v9": 4.93,
+   "sockets": 1
+  },
+  {
+   "id": "157",
+   "title": "Plasmawerfer",
+   "rarity": 2,
+   "units": 0.7,
+   "fleet0": 3.96,
+   "fleet1": 4.12,
+   "fleet": 4.04,
+   "duel0": 2.48,
+   "duel1": 2.5,
+   "duel": 2.49,
+   "score": 3.27,
+   "delta": -1.03,
+   "v9": 4.9,
+   "sockets": 1
+  },
+  {
+   "id": "166",
+   "title": "Laserkanone",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 5.85,
+   "fleet1": 5.88,
+   "fleet": 5.87,
+   "duel0": 4.02,
+   "duel1": 4.04,
+   "duel": 4.03,
+   "score": 4.95,
+   "delta": 0.95,
+   "v9": 4.67,
+   "sockets": 1
+  },
+  {
+   "id": "167",
+   "title": "Nukleare Torpedos",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 5.33,
+   "fleet1": 5.48,
+   "fleet": 5.41,
+   "duel0": 4.36,
+   "duel1": 4.35,
+   "duel": 4.35,
+   "score": 4.88,
+   "delta": 0.88,
+   "v9": 5.13,
+   "sockets": 1
+  },
+  {
+   "id": "168",
+   "title": "Automatikkanone",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 4.0,
+   "fleet1": 4.07,
+   "fleet": 4.04,
+   "duel0": 1.44,
+   "duel1": 1.43,
+   "duel": 1.44,
+   "score": 2.74,
+   "delta": -1.26,
+   "v9": 3.69,
+   "sockets": 1
+  },
+  {
+   "id": "179",
+   "title": "Pulskanone",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 7.9,
+   "fleet1": 7.9,
+   "fleet": 7.9,
+   "duel0": 5.15,
+   "duel1": 5.19,
+   "duel": 5.17,
+   "score": 6.54,
+   "delta": 2.54,
+   "v9": 5.44,
+   "sockets": 1
+  },
+  {
+   "id": "180",
+   "title": "Railgun",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 6.03,
+   "fleet1": 6.04,
+   "fleet": 6.03,
+   "duel0": 4.73,
+   "duel1": 4.57,
+   "duel": 4.65,
+   "score": 5.34,
+   "delta": 1.34,
+   "v9": 4.0,
+   "sockets": 1
+  },
+  {
+   "id": "181",
+   "title": "Flugabwehrkanone",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 3.65,
+   "fleet1": 3.87,
+   "fleet": 3.76,
+   "duel0": 1.57,
+   "duel1": 1.53,
+   "duel": 1.55,
+   "score": 2.66,
+   "delta": -1.34,
+   "v9": 4.15,
+   "sockets": 1
+  },
+  {
+   "id": "182",
+   "title": "Dual-Lasergeschütz",
+   "rarity": 1,
+   "units": 2.0,
+   "fleet0": 4.33,
+   "fleet1": 4.45,
+   "fleet": 4.39,
+   "duel0": 3.19,
+   "duel1": 3.05,
+   "duel": 3.12,
+   "score": 3.75,
+   "delta": -0.25,
+   "v9": 3.58,
+   "sockets": 1
+  },
+  {
+   "id": "203",
+   "title": "Leerenfeld",
+   "rarity": 5,
+   "units": 2.0,
+   "fleet0": 7.71,
+   "fleet1": 7.8,
+   "fleet": 7.76,
+   "duel0": 5.67,
+   "duel1": 5.5,
+   "duel": 5.59,
+   "score": 6.67,
+   "delta": -0.33,
+   "v9": 6.56,
+   "sockets": 1
+  },
+  {
+   "id": "207",
+   "title": "Materiedesintegrator",
+   "rarity": 4,
+   "units": 0.7,
+   "fleet0": 10.12,
+   "fleet1": 9.94,
+   "fleet": 10.03,
+   "duel0": 6.33,
+   "duel1": 6.33,
+   "duel": 6.33,
+   "score": 8.18,
+   "delta": 2.18,
+   "v9": 7.04,
+   "sockets": 1
+  },
+  {
+   "id": "209",
+   "title": "Phasendisruptor",
+   "rarity": 4,
+   "units": 1.0,
+   "fleet0": 6.5,
+   "fleet1": 6.66,
+   "fleet": 6.58,
+   "duel0": 5.07,
+   "duel1": 4.89,
+   "duel": 4.98,
+   "score": 5.78,
+   "delta": -0.22,
+   "v9": 5.87,
+   "sockets": 1
+  },
+  {
+   "id": "216",
+   "title": "Schwarmraketensystem",
+   "rarity": 3,
+   "units": 1.0,
+   "fleet0": 5.98,
+   "fleet1": 6.15,
+   "fleet": 6.06,
+   "duel0": 5.12,
+   "duel1": 5.08,
+   "duel": 5.1,
+   "score": 5.58,
+   "delta": 0.48,
+   "v9": 4.28,
+   "sockets": 1
+  },
+  {
+   "id": "223",
+   "title": "Massebeschleuniger",
+   "rarity": 2,
+   "units": 2.0,
+   "fleet0": 5.95,
+   "fleet1": 5.98,
+   "fleet": 5.96,
+   "duel0": 4.44,
+   "duel1": 4.32,
+   "duel": 4.38,
+   "score": 5.17,
+   "delta": 0.87,
+   "v9": 4.35,
+   "sockets": 1
+  },
+  {
+   "id": "224",
+   "title": "Bergbaulaser",
+   "rarity": 2,
+   "units": 1.2,
+   "fleet0": 2.7,
+   "fleet1": 3.89,
+   "fleet": 3.3,
+   "duel0": 1.62,
+   "duel1": 2.24,
+   "duel": 1.93,
+   "score": 2.61,
+   "delta": -1.69,
+   "v9": 4.46,
+   "sockets": 2
+  },
+  {
+   "id": "234",
+   "title": "Punktabwehrlaser",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 3.85,
+   "fleet1": 3.86,
+   "fleet": 3.85,
+   "duel0": 1.3,
+   "duel1": 1.28,
+   "duel": 1.29,
+   "score": 2.57,
+   "delta": -1.43,
+   "v9": 3.2,
+   "sockets": 1
+  },
+  {
+   "id": "237",
+   "title": "Mini-Railgun",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 5.0,
+   "fleet1": 4.86,
+   "fleet": 4.93,
+   "duel0": 2.89,
+   "duel1": 2.89,
+   "duel": 2.89,
+   "score": 3.91,
+   "delta": -0.09,
+   "v9": 3.76,
+   "sockets": 1
+  },
+  {
+   "id": "302",
+   "title": "Götterdämmerung",
+   "rarity": 5,
+   "units": 6.199999999999999,
+   "fleet0": 4.44,
+   "fleet1": 4.72,
+   "fleet": 4.58,
+   "duel0": 5.68,
+   "duel1": 5.68,
+   "duel": 5.68,
+   "score": 5.13,
+   "delta": -1.87,
+   "v9": 7.35,
+   "sockets": 3
+  },
+  {
+   "id": "303",
+   "title": "Archenemitter",
+   "rarity": 5,
+   "units": 2.7,
+   "fleet0": 7.47,
+   "fleet1": 7.56,
+   "fleet": 7.51,
+   "duel0": 6.04,
+   "duel1": 6.08,
+   "duel": 6.06,
+   "score": 6.79,
+   "delta": -0.21,
+   "v9": 7.02,
+   "sockets": 2
+  },
+  {
+   "id": "304",
+   "title": "Antimaterietorpedos",
+   "rarity": 5,
+   "units": 2.0,
+   "fleet0": 6.91,
+   "fleet1": 7.11,
+   "fleet": 7.01,
+   "duel0": 5.76,
+   "duel1": 5.75,
+   "duel": 5.75,
+   "score": 6.38,
+   "delta": -0.62,
+   "v9": 6.02,
+   "sockets": 1
+  },
+  {
+   "id": "310",
+   "title": "Gauss Kanone",
+   "rarity": 4,
+   "units": 3.4,
+   "fleet0": 6.42,
+   "fleet1": 6.52,
+   "fleet": 6.47,
+   "duel0": 5.46,
+   "duel1": 5.49,
+   "duel": 5.47,
+   "score": 5.97,
+   "delta": -0.03,
+   "v9": 6.59,
+   "sockets": 2
+  },
+  {
+   "id": "318",
+   "title": "Nova-Torpedos",
+   "rarity": 3,
+   "units": 2.0,
+   "fleet0": 4.02,
+   "fleet1": 4.18,
+   "fleet": 4.1,
+   "duel0": 3.29,
+   "duel1": 3.29,
+   "duel": 3.29,
+   "score": 3.7,
+   "delta": -1.4,
+   "v9": 4.3,
+   "sockets": 1
+  },
+  {
+   "id": "339",
+   "title": "Gatling",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 4.0,
+   "fleet1": 4.07,
+   "fleet": 4.04,
+   "duel0": 1.44,
+   "duel1": 1.43,
+   "duel": 1.44,
+   "score": 2.74,
+   "delta": -1.26,
+   "v9": 3.69,
+   "sockets": 1
+  },
+  {
+   "id": "340",
+   "title": "Abfangraketenwerfer",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 2.9,
+   "fleet1": 3.02,
+   "fleet": 2.96,
+   "duel0": 3.51,
+   "duel1": 3.53,
+   "duel": 3.52,
+   "score": 3.24,
+   "delta": -0.76,
+   "v9": 3.74,
+   "sockets": 1
+  },
+  {
+   "id": "343",
+   "title": "Laserphalanx",
+   "rarity": 1,
+   "units": 1.7,
+   "fleet0": 5.06,
+   "fleet1": 5.22,
+   "fleet": 5.14,
+   "duel0": 3.1,
+   "duel1": 3.08,
+   "duel": 3.09,
+   "score": 4.11,
+   "delta": 0.11,
+   "v9": 4.24,
+   "sockets": 1
+  },
+  {
+   "id": "344",
+   "title": "Fokuslaser",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 8.07,
+   "fleet1": 8.08,
+   "fleet": 8.07,
+   "duel0": 5.47,
+   "duel1": 5.48,
+   "duel": 5.47,
+   "score": 6.77,
+   "delta": 2.77,
+   "v9": 4.89,
+   "sockets": 1
+  },
+  {
+   "id": "347",
+   "title": "Impulslaser",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 5.89,
+   "fleet1": 5.94,
+   "fleet": 5.91,
+   "duel0": 4.77,
+   "duel1": 4.51,
+   "duel": 4.64,
+   "score": 5.28,
+   "delta": 1.28,
+   "v9": 5.01,
+   "sockets": 1
+  },
+  {
+   "id": "401",
+   "title": "Guillotine",
+   "rarity": 5,
+   "units": 4.1,
+   "fleet0": 3.7,
+   "fleet1": 4.15,
+   "fleet": 3.93,
+   "duel0": 3.71,
+   "duel1": 3.78,
+   "duel": 3.75,
+   "score": 3.84,
+   "delta": -3.16,
+   "v9": 6.56,
+   "sockets": 2
+  },
+  {
+   "id": "405",
+   "title": "Thermallanze",
+   "rarity": 4,
+   "units": 2.7,
+   "fleet0": 6.07,
+   "fleet1": 6.5,
+   "fleet": 6.28,
+   "duel0": 4.73,
+   "duel1": 4.97,
+   "duel": 4.85,
+   "score": 5.57,
+   "delta": -0.43,
+   "v9": 5.72,
+   "sockets": 2
+  },
+  {
+   "id": "409",
+   "title": "Plasmabeschleuniger",
+   "rarity": 4,
+   "units": 2.7,
+   "fleet0": 4.15,
+   "fleet1": 4.47,
+   "fleet": 4.31,
+   "duel0": 4.34,
+   "duel1": 4.32,
+   "duel": 4.33,
+   "score": 4.32,
+   "delta": -1.68,
+   "v9": 5.81,
+   "sockets": 2
+  },
+  {
+   "id": "412",
+   "title": "Langstreckentorpedos",
+   "rarity": 3,
+   "units": 1.0,
+   "fleet0": 7.42,
+   "fleet1": 7.29,
+   "fleet": 7.35,
+   "duel0": 6.43,
+   "duel1": 6.37,
+   "duel": 6.4,
+   "score": 6.88,
+   "delta": 1.78,
+   "v9": 4.33,
+   "sockets": 1
+  },
+  {
+   "id": "420",
+   "title": "Donnerkanone",
+   "rarity": 2,
+   "units": 2.0,
+   "fleet0": 2.95,
+   "fleet1": 3.17,
+   "fleet": 3.06,
+   "duel0": 2.49,
+   "duel1": 2.47,
+   "duel": 2.48,
+   "score": 2.77,
+   "delta": -1.53,
+   "v9": 3.97,
+   "sockets": 1
+  },
+  {
+   "id": "421",
+   "title": "Salvenlaser",
+   "rarity": 2,
+   "units": 2.2,
+   "fleet0": 5.19,
+   "fleet1": 5.35,
+   "fleet": 5.27,
+   "duel0": 2.76,
+   "duel1": 2.83,
+   "duel": 2.8,
+   "score": 4.03,
+   "delta": -0.27,
+   "v9": 4.81,
+   "sockets": 2
+  },
+  {
+   "id": "422",
+   "title": "Feuersturmtorpedos",
+   "rarity": 2,
+   "units": 1.0,
+   "fleet0": 5.04,
+   "fleet1": 5.19,
+   "fleet": 5.12,
+   "duel0": 4.3,
+   "duel1": 4.24,
+   "duel": 4.27,
+   "score": 4.69,
+   "delta": 0.39,
+   "v9": 5.3,
+   "sockets": 1
+  },
+  {
+   "id": "424",
+   "title": "Sturmgeschütz",
+   "rarity": 2,
+   "units": 2.0,
+   "fleet0": 3.2,
+   "fleet1": 3.42,
+   "fleet": 3.31,
+   "duel0": 2.54,
+   "duel1": 2.53,
+   "duel": 2.54,
+   "score": 2.93,
+   "delta": -1.37,
+   "v9": 4.47,
+   "sockets": 1
+  },
+  {
+   "id": "438",
+   "title": "Feldannihilator",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 5.64,
+   "fleet1": 5.6,
+   "fleet": 5.62,
+   "duel0": 3.44,
+   "duel1": 3.47,
+   "duel": 3.45,
+   "score": 4.54,
+   "delta": 0.54,
+   "v9": 4.35,
+   "sockets": 1
+  },
+  {
+   "id": "440",
+   "title": "Impulskanone",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 4.61,
+   "fleet1": 4.76,
+   "fleet": 4.68,
+   "duel0": 2.51,
+   "duel1": 2.49,
+   "duel": 2.5,
+   "score": 3.59,
+   "delta": -0.41,
+   "v9": 3.56,
+   "sockets": 1
+  },
+  {
+   "id": "441",
+   "title": "Flechette-Werfer",
+   "rarity": 1,
+   "units": 0.7,
+   "fleet0": 3.57,
+   "fleet1": 3.78,
+   "fleet": 3.67,
+   "duel0": 1.57,
+   "duel1": 1.53,
+   "duel": 1.55,
+   "score": 2.61,
+   "delta": -1.39,
+   "v9": 4.15,
+   "sockets": 1
+  },
+  {
+   "id": "554",
+   "title": "Pegasus-Torpedos",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 5.75,
+   "fleet1": 5.88,
+   "fleet": 5.82,
+   "duel0": 4.82,
+   "duel1": 4.77,
+   "duel": 4.8,
+   "score": 5.31,
+   "delta": 1.31,
+   "v9": 4.16,
+   "sockets": 1
+  },
+  {
+   "id": "555",
+   "title": "Penetrator-Torpedos",
+   "rarity": 1,
+   "units": 1.0,
+   "fleet0": 5.99,
+   "fleet1": 6.16,
+   "fleet": 6.07,
+   "duel0": 5.13,
+   "duel1": 5.1,
+   "duel": 5.11,
+   "score": 5.59,
+   "delta": 1.59,
+   "v9": 4.05,
+   "sockets": 1
+  }
+ ],
+ "cards": [
+  {
+   "id": "103",
+   "title": "Adamantiumpanzer",
+   "rarity": 5,
+   "units": 1.2,
+   "hp": 0,
+   "fleet0": 3.04,
+   "fleet1": 3.04,
+   "fleet": 3.04,
+   "duel0": 3.8,
+   "duel1": 3.83,
+   "duel": 3.82,
+   "score": 3.43,
+   "delta": -3.57,
+   "comp": {
+    "out": 0.71,
+    "take": 2.45,
+    "col": 0.0,
+    "loot": 0.27,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.44,
+     "fleet1": 0.48,
+     "duel0": 0.97,
+     "duel1": 0.97
+    },
+    "take": {
+     "fleet0": 2.32,
+     "fleet1": 2.28,
+     "duel0": 2.58,
+     "duel1": 2.61
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.28,
+     "fleet1": 0.28,
+     "duel0": 0.25,
+     "duel1": 0.26
+    }
+   }
+  },
+  {
+   "id": "109",
+   "title": "Plasmanachbrenner",
+   "rarity": 4,
+   "units": 3.1,
+   "hp": 0,
+   "fleet0": 1.47,
+   "fleet1": 0.82,
+   "fleet": 1.15,
+   "duel0": 0.67,
+   "duel1": 0.54,
+   "duel": 0.6,
+   "score": 0.87,
+   "delta": -5.13,
+   "comp": {
+    "out": -0.22,
+    "take": 0.74,
+    "col": -0.02,
+    "loot": 0.38,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -0.57,
+     "fleet1": 0.2,
+     "duel0": -0.66,
+     "duel1": 0.14
+    },
+    "take": {
+     "fleet0": 1.11,
+     "fleet1": 0.57,
+     "duel0": 0.92,
+     "duel1": 0.36
+    },
+    "col": {
+     "fleet0": -0.02,
+     "fleet1": -0.01,
+     "duel0": -0.06,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.95,
+     "fleet1": 0.06,
+     "duel0": 0.47,
+     "duel1": 0.03
+    }
+   }
+  },
+  {
+   "id": "115",
+   "title": "Ablative Magnetpanzerung",
+   "rarity": 4,
+   "units": 0.7,
+   "hp": 0,
+   "fleet0": 3.33,
+   "fleet1": 3.36,
+   "fleet": 3.35,
+   "duel0": 4.27,
+   "duel1": 4.25,
+   "duel": 4.26,
+   "score": 3.8,
+   "delta": -2.2,
+   "comp": {
+    "out": 0.75,
+    "take": 2.76,
+    "col": 0.0,
+    "loot": 0.29,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.48,
+     "fleet1": 0.53,
+     "duel0": 1.0,
+     "duel1": 0.99
+    },
+    "take": {
+     "fleet0": 2.56,
+     "fleet1": 2.54,
+     "duel0": 2.98,
+     "duel1": 2.97
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.29,
+     "fleet1": 0.29,
+     "duel0": 0.29,
+     "duel1": 0.29
+    }
+   }
+  },
+  {
+   "id": "140",
+   "title": "Deflektorschild",
+   "rarity": 2,
+   "units": 2.4,
+   "hp": 0,
+   "fleet0": 0.96,
+   "fleet1": 0.96,
+   "fleet": 0.96,
+   "duel0": 1.2,
+   "duel1": 1.27,
+   "duel": 1.23,
+   "score": 1.1,
+   "delta": -3.2,
+   "comp": {
+    "out": 0.26,
+    "take": 0.76,
+    "col": -0.0,
+    "loot": 0.09,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.15,
+     "fleet1": 0.18,
+     "duel0": 0.34,
+     "duel1": 0.36
+    },
+    "take": {
+     "fleet0": 0.72,
+     "fleet1": 0.7,
+     "duel0": 0.78,
+     "duel1": 0.82
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.09,
+     "fleet1": 0.09,
+     "duel0": 0.09,
+     "duel1": 0.09
+    }
+   }
+  },
+  {
+   "id": "161",
+   "title": "Ionenschubdüsen",
+   "rarity": 1,
+   "units": 1.7,
+   "hp": 0,
+   "fleet0": 2.56,
+   "fleet1": 0.76,
+   "fleet": 1.66,
+   "duel0": 0.83,
+   "duel1": 0.03,
+   "duel": 0.43,
+   "score": 1.05,
+   "delta": -2.95,
+   "comp": {
+    "out": -0.4,
+    "take": 0.85,
+    "col": -0.01,
+    "loot": 0.6,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -0.48,
+     "fleet1": 0.24,
+     "duel0": -1.36,
+     "duel1": 0.0
+    },
+    "take": {
+     "fleet0": 1.54,
+     "fleet1": 0.49,
+     "duel0": 1.35,
+     "duel1": 0.03
+    },
+    "col": {
+     "fleet0": -0.02,
+     "fleet1": -0.01,
+     "duel0": -0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 1.52,
+     "fleet1": 0.04,
+     "duel0": 0.85,
+     "duel1": 0.0
+    }
+   }
+  },
+  {
+   "id": "163",
+   "title": "Verbundpanzerung",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 2,
+   "fleet0": 2.83,
+   "fleet1": 2.85,
+   "fleet": 4.27,
+   "duel0": 4.46,
+   "duel1": 4.41,
+   "duel": 5.87,
+   "score": 5.07,
+   "delta": 1.07,
+   "comp": {
+    "out": 0.99,
+    "take": 2.29,
+    "col": 0.0,
+    "loot": 0.36,
+    "hp_static": 1.43
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.56,
+     "fleet1": 0.61,
+     "duel0": 1.41,
+     "duel1": 1.37
+    },
+    "take": {
+     "fleet0": 1.95,
+     "fleet1": 1.92,
+     "duel0": 2.65,
+     "duel1": 2.65
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.32,
+     "fleet1": 0.32,
+     "duel0": 0.4,
+     "duel1": 0.39
+    }
+   }
+  },
+  {
+   "id": "170",
+   "title": "Strahlenschilde",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 0,
+   "fleet0": 2.55,
+   "fleet1": 2.53,
+   "fleet": 2.54,
+   "duel0": 3.16,
+   "duel1": 3.29,
+   "duel": 3.22,
+   "score": 2.88,
+   "delta": -1.12,
+   "comp": {
+    "out": 0.6,
+    "take": 2.05,
+    "col": -0.0,
+    "loot": 0.23,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.42,
+     "fleet1": 0.47,
+     "duel0": 0.75,
+     "duel1": 0.79
+    },
+    "take": {
+     "fleet0": 1.88,
+     "fleet1": 1.83,
+     "duel0": 2.2,
+     "duel1": 2.29
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.25,
+     "fleet1": 0.24,
+     "duel0": 0.21,
+     "duel1": 0.22
+    }
+   }
+  },
+  {
+   "id": "171",
+   "title": "Titanplattenpanzer",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": -1,
+   "fleet0": 3.77,
+   "fleet1": 3.77,
+   "fleet": 3.05,
+   "duel0": 4.98,
+   "duel1": 5.01,
+   "duel": 4.28,
+   "score": 3.67,
+   "delta": -0.33,
+   "comp": {
+    "out": 0.77,
+    "take": 3.32,
+    "col": 0.0,
+    "loot": 0.29,
+    "hp_static": -0.71
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.48,
+     "fleet1": 0.51,
+     "duel0": 1.06,
+     "duel1": 1.04
+    },
+    "take": {
+     "fleet0": 2.99,
+     "fleet1": 2.96,
+     "duel0": 3.64,
+     "duel1": 3.68
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.29,
+     "fleet1": 0.3,
+     "duel0": 0.29,
+     "duel1": 0.29
+    }
+   }
+  },
+  {
+   "id": "184",
+   "title": "Rumpferweiterung",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 4,
+   "fleet0": 0.69,
+   "fleet1": 0.76,
+   "fleet": 3.58,
+   "duel0": 1.72,
+   "duel1": 1.69,
+   "duel": 4.56,
+   "score": 4.07,
+   "delta": 0.07,
+   "comp": {
+    "out": 0.92,
+    "take": -0.01,
+    "col": -0.0,
+    "loot": 0.31,
+    "hp_static": 2.86
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.42,
+     "fleet1": 0.47,
+     "duel0": 1.4,
+     "duel1": 1.38
+    },
+    "take": {
+     "fleet0": 0.06,
+     "fleet1": 0.07,
+     "duel0": -0.09,
+     "duel1": -0.09
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.21,
+     "fleet1": 0.21,
+     "duel0": 0.41,
+     "duel1": 0.41
+    }
+   }
+  },
+  {
+   "id": "240",
+   "title": "Ceramo-Stahl",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 3,
+   "fleet0": 0.1,
+   "fleet1": -1.88,
+   "fleet": 1.25,
+   "duel0": 4.55,
+   "duel1": 1.26,
+   "duel": 5.05,
+   "score": 3.15,
+   "delta": -0.85,
+   "comp": {
+    "out": -1.46,
+    "take": 2.62,
+    "col": 0.02,
+    "loot": -0.18,
+    "hp_static": 2.14
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -1.34,
+     "fleet1": -3.51,
+     "duel0": 1.5,
+     "duel1": -2.48
+    },
+    "take": {
+     "fleet0": 1.31,
+     "fleet1": 1.89,
+     "duel0": 2.62,
+     "duel1": 4.66
+    },
+    "col": {
+     "fleet0": 0.02,
+     "fleet1": 0.06,
+     "duel0": 0.0,
+     "duel1": 0.01
+    },
+    "loot": {
+     "fleet0": 0.12,
+     "fleet1": -0.33,
+     "duel0": 0.43,
+     "duel1": -0.93
+    }
+   }
+  },
+  {
+   "id": "312",
+   "title": "Refraktorfeld",
+   "rarity": 3,
+   "units": 2.4,
+   "hp": 0,
+   "fleet0": 0.75,
+   "fleet1": 0.76,
+   "fleet": 0.75,
+   "duel0": 0.89,
+   "duel1": 0.92,
+   "duel": 0.9,
+   "score": 0.83,
+   "delta": -4.27,
+   "comp": {
+    "out": 0.17,
+    "take": 0.59,
+    "col": -0.0,
+    "loot": 0.06,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.12,
+     "fleet1": 0.14,
+     "duel0": 0.21,
+     "duel1": 0.21
+    },
+    "take": {
+     "fleet0": 0.56,
+     "fleet1": 0.55,
+     "duel0": 0.62,
+     "duel1": 0.64
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.07,
+     "fleet1": 0.07,
+     "duel0": 0.06,
+     "duel1": 0.06
+    }
+   }
+  },
+  {
+   "id": "341",
+   "title": "Ködersystem",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 0,
+   "fleet0": 1.89,
+   "fleet1": 1.84,
+   "fleet": 1.86,
+   "duel0": 0.81,
+   "duel1": 0.79,
+   "duel": 0.8,
+   "score": 1.33,
+   "delta": -2.67,
+   "comp": {
+    "out": 0.26,
+    "take": 0.97,
+    "col": 0.0,
+    "loot": 0.11,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.23,
+     "fleet1": 0.26,
+     "duel0": 0.27,
+     "duel1": 0.27
+    },
+    "take": {
+     "fleet0": 1.51,
+     "fleet1": 1.42,
+     "duel0": 0.48,
+     "duel1": 0.47
+    },
+    "col": {
+     "fleet0": 0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.15,
+     "fleet1": 0.16,
+     "duel0": 0.06,
+     "duel1": 0.05
+    }
+   }
+  },
+  {
+   "id": "349",
+   "title": "Dura-Stahl Platten",
+   "rarity": 1,
+   "units": 1.2,
+   "hp": 4,
+   "fleet0": 2.34,
+   "fleet1": 2.38,
+   "fleet": 4.03,
+   "duel0": 3.57,
+   "duel1": 3.62,
+   "duel": 5.26,
+   "score": 4.64,
+   "delta": 0.64,
+   "comp": {
+    "out": 0.85,
+    "take": 1.84,
+    "col": -0.0,
+    "loot": 0.29,
+    "hp_static": 1.67
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.47,
+     "fleet1": 0.52,
+     "duel0": 1.18,
+     "duel1": 1.21
+    },
+    "take": {
+     "fleet0": 1.6,
+     "fleet1": 1.59,
+     "duel0": 2.08,
+     "duel1": 2.1
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.28,
+     "fleet1": 0.27,
+     "duel0": 0.3,
+     "duel1": 0.31
+    }
+   }
+  },
+  {
+   "id": "406",
+   "title": "Kohlenstoffsilikatpanzer",
+   "rarity": 4,
+   "units": 1.2,
+   "hp": 7,
+   "fleet0": 2.42,
+   "fleet1": 2.48,
+   "fleet": 5.36,
+   "duel0": 3.77,
+   "duel1": 3.8,
+   "duel": 6.7,
+   "score": 6.03,
+   "delta": 0.03,
+   "comp": {
+    "out": 0.98,
+    "take": 1.81,
+    "col": -0.0,
+    "loot": 0.33,
+    "hp_static": 2.92
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.56,
+     "fleet1": 0.63,
+     "duel0": 1.36,
+     "duel1": 1.38
+    },
+    "take": {
+     "fleet0": 1.53,
+     "fleet1": 1.52,
+     "duel0": 2.08,
+     "duel1": 2.09
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.33,
+     "fleet1": 0.33,
+     "duel0": 0.33,
+     "duel1": 0.33
+    }
+   }
+  },
+  {
+   "id": "426",
+   "title": "Schildbooster",
+   "rarity": 2,
+   "units": 0.7,
+   "hp": 0,
+   "fleet0": 0.29,
+   "fleet1": 0.26,
+   "fleet": 0.28,
+   "duel0": 0.3,
+   "duel1": 0.32,
+   "duel": 0.31,
+   "score": 0.29,
+   "delta": -4.01,
+   "comp": {
+    "out": 0.08,
+    "take": 0.19,
+    "col": -0.0,
+    "loot": 0.02,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.06,
+     "fleet1": 0.05,
+     "duel0": 0.11,
+     "duel1": 0.12
+    },
+    "take": {
+     "fleet0": 0.21,
+     "fleet1": 0.19,
+     "duel0": 0.17,
+     "duel1": 0.18
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": 0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.02,
+     "fleet1": 0.02,
+     "duel0": 0.02,
+     "duel1": 0.02
+    }
+   }
+  },
+  {
+   "id": "434",
+   "title": "Leichtbauweise",
+   "rarity": 2,
+   "units": 0.7,
+   "hp": -3,
+   "fleet0": 5.97,
+   "fleet1": 1.4,
+   "fleet": 1.54,
+   "duel0": 1.76,
+   "duel1": -0.68,
+   "duel": -1.6,
+   "score": -0.03,
+   "delta": -4.33,
+   "comp": {
+    "out": -1.52,
+    "take": 2.29,
+    "col": -0.02,
+    "loot": 1.37,
+    "hp_static": -2.14
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -1.31,
+     "fleet1": 0.23,
+     "duel0": -3.88,
+     "duel1": -1.12
+    },
+    "take": {
+     "fleet0": 3.72,
+     "fleet1": 1.2,
+     "duel0": 3.58,
+     "duel1": 0.65
+    },
+    "col": {
+     "fleet0": -0.05,
+     "fleet1": -0.02,
+     "duel0": -0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 3.62,
+     "fleet1": -0.01,
+     "duel0": 2.07,
+     "duel1": -0.21
+    }
+   }
+  },
+  {
+   "id": "449",
+   "title": "Schwerer Rumpf",
+   "rarity": 1,
+   "units": 0.7,
+   "hp": 5,
+   "fleet0": -2.13,
+   "fleet1": -3.75,
+   "fleet": 0.63,
+   "duel0": 1.78,
+   "duel1": -0.18,
+   "duel": 4.37,
+   "score": 2.5,
+   "delta": -1.5,
+   "comp": {
+    "out": -1.55,
+    "take": 0.66,
+    "col": 0.02,
+    "loot": -0.2,
+    "hp_static": 3.57
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -1.48,
+     "fleet1": -3.65,
+     "duel0": 1.45,
+     "duel1": -2.52
+    },
+    "take": {
+     "fleet0": -0.68,
+     "fleet1": 0.17,
+     "duel0": -0.1,
+     "duel1": 3.26
+    },
+    "col": {
+     "fleet0": 0.02,
+     "fleet1": 0.07,
+     "duel0": 0.0,
+     "duel1": 0.01
+    },
+    "loot": {
+     "fleet0": 0.02,
+     "fleet1": -0.33,
+     "duel0": 0.43,
+     "duel1": -0.93
+    }
+   }
+  },
+  {
+   "id": "522",
+   "title": "Heckdeflektor",
+   "rarity": 2,
+   "units": 2.2,
+   "hp": 0,
+   "fleet0": 1.04,
+   "fleet1": 1.05,
+   "fleet": 1.05,
+   "duel0": 1.31,
+   "duel1": 1.38,
+   "duel": 1.35,
+   "score": 1.2,
+   "delta": -3.1,
+   "comp": {
+    "out": 0.28,
+    "take": 0.82,
+    "col": -0.0,
+    "loot": 0.09,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": 0.17,
+     "fleet1": 0.19,
+     "duel0": 0.37,
+     "duel1": 0.39
+    },
+    "take": {
+     "fleet0": 0.78,
+     "fleet1": 0.76,
+     "duel0": 0.85,
+     "duel1": 0.9
+    },
+    "col": {
+     "fleet0": -0.0,
+     "fleet1": -0.0,
+     "duel0": 0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 0.1,
+     "fleet1": 0.09,
+     "duel0": 0.09,
+     "duel1": 0.1
+    }
+   }
+  },
+  {
+   "id": "537",
+   "title": "Quantenmechanischer Antrieb",
+   "rarity": 2,
+   "units": 1.2,
+   "hp": 0,
+   "fleet0": 3.62,
+   "fleet1": 1.08,
+   "fleet": 2.35,
+   "duel0": 1.18,
+   "duel1": 0.05,
+   "duel": 0.61,
+   "score": 1.48,
+   "delta": -2.82,
+   "comp": {
+    "out": -0.57,
+    "take": 1.21,
+    "col": -0.01,
+    "loot": 0.85,
+    "hp_static": 0.0
+   },
+   "comp_cells": {
+    "out": {
+     "fleet0": -0.67,
+     "fleet1": 0.33,
+     "duel0": -1.93,
+     "duel1": 0.01
+    },
+    "take": {
+     "fleet0": 2.18,
+     "fleet1": 0.69,
+     "duel0": 1.91,
+     "duel1": 0.04
+    },
+    "col": {
+     "fleet0": -0.03,
+     "fleet1": -0.01,
+     "duel0": -0.0,
+     "duel1": 0.0
+    },
+    "loot": {
+     "fleet0": 2.15,
+     "fleet1": 0.06,
+     "duel0": 1.21,
+     "duel1": 0.0
+    }
+   }
+  }
+ ],
+ "outliers": [
+  "401",
+  "344",
+  "106",
+  "179",
+  "207",
+  "136",
+  "302",
+  "412",
+  "125",
+  "224",
+  "409",
+  "127",
+  "555",
+  "420",
+  "234",
+  "318",
+  "441",
+  "424",
+  "180",
+  "181",
+  "554",
+  "118",
+  "347",
+  "168",
+  "339",
+  "157"
+ ],
+ "outliers_cards": [
+  "109",
+  "434",
+  "312",
+  "426",
+  "103",
+  "140",
+  "522",
+  "161",
+  "537",
+  "341",
+  "115",
+  "449",
+  "170",
+  "163"
+ ]
+}
