@@ -67,7 +67,7 @@ OUT_PATH = os.path.join(HERE, 'diag_random_v23_r13t.json')
 N = 10000   # v23-Ankuerung (Christophers Beschluesse 5.11.2026):
             # v22-Frame (>=-Regel) + Spielkosten +1 auf ALLE Karten +
             # Draw-v2 (Pflichtwaffe je Schiff, Re-draw, b_lo-Fix) +
-            # Flotte 1-4 Schiffe; Offizialmessung N=10k, seed 42
+            # Flotte 1-5 Schiffe; Offizialmessung N=10k, seed 42
 CKPT_EVERY = 50
 HP_STATIC = v11.HP_STATIC
 CTRL_W = v11.CTRL_W
@@ -117,7 +117,8 @@ cptot = sum(p for _, p in cpools)
 
 def draw_random_fleet(types_by_n, rng):
     """Christophers Varianz-Auftrag (5.11.2026): Flottengroesse
-    UNABHAENGIG 1..3 Schiffe je Seite, Schiffsgröße je Schiff
+    UNABHAENGIG 1..5 Schiffe je Seite (v23b; urspruenglich 1..3,
+    Zwischenschritt 1..4), Schiffsgröße je Schiff
     uniform 1..3 Sektionen (Huellen-Karten 1..9), Typ zweistufig
     wie v11 (TYPE_BEST x Build-Gewicht). Ungleich grosse Flotten
     entstehen endogen (kleinere Flotte -> mehr Ausruestung, die
@@ -699,7 +700,7 @@ for rar in (1, 2, 3, 4, 5):
 n_taken = []
 out = dict(frame='v23d: random battles (r13t probe v6, >=-halved '
                  'AUCH im wspec-Pfad (Bugfix), wspec feuert ERSTE je '
-                 'Phase (Christophers X-Beschluss 8.11.), '
+                 'Phase (Christophers X-Beschluss 5.11.), '
                  'Spielkosten +1 auf alle Karten, Draw-v2 '
                  '(Pflichtwaffe/Re-draw/b_lo-Fix), Flotte 1-5, '
                  'HP_STATIC 1.0), '

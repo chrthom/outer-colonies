@@ -8,6 +8,11 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
    Geschwindigkeitsvorteil des Verteidigers (equipment_card.ts:44:
    target.isFlightReady && attacker.speed + range < target.speed ->
    Math.round(damage/2)). Kolonien sind nie flugbereit -> nie halbiert.
+   Historischer Stand: zitiert die Pre-#813-Serverregel (striktes <);
+   der Server rechnet seit #813 (7.11.2026) <= (Gleichstand wird
+   halbiert). v9-HALF_PROB (und die darauf aufbauenden half_prob-
+   Funktionen in v10) sind damit die historische Pre-v22-Herleitungs-
+   basis, abgeloest durch das Tie-Halving der Sonde (diag_random_r13t.py).
    Herleitung aus Speed-Verteilung der 50 implementierten Huellen:
    R4 2 %, R3 10 %, R2 19 %, R1 26 % (Paar-Rechnung ueber alle Angreifer/Ziel-
    Kombinationen). Kalibrierung: R4 0 % (Christoph), R3 10 %, R2 20 %, R1 25 %.
@@ -381,7 +386,7 @@ def colony_attack(w, cards):
 def effective(w):
     wts = sum(wt for _, wt in SHIP)
     slow = SLOW_TARGET_FACTOR if w['id'] == '224' else 1.0   # 'Wirkungslos (3+ speed)'
-    # --- Mission (85 %): reines Schiffsgefecht, KEIN Kolonie-Angriff moeglich ---
+    # --- Mission (50 %): reines Schiffsgefecht, KEIN Kolonie-Angriff moeglich ---
     if w['single']:
         # Einmalverwendung: 1 Schuss zum besten Zeitpunkt (max. Reichweite optimal)
         mission = sum(wt * single_ship_best(w, c) for c, wt in SHIP) / wts * slow
@@ -392,7 +397,7 @@ def effective(w):
                 ph[p] += wt * v
         for p in ph: ph[p] = ph[p] / wts * slow
         mission = sum(ph.values())
-    # --- Raid (15 %): Kolonie erst ab R1 angreifbar, dort Zielwahl ---
+    # --- Raid (50 %): Kolonie erst ab R1 angreifbar, dort Zielwahl ---
     colony_avg = 0.0
     if not w['no_colony']:
         cw = sum(wt for _, wt in COLONY)
