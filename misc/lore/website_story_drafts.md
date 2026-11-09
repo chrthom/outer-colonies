@@ -1,10 +1,10 @@
 # Website Story Drafts – World Intro & Edition Stories
 
-> **Status**: Working snapshot of the German website story drafts (backup per repo working-copy rule). Not final: edition stories and story spotlight cards are still under review. Ongoing iteration continues in the lore knowledge base; update this file with a new snapshot at the end of each work round. Content is in German (game content).
+> **Status**: Working snapshot of the German website story drafts (backup per repo working-copy rule). Not final: edition stories, story spotlight cards and story arc subtitles are still under review. Ongoing iteration continues in the lore knowledge base; update this file with a new snapshot at the end of each work round. Content is in German (game content). Successor of #809; file moved to `misc/lore/` via the docs restructure (#824).
 
 ---
 
-# Outer Colonies – Website: Welt & Editionen (Entwurf)
+# Outer Colonies – Website: Welt & Editionen (Entwurf 💡)
 
 > **Status**: Review-fähiger Entwurf nach dem verbindlichen Story-Kanon (Intro + je Edition eine in sich geschlossene Geschichte, Wir-Sicht, enzyklopädischer Ton mit Figuren-Zitaten). Editionstitel = offizielle Titel aus dem Spielcode; poetische Story-Bogen-Titel sind Vorschläge.
 
@@ -32,9 +32,9 @@ Draußen gilt: Was du nicht selbst baust, gehört dir nicht. Was du nicht vertei
 
 > „Der Standard unserer Werften ist kein Gesetz. Er ist die gemeinsame Sprache aller, die überleben wollen." – Aygül Demir, Solare Kommission
 
-> „Der Mars schweißt, Venus zahlt sich selbst." – Layla Chen, Informationshändlerin *(vorgesehen für die Venus-Mächte-Seite)*
+> „Der Mars schweißt, Venus zahlt sich selbst." – Layla Chen, Informationshändlerin *(💡 vorgesehen für die Venus-Mächte-Seite)*
 
-*Einschub-Stil: Die ersten vier Zitate über die Seite verteilen – je Machtbereich eines (Verträge/Handel/Mars/Standard). Das Layla-Chen-Zitat gehört auf die Venus-Seite der Mächte.*
+*Einschub-Stil (💡): Die ersten vier Zitate über die Seite verteilen – je Machtbereich eines (Verträge/Handel/Mars/Standard). Das Layla-Chen-Zitat gehört auf die Venus-Seite der Mächte.*
 
 ---
 
@@ -44,7 +44,7 @@ Draußen gilt: Was du nicht selbst baust, gehört dir nicht. Was du nicht vertei
 
 ---
 
-## Edition 1 – „Outer Colonies" *(Story-Bogen: „Neue Heimat")*
+## Edition 1 – „Outer Colonies" *(Story-Bogen: „Neue Heimat" 💡)*
 
 **Beleuchteter Weltausschnitt:** Die Geburtsstunde einer Kolonie – Ankunft, Aufbau, erste Bedrohung. Die jungen Monde: Titan, Europa, Ganymed.
 
@@ -60,7 +60,7 @@ Diese Ausgabe erzählt vom Anfang – und davon, dass der Anfang nie endet: Jede
 
 ---
 
-## Edition 2 – „Jovians Freihändler" *(Story-Bogen: „Der graue Markt")*
+## Edition 2 – „Jovians Freihändler" *(Story-Bogen: „Der graue Markt" 💡)*
 
 **Beleuchteter Weltausschnitt:** Die Jupitermonde – die stärkste Wirtschaft außerhalb der inneren Welten: Rohstoffabbau, Industrie, Informationsinfrastruktur, viel Handel. Hier ringen die Freihändler um ihre Vorherrschaft, während Venus und Mars versuchen, Kontrolle zu gewinnen.
 
@@ -76,7 +76,7 @@ Und alle reden sie über die Morgenröte. Manche sagen, das legendäre Schiff ex
 
 ---
 
-## Edition 3 – „Marsianische Hegemonie" *(Story-Bogen: „Der Schatten des Mars")*
+## Edition 3 – „Marsianische Hegemonie" *(Story-Bogen: „Der Schatten des Mars" 💡)*
 
 **Beleuchteter Weltausschnitt:** Kallisto und die martianische Ordnungsmacht. Konsulate, Protektorate, Space Marines – der Kalte Krieg der Häuser, ausgetragen über den Köpfen der Kolonien.
 
@@ -92,7 +92,7 @@ Diese Ausgabe erzählt von dem Jahr, in dem der Schatten des Mars unsere Kolonie
 
 ---
 
-## Edition 4 – „Kuiper-Gürtel" *(Story-Bogen: „Am Rand des Lichts")*
+## Edition 4 – „Kuiper-Gürtel" *(Story-Bogen: „Am Rand des Lichts" 💡)*
 
 **Beleuchteter Weltausschnitt:** Die Kuiper-Frontier: Pluto, Miranda, Oberon, Triton. Immigranten aus einem erschöpften Terra, Schatzsuche, und die Legende der Guillotine.
 
@@ -108,7 +108,7 @@ Und irgendwo da draußen, das wissen wir nur vom Hörensagen, existiert eine Rui
 
 ---
 
-## Edition 5 – noch ohne Titel im Code *(Arbeitstitel „Pandora" – Achtung: „Pandora" ist aktuell der Release-Name v3.1; Konzeptrahmen – Edition in Konzeption)*
+## Edition 5 – noch ohne Titel im Code *(Arbeitstitel „Pandora" 💡 – Achtung: „Pandora" ist aktuell der Release-Name v3.1; Konzeptrahmen – Edition in Konzeption)*
 
 **Beleuchteter Weltausschnitt (geplant):** Eine systemweite Krise: Pandemie, Desinformation, Apokalypse-Angst. Das Venus-Medienmonopol als Brandbeschleuniger; die Diasporabewegung als Erbe der Kallisto-Dissidenten.
 
@@ -120,11 +120,12 @@ Eine Seuche – oder das, was das System dafür hält – springt von Kolonie zu
 
 ---
 
-# Teil 3 – Offene Entscheidungen
+# Teil 3 – Offene Entscheidungen (❓)
 
-1. **Story-Spotlights**: je 5 Karten pro Edition vorgeschlagen – vertagt, bis Christopher die Karten gesehen hat.
+1. **Story-Spotlights**: je 5 Karten pro Edition vorgeschlagen – **vertagt**, bis Christopher die Karten gesehen hat.
 2. **Story-Bogen-Titel**: poetische Untertitel („Neue Heimat", „Der graue Markt", „Der Schatten des Mars", „Am Rand des Lichts") – bestätigen oder ersetzen?
 3. **Edition-5-Titel**: noch namenlos im Code; Kollision mit Release-Name „Pandora" (v3.1) klären.
 4. **Ed-5-Konzept**: Vertiefung, sobald die Editions-Konzeption steht.
+5. **Vertiefungs-Option „Figuren-Vignetten"**: je Edition 3–5 kurze Figuren-Vignetten aus dem 14-Figuren-Register als narrative Einschübe (MTG-Side-Story-Prinzip) – als Option freigegeben, Umsetzung bei Bedarf.
 
-*Entschieden: Website-Reihenfolge Welt → Mächte → Geschichte → Editionen · Editions-Stories 1–4 kompakt, bei Bedarf später vertiefen · Editionstitel aus dem Spielcode · Ed-2-Zoom auf Jupiter (Freihändler-Ringkampf gegen Venus und Mars) · Ed-4-Story im gesetzlosen Territorium passt.*
+*Entschieden (✅): Website-Reihenfolge Welt → Mächte → Geschichte → Editionen · Editions-Stories 1–4 kompakt, bei Bedarf später vertiefen · Editionstitel aus dem Spielcode · Ed-2-Zoom auf Jupiter (Freihändler-Ringkampf gegen Venus und Mars) · Ed-4-Story im gesetzlosen Territorium passt.*
