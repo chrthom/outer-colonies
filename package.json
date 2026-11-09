@@ -5,9 +5,9 @@
     "lint": "for p in server client website; do cd $p; npm run lint; cd ..; done",
     "test": "for p in server client website; do cd $p; npm run test; cd ..; done",
     "check": "npm run format && npm run lint && npm run test",
-    "build:staging": "misc/release.sh",
-    "build:prod": "misc/release.sh -p",
-    "version": "read -p \"Version number (x.x.x)?: \" V; read -p \"Version name?: \" N; misc/version.sh $V $N"
+    "build:staging": "misc/release/release.sh",
+    "build:prod": "misc/release/release.sh -p",
+    "version": "read -p \"Version number (x.x.x)?: \" V; read -p \"Version name?: \" N; misc/release/version.sh $V $N"
   },
   "private": true,
   "author": "Christopher Thomsen"

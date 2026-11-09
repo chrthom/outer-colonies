@@ -2,7 +2,7 @@
 
 SCRIPT_PATH=`realpath "$0"`
 SCRIPT_DIR=`dirname $SCRIPT_PATH`
-BASE_DIR=${SCRIPT_DIR}/..
+BASE_DIR=${SCRIPT_DIR}/../..
 
 if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"

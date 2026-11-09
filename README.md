@@ -23,7 +23,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **website**: Angular frontend for managing card decks, settings, and opponent search
 - **client**: Phaser 3 frontend for the actual card game
 - **server**: Backend for both client and website, using REST endpoints and WebSockets
-- **misc**: Utility scripts for development
+- **misc**: Utility scripts, tools and documentation for development (see [misc/README.md](misc/README.md))
 
 ## Software Architecture
 
@@ -157,6 +157,9 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `card.ts`: General card logic
     - `collection/`: Implementation of all the actual cards
     - `types/`: Abstract classes with common logic for types of cards
+  - `components/converters/`: Conversion of client payloads to server state
+    - `client_planned_battle_converter.ts`: Planned battle conversion
+    - `client_state_converter.ts`: Client state conversion
   - `components/persistence/`: Data persistence
     - `db_connector.ts`: Database connector
     - `db_credentials.ts`: Database credentials management
@@ -170,7 +173,9 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `helpers.ts`: Helper functions
     - `mailer.ts`: Mailer utility
   - `shared/`: Shared TypeScript interfaces and types used by both website and client
-    - `interfaces/rest_api.ts`: REST API interfaces
+    - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)
+    - `config/constants.ts`: Shared constants
+    - `config/dailies.ts`: Daily achievement definitions
     - `config/enums.ts`: Game enums
     - `config/rules.ts`: Game rules configuration
     - `config/starter_decks.ts`: Starter deck configurations
@@ -223,13 +228,18 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates
 
 - **Game**:
+  - `MsgTypeInbound.Connect`: Connect to a match
   - `MsgTypeInbound.Ready`: Player ready for game phase
   - `MsgTypeInbound.Disconnect`: Player disconnected
   - `MsgTypeInbound.Handcard`: Play a hand card
   - `MsgTypeInbound.Retract`: Retract a card
   - `MsgTypeInbound.Discard`: Discard a card
   - `MsgTypeInbound.Attack`: Attack with a card
-  - `MsgTypeOutbound.Matchmaking`: Matchmaking updates
+  - `MsgTypeInbound.Surrender`: Surrender the match
+  - `MsgTypeOutbound.Connect`: Confirm match connection
+  - `MsgTypeOutbound.Countdown`: Countdown updates
+  - `MsgTypeOutbound.CardRequest`: Reserved enum value, currently unused (card decisions reach the client via `State`/`Countdown`)
+  - `MsgTypeOutbound.State`: Full game state updates
 
 ### Server Game State and Matchmaking
 
@@ -247,7 +257,7 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 
 ### Database Schema
 
-Persistence uses MariaDB (schema definition: `misc/outercolonies.sql`):
+Persistence uses MariaDB (schema definition: `misc/database/outercolonies.sql`):
 
 | Table | Purpose | Key Columns |
 | --- | --- | --- |
@@ -267,17 +277,17 @@ The `misc` directory contains the pipeline that turns the designed cards into da
 #### Card Data Extraction (GIMP)
 
 - Cards are designed as GIMP XCF files using a layer-based template, organized in edition subfolders (`1`–`5`).
-- `misc/process_cards.py` runs inside GIMP (python-fu batch) and extracts per card: type (via visible header icon layers), title, effect (bold text), tags (bold+italic), conditional tags, lore (italic), discipline, rarity (highest visible `rarity<n>_red` layer, 5–0), author and socket/stat values from the module layers. Results are written to `misc/cards.csv`.
+- `misc/cards/process_cards.py` runs inside GIMP (python-fu batch) and extracts per card: type (via visible header icon layers), title, effect (bold text), tags (bold+italic), conditional tags, lore (italic), discipline, rarity (highest visible `rarity<n>_red` layer, 5–0), author and socket/stat values from the module layers. Results are written to `misc/cards/cards.csv`.
 - Sequences of 2–6 spaces in the template text are converted to `{ICON:<type>}` placeholders using context heuristics; ambiguous cases are flagged with `?` for manual review.
-- `misc/card_bulk_analyze.sh` runs the extraction over all edition subfolders and merges the results into `misc/cards.csv`; `misc/card_text_corrections.md` logs manual text and placeholder corrections.
+- `misc/cards/card_bulk_analyze.sh` runs the extraction over all edition subfolders and merges the results into `misc/cards/cards.csv`; `misc/cards/card_text_corrections.md` logs manual text and placeholder corrections.
 
 #### Card Balancing Toolkit
 
-- `misc/balancing/` contains the simulation-based card balancing toolkit (metric modules, random-battle probe, measurement results and round log) that derives card value scores and target curves from `misc/cards.csv`; see `misc/balancing/README.md`.
+- `misc/balancing/` contains the simulation-based card balancing toolkit (metric modules, random-battle probe, measurement results and round log) that derives card value scores and target curves from `misc/cards/cards.csv`; see `misc/balancing/README.md`.
 
 #### Card Images
 
-- Card PNGs are renamed by `misc/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/card_bulk_resize.sh` to 411×561 px (ImageMagick).
+- Card PNGs are renamed by `misc/cards/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/cards/card_bulk_resize.sh` to 411×561 px (ImageMagick).
 - The client loads card images per match from `<apiURL>/assets/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
 
 #### Client Runtime Assets
@@ -300,9 +310,9 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
 ### Setup and Installation
 
 #### Prerequisites
-- Node.js (v16 or later)
-- npm (v7 or later)
-- Angular CLI (v16.1.1)
+- Node.js (v22 or later)
+- npm (v10 or later)
+- Angular CLI (v21 or later)
 
 #### Installation Steps
 
@@ -484,7 +494,7 @@ The repository contains an event-driven agent workflow on GitHub Actions for una
 - **Escalation**: the loop stops and labels the issue/PR `needs-human` when an agent cannot proceed (budgets for time, steps and tokens are capped)
 - **Automation**: GitHub is the source of truth — the chain is driven by the GitHub events each role fires, with a manual `workflow_dispatch` backstop for retries
 
-The full design, budgets and the role chain are documented in [docs/dev-loop.md](docs/dev-loop.md). Contribution guidance for AI agents (project context, conventional commits, skills) is in [AGENTS.md](AGENTS.md).
+The full design, budgets and the role chain are documented in [misc/dev-loop.md](misc/dev-loop.md). Contribution guidance for AI agents (project context, conventional commits, skills) is in [AGENTS.md](AGENTS.md).
 
 ## Technologies and Frameworks
 
@@ -509,4 +519,4 @@ The full design, budgets and the role chain are documented in [docs/dev-loop.md]
 
 ### Database
 
-- **MariaDB**: Used for data persistence (as seen in `misc/outercolonies.sql`).
+- **MariaDB**: Used for data persistence (as seen in `misc/database/outercolonies.sql`).

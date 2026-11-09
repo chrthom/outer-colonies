@@ -386,7 +386,7 @@ allocated, and the gate re-checks the live issue state, so the `workflow_dispatc
                                            an inline run: scalar - GitHub caps run: at 21,000 chars
                                            and the inline version sat within ~3.3k of it; the env:
                                            block bridges expression contexts)
-docs/dev-loop.md                           this plan / runbook
+misc/dev-loop.md                           this plan / runbook
 ```
 
 Role job skeleton (shared):
