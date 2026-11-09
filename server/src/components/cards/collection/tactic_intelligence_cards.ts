@@ -266,8 +266,8 @@ export class Card517 extends TacticCard {
   }
   onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
     this.tributeCardFromPile(optionalParameters, player.deck, card => {
-      player.deck.unshift(card);
       player.shuffleDeck();
+      player.deck.unshift(card);
     });
   }
   getValidTargets(player: Player): CardStack[] {
