@@ -3,7 +3,7 @@ name: Dev Loop Cost Report
 on:
   issues:
     # Only a closed-as-completed dev-loop issue gets a cost report
-    # (docs/dev-loop.md): not_planned (won't do) and duplicate closes are
+    # (misc/dev-loop.md): not_planned (won't do) and duplicate closes are
     # skipped by the job-level if below, before a runner is allocated; the
     # gate re-checks the live issue state as defense in depth.
     types: [closed]
@@ -26,7 +26,7 @@ concurrency:
 jobs:
   report:
     name: Cost report
-    # Job-level event filter (docs/dev-loop.md): only a closed-as-completed
+    # Job-level event filter (misc/dev-loop.md): only a closed-as-completed
     # dev-loop issue can produce a report - not_planned/duplicate closes and
     # unlabeled issues skip before a runner is allocated. The gate below
     # re-checks the live issue state as defense in depth and is the only
@@ -88,7 +88,7 @@ jobs:
             exit 0
           fi
           # Live-state gate: the issue must be closed as completed and carry
-          # the dev-loop label (docs/dev-loop.md opt-in). stateReason from
+          # the dev-loop label (misc/dev-loop.md opt-in). stateReason from
           # `gh issue view` is upper case; the event payload's state_reason
           # is lower case - normalize before comparing. Only a not-found
           # failure skips quietly; any other failure (rate limit, 5xx) is
@@ -220,7 +220,7 @@ jobs:
           # implementer, pr-<M> for reviewer/fixer runs of a linked PR) - the
           # only artifact metadata that can be filtered without a download.
           # Runs whose artifacts predate the naming scheme are not
-          # attributable and are skipped (docs/dev-loop.md).
+          # attributable and are skipped (misc/dev-loop.md).
           if ! GH_TOKEN="$GITHUB_TOKEN" gh api "repos/${GH_REPO}/actions/artifacts" --paginate < /dev/null > "$WORK_DIR/artifacts.raw.json" 2>"$WORK_DIR/artifacts.err"; then
             # The report cannot be built without the artifact list, so the
             # step fails red like the gate/Post transient failures - the
@@ -353,7 +353,7 @@ jobs:
           fi
 
           # Display helpers: money as $X.YZ, cost-weighted tokens in M/k
-          # notation (the budgets table in docs/dev-loop.md uses the same).
+          # notation (the budgets table in misc/dev-loop.md uses the same).
           fmt_cost() {
             LC_ALL=C printf '$%.2f' "$1"
           }
@@ -441,7 +441,7 @@ jobs:
           fi
           jq -n --arg body "$(cat "$WORK_DIR/body.md")" '{body: $body}' > "$WORK_DIR/payload.json"
 
-          # Marker dedupe (docs/dev-loop.md): at most one cost report comment
+          # Marker dedupe (misc/dev-loop.md): at most one cost report comment
           # per issue - a re-run (close event replay, manual backstop) edits
           # the existing comment instead of double-posting. Listing and jq
           # scan are guarded separately (a pipeline would hide a gh failure

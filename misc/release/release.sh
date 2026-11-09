@@ -11,7 +11,7 @@ echo_header() {
 INIT_DIR=`pwd`
 SCRIPT_PATH=`realpath "$0"`
 SCRIPT_DIR=`dirname $SCRIPT_PATH`
-BASE_DIR=${SCRIPT_DIR}/..
+BASE_DIR=${SCRIPT_DIR}/../..
 
 if [ "$1" = "-p" ]; then
     BUILD_FLAG=bp

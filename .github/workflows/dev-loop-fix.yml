@@ -15,7 +15,7 @@ on:
     # head a1bc960: the fixer's synchronize run started last, cancelled the
     # pending reviewer, then gate-skipped - the loop stalled).
     types: [unlabeled]
-  # Conflict origin 2 (docs/dev-loop.md): a push to main can make open ready
+  # Conflict origin 2 (misc/dev-loop.md): a push to main can make open ready
   # PRs CONFLICTING. One scan per merge to main instead of one run per CI
   # completion on every branch; the scan itself costs only gh api calls, the
   # agent runs only for PRs that are actually conflicting.
@@ -86,7 +86,7 @@ concurrency:
 jobs:
   fix:
     name: Fixer
-    # Job-level event filter (docs/dev-loop.md): an unlabeled event for any
+    # Job-level event filter (misc/dev-loop.md): an unlabeled event for any
     # label other than needs-human, or an empty-body review event (a reply-
     # only submission - the human findings channel requires a body), can
     # never start the fixer - skip before a runner is allocated. The gate
@@ -98,9 +98,9 @@ jobs:
     # except unlabeled-resume runs (the -resume sub-group above): a resume
     # fixer may overlap another fixer run on the same PR - bounded by the
     # pull-before-push in the fixer prompt plus the head-SHA dedupes and the
-    # reviewer's stale-head re-dispatch (docs/dev-loop.md).
+    # reviewer's stale-head re-dispatch (misc/dev-loop.md).
     runs-on: ubuntu-latest
-    # 15 min above --time-limit (3600 s = 60 min), per docs/dev-loop.md budgets table
+    # 15 min above --time-limit (3600 s = 60 min), per misc/dev-loop.md budgets table
     timeout-minutes: 75
     env:
       GH_REPO: ${{ github.repository }}
@@ -181,7 +181,7 @@ jobs:
             gh pr comment "$PR_NUMBER" --body-file /tmp/dev-loop-escalation.md >/dev/null
           }
           # Conflict origin 2: a push to main can leave open ready dev-loop PRs
-          # CONFLICTING. One scan per merge to main (docs/dev-loop.md): find all
+          # CONFLICTING. One scan per merge to main (misc/dev-loop.md): find all
           # conflicting candidates, dispatch each (conflict-only, no review
           # findings), and let the one-run-per-head-SHA dedupe bound the runs.
           # This must run BEFORE the empty-PR_NUMBER guard below: a push event
@@ -273,7 +273,7 @@ jobs:
           # repository ID space; the owner is a user/org ID and never matches.
           # workflow_dispatch runs carry no PR in their event payload, so this
           # check never fires there — the push scan's same-repo candidate
-          # filter is the fork gate for scan-dispatched runs (docs/dev-loop.md).
+          # filter is the fork gate for scan-dispatched runs (misc/dev-loop.md).
           if [ -n "$HEAD_REPO_ID" ] && [ "$HEAD_REPO_ID" != "$REPO_ID" ]; then
             echo "PR #$PR_NUMBER is from a fork; skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -343,7 +343,7 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Draft is a human parking brake (docs/dev-loop.md): the loop never
+          # Draft is a human parking brake (misc/dev-loop.md): the loop never
           # touches a draft PR on any event. pull_request_review fires on
           # drafts and the owner can comment-review their own draft PR, so
           # the human-findings channel makes drafts reachable on this gate's
@@ -799,7 +799,7 @@ jobs:
           # source (stored auth would otherwise silently mask a rotated secret).
           OPENCODE_CONFIG_DIR: ${{ runner.temp }}/opencode-config
           OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          # Websearch provider (docs/dev-loop.md): opencode v2 routes websearch and
+          # Websearch provider (misc/dev-loop.md): opencode v2 routes websearch and
           # webfetch through a search provider; without a key every call errors (which
           # also flips the run's exit code - see the rc=1 contract fallback). Pinned in
           # the config below because headless --auto cannot answer the provider prompt.
@@ -913,7 +913,7 @@ jobs:
         with:
           # The PR number in the name associates the artifact with its dev-loop
           # issue (via the linked PR) for the cost report workflow
-          # (docs/dev-loop.md): artifact names are the only artifact metadata
+          # (misc/dev-loop.md): artifact names are the only artifact metadata
           # that can be filtered without a download. Runs whose artifacts
           # predate this naming scheme are not attributable and are skipped.
           name: opencode-fixer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -1117,7 +1117,7 @@ jobs:
                 exit 0
               fi
               # No reviewer chain: the push itself fires synchronize, which
-              # re-triggers the reviewer (docs/dev-loop.md event map).
+              # re-triggers the reviewer (misc/dev-loop.md event map).
               echo "Push landed ($HEAD_SHA_BEFORE -> $head_sha_now); synchronize will re-review the new head."
               exit 0
               ;;

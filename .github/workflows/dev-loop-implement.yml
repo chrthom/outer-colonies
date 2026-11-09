@@ -31,13 +31,13 @@ concurrency:
 jobs:
   implement:
     name: Implementer
-    # Job-level event filter (docs/dev-loop.md): a labeled event for any
+    # Job-level event filter (misc/dev-loop.md): a labeled event for any
     # label other than dev-loop can never start the implementer - skip before
     # a runner is allocated. The gate below remains as defense in depth.
     if: >-
       !(github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name != 'dev-loop')
     runs-on: ubuntu-latest
-    # 15 min above --time-limit (5400 s = 90 min), per docs/dev-loop.md budgets table
+    # 15 min above --time-limit (5400 s = 90 min), per misc/dev-loop.md budgets table
     timeout-minutes: 105
     env:
       GH_REPO: ${{ github.repository }}
@@ -148,7 +148,7 @@ jobs:
           # source (stored auth would otherwise silently mask a rotated secret).
           OPENCODE_CONFIG_DIR: ${{ runner.temp }}/opencode-config
           OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          # Websearch provider (docs/dev-loop.md): opencode v2 routes websearch and
+          # Websearch provider (misc/dev-loop.md): opencode v2 routes websearch and
           # webfetch through a search provider; without a key every call errors (which
           # also flips the run's exit code - see the rc=1 contract fallback). Pinned in
           # the config below because headless --auto cannot answer the provider prompt.
@@ -266,7 +266,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           # The issue number in the name associates the artifact with its
-          # dev-loop issue for the cost report workflow (docs/dev-loop.md):
+          # dev-loop issue for the cost report workflow (misc/dev-loop.md):
           # artifact names are the only artifact metadata that can be
           # filtered without a download. Runs whose artifacts predate this
           # naming scheme are not attributable and are skipped by the report.

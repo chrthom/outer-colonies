@@ -6,7 +6,7 @@ Simulation-based balancing toolkit for the equipment cards of Outer Colonies. St
 
 | File | Purpose |
 | --- | --- |
-| `balancing_metric_v9.py` | Card data loader (`../cards.csv`), weapon field and FINAL weapon overrides (v23i target values), deployment cost model |
+| `balancing_metric_v9.py` | Card data loader (`../cards/cards.csv`), weapon field and FINAL weapon overrides (v23i target values), deployment cost model |
 | `balancing_metric_v10.py` | Stat-card loader (socket/energy costs, defense pools) and FINAL overrides |
 | `balancing_metric_v11.py` | Fleet battle engine (value frame v3) and FINAL stat-card overrides (`v11.weapons` is authoritative) |
 | `diag_random_r13t.py` | Random-battle probe, frame v23d: single battle type, per-ship rarity-weighted loadouts from all 69 FINAL cards, card-count mirror factor |
@@ -35,7 +35,7 @@ python3 diag_infra_effect_r13i.py  # effect levers for the classic outliers 333/
 python3 diag_infra_r13i.py         # infrastructure combat-track measurement (battle sim, N=10000, checkpoint diag_infra_ckpt_r13i.json)
 ```
 
-Requirements: Python 3, no third-party dependencies. Needs `../cards.csv` (i.e. `misc/cards.csv`; a `cards.csv` next to the scripts also works), plus `diag_random_r13t.py`, `frame_calibration.json` and the three `balancing_metric_*.py` modules in the same directory. `diag_v23i_r13t.py` does **not** import the probe (it has no `__main__` guard): it loads the probe source up to the measurement section via `exec` with an isolated namespace. Checkpoint/resume every 2000 battles (`diag_v23i_ckpt_r13t.json`); delete the checkpoint for a fresh run.
+Requirements: Python 3, no third-party dependencies. Needs `../cards/cards.csv` (i.e. `misc/cards/cards.csv`; a `cards.csv` next to the scripts also works), plus `diag_random_r13t.py`, `frame_calibration.json` and the three `balancing_metric_*.py` modules in the same directory. `diag_v23i_r13t.py` does **not** import the probe (it has no `__main__` guard): it loads the probe source up to the measurement section via `exec` with an isolated namespace. Checkpoint/resume every 2000 battles (`diag_v23i_ckpt_r13t.json`); delete the checkpoint for a fresh run.
 
 ## Model (frame v23d)
 

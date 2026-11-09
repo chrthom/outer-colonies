@@ -40,15 +40,15 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
    Angriffsschritt gegen diesen Defense-Typ (Server: fromProfile == 0 ->
    Defense bleibt aktiv). v8 hat solche Karten faelschlich deaktiviert.
 
-Datengrundlage: cards.csv (Repo: misc/cards.csv) im selben oder uebergeordneten Ordner.
+Datengrundlage: cards.csv im selben Ordner oder als ../cards/cards.csv (Repo-Layout).
 Aufruf: python3 balancing_metric_v9.py [--final]  (--final = 13 beschlossene Buffs)
 """
 import csv, json, os, statistics, sys
 
-# Datengrundlage: cards.csv im selben Ordner (Knowledge) oder uebergeordnet
-# (Repo-Layout: misc/balancing/ neben misc/cards.csv).
+# Datengrundlage: cards.csv im selben Ordner (Knowledge) oder als
+# ../cards/cards.csv (Repo-Layout: misc/balancing/ neben misc/cards/cards.csv).
 CARDS_CSV = next((p for p in ('cards.csv',
-                              os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cards.csv'))
+                              os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cards', 'cards.csv'))
                   if os.path.exists(p)), 'cards.csv')
 
 # Zielkurve v9 (Christopher, 2.11.2026): Kompromiss aus fixer v8-Kurve
