@@ -54,6 +54,10 @@ BAND_REL = 0.5   # relative Bande: 50 % des Kurvenwerts (BESCHLOSSEN I1y)
 # = eigener Beschluss (v25-Neupreisung ist Kampagnen-Frame, nicht
 # Kontowert-Frame), dokumentiert in balancing.md Runde I1ac. c_ex bleibt
 # ohnehin 1,650 (nur PV_equip ist units-abhaengig).
+# I1ad-BESCHLUSS (11.11., Christopher: Option A): Pin BESTAETIGT.
+# Robustheits-Nachweis diag_anchor_live_r13i.py: auch ungepinnt haelt die
+# Kurve (T1 0,280 / T2 0,466 = 1,66x, Rundung 0,3/0,5, keine Band-
+# Entscheidungsaenderung); Re-Kalibrierung = Backlog Frame-Wechsel.
 ANKER_C_EX = 1.65
 ANKER_PV_EQUIP = 3.145
 

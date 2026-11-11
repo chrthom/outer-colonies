@@ -23,14 +23,7 @@
   ],
   "rarity_sync": "alle 26 bewerteten Objekte: Modell-Raritaet == csv-Raritaet (nach Swap-Remap)",
   "pools": {
-   "infra_vor": {
-    "5": 2,
-    "4": 1,
-    "2": 15,
-    "1": 8,
-    "0": 15,
-    "3": 1
-   },
+   "infra_vor": null,
    "infra_nach": {
     "5": 2,
     "4": 1,
