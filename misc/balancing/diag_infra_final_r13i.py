@@ -164,7 +164,8 @@ for r in rows:
         ('Raritaets-Abweichung Modell vs. csv', r['id'],
          r['rarity'], CSV[r['id']]['rarity'])
 
-# (c) Raritaets-Pool-Konstanz gegen den Vor-Zustand (Backup):
+# (c) Raritaets-Pool-Konstanz gegen den Vor-Zustand (Backup; Aufräumrunde
+#     11.11.: Backups geloescht — Check nur noch, wenn das Backup existiert).
 def pool(path):
     c = {}
     with open(path, newline='', encoding='utf-8') as f:
@@ -175,9 +176,16 @@ def pool(path):
             if r[it] == 'infrastructure':
                 c[r[ir]] = c.get(r[ir], 0) + 1
     return c
-POOL_PRE = pool('cards.pre_i1_infra.csv')
+import os as _os
+POOL_PRE = (pool('cards.pre_i1_infra.csv')
+            if _os.path.exists('cards.pre_i1_infra.csv') else None)
 POOL_POST = pool('cards.csv')
-assert POOL_PRE == POOL_POST, ('Infra-Pool veraendert', POOL_PRE, POOL_POST)
+if POOL_PRE is not None:
+    assert POOL_PRE == POOL_POST, ('Infra-Pool veraendert', POOL_PRE, POOL_POST)
+else:
+    print('Hinweis: cards.pre_i1_infra.csv geloescht (Aufraeumrunde '
+          '11.11.) — Pool-Konstanz wurde in I1ab verifiziert und wird '
+          'hier nicht erneut geprueft.')
 assert sum(POOL_POST.values()) == len(CSV), 'csv-Infra-Bestand geaendert'
 
 CSV_VALIDATION = dict(
