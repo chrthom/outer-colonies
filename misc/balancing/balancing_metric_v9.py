@@ -40,14 +40,16 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
    Angriffsschritt gegen diesen Defense-Typ (Server: fromProfile == 0 ->
    Defense bleibt aktiv). v8 hat solche Karten faelschlich deaktiviert.
 
-Datengrundlage: cards.csv im selben Ordner oder als ../cards/cards.csv (Repo-Layout).
+Datengrundlage: cards.csv im selben Ordner, uebergeordnet oder als
+../cards/cards.csv (Repo-Layout: misc/balancing/ neben misc/cards/cards.csv).
 Aufruf: python3 balancing_metric_v9.py [--final]  (--final = 13 beschlossene Buffs)
 """
 import csv, json, os, statistics, sys
 
-# Datengrundlage: cards.csv im selben Ordner (Knowledge) oder als
-# ../cards/cards.csv (Repo-Layout: misc/balancing/ neben misc/cards/cards.csv).
+# Datengrundlage: cards.csv im selben Ordner (Knowledge) oder uebergeordnet;
+# Repo-Layout: misc/balancing/ neben misc/cards/cards.csv (../cards/cards.csv).
 CARDS_CSV = next((p for p in ('cards.csv',
+                              os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cards.csv'),
                               os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cards', 'cards.csv'))
                   if os.path.exists(p)), 'cards.csv')
 
@@ -95,59 +97,21 @@ SLOW_TARGET_FACTOR = 0.68               # 224: P(Zielspeed < 3) = 34/50
 
 # Beschlossene Aenderungen (1.11.2026) – Stand: beschlossen, noch nicht im Repo
 FINAL = {
-    # Grundrunde (1.11.2026) + Nachjustierung auf Zielkurve (2.11.2026) +
-    # Kandidaten-Runde nach Kostenmodell v2 + Kurve 4,5/4,75/5,0/6,0/6,5
-    # (Christopher, 2.11.2026):
-    '101': dict(dmg=28, e=1,  abz={'pd': 14}),        # Buff: dmg 24->28, PD-Abzug 9->14
-    '107': dict(dmg=9,  e=1,  abz={'shield': 9}),    # Runde 3: SAbz 8->9 (bei dmg 9 faktisch
-    #                                                     wirkungslos gg. Schild; Saettigung danach)
-    '125': dict(dmg=17, e=1,  abz={'shield': 7}),    # Buff: dmg 14->17, Schildabzug 6->7
-    '126': dict(dmg=7,  e=0,  abz=None),             # Nerf: dmg 8->7
-    '127': dict(dmg=14, e=0,  abz={'shield': 10, 'armour': 5}),  # Runde 2: S+Pz-Abzug +1;
-    #                                                     Runde 3: SAbz 8->10 (Christopher)
-    '151': dict(dmg=4,  e=0,  abz=None),             # Nerf: dmg 5->4
-    '167': dict(dmg=10, e=0,  abz={'shield': 7, 'armour': 5}),   # Runde 2: S+Pz-Abzug auf 5;
-    #                                                     Runde 3: SAbz 5->7 (Christopher: nur bis 7)
-    '179': dict(dmg=2,  e=0,  abz={'armour': 'X'}),  # Nerf: Panzerungsabzug -> wirkungslos (X)
-    '203': dict(dmg=8,  e=1,  abz={'shield': 2}),
-    '207': dict(dmg=3,  e=0,  abz=None),             # Nerf: dmg 4->3
-    '224': dict(dmg=8, e=0,  abz={'shield': 8}),     # Runde 2 Buff dmg 7->10, SAbz 6->8; Nerf dmg 10->8
-    #                                                     (3.11.2026, v3-Watchlist +1,15 -> 4,46/-0,29);
-    #                                                     dmg 8 + SAbz 8 = 0 gegen Schildziele
-    '303': dict(dmg=8,  e=1,  abz=None),
-    '304': dict(dmg=24, e=1,  abz={'pd': 12}),
-    '310': dict(dmg=7,  e=2,  abz={'armour': 3}),
-    '343': dict(dmg=6,  e=1,  abz=None),             # Buff: dmg 5->6
-    '405': dict(dmg=7,  e=1,  abz=None),
-    '409': dict(dmg=26, e=1,  abz=None),             # Buff: dmg 27->26, E 2->1
-    '421': dict(dmg=9,  e=1,  abz={'shield': 5}),    # Buff: dmg 8->9; Runde 3: SAbz 4->5
-    '180': dict(dmg=2,  e=0,  abz=None),             # Nerf: dmg 3->2 (Pz-Abzug 2 bleibt)
-    '420': dict(dmg=13, e=1,  abz=None),             # Buff: dmg 11->13 (kein CK - Christopher hat die
-    #                                                     gedruckte Karte geprueft, 2.11.2026)
-    '438': dict(dmg=3,  e=0,  abz=None),
-    '441': dict(dmg=4,  e=0,  abz=None),             # Nerf: dmg 5->4
-    '302': dict(dmg=72, e=5,  abz=None),             # E-Reduktion zurueckgenommen (Kostenmodell v2)
-    # --- Runde 3 (3.11.2026, Christopher): dynamischer PD-Credit (pd 0,84/1,16,
-    # k-verrechnet) + Schildabzug-Erhoehungen ueberstarker Waffen (SAbz macht
-    # Waffe schwaecher und Schildpunkte im Feld staerker):
-    '106': dict(dmg=11, e=4,  abz={'shield': 6}),    # E-Reduktion zurueckgenommen (Kostenmodell v2); Runde 3: SAbz 5->6
-    '150': dict(dmg=12, e=0,  abz={'shield': 4}),    # Runde 3: SAbz 3->4
-    '168': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (halber Schritt,
-    #                                                     PD schiffsuebergreifend/Torpedos)
-    '234': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (dito)
-    '339': dict(dmg=3,  e=0,  abz=None),             # Runde 3: dmg 2->3 (dito)
-    '340': dict(dmg=7,  e=0,  abz=None),             # Runde 3: dmg 6->7 (dito)
-    '424': dict(dmg=12, e=1,  abz={'armour': 5}),    # Runde 2 Buff dmg 8->10, Panzerungsabzug 4->5; Runde 3: dmg 10->12
-    # --- X-Switch (Christopher, 3.11.2026): SAbz == dmg -> 'wirkungslos gegen
-    # Schild' (X) statt numerisch. Metrikneutral (Score identisch: der Schuss
-    # geht gegen 1 Schildpunkt in beiden Varianten auf 0 net); in-game bleibt
-    # das Schild nach dem Treffer AKTIV -> Schildpunkte feldweit staerker
-    # (bewusst unbezahlter Vorteil, wie PD-Flottenbonus). ---
-    '157': dict(dmg=7,  e=0,  abz={'shield': 'X'}),  # Plasmawerfer (SAbz 7 == dmg 7)
-    '166': dict(dmg=3,  e=0,  abz={'shield': 'X'}),  # Laserkanone (SAbz 3 == dmg 3)
-    '344': dict(dmg=2,  e=0,  abz={'shield': 'X'}),  # Fokuslaser (SAbz 2 == dmg 2)
-    '347': dict(dmg=5,  e=0,  abz={'shield': 'X'}),  # Impulslaser (SAbz 5 == dmg 5);
-    #                                                     manuelle Watchlist +0.51
+    # v25a-Frame auf #795-Zielzustand (9.11.2026): Die Metrik-Overrides sind
+    # GEFALLEN - v23c-Ruecknahmen Kategorie A/C (106/107/303/310/343/405 und
+    # 125/127/167/168/203/224/234/339/340/409/420/421/424/441), #795-Ueberfuehrung
+    # der Beschlusswerte in cards.csv (101/126/150/151/180/182/207/223/304/318/
+    # 347/401/412/555) sowie die 302/438-Ruecknahme (csv ist Zielzustand, Issue
+    # #795: 'csv is already in the target state, only the metric overrides are
+    # dropped'). cards.csv traegt seit dem Patch (patch_cards_795.py) den
+    # v23i-Sollzustand. Uebrig bleiben NUR die X-Abzuege (#795 §5:
+    # 'X deductions 157/166/179/344/347 stay X' - csv enthaelt dort numerische
+    # Ersatzwerte, X laesst die Defense-Karte aktiv):
+    '157': dict(dmg=7, e=0, abz={'shield': 'X'}),  # Plasmawerfer (SAbz 7 == dmg 7)
+    '166': dict(dmg=3, e=0, abz={'shield': 'X'}),  # Laserkanone (SAbz 3 == dmg 3)
+    '179': dict(dmg=2, e=0, abz={'armour': 'X'}),  # Pulskanone (PzAbz wirkungslos)
+    '344': dict(dmg=2, e=0, abz={'shield': 'X'}),  # Fokuslaser (SAbz 2 == dmg 2)
+    '347': dict(dmg=4, e=0, abz={'shield': 'X'}),  # Impulslaser (#795: dmg 5->4)
 }
 
 def num(v):
