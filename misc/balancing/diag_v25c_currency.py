@@ -6,14 +6,17 @@
 # Outlier-Kriterium (Christopher): |Score - Ziel| > 8,0 je Rarity.
 import csv
 import json
+import os
 import statistics as st
 
-HERE = '/home/user/knowledge/outer-colonies'
+import balancing_metric_v9 as v9
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 CHEAP = {'socket_a', 'socket_e', 'socket_g'}
 TGT = {1: 15.0, 2: 20.0, 3: 25.0, 4: 30.0, 5: 35.0}
 
 socks_by_id, energy_by_id = {}, {}
-with open(HERE + '/cards.csv', newline='', encoding='utf-8') as f:
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
     for r in csv.DictReader(f, delimiter=';', quotechar='"'):
         s = []
         for c in ['socket_a', 'socket_b', 'socket_d', 'socket_e', 'socket_f', 'socket_g']:

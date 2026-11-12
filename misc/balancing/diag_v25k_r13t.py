@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""diag_v25b_r13t: v25b - Hullen-Benchmark (50 Hullen inkl. Stationen)
-im Kampagnen-Frame v2 (Runde v25b, 9.11.2026).
+"""diag_v25k_r13t: v25k - Dosen-Messung: kumulatives Dosen-Set nach
+Christophers Beschluessen Runde v25b-Forts. 5 (329/131 hp-2,
+134 hp+3, 436 NUR hp-1, 120 hp+4, 116/117 hp+4 kumulativ,
+308 hp+1 und e+1, 348 NUR hp-1, 315 hp+2, 121 hp+2) im
+Kampagnen-Frame v2 wie v25b (Runde v25k, 10.11.2026). REF =
+diag_v25b_r13t.json (Originalzustand).
 
 Wahrung v25: Score = Delta-Kriegsbilanz (gamma=1: hp + col + ctrl +
 dealt, Marker) je Platzierung / units. Hullen-units (H1-Konvention,

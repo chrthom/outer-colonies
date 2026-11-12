@@ -96,7 +96,7 @@
 ## Zielzustand Balancing (Stand 11.11.2026)
 
 - **Währung v25:** Score = ΔKriegsbilanz (γ=1) je Platzierung ÷ units; units = 1 + |E<0| degressiv (1 + [1 + 0,7×(E−1)]) + Sockel (a/e/g 0,7, b/d/f 1,0); Hüllen + T(n) 0/0,3/0,5; **P_Ψ = +2,0 je f-Sockel** (alle Hüllen inkl. Stationen)
-- **Kurven:** Ausrüstung **8 / 10 / 13 / 16 / 20** (gemeinsam Waffen+Karten); Hüllen (Schiffe) **−2 / −0,5 / +2 / +6** (comp mit P_Ψ); Stationen Typ-Anker **−31,72 / −40,25 / −53,22**; Infra **0,3 / 0,5**, Band ±50 % relativ; Referenzkurs **1 sp ≈ 25,5 HP** (Kampagnen-Frame, hp70-Anker, γ=1)
+- **Kurven:** Ausrüstung **8 / 10 / 13 / 16 / 20** (gemeinsam Waffen+Karten); Hüllen (Schiffe) **−2 / −0,5 / +2 / +6** (comp mit P_Ψ); Stationen Typ-Anker **−31,72 / −40,25 / −53,22**; Infra **0,3 / 0,5**, Band ±50 % relativ; Referenzkurs **1 sp ≈ 24,4 HP im #795-Frame** (Kampagnen-Frame, hp70-Anker, γ=1; alt 25,5 pre-#795)
 - **Finale v25-Schiffs-Mediane:** r1 −0,34 / r2 +1,45 / r3 −0,21 / r4 +4,20 (ohne P_Ψ r1 −2,26); v23i-Mediane 1,57/1,71/1,89/2,41/2,97
 - **cards.csv (lokal) = kompletter Zielzustand:** #795-Änderungen (Equipment/Ring/Tausch-Raritäten) + 17 Hüllen-Dosen (16 Schiffe + 102 A2B2D2E3) + I1-Infra-Übernahme (8 Swaps + 230/219-Buffs)
 - **Bewusste Outlier (dokumentiert, keine Handlung):** Schiffe 348/436 (Spitzen), 308/315/134 (Rest-Unter); Stationen 228 (Frame-Spitze, Artefakt), 102 (Festungs-Design); v23i: 9 Fälle, einziger offener 163; Infra: 172/345/183/156/448, 413 (T2-Schlusslicht, L2-Empfehlung offen), 320 (einzige r3-Infra)

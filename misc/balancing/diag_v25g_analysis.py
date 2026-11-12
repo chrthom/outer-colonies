@@ -6,9 +6,11 @@
 # Zielzustand, Neu-Messung diag_v25i_r13t 10.11.: margin 100,01
 # identisch zu 302d70, Energie wirkt nur im Nenner). Parameter:
 # MODE_207, MODE_343, MODE_302 (e3 = e3dose + MARG-Quelle 302e3).
-import csv, json, statistics as st
+import csv, json, os, statistics as st
 
-HERE = '/home/user/knowledge/outer-colonies'
+import balancing_metric_v9 as v9
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 CURVE = {1: 8.0, 2: 10.0, 3: 13.0, 4: 16.0, 5: 20.0}
 CHEAP = {'socket_a', 'socket_e', 'socket_g'}
 
@@ -17,7 +19,7 @@ def u2_units(socks, e):
     return max(1.0 + ec + socks, 0.5)
 
 socks_by_id, energy_by_id = {}, {}
-with open(HERE + '/cards.csv', newline='', encoding='utf-8') as f:
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
     for r in csv.DictReader(f, delimiter=';', quotechar='"'):
         s = []
         for c in ['socket_a', 'socket_b', 'socket_d', 'socket_e', 'socket_f', 'socket_g']:

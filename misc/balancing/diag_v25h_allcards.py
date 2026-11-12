@@ -12,8 +12,10 @@
 # v25-Zustaende via MARG/RAR/E-Overrides): (#795) = Wert-/E-Aenderung
 # im Zielzustand, (Dose) = v25-kalibrierte Dosierung, (Tausch) =
 # Raritaetstausch, "wie implementiert" = Messprofil == Repo.
-import json, sys
-sys.path.insert(0, '/home/user/knowledge/outer-colonies')
+import json, os, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import diag_v25g_analysis as g
 
 CURVE = g.CURVE
@@ -147,7 +149,7 @@ out = dict(
                score=round(r['score'], 3), abw=round(r['abw'], 3),
                src=r['src'], prof=r['prof'], in_44er_liste=not r['miss'])
           for r in rows])
-with open('/home/user/knowledge/outer-colonies/diag_v25h_allcards.json', 'w',
+with open(os.path.join(HERE, 'diag_v25h_allcards.json'), 'w',
           encoding='utf-8') as f:
     json.dump(out, f, indent=1, ensure_ascii=False)
 

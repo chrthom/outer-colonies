@@ -298,7 +298,7 @@ def ship_builds():
     builds = []
     type_best = {}
 
-    def add(combo, n, typ, speed=None):
+    def add(combo, n, typ):
         socks = {}
         for c in combo:
             for t, k in c['socks'].items():
@@ -306,7 +306,7 @@ def ship_builds():
         # H1-Speed-Summen-Fix (8.11.2026): SUMME der Sektions-Speeds
         # (Code = Wahrheit, profile.combine()); der speed-Parameter
         # (Heck-Speed-Sonderfall) entfaellt.
-        sp = speed if speed is not None else sum(c['speed'] for c in combo)
+        sp = sum(c['speed'] for c in combo)
         w = min(c['rw'] for c in combo)
         type_best[(n, typ)] = max(type_best.get((n, typ), 0.0), w)
         builds.append(dict(hp=sum(c['hp'] for c in combo), s=sp, parts=n,

@@ -5,13 +5,16 @@
 # S2d: S1 + Sockel mit v23-Rabatt (2.+ Sockel billig 0,5 / teuer 0,7)
 import csv
 import json
+import os
 import statistics as st
 
-HERE = '/home/user/knowledge/outer-colonies'
+import balancing_metric_v9 as v9
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 CHEAP = {'socket_a', 'socket_e', 'socket_g'}
 
 socks_by_id, energy_by_id, typ_by_id = {}, {}, {}
-with open(HERE + '/cards.csv', newline='', encoding='utf-8') as f:
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
     for r in csv.DictReader(f, delimiter=';', quotechar='"'):
         socks = []
         for c in CHEAP | {'socket_b', 'socket_d', 'socket_f'}:

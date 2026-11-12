@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""diag_v25b_r13t: v25b - Hullen-Benchmark (50 Hullen inkl. Stationen)
-im Kampagnen-Frame v2 (Runde v25b, 9.11.2026).
+"""diag_v25n_r13t: v25n - Dosen-Runde 4: v25m-Zielzustand PLUS 1
+neue Dose (134 e-Sockel +1, B2E2G1 -> B2E3G1) im Kampagnen-Frame
+v2 wie v25b (Runde v25n, 10.11.2026). REF-Spalten: ref_score_t =
+diag_v25b_r13t.json (Original), ref25m_score_t =
+diag_v25m_r13t.json (v25m).
 
 Wahrung v25: Score = Delta-Kriegsbilanz (gamma=1: hp + col + ctrl +
 dealt, Marker) je Platzierung / units. Hullen-units (H1-Konvention,

@@ -32,6 +32,8 @@ import json
 import os
 import statistics
 
+import balancing_metric_v9 as v9
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 SRC = open(os.path.join(HERE, 'diag_infra_prices_r13i.py'),
@@ -139,7 +141,7 @@ rows.append(EXTRA_413)
 
 # ============================== KREUZVALIDIERUNG MODELL vs. cards.csv ====
 CSV = {}
-with open('cards.csv', newline='', encoding='utf-8') as f:
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
     rd = csvmod.reader(f, delimiter=';')
     hdr = next(rd)
     idx = {h: i for i, h in enumerate(hdr)}
@@ -183,7 +185,7 @@ def pool(path):
 import os as _os
 POOL_PRE = (pool('cards.pre_i1_infra.csv')
             if _os.path.exists('cards.pre_i1_infra.csv') else None)
-POOL_POST = pool('cards.csv')
+POOL_POST = pool(v9.CARDS_CSV)
 if POOL_PRE is not None:
     assert POOL_PRE == POOL_POST, ('Infra-Pool veraendert', POOL_PRE, POOL_POST)
 else:

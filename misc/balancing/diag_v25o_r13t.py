@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""diag_v25b_r13t: v25b - Hullen-Benchmark (50 Hullen inkl. Stationen)
-im Kampagnen-Frame v2 (Runde v25b, 9.11.2026).
+"""diag_v25o_r13t: v25o - Dosen-Runde 5 + Stationen: v25n PLUS 1
+neue Dose 102 Sternbasis (A1B2D1E3 -> A2B2D2E3); NEU Per-Modus-
+Scores score_m/score_r (mission-only/raid-only) je Zeile und
+P_Psi = +2,0 je f-Sockel fuer ALLE Hullen inkl. Stationen im
+Kampagnen-Frame v2 wie v25b (Runde v25o, 11.11.2026). REF:
+ref_score_t = v25b (Original), ref25n_score_t = v25n.
 
 Wahrung v25: Score = Delta-Kriegsbilanz (gamma=1: hp + col + ctrl +
 dealt, Marker) je Platzierung / units. Hullen-units (H1-Konvention,
@@ -999,7 +1003,7 @@ with open(OUT_PATH, 'w', encoding='utf-8') as f:
 
 print('Basis: n=%d | Gefechte mission=%.2f raid=%.2f'
       % (bacc['n'], bacc['nb']['mission'] / bn, bacc['nb']['raid'] / bn))
-print('P_PSI = %+0.1f je f-Sockel (nur Schiffe)' % P_PSI)
+print('P_PSI = %+0.1f je f-Sockel (alle Hullen inkl. Stationen)' % P_PSI)
 TARGET = {1: -2.0, 2: -0.5, 3: 2.0, 4: 6.0}
 ships = [r for r in rows if not r['station']]
 stats = [r for r in rows if r['station']]
@@ -1023,7 +1027,7 @@ for rar in sorted(TARGET):
     vals = [s['score_t'] for s in ships if s['rarity'] == rar]
     med = _st.median(vals)
     print('  r%d: %+6.2f (Abw %+5.2f)' % (rar, med, med - TARGET[rar]))
-print('STATIONEN (%d, ohne P_Psi, nachgelagert):' % len(stats))
+print('STATIONEN (%d, nachgelagert; Kriegsframe score_t, P_Psi im Composite):' % len(stats))
 for s in sorted(stats, key=lambda x: x['score_t']):
     print('  %-22s r%d %d  score_t %+7.2f (alt %+7.2f)'
           % (s['title'][:22], s['rarity'], s['n'], s['score_t'], s['ref_score_t']))

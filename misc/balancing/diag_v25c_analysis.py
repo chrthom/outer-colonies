@@ -2,9 +2,10 @@
 # (1) E-Waehrung degressiv statt linear, (2) gamma-Szenarien,
 # (3) 171-Tausch-Arithmetik, (4) 104/163-Check.
 import json
+import os
 import statistics as st
 
-HERE = '/home/user/knowledge/outer-colonies'
+HERE = os.path.dirname(os.path.abspath(__file__))
 rows = json.load(open(HERE + '/diag_v25a_r13t.json', encoding='utf-8'))['rows']
 rows = [r for r in rows if r['id'] not in ('325', '104')]  # Sonderobjekte ohne Basisframe
 for r in rows:

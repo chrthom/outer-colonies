@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""diag_v25b_r13t: v25b - Hullen-Benchmark (50 Hullen inkl. Stationen)
-im Kampagnen-Frame v2 (Runde v25b, 9.11.2026).
+"""diag_v25l_r13t: v25l - ZIELZUSTANDS-VOLLLAUF: alle 50 Hullen im
+kompletten v25-Zielzustand (13 kumulative Hullen-Dosen, csv mit
+voller Tauschliste und 171-Ring, P_Psi = +2,0 je f-Sockel als
+analytischer Composite additiv auf den Schiffs-Score) im
+Kampagnen-Frame v2 wie v25b (Runde v25l, 11.11.2026).
 
 Wahrung v25: Score = Delta-Kriegsbilanz (gamma=1: hp + col + ctrl +
 dealt, Marker) je Platzierung / units. Hullen-units (H1-Konvention,

@@ -8,9 +8,10 @@ Basis: diag_v25b_r13t.json (N=3000). 'Anzahl Karten' = Teiligkeit n
 Build-Speed-0-Hullen (Orbitaler Aussenposten, Raumstation, Sternbasis).
 """
 import json
+import os
 import statistics as st
 
-HERE = '/home/user/knowledge/outer-colonies'
+HERE = os.path.dirname(os.path.abspath(__file__))
 d = json.load(open(HERE + '/diag_v25b_r13t.json', encoding='utf-8'))
 rows = d['rows']
 ships = [r for r in rows if not r['station']]

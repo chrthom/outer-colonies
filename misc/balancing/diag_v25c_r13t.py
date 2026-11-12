@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""diag_v25a_r13t: v25a-PILOT - Waffen (50) + Statkarten (19) +
-Reparaturkarten (325/104) im Kampagnen-Frame v2 (Runde v25a,
-9.11.2026).
+"""diag_v25c_r13t: v25c - Kartenvariantenmessung: Christophers
+Karten-Hebel aus Forts. 3 einzeln gemessen gegen den unveraenderten
+#795-POOL (Methodik identisch v25a) im Kampagnen-Frame v2 (Runde
+v25c, 9.11.2026).
 
 Wahrung v25: Score = Delta-Kriegsbilanz (gamma=1: hp + col + ctrl
 + dealt, Marker) je Platzierung / units (units = 1 + |E<0| aus
