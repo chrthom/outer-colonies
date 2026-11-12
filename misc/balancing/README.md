@@ -29,7 +29,7 @@ Simulation-based balancing toolkit for the equipment cards of Outer Colonies. St
 ## Running
 
 ```bash
-python3 diag_v23i_r13t.py     # full v23i measurement; env DIAG_N sets N (default 10000), seed 42, common random numbers; note: overwrites diag_v23i_r13t.json
+python3 diag_v23i_r13t.py     # HISTORICAL v23i measurement (frozen frame: ~30 FINAL overrides, max/heck section speed, status-quo csv — the checked-in JSON is the I1 anchor/calibration basis and can no longer be reproduced by a re-run); refuses to run without V23I_ALLOW_OVERWRITE=1 (explicit opt-in to overwrite diag_v23i_r13t.json); env DIAG_N sets N (default 10000), seed 42, common random numbers
 python3 diag_random_r13t.py   # bare probe; note: overwrites diag_random_v23_r13t.json and its checkpoint
 python3 diag_infra_prices_r13i.py  # infrastructure pricing model v9 (analytic, fast, no simulation)
 python3 diag_infra_sweep_r13i.py   # regulator sweep (re-runs the pricing script per variant)

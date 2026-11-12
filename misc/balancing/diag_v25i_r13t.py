@@ -53,6 +53,70 @@ CTRL_W = v11.CTRL_W
 COLONY_HP = v11.COLONY_HP
 PHASES = v11.PHASES
 
+# --------------- #795-ZIELZUSTANDS-CHECK (VOR Messloop) -------------------
+# Diese Runde misst im v25-Frame: cards.csv mit den #795-Energy-Dosen
+# (109/126/161/223/304, s. diag_anchor_live_r13i.py), Hullen aber VOR
+# den 17 Hullen-Dosen der Runden v25l-o (diese Baseline lief pre-Dosis;
+# erst ab v25l steht der Dosen-Stand in der csv). Gegen die Ist-csv
+# (pre-#795) oder die dosierte csv (post-v25l) ist der Messframe
+# veraendert - der Lauf ueberschreibt das gepaarte Referenz-JSON (REF-
+# Basis der Folgerunden) still mit abweichenden Daten. Deshalb VOR der
+# Messung beides assertieren: Energy-Dosen AN, Hullen-Dosen AUS - genau
+# der csv-Stand, gegen den diese Baseline gemessen wurde.
+import csv as _csv_795
+
+
+def _e_abs_795(v):
+    """Energie-Feld der csv als |int| ('' und '0' zaehlen als 0)."""
+    v = (v or '').strip()
+    return abs(int(v)) if v not in ('', '0') else 0
+
+
+ENERGY_DOSE_795 = {   # id -> #795-Zielenergie (abs) der csv-getragenen Dosen
+    '109': 1, '126': 1, '161': 0, '223': 2, '304': 1,
+}
+HULL_PRE_DOSE = {     # id -> hp/socks VOR den Hullen-Dosen (Runden v25l-o)
+    '329': dict(hp=7, socks={'b': 2, 'e': 1, 'g': 1}),
+    '131': dict(hp=7, socks={'e': 2}),
+    '134': dict(hp=9, socks={'b': 1, 'e': 2, 'g': 1}),
+    '436': dict(hp=8, socks={'b': 1, 'e': 2}),
+    '120': dict(hp=13, socks={'a': 1, 'd': 1, 'e': 1}),
+    '116': dict(hp=9, socks={'a': 1, 'b': 1, 'e': 1}),
+    '117': dict(hp=9, socks={'d': 2, 'e': 1}),
+    '308': dict(hp=10, socks={'a': 2, 'b': 2, 'e': 1}),
+    '348': dict(hp=5, socks={'b': 1, 'e': 1, 'g': 1}),
+    '315': dict(hp=11, socks={'b': 1, 'e': 3}),
+    '121': dict(hp=9, socks={'b': 2, 'e': 1}),
+    '326': dict(hp=12, socks={'a': 2, 'e': 1, 'f': 1}),
+    '327': dict(hp=8, socks={'e': 2, 'f': 1, 'g': 1}),
+    '221': dict(hp=8, socks={'a': 2, 'e': 1, 'f': 1}),
+    '226': dict(hp=7, socks={'e': 1, 'f': 1}),
+    '306': dict(hp=15, socks={'b': 1, 'e': 1}),
+    '102': dict(hp=17, socks={'a': 1, 'b': 2, 'd': 1, 'e': 3}),
+}
+_rows_795 = {}
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as _f_795:
+    for _r_795 in _csv_795.DictReader(_f_795, delimiter=';', quotechar='"'):
+        _rows_795[_r_795['id']] = _r_795
+for _cid_795, _want_795 in ENERGY_DOSE_795.items():
+    _got_795 = _e_abs_795(_rows_795.get(_cid_795, {}).get('energy'))
+    assert _got_795 == _want_795, (
+        'csv nicht im #795-Zielzustand (Energie-Dosis)', _cid_795,
+        _got_795, _want_795)
+for _cid_795, _soll_795 in HULL_PRE_DOSE.items():
+    _r_795 = _rows_795.get(_cid_795)
+    assert _r_795 is not None, ('csv-Hulle fehlt', _cid_795)
+    _socks_795 = {}
+    for _c_795 in ('socket_a', 'socket_b', 'socket_d', 'socket_e',
+                   'socket_f', 'socket_g'):
+        _v_795 = _r_795[_c_795]
+        if _v_795 and _v_795.lstrip('-').isdigit() and int(_v_795) > 0:
+            _socks_795[_c_795.replace('socket_', '')] = int(_v_795)
+    assert int(_r_795['hp']) == _soll_795['hp'] \
+        and _socks_795 == _soll_795['socks'], (
+        'csv nicht im pre-Dosis-Hullen-Zustand (v25l-o-Dosen draussen)',
+        _cid_795, int(_r_795['hp']), _socks_795)
+
 # ============ kopiert aus diag_random_r13t.py (Stand 8.11.2026) ===========
 # --- Karten-Pools mit Sockelbedarf ------------------------------------
 ws = v11.weapons

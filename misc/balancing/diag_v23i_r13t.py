@@ -32,6 +32,31 @@ THRESH = 0.5
 TARGETS = {1: 1.5, 2: 1.7, 3: 2.0, 4: 2.5, 5: 3.0}   # v23g-Kurve
 HP_STATIC = 1.0
 
+# --------------- HISTORISCHER SNAPSHOT: Messframe eingefroren -------------
+# diag_v23i_r13t.json ist die Kalibrierungs-Basis des I1-Preismodells
+# (diag_infra_prices_r13i.py: c_ex/PV_equip = rw_median ueber die v23i-
+# Zeilen x units_of; auch diag_anchor_live_r13i.py liest dieselbe JSON).
+# Der Messframe dieses Snapshots existiert im Repo NICHT mehr: v9.FINAL
+# traegt nur noch die 5 X-Abzuege (v25a-Frame, 9.11.2026), v11 summiert
+# die Sektions-Speeds (H1-Fix 8.11.2026, "Code = Wahrheit") statt
+# Heck-/Max-Speed, und die csv wandert mit #795 in den Zielzustand.
+# Jeder Re-Run misst deshalb in einem ANDEREN Frame und ueberschreibt
+# die eingefrorene Kalibrierungs-Basis hinter dem I1ac/I1ad-Pin-Entscheid
+# still mit abweichenden Daten. Ein csv-Zustands-Assert greift zu kurz
+# (FINAL-Trim und Speed-Fix sitzen in den Metrik-Modulen, nicht in der
+# csv) — deshalb Ueberschreiben nur noch mit explizitem Opt-In; ohne
+# Flag bricht das Skript VOR der Messung ab (laut, kein Silent-
+# Overwrite des Referenz-JSON).
+if os.environ.get('V23I_ALLOW_OVERWRITE') != '1':
+    raise SystemExit(
+        'HISTORISCHER SNAPSHOT: diag_v23i_r13t.json ist die v23i-'
+        'Kalibrierungs-Basis des I1-Preismodells (Anker-Pin I1ac/I1ad). '
+        'Der Messframe (~30 FINAL-Overrides, Heck-/Max-Speed, Ist-csv) '
+        'existiert im Repo nicht mehr (v25a-Frame: 5 X-Abzuege, '
+        'Speed-Summen-Fix, #795-Ziel-csv) — ein Re-Run wuerde die Basis '
+        'mit abweichenden Daten ueberschreiben. Explizites Opt-In: '
+        'V23I_ALLOW_OVERWRITE=1 python3 diag_v23i_r13t.py')
+
 t0 = time.time()
 SRC = open('diag_random_r13t.py', encoding='utf-8').read()
 CUT = SRC.index('# ---------------- Messung mit Checkpoint')
