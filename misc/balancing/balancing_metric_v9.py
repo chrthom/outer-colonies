@@ -42,7 +42,7 @@ Erweitert v8 um Reichweiten-Dynamik (alle Mechaniken gegen Server-Code verifizie
 
 Datengrundlage: cards.csv im selben Ordner, uebergeordnet oder als
 ../cards/cards.csv (Repo-Layout: misc/balancing/ neben misc/cards/cards.csv).
-Aufruf: python3 balancing_metric_v9.py [--final]  (--final = 13 beschlossene Buffs)
+Aufruf: python3 balancing_metric_v9.py [--final]  (--final = die 5 X-Abzuege 157/166/179/344/347)
 """
 import csv, json, os, statistics, sys
 
@@ -104,12 +104,16 @@ FINAL = {
     # 347/401/412/555) sowie die 302/438-Ruecknahme (csv ist Zielzustand, Issue
     # #795: 'csv is already in the target state, only the metric overrides are
     # dropped'). cards.csv traegt seit dem Patch (patch_cards_795.py) den
-    # v23i-Sollzustand. Uebrig bleiben NUR die X-Abzuege (#795 §5:
-    # 'X deductions 157/166/179/344/347 stay X' - csv enthaelt dort numerische
-    # Ersatzwerte, X laesst die Defense-Karte aktiv):
+    # v23i-Sollzustand. Uebrig bleiben NUR die X-Abzuege (#795 §3: 'X
+    # deductions 157/166/344/347 stay X'; 179 steht NICHT in dieser Liste -
+    # seine X-Schalter PzAbz UND SAbz sind neue v25-Beschluesse, §1:
+    # 'damage_armour -2->X AND damage_shield ->X (v25, X switch against
+    # both defence types)', §7: 'Applies now to ... 179 (armour AND
+    # shield)'). Die csv enthaelt dort numerische Ersatzwerte, X laesst
+    # die Defense-Karte aktiv):
     '157': dict(dmg=7, e=0, abz={'shield': 'X'}),  # Plasmawerfer (SAbz 7 == dmg 7)
     '166': dict(dmg=3, e=0, abz={'shield': 'X'}),  # Laserkanone (SAbz 3 == dmg 3)
-    '179': dict(dmg=2, e=0, abz={'armour': 'X'}),  # Pulskanone (PzAbz wirkungslos)
+    '179': dict(dmg=2, e=0, abz={'armour': 'X', 'shield': 'X'}),  # Pulskanone (PzAbz + SAbz wirkungslos, #795 §1/§7)
     '344': dict(dmg=2, e=0, abz={'shield': 'X'}),  # Fokuslaser (SAbz 2 == dmg 2)
     '347': dict(dmg=4, e=0, abz={'shield': 'X'}),  # Impulslaser (#795: dmg 5->4)
 }

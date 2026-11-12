@@ -19,6 +19,21 @@ sys.path.insert(0, HERE)
 import diag_v25g_analysis as g
 
 CURVE = g.CURVE
+
+# --- #795-Zielzustands-Sicherung (Daten-Assertion wie diag_v25c_scenarios.py):
+# units/energies stammen aus der csv — nur 140/426/522/343/302 bekommen ihre
+# Energie als E-Override in g.build (nicht aus der csv). Gegen die Ist-csv
+# (pre-#795) driften genau die 5 Energie-Dosen-Karten (126/223/161/109/304)
+# und der Lauf ueberschreibt die eingecheckte 71-Objekt-Referenztabelle
+# (Autoritaet fuer #795 Abschnitt 8) mit 5 stillschweigend veraenderten
+# Zeilen. Deshalb VOR der Analyse die #795-Zielenergien der 5 Karten
+# assertieren:
+E_DOSE_795 = {'109': 1, '126': 1, '161': 0, '223': 2, '304': 1}
+for cid, want in E_DOSE_795.items():
+    got = g.energy_by_id.get(cid, 0)
+    assert got == want, ('csv nicht im #795-Zielzustand (Energie-Dosis)',
+                         cid, got, want)
+
 objs = g.build('pz3', 'e2', 'e3')
 
 # --- v25h-Runde (Christophers Beschluesse der Vollstaendigkeits-

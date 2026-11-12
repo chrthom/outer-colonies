@@ -23,10 +23,13 @@
 #     Kurven-Rundung 0,3/0,5?
 # ----------------------------------------------------------------------------
 import contextlib
+import csv as csvmod
 import io
 import json
 import os
 import statistics
+
+import balancing_metric_v9 as v9
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
@@ -37,6 +40,34 @@ TMP = os.path.join(HERE, '.anchor_live_out.tmp')
 BAND_REL = 0.5   # relative Bande +-50 % (BESCHLOSSEN I1y)
 PIN_C_EX = 1.65
 PIN_PV_EQUIP = 3.145
+
+# --------------- #795-ZIELZUSTANDS-CHECK (VOR Analyse und json.dump) --------
+# Die Live-Ableitung rechnet units_of gegen die AKTUELLE cards.csv und ist
+# nur im v25-Messzustand aussagekraeftig (#795-Energy-Dosen, Patch
+# patch_cards_795.py). Gegen die Ist-csv (pre-#795) entfaellt die Drift
+# komplett (PV_equip 3,145 = Pin, +0,00 %) und der Lauf ueberschreibt das
+# eingecheckte I1ad-Robustheits-JSON mit einem sinnlosen No-Drift-Befund.
+# Deshalb — analog zum Schwester-Skript diag_infra_final_r13i.py
+# (CSV_FIELD_CHECKS) — VOR der Analyse die #795-Energie-Dosen der 5 Karten
+# assertieren, die die v25-Runden REAL aus der csv lesen (Messzustand der
+# I1ad-Baseline; die Dosen 140/426/522/302/343 tragen die v25-Analysen als
+# E-Overrides, nicht als csv-Stand):
+def e_abs(v):
+    """Energie-Feld der csv als |int| ('' und '0' zaehlen als 0)."""
+    v = (v or '').strip()
+    return abs(int(v)) if v not in ('', '0') else 0
+
+ENERGY_DOSE_795 = {   # id -> #795-Zielenergie (abs) der csv-getragenen Dosen
+    '109': 1, '126': 1, '161': 0, '223': 2, '304': 1,
+}
+csv_energy = {}
+with open(v9.CARDS_CSV, newline='', encoding='utf-8') as f:
+    for r in csvmod.DictReader(f, delimiter=';', quotechar='"'):
+        csv_energy[r['id']] = r['energy']
+for cid, want in ENERGY_DOSE_795.items():
+    got = e_abs(csv_energy.get(cid))
+    assert got == want, ('csv nicht im #795-Zielzustand (Energie-Dosis)',
+                         cid, got, want)
 
 
 def run_live():
