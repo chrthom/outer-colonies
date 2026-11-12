@@ -2,17 +2,30 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
 import { IconService } from 'src/app/icon.service';
+
+type QueryParams = Record<string, string>;
 
 describe('RulesPage', () => {
   let component: RulesPage;
   let fixture: ComponentFixture<RulesPage>;
+  let routeStub: { queryParams: Observable<QueryParams> };
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    localStorage.clear();
+    routeStub = { queryParams: of<QueryParams>({}) };
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
-      imports: [RulesPage, RouterTestingModule],
-      providers: [IconService]
+      imports: [RulesPage],
+      providers: [
+        IconService,
+        { provide: ActivatedRoute, useValue: routeStub },
+        { provide: Router, useValue: routerSpy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RulesPage);
@@ -41,6 +54,10 @@ describe('RulesPage', () => {
     const imgName = 'test';
     const expectedUrl = `${environment.url.assets}/rules/${imgName}.png`;
     expect(component.imgUrl(imgName)).toBe(expectedUrl);
+  });
+
+  it('should generate correct local screenshot URL', () => {
+    expect(component.screenshotUrl('online_hand')).toBe('assets/rules/online_hand.png');
   });
 
   it('should return icon font character for known icons', () => {
@@ -99,6 +116,81 @@ describe('RulesPage', () => {
   it('should not mention mission cards in the turn overview', () => {
     selectChapter('turn-overview');
     expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  it('should default to online mode', () => {
+    expect(component.onlineMode).toBeTrue();
+    const toggleButton = fixture.debugElement.query(By.css('#mode-toggle button')).nativeElement;
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true');
+    expect(fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent).toContain(
+      'Online-Spiel'
+    );
+  });
+
+  it('should persist the mode choice and mirror it to the mode query param', () => {
+    component.setMode('kartenspiel');
+    expect(component.onlineMode).toBeFalse();
+    expect(localStorage.getItem('oc-rules-mode')).toBe('kartenspiel');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({ queryParams: { mode: 'kartenspiel' } })
+    );
+    fixture.detectChanges();
+    const toggleButton = fixture.debugElement.query(By.css('#mode-toggle button')).nativeElement;
+    expect(toggleButton.getAttribute('aria-checked')).toBe('false');
+    expect(fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent).toContain(
+      'Kartenspiel'
+    );
+  });
+
+  it('should restore the persisted mode on init', () => {
+    localStorage.setItem('oc-rules-mode', 'kartenspiel');
+    const newFixture = TestBed.createComponent(RulesPage);
+    newFixture.detectChanges();
+    expect(newFixture.componentInstance.onlineMode).toBeFalse();
+  });
+
+  it('should let the mode query param take precedence over the stored preference', () => {
+    localStorage.setItem('oc-rules-mode', 'online');
+    routeStub.queryParams = of({ mode: 'kartenspiel' });
+    const newFixture = TestBed.createComponent(RulesPage);
+    newFixture.detectChanges();
+    expect(newFixture.componentInstance.onlineMode).toBeFalse();
+  });
+
+  it('should fall back to the stored preference for an invalid mode query param', () => {
+    localStorage.setItem('oc-rules-mode', 'kartenspiel');
+    routeStub.queryParams = of({ mode: 'invalid' });
+    const newFixture = TestBed.createComponent(RulesPage);
+    newFixture.detectChanges();
+    expect(newFixture.componentInstance.onlineMode).toBeFalse();
+  });
+
+  it('should show the client controls in the online-game chapter only in online mode', () => {
+    selectChapter('online-game');
+    const text = () => fixture.debugElement.nativeElement.textContent;
+    expect(text()).toContain('So steuerst du das Spiel');
+    expect(text()).toContain('Deine Handkarten');
+    expect(text()).toContain('Kartenstapel inspizieren');
+    expect(text()).toContain('Missionen und Überfälle starten');
+    expect(text()).toContain('Gefechte');
+    expect(text()).toContain('Spielende und Kapitulation');
+    component.setMode('kartenspiel');
+    fixture.detectChanges();
+    expect(text()).not.toContain('So steuerst du das Spiel');
+    expect(text()).not.toContain('Kapitulation bestätigen');
+    // Mode-independent online features remain visible in both modes
+    expect(text()).toContain('Timer und Bedenkzeit');
+    expect(text()).toContain('Sol');
+  });
+
+  it('should show inline hints in physical-rule chapters only in online mode', () => {
+    selectChapter('setup');
+    const text = () => fixture.debugElement.nativeElement.textContent;
+    expect(text()).toContain('Deck-Manager der Website');
+    component.setMode('kartenspiel');
+    fixture.detectChanges();
+    expect(text()).not.toContain('Deck-Manager der Website');
   });
 
   function selectChapter(chapter: string): void {

@@ -32,6 +32,11 @@
           </mat-selection-list>
         </td>
         <td id="rules-content">
+          <div id="mode-toggle">
+            <mat-slide-toggle [checked]="onlineMode" (change)="onModeChange($event)">
+              {{ onlineMode ? 'Online-Spiel' : 'Kartenspiel' }}
+            </mat-slide-toggle>
+          </div>
           <div id="navigation-buttons-top">
             <button
               mat-raised-button
@@ -68,6 +73,15 @@
               zusammen, mit dem du gegen andere Spieler:innen antreten kannst. Auf den folgenden Seiten lernst
               du, wie eine Partie <i>Outer Colonies</i> abl&auml;uft und wie du deine Karten einsetzt.
             </p>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Im Online-Spiel stellst du dein Deck über den Deck-Manager der Website zusammen; auch die
+                Spielersuche und der Spielstart laufen dort. Die Anzahl deiner verbleibenden Karten wird an
+                deinem Deckstapel angezeigt.
+              </p>
+            </div>
+            }
             <p>Vor dem Spielbeginn mischen beide Spieler:innen ihr Deck und ziehen <b>7 Karten</b>.</p>
             <p>
               Die Spieler:in mit dem kleineren Deck wird zur aktiven Spieler:in und beginnt das Spiel. Haben
@@ -231,6 +245,15 @@
                 </td>
               </tr>
             </table>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Im Online-Spiel siehst du die Symbole sowohl auf den Karten als auch in den
+                Zusammenfassungsboxen der Kartenstapel. Mit einem Rechtsklick auf eine Karte kannst du sie in
+                einer vergrößerten Ansicht betrachten.
+              </p>
+            </div>
+            }
           </div>
           } @case ('victory') {
           <div>
@@ -261,6 +284,14 @@
                 Spieler:in gewinnt.
               </li>
             </ul>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Im Online-Spiel zeigt dir der Client am Spielende den Ergebnisbildschirm mit Sieg oder
+                Niederlage und deinem verdienten Sol.
+              </p>
+            </div>
+            }
           </div>
           } @case ('online-game') {
           <div>
@@ -269,7 +300,174 @@
               Das Online-Spiel basiert auf den hier beschriebenen Regeln. Neben den klassischen Regeln gibt es
               einige online-spezifische Funktionen:
             </p>
-            <h4>Spiel-Währung: Sol</h4>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <h4>So steuerst du das Spiel</h4>
+              <p>
+                Du steuerst das Online-Spiel hauptsächlich mit der Maus: Ein <b>Linksklick</b> wählt eine
+                Karte aus bzw. führt die damit verbundene Aktion aus. Ein <b>Rechtsklick</b> auf eine Karte
+                zeigt dir diese in einer vergrößerten Ansicht. Fahre mit dem Mauszeiger über Spielelemente, um
+                zusätzliche Informationen zu erhalten. Die <b>Leertaste</b> löst jederzeit dieselbe Aktion aus
+                wie ein Klick auf die Weiter-Schaltfläche.
+              </p>
+              <p>
+                Die Hinweisbox über dem Spielfeld zeigt dir jederzeit an, welche Aktion gerade von dir
+                erwartet wird – etwa Karten auszuspielen, Schiffe für eine Mission zu wählen oder Angriffe
+                durchzuführen. Schaltflächen heben ihre Beschriftung farblich ab, sobald du mit dem Zeiger
+                darüberfährst.
+              </p>
+              <p>Damit du auf einen Blick siehst, was möglich ist, hebt der Client Karten farblich hervor:</p>
+              <ul>
+                <li>
+                  <b>Weißer Schimmer</b>: Die Karte kann ausgewählt bzw. gespielt werden bzw. ist ein gültiges
+                  Ziel.
+                </li>
+                <li><b>Roter Schimmer</b>: Die Karte ist aktuell von dir ausgewählt.</li>
+                <li>
+                  <b>Abgeblendete Karte</b>: Die Karte steht in der aktuellen Situation nicht zur Verfügung.
+                </li>
+              </ul>
+              <img
+                [src]="screenshotUrl('online_prompt')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot der Hinweisbox mit Hervorhebungen"
+              />
+              <h4>Deine Handkarten</h4>
+              <p>
+                Deine Handkarten liegen unten am Bildschirmrand. Fährst du mit dem Zeiger über deine Hand,
+                breiten sich die Karten auseinander und die Karte unter dem Zeiger hebt sich hervor.
+              </p>
+              <p>
+                Handkarten, die du in deiner Aufbauphase ausspielen darfst, sind mit einem weißen Schimmer
+                markiert. Klicke eine Handkarte an, um sie auszuwählen – die gültigen Ziele werden daraufhin
+                hervorgehoben. Klicke eines dieser Ziele an, um die Karte auszuspielen. Ein erneuter Klick auf
+                die Handkarte hebt die Auswahl wieder auf.
+              </p>
+              <p>
+                Bei manchen Karten erscheint beim Ausspielen eine Auswahl, z.B. wenn du eine Karte aus
+                mehreren Möglichkeiten aussuchen sollst: Wähle dort die geforderte Anzahl Karten aus –
+                angezeigt werden je drei Karten pro Seite, mit den Pfeilen blätterst du umher – und bestätige
+                mit <b>OK</b>.
+              </p>
+              <img
+                [src]="screenshotUrl('online_picker')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot der Kartenauswahl"
+              />
+              <p>
+                Hast du am Ende deines Spielzugs mehr als 7 Handkarten, legt ein Klick auf eine Handkarte
+                diese auf deinen Ablagestapel.
+              </p>
+              <img
+                [src]="screenshotUrl('online_hand')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot der aufgefächerten Handkarten"
+              />
+              <h4>Kartenstapel inspizieren</h4>
+              <p>
+                Fährst du mit dem Zeiger über einen Kartenstapel, fächert sich dieser auf und du siehst alle
+                enthaltenen Karten einzeln. Unter jedem Stapel zeigt dir eine Zusammenfassungsbox die
+                wichtigsten Eigenschaftspunkte des Stapels an. An deinem Deck und Ablagestapel siehst du
+                zudem, wie viele Karten diese enthalten.
+              </p>
+              <p>
+                Mit einem Rechtsklick auf irgendeine Karte – auch auf Karten deiner Gegenspieler:in und die
+                oberste Karte des gegnerischen Ablagestapels – kannst du sie in einer vergrößerten Ansicht
+                lesen. Diese folgt dem Mauszeiger und verschwindet, sobald du den Zeiger wegbewegst oder
+                erneut mit der rechten Maustaste klickst. Spielt deine Gegenspieler:in eine Taktikkarte, wird
+                dir diese automatisch groß angezeigt; ein Linksklick blendet die Ansicht aus.
+              </p>
+              <img
+                [src]="screenshotUrl('online_stack')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot eines aufgefächerten Kartenstapels"
+              />
+              <h4>Missionen und Überfälle starten</h4>
+              <p>
+                In deiner Aufbauphase erscheinen die Schaltflächen <b>Mission</b> und <b>Überfall</b>, sobald
+                du mindestens ein einsatzbereites Schiff besitzt. Ein Klick startet die Planung – die aktive
+                Schaltfläche ist farblich hervorgehoben und deine Handkarten sind während der Planung
+                abgeblendet –, ein weiterer Klick bricht die Planung ab.
+              </p>
+              <p>
+                Wähle danach per Klick die Schiffe aus deiner orbitalen Zone aus, die an der Mission bzw. dem
+                Überfall teilnehmen sollen; ein erneuter Klick nimmt ein gewähltes Schiff wieder aus der
+                Planung. Mit der Weiter-Schaltfläche führst du die geplante Mission bzw. den Überfall durch –
+                hast du kein Schiff gewählt, beendest du damit deinen Zug.
+              </p>
+              <p>
+                Plant deine Gegenspieler:in eine Mission oder einen Überfall, wählst du auf dieselbe Weise per
+                Klick deine Schiffe zum Abfangen bzw. zur Verteidigung deiner Kolonie aus und bestätigst mit
+                der Weiter-Schaltfläche.
+              </p>
+              <p>
+                Ausgespielte Karten kannst du in deiner Aufbauphase wieder auf die Hand zurücknehmen: Fahre
+                dazu über einen deiner Kartenstapel und klicke auf die Zurücknehmen-Schaltfläche der
+                jeweiligen Karte. Karten, die nicht mehr genügend Energie haben, sind dauerhaft rot markiert
+                und müssen zurückgenommen werden.
+              </p>
+              <img
+                [src]="screenshotUrl('online_buttons')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot der Schaltflächen für Mission und Überfall"
+              />
+              <h4>Gefechte</h4>
+              <p>
+                In der Gefechtsphase wählst du zuerst eine kampfbereite Waffe deines Schiffes als Angreifer
+                aus – kampfbereite Waffen sind hervorgehoben – und klickst anschließend auf ein gegnerisches
+                Schiff, um den Angriff durchzuführen. Ein erneuter Klick auf den gewählten Angreifer hebt die
+                Auswahl wieder auf.
+              </p>
+              <p>
+                In der letzten Gefechtsphase (Reichweite 1) eines Überfalls kannst du per Klick auf die
+                gegnerische Kolonie einen <b>Gesamtangriff</b> mit allen kampfbereiten Waffen auf die Kolonie
+                durchführen.
+              </p>
+              <p>
+                Die aktuelle Reichweite des Gefechts wird dir im Spielfeld angezeigt; zugefügte Schadenspunkte
+                erscheinen direkt an den angegriffenen Karten. Mit der Weiter-Schaltfläche oder der Leertaste
+                beendest du die Gefechtsphase – kannst du nicht angreifen, geschieht dies automatisch.
+              </p>
+              <p>
+                Wird eine Intervention von dir erwartet – weil deine Gegenspieler:in z.B. eine Taktikkarte mit
+                Intervention spielt oder eines deiner Schiffe angreift –, kannst du eine passende Taktikkarte
+                ausspielen, indem du die Handkarte und danach ihr Ziel anklickst, oder die Intervention mit
+                der Weiter-Schaltfläche überspringen.
+              </p>
+              <img
+                [src]="screenshotUrl('online_combat')"
+                class="screenshot"
+                alt="Platzhalter: Screenshot der Angriffsauswahl im Gefecht"
+              />
+              <h4>Spielende und Kapitulation</h4>
+              <p>
+                Über die Schaltfläche <b>Aufgeben</b> kannst du jederzeit kapitulieren: Der erste Klick zeigt
+                dir den Hinweis <i>Kapitulation bestätigen</i>; klicke auf den Hinweis, um die Kapitulation
+                endgültig auszusprechen.
+              </p>
+              <p>
+                Nach dem Spielende erscheint der Ergebnisbildschirm mit Sieg oder Niederlage und deinem
+                Sol-Verdienst. Über die Schaltfläche <b>Neuen Gegner suchen</b> startest du direkt eine neue
+                Spielersuche; über <b>Spiel beenden</b> kehrst du zur Website zurück.
+              </p>
+            </div>
+            }
+            <h4>Timer und Bedenkzeit</h4>
+            <p>
+              Im Online-Spiel beträgt die Bedenkzeit für jede ausstehende Handlung <b>90 Sekunden</b> - auch
+              für Abfang- und Gefechtsreaktionen außerhalb des eigenen Spielzugs. Wird diese Zeit
+              überschritten, wird die ausstehende Handlung automatisch abgeschlossen: Dein Spielzug endet bzw.
+              eine Reaktion wird ohne von dir gewählte Schiffe fortgesetzt.
+            </p>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Die verbleibende Bedenkzeit wird neben dem Namen der Spieler:in angezeigt, die gerade handeln
+                muss, und färbt sich in den letzten 60 Sekunden rot.
+              </p>
+            </div>
+            }
+            <h4>Sol</h4>
             <p>
               Im Online-Spiel erhältst du nach jedem Spiel <b>Sol</b> basierend auf deiner Leistung. Sol wird
               für folgende Aktionen gutgeschrieben:
@@ -284,13 +482,6 @@
               </li>
             </ul>
             <p>Sol kann verwendet werden, um Booster zu kaufen und damit deine Sammlung zu erweitern.</p>
-            <h4>Spielzeitlimit</h4>
-            <p>
-              Im Online-Spiel beträgt die Bedenkzeit für jede ausstehende Handlung <b>90 Sekunden</b> - auch
-              für Abfang- und Gefechtsreaktionen außerhalb des eigenen Spielzugs. Wird diese Zeit
-              überschritten, wird die ausstehende Handlung automatisch abgeschlossen: Dein Spielzug endet bzw.
-              eine Reaktion wird ohne von dir gewählte Schiffe fortgesetzt.
-            </p>
             <h4>Spielmodi</h4>
             <p>Im Online-Spiel gibt es folgende Spielmodi:</p>
             <ul>
@@ -962,6 +1153,14 @@
               </li>
               <li>Der nächste Spieler:in wird zum aktiven Spieler:in.</li>
             </ul>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Im Online-Spiel führt dich die Hinweisbox durch die Spielphasen; die Weiter-Schaltfläche oder
+                die Leertaste schließt die aktuelle Phase ab.
+              </p>
+            </div>
+            }
           </div>
           } @case ('missions') {
           <div>
@@ -1014,6 +1213,14 @@
               (Reichweite 1) eines Überfalls können die Kolonie und Karten in der Koloniezone des Verteidigers
               angegriffen werden.
             </p>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Wie du Missionen und Überfälle im Online-Spiel startest und Schiffe zuweist, beschreibt das
+                Kapitel <i>Online-Spiel</i> im Abschnitt <i>Missionen und Überfälle starten</i>.
+              </p>
+            </div>
+            }
           </div>
           } @case ('battle-overview') {
           <div>
@@ -1100,6 +1307,15 @@
               tragen in der Regel das Schlagwort <i>Einmalige Verwendung</i> und werden daher innerhalb eines
               Gefechts nicht wieder aktiviert.
             </p>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Wie du Gefechte im Online-Spiel bedienst – Angriffe anklicken, Gesamtangriff auf die Kolonie,
+                Gefechtsphase beenden –, beschreibt das Kapitel <i>Online-Spiel</i> im Abschnitt
+                <i>Gefechte</i>.
+              </p>
+            </div>
+            }
           </div>
           } @case ('attacks') {
           <div>
@@ -1279,6 +1495,15 @@
                 <span class="oc-icon" [innerHTML]="getIconHtml('shield_1')"></span> deaktiviert worden.
               </li>
             </ol>
+            @if (onlineMode) {
+            <div class="online-hint">
+              <p>
+                Wie du Angriffe im Online-Spiel durch Klick auf Waffe und Ziel durchführst – inklusive des
+                Gesamtangriffs auf die Kolonie –, beschreibt das Kapitel <i>Online-Spiel</i> im Abschnitt
+                <i>Gefechte</i>.
+              </p>
+            </div>
+            }
           </div>
           } @case ('battle-end') {
           <div>
