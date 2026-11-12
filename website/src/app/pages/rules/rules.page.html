@@ -34,7 +34,7 @@
         <td id="rules-content">
           <div id="mode-toggle">
             <mat-slide-toggle [checked]="onlineMode" (change)="onModeChange($event)">
-              {{ onlineMode ? 'Online-Spiel' : 'Kartenspiel' }}
+              Online-Spiel
             </mat-slide-toggle>
           </div>
           <div id="navigation-buttons-top">
@@ -316,10 +316,16 @@
                 durchzuführen. Schaltflächen heben ihre Beschriftung farblich ab, sobald du mit dem Zeiger
                 darüberfährst.
               </p>
+              <p>
+                Am rechten Spielfeldrand siehst du für beide Spieler:innen jeweils eine Spalte kleiner Symbole
+                – je eines pro noch verfügbarer Aktion der Aufbauphase. Jedes Symbol zeigt an, welche
+                Kartentypen mit dieser Aktion noch ausgespielt werden können, z.B. Rumpf, Ausrüstung,
+                Infrastruktur oder Taktik.
+              </p>
               <p>Damit du auf einen Blick siehst, was möglich ist, hebt der Client Karten farblich hervor:</p>
               <ul>
                 <li>
-                  <b>Weißer Schimmer</b>: Die Karte kann ausgewählt bzw. gespielt werden bzw. ist ein gültiges
+                  <b>Weißer Schimmer</b>: Die Karte kann ausgewählt oder gespielt werden oder ist ein gültiges
                   Ziel.
                 </li>
                 <li><b>Roter Schimmer</b>: Die Karte ist aktuell von dir ausgewählt.</li>

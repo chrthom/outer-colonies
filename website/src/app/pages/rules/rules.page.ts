@@ -74,7 +74,11 @@ export class RulesPage implements OnInit {
   /** Applies a rules mode, persists it in localStorage and mirrors it to the `?mode=` query param. */
   setMode(mode: RulesMode): void {
     this.onlineMode = mode == 'online';
-    localStorage.setItem(MODE_STORAGE_KEY, mode);
+    try {
+      localStorage.setItem(MODE_STORAGE_KEY, mode);
+    } catch {
+      // Storage may be unavailable (strict privacy modes); the mode still applies for this session.
+    }
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { mode: mode },

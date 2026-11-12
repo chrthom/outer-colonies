@@ -20,7 +20,7 @@
         background-color: color-mix(in srgb, var(--color-accent), transparent 92%);
         padding: 8px 14px;
         margin-bottom: 30px;
-        &::before {
+        & > p:first-child::before {
           content: "Online-Spiel: ";
           font-weight: bold;
         }

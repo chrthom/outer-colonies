@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -127,6 +128,14 @@ describe('RulesPage', () => {
     );
   });
 
+  it('should keep the static toggle label regardless of the mode', () => {
+    component.setMode('kartenspiel');
+    fixture.detectChanges();
+    const toggleText = fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent;
+    expect(toggleText).toContain('Online-Spiel');
+    expect(toggleText).not.toContain('Kartenspiel');
+  });
+
   it('should persist the mode choice and mirror it to the mode query param', () => {
     component.setMode('kartenspiel');
     expect(component.onlineMode).toBeFalse();
@@ -138,8 +147,22 @@ describe('RulesPage', () => {
     fixture.detectChanges();
     const toggleButton = fixture.debugElement.query(By.css('#mode-toggle button')).nativeElement;
     expect(toggleButton.getAttribute('aria-checked')).toBe('false');
-    expect(fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent).toContain(
-      'Kartenspiel'
+  });
+
+  it('should apply the mode from the slide toggle change event', () => {
+    component.onModeChange({ checked: false } as MatSlideToggleChange);
+    expect(component.onlineMode).toBeFalse();
+    expect(localStorage.getItem('oc-rules-mode')).toBe('kartenspiel');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({ queryParams: { mode: 'kartenspiel' } })
+    );
+    component.onModeChange({ checked: true } as MatSlideToggleChange);
+    expect(component.onlineMode).toBeTrue();
+    expect(localStorage.getItem('oc-rules-mode')).toBe('online');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({ queryParams: { mode: 'online' } })
     );
   });
 
