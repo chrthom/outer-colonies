@@ -1,5 +1,5 @@
 import SocketData from './game_state/socket_data';
-import Match from './game_state/match';
+import Match, { BotPlayerSetup } from './game_state/match';
 import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
@@ -7,9 +7,12 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import Bot, { processBotActions } from './bot/bot';
+import { pickRandom } from './utils/helpers';
 
 export const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
+const botName = 'Bot';
 
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
   socket.on(MsgTypeInbound.Login, async (sessionToken: string) => {
@@ -31,6 +34,19 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     } catch (err) {
       console.log(`ERROR: Login failed for session token ${sessionToken}: ${err}`);
     }
+  });
+  socket.on(MsgTypeInbound.StartBotGame, () => {
+    const socketData = <SocketData>socket.data;
+    if (!socketData || socketData.activeDeck.length == 0) {
+      console.log(`WARN: Socket ${socket.id} tried to start a bot game before logging in`);
+      return;
+    }
+    if (socketData.match) {
+      console.log(`WARN: ${socketData.user.username} tried to start a bot game while already in a match`);
+      return;
+    }
+    socket.leave(matchmakingRoom);
+    initBotGame(io, socket);
   });
 }
 
@@ -62,4 +78,24 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
     preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
   io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', gameParams);
+}
+
+/**
+ * Starts a singleplayer game between the requesting human player and a bot
+ * with a random bot deck. The requesting player is removed from the
+ * matchmaking room, so the matchmaking cron can no longer pair it.
+ */
+function initBotGame(io: Server, socket: Socket): void {
+  const match = new Match(
+    `${gameRoomPrefix}-${uuidv4()}`,
+    socket,
+    new BotPlayerSetup(botName, pickRandom(CardCollection.botDecks).slice())
+  );
+  match.bot = new Bot(match, 1);
+  const gameParams: ClientGameParams = {
+    preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
+  };
+  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', gameParams);
+  processBotActions(io, match); // Bot readies up for match initialization
+  console.log(`Player ${(<SocketData>socket.data).user.username} started a bot game`);
 }

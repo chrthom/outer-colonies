@@ -1,22 +1,20 @@
 import Match from './game_state/match';
-import toClientState from './converters/client_state_converter';
-import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { combineAttackResults, getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
+import { combineAttackResults, getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { matchmakingRoom } from './matchmaking';
 import { Attack } from './game_state/battle';
+import { processBotActions } from './bot/bot';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
     doWithMatchAndPlayer(socket, (match, player) => {
       if (turnPhase == match.turnPhase) {
         if (turnPhase == TurnPhase.Init) {
-          match.players[player.no].ready = true;
-          if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
+          if (match.setReadyAndCheck(player.no)) match.startMatch();
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
           // Verify conditions before processing ready event
           if (verifyReadyConditions(player, turnPhase)) {
@@ -182,6 +180,8 @@ export function gameCron(io: Server) {
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
+        const player = match.players[playerNo];
+        if (player.isBot) return; // Bot players have no socket to emit to
         const socket = getSocket(io, match, playerNo);
         if (socket)
           socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
@@ -202,7 +202,8 @@ function getSocketData(socket: Socket): SocketData {
 }
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket | undefined {
-  return io.sockets.sockets.get(match.players[playerNo].socketId);
+  const socketId = match.players[playerNo].socketId;
+  return socketId ? io.sockets.sockets.get(socketId) : undefined;
 }
 
 function getPlayer(socket: Socket): Player | undefined {
@@ -211,22 +212,8 @@ function getPlayer(socket: Socket): Player | undefined {
 }
 
 function emitState(io: Server, match: Match) {
-  match.forAllPlayers((playerNo: number) => {
-    const socket = getSocket(io, match, playerNo);
-    if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
-    else console.log('WARN: Could not find socket to emit state');
-  });
-  match.resetTempStates();
-}
-
-function initMatch(io: Server, match: Match) {
-  match.setSecondPlayer();
-  match.players.forEach(player => {
-    player.shuffleDeck();
-    player.drawCards(rules.initialCardsToDraw);
-  });
-  match.prepareStartPhase();
-  emitState(io, match);
+  match.emitState(io);
+  processBotActions(io, match);
 }
 
 export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {

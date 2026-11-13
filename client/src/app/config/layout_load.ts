@@ -1,4 +1,8 @@
 class LayoutLoadConfig {
+  readonly botButton = {
+    x: 1200,
+    y: 880
+  };
   readonly loadingAnimation = {
     x: 1200,
     y: 750,

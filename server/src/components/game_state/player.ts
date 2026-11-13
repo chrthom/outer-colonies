@@ -9,21 +9,30 @@ import { InterventionTacticCard } from './intervention';
 import { rules } from '../../shared/config/rules';
 
 export default class Player {
-  socketId: string;
+  socketId?: string;
   name: string;
   match: Match;
   no: number;
+  isBot: boolean;
   ready: boolean = false;
   deck: Card[];
   discardPile: Card[] = [];
   hand: CardStack[] = [];
   cardStacks: CardStack[];
   actionPool!: ActionPool;
-  constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
+  constructor(
+    socketd: string | undefined,
+    name: string,
+    match: Match,
+    playerNo: number,
+    deck: Card[],
+    isBot: boolean = false
+  ) {
     this.socketId = socketd;
     this.name = name;
     this.match = match;
     this.no = playerNo;
+    this.isBot = isBot;
     this.deck = deck;
     this.cardStacks = [new RootCardStack(new ColonyCard(), Zone.Colony, this)];
     this.resetRemainingActions();
@@ -179,9 +188,10 @@ export default class Player {
   }
 
   /**
-   * Retract cards with insufficient energy
+   * Retract cards with insufficient energy, e.g. when the player ends the build
+   * phase or when the countdown expires. Also used by the singleplayer bot.
    */
-  private retractInsufficientEnergyCards() {
+  retractInsufficientEnergyCards() {
     // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
     const cardStacksToRetract = this.cardStacks
       .filter(cs => cs.hasInsufficientEnergy)

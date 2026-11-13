@@ -1,5 +1,6 @@
 import { Rarity } from '../../../shared/config/enums';
 import { starterDecks } from '../../../shared/config/starter_decks';
+import { botDecks } from '../../bot/decks';
 import Card from '../card';
 import ColonyCard from '../types/colony_card';
 import { allCards as equipmentDefenseCards } from './equipment_defense_cards';
@@ -62,6 +63,12 @@ export default class CardCollection {
   static allCards: Card[] = allCardInstances;
   static starterDecks: Card[][] = starterDecks.map(sd =>
     sd
+      .map(c => Array(c[0]).fill(c[1]))
+      .flat()
+      .map(cid => this.cards[cid as number])
+  );
+  static botDecks: Card[][] = botDecks.map(bd =>
+    bd
       .map(c => Array(c[0]).fill(c[1]))
       .flat()
       .map(cid => this.cards[cid as number])

@@ -1,11 +1,11 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
-import { BattleType, CardDurability, CardType, TurnPhase } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, MsgTypeOutbound, TurnPhase } from '../../shared/config/enums';
 import Battle from './battle';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
 import { opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import GameResult from './game_result';
 import Intervention, {
   InterventionAttack,
@@ -14,8 +14,34 @@ import Intervention, {
   InterventionOpponentTurnStart
 } from './intervention';
 import SocketData from './socket_data';
+import toClientState from '../converters/client_state_converter';
+import Card from '../cards/card';
 
 type Players = [player1: Player, player2: Player];
+
+/**
+ * Describes the bot player of a match. Passed to the Match constructor
+ * instead of a second human socket to create a bot-controlled player.
+ */
+export class BotPlayerSetup {
+  constructor(
+    readonly name: string,
+    readonly deck: Card[]
+  ) {}
+}
+
+/**
+ * Minimal interface of the singleplayer bot attached to a match. Declared here
+ * so that Match does not have to depend on the bot implementation.
+ */
+export interface MatchBot {
+  readonly playerNo: number;
+  act(io: Server): void;
+}
+
+export function isBotPlayerSetup(player: Socket | BotPlayerSetup): player is BotPlayerSetup {
+  return player instanceof BotPlayerSetup;
+}
 
 export default class Match {
   readonly room!: string;
@@ -29,11 +55,12 @@ export default class Match {
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
-  constructor(room: string, socket1: Socket, socket2: Socket) {
+  bot?: MatchBot;
+  constructor(room: string, player1: Socket | BotPlayerSetup, player2: Socket | BotPlayerSetup) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
     this.gameResult = new GameResult(this);
-    this.players = [this.newPlayer(socket1, 0), this.newPlayer(socket2, 1)];
+    this.players = [this.newPlayer(player1, 0), this.newPlayer(player2, 1)];
   }
   get activePlayer(): Player {
     return this.players[this.activePlayerNo];
@@ -70,7 +97,7 @@ export default class Match {
   }
   /**
    * Marks the player who will NOT take the first turn: the player with the larger deck,
-   * or a random player on equal deck sizes. initMatch() calls prepareStartPhase() right
+   * or a random player on equal deck sizes. startMatch() calls prepareStartPhase() right
    * after, which flips activePlayerNo, so the player with the smaller deck takes the
    * first turn.
    */
@@ -167,14 +194,52 @@ export default class Match {
     if (this.control >= rules.controlLimit) this.gameResult.setWinnerByDomination(this.players[1]);
     else if (this.control <= -rules.controlLimit) this.gameResult.setWinnerByDomination(this.players[0]);
   }
-  private newPlayer(socket: Socket, playerNo: number): Player {
-    socket.join(this.room);
-    const socketData: SocketData = <SocketData>socket.data;
+  private newPlayer(player: Socket | BotPlayerSetup, playerNo: number): Player {
+    if (isBotPlayerSetup(player)) {
+      return new Player(undefined, player.name, this, playerNo, player.deck, true);
+    }
+    player.join(this.room);
+    const socketData: SocketData = <SocketData>player.data;
     socketData.match = this;
     socketData.playerNo = playerNo;
-    return new Player(socket.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
+    return new Player(player.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
   }
   private getDestroyedCardStacks(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
+  }
+  /**
+   * Ready up a player for match initialization. Returns true when both players
+   * are ready and the match can be started via startMatch().
+   */
+  setReadyAndCheck(playerNo: number): boolean {
+    this.players[playerNo].ready = true;
+    return this.players.every(player => player.ready);
+  }
+  /**
+   * Initializes a fully set up match: determines the starting player, shuffles
+   * both decks, draws the initial hands and starts the first turn.
+   */
+  startMatch() {
+    this.setSecondPlayer();
+    this.players.forEach(player => {
+      player.shuffleDeck();
+      player.drawCards(rules.initialCardsToDraw);
+    });
+    this.prepareStartPhase();
+  }
+  /**
+   * Emits the current state to every connected (human) player and resets
+   * temporary match states afterwards. Bot players have no socket and are
+   * skipped.
+   */
+  emitState(io: Server) {
+    this.forAllPlayers((playerNo: number) => {
+      const player = this.players[playerNo];
+      if (player.isBot) return;
+      const socket = player.socketId ? io.sockets.sockets.get(player.socketId) : undefined;
+      if (socket) socket.emit(MsgTypeOutbound.State, toClientState(this, playerNo));
+      else console.log('WARN: Could not find socket to emit state');
+    });
+    this.resetTempStates();
   }
 }
