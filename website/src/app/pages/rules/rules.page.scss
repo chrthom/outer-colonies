@@ -11,6 +11,25 @@
     }
     #rules-content {
       padding-left: 40px;
+      #mode-toggle {
+        margin-bottom: 15px;
+        padding-top: 10px;
+      }
+      .online-hint {
+        border-left: 3px solid var(--color-accent);
+        background-color: color-mix(in srgb, var(--color-accent), transparent 92%);
+        padding: 8px 14px;
+        margin-bottom: 30px;
+        & > p:first-child::before {
+          content: "Online-Spiel: ";
+          font-weight: bold;
+        }
+        .screenshot {
+          display: block;
+          max-width: 60%;
+          margin: 0 auto 20px auto;
+        }
+      }
       h2 {
         display: block;
         margin-bottom: 15px;
