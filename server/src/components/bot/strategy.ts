@@ -103,16 +103,18 @@ export function selectInterceptingShips(player: Player): string[] {
 
 /**
  * Selects the bot's next attack in the combat phase: the first available
- * weapon against the current focus target. If the focus target no longer
- * participates in the battle (e.g. it was destroyed), a random new target is
- * picked, so all weapons focus the same target until it is destroyed.
- * Returns undefined if the bot cannot attack.
+ * weapon against the current focus target. Destroyed hulls are never pruned
+ * from battle.ships (they are only removed from the player's card stacks at
+ * the end of each battle round), so the target pool is filtered by aliveness:
+ * a destroyed focus target releases the focus and destroyed hulls cannot be
+ * picked as new targets, so all weapons focus the same target until it is
+ * destroyed. Returns undefined if the bot cannot attack.
  */
 export function selectAttack(player: Player, focusTargetUUID?: string): BotAttack | undefined {
   const match = player.match;
   const srcWeapon = match.battle.ships[player.no].flatMap(ship => ship.cardStacks).find(cs => cs.canAttack);
   if (!srcWeapon) return undefined;
-  const opponentShips = match.battle.ships[match.waitingPlayerNo];
+  const opponentShips = match.battle.ships[match.waitingPlayerNo].filter(cs => cs.damage < cs.profile.hp);
   const focusTarget = focusTargetUUID ? opponentShips.find(cs => cs.uuid == focusTargetUUID) : undefined;
   const target = focusTarget ?? (opponentShips.length > 0 ? pickRandom(opponentShips) : undefined);
   return target ? { srcWeapon, target } : undefined;

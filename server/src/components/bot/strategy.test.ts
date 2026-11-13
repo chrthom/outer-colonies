@@ -317,18 +317,30 @@ describe('Bot strategy', () => {
     });
 
     test('focuses all weapons on the same target until it is destroyed', () => {
-      const { match, player, enemyShips } = setupCombat();
+      const { player, enemyShips } = setupCombat();
       const firstAttack = selectAttack(player)!;
 
       const secondAttack = selectAttack(player, firstAttack.target.uuid)!;
       expect(secondAttack.target).toBe(firstAttack.target);
 
-      // Focus target is destroyed and removed from the battle: a new target
-      // among the survivors is picked
-      match.battle.ships[1] = match.battle.ships[1].filter(cs => cs.uuid != firstAttack.target.uuid);
+      // Focus target is destroyed: like in the real game flow it stays in
+      // battle.ships (destroyed hulls are only pruned from the player's card
+      // stacks at the end of each battle round), so the aliveness filter must
+      // release the focus and a new target among the survivors is picked
+      firstAttack.target.damage = firstAttack.target.profile.hp;
       const survivors = enemyShips.filter(cs => cs.uuid != firstAttack.target.uuid);
       const thirdAttack = selectAttack(player, firstAttack.target.uuid)!;
       expect(survivors).toContain(thirdAttack.target);
+    });
+
+    test('does not pick a destroyed ship as a new target', () => {
+      const { match, player, enemyShips } = setupCombat();
+      enemyShips.forEach(cs => (cs.damage = cs.profile.hp));
+
+      expect(selectAttack(player)).toBeUndefined();
+      // The destroyed hulls are still in the battle's ship pool, so the
+      // undefined result must come from the aliveness filter
+      expect(match.battle.ships[1].length).toBe(enemyShips.length);
     });
 
     test('returns undefined when no weapon can attack', () => {

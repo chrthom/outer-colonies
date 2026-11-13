@@ -124,7 +124,9 @@ export default class Bot implements MatchBot {
   /**
    * The combat phase: attack with the first available weapon, focusing all
    * weapons on one target until it is destroyed, and ready up once no more
-   * attacks are possible.
+   * attacks are possible. The focus target is kept across battle rounds, as
+   * selectAttack already releases it when it is destroyed or no longer an
+   * alive participant of the battle.
    */
   private combatAction() {
     const attack = selectAttack(this.player, this.focusTargetUUID);
@@ -132,7 +134,6 @@ export default class Bot implements MatchBot {
       this.focusTargetUUID = attack.target.uuid;
       this.match.planAttack(attack.srcWeapon, attack.target);
     } else {
-      this.focusTargetUUID = undefined;
       this.match.processBattleRound();
     }
   }
