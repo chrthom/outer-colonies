@@ -12,6 +12,15 @@ import { AttackProfile } from '../cards/card_profile';
  */
 const battleStrengthFactor = 1.5;
 
+/**
+ * The bot only raids (instead of running a mission) when its own fleet
+ * strength even exceeds the opponent's orbital defense by this factor, so a
+ * merely superior fleet runs a mission while an overwhelming one attacks the
+ * colony. A defenseless colony is always raided, as the factor then compares
+ * against zero.
+ */
+const raidStrengthFactor = 2;
+
 /** A single attack planned by the bot: one weapon against one target. */
 export interface BotAttack {
   srcWeapon: CardStack;
@@ -57,19 +66,19 @@ export function selectTarget(handCard: CardStack): CardStack | undefined {
 }
 
 /**
- * Decides the battle the bot declares this turn: a mission with all
- * mission-ready ships when its fleet strength clearly exceeds the opponent's
- * potential defense, otherwise no battle.
+ * Decides the battle the bot declares this turn: a raid with all
+ * mission-ready ships when the opponent has no orbital defense or the bot's
+ * fleet clearly overwhelms it, a mission when the fleet merely clearly
+ * exceeds the opponent's potential defense, otherwise no battle.
  */
 export function planBattle(player: Player): ClientPlannedBattle {
   const missionReadyShips = player.cardStacks.filter(cs => cs.isMissionReady);
   const opponent = player.match.players[opponentPlayerNo(player.no)];
   const opponentStrength = fleetStrength(opponent.cardStacks.filter(cs => cs.zone == Zone.Orbital));
-  if (
-    missionReadyShips.length > 0 &&
-    fleetStrength(missionReadyShips) >= opponentStrength * battleStrengthFactor
-  ) {
-    return { type: BattleType.Mission, shipIds: missionReadyShips.map(cs => cs.uuid) };
+  const ownStrength = fleetStrength(missionReadyShips);
+  if (missionReadyShips.length > 0 && ownStrength >= opponentStrength * battleStrengthFactor) {
+    const type = ownStrength >= opponentStrength * raidStrengthFactor ? BattleType.Raid : BattleType.Mission;
+    return { type, shipIds: missionReadyShips.map(cs => cs.uuid) };
   }
   return { type: BattleType.None, shipIds: [] };
 }

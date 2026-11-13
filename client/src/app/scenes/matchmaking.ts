@@ -49,6 +49,9 @@ export default class Matchmaking extends Phaser.Scene {
         case 'search':
           this.status.setText('Suche Mitspieler...');
           break;
+        case 'botRejected':
+          this.status.setText('Bot-Spiel konnte nicht gestartet werden. Suche Mitspieler...');
+          break;
         case 'start':
           this.socket.off(MsgTypeOutbound.Connect);
           this.socket.off(MsgTypeOutbound.Matchmaking);

@@ -39,6 +39,10 @@ export interface MatchBot {
   act(io: Server): void;
 }
 
+/**
+ * Type guard to distinguish the bot player setup from a human player's
+ * socket, e.g. in the Match constructor.
+ */
 export function isBotPlayerSetup(player: Socket | BotPlayerSetup): player is BotPlayerSetup {
   return player instanceof BotPlayerSetup;
 }

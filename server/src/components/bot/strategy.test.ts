@@ -93,8 +93,6 @@ describe('Bot strategy', () => {
       const ship = createShip(player, new MockHullCard(1, 10, 2));
       ship.damage = 3;
       ship.attach(new AttachmentCardStack(new MockWeaponCard(100, 4), ship));
-      match.battle = new Battle(BattleType.Mission, 0);
-      match.battle.ships[0] = [ship];
 
       expect(fleetStrength([ship])).toBe(7 + 4);
     });
@@ -186,16 +184,16 @@ describe('Bot strategy', () => {
   });
 
   describe('planBattle', () => {
-    test('declares a mission with all mission-ready ships when clearly stronger', () => {
+    test('declares a mission with all mission-ready ships when clearly, but not overwhelmingly, stronger', () => {
       const match = createMatch();
       const player = match.players[0];
       const ships = [
-        createShip(player, new MockHullCard(1, 10, 2)),
-        createShip(player, new MockHullCard(2, 10, 2))
+        createShip(player, new MockHullCard(1, 5, 2)),
+        createShip(player, new MockHullCard(2, 5, 2))
       ];
       player.cardStacks.push(...ships);
       const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 4, 2)));
+      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 6, 2)));
 
       const plannedBattle = planBattle(player);
 
@@ -203,13 +201,26 @@ describe('Bot strategy', () => {
       expect(plannedBattle.shipIds).toEqual(ships.map(cs => cs.uuid));
     });
 
-    test('declares a mission when the opponent has no orbital ships', () => {
+    test('declares a raid when the opponent has no orbital ships', () => {
       const match = createMatch();
       const player = match.players[0];
       const ships = [createShip(player, new MockHullCard(1, 6, 2))];
       player.cardStacks.push(...ships);
 
-      expect(planBattle(player).type).toBe(BattleType.Mission);
+      const plannedBattle = planBattle(player);
+
+      expect(plannedBattle.type).toBe(BattleType.Raid);
+      expect(plannedBattle.shipIds).toEqual(ships.map(cs => cs.uuid));
+    });
+
+    test('declares a raid when the fleet clearly overwhelms the orbital defense', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      player.cardStacks.push(createShip(player, new MockHullCard(1, 20, 2)));
+      const opponent = match.players[1];
+      opponent.cardStacks.push(createShip(opponent, new MockHullCard(2, 8, 2)));
+
+      expect(planBattle(player).type).toBe(BattleType.Raid);
     });
 
     test('passes when the own fleet is not clearly stronger', () => {

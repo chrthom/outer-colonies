@@ -38,7 +38,12 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
   socket.on(MsgTypeInbound.StartBotGame, () => {
     const socketData = <SocketData>socket.data;
     if (!socketData || socketData.activeDeck.length == 0) {
-      console.log(`WARN: Socket ${socket.id} tried to start a bot game before logging in`);
+      console.log(
+        socketData
+          ? `WARN: ${socketData.user.username} tried to start a bot game without an active deck`
+          : `WARN: Socket ${socket.id} tried to start a bot game before logging in`
+      );
+      socket.emit(MsgTypeOutbound.Matchmaking, 'botRejected');
       return;
     }
     if (socketData.match) {
