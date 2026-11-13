@@ -21,14 +21,14 @@ export default class Player {
   cardStacks: CardStack[];
   actionPool!: ActionPool;
   constructor(
-    socketd: string | undefined,
+    socketId: string | undefined,
     name: string,
     match: Match,
     playerNo: number,
     deck: Card[],
     isBot: boolean = false
   ) {
-    this.socketId = socketd;
+    this.socketId = socketId;
     this.name = name;
     this.match = match;
     this.no = playerNo;

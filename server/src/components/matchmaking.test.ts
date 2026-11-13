@@ -62,7 +62,8 @@ describe('StartBotGame handler', () => {
   }
 
   test('rejects the request before login and keeps the socket in the matchmaking room', () => {
-    const { socket, startBotGame } = setup(undefined);
+    // socket.io v4 always initializes socket.data as {} before login
+    const { socket, startBotGame } = setup({} as SocketData);
 
     startBotGame();
 
