@@ -38,10 +38,18 @@ export default class GameResult {
     this.gameOver = true;
     this.winnerNo = opponentPlayerNo(loser.no);
     const winner = this.match.players[this.winnerNo];
-    this.winnerSol = this.computeEarnings(winner, loser, true);
-    this.loserSol = this.computeEarnings(loser, winner, false);
-    void this.persistEarnings(winner, loser, true, this.winnerSol);
-    void this.persistEarnings(loser, winner, false, this.loserSol);
+    const botGame = winner.isBot || loser.isBot;
+    this.winnerSol = this.halveSolInBotGame(this.computeEarnings(winner, loser, true), botGame);
+    this.loserSol = this.halveSolInBotGame(this.computeEarnings(loser, winner, false), botGame);
+    if (!winner.isBot) void this.persistEarnings(winner, loser, true, this.winnerSol);
+    if (!loser.isBot) void this.persistEarnings(loser, winner, false, this.loserSol);
+  }
+  /**
+   * Sol gains of the human player are halved in bot games (rounded down, as Sol
+   * is an integer currency). The bot itself persists nothing.
+   */
+  private halveSolInBotGame(sol: number, botGame: boolean): number {
+    return botGame ? Math.floor(sol / 2) : sol;
   }
   private shouldAchieveDaily(dailyType: DailyType, player: Player, opponent: Player, won: boolean): boolean {
     const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);

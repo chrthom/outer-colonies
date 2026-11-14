@@ -71,6 +71,7 @@ export enum MsgTypeInbound {
   Login = 'login',
   Ready = 'ready',
   Retract = 'retract',
+  StartBotGame = 'start_bot_game',
   Surrender = 'surrender'
 }
 

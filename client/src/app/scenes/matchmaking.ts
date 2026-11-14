@@ -6,6 +6,7 @@ import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
+import BotButton from '../components/buttons/bot_button';
 import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
 
 export default class Matchmaking extends Phaser.Scene {
@@ -28,6 +29,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
     new ExitButton(this);
+    new BotButton(this);
     this.socket = io(environment.urls.api, { reconnectionAttempts: 5 });
     this.socket.on(MsgTypeOutbound.Connect, () => {
       this.status.setText('Authentifiziere Nutzer...');
@@ -47,6 +49,9 @@ export default class Matchmaking extends Phaser.Scene {
         case 'search':
           this.status.setText('Suche Mitspieler...');
           break;
+        case 'botRejected':
+          this.status.setText('Bot-Spiel konnte nicht gestartet werden. Suche Mitspieler...');
+          break;
         case 'start':
           this.socket.off(MsgTypeOutbound.Connect);
           this.socket.off(MsgTypeOutbound.Matchmaking);
@@ -62,5 +67,15 @@ export default class Matchmaking extends Phaser.Scene {
     });
     new Background(this);
     loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
+  }
+
+  /**
+   * Cancels the opponent search and starts a singleplayer game against the
+   * bot. The server emits the regular matchmaking start message, so the
+   * transition to the game scene works exactly like in a human match.
+   */
+  startBotGame() {
+    this.status.setText('Starte Bot-Spiel...');
+    this.socket.emit(MsgTypeInbound.StartBotGame);
   }
 }

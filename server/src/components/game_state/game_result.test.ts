@@ -8,6 +8,7 @@ function makeMatch() {
       {
         no: 0,
         name: 'Player1',
+        isBot: false,
         colonyCardStack,
         deck: [],
         discardPile: [],
@@ -16,6 +17,7 @@ function makeMatch() {
       {
         no: 1,
         name: 'Player2',
+        isBot: false,
         colonyCardStack,
         deck: [],
         discardPile: [],
@@ -227,6 +229,75 @@ describe('GameResult', () => {
 
     test('Login is never achieved through shouldAchieveDaily', () => {
       expect(check(DailyType.Login, player(), player(), true)).toBe(false);
+    });
+  });
+
+  describe('bot games', () => {
+    test('halves sol earnings for the human winner of a bot game', () => {
+      const match = makeMatch();
+      match.players[1].isBot = true;
+      const { result } = makeResult(match);
+
+      result.setWinnerByDeckDepletion(match.players[1] as any); // Human (player 0) wins
+
+      const fullSol = result.computeEarnings(match.players[0] as any, match.players[1] as any, true);
+      expect(result.winnerSol).toBe(Math.floor(fullSol / 2));
+    });
+
+    test('halves sol earnings for the human loser of a bot game', () => {
+      const match = makeMatch();
+      match.players[1].isBot = true;
+      const { result } = makeResult(match);
+
+      result.setWinnerByDeckDepletion(match.players[0] as any); // Bot (player 1) wins
+
+      const fullSol = result.computeEarnings(match.players[0] as any, match.players[1] as any, false);
+      expect(result.loserSol).toBe(Math.floor(fullSol / 2));
+    });
+
+    test('does not halve sol earnings in regular human games', () => {
+      const { result, match } = makeResult();
+
+      result.setWinnerByDeckDepletion(match.players[1] as any);
+
+      expect(result.winnerSol).toBe(
+        result.computeEarnings(match.players[0] as any, match.players[1] as any, true)
+      );
+      expect(result.loserSol).toBe(
+        result.computeEarnings(match.players[1] as any, match.players[0] as any, false)
+      );
+    });
+
+    test('persists earnings only for the human player of a bot game', () => {
+      const match = makeMatch();
+      match.players[1].isBot = true;
+      const { result } = makeResult(match);
+
+      result.setWinnerByDeckDepletion(match.players[1] as any);
+
+      expect(result.persistEarnings).toHaveBeenCalledTimes(1);
+      expect(result.persistEarnings).toHaveBeenCalledWith(
+        match.players[0] as any,
+        match.players[1] as any,
+        true,
+        result.winnerSol
+      );
+    });
+
+    test('persists nothing for the bot when the bot wins', () => {
+      const match = makeMatch();
+      match.players[1].isBot = true;
+      const { result } = makeResult(match);
+
+      result.setWinnerBySurrender(match.players[0] as any);
+
+      expect(result.persistEarnings).toHaveBeenCalledTimes(1);
+      expect(result.persistEarnings).toHaveBeenCalledWith(
+        match.players[0] as any,
+        match.players[1] as any,
+        false,
+        result.loserSol
+      );
     });
   });
 
