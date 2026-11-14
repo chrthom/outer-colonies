@@ -174,6 +174,109 @@ describe('Bot strategy', () => {
       expect(targets).toContain(selectTarget(handCard));
     });
 
+    test('prefers an enemy ship in the orbital zone over an own ship', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const opponent = match.players[1];
+      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
+      const enemyShip = createShip(opponent, new MockHullCard(2, 5, 1));
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        ownShip,
+        enemyShip
+      ]);
+
+      expect(selectTarget(handCard)).toBe(enemyShip);
+    });
+
+    test('prefers an enemy card in the colony zone over an own ship in the orbital zone', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const opponent = match.players[1];
+      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
+      const enemyInfrastructure = new RootCardStack(
+        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
+        Zone.Colony,
+        opponent
+      );
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        ownShip,
+        enemyInfrastructure
+      ]);
+
+      expect(selectTarget(handCard)).toBe(enemyInfrastructure);
+    });
+
+    test('prefers an enemy ship in the neutral zone over the enemy colony', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const opponent = match.players[1];
+      const enemyShip = createShip(opponent, new MockHullCard(2, 5, 1), Zone.Neutral);
+      const enemyColony = new RootCardStack(
+        new MockCard(5, 'Enemy Colony', CardType.Colony, 1),
+        Zone.Colony,
+        opponent
+      );
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        enemyShip,
+        enemyColony
+      ]);
+
+      expect(selectTarget(handCard)).toBe(enemyShip);
+    });
+
+    test('prefers an own ship in the orbital zone over an own card in the colony zone', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
+      const ownInfrastructure = new RootCardStack(
+        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
+        Zone.Colony,
+        player
+      );
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        ownShip,
+        ownInfrastructure
+      ]);
+
+      expect(selectTarget(handCard)).toBe(ownShip);
+    });
+
+    test('prefers an own card in the colony zone over the own colony', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const ownInfrastructure = new RootCardStack(
+        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
+        Zone.Colony,
+        player
+      );
+      const ownColony = new RootCardStack(
+        new MockCard(5, 'Own Colony', CardType.Colony, 1),
+        Zone.Colony,
+        player
+      );
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        ownInfrastructure,
+        ownColony
+      ]);
+
+      expect(selectTarget(handCard)).toBe(ownInfrastructure);
+    });
+
+    test('targets the own colony when it is the only valid target', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const ownColony = new RootCardStack(
+        new MockCard(5, 'Own Colony', CardType.Colony, 1),
+        Zone.Colony,
+        player
+      );
+      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
+        ownColony
+      ]);
+
+      expect(selectTarget(handCard)).toBe(ownColony);
+    });
+
     test('returns undefined without valid targets', () => {
       const match = createMatch();
       const player = match.players[0];
@@ -184,7 +287,7 @@ describe('Bot strategy', () => {
   });
 
   describe('planBattle', () => {
-    test('declares a mission with all mission-ready ships when clearly, but not overwhelmingly, stronger', () => {
+    test('declares a mission with all ships when the fleet matches the enemy total', () => {
       const match = createMatch();
       const player = match.players[0];
       const ships = [
@@ -193,12 +296,42 @@ describe('Bot strategy', () => {
       ];
       player.cardStacks.push(...ships);
       const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 6, 2)));
+      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 7, 2)));
 
       const plannedBattle = planBattle(player);
 
       expect(plannedBattle.type).toBe(BattleType.Mission);
       expect(plannedBattle.shipIds).toEqual(ships.map(cs => cs.uuid));
+    });
+
+    test('declares a mission with only the fastest ships', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const fastShip = createShip(player, new MockHullCard(1, 6, 4));
+      player.cardStacks.push(fastShip, createShip(player, new MockHullCard(2, 6, 2)));
+      const opponent = match.players[1];
+      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 9, 2)));
+
+      const plannedBattle = planBattle(player);
+
+      expect(plannedBattle.type).toBe(BattleType.Mission);
+      expect(plannedBattle.shipIds).toEqual([fastShip.uuid]);
+    });
+
+    test('passes when the fastest ships are weaker than the intercepting enemy ships', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      player.cardStacks.push(
+        createShip(player, new MockHullCard(1, 6, 4)),
+        createShip(player, new MockHullCard(2, 6, 2))
+      );
+      const opponent = match.players[1];
+      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 9, 5)));
+
+      const plannedBattle = planBattle(player);
+
+      expect(plannedBattle.type).toBe(BattleType.None);
+      expect(plannedBattle.shipIds).toEqual([]);
     });
 
     test('declares a raid when the opponent has no orbital ships', () => {
@@ -223,10 +356,10 @@ describe('Bot strategy', () => {
       expect(planBattle(player).type).toBe(BattleType.Raid);
     });
 
-    test('passes when the own fleet is not clearly stronger', () => {
+    test('passes when the own fleet is weaker than the enemy total', () => {
       const match = createMatch();
       const player = match.players[0];
-      player.cardStacks.push(createShip(player, new MockHullCard(1, 10, 2)));
+      player.cardStacks.push(createShip(player, new MockHullCard(1, 9, 2)));
       const opponent = match.players[1];
       opponent.cardStacks.push(createShip(opponent, new MockHullCard(2, 10, 2)));
 

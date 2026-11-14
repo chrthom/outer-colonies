@@ -1,25 +1,17 @@
 import CardStack from '../cards/card_stack';
 import Player from '../game_state/player';
-import { BattleType, Zone } from '../../shared/config/enums';
+import { BattleType, CardType, Zone } from '../../shared/config/enums';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import { opponentPlayerNo, pickRandom } from '../utils/helpers';
 import EquipmentCard from '../cards/types/equipment_card';
 import { AttackProfile } from '../cards/card_profile';
 
 /**
- * The bot only declares a battle when its own fleet strength clearly exceeds
- * the opponent's strength by this factor.
+ * The bot only raids when its own fleet strength clearly exceeds the
+ * opponent's orbital defense by this factor. A defenseless colony is always
+ * raided, as the factor then compares against zero.
  */
-const battleStrengthFactor = 1.5;
-
-/**
- * The bot only raids (instead of running a mission) when its own fleet
- * strength even exceeds the opponent's orbital defense by this factor, so a
- * merely superior fleet runs a mission while an overwhelming one attacks the
- * colony. A defenseless colony is always raided, as the factor then compares
- * against zero.
- */
-const raidStrengthFactor = 2;
+const raidStrengthFactor = 1.5;
 
 /** A single attack planned by the bot: one weapon against one target. */
 export interface BotAttack {
@@ -57,28 +49,61 @@ export function selectHandCard(hand: CardStack[]): CardStack | undefined {
 }
 
 /**
- * Picks a random valid target for the given hand card. Returns undefined if
- * the card has no valid targets.
+ * Picks the target for the given hand card by priority (random choice on ties
+ * within a priority): enemy ship in neutral or orbital zone, enemy card in
+ * colony zone or the enemy colony itself, own ship in neutral or orbital
+ * zone, own ship or other card in colony zone, own colony. Returns undefined
+ * if the card has no valid targets.
  */
 export function selectTarget(handCard: CardStack): CardStack | undefined {
-  const validTargets = handCard.validTargets;
-  return validTargets.length > 0 ? pickRandom(validTargets) : undefined;
+  const isOwn = (target: CardStack) => target.rootCardStack.player.no == handCard.player.no;
+  const isShip = (target: CardStack) => target.rootCardStack.type == CardType.Hull;
+  const isColony = (target: CardStack) => target.rootCardStack.type == CardType.Colony;
+  const isEnemyColonyZoneTarget = (target: CardStack) =>
+    target.rootCardStack.zone == Zone.Colony || isColony(target);
+  const isShipInCombatZone = (target: CardStack) =>
+    isShip(target) &&
+    (target.rootCardStack.zone == Zone.Neutral || target.rootCardStack.zone == Zone.Orbital);
+  const priorities = [
+    handCard.validTargets.filter(target => !isOwn(target) && isShipInCombatZone(target)),
+    handCard.validTargets.filter(target => !isOwn(target) && isEnemyColonyZoneTarget(target)),
+    handCard.validTargets.filter(target => isOwn(target) && isShipInCombatZone(target)),
+    handCard.validTargets.filter(
+      target => isOwn(target) && target.rootCardStack.zone == Zone.Colony && !isColony(target)
+    ),
+    handCard.validTargets.filter(target => isOwn(target) && isColony(target))
+  ];
+  for (const targets of priorities) {
+    if (targets.length > 0) return pickRandom(targets);
+  }
+  return undefined;
 }
 
 /**
  * Decides the battle the bot declares this turn: a raid with all
- * mission-ready ships when the opponent has no orbital defense or the bot's
- * fleet clearly overwhelms it, a mission when the fleet merely clearly
- * exceeds the opponent's potential defense, otherwise no battle.
+ * mission-ready ships when the bot's fleet clearly exceeds the opponent's
+ * orbital defense, otherwise a mission with the fastest mission-ready ships
+ * when the fleet is at least as strong as the opponent's total fleet and
+ * those fastest ships are at least as strong as the opponent ships fast
+ * enough to intercept them, otherwise no battle.
  */
 export function planBattle(player: Player): ClientPlannedBattle {
   const missionReadyShips = player.cardStacks.filter(cs => cs.isMissionReady);
+  if (missionReadyShips.length == 0) return { type: BattleType.None, shipIds: [] };
   const opponent = player.match.players[opponentPlayerNo(player.no)];
-  const opponentStrength = fleetStrength(opponent.cardStacks.filter(cs => cs.zone == Zone.Orbital));
+  const opponentShips = opponent.cardStacks.filter(cs => cs.type == CardType.Hull);
   const ownStrength = fleetStrength(missionReadyShips);
-  if (missionReadyShips.length > 0 && ownStrength >= opponentStrength * battleStrengthFactor) {
-    const type = ownStrength >= opponentStrength * raidStrengthFactor ? BattleType.Raid : BattleType.Mission;
-    return { type, shipIds: missionReadyShips.map(cs => cs.uuid) };
+  const opponentOrbitalStrength = fleetStrength(opponentShips.filter(cs => cs.zone == Zone.Orbital));
+  if (ownStrength >= opponentOrbitalStrength * raidStrengthFactor) {
+    return { type: BattleType.Raid, shipIds: missionReadyShips.map(cs => cs.uuid) };
+  }
+  if (ownStrength >= fleetStrength(opponentShips)) {
+    const maxSpeed = Math.max(...missionReadyShips.map(cs => cs.profile.speed));
+    const fastestShips = missionReadyShips.filter(cs => cs.profile.speed == maxSpeed);
+    const interceptors = opponentShips.filter(cs => cs.profile.speed >= maxSpeed);
+    if (fleetStrength(fastestShips) >= fleetStrength(interceptors)) {
+      return { type: BattleType.Mission, shipIds: fastestShips.map(cs => cs.uuid) };
+    }
   }
   return { type: BattleType.None, shipIds: [] };
 }
