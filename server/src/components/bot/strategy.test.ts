@@ -318,6 +318,23 @@ describe('Bot strategy', () => {
       expect(plannedBattle.shipIds).toEqual([fastShip.uuid]);
     });
 
+    test('ignores enemy ships in the neutral zone as interceptors', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const fastShip = createShip(player, new MockHullCard(1, 10, 4));
+      player.cardStacks.push(fastShip, createShip(player, new MockHullCard(2, 4, 2)));
+      const opponent = match.players[1];
+      opponent.cardStacks.push(
+        createShip(opponent, new MockHullCard(3, 10, 4)),
+        createShip(opponent, new MockHullCard(4, 4, 5), Zone.Neutral)
+      );
+
+      const plannedBattle = planBattle(player);
+
+      expect(plannedBattle.type).toBe(BattleType.Mission);
+      expect(plannedBattle.shipIds).toEqual([fastShip.uuid]);
+    });
+
     test('passes when the fastest ships are weaker than the intercepting enemy ships', () => {
       const match = createMatch();
       const player = match.players[0];

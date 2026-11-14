@@ -84,8 +84,8 @@ export function selectTarget(handCard: CardStack): CardStack | undefined {
  * mission-ready ships when the bot's fleet clearly exceeds the opponent's
  * orbital defense, otherwise a mission with the fastest mission-ready ships
  * when the fleet is at least as strong as the opponent's total fleet and
- * those fastest ships are at least as strong as the opponent ships fast
- * enough to intercept them, otherwise no battle.
+ * those fastest ships are at least as strong as the opponent ships in the
+ * orbital zone fast enough to intercept them, otherwise no battle.
  */
 export function planBattle(player: Player): ClientPlannedBattle {
   const missionReadyShips = player.cardStacks.filter(cs => cs.isMissionReady);
@@ -100,7 +100,7 @@ export function planBattle(player: Player): ClientPlannedBattle {
   if (ownStrength >= fleetStrength(opponentShips)) {
     const maxSpeed = Math.max(...missionReadyShips.map(cs => cs.profile.speed));
     const fastestShips = missionReadyShips.filter(cs => cs.profile.speed == maxSpeed);
-    const interceptors = opponentShips.filter(cs => cs.profile.speed >= maxSpeed);
+    const interceptors = opponentShips.filter(cs => cs.zone == Zone.Orbital && cs.profile.speed >= maxSpeed);
     if (fleetStrength(fastestShips) >= fleetStrength(interceptors)) {
       return { type: BattleType.Mission, shipIds: fastestShips.map(cs => cs.uuid) };
     }
