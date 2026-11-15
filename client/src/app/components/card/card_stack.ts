@@ -42,21 +42,24 @@ export default class CardStack {
     this.cards.forEach(c => c.discard(toDeck));
   }
   update(data: ClientCardStack) {
-    const removedCards = this.cards.filter(c => !data.cards.some(nc => nc.uuid == c.data.uuid));
-    removedCards.forEach(c => {
+    const newUuids = new Set(data.cards.map(nc => nc.uuid));
+    const existingCardsByUuid = new Map<string, Card>(
+      this.cards.map(c => [c.data.uuid, c] as [string, Card])
+    );
+    existingCardsByUuid.forEach((card, uuid) => {
+      if (newUuids.has(uuid)) return;
       let toDeck = false;
-      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
+      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != card.cardId) {
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
-      c.destroyRetractButton();
-      c.discard(toDeck);
+      card.destroyRetractButton();
+      card.discard(toDeck);
     });
-    const keptCards = this.cards.filter(c => !removedCards.includes(c));
     this.data = data;
     const x = this.targetX.value2d;
     this.cards = data.cards.map(nc => {
-      const existingCard = keptCards.find(c => c.data.uuid == nc.uuid);
+      const existingCard = existingCardsByUuid.get(nc.uuid);
       if (existingCard) {
         existingCard.update(nc, x, this.targetY(nc.index).value2d);
         return existingCard;

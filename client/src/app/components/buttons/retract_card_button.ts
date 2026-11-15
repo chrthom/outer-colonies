@@ -32,23 +32,7 @@ export default class RetractCardButton {
     } else this.setTintNormal();
   }
   show(x: number, y: number, onPointerOver: () => void, onPointerOut: () => void): this {
-    this.image
-      .off('pointerover')
-      .off('pointerout')
-      .off('pointerdown')
-      .on('pointerover', () => {
-        this.setTintHover();
-        onPointerOver();
-      })
-      .on('pointerout', () => {
-        if (this.card.data.insufficientEnergy) this.setTintCritical();
-        else this.setTintNormal();
-        onPointerOut();
-      })
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown())
-          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
-      });
+    this.bindInputHandlers(onPointerOver, onPointerOut);
     this.tween(true, x, y);
     return this;
   }
@@ -71,6 +55,10 @@ export default class RetractCardButton {
     );
     if (this.isCritical) {
       this.setTintCritical();
+      this.bindInputHandlers(
+        () => {},
+        () => {}
+      );
       this.image.setAlpha(designConfig.alpha.normal);
     } else {
       this.setTintNormal();
@@ -90,6 +78,31 @@ export default class RetractCardButton {
       x: x + layoutConfig.game.cards.retractCardButton.xOffset,
       y: y + layoutConfig.game.cards.retractCardButton.yOffset
     });
+  }
+  /**
+   * (Re-)binds the pointer handlers so a visible button is interactive: hover
+   * tint feedback, the stack expand/collapse callbacks and the retract
+   * message on click. Called by show() and by refresh() for critical
+   * buttons (with no-op callbacks, like the constructor's critical path).
+   */
+  private bindInputHandlers(onPointerOver: () => void, onPointerOut: () => void) {
+    this.image
+      .off('pointerover')
+      .off('pointerout')
+      .off('pointerdown')
+      .on('pointerover', () => {
+        this.setTintHover();
+        onPointerOver();
+      })
+      .on('pointerout', () => {
+        if (this.card.data.insufficientEnergy) this.setTintCritical();
+        else this.setTintNormal();
+        onPointerOut();
+      })
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown())
+          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
+      });
   }
   private setTintNormal() {
     this.image.setTint(

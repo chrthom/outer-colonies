@@ -1,7 +1,10 @@
 import CardStack from './card_stack';
-import { ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
-import { Zone } from '../../../../../server/src/shared/config/enums';
+import Card from './card';
+import { ClientCard, ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
+import { MsgTypeInbound, Zone } from '../../../../../server/src/shared/config/enums';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { designConfig } from '../../config/design';
+import { CardXPosition, CardYPosition } from '../perspective';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   return {
@@ -39,21 +42,47 @@ function makePlaneStub(): any {
   return stub;
 }
 
+function makeImageStub(): any {
+  const stub: any = {
+    modelPosition: { x: 0, y: 0, z: 0 },
+    modelRotation: { x: 0, y: 0, z: 0 },
+    angle: 0
+  };
+  [
+    'setOrigin',
+    'setAlpha',
+    'setDepth',
+    'setInteractive',
+    'setTint',
+    'setPosition',
+    'on',
+    'off',
+    'destroy'
+  ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
+  return stub;
+}
+
 function makeScene(): any {
   const scene: any = {
     getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     retractCardsExist: false,
+    socket: { emit: jasmine.createSpy('emit') },
     time: { delayedCall: jasmine.createSpy('delayedCall') },
     add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
     tweens: jasmine.createSpyObj('tweens', ['add'])
   };
+  scene.add.image.and.callFake(makeImageStub);
   scene.add.plane.and.callFake(makePlaneStub);
   return scene;
 }
 
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
   return new CardStack(makeScene(), makeData(over));
+}
+
+function seedSummaryBox(cs: CardStack) {
+  (cs as any).summaryBox = { update: jasmine.createSpy('summaryBox.update') };
 }
 
 describe('CardStack', () => {
@@ -182,10 +211,6 @@ describe('CardStack', () => {
         tween: jasmine.createSpy('tween'),
         shortestAngle: jasmine.createSpy('shortestAngle').and.returnValue(0)
       };
-    }
-
-    function seedSummaryBox(cs: CardStack) {
-      (cs as any).summaryBox = { update: jasmine.createSpy('summaryBox.update') };
     }
 
     it('reuses existing card objects keyed by uuid instead of recreating them', () => {
@@ -331,6 +356,91 @@ describe('CardStack', () => {
       cs.update(makeData({ cards: [] }));
 
       expect((cs as any).summaryBox).toBeDefined();
+    });
+  });
+
+  describe('update with real Card objects (retract button sync)', () => {
+    const realCardData = (uuid: string, retractable: boolean, insufficientEnergy: boolean) => ({
+      uuid,
+      id: 1,
+      index: 0,
+      battleReady: false,
+      retractable,
+      insufficientEnergy
+    });
+
+    function makeRealCard(scene: any, data: ClientCard): Card {
+      return new Card(scene, new CardXPosition(0), new CardYPosition(0), false, 'stack-uuid', data);
+    }
+
+    function pointerdownHandler(image: any): (pointer: any) => void {
+      return image.on.calls
+        .allArgs()
+        .filter((args: any[]) => args[0] == 'pointerdown')
+        .pop()![1];
+    }
+
+    it('creates a visible, interactive retract button when a kept card becomes retractable and critical', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', false, false));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+      const newData = realCardData('a', true, true);
+
+      cs.update(makeData({ cards: [newData] }));
+
+      expect(cs.cards[0]).toBe(card);
+      expect(card.data).toBe(newData);
+      expect(card.retractCardButton).toBeDefined();
+      const button: any = card.retractCardButton;
+      expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal); // visible
+      expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function)); // interactive
+      pointerdownHandler(button.image)({ leftButtonDown: () => true });
+      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+    });
+
+    it('binds input handlers when refresh turns a non-critical button critical', () => {
+      // Regression: a button created while the card was not critical was never
+      // shown, so refresh() must bind the input handlers when it turns critical.
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', false, false));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [realCardData('a', true, false)] })); // retractable, not critical
+      const button: any = card.retractCardButton;
+      expect(button).toBeDefined();
+      expect(button.image.setAlpha).toHaveBeenCalledWith(0); // hidden
+      button.image.on.calls.reset();
+
+      cs.update(makeData({ cards: [realCardData('a', true, true)] })); // turns critical
+
+      expect(card.retractCardButton).toBe(button); // refreshed, not recreated
+      expect(scene.add.image).toHaveBeenCalledTimes(1); // button image created only once
+      expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal);
+      expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function));
+      pointerdownHandler(button.image)({ leftButtonDown: () => true });
+      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+    });
+
+    it('destroys the retract button when the card is no longer retractable', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', false, false));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [realCardData('a', true, false)] }));
+      const button: any = card.retractCardButton;
+      expect(button).toBeDefined();
+
+      cs.update(makeData({ cards: [realCardData('a', false, false)] }));
+
+      expect(button.image.destroy).toHaveBeenCalled();
+      expect(card.retractCardButton).toBeUndefined();
+      expect(cs.cards[0]).toBe(card); // the card itself is kept
     });
   });
 });

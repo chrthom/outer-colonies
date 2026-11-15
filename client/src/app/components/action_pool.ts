@@ -10,10 +10,6 @@ export default class ActionPool {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
   }
-  destroy() {
-    this.images.forEach(s => s.destroy());
-    this.images = [];
-  }
   update() {
     const placementConfig = this.ownedByPlayer
       ? layoutConfig.game.ui.actionPool.player
