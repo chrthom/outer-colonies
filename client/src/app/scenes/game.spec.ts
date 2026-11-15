@@ -1,6 +1,7 @@
 import Game from './game';
-import { GameResultType } from '../../../../server/src/shared/config/enums';
+import { GameResultType, MsgTypeOutbound } from '../../../../server/src/shared/config/enums';
 import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import Phaser from 'phaser';
 
 function makeRenderStubs() {
   // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
@@ -75,5 +76,60 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
     expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Game scene - socket listener lifecycle', () => {
+  let game: Game;
+  let socket: any;
+  let shutdownEvent: string;
+  let shutdownHandler: () => void;
+
+  beforeEach(() => {
+    game = new Game();
+    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    (game as any).socket = socket;
+    (game as any).events = {
+      once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
+        shutdownEvent = event;
+        shutdownHandler = handler;
+      })
+    };
+    (game as any).registerSocketListeners();
+  });
+
+  it('registers all game listeners in create()', () => {
+    expect(socket.on.calls.allArgs().map((args: any[]) => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('binds the listener cleanup to the scene shutdown event', () => {
+    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+  });
+
+  it('removes all game listeners on scene shutdown', () => {
+    shutdownHandler();
+
+    expect(socket.off.calls.allArgs().map((args: any[]) => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('shows the surrender indicator when the socket disconnects', () => {
+    const stubs = makeRenderStubs();
+    (game as any).add = stubs.add;
+    (game as any).tweens = stubs.tweens;
+    game.state = emptyClientState;
+
+    const disconnectHandler = socket.on.calls.allArgs().find((args: any[]) => args[0] == 'disconnect')![1];
+    disconnectHandler();
+
+    expect(game.state.gameResult?.won).toBeFalse();
+    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
   });
 });
