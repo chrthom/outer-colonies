@@ -38,10 +38,12 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // The component boots its Phaser game in a field initializer, so destroy
     // it after each run to avoid leaking canvas elements and socket listeners.
-    destroyPhaserGame();
+    // Await the destroy promise so the canvas is guaranteed to be removed
+    // before the next spec boots a new game.
+    await destroyPhaserGame();
     fixture = undefined;
   });
 

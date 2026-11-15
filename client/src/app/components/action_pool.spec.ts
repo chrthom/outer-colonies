@@ -1,7 +1,7 @@
 import ActionPool from './action_pool';
 import { layoutConfig } from '../config/layout';
 import { designConfig } from '../config/design';
-import { asGameScene, makeSceneStub, SceneStub } from '../testing/phaser_stubs';
+import { asGameScene, makeGameObjectStub, makeSceneStub, SceneStub } from '../testing/phaser_stubs';
 
 describe('ActionPool', () => {
   let scene: SceneStub;
@@ -14,9 +14,9 @@ describe('ActionPool', () => {
   });
 
   it('should destroy existing images when destroyed', () => {
-    // Add some mock images - use type assertion since we're testing behavior, not Phaser types
-    const mockImage1 = { destroy: jasmine.createSpy('destroy1') } as any;
-    const mockImage2 = { destroy: jasmine.createSpy('destroy2') } as any;
+    // Stub game objects stand in for real Phaser images, hence the cast
+    const mockImage1 = makeGameObjectStub() as any;
+    const mockImage2 = makeGameObjectStub() as any;
 
     actionPool.images = [mockImage1, mockImage2];
 

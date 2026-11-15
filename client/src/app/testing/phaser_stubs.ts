@@ -21,10 +21,15 @@ const chainableMethods = [
   'setAngle',
   'setColor',
   'setDepth',
+  'setFillStyle',
   'setFontFamily',
   'setFontSize',
+  'setInteractive',
+  'setMask',
   'setOrigin',
+  'setScale',
   'setText',
+  'setTexture',
   'setTint',
   'setVisible',
   'setX',
@@ -38,7 +43,7 @@ export type ChainableMethod = (typeof chainableMethods)[number];
 /** Stub of a Phaser game object (image, text, graphic, ...) with chainable setter spies. */
 export type GameObjectStub = Record<ChainableMethod, jasmine.Spy> & {
   destroy: jasmine.Spy;
-  postFX: { addShadow: jasmine.Spy; addShine: jasmine.Spy };
+  postFX: { addGlow: jasmine.Spy; addShadow: jasmine.Spy; addShine: jasmine.Spy };
 };
 
 /**
@@ -50,6 +55,7 @@ export function makeGameObjectStub(): GameObjectStub {
   const stub = {
     destroy: jasmine.createSpy('destroy'),
     postFX: {
+      addGlow: jasmine.createSpy('addGlow'),
       addShadow: jasmine.createSpy('addShadow'),
       addShine: jasmine.createSpy('addShine')
     }
@@ -113,7 +119,8 @@ export interface SceneStub {
  * Creates a game scene stub. `getPlayerState` mirrors the real scene by
  * delegating to `state.player`/`state.opponent` and `getPlayerUI` returns an
  * empty hand; both spies can be re-stubbed per test via jasmine. The optional
- * overrides replace the defaults after the spies are wired up.
+ * overrides are applied to the returned stub itself, so the delegation always
+ * reads the final state - also after later `scene.state = ...` assignments.
  */
 export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
   const stub: SceneStub = {
@@ -129,7 +136,8 @@ export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
     isPlayer ? stub.state.player : stub.state.opponent
   );
   stub.getPlayerUI.and.callFake(() => ({ hand: [] }));
-  return { ...stub, ...overrides };
+  Object.assign(stub, overrides);
+  return stub;
 }
 
 /**
