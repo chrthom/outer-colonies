@@ -1,10 +1,5 @@
 import OptionPicker from './option_picker';
-import {
-  InterventionType,
-  MsgTypeInbound,
-  TurnPhase,
-  Zone
-} from '@shared/config/enums';
+import { InterventionType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
 import {
   ClientCardStack,
   ClientHandCard,
