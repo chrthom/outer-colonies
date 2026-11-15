@@ -50,24 +50,29 @@ export default class Matchmaking extends Phaser.Scene {
     this.socket.io.on('reconnect_failed', () => {
       this.status.setText('Verbindung fehlgeschlagen. Bitte Seite neu laden.');
     });
-    this.socket.on(MsgTypeOutbound.Matchmaking, (status: MatchmakingStatus, gameParams: ClientGameParams) => {
-      switch (status) {
-        case MatchmakingStatus.Search:
-          this.status.setText('Suche Mitspieler...');
-          break;
-        case MatchmakingStatus.Start:
-          this.socket.off(MsgTypeOutbound.Connect);
-          this.socket.off(MsgTypeOutbound.Matchmaking);
-          this.socket.off('disconnect');
-          this.socket.off('connect_error');
-          this.socket.io.off('reconnect_failed');
-          this.scene.start('Game', {
-            socket: this.socket,
-            gameParams: gameParams
-          });
-          break;
+    this.socket.on(
+      MsgTypeOutbound.Matchmaking,
+      (status: MatchmakingStatus, payload: ClientGameParams | number) => {
+        switch (status) {
+          case MatchmakingStatus.Search:
+            // The server reports the number of waiting clients, which is not displayed.
+            this.status.setText('Suche Mitspieler...');
+            break;
+          case MatchmakingStatus.Start:
+            this.socket.off(MsgTypeOutbound.Connect);
+            this.socket.off(MsgTypeOutbound.Matchmaking);
+            this.socket.off('disconnect');
+            this.socket.off('connect_error');
+            this.socket.io.off('reconnect_failed');
+            // Only the Start message carries game params; Search reports the waiting-client count.
+            this.scene.start('Game', {
+              socket: this.socket,
+              gameParams: payload as ClientGameParams
+            });
+            break;
+        }
       }
-    });
+    );
     new Background(this);
     loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
   }

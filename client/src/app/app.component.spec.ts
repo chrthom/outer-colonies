@@ -24,7 +24,7 @@ describe('AppComponent', () => {
     fixture.detectChanges(); // triggers ngAfterViewInit
     expect(app.phaserGame).toBeInstanceOf(Phaser.Game);
 
-    const destroySpy = spyOn(app.phaserGame!, 'destroy');
+    const destroySpy = spyOn(app.phaserGame!, 'destroy').and.callThrough();
     fixture.destroy(); // triggers ngOnDestroy
     expect(destroySpy).toHaveBeenCalledWith(true);
     expect(app.phaserGame).toBeUndefined();

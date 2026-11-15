@@ -48,24 +48,40 @@ function makeState(over: Partial<ClientState> = {}): ClientState {
   return { ...emptyClientState, ...over };
 }
 
+/**
+ * Test handle for overriding the private update helpers and Phaser internals
+ * of a Game instance with spies and stubs.
+ */
+interface GameTestOverrides {
+  time: { delayedCall: FakeClock['delayedCall'] };
+  preloader: { destroy: () => void };
+  updateCardStacks: jasmine.Spy;
+  updateHandCards: jasmine.Spy;
+  updateView: jasmine.Spy;
+  highlightAttackIntervention: jasmine.Spy;
+  player: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
+  opponent: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
+}
+
 /** Creates a Game instance with a fake clock and spied update helpers. */
 function setupGame() {
   const game = new Game();
   const clock = new FakeClock();
-  (game as any).time = { delayedCall: clock.delayedCall };
-  (game as any).preloader = { destroy: () => {} };
+  const overrides = game as unknown as GameTestOverrides;
+  overrides.time = { delayedCall: clock.delayedCall };
+  overrides.preloader = { destroy: () => {} };
   const updateCardStacks = jasmine.createSpy('updateCardStacks');
   const updateHandCards = jasmine.createSpy('updateHandCards');
   const updateView = jasmine.createSpy('updateView');
   const highlightAttackIntervention = jasmine.createSpy('highlightAttackIntervention');
-  (game as any).updateCardStacks = updateCardStacks;
-  (game as any).updateHandCards = updateHandCards;
-  (game as any).updateView = updateView;
-  (game as any).highlightAttackIntervention = highlightAttackIntervention;
+  overrides.updateCardStacks = updateCardStacks;
+  overrides.updateHandCards = updateHandCards;
+  overrides.updateView = updateView;
+  overrides.highlightAttackIntervention = highlightAttackIntervention;
   const playerDiscardPile = jasmine.createSpy('playerDiscardPile.update');
   const opponentDiscardPile = jasmine.createSpy('opponentDiscardPile.update');
-  (game as any).player = { hand: [], discardPile: { update: playerDiscardPile } };
-  (game as any).opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
+  overrides.player = { hand: [], discardPile: { update: playerDiscardPile } };
+  overrides.opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
   return {
     game,
     clock,

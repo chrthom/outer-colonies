@@ -2,24 +2,47 @@ import Prompt from './prompt';
 import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
 import { ClientState, emptyClientState } from '../../../../../server/src/shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
+import Game from '../../scenes/game';
 
-const chainable = (): any => {
-  const stub: any = {};
-  [
-    'setDepth',
-    'setOrigin',
-    'setScale',
-    'setFontSize',
-    'setFontFamily',
-    'setColor',
-    'setAlign',
-    'setText',
-    'setVisible'
-  ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
+interface ChainableStub {
+  setDepth: jasmine.Spy;
+  setOrigin: jasmine.Spy;
+  setScale: jasmine.Spy;
+  setFontSize: jasmine.Spy;
+  setFontFamily: jasmine.Spy;
+  setColor: jasmine.Spy;
+  setAlign: jasmine.Spy;
+  setText: jasmine.Spy;
+  setVisible: jasmine.Spy;
+}
+
+const chainable = (): ChainableStub => {
+  const stub = {} as ChainableStub;
+  (
+    [
+      'setDepth',
+      'setOrigin',
+      'setScale',
+      'setFontSize',
+      'setFontFamily',
+      'setColor',
+      'setAlign',
+      'setText',
+      'setVisible'
+    ] as Array<keyof ChainableStub>
+  ).forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
   return stub;
 };
 
-const makeScene = (state: ClientState): any => ({
+interface SceneStub {
+  state: ClientState;
+  plannedBattle: { type: BattleType; shipIds: string[] };
+  add: { image: jasmine.Spy; text: jasmine.Spy };
+  time: { delayedCall: jasmine.Spy };
+  obj: { exitButton: { show: jasmine.Spy; hide: jasmine.Spy } };
+}
+
+const makeScene = (state: ClientState): SceneStub => ({
   state: state,
   plannedBattle: { type: BattleType.None, shipIds: [] },
   add: {
@@ -42,16 +65,22 @@ const makeState = (overrides: Partial<ClientState> = {}): ClientState => ({
   ...overrides
 });
 
+/** The private Prompt text object, on which the prompt stubs are recorded. */
+const textOf = (prompt: Prompt): { setText: jasmine.Spy; setVisible: jasmine.Spy } =>
+  (prompt as unknown as { text: { setText: jasmine.Spy; setVisible: jasmine.Spy } }).text;
+
 describe('Prompt', () => {
   it('shows the waiting prompt while the opponent is taking their turn', () => {
     const scene = makeScene(makeState({ playerPendingAction: false }));
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(scene as unknown as Game);
 
     prompt.update();
 
-    expect((prompt as any).text.setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeTrue();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeTrue();
+    expect(textOf(prompt).setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeTrue();
+    expect(
+      (prompt as unknown as { image: ChainableStub }).image.setVisible.calls.mostRecent().args[0]
+    ).toBeTrue();
     expect(scene.obj.exitButton.hide).toHaveBeenCalled();
     expect(scene.time.delayedCall).toHaveBeenCalledWith(
       animationConfig.duration.promptShow,
@@ -66,14 +95,16 @@ describe('Prompt', () => {
         gameResult: { won: false, type: GameResultType.Domination, sol: 0 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(scene as unknown as Game);
 
     prompt.update();
 
     // Must not fall back to the regular "Warte auf Gegenspieler..." branch
-    expect((prompt as any).text.setText).not.toHaveBeenCalled();
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(textOf(prompt).setText).not.toHaveBeenCalled();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(
+      (prompt as unknown as { image: ChainableStub }).image.setVisible.calls.mostRecent().args[0]
+    ).toBeFalse();
     expect(scene.obj.exitButton.show).toHaveBeenCalled();
     expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
     expect(scene.time.delayedCall).not.toHaveBeenCalled();
@@ -88,12 +119,12 @@ describe('Prompt', () => {
         gameResult: { won: true, type: GameResultType.Destruction, sol: 42 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(scene as unknown as Game);
 
     prompt.update();
 
-    expect((prompt as any).text.setText).not.toHaveBeenCalled();
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(textOf(prompt).setText).not.toHaveBeenCalled();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
     expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
   });
 
@@ -105,23 +136,25 @@ describe('Prompt', () => {
         battle: { type: BattleType.Mission, playerShipIds: [], opponentShipIds: [], range: 3 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(scene as unknown as Game);
 
     prompt.update();
 
-    expect((prompt as any).text.setText).toHaveBeenCalledWith(
+    expect(textOf(prompt).setText).toHaveBeenCalledWith(
       'Aktuelle Reichweite des Gefechts: 3\nFühre Angriffe mit deinen\nWaffensystemen durch!'
     );
   });
 
   it('keeps the prompt hidden and the exit button visible when show() is called while the game is over', () => {
     const scene = makeScene(makeState({ gameResult: { won: true, type: GameResultType.Surrender, sol: 0 } }));
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(scene as unknown as Game);
 
     prompt.show();
 
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(
+      (prompt as unknown as { image: ChainableStub }).image.setVisible.calls.mostRecent().args[0]
+    ).toBeFalse();
     expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
   });
 });
