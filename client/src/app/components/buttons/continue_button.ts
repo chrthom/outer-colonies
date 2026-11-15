@@ -5,7 +5,7 @@ import {
   MsgTypeOutbound,
   TurnPhase
 } from '../../../../../server/src/shared/config/enums';
-import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientGameResult, ClientState } from '../../../../../server/src/shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
@@ -25,11 +25,19 @@ interface ButtonImages {
   lost: Phaser.GameObjects.Image;
 }
 
+/** Automatic Ready message a pending player emits when he cannot act himself. */
+interface AutoReadyAction {
+  delay: number;
+  emit: () => void;
+}
+
 export default class ContinueButton {
   private scene!: Game;
   private buttonImages!: ButtonImages;
   private text: Phaser.GameObjects.Text;
   private prompt!: Prompt;
+  private autoReadyTimer?: Phaser.Time.TimerEvent;
+  private autoReadyState?: ClientState;
   private onClickAction: () => void = () => {
     /* Do nothing */
   };
@@ -84,6 +92,7 @@ export default class ContinueButton {
   }
   update() {
     this.prompt.update();
+    this.updateAutoReady();
     if (this.scene.state.gameResult) {
       this.showGameOver(this.scene.state.gameResult);
     } else if (!this.scene.state.playerPendingAction) {
@@ -94,11 +103,6 @@ export default class ContinueButton {
       switch (this.scene.state.turnPhase) {
         case TurnPhase.Build:
           if (!this.scene.state.playerIsActive) {
-            if (!this.canIntercept) {
-              this.scene.time.delayedCall(animationConfig.duration.move, () => {
-                this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, []);
-              });
-            }
             this.showIncept();
           } else if (this.scene.state.player.hasToRetractCards) {
             this.waitState();
@@ -108,11 +112,6 @@ export default class ContinueButton {
           break;
         case TurnPhase.Combat:
           this.showNextCombatPhase();
-          if (!this.canAttack) {
-            this.scene.time.delayedCall(animationConfig.duration.attack, () => {
-              this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat);
-            });
-          }
           break;
         case TurnPhase.End:
           this.showEndPhase();
@@ -120,6 +119,69 @@ export default class ContinueButton {
         default:
           this.waitState();
       }
+    }
+  }
+  /**
+   * Queues the automatic Ready message for a pending player who cannot act,
+   * i.e. who can neither intercept in the build phase nor attack in the combat
+   * phase.
+   *
+   * update() runs on every updateView() call, i.e. on every state update and
+   * on every user interaction. To avoid duplicate Ready messages, the emission
+   * is queued at most once per state (which corresponds to one pending action);
+   * a queued emission from a previous state is canceled as soon as it is no
+   * longer needed.
+   */
+  private updateAutoReady() {
+    const autoReady = this.pendingAutoReady;
+    if (!autoReady) {
+      this.cancelPendingAutoReady();
+    } else if (this.autoReadyState != this.scene.state) {
+      this.cancelPendingAutoReady();
+      this.autoReadyState = this.scene.state;
+      this.autoReadyTimer = this.scene.time.delayedCall(autoReady.delay, () => {
+        this.autoReadyTimer = undefined;
+        autoReady.emit();
+      });
+    }
+  }
+  /** Cancels a queued automatic Ready message, if one exists. */
+  private cancelPendingAutoReady() {
+    if (this.autoReadyTimer) {
+      this.scene.time.removeEvent(this.autoReadyTimer);
+      this.autoReadyTimer = undefined;
+    }
+    this.autoReadyState = undefined;
+  }
+  /**
+   * Ready message to automatically send for the current state, or undefined if
+   * the player is not pending for an action he cannot perform himself.
+   */
+  private get pendingAutoReady(): AutoReadyAction | undefined {
+    if (
+      this.scene.state.gameResult ||
+      !this.scene.state.playerPendingAction ||
+      this.scene.state.intervention
+    ) {
+      return undefined;
+    }
+    switch (this.scene.state.turnPhase) {
+      case TurnPhase.Build:
+        return !this.scene.state.playerIsActive && !this.canIntercept
+          ? {
+              delay: animationConfig.duration.move,
+              emit: () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, [])
+            }
+          : undefined;
+      case TurnPhase.Combat:
+        return !this.canAttack
+          ? {
+              delay: animationConfig.duration.attack,
+              emit: () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat)
+            }
+          : undefined;
+      default:
+        return undefined;
     }
   }
   private createButtonImage(name: string) {
@@ -172,7 +234,11 @@ export default class ContinueButton {
   }
   private show(text: string, button: string, onClickAction?: () => void) {
     this.onClickAction = onClickAction
-      ? onClickAction
+      ? () => {
+          // The player acts himself, so a queued automatic Ready message is obsolete
+          this.cancelPendingAutoReady();
+          onClickAction();
+        }
       : () => {
           /* Do nothing */
         };
