@@ -148,6 +148,15 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state.gameResult?.won).toBeTrue();
     expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
   });
+
+  it('destroys a pending option picker that would cover the game over indicator', () => {
+    const optionPicker = { destroy: jasmine.createSpy('destroy') };
+    (game as any).obj = { optionPicker };
+
+    game.showSurrenderOnDisconnect();
+
+    expect(optionPicker.destroy).toHaveBeenCalled();
+  });
 });
 
 describe('Game scene - updateState', () => {

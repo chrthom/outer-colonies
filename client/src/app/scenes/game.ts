@@ -152,6 +152,9 @@ export default class Game extends Phaser.Scene {
     // Avoid mutating the shared `emptyClientState` constant if no State
     // message has arrived yet.
     this.state = { ...this.state, gameResult: result };
+    // No further state arrives after a disconnect, so destroy a pending option
+    // picker that would otherwise linger over the game over indicator.
+    this.obj?.optionPicker?.destroy();
     new GameOverIndicator(this, result);
   }
 

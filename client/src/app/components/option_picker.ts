@@ -59,9 +59,7 @@ export default class OptionPicker {
       .setDepth(layoutConfig.depth.optionsPicker)
       .setOrigin(0)
       .setInteractive();
-    this.backgroundOverlay.on('pointerdown', (p: Phaser.Input.Pointer) => {
-      if (p.rightButtonDown()) this.cancel();
-    });
+    this.backgroundOverlay.on('pointerdown', (p: Phaser.Input.Pointer) => this.handlePointerDown(p));
     this.text = this.scene.add
       .text(layoutConfig.scene.width / 2, this.uiConfig.margin.y, this.selectedOptionsText)
       .setFontSize(layoutConfig.fontSize.large)
@@ -89,9 +87,7 @@ export default class OptionPicker {
         useHandCursor: true
       })
       .setVisible(this.hasNextPage)
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.movePageBy(1);
-      });
+      .on('pointerdown', (p: Phaser.Input.Pointer) => this.handlePointerDown(p, () => this.movePageBy(1)));
     this.nextPageButton
       .on('pointerover', () =>
         this.nextPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal)
@@ -118,9 +114,7 @@ export default class OptionPicker {
         useHandCursor: true
       })
       .setVisible(this.hasPreviousPage)
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.movePageBy(-1);
-      });
+      .on('pointerdown', (p: Phaser.Input.Pointer) => this.handlePointerDown(p, () => this.movePageBy(-1)));
     this.previousPageButton
       .on('pointerover', () =>
         this.previousPageButton.setFillStyle(designConfig.tint.opponent, designConfig.alpha.normal)
@@ -138,9 +132,7 @@ export default class OptionPicker {
       .setInteractive({
         useHandCursor: true
       })
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.cancel();
-      });
+      .on('pointerdown', (p: Phaser.Input.Pointer) => this.handlePointerDown(p, () => this.cancel()));
     this.cancelButton
       .on('pointerover', () => this.cancelButton.setColor(designConfig.color.hover))
       .on('pointerout', () => this.cancelButton.setColor(designConfig.color.opponent));
@@ -155,9 +147,7 @@ export default class OptionPicker {
         useHandCursor: true
       })
       .setVisible(false)
-      .on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.confirm();
-      });
+      .on('pointerdown', (p: Phaser.Input.Pointer) => this.handlePointerDown(p, () => this.confirm()));
     this.confirmButton
       .on('pointerover', () => this.confirmButton.setColor(designConfig.color.warn))
       .on('pointerout', () => this.confirmButton.setColor(designConfig.color.player));
@@ -200,6 +190,7 @@ export default class OptionPicker {
     return (
       state.playerPendingAction &&
       !state.intervention &&
+      !state.gameResult &&
       state.turnPhase == TurnPhase.Build &&
       state.playerIsActive &&
       state.cardStacks.some(cs => cs.uuid == this.targetUUID) &&
@@ -207,6 +198,17 @@ export default class OptionPicker {
         h => h.uuid == this.handCardUUID && h.playable && h.validTargets.includes(this.targetUUID)
       )
     );
+  }
+  /**
+   * Shared pointerdown handler for the picker's game objects: right-click always
+   * cancels the picker, so the cancel affordance is uniform across the whole picker
+   * area, while left-click runs the given action.
+   * @param pointer pointer that triggered the pointerdown event
+   * @param action action to perform on left-click
+   */
+  private handlePointerDown(pointer: Phaser.Input.Pointer, action?: () => void) {
+    if (pointer.rightButtonDown()) this.cancel();
+    else if (pointer.leftButtonDown()) action?.();
   }
   private createCards() {
     this.cards.forEach(c => c.destroy());
@@ -225,9 +227,9 @@ export default class OptionPicker {
         ).setDepth(layoutConfig.depth.optionsPicker)
       );
     this.cards.forEach((c, index) =>
-      c.image.on('pointerdown', (p: Phaser.Input.Pointer) => {
-        if (p.leftButtonDown()) this.onCardClick(this.absoluteCardIndex(index));
-      })
+      c.image.on('pointerdown', (p: Phaser.Input.Pointer) =>
+        this.handlePointerDown(p, () => this.onCardClick(this.absoluteCardIndex(index)))
+      )
     );
     this.cards
       .filter((_, index) => this.selectedIndexes.includes(this.absoluteCardIndex(index)))

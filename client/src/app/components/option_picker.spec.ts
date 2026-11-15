@@ -1,5 +1,5 @@
 import OptionPicker from './option_picker';
-import { InterventionType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { GameResultType, InterventionType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
 import {
   ClientCardStack,
   ClientHandCard,
@@ -67,6 +67,17 @@ function makeScene(created: { text: any[]; keys: any[] }): any {
     state: emptyClientState,
     updateView: jasmine.createSpy('updateView')
   };
+}
+
+/**
+ * Stubs of the option card images: CardImage creates four planes per card (pile,
+ * highlight, mask, image), of which only the image is interactive.
+ */
+function optionCardStubs(scene: any): any[] {
+  return scene.add.plane.calls
+    .all()
+    .map((call: any) => call.returnValue)
+    .filter((stub: any) => stub.setInteractive.calls.count() > 0);
 }
 
 describe('OptionPicker', () => {
@@ -140,13 +151,20 @@ describe('OptionPicker', () => {
 
     it('is wired to the OK button', () => {
       (picker as any).selectedIndexes = [0, 1];
-      textStubs[2].handlers['pointerdown']({ leftButtonDown: () => true });
+      textStubs[2].handlers['pointerdown']({ leftButtonDown: () => true, rightButtonDown: () => false });
       expect(scene.socket.emit).toHaveBeenCalledWith(
         MsgTypeInbound.Handcard,
         handUUID,
         targetUUID,
         [101, 102]
       );
+    });
+
+    it('cancels on right-clicking the OK button instead of confirming', () => {
+      (picker as any).selectedIndexes = [0, 1];
+      textStubs[2].handlers['pointerdown']({ leftButtonDown: () => false, rightButtonDown: () => true });
+      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.obj.optionPicker).toBeUndefined();
     });
   });
 
@@ -161,7 +179,7 @@ describe('OptionPicker', () => {
     });
 
     it('is triggered by left-clicking the X button', () => {
-      textStubs[1].handlers['pointerdown']({ leftButtonDown: () => true });
+      textStubs[1].handlers['pointerdown']({ leftButtonDown: () => true, rightButtonDown: () => false });
       expect(scene.obj.optionPicker).toBeUndefined();
       expect(scene.socket.emit).not.toHaveBeenCalled();
     });
@@ -178,8 +196,26 @@ describe('OptionPicker', () => {
       expect(scene.socket.emit).not.toHaveBeenCalled();
     });
 
+    it('is triggered by right-clicking an option card', () => {
+      optionCardStubs(scene)[0].handlers['pointerdown']({
+        leftButtonDown: () => false,
+        rightButtonDown: () => true
+      });
+      expect(scene.obj.optionPicker).toBeUndefined();
+      expect(scene.socket.emit).not.toHaveBeenCalled();
+    });
+
+    it('is not triggered by left-clicking an option card', () => {
+      optionCardStubs(scene)[0].handlers['pointerdown']({
+        leftButtonDown: () => true,
+        rightButtonDown: () => false
+      });
+      expect(scene.obj.optionPicker).toBe(picker);
+      expect(scene.socket.emit).not.toHaveBeenCalled();
+    });
+
     it('is not triggered by left-clicking the overlay', () => {
-      overlayStub.handlers['pointerdown']({ rightButtonDown: () => false });
+      overlayStub.handlers['pointerdown']({ leftButtonDown: () => true, rightButtonDown: () => false });
       expect(scene.obj.optionPicker).toBe(picker);
     });
   });
@@ -227,6 +263,12 @@ describe('OptionPicker', () => {
             intervention: { type: InterventionType.TacticCard, rootType: InterventionType.TacticCard }
           })
         )
+      ).toBeFalse();
+    });
+
+    it('rejects a state with a game result', () => {
+      expect(
+        picker.isValidFor(makeState({ gameResult: { won: false, type: GameResultType.Surrender, sol: 0 } }))
       ).toBeFalse();
     });
 
