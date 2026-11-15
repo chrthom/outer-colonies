@@ -1,4 +1,4 @@
-import { InterventionType } from '../../../../../server/src/shared/config/enums';
+import { InterventionType } from '@shared/config/enums';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 

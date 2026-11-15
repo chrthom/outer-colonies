@@ -1,4 +1,4 @@
-import { MsgTypeInbound } from '../../../../server/src/shared/config/enums';
+import { MsgTypeInbound } from '@shared/config/enums';
 import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import { perspectiveConfig } from '../config/perspective';

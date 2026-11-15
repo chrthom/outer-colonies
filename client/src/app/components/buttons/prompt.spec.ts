@@ -1,6 +1,6 @@
 import Prompt from './prompt';
-import { BattleType, GameResultType, TurnPhase } from '../../../../../server/src/shared/config/enums';
-import { ClientState, emptyClientState } from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, GameResultType, TurnPhase } from '@shared/config/enums';
+import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 
 const chainable = (): any => {
