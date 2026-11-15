@@ -164,6 +164,7 @@ export default class Game extends Phaser.Scene {
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     this.resetSelection();
+    this.destroyStaleOptionPicker(state);
     this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
       const newHandCards = this.newHandCards;
       this.retractCardsExist = false; // If true, then the hand animations are delayed
@@ -225,6 +226,16 @@ export default class Game extends Phaser.Scene {
     this.interceptShipIds = [];
     this.plannedBattle = ClientPlannedBattleHelper.empty;
     this.plannedBattle.type = battleType ?? this.plannedBattle.type;
+  }
+
+  /**
+   * Destroys a pending option picker if the incoming state invalidated its pending
+   * action, e.g. because the countdown expired or the hand card is no longer playable.
+   * @param state incoming client state
+   */
+  private destroyStaleOptionPicker(state: ClientState) {
+    const optionPicker = this.obj?.optionPicker;
+    if (optionPicker && !optionPicker.isValidFor(state)) optionPicker.destroy();
   }
 
   private animateAttack(): boolean {
