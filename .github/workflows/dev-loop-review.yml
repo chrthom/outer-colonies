@@ -71,9 +71,8 @@ jobs:
           # and the post-step's escalation templates address the human
           # through (no hardcoded login).
           REPO_OWNER: ${{ github.repository_owner }}
-          # The pre-push head of a synchronize event (github.event.before):
-          # the merge-only detection below verifies the push against it.
-          # Absent on every other event; the zero SHA on force-pushes.
+          # Pre-push head of a synchronize event (github.event.before);
+          # the merge-only detection verifies the push against it.
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           set -eu
@@ -171,18 +170,14 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Merge-only head detection (misc/dev-loop.md): a synchronize push
-          # that is a verified clean merge of main (or a fast-forward into
-          # main) introduces no branch-authored content - both sides were
-          # already reviewed - so the full review is skipped and only the CI
-          # watch below runs. Verified from the git objects, not forgeable
-          # commit messages: a single two-parent merge of the pre-push head
-          # (github.event.before) with a main-contained second parent whose
-          # tree equals the automatic merge (git merge-tree --write-tree) -
-          # hand-resolved merges fail the tree check and keep their full
-          # review. All checks fail open to the full review. KEEP IN SYNC with
-          # the scripted merge in dev-loop-fix.yml, which pushes exactly
-          # this shape.
+          # Merge-only head detection (misc/dev-loop.md): a verified clean
+          # merge of main (or a fast-forward into it) needs no full review -
+          # both sides were already reviewed; only the CI watch below runs.
+          # Verified from the git objects (two-parent merge of the pre-push
+          # head, main-contained second parent, tree == git merge-tree's
+          # automatic result - hand-resolved merges keep their review); all
+          # checks fail open to the full review. KEEP IN SYNC with the
+          # scripted merge in dev-loop-fix.yml.
           merge_only="false"
           if [ "$EVENT_ACTION" = "synchronize" ] && [ -n "$BEFORE_SHA" ] \
             && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] \
@@ -208,10 +203,8 @@ jobs:
               fi
             fi
             if [ "$merge_only" = "true" ]; then
-              # A consumable findings review standing on the pre-merge head
-              # keeps the full review: the merge would move the head under
-              # its fixer (whose stale-head skip relies on the mover's
-              # synchronize re-review - the very thing the skip suppresses).
+              # A findings review standing on the pre-merge head keeps the
+              # full review: the merge would strand its fixer's findings.
               # Fail open to the full review on poll errors.
               pending_at_before="$(gh api repos/${GH_REPO}/pulls/$PR_NUMBER/reviews --paginate \
                 | jq -rs --arg owner "$REPO_OWNER" --arg sha "$BEFORE_SHA" \
@@ -220,11 +213,9 @@ jobs:
                 merge_only="false"
                 echo "A consumable findings review stands on the pre-merge head $BEFORE_SHA; keeping the full review so its findings are re-surfaced on the merged head."
               fi
-              # The branch side must be reviewed at the pre-merge head (a
-              # marker review with commit_id == before; CHANGES_NEEDED is
-              # already excluded above, NEEDS_HUMAN parks the PR) - an
-              # unreviewed head must not skip its only review. Fail closed
-              # to the full review on poll errors.
+              # The branch side must be reviewed at the pre-merge head (any
+              # marker verdict); an unreviewed head must not skip its only
+              # review. Fail closed on poll errors.
               reviewed_before="$(gh api repos/${GH_REPO}/pulls/$PR_NUMBER/reviews --paginate \
                 | jq -rs --arg sha "$BEFORE_SHA" \
                   '(add // []) | any(.[]; ((.body // "") | startswith("<!-- dev-loop-review -->")) and .commit_id == $sha)' 2>/dev/null || true)"
@@ -312,10 +303,8 @@ jobs:
           if [ "${ci_state:-}" = "" ]; then
             echo "CI wait timed out or no relevant check runs on head $head_sha (last poll summary: ${ci_summary:-none}); proceeding with the review (fail open)."
           elif [ "$merge_only" = "true" ]; then
-            # The one exception to "one review per head SHA": both sides of
-            # the merge were already reviewed and the CI watch above covered
-            # the head. No marker is posted, so a later event re-runs the
-            # detection instead of deduping on a marker.
+            # The one exception to "one review per head SHA": both merge
+            # sides were already reviewed and the CI watch covered the head.
             echo "CI is green on the merge-only head $head_sha with the tip unchanged; skipping the full review - the content was already reviewed on both sides of the merge."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0

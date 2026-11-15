@@ -519,13 +519,11 @@ jobs:
             else
               echo "PR #$PR_NUMBER has red CI checks on head $head_tip; treating this as a CI-failure run (plus conflicts if any)."
             fi
-            # Scripted merge (misc/dev-loop.md): a no-findings run whose only
-            # work is merging main in needs no agent when the merge resolves
-            # cleanly - fetch, merge, push in script. A real conflict, a
-            # red-CI run (its agent is needed anyway) or an unreadable state
-            # falls through to the agent (fail open). KEEP IN SYNC with the
-            # merge-only detection in dev-loop-review.yml, which verifies
-            # exactly the clean-merge shape pushed here.
+            # Scripted merge (misc/dev-loop.md): a no-findings run that only
+            # merges main in needs no agent when the merge is clean;
+            # conflicts, red CI or unreadable state fall through to the
+            # agent. KEEP IN SYNC with the merge-only detection in
+            # dev-loop-review.yml.
             if [ -n "$head_tip" ] && [ "$ci_red" != "true" ] && [ "$ci_fetch_failed" != "true" ] \
               && { [ "$mergeable" = "CONFLICTING" ] || [ "$mergeable" = "UNKNOWN" ]; }; then
               pending_at_head="$(gh api repos/${GH_REPO}/pulls/$PR_NUMBER/reviews --paginate \
@@ -534,19 +532,16 @@ jobs:
               if [ -n "$pending_at_head" ]; then
                 echo "A consumable findings review stands on head $head_tip; leaving the merge to that review's fixer run (the agent merges main itself)."
               else
-                # Fork gate for the scripted push (the event-payload check
-                # never fires on workflow_dispatch): compare the head
-                # repo's GraphQL node id like the scan does; a fork or an
-                # unreadable id falls through to the agent.
+                # Fork gate (the event-payload check never fires on
+                # workflow_dispatch); a fork or unreadable id falls to the
+                # agent.
                 merge_head_repo="$(gh pr view "$PR_NUMBER" --json headRepository --jq .headRepository.id 2>/dev/null || true)"
                 if [ -n "$merge_head_repo" ] && [ "$merge_head_repo" != "$REPO_NODE_ID" ]; then
                   echo "PR #$PR_NUMBER's head is from a fork; the scripted merge never pushes across repositories. The agent handles the run."
                 else
-                # Essential poll, like the branch read at the gate's end: the
-                # scripted merge pushes to this branch, and an empty read
-                # must never reach the push. Retry boundedly, then fall
-                # through to the agent (which resolves the branch itself) -
-                # not escalate: a no-findings run has no findings to strand.
+                # Essential poll: the push below needs the branch; fall
+                # through to the agent, not escalate (no findings to
+                # strand).
                 merge_branch=""
                 for attempt in 1 2 3 4 5; do
                   merge_branch="$(gh pr view "$PR_NUMBER" --json headRefName --jq .headRefName 2>/dev/null || true)"
@@ -559,9 +554,8 @@ jobs:
                   && git checkout --quiet --force -B dev-loop-scripted-merge "$head_tip" 2>/dev/null \
                   && git -c user.name="GitHub Actions" -c user.email="actions@github.com" \
                        merge --no-edit refs/remotes/origin/main >/dev/null 2>&1; then
-                  # Tip re-check before pushing (a racing push would make
-                  # this a non-fast-forward rejection); a mismatch or a
-                  # failed push falls through to the agent (fail open).
+                  # Tip re-check before pushing; a mismatch or failed push
+                  # falls through to the agent (fail open).
                   merge_tip_now="$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid 2>/dev/null || true)"
                   if [ "$merge_tip_now" = "$head_tip" ] \
                     && git push origin "HEAD:refs/heads/$merge_branch" >/dev/null 2>&1; then
@@ -573,8 +567,7 @@ jobs:
                 else
                   echo "Scripted merge of main into PR #$PR_NUMBER conflicted (or could not start); the agent resolves the conflict."
                 fi
-                # Restore the pre-attempt workspace: abort the merge, return
-                # to the original commit, drop the attempt branch.
+                # Restore the pre-attempt workspace.
                 git merge --abort >/dev/null 2>&1 || true
                 git checkout --quiet --force --detach "$merge_orig_head" >/dev/null 2>&1 || true
                 git branch -D dev-loop-scripted-merge >/dev/null 2>&1 || true
