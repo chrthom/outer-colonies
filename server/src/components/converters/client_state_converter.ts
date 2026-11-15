@@ -15,21 +15,26 @@ import {
 import { InterventionAttack } from '../game_state/intervention';
 import CardStack from '../cards/card_stack';
 import { rules } from '../../shared/config/rules';
+import { constants } from '../../shared/config/constants';
 
 export default function toClientState(match: Match, playerNo: number): ClientState {
   const player = match.players[playerNo];
   const opponent = match.players[opponentPlayerNo(playerNo)];
-  const toHand: (hand: CardStack[]) => ClientHandCard[] = (hand: CardStack[]) => {
+  const toHand: (hand: CardStack[], ownedByPlayer: boolean) => ClientHandCard[] = (hand, ownedByPlayer) => {
     return hand.map((c, index) => {
+      // Hide card IDs and playability of opponent hand cards from the requesting
+      // player (anti-cheat). The tactic card currently revealed via
+      // `highlightCardUUID` keeps its real card ID.
+      const revealed = ownedByPlayer || c.uuid == match.highlightCard?.uuid;
       return {
         uuid: c.uuid,
-        cardId: c.card.id,
+        cardId: revealed ? c.card.id : constants.cardBackSideID,
         index: index,
-        playable: c.hasValidTargets,
-        validTargets: c.validTargets.map(cs => cs.uuid),
-        ownedByPlayer: c.player.no == playerNo,
-        optionsToSelect: c.card.onEnterGameNumberOfSelectableCardOptions(player),
-        options: c.card.onEnterGameSelectableCardOptions(player)
+        playable: revealed ? c.hasValidTargets : false,
+        validTargets: revealed ? c.validTargets.map(cs => cs.uuid) : [],
+        ownedByPlayer: ownedByPlayer,
+        optionsToSelect: revealed ? c.card.onEnterGameNumberOfSelectableCardOptions(player) : 0,
+        options: revealed ? c.card.onEnterGameSelectableCardOptions(player) : []
       };
     });
   };
@@ -157,7 +162,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
       actionPool: actionPool,
       deckSize: p.deck.length,
       discardPileIds: p.discardPile.map(c => c.id),
-      hand: toHand(p.hand),
+      hand: toHand(p.hand, p.no == playerNo),
       handCardLimit: p.handCardLimit,
       hasToRetractCards: hasToRetractCards,
       name: p.name
@@ -175,6 +180,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     cardStacks: cardStacks,
     gameResult: gameResult,
     highlightCardUUID: match.highlightCard?.uuid,
+    highlightCardID: match.highlightCard?.card.id,
     intervention: intervention,
     opponent: players[1],
     player: players[0],
