@@ -9,6 +9,7 @@ import {
 } from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
 import Phaser from 'phaser';
+import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
 
 /**
  * Test double for Phaser's clock: records delayed calls so tests can fire
@@ -81,57 +82,19 @@ function setupGame() {
   };
 }
 
-function makeRenderStubs() {
-  // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
-  // and scene.add.text(...).setFontSize().setFontFamily().setColor().setDepth()
-  //   .setOrigin().setAlpha() then accesses postFX.addShadow.
-  // Background (constructed by Game.init()) additionally calls scene.add.group(),
-  // scene.time.delayedCall(...) and chains setAngle(), setScale() and setTint().
-  // Return chainable stubs so the whole call sequence is non-throwing.
-  const chainable = (): any => {
-    const stub: any = {
-      postFX: { addShadow: jasmine.createSpy('addShadow'), addShine: jasmine.createSpy('addShine') }
-    };
-    [
-      'setOrigin',
-      'setDepth',
-      'setAlpha',
-      'setFontSize',
-      'setFontFamily',
-      'setColor',
-      'setAlign',
-      'setText',
-      'setVisible',
-      'setAngle',
-      'setScale',
-      'setTint'
-    ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
-    return stub;
-  };
-  return {
-    add: {
-      group: jasmine.createSpy('group').and.returnValue({}),
-      image: jasmine.createSpy('image').and.callFake(chainable),
-      text: jasmine.createSpy('text').and.callFake(chainable),
-      particles: jasmine.createSpy('particles').and.callFake(chainable)
-    },
-    time: { delayedCall: jasmine.createSpy('delayedCall') },
-    tweens: { add: jasmine.createSpy('tweens.add') }
-  };
-}
-
 /** The GameOverIndicator constructor renders one image and three text labels. */
 function expectSingleIndicator(game: Game) {
   expect((game as any).add.image as jasmine.Spy).toHaveBeenCalledTimes(1);
   expect((game as any).add.text as jasmine.Spy).toHaveBeenCalledTimes(3);
 }
 
+/** Creates a Game instance with shared-harness render, clock and tween stubs. */
 function makeGame(): Game {
   const game = new Game();
-  const stubs = makeRenderStubs();
-  (game as any).add = stubs.add;
-  (game as any).time = stubs.time;
-  (game as any).tweens = stubs.tweens;
+  (game as any).add = makeAddStub();
+  // Game.init() constructs the Background, which schedules via scene.time
+  (game as any).time = makeTimeStub();
+  (game as any).tweens = makeTweensStub();
   game.state = emptyClientState;
   return game;
 }
@@ -151,8 +114,8 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
     expect(game.state.gameResult?.sol).toBe(0);
     // The GameOverIndicator constructor renders three text labels and one image.
-    expect((game as any).add.image as jasmine.Spy).toHaveBeenCalled();
-    expect((game as any).add.text as jasmine.Spy).toHaveBeenCalled();
+    expect((game as any).add.image).toHaveBeenCalled();
+    expect((game as any).add.text).toHaveBeenCalled();
   });
 
   it('does not mutate the shared emptyClientState constant', () => {
@@ -172,7 +135,7 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
 
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
-    expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
+    expect((game as any).add.image).not.toHaveBeenCalled();
   });
 });
 
@@ -218,9 +181,8 @@ describe('Game scene - socket listener lifecycle', () => {
   });
 
   it('shows the surrender indicator when the socket disconnects', () => {
-    const stubs = makeRenderStubs();
-    (game as any).add = stubs.add;
-    (game as any).tweens = stubs.tweens;
+    (game as any).add = makeAddStub();
+    (game as any).tweens = makeTweensStub();
     game.state = emptyClientState;
 
     const disconnectHandler = socket.on.calls.allArgs().find((args: any[]) => args[0] == 'disconnect')![1];
