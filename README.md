@@ -135,6 +135,8 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `perspective.ts`: Perspective configuration
   - `testing/`: Shared test utilities
     - `phaser_stubs.ts`: Chainable Phaser game object, scene and system stubs for the client specs
+  - `utils/`: Utility classes
+    - `state_update_sequencer.ts`: Cancel-and-replace sequencer for the state update pipeline
 - **Communication**: Uses WebSockets to communicate with the server for real-time game updates
 
 #### Server (Express + Socket.IO)
