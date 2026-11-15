@@ -1,47 +1,55 @@
 import ActionPool from './action_pool';
 import { layoutConfig } from '../config/layout';
 import { designConfig } from '../config/design';
+import Game from '../scenes/game';
+
+interface MockImage {
+  setOrigin: jasmine.Spy;
+  setTint: jasmine.Spy;
+  setAlpha: jasmine.Spy;
+  destroy: jasmine.Spy;
+}
+
+const makeImage = (): MockImage => {
+  const image = {
+    setOrigin: jasmine.createSpy('setOrigin'),
+    setTint: jasmine.createSpy('setTint'),
+    setAlpha: jasmine.createSpy('setAlpha'),
+    destroy: jasmine.createSpy('destroy')
+  };
+  [image.setOrigin, image.setTint, image.setAlpha].forEach(spy => spy.and.returnValue(image));
+  return image;
+};
+
+interface SceneStub {
+  getPlayerState: jasmine.Spy;
+  add: { image: jasmine.Spy };
+}
 
 describe('ActionPool', () => {
-  let mockScene: any;
+  let mockScene: SceneStub;
   let actionPool: ActionPool;
-  let mockImages: any[];
 
   beforeEach(() => {
     // Mock Phaser scene with necessary methods
-    mockImages = [{ destroy: jasmine.createSpy('destroy') }, { destroy: jasmine.createSpy('destroy') }];
-
-    // Mock the scene methods
     mockScene = {
       getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({
         actionPool: ['attack', 'defend']
       }),
       add: {
-        image: jasmine.createSpy('image').and.callFake(() => {
-          // Create mock image with proper typing - use a class to avoid circular references
-          class MockImage {
-            setOrigin = jasmine.createSpy().and.returnValue(this);
-            setTint = jasmine.createSpy().and.returnValue(this);
-            setAlpha = jasmine.createSpy().and.returnValue(this);
-            destroy = jasmine.createSpy('destroy');
-          }
-
-          const mockImage = new MockImage();
-          mockImages.push(mockImage);
-          return mockImage;
-        })
+        image: jasmine.createSpy('image').and.callFake(makeImage)
       }
     };
 
-    actionPool = new ActionPool(mockScene, true); // ownedByPlayer = true
+    actionPool = new ActionPool(mockScene as unknown as Game, true); // ownedByPlayer = true
   });
 
   it('should destroy existing images when destroyed', () => {
-    // Add some mock images - use type assertion since we're testing behavior, not Phaser types
-    const mockImage1 = { destroy: jasmine.createSpy('destroy1') } as any;
-    const mockImage2 = { destroy: jasmine.createSpy('destroy2') } as any;
+    // Add some mock images - use a type assertion since we are testing behavior, not Phaser types
+    const mockImage1 = { destroy: jasmine.createSpy('destroy1') };
+    const mockImage2 = { destroy: jasmine.createSpy('destroy2') };
 
-    actionPool.images = [mockImage1, mockImage2];
+    actionPool.images = [mockImage1, mockImage2] as unknown as Phaser.GameObjects.Image[];
 
     actionPool.destroy();
 
@@ -75,7 +83,7 @@ describe('ActionPool', () => {
   });
 
   it('should use different placement for opponent', () => {
-    const opponentActionPool = new ActionPool(mockScene, false); // ownedByPlayer = false
+    const opponentActionPool = new ActionPool(mockScene as unknown as Game, false); // ownedByPlayer = false
     opponentActionPool.update();
 
     // Verify getPlayerState was called with false
@@ -91,7 +99,7 @@ describe('ActionPool', () => {
     // Test player ownership (should use player tint)
     actionPool.update();
     const playerCall = mockScene.add.image.calls.first();
-    const playerImage = playerCall.returnValue;
+    const playerImage = playerCall.returnValue as MockImage;
     expect(playerImage.setTint).toHaveBeenCalledWith(
       designConfig.tint.player,
       designConfig.tint.neutral,
@@ -100,10 +108,10 @@ describe('ActionPool', () => {
     );
 
     // Test opponent ownership (should use opponent tint)
-    const opponentActionPool = new ActionPool(mockScene, false);
+    const opponentActionPool = new ActionPool(mockScene as unknown as Game, false);
     opponentActionPool.update();
     const opponentCall = mockScene.add.image.calls.mostRecent();
-    const opponentImage = opponentCall.returnValue;
+    const opponentImage = opponentCall.returnValue as MockImage;
     expect(opponentImage.setTint).toHaveBeenCalledWith(
       designConfig.tint.opponent,
       designConfig.tint.neutral,

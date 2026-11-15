@@ -1,4 +1,5 @@
 import { InterventionType } from '../../../../../server/src/shared/config/enums';
+import { rules } from '../../../../../server/src/shared/config/rules';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 
@@ -7,9 +8,9 @@ export default class CombatRangeIndicator {
   private images: Phaser.GameObjects.Image[];
   constructor(scene: Game) {
     this.scene = scene;
-    this.images = [1, 2, 3, 4].map(i =>
+    this.images = Array.from({ length: rules.maxRange }, (_, i) =>
       this.scene.add
-        .image(layoutConfig.game.ui.combatRange.x, layoutConfig.game.ui.combatRange.y, `range_${i}`)
+        .image(layoutConfig.game.ui.combatRange.x, layoutConfig.game.ui.combatRange.y, `range_${i + 1}`)
         .setOrigin(0.5)
         .setVisible(false)
     );
@@ -17,14 +18,15 @@ export default class CombatRangeIndicator {
   update() {
     this.hide();
     if (
-      this.scene.state.battle?.range < 5 &&
+      // The server encodes "no battle" as rules.maxRange + 1
+      this.scene.state.battle.range < rules.maxRange + 1 &&
       this.scene.state.intervention?.rootType != InterventionType.BattleRoundEnd
     ) {
       this.show(this.scene.state.battle.range);
     }
   }
   show(range: number) {
-    this.images[range - 1].setVisible(true);
+    this.images[range - 1]?.setVisible(true);
   }
   hide() {
     this.images.forEach(i => i.setVisible(false));

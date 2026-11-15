@@ -1,22 +1,35 @@
 import CombatRangeIndicator from './combat_range_indicator';
 import { BattleType, InterventionType } from '../../../../../server/src/shared/config/enums';
+import { rules } from '../../../../../server/src/shared/config/rules';
 import {
   ClientIntervention,
   ClientState,
   emptyClientState
 } from '../../../../../server/src/shared/interfaces/client_state';
+import Game from '../../scenes/game';
 
-class MockImage {
-  setOrigin = jasmine.createSpy('setOrigin').and.returnValue(this);
-  setVisible = jasmine.createSpy('setVisible').and.returnValue(this);
+interface MockImage {
+  setOrigin: jasmine.Spy;
+  setVisible: jasmine.Spy;
 }
 
-const makeScene = (state: ClientState): any => ({
-  state: state,
-  add: {
-    image: jasmine.createSpy('image').and.callFake(() => new MockImage())
-  }
-});
+const makeImage = (): MockImage => {
+  const image = {
+    setOrigin: jasmine.createSpy('setOrigin'),
+    setVisible: jasmine.createSpy('setVisible')
+  };
+  image.setOrigin.and.returnValue(image);
+  image.setVisible.and.returnValue(image);
+  return image;
+};
+
+const makeScene = (state: ClientState): Game =>
+  ({
+    state: state,
+    add: {
+      image: jasmine.createSpy('image').and.callFake(makeImage)
+    }
+  }) as unknown as Game;
 
 const makeState = (range: number, intervention?: ClientIntervention): ClientState => ({
   ...emptyClientState,
@@ -31,7 +44,7 @@ const makeState = (range: number, intervention?: ClientIntervention): ClientStat
 
 /** Ranges whose indicator image is visible after the last update() call. */
 const visibleRanges = (indicator: CombatRangeIndicator): number[] => {
-  const images = (indicator as any).images as any[];
+  const images = (indicator as unknown as { images: MockImage[] }).images;
   return images
     .map((image, i) => (image.setVisible.calls.mostRecent().args[0] ? i + 1 : 0))
     .filter(range => range > 0);
@@ -91,10 +104,17 @@ describe('CombatRangeIndicator', () => {
   });
 
   it('hides the indicator for the pre-battle placeholder range', () => {
-    const indicator = new CombatRangeIndicator(makeScene(makeState(5)));
+    const indicator = new CombatRangeIndicator(makeScene(makeState(rules.maxRange + 1)));
 
     indicator.update();
 
+    expect(visibleRanges(indicator)).toEqual([]);
+  });
+
+  it('does not throw for a range without an indicator image', () => {
+    const indicator = new CombatRangeIndicator(makeScene(makeState(0)));
+
+    expect(() => indicator.update()).not.toThrow();
     expect(visibleRanges(indicator)).toEqual([]);
   });
 });

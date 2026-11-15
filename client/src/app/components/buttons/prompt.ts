@@ -93,14 +93,14 @@ export default class Prompt {
   }
   private showInterceptPhase() {
     const battleText =
-      this.scene.state.battle?.type == BattleType.Raid
+      this.scene.state.battle.type == BattleType.Raid
         ? 'zur Verteidigung\ndeiner Kolonie'
         : 'zum Abfangen der\ngegenerischen Mission';
     this.setText(`Wähle Schiffe ${battleText}!`);
   }
   private showCombatPhase() {
     this.setText(
-      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
+      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
     );
   }
   private showEndPhase() {

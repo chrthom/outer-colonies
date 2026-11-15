@@ -2,26 +2,46 @@ import Game from './game';
 import { GameResultType } from '../../../../server/src/shared/config/enums';
 import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
 
-function makeRenderStubs() {
+interface ChainableStub {
+  postFX: { addShadow: jasmine.Spy; addShine: jasmine.Spy };
+  setOrigin: jasmine.Spy;
+  setDepth: jasmine.Spy;
+  setAlpha: jasmine.Spy;
+  setFontSize: jasmine.Spy;
+  setFontFamily: jasmine.Spy;
+  setColor: jasmine.Spy;
+  setAlign: jasmine.Spy;
+  setText: jasmine.Spy;
+  setVisible: jasmine.Spy;
+}
+
+interface RenderStubs {
+  add: { image: jasmine.Spy; text: jasmine.Spy; particles: jasmine.Spy };
+  tweens: { add: jasmine.Spy };
+}
+
+function makeRenderStubs(): RenderStubs {
   // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
   // and scene.add.text(...).setFontSize().setFontFamily().setColor().setDepth()
   //   .setOrigin().setAlpha() then accesses postFX.addShadow.
   // Return chainable stubs so the whole call sequence is non-throwing.
-  const chainable = (): any => {
-    const stub: any = {
+  const chainable = (): ChainableStub => {
+    const stub = {
       postFX: { addShadow: jasmine.createSpy('addShadow'), addShine: jasmine.createSpy('addShine') }
-    };
-    [
-      'setOrigin',
-      'setDepth',
-      'setAlpha',
-      'setFontSize',
-      'setFontFamily',
-      'setColor',
-      'setAlign',
-      'setText',
-      'setVisible'
-    ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
+    } as ChainableStub;
+    (
+      [
+        'setOrigin',
+        'setDepth',
+        'setAlpha',
+        'setFontSize',
+        'setFontFamily',
+        'setColor',
+        'setAlign',
+        'setText',
+        'setVisible'
+      ] as Array<keyof Omit<ChainableStub, 'postFX'>>
+    ).forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
     return stub;
   };
   return {
@@ -40,8 +60,8 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
   beforeEach(() => {
     game = new Game();
     const stubs = makeRenderStubs();
-    (game as any).add = stubs.add;
-    (game as any).tweens = stubs.tweens;
+    game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
+    game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
     game.state = emptyClientState;
   });
 
@@ -53,8 +73,8 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
     expect(game.state.gameResult?.sol).toBe(0);
     // The GameOverIndicator constructor renders three text labels and one image.
-    expect((game as any).add.image as jasmine.Spy).toHaveBeenCalled();
-    expect((game as any).add.text as jasmine.Spy).toHaveBeenCalled();
+    expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalled();
+    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalled();
   });
 
   it('does not mutate the shared emptyClientState constant', () => {
@@ -74,6 +94,6 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
 
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
-    expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
+    expect(game.add.image as unknown as jasmine.Spy).not.toHaveBeenCalled();
   });
 });

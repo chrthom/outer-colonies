@@ -159,7 +159,7 @@ export default class Game extends Phaser.Scene {
   }
 
   updateState(state: ClientState) {
-    const previousTurnPhase = this.state?.turnPhase ?? TurnPhase.Init;
+    const previousTurnPhase = this.state.turnPhase;
     this.state = state;
     //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
@@ -228,7 +228,7 @@ export default class Game extends Phaser.Scene {
   }
 
   private animateAttack(): boolean {
-    const attack = this.state.battle?.recentAttack;
+    const attack = this.state.battle.recentAttack;
     if (attack) {
       this.isAttackAnimating = true;
       this.cardStacks.filter(cs => cs.cards.length > 1).forEach(cs => cs.tween());
@@ -340,7 +340,7 @@ export default class Game extends Phaser.Scene {
           const activeCard = this.player.hand.find(c => c.uuid == this.activeCards.hand);
           if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
         } else {
-          const allShips = this.state.battle?.playerShipIds.concat(this.state.battle.opponentShipIds);
+          const allShips = this.state.battle.playerShipIds.concat(this.state.battle.opponentShipIds);
           switch (this.state.turnPhase) {
             case TurnPhase.Build:
               if (this.plannedBattle.type != BattleType.None) {
@@ -350,7 +350,7 @@ export default class Game extends Phaser.Scene {
                 } else if (cs.data.missionReady) {
                   cs.highlightSelectable();
                 }
-              } else if (this.state.battle?.type != BattleType.None && !this.state.playerIsActive) {
+              } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) {
                 // Assign ships to intercept
                 if (this.interceptShipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
@@ -360,15 +360,15 @@ export default class Game extends Phaser.Scene {
               }
               break;
             case TurnPhase.Combat:
-              if (!allShips?.includes(cs.uuid)) {
+              if (!allShips.includes(cs.uuid)) {
                 cs.highlightDisabled();
               }
               if (this.activeCards.stackUUID == cs.uuid && this.activeCards.cardUUID != undefined) {
                 cs.cards.find(c => c.data.uuid == this.activeCards.cardUUID)?.highlightSelected();
-              } else if (this.state.battle?.playerShipIds.includes(cs.uuid)) {
+              } else if (this.state.battle.playerShipIds.includes(cs.uuid)) {
                 cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
               }
-              if (this.activeCards.stackUUID && this.state.battle?.opponentShipIds.includes(cs.uuid)) {
+              if (this.activeCards.stackUUID && this.state.battle.opponentShipIds.includes(cs.uuid)) {
                 cs.highlightSelectable();
               } else if (cs.canPerformAllAttackOnBase) {
                 cs.highlightSelected();

@@ -467,7 +467,7 @@ export default class Background {
     return array[this.randomIndex(array)];
   }
 
-  private randomIndex(array: any[]): number {
+  private randomIndex<T>(array: T[]): number {
     return Math.floor(Math.random() * array.length);
   }
 
@@ -549,17 +549,14 @@ export default class Background {
   }
 
   private get inCombat(): boolean {
-    return this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Combat;
+    return this.isGame && this.game.state.turnPhase == TurnPhase.Combat;
   }
 
   private get inCombatRaid(): boolean {
-    return this.inCombat && this.game.state.battle && this.game.state.battle.type == BattleType.Raid;
+    return this.inCombat && this.game.state.battle.type == BattleType.Raid;
   }
 
   private get inStartOrBuildPhase(): boolean {
-    return (
-      (this.isGame && this.game.state && this.game.state.turnPhase == TurnPhase.Start) ||
-      this.game.state.turnPhase == TurnPhase.Build
-    );
+    return this.game.state.turnPhase == TurnPhase.Start || this.game.state.turnPhase == TurnPhase.Build;
   }
 }
