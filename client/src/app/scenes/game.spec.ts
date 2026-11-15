@@ -1,7 +1,13 @@
 import Game from './game';
 import { GameResultType, TurnPhase } from '@shared/config/enums';
-import { ClientHandCard, ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import {
+  ClientGameResult,
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
+import { Socket } from 'socket.io-client';
 
 /**
  * Test double for Phaser's clock: records delayed calls so tests can fire
@@ -101,10 +107,14 @@ interface ChainableStub {
   setAlign: jasmine.Spy;
   setText: jasmine.Spy;
   setVisible: jasmine.Spy;
+  setAngle: jasmine.Spy;
+  setScale: jasmine.Spy;
+  setTint: jasmine.Spy;
 }
 
 interface RenderStubs {
-  add: { image: jasmine.Spy; text: jasmine.Spy; particles: jasmine.Spy };
+  add: { group: jasmine.Spy; image: jasmine.Spy; text: jasmine.Spy; particles: jasmine.Spy };
+  time: { delayedCall: jasmine.Spy };
   tweens: { add: jasmine.Spy };
 }
 
@@ -112,6 +122,8 @@ function makeRenderStubs(): RenderStubs {
   // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
   // and scene.add.text(...).setFontSize().setFontFamily().setColor().setDepth()
   //   .setOrigin().setAlpha() then accesses postFX.addShadow.
+  // Background (constructed by Game.init()) additionally calls scene.add.group(),
+  // scene.time.delayedCall(...) and chains setAngle(), setScale() and setTint().
   // Return chainable stubs so the whole call sequence is non-throwing.
   const chainable = (): ChainableStub => {
     const stub = {
@@ -127,30 +139,47 @@ function makeRenderStubs(): RenderStubs {
         'setColor',
         'setAlign',
         'setText',
-        'setVisible'
+        'setVisible',
+        'setAngle',
+        'setScale',
+        'setTint'
       ] as Array<keyof Omit<ChainableStub, 'postFX'>>
     ).forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
     return stub;
   };
   return {
     add: {
+      group: jasmine.createSpy('group').and.returnValue({}),
       image: jasmine.createSpy('image').and.callFake(chainable),
       text: jasmine.createSpy('text').and.callFake(chainable),
       particles: jasmine.createSpy('particles').and.callFake(chainable)
     },
+    time: { delayedCall: jasmine.createSpy('delayedCall') },
     tweens: { add: jasmine.createSpy('tweens.add') }
   };
+}
+
+/** The GameOverIndicator constructor renders one image and three text labels. */
+function expectSingleIndicator(game: Game) {
+  expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
+  expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(3);
+}
+
+function makeGame(): Game {
+  const game = new Game();
+  const stubs = makeRenderStubs();
+  game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
+  game.time = stubs.time as unknown as Phaser.Time.Clock;
+  game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
+  game.state = emptyClientState;
+  return game;
 }
 
 describe('Game scene - showSurrenderOnDisconnect', () => {
   let game: Game;
 
   beforeEach(() => {
-    game = new Game();
-    const stubs = makeRenderStubs();
-    game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
-    game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
-    game.state = emptyClientState;
+    game = makeGame();
   });
 
   it('synthesises a surrender ClientGameResult and renders the indicator', () => {
@@ -183,6 +212,49 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
     expect(game.add.image as unknown as jasmine.Spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Game scene - showGameOverIndicator', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = makeGame();
+  });
+
+  it('creates the overlay exactly once regardless of how often it is called', () => {
+    const result: ClientGameResult = { won: true, type: GameResultType.Domination, sol: 42 };
+
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator({ ...result, sol: 0 });
+
+    expectSingleIndicator(game);
+  });
+
+  it('does not create a second overlay when updates follow a disconnect surrender', () => {
+    game.showSurrenderOnDisconnect();
+
+    // Simulates the ContinueButton.update() path after further updateView() calls
+    game.showGameOverIndicator(game.state.gameResult!);
+    game.showGameOverIndicator(game.state.gameResult!);
+
+    expectSingleIndicator(game);
+  });
+
+  it('shows a fresh overlay in the next match after init() resets the reference', () => {
+    game.showSurrenderOnDisconnect();
+
+    game.init({
+      gameParams: { preloadCardIds: [] },
+      socket: { io: { reconnection: () => undefined } } as unknown as Socket
+    });
+    (game.add.image as unknown as jasmine.Spy).calls.reset();
+    (game.add.text as unknown as jasmine.Spy).calls.reset();
+
+    game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
+
+    expectSingleIndicator(game);
   });
 });
 
