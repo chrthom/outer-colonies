@@ -427,6 +427,63 @@ describe('CardStack', () => {
       expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
     });
 
+    it('unbinds the input handlers when refresh turns a critical button non-critical', () => {
+      // Regression: the hidden (alpha 0) button stayed interactive with its
+      // live handlers, so a click at its position emitted a spurious Retract.
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', true, true));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+      const button: any = card.retractCardButton;
+      expect(button).toBeDefined(); // created critical by the constructor
+      button.image.off.calls.reset();
+      button.image.on.calls.reset();
+
+      cs.update(makeData({ cards: [realCardData('a', true, false)] })); // no longer critical
+
+      expect(card.retractCardButton).toBe(button); // refreshed, not recreated
+      expect(button.image.setAlpha).toHaveBeenCalledWith(0); // hidden
+      expect(button.image.off).toHaveBeenCalledWith('pointerover');
+      expect(button.image.off).toHaveBeenCalledWith('pointerout');
+      expect(button.image.off).toHaveBeenCalledWith('pointerdown');
+      expect(button.image.on).not.toHaveBeenCalledWith('pointerdown', jasmine.any(Function));
+    });
+
+    it('unbinds the input handlers when hide() makes a non-critical button invisible', () => {
+      // Regression: a button shown via pointerover kept its live pointerdown
+      // handler while fading to alpha 0.
+      const scene = makeScene();
+      const card = makeRealCard(scene, realCardData('a', true, false));
+      const button: any = card.retractCardButton;
+      button.show(
+        0,
+        0,
+        () => {},
+        () => {}
+      ); // pointerover path: binds handlers
+      button.image.off.calls.reset();
+
+      button.hide();
+
+      expect(button.image.off).toHaveBeenCalledWith('pointerover');
+      expect(button.image.off).toHaveBeenCalledWith('pointerout');
+      expect(button.image.off).toHaveBeenCalledWith('pointerdown');
+    });
+
+    it('keeps the input handlers when hide() leaves a critical button visible', () => {
+      const scene = makeScene();
+      const card = makeRealCard(scene, realCardData('a', true, true));
+      const button: any = card.retractCardButton;
+      button.image.off.calls.reset();
+
+      button.hide();
+
+      expect(button.image.off).not.toHaveBeenCalled();
+      pointerdownHandler(button.image)({ leftButtonDown: () => true });
+      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+    });
+
     it('destroys the retract button when the card is no longer retractable', () => {
       const scene = makeScene();
       const cs = new CardStack(scene, makeData());

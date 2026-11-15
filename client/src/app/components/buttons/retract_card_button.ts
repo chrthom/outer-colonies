@@ -37,6 +37,9 @@ export default class RetractCardButton {
     return this;
   }
   hide(): this {
+    // A critical button stays visible (and interactive) when hidden, so only
+    // unbind the handlers when the button actually becomes invisible.
+    if (!this.isCritical) this.unbindInputHandlers();
     this.tween(false, this.card.x.value2d, this.card.y.value2d);
     return this;
   }
@@ -61,6 +64,7 @@ export default class RetractCardButton {
       );
       this.image.setAlpha(designConfig.alpha.normal);
     } else {
+      this.unbindInputHandlers();
       this.setTintNormal();
       this.image.setAlpha(0);
     }
@@ -103,6 +107,16 @@ export default class RetractCardButton {
         if (p.leftButtonDown())
           this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
       });
+  }
+  /**
+   * Removes the pointer handlers so an invisible button is not interactive:
+   * Phaser hit-testing ignores alpha, so a hidden button with live handlers
+   * would still fire them (e.g. emit a spurious Retract when clicked at its
+   * position). Called by refresh() and hide() when the button loses its
+   * critical (always visible) state; show() rebinds the handlers.
+   */
+  private unbindInputHandlers() {
+    this.image.off('pointerover').off('pointerout').off('pointerdown');
   }
   private setTintNormal() {
     this.image.setTint(
