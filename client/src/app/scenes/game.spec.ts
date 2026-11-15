@@ -1,6 +1,82 @@
 import Game from './game';
-import { EventType, GameResultType } from '../../../../server/src/shared/config/enums';
-import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import { EventType, GameResultType, TurnPhase } from '../../../../server/src/shared/config/enums';
+import {
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '../../../../server/src/shared/interfaces/client_state';
+import { animationConfig } from '../config/animation';
+
+/**
+ * Test double for Phaser's clock: records delayed calls so tests can fire
+ * them manually, which makes the state update pipeline testable without
+ * Phaser timers.
+ */
+class FakeClock {
+  readonly entries: Array<{ delay: number; callback: () => void }> = [];
+
+  delayedCall = (delay: number, callback: () => void) => {
+    this.entries.push({ delay, callback });
+  };
+
+  /** Fires and removes the oldest scheduled delayed call (mimics an elapsed timer). */
+  fireOldest() {
+    const entry = this.entries.shift();
+    if (!entry) throw new Error('No delayed call scheduled');
+    entry.callback();
+  }
+
+  /** Fires all scheduled delayed calls, including those scheduled while firing. */
+  fireAll() {
+    while (this.entries.length) this.fireOldest();
+  }
+}
+
+function handCard(uuid: string, cardId = 1): ClientHandCard {
+  return {
+    uuid,
+    cardId,
+    index: 0,
+    playable: true,
+    validTargets: [],
+    ownedByPlayer: true,
+    optionsToSelect: 0
+  };
+}
+
+function makeState(over: Partial<ClientState> = {}): ClientState {
+  return { ...emptyClientState, ...over };
+}
+
+/** Creates a Game instance with a fake clock and spied update helpers. */
+function setupGame() {
+  const game = new Game();
+  const clock = new FakeClock();
+  (game as any).time = { delayedCall: clock.delayedCall };
+  (game as any).preloader = { destroy: () => {} };
+  const updateCardStacks = jasmine.createSpy('updateCardStacks');
+  const updateHandCards = jasmine.createSpy('updateHandCards');
+  const updateView = jasmine.createSpy('updateView');
+  const highlightAttackIntervention = jasmine.createSpy('highlightAttackIntervention');
+  (game as any).updateCardStacks = updateCardStacks;
+  (game as any).updateHandCards = updateHandCards;
+  (game as any).updateView = updateView;
+  (game as any).highlightAttackIntervention = highlightAttackIntervention;
+  const playerDiscardPile = jasmine.createSpy('playerDiscardPile.update');
+  const opponentDiscardPile = jasmine.createSpy('opponentDiscardPile.update');
+  (game as any).player = { hand: [], discardPile: { update: playerDiscardPile } };
+  (game as any).opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
+  return {
+    game,
+    clock,
+    updateCardStacks,
+    updateHandCards,
+    updateView,
+    highlightAttackIntervention,
+    playerDiscardPile,
+    opponentDiscardPile
+  };
+}
 
 function makeRenderStubs() {
   // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
@@ -109,5 +185,134 @@ describe('Game scene - getCardMovementEvent', () => {
 
   it('returns undefined for cards without a movement event', () => {
     expect(game.getCardMovementEvent('card-3')).toBeUndefined();
+  });
+});
+
+describe('Game scene - state update pipeline', () => {
+  it('runs the full update chain for a single state', () => {
+    const {
+      game,
+      clock,
+      updateCardStacks,
+      updateHandCards,
+      updateView,
+      highlightAttackIntervention,
+      playerDiscardPile,
+      opponentDiscardPile
+    } = setupGame();
+    const state = makeState({
+      turnPhase: TurnPhase.Build,
+      player: { ...emptyClientState.player, discardPileIds: [7], hand: [handCard('p1', 10)] },
+      opponent: { ...emptyClientState.opponent, discardPileIds: [8] }
+    });
+
+    game.updateState(state);
+    clock.fireAll();
+
+    expect(updateCardStacks).toHaveBeenCalledTimes(1);
+    expect(updateCardStacks).toHaveBeenCalledWith();
+    expect(updateHandCards).toHaveBeenCalledTimes(1);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)]);
+    expect(updateView).toHaveBeenCalledTimes(1);
+    expect(highlightAttackIntervention).toHaveBeenCalledTimes(1);
+    expect(playerDiscardPile).toHaveBeenCalledWith([7]);
+    expect(opponentDiscardPile).toHaveBeenCalledWith([8]);
+  });
+
+  it('renders the newest state when a second state arrives mid-chain', () => {
+    const { game, clock, updateCardStacks, updateHandCards, playerDiscardPile, opponentDiscardPile } =
+      setupGame();
+    const state1 = makeState({
+      turnPhase: TurnPhase.Build,
+      player: { ...emptyClientState.player, hand: [handCard('p1', 10)] }
+    });
+    game.updateState(state1);
+    clock.fireOldest(); // Chain 1 applied its card stacks step
+    const state2 = makeState({
+      turnPhase: TurnPhase.Combat,
+      player: { ...emptyClientState.player, discardPileIds: [3], hand: [handCard('p2', 20)] },
+      opponent: { ...emptyClientState.opponent, discardPileIds: [4] }
+    });
+
+    game.updateState(state2); // Supersedes the pending steps of chain 1
+    clock.fireAll();
+
+    expect(game.state).toBe(state2);
+    // Each chain ran its card stacks step exactly once
+    expect(updateCardStacks).toHaveBeenCalledTimes(2);
+    // The hand update ran only for the newest state, with the new hand
+    // cards captured from that state
+    expect(updateHandCards).toHaveBeenCalledTimes(1);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
+    // The discard piles were updated from the newest state only
+    expect(playerDiscardPile).toHaveBeenCalledTimes(1);
+    expect(playerDiscardPile).toHaveBeenCalledWith([3]);
+    expect(opponentDiscardPile).toHaveBeenCalledWith([4]);
+  });
+
+  it('skips every step of a chain that was superseded before it started', () => {
+    const { game, clock, updateCardStacks, updateHandCards, playerDiscardPile } = setupGame();
+    const state1 = makeState({
+      player: { ...emptyClientState.player, discardPileIds: [1], hand: [handCard('p1', 10)] }
+    });
+    game.updateState(state1);
+    const state2 = makeState({
+      player: { ...emptyClientState.player, discardPileIds: [2], hand: [handCard('p2', 20)] }
+    });
+
+    game.updateState(state2); // Supersedes chain 1 before any of its steps ran
+    clock.fireAll();
+
+    expect(updateCardStacks).toHaveBeenCalledTimes(1);
+    expect(updateHandCards).toHaveBeenCalledTimes(1);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
+    expect(playerDiscardPile).toHaveBeenCalledTimes(1);
+    expect(playerDiscardPile).toHaveBeenCalledWith([2]);
+  });
+
+  it('waits for the attack animation before updating the card stacks', () => {
+    const { game, clock, updateCardStacks } = setupGame();
+    const state = makeState({
+      battle: {
+        ...emptyClientState.battle,
+        recentAttack: {
+          sourceRootUUID: 'src-root',
+          sourceSubUUID: 'src-sub',
+          targetUUID: 'target',
+          pointDefense: 0,
+          shield: 0,
+          armour: 0,
+          damage: 1
+        }
+      }
+    });
+
+    game.updateState(state);
+
+    expect(game.isAttackAnimating).toBeTrue();
+    // The attack animation reset and the chain's first step are both
+    // scheduled with the attack duration
+    expect(clock.entries.map(e => e.delay)).toEqual([
+      animationConfig.duration.attack,
+      animationConfig.duration.attack
+    ]);
+    clock.fireOldest(); // Resets isAttackAnimating
+    expect(game.isAttackAnimating).toBeFalse();
+    expect(updateCardStacks).not.toHaveBeenCalled();
+    clock.fireOldest(); // Chain step 1
+    expect(updateCardStacks).toHaveBeenCalledTimes(1);
+  });
+
+  it('delays the hand update when a retract animation was detected', () => {
+    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
+    updateCardStacks.and.callFake(() => (game.retractCardsExist = true));
+
+    game.updateState(makeState());
+    clock.fireOldest(); // Step 1 detects a retract via updateCardStacks
+
+    expect(clock.entries[0].delay).toBe(animationConfig.duration.move);
+    expect(updateHandCards).not.toHaveBeenCalled();
+    clock.fireOldest();
+    expect(updateHandCards).toHaveBeenCalledTimes(1);
   });
 });
