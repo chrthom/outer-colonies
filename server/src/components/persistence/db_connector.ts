@@ -57,6 +57,7 @@ export default class DBConnection {
       await conn.commit();
       return result;
     } catch (err) {
+      console.log(`WARN: DB transaction error ${err}`);
       await conn.rollback().catch(rollbackErr => console.log(`WARN: DB rollback error ${rollbackErr}`));
       throw err;
     } finally {

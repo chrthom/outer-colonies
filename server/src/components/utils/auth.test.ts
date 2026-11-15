@@ -78,7 +78,13 @@ describe('AuthUtils', () => {
       jest.spyOn(DBDailiesDAO, 'create').mockResolvedValue(undefined);
       const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
       jest.spyOn(DBMagicLinksDAO, 'createAccountActivation').mockResolvedValue('activation-uuid');
-      const mailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockImplementation(() => undefined);
+      const callOrder: string[] = [];
+      fakeConnection.commit.mockImplementation(async () => {
+        callOrder.push('commit');
+      });
+      const mailSpy = jest
+        .spyOn(Mailer, 'sendAccountActivation')
+        .mockImplementation(() => callOrder.push('mail'));
 
       const result = await AuthUtils.register(registrationData);
 
@@ -92,20 +98,23 @@ describe('AuthUtils', () => {
         expect(inUse).toBe(true);
       });
       expect(mailSpy).toHaveBeenCalledWith(credential.email, credential.username, 'activation-uuid');
+      expect(callOrder).toEqual(['commit', 'mail']);
     });
 
-    it('should roll back the transaction when a registration statement fails', async () => {
+    it('should roll back the transaction and send no activation mail when a registration statement fails', async () => {
       setupFakePool();
       jest.spyOn(DBCredentialsDAO, 'create').mockResolvedValue(undefined);
       jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(credential);
       jest.spyOn(DBProfilesDAO, 'create').mockRejectedValue(new Error('profile insert failed'));
       const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
+      const mailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockImplementation(() => undefined);
 
       await expect(AuthUtils.register(registrationData)).rejects.toThrow('profile insert failed');
 
       expect(fakeConnection.commit).not.toHaveBeenCalled();
       expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
       expect(deckCreateSpy).not.toHaveBeenCalled();
+      expect(mailSpy).not.toHaveBeenCalled();
     });
   });
 });

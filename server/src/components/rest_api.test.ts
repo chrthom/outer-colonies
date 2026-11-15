@@ -7,7 +7,7 @@ import DBDecksDAO from './persistence/db_decks';
 import DBItemsDAO from './persistence/db_items';
 import DBProfilesDAO from './persistence/db_profiles';
 import CardCollection from './cards/collection/card_collection';
-import { buyBooster, getDailies, getDailiesResponse, openItem } from './rest_api';
+import { buyBooster, getDailies, getDailiesResponse, INVALID_ITEM_TYPE, openItem } from './rest_api';
 import * as dailySelector from './utils/daily_selector';
 
 describe('RESTAPI Daily Endpoints', () => {
@@ -71,7 +71,7 @@ describe('RESTAPI Item and Booster Endpoints', () => {
       setupFakePool();
       const item = { itemId: 7, type: ItemType.Booster, content: '3' };
       jest.spyOn(DBItemsDAO, 'getByUserId').mockResolvedValue([item]);
-      const deleteSpy = jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(undefined);
+      const deleteSpy = jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(1);
       const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
       jest
         .spyOn(CardCollection, 'generateBoosterContent')
@@ -101,7 +101,7 @@ describe('RESTAPI Item and Booster Endpoints', () => {
       ];
       const item = { itemId: 8, type: ItemType.Box, content: JSON.stringify(content) };
       jest.spyOn(DBItemsDAO, 'getByUserId').mockResolvedValue([item]);
-      const deleteSpy = jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(undefined);
+      const deleteSpy = jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(1);
       const createBoosterSpy = jest.spyOn(DBItemsDAO, 'createBooster').mockResolvedValue(undefined);
       const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
       const increaseSolSpy = jest.spyOn(DBProfilesDAO, 'increaseSol').mockResolvedValue(undefined);
@@ -130,11 +130,39 @@ describe('RESTAPI Item and Booster Endpoints', () => {
       expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
     });
 
+    it('should reject with NotFound when the item was already deleted concurrently', async () => {
+      setupFakePool();
+      const item = { itemId: 7, type: ItemType.Booster, content: '3' };
+      jest.spyOn(DBItemsDAO, 'getByUserId').mockResolvedValue([item]);
+      jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(0);
+      const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
+      jest.spyOn(CardCollection, 'generateBoosterContent').mockReturnValue(<any>[{ id: 101 }]);
+
+      await expect(openItem(42, 7)).rejects.toBe(APIRejectReason.NotFound);
+
+      expect(deckCreateSpy).not.toHaveBeenCalled();
+      expect(fakeConnection.commit).not.toHaveBeenCalled();
+      expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should reject with INVALID_ITEM_TYPE and not delete items of unknown type', async () => {
+      setupFakePool();
+      const item = { itemId: 10, type: <any>'quest', content: '3' };
+      jest.spyOn(DBItemsDAO, 'getByUserId').mockResolvedValue([item]);
+      const deleteSpy = jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(1);
+
+      await expect(openItem(42, 10)).rejects.toBe(INVALID_ITEM_TYPE);
+
+      expect(deleteSpy).not.toHaveBeenCalled();
+      expect(fakeConnection.commit).not.toHaveBeenCalled();
+      expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
+    });
+
     it('should roll back when a granted card insert fails', async () => {
       setupFakePool();
       const item = { itemId: 7, type: ItemType.Booster, content: '3' };
       jest.spyOn(DBItemsDAO, 'getByUserId').mockResolvedValue([item]);
-      jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(undefined);
+      jest.spyOn(DBItemsDAO, 'delete').mockResolvedValue(1);
       jest.spyOn(DBDecksDAO, 'create').mockRejectedValue(new Error('insert failed'));
       jest.spyOn(CardCollection, 'generateBoosterContent').mockReturnValue(<any>[{ id: 101 }]);
 

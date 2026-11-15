@@ -53,7 +53,7 @@ export default class Auth {
     await DBMagicLinksDAO.delete(resetId);
   }
   static async register(registrationData: AuthRegisterRequest): Promise<DBCredential> {
-    return DBConnection.instance.transaction(async () => {
+    const { credential, activationUuid } = await DBConnection.instance.transaction(async () => {
       await DBCredentialsDAO.create(
         registrationData.username,
         registrationData.password,
@@ -66,10 +66,13 @@ export default class Auth {
       for (const card of CardCollection.starterDecks[registrationData.starterDeck]) {
         await DBDecksDAO.create(card.id, credential.userId, true);
       }
-      const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
-      Mailer.sendAccountActivation(credential.email, credential.username, uuid);
-      return credential;
+      const activationUuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
+      return { credential, activationUuid };
     });
+    // The mail is sent only after the transaction committed, so no activation link is sent for
+    // an account that was rolled back.
+    Mailer.sendAccountActivation(credential.email, credential.username, activationUuid);
+    return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
     const credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password).catch(

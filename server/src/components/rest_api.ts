@@ -435,11 +435,13 @@ export async function getDailies(userId: number): Promise<DailyGetResponse> {
 }
 
 // Sentinel rejection value for items whose type is neither box nor booster.
-const INVALID_ITEM_TYPE = 'invalid_item_type';
+export const INVALID_ITEM_TYPE = 'invalid_item_type';
 
 /**
  * Opens an item in a single database transaction: the item is deleted and all granted cards, sol
- * and boosters are inserted before the transaction commits. Rejects with
+ * and boosters are inserted before the transaction commits. The delete is guarded by an
+ * affected-rows check, so a concurrent open of the same item rejects with
+ * `APIRejectReason.NotFound` instead of granting the content twice. Rejects with
  * `APIRejectReason.NotFound` if the user owns no such item and with `INVALID_ITEM_TYPE` for
  * unknown item types; any failure rolls the whole operation back.
  * @param userId id of the user opening the item
@@ -453,7 +455,7 @@ export async function openItem(userId: number, itemId: number): Promise<ItemList
     if (!item) return Promise.reject(APIRejectReason.NotFound);
     if (item.type == ItemType.Booster) {
       const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
-      await DBItemsDAO.delete(itemId);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
       for (const cardId of cards) {
         await DBDecksDAO.create(cardId, userId, false, true);
       }
@@ -466,7 +468,7 @@ export async function openItem(userId: number, itemId: number): Promise<ItemList
       };
     } else if (item.type == ItemType.Box) {
       const content = <DBItemBoxContent[]>JSON.parse(item.content);
-      await DBItemsDAO.delete(itemId);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
       for (const entry of content) {
         switch (entry.type) {
           case ItemBoxContentType.Booster:
