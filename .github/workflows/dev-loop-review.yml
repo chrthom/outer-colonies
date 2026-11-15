@@ -238,6 +238,25 @@ jobs:
                 merge_only="false"
                 echo "A consumable findings review stands on the pre-merge head $BEFORE_SHA; keeping the full review so its findings are re-surfaced on the merged head."
               fi
+              # The branch side must actually have been reviewed at the
+              # pre-merge head: a marker review (any verdict) whose
+              # commit_id is the pre-merge head. Without this check an
+              # unreviewed head - e.g. the implementer's fresh push whose
+              # review is still waiting on CI - would absorb a scan-
+              # dispatched scripted merge and then skip its only review on
+              # the merged head. A CHANGES_NEEDED marker at the pre-merge
+              # head is already excluded by the pending-findings guard
+              # above, so a marker here means CLEAN (a NEEDS_HUMAN verdict
+              # parks the PR, which never reaches this branch). Fail closed
+              # to the full review: an unreadable poll must not skip the
+              # review of an unverified head.
+              reviewed_before="$(gh api repos/${GH_REPO}/pulls/$PR_NUMBER/reviews --paginate \
+                | jq -rs --arg sha "$BEFORE_SHA" \
+                  '(add // []) | any(.[]; ((.body // "") | startswith("<!-- dev-loop-review -->")) and .commit_id == $sha)' 2>/dev/null || true)"
+              if [ "$reviewed_before" != "true" ]; then
+                merge_only="false"
+                echo "No marker review stands on the pre-merge head $BEFORE_SHA (poll: ${reviewed_before:-failed}); the branch side is not verified. Keeping the full review."
+              fi
             fi
           fi
           # CI gate (misc/dev-loop.md): review only a CI-green, format-stable
