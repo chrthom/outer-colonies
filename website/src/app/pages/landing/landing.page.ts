@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
 import { MatAnchor } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { ContentBoxComponent } from '../../components/content-box/content-box.co
   styleUrls: ['./landing.page.scss'],
   imports: [RouterLink, MatAnchor, MatTooltip, ContentBoxComponent]
 })
-export class LandingPage {
+export class LandingPage implements OnDestroy {
   private meta = inject(Meta);
 
   private readonly description =
@@ -28,6 +28,17 @@ export class LandingPage {
     this.meta.updateTag({ property: 'og:title', content: 'Outer Colonies – Das Online-Sammelkartenspiel' });
     this.meta.updateTag({ property: 'og:description', content: this.description });
     this.meta.updateTag({ property: 'og:image', content: this.heroArtworkUrl });
+  }
+
+  /**
+   * Removes the landing page meta tags again so they do not persist in the DOM
+   * on all subsequent SPA routes.
+   */
+  ngOnDestroy(): void {
+    this.meta.removeTag('name="description"');
+    this.meta.removeTag('property="og:title"');
+    this.meta.removeTag('property="og:description"');
+    this.meta.removeTag('property="og:image"');
   }
 
   /** Hero background: gradient overlay on top of the hero artwork (star field as long as the artwork is pending). */

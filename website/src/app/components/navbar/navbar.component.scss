@@ -84,20 +84,37 @@ h2.navbar-right {
   z-index: 51;
 }
 
-#navbar-anon-links {
+/*
+ * Anonymous three-zone layout: logo (space reserved via padding) / centered lore links / auth actions.
+ * The flex zones reserve their space, so the links can never collide with logo or action buttons.
+ */
+#navbar-anon-zone {
   position: absolute;
   top: 0;
-  left: calc(50% + 80px);
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   height: 62px;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  padding-left: 110px; /* reserves the logo zone on the left */
+}
+
+#navbar-anon-links {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden; /* clips instead of overlapping the action buttons if the viewport is too narrow */
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 32px;
   a {
     font-family: "Latin Modern Mono Caps";
     font-size: 16px;
     color: var(--color-primary-light);
     text-decoration: none;
+    white-space: nowrap;
     &.active,
     &:hover {
       color: var(--color-primary);
@@ -107,9 +124,7 @@ h2.navbar-right {
 }
 
 #navbar-anon-actions {
-  position: absolute;
-  top: 0;
-  right: 0;
+  flex: 0 0 auto;
   height: 62px;
   display: flex;
   align-items: center;
@@ -117,7 +132,7 @@ h2.navbar-right {
   padding: 0 15px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   #navbar-anon-links {
     gap: 20px;
     a {
@@ -126,11 +141,18 @@ h2.navbar-right {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   #navbar-anon-links {
     gap: 12px;
     a {
       font-size: 13px;
     }
+  }
+}
+
+@media (max-width: 760px) {
+  /* The text links no longer fit next to logo and action buttons; the landing page teasers keep the lore pages reachable. */
+  #navbar-anon-links {
+    display: none;
   }
 }

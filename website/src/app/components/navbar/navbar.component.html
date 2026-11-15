@@ -49,15 +49,17 @@
       <img src="../../../assets/icons/logout.png" />
     </div>
   } @else {
-    <nav id="navbar-anon-links">
-      <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
-      <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
-      <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
-      <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
-    </nav>
-    <div id="navbar-anon-actions">
-      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
-      <a mat-raised-button routerLink="/login">Login</a>
+    <div id="navbar-anon-zone">
+      <nav id="navbar-anon-links">
+        <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
+        <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
+        <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
+        <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
+      </nav>
+      <div id="navbar-anon-actions">
+        <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
+        <a mat-raised-button routerLink="/login">Login</a>
+      </div>
     </div>
   }
 </div>

@@ -78,17 +78,20 @@ const routes: Routes = [
   {
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
-    component: ActivateAccountPage
+    component: ActivateAccountPage,
+    title: 'Outer Colonies – Nutzerkonto aktivieren'
   },
   {
     path: 'confirm-email/:id',
     canActivate: [publicGuardFn],
-    component: ConfirmEmailPage
+    component: ConfirmEmailPage,
+    title: 'Outer Colonies – E-Mail bestätigen'
   },
   {
     path: 'deck',
     canActivate: [privateGuardFn],
-    component: DeckPage
+    component: DeckPage,
+    title: 'Outer Colonies – Deck-Manager'
   },
   {
     path: 'editions',
@@ -105,7 +108,8 @@ const routes: Routes = [
   {
     path: 'forgot-password',
     canActivate: [publicGuardFn],
-    component: ForgotPasswordPage
+    component: ForgotPasswordPage,
+    title: 'Outer Colonies – Passwort vergessen'
   },
   {
     path: 'history',
@@ -116,47 +120,56 @@ const routes: Routes = [
   {
     path: 'home',
     canActivate: [privateGuardFn],
-    component: HomePage
+    component: HomePage,
+    title: 'Outer Colonies – Spielsuche & Aktuelles'
   },
   {
     path: 'imprint',
     canActivate: [publicGuardFn],
-    component: ImprintPage
+    component: ImprintPage,
+    title: 'Outer Colonies – Impressum'
   },
   {
     path: 'login',
     canActivate: [publicGuardFn],
-    component: LoginPage
+    component: LoginPage,
+    title: 'Outer Colonies – Login'
   },
   {
     path: 'privacy',
     canActivate: [publicGuardFn],
-    component: DataPrivacyPage
+    component: DataPrivacyPage,
+    title: 'Outer Colonies – Datenschutzerklärung'
   },
   {
     path: 'profile',
     canActivate: [privateGuardFn],
-    component: ProfilePage
+    component: ProfilePage,
+    title: 'Outer Colonies – Profil'
   },
   {
     path: 'register',
     canActivate: [publicGuardFn],
-    component: RegisterPage
+    component: RegisterPage,
+    title: 'Outer Colonies – Registrieren'
   },
   {
     path: 'reset-password/:id',
     canActivate: [publicGuardFn],
-    component: ResetPasswordPage
+    component: ResetPasswordPage,
+    title: 'Outer Colonies – Neues Passwort setzen'
   },
   {
     path: 'rules',
     canActivate: [privateGuardFn],
-    component: RulesPage
+    component: RulesPage,
+    title: 'Outer Colonies – Spielregeln'
   },
   {
     path: 'trade',
     canActivate: [privateGuardFn],
-    component: TradePage
+    component: TradePage,
+    title: 'Outer Colonies – Inventar & Markt'
   },
   {
     path: 'world',
