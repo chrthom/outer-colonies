@@ -37,6 +37,7 @@ import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 import OptionPicker from '../components/option_picker';
+import StateUpdateSequencer from '../utils/state_update_sequencer';
 
 interface ActiveCards {
   hand?: string;
@@ -78,6 +79,10 @@ export default class Game extends Phaser.Scene {
   interceptShipIds: Array<string> = [];
   retractCardsExist = false;
   isAttackAnimating = false;
+
+  private stateUpdateSequencer = new StateUpdateSequencer((delayMs, callback) =>
+    this.time.delayedCall(delayMs, callback)
+  );
 
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
@@ -158,28 +163,46 @@ export default class Game extends Phaser.Scene {
     new GameOverIndicator(this, result);
   }
 
+  /**
+   * Applies a new game state to the UI via a cancel-and-replace sequencer:
+   * `this.state` is stored immediately as the single source of truth, while
+   * the animation steps are enqueued. If a newer state arrives while an
+   * older chain is still running, the queued steps of the older chain are
+   * cancelled and the new chain reconciles directly to the newest state,
+   * animating only the remaining delta.
+   */
   updateState(state: ClientState) {
     const previousTurnPhase = this.state.turnPhase;
     this.state = state;
-    //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     this.resetSelection();
-    this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
-      const newHandCards = this.newHandCards;
-      this.retractCardsExist = false; // If true, then the hand animations are delayed
-      this.updateCardStacks(newHandCards);
-      this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-        this.updateHandCards(newHandCards, previousTurnPhase);
-        this.updateView();
-        this.highlightAttackIntervention();
-        this.time.delayedCall(animationConfig.duration.move, () => {
-          if (this.state == state) {
-            this.player.discardPile.update(this.state.player.discardPileIds);
-            this.opponent.discardPile.update(this.state.opponent.discardPileIds);
-          }
-        });
-      });
-    });
+    const attackAnimating = this.animateAttack();
+    let newHandCards: ClientHandCard[] = [];
+    this.stateUpdateSequencer.run([
+      {
+        delay: () => (attackAnimating ? animationConfig.duration.attack : 0),
+        action: () => {
+          newHandCards = this.newHandCards;
+          this.retractCardsExist = false; // If true, then the hand animations are delayed
+          this.updateCardStacks(newHandCards);
+        }
+      },
+      {
+        delay: () => (this.retractCardsExist ? animationConfig.duration.move : 0),
+        action: () => {
+          this.updateHandCards(newHandCards, previousTurnPhase);
+          this.updateView();
+          this.highlightAttackIntervention();
+        }
+      },
+      {
+        delay: () => animationConfig.duration.move,
+        action: () => {
+          this.player.discardPile.update(this.state.player.discardPileIds);
+          this.opponent.discardPile.update(this.state.opponent.discardPileIds);
+        }
+      }
+    ]);
   }
 
   resetView(battleType?: BattleType) {

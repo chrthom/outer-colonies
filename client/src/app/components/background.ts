@@ -128,8 +128,8 @@ export default class Background {
   }
 
   update() {
-    this.checkPlayerOrbs();
     if (this.isGame) {
+      this.checkPlayerOrbs();
       const state = this.game.state;
       if (this.inCombatRaid) {
         if (this.isColonyOrb != !state.playerIsActive) {
@@ -530,7 +530,7 @@ export default class Background {
       y = (Math.random() - 0.25) * 2 * layoutConfig.scene.height;
     } else {
       y = this.randomBoolean()
-        ? layoutConfig.scene.width + backgroundConfig.animation.offDistance
+        ? layoutConfig.scene.height + backgroundConfig.animation.offDistance
         : -backgroundConfig.animation.offDistance;
       x = (Math.random() - 0.25) * 2 * layoutConfig.scene.width;
     }
@@ -557,6 +557,7 @@ export default class Background {
   }
 
   private get inStartOrBuildPhase(): boolean {
+    if (!this.isGame || !this.game.state) return false;
     return this.game.state.turnPhase == TurnPhase.Start || this.game.state.turnPhase == TurnPhase.Build;
   }
 }
