@@ -117,15 +117,10 @@ export default class ContinueButton {
     }
   }
   /**
-   * Queues the automatic Ready message for a pending player who cannot act,
-   * i.e. who can neither intercept in the build phase nor attack in the combat
-   * phase.
-   *
-   * update() runs on every updateView() call, i.e. on every state update and
-   * on every user interaction. To avoid duplicate Ready messages, the emission
-   * is queued at most once per state (which corresponds to one pending action);
-   * a queued emission from a previous state is canceled as soon as it is no
-   * longer needed.
+   * Queues the automatic Ready for a pending player who can neither intercept
+   * (build) nor attack (combat), at most once per state (one pending action);
+   * a queued emission is canceled at the next update() call when no longer
+   * needed.
    */
   private updateAutoReady() {
     const autoReady = this.pendingAutoReady;
@@ -238,11 +233,8 @@ export default class ContinueButton {
   private show(text: string, button: string, onClickAction?: () => void) {
     this.onClickAction = onClickAction
       ? () => {
-          // The player acts himself, so a queued automatic Ready message is
-          // obsolete. Only its timer is removed while the state marker is
-          // kept, so that subsequent update() calls for the same state (e.g.
-          // user interactions while waiting for the server) do not queue a
-          // second Ready for the same pending action.
+          // Manual click makes a queued auto-ready obsolete; keep the state
+          // marker so the same state does not queue a second Ready.
           this.cancelAutoReadyTimer();
           onClickAction();
         }
