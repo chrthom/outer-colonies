@@ -1,4 +1,8 @@
 import Game from '../scenes/game';
+import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
+import ClientPlannedBattle, {
+  ClientPlannedBattleHelper
+} from '../../../../server/src/shared/interfaces/client_planned_battle';
 import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
 
 /**
@@ -69,6 +73,7 @@ export function makeGameObjectStub(): GameObjectStub {
 /** Stub of the `scene.add` game object factory. */
 export interface AddStub {
   graphics: jasmine.Spy;
+  group: jasmine.Spy;
   image: jasmine.Spy;
   particles: jasmine.Spy;
   text: jasmine.Spy;
@@ -78,6 +83,7 @@ export interface AddStub {
 export function makeAddStub(): AddStub {
   return {
     graphics: jasmine.createSpy('add.graphics').and.callFake(makeGameObjectStub),
+    group: jasmine.createSpy('add.group').and.callFake(makeGameObjectStub),
     image: jasmine.createSpy('add.image').and.callFake(makeGameObjectStub),
     particles: jasmine.createSpy('add.particles').and.callFake(makeGameObjectStub),
     text: jasmine.createSpy('add.text').and.callFake(makeGameObjectStub)
@@ -104,15 +110,41 @@ export function makeTimeStub(): TimeStub {
   return { delayedCall: jasmine.createSpy('time.delayedCall') };
 }
 
+/** Stub of the scene's fixed UI elements (`scene.obj`). */
+export interface ObjStub {
+  exitButton: { show: jasmine.Spy; hide: jasmine.Spy };
+}
+
+/** Creates a stub of the fixed UI elements with a spied exit button. */
+export function makeObjStub(): ObjStub {
+  return {
+    exitButton: {
+      show: jasmine.createSpy('exitButton.show'),
+      hide: jasmine.createSpy('exitButton.hide')
+    }
+  };
+}
+
 /** Typed stub of the game scene the client components render on. */
 export interface SceneStub {
   add: AddStub;
   getPlayerState: jasmine.Spy;
   getPlayerUI: jasmine.Spy;
   retractCardsExist: boolean;
-  state: ClientState;
+  /**
+   * Scene state; defaults to a deep copy of `emptyClientState` so no spec can
+   * corrupt the shared constant. Pass `undefined` to mimic a scene without
+   * state, e.g. the matchmaking scene.
+   */
+  state?: ClientState;
   time: TimeStub;
   tweens: TweensStub;
+  /** The battle the player is planning; defaults to `ClientPlannedBattleHelper.empty` like the `Game` scene. */
+  plannedBattle?: ClientPlannedBattle;
+  /** Fixed UI elements; defaults to a fresh `makeObjStub()`. */
+  obj?: ObjStub;
+  /** Game parameters; only set on a game scene, so their absence mimics a matchmaking scene. */
+  gameParams?: ClientGameParams;
 }
 
 /**
@@ -128,12 +160,14 @@ export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
     getPlayerState: jasmine.createSpy('getPlayerState'),
     getPlayerUI: jasmine.createSpy('getPlayerUI'),
     retractCardsExist: false,
-    state: emptyClientState,
+    state: structuredClone(emptyClientState),
     time: makeTimeStub(),
-    tweens: makeTweensStub()
+    tweens: makeTweensStub(),
+    plannedBattle: ClientPlannedBattleHelper.empty,
+    obj: makeObjStub()
   };
   stub.getPlayerState.and.callFake((isPlayer: boolean) =>
-    isPlayer ? stub.state.player : stub.state.opponent
+    isPlayer ? stub.state?.player : stub.state?.opponent
   );
   stub.getPlayerUI.and.callFake(() => ({ hand: [] }));
   Object.assign(stub, overrides);
