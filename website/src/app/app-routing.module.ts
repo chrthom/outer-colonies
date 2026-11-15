@@ -56,6 +56,20 @@ const privateGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
 const publicGuardFn: CanActivateFn = () => checkHttps();
 
 /**
+ * Resolves deep links of the form /?p=<path> (the only deep-link form that works behind the
+ * production hosting, see #253) by navigating to the target route, so the target route's own
+ * guards apply - anonymous deep links to private routes still cascade to /login.
+ */
+const deepLinkGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const initialPath = route.queryParams['p'];
+  if (initialPath) {
+    inject(Router).navigate(['/' + initialPath]);
+    return false;
+  }
+  return true;
+};
+
+/**
  * Redirects already authenticated visitors from the public landing page to the game home page,
  * so logged-in players always end up in the game instead of on the marketing page.
  */
@@ -179,7 +193,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [publicGuardFn, authenticatedGuardFn],
+    canActivate: [publicGuardFn, deepLinkGuardFn, authenticatedGuardFn],
     component: LandingPage,
     pathMatch: 'full',
     title: 'Outer Colonies – Das Online-Sammelkartenspiel'

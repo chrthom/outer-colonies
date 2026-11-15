@@ -99,6 +99,25 @@ describe('AppRoutingModule', () => {
     expect(router.url).toBe('/login');
     expect(fixture.nativeElement.querySelector('oc-page-login')).toBeTruthy();
   }));
+
+  it('resolves ?p= deep links to private routes with the /login redirect for anonymous visitors', fakeAsync(() => {
+    router.navigate(['/'], { queryParams: { p: 'deck' } });
+    tick();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/login');
+    expect(fixture.nativeElement.querySelector('oc-page-login')).toBeTruthy();
+  }));
+
+  it('resolves ?p= deep links to public lore pages', fakeAsync(() => {
+    router.navigate(['/'], { queryParams: { p: 'world' } });
+    tick();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/world');
+    expect(fixture.nativeElement.querySelector('oc-page-world')).toBeTruthy();
+    expect(title.getTitle()).toBe('Outer Colonies – Die Welt');
+  }));
 });
 
 function emptyDailies(): DailyGetResponse {

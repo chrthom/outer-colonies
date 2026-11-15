@@ -58,6 +58,7 @@ describe('NavbarComponent', () => {
     expect(iconElements.length).toBe(5);
     expect(element.querySelector('.user-name')?.textContent).toBe('testuser');
     expect(element.querySelector('#navbar-anon-links')).toBeFalsy();
+    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(false);
   });
 
   it('should render public links and auth buttons for anonymous users', () => {
@@ -78,5 +79,7 @@ describe('NavbarComponent', () => {
     expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
     expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Login']);
     expect(element.querySelector('.navbar-element.navbar-center')).toBeFalsy();
+    // The compact logo keeps the logo box within the space the anon zone reserves for it:
+    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(true);
   });
 });

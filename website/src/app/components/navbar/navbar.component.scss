@@ -85,7 +85,20 @@ h2.navbar-right {
 }
 
 /*
- * Anonymous three-zone layout: logo (space reserved via padding) / centered lore links / auth actions.
+ * Compact logo variant for the anonymous navbar: the logo has no intrinsic size rule otherwise
+ * (natural 300x188 plus padding = ~350px box), which would overlap the centered lore links.
+ * Shrunk to 100px the box (100px + 2x10px padding = 120px) fits the space #navbar-anon-zone reserves.
+ */
+#navbar-logo.compact {
+  padding: 15px 10px;
+  transform: translateY(-15%);
+  img {
+    width: 100px;
+  }
+}
+
+/*
+ * Anonymous three-zone layout: compact logo (space reserved via padding) / centered lore links / auth actions.
  * The flex zones reserve their space, so the links can never collide with logo or action buttons.
  */
 #navbar-anon-zone {
@@ -97,7 +110,7 @@ h2.navbar-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-left: 110px; /* reserves the logo zone on the left */
+  padding-left: 120px; /* reserves exactly the compact logo box (see #navbar-logo.compact) */
 }
 
 #navbar-anon-links {

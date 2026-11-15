@@ -66,6 +66,15 @@ describe('LandingPage', () => {
     expect(meta.getTag('property="og:image"')?.content).toBe(`${environment.url.assets}/website/hero.jpg`);
   });
 
+  it('should remove the meta tags again on destroy', () => {
+    component.ngOnDestroy();
+
+    expect(meta.getTag('name="description"')).toBeNull();
+    expect(meta.getTag('property="og:title"')).toBeNull();
+    expect(meta.getTag('property="og:description"')).toBeNull();
+    expect(meta.getTag('property="og:image"')).toBeNull();
+  });
+
   it('should compose the hero background from gradient, artwork and star field fallback', () => {
     const background = component.heroBackground;
     expect(background).toContain('linear-gradient(to top');

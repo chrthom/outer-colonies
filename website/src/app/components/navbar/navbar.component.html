@@ -1,6 +1,6 @@
 <div id="navbar-space"></div>
 <div id="navbar-main">
-  <div id="navbar-logo" routerLink="/">
+  <div id="navbar-logo" [class.compact]="!isLoggedIn" routerLink="/">
     <img src="../../../assets/logo.png" />
   </div>
   @if (isLoggedIn) {
