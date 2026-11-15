@@ -1,10 +1,6 @@
 import CombatRangeIndicator from './combat_range_indicator';
-import { BattleType, InterventionType } from '../../../../../server/src/shared/config/enums';
-import {
-  ClientIntervention,
-  ClientState,
-  emptyClientState
-} from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, InterventionType } from '@shared/config/enums';
+import { ClientIntervention, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { asGameScene, GameObjectStub, makeSceneStub, SceneStub } from '../../testing/phaser_stubs';
 
 const makeScene = (state: ClientState): SceneStub => makeSceneStub({ state });

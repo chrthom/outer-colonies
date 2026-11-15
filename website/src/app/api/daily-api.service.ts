@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DailyGetResponse } from '../../../../server/src/shared/interfaces/rest_api';
+import { DailyGetResponse } from '@shared/interfaces/rest_api';
 import OCApi from './api';
 
 @Injectable({

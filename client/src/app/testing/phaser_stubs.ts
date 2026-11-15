@@ -1,9 +1,7 @@
 import Game from '../scenes/game';
-import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
-import ClientPlannedBattle, {
-  ClientPlannedBattleHelper
-} from '../../../../server/src/shared/interfaces/client_planned_battle';
-import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import ClientGameParams from '@shared/interfaces/client_game_params';
+import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
+import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 
 /**
  * Shared Jasmine stubs for the Phaser scene API used by the client components.

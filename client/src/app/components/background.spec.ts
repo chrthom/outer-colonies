@@ -1,6 +1,6 @@
 import Background from './background';
-import { TurnPhase } from '../../../../server/src/shared/config/enums';
-import { emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import { TurnPhase } from '@shared/config/enums';
+import { emptyClientState } from '@shared/interfaces/client_state';
 import { backgroundConfig } from '../config/background';
 import { Coordinates, layoutConfig } from '../config/layout';
 import Game from '../scenes/game';

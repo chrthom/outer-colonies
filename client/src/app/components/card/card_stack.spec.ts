@@ -1,7 +1,7 @@
 import CardStack from './card_stack';
-import { ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
-import { Zone } from '../../../../../server/src/shared/config/enums';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { ClientCardStack } from '@shared/interfaces/client_state';
+import { Zone } from '@shared/config/enums';
+import { constants } from '@shared/config/constants';
 import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {

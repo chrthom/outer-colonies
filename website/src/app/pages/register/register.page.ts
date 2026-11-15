@@ -13,7 +13,7 @@ import { ErrorStateMatcher, MatOption } from '@angular/material/core';
 import { Observable, map } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
-import { MultipleCards, starterDecks } from '../../../../../server/src/shared/config/starter_decks';
+import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';

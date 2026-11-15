@@ -1,10 +1,6 @@
 import Game from './game';
-import { GameResultType, TurnPhase } from '../../../../server/src/shared/config/enums';
-import {
-  ClientHandCard,
-  ClientState,
-  emptyClientState
-} from '../../../../server/src/shared/interfaces/client_state';
+import { GameResultType, TurnPhase } from '@shared/config/enums';
+import { ClientHandCard, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
 import { makeAddStub, makeTweensStub } from '../testing/phaser_stubs';
 
