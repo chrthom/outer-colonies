@@ -4,6 +4,8 @@ import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import { MsgTypeInbound, Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
 import { designConfig } from '../../config/design';
+import { layoutConfig } from '../../config/layout';
+import { animationConfig } from '../../config/animation';
 import { CardXPosition, CardYPosition } from '../perspective';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
@@ -67,10 +69,12 @@ function makeScene(): any {
     getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     retractCardsExist: false,
+    activeCards: {},
+    isAttackAnimating: false,
     socket: { emit: jasmine.createSpy('emit') },
     time: { delayedCall: jasmine.createSpy('delayedCall') },
     add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
-    tweens: jasmine.createSpyObj('tweens', ['add']),
+    tweens: jasmine.createSpyObj('tweens', ['add', 'killTweensOf']),
     children: jasmine.createSpyObj('children', ['bringToTop'])
   };
   scene.add.image.and.callFake(makeImageStub);
@@ -523,6 +527,147 @@ describe('CardStack', () => {
       const broughtPlanes = scene.children.bringToTop.calls.allArgs().map(([plane]: any[]) => plane);
       // planes are brought to top in data order, so the hull ends up topmost
       expect(broughtPlanes).toEqual([...planesOf(attachment), ...planesOf(hull)]);
+    });
+
+    it('stops tweens still running on kept cards before re-tweening them', () => {
+      // Regression: the kept card's planes are reused, so a tween from a
+      // previous update or hover expand/collapse kept writing alongside the
+      // new one.
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', false, false));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+      scene.tweens.killTweensOf.calls.reset();
+
+      cs.update(makeData({ cards: [realCardData('a', false, false)] }));
+
+      const tweenedPlanes = (c: any) => [c.image, c.imageHighlight, c.imageMask];
+      expect(scene.tweens.killTweensOf).toHaveBeenCalledWith([
+        ...tweenedPlanes(card).map((p: any) => p.modelPosition),
+        ...tweenedPlanes(card).map((p: any) => p.modelRotation)
+      ]);
+    });
+
+    it('tweens a kept button to the new card position instead of snapping it', () => {
+      // Regression: refresh() teleported the button to the card's target
+      // position while the card itself tweens there, so a visible button
+      // floated detached from its card for the whole move animation.
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const card = makeRealCard(scene, realCardData('a', true, false));
+      cs.cards = [card];
+      seedSummaryBox(cs);
+      const button: any = card.retractCardButton;
+      button.image.setPosition.calls.reset();
+      scene.tweens.add.calls.reset();
+
+      cs.update(makeData({ cards: [realCardData('a', true, false)] }));
+
+      expect(button.image.setPosition).not.toHaveBeenCalled();
+      const moveTween = scene.tweens.add.calls
+        .allArgs()
+        .map(([config]: any[]) => config)
+        .find(
+          (config: any) =>
+            config.targets === button.image && config.duration === animationConfig.duration.move
+        );
+      expect(moveTween).toBeDefined();
+      expect(moveTween.ease).toBe('Cubic.easeInOut'); // in sync with the card's move tween
+      expect(moveTween.x).toBe(cs.targetX.value2d + layoutConfig.game.cards.retractCardButton.xOffset);
+      expect(moveTween.y).toBe(cs.targetY(0).value2d + layoutConfig.game.cards.retractCardButton.yOffset);
+    });
+  });
+
+  describe('update with real Card objects (hover state)', () => {
+    const stackCard = (uuid: string) => ({
+      uuid,
+      id: 1,
+      index: 0,
+      battleReady: false,
+      retractable: true,
+      insufficientEnergy: false
+    });
+
+    function handlerOf(image: any, event: string): () => void {
+      return image.on.calls
+        .allArgs()
+        .filter((args: any[]) => args[0] == event)
+        .pop()![1];
+    }
+
+    function makeHoveredStack(): { cs: CardStack; scene: any; highlight: jasmine.Spy } {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData({ cards: [stackCard('a'), stackCard('b')] }));
+      cs.init();
+      spyOn(cs.summaryBox, 'update');
+      const highlight = spyOn(cs.summaryBox, 'highlight');
+      return { cs, scene, highlight };
+    }
+
+    it('re-applies the hover state after an update while the pointer rests on the stack', () => {
+      // Regression: the reused card planes never get a new pointerover from
+      // Phaser's input poll, so the stack stayed collapsed after a state
+      // update until the pointer fully exited and re-entered a card.
+      const { cs, highlight } = makeHoveredStack();
+      const imageA = (cs.cards[0] as any).image;
+      const buttonA: any = (cs.cards[0] as any).retractCardButton;
+      const buttonB: any = (cs.cards[1] as any).retractCardButton;
+      spyOn(buttonA, 'show');
+      spyOn(buttonB, 'show');
+      handlerOf(imageA, 'pointerover')(); // pointer rests on the stack
+      buttonA.show.calls.reset();
+      buttonB.show.calls.reset();
+      imageA.setDepth.calls.reset();
+      highlight.calls.reset();
+
+      cs.update(makeData({ cards: [stackCard('a'), stackCard('b')] }));
+
+      expect(buttonA.show).toHaveBeenCalledWith(
+        jasmine.any(Number),
+        jasmine.any(Number),
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(buttonB.show).toHaveBeenCalledWith(
+        jasmine.any(Number),
+        jasmine.any(Number),
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(imageA.setDepth).toHaveBeenCalledWith(layoutConfig.depth.cardStackExpanded);
+      expect(highlight).toHaveBeenCalled();
+    });
+
+    it('does not re-apply the hover state when the stack is not hovered', () => {
+      const { cs, highlight } = makeHoveredStack();
+      const imageA = (cs.cards[0] as any).image;
+      const buttonA: any = (cs.cards[0] as any).retractCardButton;
+      spyOn(buttonA, 'show');
+
+      cs.update(makeData({ cards: [stackCard('a'), stackCard('b')] }));
+
+      expect(buttonA.show).not.toHaveBeenCalled();
+      expect(highlight).not.toHaveBeenCalled();
+      expect(imageA.setDepth).not.toHaveBeenCalledWith(layoutConfig.depth.cardStackExpanded);
+    });
+
+    it('does not re-apply the hover state after the pointer left the stack', () => {
+      const { cs, highlight } = makeHoveredStack();
+      const imageA = (cs.cards[0] as any).image;
+      const buttonA: any = (cs.cards[0] as any).retractCardButton;
+      spyOn(buttonA, 'show');
+      handlerOf(imageA, 'pointerover')(); // pointer enters the stack
+      handlerOf(imageA, 'pointerout')(); // ... and leaves it again
+      buttonA.show.calls.reset();
+      imageA.setDepth.calls.reset();
+      highlight.calls.reset();
+
+      cs.update(makeData({ cards: [stackCard('a'), stackCard('b')] }));
+
+      expect(buttonA.show).not.toHaveBeenCalled();
+      expect(highlight).not.toHaveBeenCalled();
+      expect(imageA.setDepth).not.toHaveBeenCalledWith(layoutConfig.depth.cardStackExpanded);
     });
   });
 });

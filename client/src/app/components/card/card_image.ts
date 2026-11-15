@@ -178,6 +178,23 @@ export default class CardImage {
     );
     return this;
   }
+  /**
+   * Stops the tweens currently running on this card's planes (their
+   * modelPosition/modelRotation objects). The planes are reused across state
+   * updates, so a tween from a previous update or hover expand/collapse may
+   * still be writing them: call this before adding a new tween so only the
+   * newest one animates the card.
+   */
+  protected killTweens(): void {
+    this.scene.tweens.killTweensOf([
+      this.image.modelPosition,
+      this.imageHighlight.modelPosition,
+      this.imageMask.modelPosition,
+      this.image.modelRotation,
+      this.imageHighlight.modelRotation,
+      this.imageMask.modelRotation
+    ]);
+  }
   setXRotation(x: number): this {
     this.forAllImages(i => (i.modelRotation.x = x));
     return this;

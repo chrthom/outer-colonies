@@ -58,6 +58,11 @@ export default class Card extends CardImage {
   }
   override tween(config: CardTweenConfig) {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
+    // Stack cards are kept across state updates: stop tweens still running
+    // from a previous update or hover expand/collapse (mirroring
+    // RetractCardButton's tweenAnimation?.stop()) so they do not keep writing
+    // the plane positions alongside this tween.
+    this.killTweens();
     super.tween(config);
   }
 }

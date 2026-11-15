@@ -19,6 +19,7 @@ export default class CardStack {
   summaryBox!: CardStackSummary;
   private scene: Game;
   private initialized = false;
+  private hovered = false;
 
   constructor(scene: Game, data: ClientCardStack) {
     this.scene = scene;
@@ -69,6 +70,11 @@ export default class CardStack {
     if (this.summaryBox) this.summaryBox.update();
     else this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
+    // The card planes are reused, so Phaser never re-fires pointerover on a
+    // pointer resting on the stack (pre-PR the recreated planes got it from
+    // the per-frame input poll): re-apply the hover state to re-expand the
+    // stack, re-show the retract buttons and re-highlight the summary box.
+    if (this.hovered) this.pointerover();
   }
   animateAttack(cardUUID: string) {
     this.cards.find(c => c.data.uuid == cardUUID)?.animateAttack();
@@ -160,6 +166,7 @@ export default class CardStack {
     );
   }
   private pointerover() {
+    this.hovered = true;
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
@@ -174,6 +181,7 @@ export default class CardStack {
     this.summaryBox.highlight();
   }
   private pointerout() {
+    this.hovered = false;
     this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();

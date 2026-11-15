@@ -44,18 +44,23 @@ export default class RetractCardButton {
     return this;
   }
   /**
-   * Syncs the button after a state update: moves it to the given card position
-   * and refreshes tint and visibility according to the critical state, without
+   * Syncs the button after a state update: tweens it to the given card
+   * position (same duration and ease as the card's move tween, so a visible
+   * button travels with its card instead of snapping ahead of it) and
+   * refreshes tint and visibility according to the critical state, without
    * recreating the image.
    * @param x target x position (2d) of the card
    * @param y target y position (2d) of the card
    */
   refresh(x: number, y: number): this {
     this.tweenAnimation?.stop();
-    this.image.setPosition(
-      x + layoutConfig.game.cards.retractCardButton.xOffset,
-      y + layoutConfig.game.cards.retractCardButton.yOffset
-    );
+    this.tweenAnimation = this.scene.tweens.add({
+      targets: this.image,
+      duration: animationConfig.duration.move,
+      ease: 'Cubic.easeInOut',
+      x: x + layoutConfig.game.cards.retractCardButton.xOffset,
+      y: y + layoutConfig.game.cards.retractCardButton.yOffset
+    });
     if (this.isCritical) {
       this.setTintCritical();
       this.bindInputHandlers(
