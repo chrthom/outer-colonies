@@ -29,7 +29,7 @@ export default class Background {
     this.scene = scene;
     this.zoneMarkers = scene.add.group();
     this.starsImage = scene.add
-      .image(0, this.starsYCorrdinates(this.currentRing), 'background')
+      .image(0, this.starsYCoordinates(this.currentRing), 'background')
       .setOrigin(0)
       .setDepth(layoutConfig.depth.background)
       .setAlpha(designConfig.alpha.faded);
@@ -209,7 +209,7 @@ export default class Background {
         duration:
           backgroundConfig.animation.durationNextRing * Math.abs(this.targetRing - this.currentRing) +
           backgroundConfig.animation.durationObjectTransition,
-        y: this.starsYCorrdinates(this.targetRing),
+        y: this.starsYCoordinates(this.targetRing),
         ease: 'Quad.inOut'
       });
     }
@@ -479,7 +479,7 @@ export default class Background {
     };
   }
 
-  private starsYCorrdinates(ring: number): number {
+  private starsYCoordinates(ring: number): number {
     return (
       -Math.floor(
         (backgroundConfig.animation.starsHeight - layoutConfig.scene.height) /

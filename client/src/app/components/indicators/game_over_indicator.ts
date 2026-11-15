@@ -54,7 +54,7 @@ export default class GameOverIndicator {
       .text(
         layoutConfig.scene.width / 2,
         layoutConfig.scene.height / 2 +
-          (gameResult.won ? confYOffset.solGain.winner : confYOffset.solGain.looser),
+          (gameResult.won ? confYOffset.solGain.winner : confYOffset.solGain.loser),
         `${this.gameResult.sol} Sol erhalten`
       )
       .setFontSize(layoutConfig.fontSize.normal)
