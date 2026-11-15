@@ -1,5 +1,5 @@
 import { designConfig } from 'src/app/config/design';
-import { ClientAttack } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientAttack } from '@shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
