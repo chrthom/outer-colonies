@@ -2,7 +2,7 @@
 name: Enhancement
 about: Suggest an idea to improve an existing feature
 title: ''
-labels: enhancement
+type: Feature
 assignees: chrthom
 
 ---

@@ -10,6 +10,7 @@ import {
 import { animationConfig } from '../config/animation';
 import { Socket } from 'socket.io-client';
 import Phaser from 'phaser';
+import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
 
 /** Fake socket that records the game listeners registered and removed by the scene. */
 interface SocketListenerStub {
@@ -27,6 +28,21 @@ interface GameSocketOverrides {
 /** Handle for overriding the private socket factory of the SocketService. */
 interface SocketServiceOverrides {
   createSocket: () => Socket;
+}
+
+/**
+ * Test handle for overriding the private update helpers and Phaser internals
+ * of a Game instance with spies and stubs.
+ */
+interface GameTestOverrides {
+  time: { delayedCall: FakeClock['delayedCall'] };
+  preloader: { destroy: () => void };
+  updateCardStacks: jasmine.Spy;
+  updateHandCards: jasmine.Spy;
+  updateView: jasmine.Spy;
+  highlightAttackIntervention: jasmine.Spy;
+  player: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
+  opponent: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
 }
 
 /**
@@ -70,21 +86,6 @@ function makeState(over: Partial<ClientState> = {}): ClientState {
   return { ...emptyClientState, ...over };
 }
 
-/**
- * Test handle for overriding the private update helpers and Phaser internals
- * of a Game instance with spies and stubs.
- */
-interface GameTestOverrides {
-  time: { delayedCall: FakeClock['delayedCall'] };
-  preloader: { destroy: () => void };
-  updateCardStacks: jasmine.Spy;
-  updateHandCards: jasmine.Spy;
-  updateView: jasmine.Spy;
-  highlightAttackIntervention: jasmine.Spy;
-  player: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
-  opponent: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
-}
-
 /** Creates a Game instance with a fake clock and spied update helpers. */
 function setupGame() {
   const game = new Game();
@@ -116,81 +117,19 @@ function setupGame() {
   };
 }
 
-interface ChainableStub {
-  postFX: { addShadow: jasmine.Spy; addShine: jasmine.Spy };
-  setOrigin: jasmine.Spy;
-  setDepth: jasmine.Spy;
-  setAlpha: jasmine.Spy;
-  setFontSize: jasmine.Spy;
-  setFontFamily: jasmine.Spy;
-  setColor: jasmine.Spy;
-  setAlign: jasmine.Spy;
-  setText: jasmine.Spy;
-  setVisible: jasmine.Spy;
-  setAngle: jasmine.Spy;
-  setScale: jasmine.Spy;
-  setTint: jasmine.Spy;
-}
-
-interface RenderStubs {
-  add: { group: jasmine.Spy; image: jasmine.Spy; text: jasmine.Spy; particles: jasmine.Spy };
-  time: { delayedCall: jasmine.Spy };
-  tweens: { add: jasmine.Spy };
-}
-
-function makeRenderStubs(): RenderStubs {
-  // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
-  // and scene.add.text(...).setFontSize().setFontFamily().setColor().setDepth()
-  //   .setOrigin().setAlpha() then accesses postFX.addShadow.
-  // Background (constructed by Game.init()) additionally calls scene.add.group(),
-  // scene.time.delayedCall(...) and chains setAngle(), setScale() and setTint().
-  // Return chainable stubs so the whole call sequence is non-throwing.
-  const chainable = (): ChainableStub => {
-    const stub = {
-      postFX: { addShadow: jasmine.createSpy('addShadow'), addShine: jasmine.createSpy('addShine') }
-    } as ChainableStub;
-    (
-      [
-        'setOrigin',
-        'setDepth',
-        'setAlpha',
-        'setFontSize',
-        'setFontFamily',
-        'setColor',
-        'setAlign',
-        'setText',
-        'setVisible',
-        'setAngle',
-        'setScale',
-        'setTint'
-      ] as Array<keyof Omit<ChainableStub, 'postFX'>>
-    ).forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
-    return stub;
-  };
-  return {
-    add: {
-      group: jasmine.createSpy('group').and.returnValue({}),
-      image: jasmine.createSpy('image').and.callFake(chainable),
-      text: jasmine.createSpy('text').and.callFake(chainable),
-      particles: jasmine.createSpy('particles').and.callFake(chainable)
-    },
-    time: { delayedCall: jasmine.createSpy('delayedCall') },
-    tweens: { add: jasmine.createSpy('tweens.add') }
-  };
-}
-
 /** The GameOverIndicator constructor renders one image and three text labels. */
 function expectSingleIndicator(game: Game) {
   expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
   expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(3);
 }
 
+/** Creates a Game instance with shared-harness render, clock and tween stubs. */
 function makeGame(): Game {
   const game = new Game();
-  const stubs = makeRenderStubs();
-  game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
-  game.time = stubs.time as unknown as Phaser.Time.Clock;
-  game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
+  game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
+  // Game.init() constructs the Background, which schedules via scene.time
+  game.time = makeTimeStub() as unknown as Phaser.Time.Clock;
+  game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
   game.state = emptyClientState;
   return game;
 }
@@ -278,9 +217,8 @@ describe('Game scene - socket listener lifecycle', () => {
   });
 
   it('shows the surrender indicator when the socket disconnects', () => {
-    const stubs = makeRenderStubs();
-    game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
-    game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
+    game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
+    game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
     game.state = emptyClientState;
 
     const disconnectHandler = socket.on.calls.allArgs().find(args => args[0] == 'disconnect')![1];

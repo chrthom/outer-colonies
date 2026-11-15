@@ -1,9 +1,9 @@
 import CardStack from './card_stack';
+import Card from './card';
 import { ClientCardStack } from '@shared/interfaces/client_state';
 import { Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
-import Game from '../../scenes/game';
-import Card from './card';
+import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   return {
@@ -20,35 +20,15 @@ function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   };
 }
 
-interface SceneStub {
-  getPlayerState: jasmine.Spy;
-  getPlayerUI: jasmine.Spy;
-  retractCardsExist: boolean;
-  time: { delayedCall: jasmine.Spy };
-  add: { image: jasmine.Spy; text: jasmine.Spy };
-  tweens: { add: jasmine.Spy };
-}
-
-function makeScene(): SceneStub {
-  return {
-    getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
-    getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
-    retractCardsExist: false,
-    time: { delayedCall: jasmine.createSpy('delayedCall') },
-    add: jasmine.createSpyObj('add', ['image', 'text']),
-    tweens: jasmine.createSpyObj('tweens', ['add'])
-  };
-}
-
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
-  return new CardStack(makeScene() as unknown as Game, makeData(over));
+  return new CardStack(asGameScene(makeSceneStub()), makeData(over));
 }
 
 describe('CardStack', () => {
   describe('constructor', () => {
     it('does not touch the scene (no render side effects)', () => {
-      const scene = makeScene();
-      const cs = new CardStack(scene as unknown as Game, makeData());
+      const scene = makeSceneStub();
+      const cs = new CardStack(asGameScene(scene), makeData());
 
       expect(scene.add.image).not.toHaveBeenCalled();
       expect(scene.add.text).not.toHaveBeenCalled();
@@ -59,7 +39,7 @@ describe('CardStack', () => {
 
     it('assigns data and uuid from the input ClientCardStack', () => {
       const data = makeData({ uuid: 'abc-123', ownedByPlayer: false });
-      const cs = new CardStack(makeScene() as unknown as Game, data);
+      const cs = new CardStack(asGameScene(makeSceneStub()), data);
 
       expect(cs.uuid).toBe('abc-123');
       expect(cs.data).toBe(data);
