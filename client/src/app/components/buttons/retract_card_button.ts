@@ -1,5 +1,5 @@
 import { designConfig } from 'src/app/config/design';
-import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
+import { MsgTypeInbound } from '@shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';

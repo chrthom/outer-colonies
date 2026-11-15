@@ -1,8 +1,8 @@
 import CardStack from './card_stack';
 import Card from './card';
-import { ClientCard, ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
-import { MsgTypeInbound, Zone } from '../../../../../server/src/shared/config/enums';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
+import { MsgTypeInbound, Zone } from '@shared/config/enums';
+import { constants } from '@shared/config/constants';
 import { designConfig } from '../../config/design';
 import { CardXPosition, CardYPosition } from '../perspective';
 

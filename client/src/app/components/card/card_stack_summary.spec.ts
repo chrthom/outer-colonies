@@ -1,5 +1,5 @@
 import CardStackSummary from './card_stack_summary';
-import { ClientCardStackAttribute } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientCardStackAttribute } from '@shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from '../../config/design';
 

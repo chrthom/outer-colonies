@@ -1,6 +1,6 @@
 import Game from 'src/app/scenes/game';
 import CardStack from './card_stack';
-import { ClientCardStackAttribute } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientCardStackAttribute } from '@shared/interfaces/client_state';
 import { layoutConfig } from 'src/app/config/layout';
 import { designConfig } from 'src/app/config/design';
 import { animationConfig } from 'src/app/config/animation';

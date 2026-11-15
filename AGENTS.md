@@ -52,7 +52,7 @@ Maintain consistency across the three subprojects
 ## Documentation Requirements
 - Update README.md for significant changes
 - Add JSDoc comments for new public or protected functions
-- Update TypeScript declarations when server interfaces change
+- Changes in `server/src/shared/` are picked up by the client and website automatically via the `@shared/*` path alias - no declaration update is required
 
 ## Decision Making Guidelines
 
