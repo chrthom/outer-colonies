@@ -4,13 +4,13 @@ import {
   MsgTypeInbound,
   TurnPhase,
   Zone
-} from '../../../../server/src/shared/config/enums';
+} from '@shared/config/enums';
 import {
   ClientCardStack,
   ClientHandCard,
   ClientState,
   emptyClientState
-} from '../../../../server/src/shared/interfaces/client_state';
+} from '@shared/interfaces/client_state';
 import Phaser from 'phaser';
 
 // The production bundle exposes Phaser as a global (see src/index.html) and CardImage

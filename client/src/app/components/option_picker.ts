@@ -1,8 +1,8 @@
-import { MsgTypeInbound, TurnPhase } from '../../../../server/src/shared/config/enums';
+import { MsgTypeInbound, TurnPhase } from '@shared/config/enums';
 import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import { perspectiveConfig } from '../config/perspective';
-import { ClientState } from '../../../../server/src/shared/interfaces/client_state';
+import { ClientState } from '@shared/interfaces/client_state';
 import Game from '../scenes/game';
 import CardImage from './card/card_image';
 import { ZoomCardXPosition, ZoomCardYPosition } from './perspective';
