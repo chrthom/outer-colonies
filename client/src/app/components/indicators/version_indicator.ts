@@ -2,7 +2,7 @@ import { environment } from 'src/environments/environment';
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from 'src/app/config/design';
 
-export default class VersonIndicator {
+export default class VersionIndicator {
   constructor(scene: Phaser.Scene) {
     scene.add
       .text(
