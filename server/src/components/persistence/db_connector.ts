@@ -1,8 +1,9 @@
-import mariadb, { SqlError, Pool, PoolConnection } from 'mariadb';
+import mariadb, { Pool, PoolConnection, Prepare } from 'mariadb';
 import config from 'config';
 
 export default class DBConnection {
   private static con: DBConnection;
+  private static readonly MAX_ACQUIRE_ATTEMPTS = 3;
   pool: Pool;
   private constructor() {
     this.pool = mariadb.createPool({
@@ -14,24 +15,52 @@ export default class DBConnection {
       connectionLimit: config.get<number>('database.connectionLimit')
     });
   }
-  async query(query: string, params: any[], noRetry?: boolean): Promise<any> {
+
+  /**
+   * Executes a query as prepared statement on a connection from the pool.
+   *
+   * The connection and the prepared statement are only released after the query has finished.
+   * If no connection can be acquired, the query is retried a bounded number of times, which is
+   * safe because the statement has not been sent yet. Errors while preparing or executing are
+   * never retried, because re-running a possibly non-idempotent statement (e.g. INSERT) could
+   * create duplicate rows.
+   *
+   * @param query SQL statement to execute
+   * @param params parameters to bind to the prepared statement
+   * @returns the result of the executed statement
+   */
+  async query(query: string, params: any[]): Promise<any> {
+    return this.executeQuery(query, params, 1);
+  }
+
+  /**
+   * Executes a query, retrying connection acquisition up to
+   * {@link DBConnection.MAX_ACQUIRE_ATTEMPTS} times.
+   *
+   * @param query SQL statement to execute
+   * @param params parameters to bind to the prepared statement
+   * @param attempt current connection acquisition attempt (1-based)
+   * @returns the result of the executed statement
+   */
+  private async executeQuery(query: string, params: any[], attempt: number): Promise<any> {
     let conn: PoolConnection | undefined;
+    let stmt: Prepare | undefined;
     try {
       conn = await this.pool.getConnection();
-      return conn.prepare(query).then(q => q.execute(params));
+      stmt = await conn.prepare(query);
+      return await stmt.execute(params);
     } catch (err) {
       console.log(`WARN: DB error ${err}`);
-      if (err instanceof SqlError && err.code == 'ER_GET_CONNECTION_TIMEOUT') {
-        return this.query(query, params);
-      } else if (!noRetry) {
-        return this.query(query, params, true);
-      } else {
-        return Promise.reject(err);
+      if (!conn && attempt < DBConnection.MAX_ACQUIRE_ATTEMPTS) {
+        return this.executeQuery(query, params, attempt + 1);
       }
+      throw err;
     } finally {
-      if (conn) conn.end();
+      stmt?.close();
+      await conn?.release();
     }
   }
+
   static get instance(): DBConnection {
     if (!DBConnection.con) DBConnection.con = new DBConnection();
     return DBConnection.con;
