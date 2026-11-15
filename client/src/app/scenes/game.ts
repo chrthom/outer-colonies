@@ -8,23 +8,15 @@ import {
   ClientPlayer,
   ClientState,
   emptyClientState
-} from '../../../../server/src/shared/interfaces/client_state';
-import {
-  BattleType,
-  GameResultType,
-  MsgTypeInbound,
-  MsgTypeOutbound,
-  TurnPhase
-} from '../../../../server/src/shared/config/enums';
+} from '@shared/interfaces/client_state';
+import { BattleType, GameResultType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import GameOverIndicator from '../components/indicators/game_over_indicator';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
 import ZoomCard from '../components/card/zoom_card';
-import ClientPlannedBattle, {
-  ClientPlannedBattleHelper
-} from '../../../../server/src/shared/interfaces/client_planned_battle';
-import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
+import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
+import ClientGameParams from '@shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import Preloader from '../components/preloader';
@@ -37,6 +29,8 @@ import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 import OptionPicker from '../components/option_picker';
+import SocketService from '../socket_service';
+import StateUpdateSequencer from '../utils/state_update_sequencer';
 
 interface ActiveCards {
   hand?: string;
@@ -56,7 +50,6 @@ interface FixedUIElements {
 
 interface InitData {
   gameParams: ClientGameParams;
-  socket: Socket;
 }
 
 interface PlayerUIElements {
@@ -79,8 +72,13 @@ export default class Game extends Phaser.Scene {
   retractCardsExist = false;
   isAttackAnimating = false;
 
+  private stateUpdateSequencer = new StateUpdateSequencer((delayMs, callback) =>
+    this.time.delayedCall(delayMs, callback)
+  );
+
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
+  private gameOverIndicator?: GameOverIndicator;
   background!: Background;
   obj!: FixedUIElements;
   player!: PlayerUIElements;
@@ -93,11 +91,14 @@ export default class Game extends Phaser.Scene {
   }
 
   init(data: InitData) {
-    this.socket = data.socket;
+    this.socket = SocketService.getSocket();
     this.gameParams = data.gameParams;
     // The server treats any in-game disconnect as a surrender, so a reconnected
     // socket would no longer be bound to this match.
     this.socket.io.reconnection(false);
+    // Phaser reuses the scene instance for the next match, so reset the
+    // reference to allow a fresh game over overlay in the new game.
+    this.gameOverIndicator = undefined;
     this.background = new Background(this);
   }
 
@@ -108,16 +109,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
-      this.updateState(state);
-    });
-    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
-      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
-      (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
-    });
-    this.socket.on('disconnect', () => {
-      this.showSurrenderOnDisconnect();
-    });
+    this.registerSocketListeners();
     this.background.initInterface();
     this.opponent = {
       actionPool: new ActionPool(this, false),
@@ -144,6 +136,42 @@ export default class Game extends Phaser.Scene {
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
 
+  /**
+   * Registers the socket listeners of the game scene.
+   *
+   * All listeners are bound to the scene lifecycle and removed again on scene
+   * shutdown, so that no listeners of a finished match leak into the next
+   * matchmaking session.
+   */
+  private registerSocketListeners(): void {
+    this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
+      this.updateState(state);
+    });
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
+      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
+      (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
+    });
+    this.socket.on('disconnect', () => {
+      this.showSurrenderOnDisconnect();
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.socket.off(MsgTypeOutbound.State);
+      this.socket.off(MsgTypeOutbound.Countdown);
+      this.socket.off('disconnect');
+    });
+  }
+
+  /**
+   * Shows the game over overlay for the given result exactly once per game.
+   * Any later call (e.g. from additional states or user interactions after the game result)
+   * is ignored, so exactly one overlay exists regardless of how many updates arrive.
+   */
+  showGameOverIndicator(gameResult: ClientGameResult) {
+    if (!this.gameOverIndicator) {
+      this.gameOverIndicator = new GameOverIndicator(this, gameResult);
+    }
+  }
+
   showSurrenderOnDisconnect() {
     // The server treats disconnect-during-game as surrender
     if (this.state.gameResult) return;
@@ -155,31 +183,49 @@ export default class Game extends Phaser.Scene {
     // Avoid mutating the shared `emptyClientState` constant if no State
     // message has arrived yet.
     this.state = { ...this.state, gameResult: result };
-    new GameOverIndicator(this, result);
+    this.showGameOverIndicator(result);
   }
 
+  /**
+   * Applies a new game state to the UI via a cancel-and-replace sequencer:
+   * `this.state` is stored immediately as the single source of truth, while
+   * the animation steps are enqueued. If a newer state arrives while an
+   * older chain is still running, the queued steps of the older chain are
+   * cancelled and the new chain reconciles directly to the newest state,
+   * animating only the remaining delta.
+   */
   updateState(state: ClientState) {
     const previousTurnPhase = this.state?.turnPhase ?? TurnPhase.Init;
     this.state = state;
-    //console.log(JSON.stringify(state)); ////
     this.preloader.destroy();
     this.resetSelection();
-    this.time.delayedCall(this.animateAttack() ? animationConfig.duration.attack : 0, () => {
-      const newHandCards = this.newHandCards;
-      this.retractCardsExist = false; // If true, then the hand animations are delayed
-      this.updateCardStacks(newHandCards);
-      this.time.delayedCall(this.retractCardsExist ? animationConfig.duration.move : 0, () => {
-        this.updateHandCards(newHandCards, previousTurnPhase);
-        this.updateView();
-        this.highlightAttackIntervention();
-        this.time.delayedCall(animationConfig.duration.move, () => {
-          if (this.state == state) {
-            this.player.discardPile.update(this.state.player.discardPileIds);
-            this.opponent.discardPile.update(this.state.opponent.discardPileIds);
-          }
-        });
-      });
-    });
+    const attackAnimating = this.animateAttack();
+    let newHandCards: ClientHandCard[] = [];
+    this.stateUpdateSequencer.run([
+      {
+        delay: () => (attackAnimating ? animationConfig.duration.attack : 0),
+        action: () => {
+          newHandCards = this.newHandCards;
+          this.retractCardsExist = false; // If true, then the hand animations are delayed
+          this.updateCardStacks(newHandCards);
+        }
+      },
+      {
+        delay: () => (this.retractCardsExist ? animationConfig.duration.move : 0),
+        action: () => {
+          this.updateHandCards(newHandCards, previousTurnPhase);
+          this.updateView();
+          this.highlightAttackIntervention();
+        }
+      },
+      {
+        delay: () => animationConfig.duration.move,
+        action: () => {
+          this.player.discardPile.update(this.state.player.discardPileIds);
+          this.opponent.discardPile.update(this.state.opponent.discardPileIds);
+        }
+      }
+    ]);
   }
 
   resetView(battleType?: BattleType) {

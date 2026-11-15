@@ -1,12 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
-import {
-  ItemListResponseBooster,
-  ItemListResponseBox
-} from '../../../../../server/src/shared/interfaces/rest_api';
+import { ItemListResponseBooster, ItemListResponseBox } from '@shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
-import { rules } from '../../../../../server/src/shared/config/rules';
+import { rules } from '@shared/config/rules';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { InventoryItemComponent } from '../../components/inventory-item/inventory-item.component';
