@@ -32,7 +32,7 @@ Maintain consistency across the three subprojects
   - `Feature` – New game or website features, feature improvements, design enhancements, website content additions, and game cards to be added or adjusted
   - `Task` – Database, testing, deployment, refactorings and hosting
   - `Bug` – Something isn't working
-- `dev-loop` is the default label if the task can be fully implemented by the AI dev loop; use `needs-human` instead if human work is required (especially adjusting card graphics)
+- When creating an issue, label it as follows: add `needs-human` whenever the issue cannot be completely implemented by the AI agent in this environment; additionally add `dev-loop` only if any part of it can be automatically implemented by the AI agent there (a fully automatable issue carries only `dev-loop`)
 - The `clean` label on a PR marks that its current head passed a dev-loop review with verdict CLEAN; it is managed by the dev loop (added on a CLEAN verdict, removed on the next non-CLEAN verdict)
 
 ### Milestones, Versions & Releases
