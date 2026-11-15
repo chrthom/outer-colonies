@@ -1,8 +1,13 @@
 import Game from './game';
 import { GameResultType, TurnPhase } from '@shared/config/enums';
-import { ClientHandCard, ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import {
+  ClientGameResult,
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
-import { makeAddStub, makeTweensStub } from '../testing/phaser_stubs';
+import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
 
 /**
  * Test double for Phaser's clock: records delayed calls so tests can fire
@@ -75,14 +80,28 @@ function setupGame() {
   };
 }
 
+/** The GameOverIndicator constructor renders one image and three text labels. */
+function expectSingleIndicator(game: Game) {
+  expect((game as any).add.image as jasmine.Spy).toHaveBeenCalledTimes(1);
+  expect((game as any).add.text as jasmine.Spy).toHaveBeenCalledTimes(3);
+}
+
+/** Creates a Game instance with shared-harness render, clock and tween stubs. */
+function makeGame(): Game {
+  const game = new Game();
+  (game as any).add = makeAddStub();
+  // Game.init() constructs the Background, which schedules via scene.time
+  (game as any).time = makeTimeStub();
+  (game as any).tweens = makeTweensStub();
+  game.state = emptyClientState;
+  return game;
+}
+
 describe('Game scene - showSurrenderOnDisconnect', () => {
   let game: Game;
 
   beforeEach(() => {
-    game = new Game();
-    (game as any).add = makeAddStub();
-    (game as any).tweens = makeTweensStub();
-    game.state = emptyClientState;
+    game = makeGame();
   });
 
   it('synthesises a surrender ClientGameResult and renders the indicator', () => {
@@ -115,6 +134,49 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
     expect((game as any).add.image).not.toHaveBeenCalled();
+  });
+});
+
+describe('Game scene - showGameOverIndicator', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = makeGame();
+  });
+
+  it('creates the overlay exactly once regardless of how often it is called', () => {
+    const result: ClientGameResult = { won: true, type: GameResultType.Domination, sol: 42 };
+
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator({ ...result, sol: 0 });
+
+    expectSingleIndicator(game);
+  });
+
+  it('does not create a second overlay when updates follow a disconnect surrender', () => {
+    game.showSurrenderOnDisconnect();
+
+    // Simulates the ContinueButton.update() path after further updateView() calls
+    game.showGameOverIndicator(game.state.gameResult!);
+    game.showGameOverIndicator(game.state.gameResult!);
+
+    expectSingleIndicator(game);
+  });
+
+  it('shows a fresh overlay in the next match after init() resets the reference', () => {
+    game.showSurrenderOnDisconnect();
+
+    game.init({
+      gameParams: { preloadCardIds: [] },
+      socket: { io: { reconnection: () => undefined } } as any
+    });
+    ((game as any).add.image as jasmine.Spy).calls.reset();
+    ((game as any).add.text as jasmine.Spy).calls.reset();
+
+    game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
+
+    expectSingleIndicator(game);
   });
 });
 
