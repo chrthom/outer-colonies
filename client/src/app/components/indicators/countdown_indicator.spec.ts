@@ -1,6 +1,6 @@
 import CountdownIndicator from './countdown_indicator';
 import { designConfig } from 'src/app/config/design';
-import { ClientState, emptyClientState } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 
 class MockText {
   setFontSize = jasmine.createSpy('setFontSize').and.returnValue(this);

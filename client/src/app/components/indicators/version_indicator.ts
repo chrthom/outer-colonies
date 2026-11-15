@@ -1,7 +1,7 @@
 import { environment } from 'src/environments/environment';
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from 'src/app/config/design';
-import { version, releaseName } from '../../../../../server/src/shared/config/version';
+import { version, releaseName } from '@shared/config/version';
 
 export default class VersionIndicator {
   constructor(scene: Phaser.Scene) {

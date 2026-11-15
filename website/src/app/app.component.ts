@@ -6,7 +6,7 @@ import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
-import { version, releaseName } from '../../../server/src/shared/config/version';
+import { version, releaseName } from '@shared/config/version';
 
 @Component({
   selector: 'oc-root',
