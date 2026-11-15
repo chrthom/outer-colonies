@@ -30,6 +30,22 @@ EOF
     || echo "::warning::Could not post the escalation comment (gh pr comment failed); the needs-human label marks the PR."
 }
 
+drop_clean_label() {
+  # The head no longer stands at a CLEAN verdict: drop the clean label so the
+  # merge-ready signal cannot outlive the verdict it was earned on
+  # (best-effort, membership-checked - a missing label is not an error).
+  if clean_present="$(gh pr view "$PR_NUMBER" --json labels --jq 'any(.labels[]; .name == "clean")' 2>/dev/null)"; then
+    if [ "$clean_present" = "true" ]; then
+      gh pr edit "$PR_NUMBER" --remove-label clean >/dev/null 2>&1 \
+        || echo "::warning::Could not remove the clean label on PR #$PR_NUMBER; remove it manually."
+    fi
+  else
+    # A failed poll would otherwise be indistinguishable from an absent label;
+    # keep the skipped drop diagnosable like every other fail-open poll here.
+    echo "::warning::Clean-label membership poll failed on PR #$PR_NUMBER; a stale clean label, if present, stays until the next verdict - remove it manually."
+  fi
+}
+
 # OPENCODE_RC mirrors steps.opencode.outputs.rc from the workflow (an inline
 # ${{ }} expression cannot survive in a checked-in script file).
 rc="${OPENCODE_RC}"
@@ -355,8 +371,13 @@ case "$verdict" in
     # case). Best-effort like the escalation guards: a failed label call
     # must not red-run the post-step after a successful review post, and the
     # next verdict re-offers the sync. The label is created on demand, like
-    # the gates create needs-human/dev-loop.
+    # the gates create needs-human/dev-loop. A pre-existing label (this repo
+    # carries a legacy 'clean' with a stale description) makes create 422 on
+    # already-exists - the follow-up edit reconciles it: create covers fresh
+    # repos, edit realigns the stale definition.
     gh label create clean --color 2BB552 \
+      --description "dev-loop: the current head passed a CLEAN review" 2>/dev/null || true
+    gh label edit clean --color 2BB552 \
       --description "dev-loop: the current head passed a CLEAN review" 2>/dev/null || true
     if gh pr edit "$PR_NUMBER" --add-label clean >/dev/null 2>&1; then
       echo "Verdict CLEAN: the PR stands ready for a human merge decision; clean label added."
@@ -366,13 +387,7 @@ case "$verdict" in
     exit 0
     ;;
   CHANGES_NEEDED)
-    # The head no longer stands at a CLEAN verdict: drop the clean label so
-    # the merge-ready signal cannot outlive the verdict it was earned on
-    # (best-effort, membership-checked - a missing label is not an error).
-    if gh pr view "$PR_NUMBER" --json labels --jq 'any(.labels[]; .name == "clean")' 2>/dev/null | grep -q true; then
-      gh pr edit "$PR_NUMBER" --remove-label clean >/dev/null 2>&1 \
-        || echo "::warning::Could not remove the clean label on PR #$PR_NUMBER; remove it manually."
-    fi
+    drop_clean_label
     case "$review_post_id" in
       ''|*[!0-9]*)
         # A non-numeric id must never reach the fixer (PR #106: the 422 error JSON crashed the fixer gate).
@@ -390,10 +405,7 @@ case "$verdict" in
     ;;
   NEEDS_HUMAN)
     # Same label drop as CHANGES_NEEDED: the head did not pass a CLEAN review.
-    if gh pr view "$PR_NUMBER" --json labels --jq 'any(.labels[]; .name == "clean")' 2>/dev/null | grep -q true; then
-      gh pr edit "$PR_NUMBER" --remove-label clean >/dev/null 2>&1 \
-        || echo "::warning::Could not remove the clean label on PR #$PR_NUMBER; remove it manually."
-    fi
+    drop_clean_label
     escalate "review verdict NEEDS_HUMAN - at least one finding requires a human decision; see the review just posted"
     exit 0
     ;;

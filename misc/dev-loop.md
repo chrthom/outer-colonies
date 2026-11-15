@@ -164,6 +164,12 @@ Non-events by design:
 | implementer | outcome `finished`                                                              | open a **ready** PR (`Closes #<N>`) with the `dev-loop` label; `ready_for_review` fires the first review                                                                 |
 | implementer | outcome `NO_PR`                                                                 | comment questions on the issue + label `needs-human`                                                                                                                     |
 
+Clean-label lifecycle caveat: the label is verdict-driven only - added on a CLEAN verdict,
+dropped by the next non-CLEAN verdict. A push to the PR head after a CLEAN verdict (a human
+edit or a conflict-resolution merge commit) therefore leaves the label on a head that has not
+passed review until the next verdict lands; the push's `synchronize` trigger re-offers a review
+for the new head, and that verdict reconciles the label (CLEAN re-adds it, non-CLEAN drops it).
+
 The reviewer is never called twice for the same work: dispatches on the same PR serialize in
 the shared `dev-loop-pr-<N>` concurrency group, the head-SHA marker dedupe makes at most one
 review per commit, and a push landing mid-review is handled by the stale-head re-dispatch (the

@@ -44,7 +44,7 @@ ISSUE_TYPE=$(echo "$ISSUE_DATA" | jq -r '.type.name // empty')
 4. Determine Issue Type and Branch Prefix
 ```bash
 if [ "$ISSUE_TYPE" = "Bug" ]; then
-  BRANCH_PREFIX="bugfix"
+  BRANCH_PREFIX="fix"
 else
   BRANCH_PREFIX="feature"
 fi
