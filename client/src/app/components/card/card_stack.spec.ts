@@ -2,6 +2,7 @@ import CardStack from './card_stack';
 import { ClientCardStack } from '../../../../../server/src/shared/interfaces/client_state';
 import { Zone } from '../../../../../server/src/shared/config/enums';
 import { constants } from '../../../../../server/src/shared/config/constants';
+import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   return {
@@ -18,26 +19,15 @@ function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   };
 }
 
-function makeScene(): any {
-  return {
-    getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
-    getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
-    retractCardsExist: false,
-    time: { delayedCall: jasmine.createSpy('delayedCall') },
-    add: jasmine.createSpyObj('add', ['image', 'text']),
-    tweens: jasmine.createSpyObj('tweens', ['add'])
-  };
-}
-
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
-  return new CardStack(makeScene(), makeData(over));
+  return new CardStack(asGameScene(makeSceneStub()), makeData(over));
 }
 
 describe('CardStack', () => {
   describe('constructor', () => {
     it('does not touch the scene (no render side effects)', () => {
-      const scene = makeScene();
-      const cs = new CardStack(scene, makeData());
+      const scene = makeSceneStub();
+      const cs = new CardStack(asGameScene(scene), makeData());
 
       expect(scene.add.image).not.toHaveBeenCalled();
       expect(scene.add.text).not.toHaveBeenCalled();
@@ -48,7 +38,7 @@ describe('CardStack', () => {
 
     it('assigns data and uuid from the input ClientCardStack', () => {
       const data = makeData({ uuid: 'abc-123', ownedByPlayer: false });
-      const cs = new CardStack(makeScene(), data);
+      const cs = new CardStack(asGameScene(makeSceneStub()), data);
 
       expect(cs.uuid).toBe('abc-123');
       expect(cs.data).toBe(data);
