@@ -1,6 +1,6 @@
 import Game from '../../scenes/game';
 import { designConfig } from '../../config/design';
-import { BattleType } from '../../../../../server/src/shared/config/enums';
+import { BattleType } from '@shared/config/enums';
 import { BaseButton } from './base_button';
 
 export abstract class BattleActionButton extends BaseButton {

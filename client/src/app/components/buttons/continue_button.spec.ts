@@ -1,11 +1,7 @@
 import ContinueButton from './continue_button';
 import { animationConfig } from '../../config/animation';
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
-import {
-  ClientCardStack,
-  ClientState,
-  emptyClientState
-} from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { ClientCardStack, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 
 interface QueuedTimer {
   delay: number;

@@ -9,6 +9,9 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
+    "paths": {
+      "@shared/*": ["./src/shared/*"]
+    },
     "useDefineForClassFields": false,
     "downlevelIteration": true,
     "importHelpers": true,
