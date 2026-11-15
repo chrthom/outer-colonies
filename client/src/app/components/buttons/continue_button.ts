@@ -6,7 +6,6 @@ import Game from '../../scenes/game';
 import Prompt from './prompt';
 import Phaser from 'phaser';
 import { designConfig } from 'src/app/config/design';
-import GameOverIndicator from '../indicators/game_over_indicator';
 
 interface ButtonImages {
   active_build: Phaser.GameObjects.Image;
@@ -159,7 +158,7 @@ export default class ContinueButton {
     );
   }
   private showGameOver(gameResult: ClientGameResult) {
-    new GameOverIndicator(this.scene, gameResult);
+    this.scene.showGameOverIndicator(gameResult);
     // The Game scene removes all of its socket listeners on scene shutdown
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
       this.scene.scene.start('Matchmaking');
