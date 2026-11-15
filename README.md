@@ -182,7 +182,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Communication**:
   - REST API for website communication
   - WebSocket for real-time game communication with the client
-- **Shared Code Boundary**: Code shared by the server, client and website lives in `server/src/shared/`. All three subprojects import it through the `@shared/*` TypeScript path alias (configured in each subproject's `tsconfig.json`), e.g. `import { CardType } from '@shared/config/enums'`. No import crosses a subproject root with a relative path.
+- **Shared Code Boundary**: Code shared by the server, client and website lives in `server/src/shared/`. The client and website import it through the `@shared/*` TypeScript path alias, e.g. `import { CardType } from '@shared/config/enums'`, while the server's own imports stay relative within its subproject root. The alias is configured in all three subprojects' `tsconfig.json` but only exercised by the client and website, as the server's runtime (ts-node) and test setup (Jest) do not resolve it. No import crosses a subproject root with a relative path.
 
 #### REST Endpoints
 
