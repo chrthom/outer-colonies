@@ -1,11 +1,7 @@
 import CombatRangeIndicator from './combat_range_indicator';
-import { BattleType, InterventionType } from '../../../../../server/src/shared/config/enums';
-import { rules } from '../../../../../server/src/shared/config/rules';
-import {
-  ClientIntervention,
-  ClientState,
-  emptyClientState
-} from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, InterventionType } from '@shared/config/enums';
+import { rules } from '@shared/config/rules';
+import { ClientIntervention, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import Game from '../../scenes/game';
 
 interface MockImage {

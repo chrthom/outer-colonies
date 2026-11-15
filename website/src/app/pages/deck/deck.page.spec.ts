@@ -3,7 +3,7 @@ import { DeckPage } from './deck.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { of } from 'rxjs';
-import { TacticDiscipline } from '../../../../../server/src/shared/config/enums';
+import { TacticDiscipline } from '@shared/config/enums';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';

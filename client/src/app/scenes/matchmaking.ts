@@ -1,17 +1,13 @@
 import io, { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
-import {
-  MatchmakingStatus,
-  MsgTypeInbound,
-  MsgTypeOutbound
-} from '../../../../server/src/shared/config/enums';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
 import VersionIndicator from '../components/indicators/version_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
 import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
-import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
+import ClientGameParams from '@shared/interfaces/client_game_params';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;

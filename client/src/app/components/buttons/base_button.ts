@@ -1,6 +1,6 @@
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from 'src/app/config/design';
-import { TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { TurnPhase } from '@shared/config/enums';
 import Game from '../../scenes/game';
 import Matchmaking from '../../scenes/matchmaking';
 

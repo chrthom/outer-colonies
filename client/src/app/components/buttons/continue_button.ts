@@ -1,11 +1,6 @@
 import { animationConfig } from 'src/app/config/animation';
-import {
-  BattleType,
-  MsgTypeInbound,
-  MsgTypeOutbound,
-  TurnPhase
-} from '../../../../../server/src/shared/config/enums';
-import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { ClientGameResult } from '@shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';

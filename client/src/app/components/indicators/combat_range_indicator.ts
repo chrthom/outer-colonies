@@ -1,5 +1,5 @@
-import { InterventionType } from '../../../../../server/src/shared/config/enums';
-import { rules } from '../../../../../server/src/shared/config/rules';
+import { InterventionType } from '@shared/config/enums';
+import { rules } from '@shared/config/rules';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 

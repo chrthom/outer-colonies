@@ -1,7 +1,7 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { constants } from '@shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import { ZoomCardXPosition, ZoomCardYPosition } from '../perspective';
 import { animationConfig } from 'src/app/config/animation';

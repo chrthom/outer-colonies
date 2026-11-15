@@ -184,7 +184,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Communication**:
   - REST API for website communication
   - WebSocket for real-time game communication with the client
-- **Type Declarations**: The server project generates TypeScript declaration files (`.d.ts`) that are required by the website and client projects for type safety and compilation.
+- **Shared Code Boundary**: Code shared by the server, client and website lives in `server/src/shared/`. The client and website import it through the `@shared/*` TypeScript path alias, e.g. `import { CardType } from '@shared/config/enums'`, while the server's own imports stay relative within its subproject root. The alias is configured in all three subprojects' `tsconfig.json` but only exercised by the client and website, as the server's runtime (ts-node) and test setup (Jest) do not resolve it. No import crosses a subproject root with a relative path.
 
 #### REST Endpoints
 
@@ -335,15 +335,7 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
    cd server && npm install && cd ..
    ```
 
-3. **Build Server Type Declarations**:
-   ```bash
-   # Generate TypeScript declarations required by website and client projects
-   cd server
-   npx tsc --declaration --emitDeclarationOnly
-   cd ..
-   ```
-
-4. **Configuration**:
+3. **Configuration**:
    - Copy the configuration files from `server/config/` and adjust as needed.
    - Ensure the database connection settings are correctly configured.
    - Set the environment variables for the database and mail service:
@@ -386,33 +378,18 @@ The repository working rules — repository language, branches and merges, issue
    npm run si
    ```
 
-**Note**: If you make changes to the server's TypeScript interfaces or types that are used by the website or client projects, you need to rebuild the type declarations:
-```bash
-cd server
-npx tsc --declaration --emitDeclarationOnly
-cd ..
-```
+**Note**: If you make changes to the server's TypeScript interfaces or types in `server/src/shared/`, they are picked up by the website and client projects automatically: both compile the shared sources directly through the `@shared/*` path alias, so no separate build step is required.
 
 #### Building the Projects
 
 1. **Build for Staging**:
    ```bash
-   # Ensure server type declarations are up to date
-   cd server
-   npx tsc --declaration --emitDeclarationOnly
-   cd ..
-   
    # Build the projects
    npm run build:staging
    ```
 
 2. **Build for Production**:
    ```bash
-   # Ensure server type declarations are up to date
-   cd server
-   npx tsc --declaration --emitDeclarationOnly
-   cd ..
-   
    # Build the projects
    npm run build:prod
    ```

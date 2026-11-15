@@ -3,7 +3,7 @@ import { environment } from '../../../environments/environment';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { designConfig } from 'src/app/config/design';
-import { MsgTypeInbound } from '../../../../../server/src/shared/config/enums';
+import { MsgTypeInbound } from '@shared/config/enums';
 import { BaseButton } from './base_button';
 
 export default class ExitButton extends BaseButton {
