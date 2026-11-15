@@ -3,48 +3,61 @@
   <div id="navbar-logo" routerLink="/">
     <img src="../../../assets/logo.png" />
   </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Spielsuche & Aktuelles"
-    [class.active]="active === ''"
-    routerLink="/"
-  >
-    <img src="../../../assets/icons/home.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Spielregeln"
-    [class.active]="active === 'rules'"
-    routerLink="/rules"
-  >
-    <img src="../../../assets/icons/rules.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Deck-Manager"
-    [class.active]="active === 'deck'"
-    routerLink="/deck"
-  >
-    <img src="../../../assets/icons/deck.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Inventar und Markt"
-    [class.active]="active === 'trade'"
-    routerLink="/trade"
-  >
-    <img src="../../../assets/icons/trade.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Verwalte dein Profil"
-    [class.active]="active === 'profile'"
-    routerLink="/profile"
-  >
-    <img src="../../../assets/icons/profile.png" />
-  </div>
-  <h2 class="user-name navbar-right">{{ username }}</h2>
-  <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()" tabindex="invalid">
-    <img src="../../../assets/icons/logout.png" />
-  </div>
+  @if (isLoggedIn) {
+    <div
+      class="navbar-element navbar-center"
+      matTooltip="Spielsuche & Aktuelles"
+      [class.active]="active === 'home'"
+      routerLink="/home"
+    >
+      <img src="../../../assets/icons/home.png" />
+    </div>
+    <div
+      class="navbar-element navbar-center"
+      matTooltip="Spielregeln"
+      [class.active]="active === 'rules'"
+      routerLink="/rules"
+    >
+      <img src="../../../assets/icons/rules.png" />
+    </div>
+    <div
+      class="navbar-element navbar-center"
+      matTooltip="Deck-Manager"
+      [class.active]="active === 'deck'"
+      routerLink="/deck"
+    >
+      <img src="../../../assets/icons/deck.png" />
+    </div>
+    <div
+      class="navbar-element navbar-center"
+      matTooltip="Inventar und Markt"
+      [class.active]="active === 'trade'"
+      routerLink="/trade"
+    >
+      <img src="../../../assets/icons/trade.png" />
+    </div>
+    <div
+      class="navbar-element navbar-center"
+      matTooltip="Verwalte dein Profil"
+      [class.active]="active === 'profile'"
+      routerLink="/profile"
+    >
+      <img src="../../../assets/icons/profile.png" />
+    </div>
+    <h2 class="user-name navbar-right">{{ username }}</h2>
+    <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()" tabindex="invalid">
+      <img src="../../../assets/icons/logout.png" />
+    </div>
+  } @else {
+    <nav id="navbar-anon-links">
+      <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
+      <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
+      <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
+      <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
+    </nav>
+    <div id="navbar-anon-actions">
+      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
+      <a mat-raised-button routerLink="/login">Login</a>
+    </div>
+  }
 </div>

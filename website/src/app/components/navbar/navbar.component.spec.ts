@@ -13,6 +13,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj('AuthService', ['logout'], { displayname: 'testuser' });
+    Object.assign(authSpy, { isLoggedIn: true }); // plain property, as jasmine accessors cannot be reassigned
 
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule, MatTooltipModule],
@@ -49,5 +50,33 @@ describe('NavbarComponent', () => {
   it('should get active route', () => {
     // This is a basic test - more comprehensive routing tests would be needed
     expect(component.active).toBeDefined();
+  });
+
+  it('should render the icon navbar for logged-in users', () => {
+    const element = fixture.nativeElement;
+    const iconElements = element.querySelectorAll('.navbar-element.navbar-center');
+    expect(iconElements.length).toBe(5);
+    expect(element.querySelector('.user-name')?.textContent).toBe('testuser');
+    expect(element.querySelector('#navbar-anon-links')).toBeFalsy();
+  });
+
+  it('should render public links and auth buttons for anonymous users', () => {
+    Object.assign(authSpy, { isLoggedIn: false });
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement;
+    const links = Array.from<Element>(element.querySelectorAll('#navbar-anon-links a'));
+    expect(links.map(a => a.getAttribute('href'))).toEqual(['/world', '/factions', '/history', '/editions']);
+    expect(links.map(a => a.textContent?.trim())).toEqual([
+      'Die Welt',
+      'Die Mächte',
+      'Die Geschichte',
+      'Die Editionen'
+    ]);
+
+    const actions = Array.from<Element>(element.querySelectorAll('#navbar-anon-actions a'));
+    expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
+    expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Login']);
+    expect(element.querySelector('.navbar-element.navbar-center')).toBeFalsy();
   });
 });

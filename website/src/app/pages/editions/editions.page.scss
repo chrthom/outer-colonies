@@ -1,0 +1,29 @@
+.lore-page {
+  width: min(860px, 100%);
+  margin: 40px auto 20px;
+  > oc-content-box {
+    display: block;
+    margin-top: 40px;
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}
+
+h3.edition-subtitle {
+  display: block;
+  font-size: 20px;
+  color: var(--color-primary-light);
+  margin-bottom: 12px;
+}
+
+.edition-scope {
+  font-style: italic;
+  font-size: 16px;
+  color: var(--color-primary-light);
+}

@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import AuthService from './auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
@@ -14,7 +13,6 @@ import { RouterOutlet } from '@angular/router';
   imports: [NavbarComponent, RouterOutlet]
 })
 export class AppComponent {
-  authService = inject(AuthService);
   private dialog = inject(MatDialog);
 
   bgNo: number;

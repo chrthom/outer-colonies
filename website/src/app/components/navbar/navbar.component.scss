@@ -83,3 +83,54 @@ h2.navbar-right {
   padding: 15px 25px;
   z-index: 51;
 }
+
+#navbar-anon-links {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 80px);
+  transform: translateX(-50%);
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  a {
+    font-family: "Latin Modern Mono Caps";
+    font-size: 16px;
+    color: var(--color-primary-light);
+    text-decoration: none;
+    &.active,
+    &:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
+    }
+  }
+}
+
+#navbar-anon-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+}
+
+@media (max-width: 900px) {
+  #navbar-anon-links {
+    gap: 20px;
+    a {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  #navbar-anon-links {
+    gap: 12px;
+    a {
+      font-size: 13px;
+    }
+  }
+}
