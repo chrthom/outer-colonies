@@ -4,6 +4,7 @@ import {
   BattleType,
   CardDurability,
   CardType,
+  EventType,
   RechargeRate,
   TurnPhase,
   Zone
@@ -191,11 +192,21 @@ export default abstract class CardStack {
   discard() {
     this.removeCardStack();
     this.player.discardCards(...this.cards);
+    this.cardStacks.forEach(cs => this.match.addCardMovementEvent(EventType.Discard, cs));
   }
   retract() {
     this.removeCardStack();
-    this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
+    const retractedCards = this.cards.filter(c => c.canBeRetracted(this.isRootCard));
+    const newHandCardStacks = this.player.takeCards(retractedCards);
     this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
+    this.cardStacks.forEach(cs => {
+      const newHandCardStackIndex = retractedCards.indexOf(cs.card);
+      if (newHandCardStackIndex >= 0) {
+        this.match.addCardMovementEvent(EventType.Retract, cs, newHandCardStacks[newHandCardStackIndex].uuid);
+      } else {
+        this.match.addCardMovementEvent(EventType.Discard, cs);
+      }
+    });
   }
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);

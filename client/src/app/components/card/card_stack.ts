@@ -1,6 +1,12 @@
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
+import {
+  BattleType,
+  EventType,
+  MsgTypeInbound,
+  TurnPhase,
+  Zone
+} from '../../../../../server/src/shared/config/enums';
 import {
   ClientAttack,
   ClientCard,
@@ -37,30 +43,32 @@ export default class CardStack {
     this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
   }
-  discard(toDeck?: boolean) {
+  /**
+   * Animates all cards of this stack away from the board.
+   * @param toDeckFor Optional per-card callback: returns true if the card was retracted (animated
+   * to the deck, from where it is redrawn into the hand) and false if it was discarded
+   */
+  discard(toDeckFor?: (card: Card) => boolean) {
     this.destroyIndicators();
-    this.cards.forEach(c => c.discard(toDeck));
+    this.cards.forEach(c => c.discard(toDeckFor?.(c)));
   }
   update(data: ClientCardStack) {
     this.destroyIndicators();
-    const [removedCardIds, newCardIds] = this.arrayDiff(
-      this.cards.map(c => c.cardId),
-      data.cards.map(c => c.id)
+    const [removedCardUUIDs, newCardUUIDs] = this.arrayDiff(
+      this.cards.map(c => c.data.uuid),
+      data.cards.map(c => c.uuid)
     );
-    this.filterCardsByIdList(removedCardIds).forEach(c => {
-      let toDeck = false;
-      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
-        toDeck = true;
-        this.scene.retractCardsExist = true;
-      }
+    this.filterCardsByUUIDList(removedCardUUIDs).forEach(c => {
+      const toDeck = this.scene.getCardMovementEvent(c.data.uuid)?.type == EventType.Retract;
+      if (toDeck) this.scene.retractCardsExist = true;
       c.discard(toDeck);
     }, this);
-    const replacedCards = this.filterCardsByIdList(data.cards.map(c => c.id));
+    const replacedCards = this.filterCardsByUUIDList(data.cards.map(c => c.uuid));
     this.data.cards = data.cards;
     this.createCards();
     this.data = data;
     this.summaryBox = new CardStackSummary(this.scene, this);
-    this.filterCardsByIdList(newCardIds).forEach(c => {
+    this.filterCardsByUUIDList(newCardUUIDs).forEach(c => {
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
@@ -161,11 +169,12 @@ export default class CardStack {
       !this.scene.activeCards.hand
     );
   }
-  private filterCardsByIdList(list: number[]) {
+  private filterCardsByUUIDList(list: string[]) {
     const l = list.slice();
     return this.cards.filter(c => {
-      if (l.includes(c.cardId)) {
-        l.splice(l.indexOf(c.cardId), 1);
+      const i = l.indexOf(c.data.uuid);
+      if (i >= 0) {
+        l.splice(i, 1);
         return true;
       } else {
         return false;

@@ -1,6 +1,6 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
-import { BattleType, CardDurability, CardType, TurnPhase } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, EventType, TurnPhase } from '../../shared/config/enums';
 import Battle from './battle';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
@@ -17,6 +17,17 @@ import SocketData from './socket_data';
 
 type Players = [player1: Player, player2: Player];
 
+/**
+ * Server-internal card movement event, accumulated on the match between two state emissions.
+ * Converted into a receiver-relative ClientEvent (with the playerEvent flag) by toClientState().
+ */
+export interface MatchEvent {
+  type: EventType;
+  playerNo: number;
+  oldUUID: string;
+  newUUID?: string;
+}
+
 export default class Match {
   readonly room!: string;
   players: Players;
@@ -29,6 +40,7 @@ export default class Match {
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
+  events: MatchEvent[] = [];
   constructor(room: string, socket1: Socket, socket2: Socket) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
@@ -67,6 +79,23 @@ export default class Match {
     this.countdown = rules.countdownTimer;
     this.battle.resetRecentAttack();
     this.highlightCard = undefined;
+    this.events = [];
+  }
+  /**
+   * Records a card movement (e.g. retract or discard) to be sent to the clients together with the
+   * next state. Events are cleared after each state emission (see resetTempStates()).
+   * @param type movement type; EventType.Retract for movements back to the player's hand
+   * (animated via the deck on the client), EventType.Discard for movements to the discard pile
+   * @param cardStack the moved card stack; determines the owning player and the old UUID
+   * @param newUUID for retract events: UUID of the newly created hand card stack
+   */
+  addCardMovementEvent(type: EventType, cardStack: CardStack, newUUID?: string) {
+    this.events.push({
+      type: type,
+      playerNo: cardStack.player.no,
+      oldUUID: cardStack.uuid,
+      newUUID: newUUID
+    });
   }
   /**
    * Marks the player who will NOT take the first turn: the player with the larger deck,
@@ -153,6 +182,9 @@ export default class Match {
         );
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
         player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
+        destroyedCardStacks.forEach(cs =>
+          cs.cardStacks.forEach(subCs => this.addCardMovementEvent(EventType.Discard, subCs))
+        );
         return destroyedCardStacks;
       })
       .flat();

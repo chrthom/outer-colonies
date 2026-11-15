@@ -1,5 +1,5 @@
 import Game from './game';
-import { GameResultType } from '../../../../server/src/shared/config/enums';
+import { EventType, GameResultType } from '../../../../server/src/shared/config/enums';
 import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
 
 function makeRenderStubs() {
@@ -75,5 +75,39 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
     expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Game scene - getCardMovementEvent', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game();
+    game.state = {
+      ...emptyClientState,
+      events: [
+        { type: EventType.Retract, playerEvent: true, oldUUID: 'card-1', newUUID: 'hand-1' },
+        { type: EventType.Discard, playerEvent: false, oldUUID: 'card-2' }
+      ]
+    };
+  });
+
+  it('returns the movement event for a card that was moved by the server', () => {
+    const event = game.getCardMovementEvent('card-1');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Retract);
+    expect(event?.newUUID).toBe('hand-1');
+  });
+
+  it('returns the discard event for a discarded card regardless of the owning player', () => {
+    const event = game.getCardMovementEvent('card-2');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Discard);
+  });
+
+  it('returns undefined for cards without a movement event', () => {
+    expect(game.getCardMovementEvent('card-3')).toBeUndefined();
   });
 });

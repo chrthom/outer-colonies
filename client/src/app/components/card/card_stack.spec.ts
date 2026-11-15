@@ -171,32 +171,68 @@ describe('CardStack', () => {
     });
   });
 
-  describe('filterCardsByIdList (private)', () => {
-    function filter(cardIds: number[], list: number[]): any[] {
+  describe('filterCardsByUUIDList (private)', () => {
+    function filter(cardUUIDs: string[], list: string[]): any[] {
       const cs = makeCardStack();
-      (cs as any).cards = cardIds.map(id => ({ cardId: id }));
-      return (cs as any).filterCardsByIdList(list);
+      (cs as any).cards = cardUUIDs.map(uuid => ({ data: { uuid } }));
+      return (cs as any).filterCardsByUUIDList(list);
     }
 
-    it('returns the cards whose ids are present in the list', () => {
-      const filtered = filter([10, 20, 30], [10, 30]);
-      expect(filtered.map(c => c.cardId)).toEqual([10, 30]);
+    it('returns the cards whose uuids are present in the list', () => {
+      const filtered = filter(['u-10', 'u-20', 'u-30'], ['u-10', 'u-30']);
+      expect(filtered.map(c => c.data.uuid)).toEqual(['u-10', 'u-30']);
     });
 
-    it('matches each id in the list against at most one card', () => {
-      const filtered = filter([10, 10, 10], [10, 10]);
+    it('matches each uuid in the list against at most one card', () => {
+      const filtered = filter(['u-10', 'u-10', 'u-10'], ['u-10', 'u-10']);
       expect(filtered.length).toBe(2);
-      expect(filtered.every(c => c.cardId === 10)).toBeTrue();
+      expect(filtered.every(c => c.data.uuid === 'u-10')).toBeTrue();
     });
 
-    it('returns an empty array when no card id matches', () => {
-      expect(filter([10, 20], [99])).toEqual([]);
+    it('returns an empty array when no card uuid matches', () => {
+      expect(filter(['u-10', 'u-20'], ['u-99'])).toEqual([]);
     });
 
     it('does not mutate the input list', () => {
-      const list = [10, 20];
-      filter([10, 20], list);
-      expect(list).toEqual([10, 20]);
+      const list = ['u-10', 'u-20'];
+      filter(['u-10', 'u-20'], list);
+      expect(list).toEqual(['u-10', 'u-20']);
+    });
+  });
+
+  describe('discard(toDeckFor)', () => {
+    function makeFakeCard(uuid: string): any {
+      return {
+        data: { uuid },
+        discard: jasmine.createSpy('discard'),
+        destroyRetractButton: jasmine.createSpy('destroyRetractButton')
+      };
+    }
+
+    it('animates each card to the destination reported by the per-card callback', () => {
+      const cs = makeCardStack();
+      const retractedCard = makeFakeCard('u-retracted');
+      const discardedCard = makeFakeCard('u-discarded');
+      (cs as any).cards = [retractedCard, discardedCard];
+
+      cs.discard(card => card.data.uuid == 'u-retracted');
+
+      expect(retractedCard.discard).toHaveBeenCalledWith(true);
+      expect(discardedCard.discard).toHaveBeenCalledWith(false);
+    });
+
+    it('destroys the indicators of the stack before animating the cards away', () => {
+      const cs = makeCardStack();
+      const card = makeFakeCard('u-1');
+      (cs as any).cards = [card];
+      const summaryBox = { destroy: jasmine.createSpy('destroy') };
+      (cs as any).summaryBox = summaryBox;
+
+      cs.discard();
+
+      expect(summaryBox.destroy).toHaveBeenCalled();
+      expect(card.destroyRetractButton).toHaveBeenCalled();
+      expect(card.discard).toHaveBeenCalledWith(undefined);
     });
   });
 });

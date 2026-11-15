@@ -6,6 +6,7 @@ import {
   ClientBattle,
   ClientCardStack,
   ClientCardStackAttribute,
+  ClientEvent,
   ClientGameResult,
   ClientHandCard,
   ClientIntervention,
@@ -170,9 +171,18 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
         sol: match.gameResult.winnerNo == player.no ? match.gameResult.winnerSol : match.gameResult.loserSol
       }
     : undefined;
+  const events: ClientEvent[] = match.events.map(e => {
+    return {
+      type: e.type,
+      playerEvent: e.playerNo == playerNo,
+      oldUUID: e.oldUUID,
+      newUUID: e.newUUID
+    };
+  });
   return {
     battle: battle,
     cardStacks: cardStacks,
+    events: events,
     gameResult: gameResult,
     highlightCardUUID: match.highlightCard?.uuid,
     intervention: intervention,
