@@ -1,10 +1,6 @@
 import Game from './game';
 import { GameResultType, TurnPhase } from '@shared/config/enums';
-import {
-  ClientHandCard,
-  ClientState,
-  emptyClientState
-} from '@shared/interfaces/client_state';
+import { ClientHandCard, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
 
 /**
