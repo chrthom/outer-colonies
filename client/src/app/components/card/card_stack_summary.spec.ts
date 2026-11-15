@@ -147,4 +147,20 @@ describe('CardStackSummary', () => {
     expect(valueTween.x).toBe(expectedX + config.xOffset);
     expect(valueTween.y).toBe(expectedY + config.yOffset);
   });
+
+  it('clears the info boxes on destroy so a later update recreates them', () => {
+    const scene = makeScene();
+    const cardStack = makeCardStack([attribute('energy', 5)]);
+    const summary = new CardStackSummary(scene, cardStack);
+
+    summary.destroy();
+
+    expect((summary as any).infoBoxes).toEqual([]);
+
+    summary.update();
+
+    expect((summary as any).infoBoxes.length).toBe(1); // recreated, not resurrected
+    expect(scene.add.image).toHaveBeenCalledTimes(4); // box and icon again
+    expect(scene.add.text).toHaveBeenCalledTimes(2); // value text again
+  });
 });

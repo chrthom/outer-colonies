@@ -166,6 +166,18 @@ export default class CardImage {
   get depth(): number {
     return this.image.depth;
   }
+  /**
+   * Brings the planes of this card to the top of the display list in creation
+   * order (pile, glow, mask, image). Phaser renders objects of equal depth in
+   * display list order, so this restores the card's render order within its
+   * stack after new cards were appended to the display list out of data order.
+   */
+  bringPlanesToTop(): this {
+    [this.imagePile, this.imageHighlight, this.imageMask, this.image].forEach(p =>
+      this.scene.children.bringToTop(p)
+    );
+    return this;
+  }
   setXRotation(x: number): this {
     this.forAllImages(i => (i.modelRotation.x = x));
     return this;

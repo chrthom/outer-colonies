@@ -66,6 +66,10 @@ export default class CardStack {
       }
       return this.createNewCard(nc);
     });
+    // Restore data-order rendering: newly created cards are appended to the end
+    // of the display list and would otherwise render above kept cards (e.g.
+    // above the root hull, which is last in data.cards and must stay topmost).
+    this.cards.forEach(c => c.bringPlanesToTop());
     if (this.summaryBox) this.summaryBox.update();
     else this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();

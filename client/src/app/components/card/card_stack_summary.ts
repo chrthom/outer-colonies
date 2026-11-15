@@ -53,6 +53,7 @@ export default class CardStackSummary {
   }
   destroy() {
     this.forAllObjects(o => this.tweenGameObject(o, 0, true));
+    this.infoBoxes = [];
   }
   highlight() {
     this.forAllObjects(o => this.tweenGameObject(o, 1));

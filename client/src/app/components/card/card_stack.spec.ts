@@ -70,7 +70,8 @@ function makeScene(): any {
     socket: { emit: jasmine.createSpy('emit') },
     time: { delayedCall: jasmine.createSpy('delayedCall') },
     add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
-    tweens: jasmine.createSpyObj('tweens', ['add'])
+    tweens: jasmine.createSpyObj('tweens', ['add']),
+    children: jasmine.createSpyObj('children', ['bringToTop'])
   };
   scene.add.image.and.callFake(makeImageStub);
   scene.add.plane.and.callFake(makePlaneStub);
@@ -208,6 +209,7 @@ describe('CardStack', () => {
         destroyRetractButton: jasmine.createSpy('destroyRetractButton'),
         destroy: jasmine.createSpy('destroy'),
         setDepth: jasmine.createSpy('setDepth'),
+        bringPlanesToTop: jasmine.createSpy('bringPlanesToTop'),
         tween: jasmine.createSpy('tween'),
         shortestAngle: jasmine.createSpy('shortestAngle').and.returnValue(0)
       };
@@ -441,6 +443,29 @@ describe('CardStack', () => {
       expect(button.image.destroy).toHaveBeenCalled();
       expect(card.retractCardButton).toBeUndefined();
       expect(cs.cards[0]).toBe(card); // the card itself is kept
+    });
+
+    it('restores data-order rendering when a card is attached to an existing stack', () => {
+      // Regression: a newly attached card is appended to the end of the
+      // display list and would render above the kept cards. The root hull
+      // is last in data.cards (non-hull attachments come first) and must
+      // stay topmost, as it was when all cards were recreated per update.
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const hull = makeRealCard(scene, realCardData('hull', false, false));
+      cs.cards = [hull];
+      seedSummaryBox(cs);
+
+      cs.update(
+        makeData({ cards: [realCardData('attachment', false, false), realCardData('hull', false, false)] })
+      );
+
+      const attachment = cs.cards[0] as any;
+      expect(cs.cards[1]).toBe(hull);
+      const planesOf = (card: any) => [card.imagePile, card.imageHighlight, card.imageMask, card.image];
+      const broughtPlanes = scene.children.bringToTop.calls.allArgs().map(([plane]: any[]) => plane);
+      // planes are brought to top in data order, so the hull ends up topmost
+      expect(broughtPlanes).toEqual([...planesOf(attachment), ...planesOf(hull)]);
     });
   });
 });
