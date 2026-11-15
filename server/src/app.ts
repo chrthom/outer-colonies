@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import { matchMakingSocketListeners, matchMakingCron } from './components/matchmaking';
 import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
+import { version, releaseName } from './shared/config/version';
 import restAPI from './components/rest_api';
 import process from 'node:process';
 
@@ -36,7 +37,7 @@ app.use(express.json());
 restAPI(app);
 
 httpServer.listen(config.get<number>('server.port'), () => {
-  console.log(`Server started on stage ${config.get('stage')}`);
+  console.log(`Server v${version} (${releaseName}) started on stage ${config.get('stage')}`);
 });
 
 if (!config.get<boolean>('terminate_on_error')) {
