@@ -111,6 +111,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Actual card game implementation with game logic and rendering
 - **Key Components**:
   - `app.component.ts`: Main game component
+  - `socket_service.ts`: App-level owner of the single Socket.IO connection; opening a new matchmaking session disconnects the socket of the previous match, and scenes bind their socket listeners to their lifecycle
   - `scenes/`: Different game scenes (menus, gameplay, etc.)
     - `game.ts`: Main game scene
     - `matchmaking.ts`: Matchmaking scene
