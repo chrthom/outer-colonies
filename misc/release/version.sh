@@ -7,6 +7,7 @@ BASE_DIR=${SCRIPT_DIR}/../..
 if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"
     echo "Usage: version.sh VERSION RELEASE_NAME"
+    exit 1
 fi
 
 echo "Incrementing version to $2 (v$1)"

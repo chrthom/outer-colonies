@@ -24,7 +24,7 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/assets"],
+            "assets": [],
             "styles": ["src/styles.scss"],
             "scripts": [],
             "allowedCommonJsDependencies": ["phaser"],
@@ -126,7 +126,7 @@
             "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/assets"],
+            "assets": [],
             "styles": ["src/styles.scss"],
             "scripts": []
           }
