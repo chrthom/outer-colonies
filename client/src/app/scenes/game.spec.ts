@@ -1,6 +1,6 @@
 import Game from './game';
-import { GameResultType } from '../../../../server/src/shared/config/enums';
-import { ClientState, emptyClientState } from '../../../../server/src/shared/interfaces/client_state';
+import { GameResultType } from '@shared/config/enums';
+import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 
 function makeRenderStubs() {
   // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()

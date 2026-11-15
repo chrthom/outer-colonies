@@ -1,10 +1,10 @@
 import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { ClientHandCard } from '../../../../../server/src/shared/interfaces/client_state';
-import { BattleType, MsgTypeInbound, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { ClientHandCard } from '@shared/interfaces/client_state';
+import { BattleType, MsgTypeInbound, TurnPhase } from '@shared/config/enums';
 import { animationConfig } from '../../config/animation';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { constants } from '@shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import { CardXPosition, CardYPosition } from '../perspective';
 

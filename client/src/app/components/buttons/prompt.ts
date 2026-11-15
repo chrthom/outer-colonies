@@ -1,5 +1,5 @@
 import { designConfig } from 'src/app/config/design';
-import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, TurnPhase } from '@shared/config/enums';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { animationConfig } from 'src/app/config/animation';
