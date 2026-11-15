@@ -153,7 +153,7 @@ This file tracks manual text corrections made during the ICON placeholder review
 | 443 | tags | Intervention (Taktik - Information, Wissenschaft) | Intervention ({ICON:tactic} Information, {ICON:tactic} Wissenschaft) | Added tactic icon placeholders for disciplines |
 | 452 | effect | unversiegbaren | unerschöpflichen | Wrong word - "unversiegbaren" (unsealable) → "unerschöpflichen" (inexhaustible) |
 | 216 | tags |  | Einmalige Verwendung | Single-use rule was printed as effect text on the card; tag keyword missed by XCF extraction |
-| 216 | effect | Kann pro Gefecht nur einmal eingesetzt werden. |  | Redundant with tag; removed to match all other single-use torpedoes (card graphic rework tracked in #787) |
+| 216 | effect | Kann pro Gefecht nur einmal eingesetzt werden. |  | Redundant with tag; removed to match all other single-use torpedoes (card graphic rework completed via #787: keyword line only; the reworked PNG was produced in one XCF pass together with the #795 value update, so it also shows damage_armour -6, which reaches the CSV and server code with #795) |
 | 304 | tags |  | Einmalige Verwendung | Single-use rule was printed as effect text on the card; tag keyword missed by XCF extraction |
 | 304 | effect | Kann pro Gefecht nur einmal eingesetzt werden. |  | Redundant with tag; removed to match all other single-use torpedoes (printed card verified via OCR: keyword line only) |
 | 423 | effect | Sieh dir die obersten 7 Karten seines Decks an. | Sieh dir die obersten 7 Karten deines Decks an. | Fixed pronoun: card searches the player's own deck (cf. Card423 server code); card graphic rework tracked in #819 |
