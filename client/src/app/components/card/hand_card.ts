@@ -50,7 +50,10 @@ export default class HandCard extends CardImage {
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)
-      .setCardId(this.data.cardId) // To display if card's origin is opponent's hand
+      // The played tactic card is no longer part of the hand data, so the real
+      // card ID of the revealed card is taken from the state (relevant for
+      // opponent cards, whose hand card IDs are redacted server-side)
+      .setCardId(this.scene.state.highlightCardID ?? this.data.cardId)
       .highlightReset();
     if (!this.data.ownedByPlayer) this.setAngle(this.angle + 180);
     this.tween({
