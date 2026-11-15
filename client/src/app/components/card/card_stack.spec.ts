@@ -18,15 +18,38 @@ function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   };
 }
 
+function makePlaneStub(): any {
+  const stub: any = {
+    modelPosition: { x: 0, y: 0, z: 0 },
+    modelRotation: { x: 0, y: 0, z: 0 },
+    angle: 0
+  };
+  [
+    'setVisible',
+    'setInteractive',
+    'setMask',
+    'createBitmapMask',
+    'setDepth',
+    'setTexture',
+    'setTint',
+    'setAlpha',
+    'on',
+    'destroy'
+  ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
+  return stub;
+}
+
 function makeScene(): any {
-  return {
+  const scene: any = {
     getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     retractCardsExist: false,
     time: { delayedCall: jasmine.createSpy('delayedCall') },
-    add: jasmine.createSpyObj('add', ['image', 'text']),
+    add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
     tweens: jasmine.createSpyObj('tweens', ['add'])
   };
+  scene.add.plane.and.callFake(makePlaneStub);
+  return scene;
 }
 
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
@@ -137,66 +160,177 @@ describe('CardStack', () => {
     });
   });
 
-  describe('arrayDiff (private)', () => {
-    function arrayDiff<T>(a: T[], b: T[]): [T[], T[]] {
-      return (makeCardStack() as any).arrayDiff(a, b);
+  describe('update', () => {
+    const cardData = (uuid: string, id: number, index = 0) => ({
+      uuid,
+      id,
+      index,
+      battleReady: false,
+      retractable: false,
+      insufficientEnergy: false
+    });
+
+    function makeCard(uuid: string, id: number): any {
+      return {
+        data: { uuid, index: 0 },
+        cardId: id,
+        update: jasmine.createSpy('update'),
+        discard: jasmine.createSpy('discard'),
+        destroyRetractButton: jasmine.createSpy('destroyRetractButton'),
+        destroy: jasmine.createSpy('destroy'),
+        setDepth: jasmine.createSpy('setDepth'),
+        tween: jasmine.createSpy('tween'),
+        shortestAngle: jasmine.createSpy('shortestAngle').and.returnValue(0)
+      };
     }
 
-    it('returns the inputs unchanged when nothing overlaps', () => {
-      expect(arrayDiff([1, 2], [3, 4])).toEqual([
-        [1, 2],
-        [3, 4]
-      ]);
-    });
+    function seedSummaryBox(cs: CardStack) {
+      (cs as any).summaryBox = { update: jasmine.createSpy('summaryBox.update') };
+    }
 
-    it('removes each shared element once from both sides', () => {
-      expect(arrayDiff([1, 2, 3, 4], [3, 4, 5, 6])).toEqual([
-        [1, 2],
-        [5, 6]
-      ]);
-    });
-
-    it('preserves duplicates when only one occurrence is shared', () => {
-      const [left, right] = arrayDiff([1, 1, 2], [1, 3]);
-      expect(left).toEqual([1, 2]);
-      expect(right).toEqual([3]);
-    });
-
-    it('does not mutate the original arrays', () => {
-      const a = [1, 2, 3];
-      const b = [2, 3, 4];
-      arrayDiff(a, b);
-      expect(a).toEqual([1, 2, 3]);
-      expect(b).toEqual([2, 3, 4]);
-    });
-  });
-
-  describe('filterCardsByIdList (private)', () => {
-    function filter(cardIds: number[], list: number[]): any[] {
+    it('reuses existing card objects keyed by uuid instead of recreating them', () => {
       const cs = makeCardStack();
-      (cs as any).cards = cardIds.map(id => ({ cardId: id }));
-      return (cs as any).filterCardsByIdList(list);
-    }
+      const cardA = makeCard('a', 1);
+      const cardB = makeCard('b', 2);
+      cs.cards = [cardA, cardB] as any;
+      seedSummaryBox(cs);
+      const dataA = cardData('a', 1);
+      const dataB = cardData('b', 2);
 
-    it('returns the cards whose ids are present in the list', () => {
-      const filtered = filter([10, 20, 30], [10, 30]);
-      expect(filtered.map(c => c.cardId)).toEqual([10, 30]);
+      cs.update(makeData({ cards: [dataA, dataB] }));
+
+      expect(cardA.update).toHaveBeenCalledWith(dataA, jasmine.any(Number), jasmine.any(Number));
+      expect(cardB.update).toHaveBeenCalledWith(dataB, jasmine.any(Number), jasmine.any(Number));
+      expect(cs.cards.length).toBe(2);
+      expect(cs.cards[0]).toBe(cardA);
+      expect(cs.cards[1]).toBe(cardB);
+      expect(cardA.destroy).not.toHaveBeenCalled();
+      expect(cardB.destroy).not.toHaveBeenCalled();
+      expect(cardA.discard).not.toHaveBeenCalled();
+      expect(cardB.discard).not.toHaveBeenCalled();
     });
 
-    it('matches each id in the list against at most one card', () => {
-      const filtered = filter([10, 10, 10], [10, 10]);
-      expect(filtered.length).toBe(2);
-      expect(filtered.every(c => c.cardId === 10)).toBeTrue();
+    it('does not schedule delayed destroys (no replaced-card duplicates)', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      cs.cards = [makeCard('a', 1)] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [cardData('a', 1)] }));
+
+      expect(scene.time.delayedCall).not.toHaveBeenCalled();
     });
 
-    it('returns an empty array when no card id matches', () => {
-      expect(filter([10, 20], [99])).toEqual([]);
+    it('discards cards whose uuid is no longer present and flags retraction', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const cardA = makeCard('a', 1);
+      const cardB = makeCard('b', 2);
+      cs.cards = [cardA, cardB] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [cardData('b', 2)] }));
+
+      expect(cardA.destroyRetractButton).toHaveBeenCalled();
+      expect(cardA.discard).toHaveBeenCalledWith(true); // no matching discard pile top card
+      expect(scene.retractCardsExist).toBeTrue();
+      expect(cardB.discard).not.toHaveBeenCalled();
+      expect(cs.cards.length).toBe(1);
+      expect(cs.cards[0]).toBe(cardB);
     });
 
-    it('does not mutate the input list', () => {
-      const list = [10, 20];
-      filter([10, 20], list);
-      expect(list).toEqual([10, 20]);
+    it('discards removed cards to the discard pile when its top card matches', () => {
+      const scene = makeScene();
+      scene.getPlayerState.and.returnValue({ discardPileIds: [1] });
+      const cs = new CardStack(scene, makeData());
+      const cardA = makeCard('a', 1);
+      cs.cards = [cardA] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [] }));
+
+      expect(cardA.discard).toHaveBeenCalledWith(false);
+      expect(scene.retractCardsExist).toBeFalse();
+    });
+
+    it('matches duplicate card ids deterministically by uuid', () => {
+      const cs = makeCardStack();
+      const cardA = makeCard('a', 42);
+      const cardB = makeCard('b', 42);
+      cs.cards = [cardA, cardB] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [cardData('b', 42)] }));
+
+      expect(cardA.discard).toHaveBeenCalled();
+      expect(cardB.update).toHaveBeenCalled();
+      expect(cs.cards.length).toBe(1);
+      expect(cs.cards[0]).toBe(cardB);
+    });
+
+    it('creates card objects only for cards with new uuids', () => {
+      const scene = makeScene();
+      const cs = new CardStack(scene, makeData());
+      const cardA = makeCard('a', 1);
+      cs.cards = [cardA] as any;
+      seedSummaryBox(cs);
+      const dataNew = cardData('new', 7);
+
+      cs.update(makeData({ cards: [cardData('a', 1), dataNew] }));
+
+      expect(scene.add.plane).toHaveBeenCalledTimes(4); // pile, glow, mask and image planes
+      expect(cs.cards.length).toBe(2);
+      expect(cs.cards[0]).toBe(cardA);
+      expect(cs.cards[1].data).toBe(dataNew);
+    });
+
+    it('places new cards at the position of the hand card with the same uuid', () => {
+      const scene = makeScene();
+      scene.getPlayerUI.and.returnValue({
+        hand: [{ uuid: 'new', x: { value3d: 111 }, y: { value3d: 222 }, image: { angle: 30 } }]
+      });
+      const cs = new CardStack(scene, makeData());
+      cs.cards = [] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [cardData('new', 7)] }));
+
+      const newCard = cs.cards[0] as any;
+      expect(newCard.image.modelPosition.x).toBe(111);
+      expect(newCard.image.modelPosition.y).toBe(222);
+    });
+
+    it('places new cards at the deck position when no hand card matches', () => {
+      const cs = makeCardStack();
+      cs.cards = [] as any;
+      seedSummaryBox(cs);
+
+      cs.update(makeData({ cards: [cardData('new', 7)] }));
+
+      const newCard = cs.cards[0] as any;
+      expect(newCard.image.modelPosition.x).toBe(newCard.placementConfig.deck.x.value3d);
+      expect(newCard.image.modelPosition.y).toBe(newCard.placementConfig.deck.y.value3d);
+    });
+
+    it('updates the summary box in place instead of recreating it', () => {
+      const cs = makeCardStack();
+      cs.cards = [] as any;
+      const summaryBox = { update: jasmine.createSpy('summaryBox.update') };
+      (cs as any).summaryBox = summaryBox;
+
+      cs.update(makeData({ cards: [] }));
+
+      expect(summaryBox.update).toHaveBeenCalled();
+      expect((cs as any).summaryBox).toBe(summaryBox);
+    });
+
+    it('creates the summary box if it does not exist yet', () => {
+      const cs = makeCardStack();
+      cs.cards = [] as any;
+
+      cs.update(makeData({ cards: [] }));
+
+      expect((cs as any).summaryBox).toBeDefined();
     });
   });
 });

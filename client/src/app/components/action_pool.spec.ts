@@ -23,6 +23,7 @@ describe('ActionPool', () => {
             setOrigin = jasmine.createSpy().and.returnValue(this);
             setTint = jasmine.createSpy().and.returnValue(this);
             setAlpha = jasmine.createSpy().and.returnValue(this);
+            setTexture = jasmine.createSpy().and.returnValue(this);
             destroy = jasmine.createSpy('destroy');
           }
 
@@ -120,24 +121,53 @@ describe('ActionPool', () => {
     expect(actionPool.images).toEqual([]);
   });
 
-  it('should destroy old images before creating new ones', () => {
+  it('should reuse images and update their textures in place', () => {
     // First update
     actionPool.update();
     const firstImages = [...actionPool.images];
+    expect(firstImages.length).toBe(2);
 
-    // Second update with different actions
-    mockScene.getPlayerState.and.returnValue({ actionPool: ['move'] });
+    // Second update with different actions of the same size
+    mockScene.getPlayerState.and.returnValue({ actionPool: ['move', 'defend'] });
     actionPool.update();
 
-    // Verify old images were destroyed
-    firstImages.forEach(img => expect(img.destroy).toHaveBeenCalled());
+    // Verify the same image objects are reused with updated textures
+    expect(actionPool.images.length).toBe(2);
+    expect(actionPool.images[0]).toBe(firstImages[0]);
+    expect(actionPool.images[1]).toBe(firstImages[1]);
+    expect(firstImages[0].setTexture).toHaveBeenCalledWith('icon_move');
+    expect(firstImages[1].setTexture).toHaveBeenCalledWith('icon_defend');
 
-    // Verify new images were created
+    // No images were destroyed or recreated for the update
+    firstImages.forEach(img => expect(img.destroy).not.toHaveBeenCalled());
+    expect(mockScene.add.image).toHaveBeenCalledTimes(2); // only from the first update
+  });
+
+  it('should destroy only surplus images when the action pool shrinks', () => {
+    actionPool.update();
+    const firstImages = [...actionPool.images];
+
+    mockScene.getPlayerState.and.returnValue({ actionPool: ['attack'] });
+    actionPool.update();
+
     expect(actionPool.images.length).toBe(1);
-    expect(mockScene.add.image).toHaveBeenCalledWith(
-      layoutConfig.game.ui.actionPool.player.x,
-      layoutConfig.game.ui.actionPool.player.y,
-      'icon_move'
-    );
+    expect(actionPool.images[0]).toBe(firstImages[0]);
+    expect(firstImages[0].setTexture).toHaveBeenCalledWith('icon_attack');
+    expect(firstImages[1].destroy).toHaveBeenCalled();
+    expect(firstImages[0].destroy).not.toHaveBeenCalled();
+  });
+
+  it('should recreate images after the pool was emptied and grows again', () => {
+    actionPool.update();
+    expect(actionPool.images.length).toBe(2);
+
+    mockScene.getPlayerState.and.returnValue({ actionPool: [] });
+    actionPool.update();
+    expect(actionPool.images).toEqual([]);
+
+    mockScene.getPlayerState.and.returnValue({ actionPool: ['attack', 'defend'] });
+    actionPool.update();
+    expect(actionPool.images.length).toBe(2);
+    expect(mockScene.add.image).toHaveBeenCalledTimes(4); // 2 from each non-empty update
   });
 });

@@ -73,6 +73,7 @@ export default class CardImage {
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
+    this.imagePile.destroy();
     return this;
   }
   discard(toDeck?: boolean): this {

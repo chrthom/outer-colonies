@@ -20,15 +20,18 @@ export default class DeckCard extends CardImage {
     this.update();
   }
   update() {
-    if (this.indicator) this.indicator.destroy();
-    this.indicator = new ValueIndicator(
-      this.scene,
-      this.deckSize,
-      this.deckSize < 10,
-      this.placementConfig.deck.x.value2d,
-      this.placementConfig.deck.y.value2d,
-      this.ownedByPlayer
-    );
+    if (this.indicator) {
+      this.indicator.update(this.deckSize, this.deckSize < 10);
+    } else {
+      this.indicator = new ValueIndicator(
+        this.scene,
+        this.deckSize,
+        this.deckSize < 10,
+        this.placementConfig.deck.x.value2d,
+        this.placementConfig.deck.y.value2d,
+        this.ownedByPlayer
+      );
+    }
     this.setPileSize(this.deckSize);
   }
 

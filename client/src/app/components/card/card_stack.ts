@@ -42,35 +42,30 @@ export default class CardStack {
     this.cards.forEach(c => c.discard(toDeck));
   }
   update(data: ClientCardStack) {
-    this.destroyIndicators();
-    const [removedCardIds, newCardIds] = this.arrayDiff(
-      this.cards.map(c => c.cardId),
-      data.cards.map(c => c.id)
-    );
-    this.filterCardsByIdList(removedCardIds).forEach(c => {
+    const removedCards = this.cards.filter(c => !data.cards.some(nc => nc.uuid == c.data.uuid));
+    removedCards.forEach(c => {
       let toDeck = false;
       if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != c.cardId) {
         toDeck = true;
         this.scene.retractCardsExist = true;
       }
+      c.destroyRetractButton();
       c.discard(toDeck);
-    }, this);
-    const replacedCards = this.filterCardsByIdList(data.cards.map(c => c.id));
-    this.data.cards = data.cards;
-    this.createCards();
-    this.data = data;
-    this.summaryBox = new CardStackSummary(this.scene, this);
-    this.filterCardsByIdList(newCardIds).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
-      const x = handCard ? handCard.x : c.placementConfig.deck.x;
-      const y = handCard ? handCard.y : c.placementConfig.deck.y;
-      const angle = handCard
-        ? handCard.image.angle
-        : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
-      c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
     });
+    const keptCards = this.cards.filter(c => !removedCards.includes(c));
+    this.data = data;
+    const x = this.targetX.value2d;
+    this.cards = data.cards.map(nc => {
+      const existingCard = keptCards.find(c => c.data.uuid == nc.uuid);
+      if (existingCard) {
+        existingCard.update(nc, x, this.targetY(nc.index).value2d);
+        return existingCard;
+      }
+      return this.createNewCard(nc);
+    });
+    if (this.summaryBox) this.summaryBox.update();
+    else this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
-    this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
   }
   animateAttack(cardUUID: string) {
     this.cards.find(c => c.data.uuid == cardUUID)?.animateAttack();
@@ -161,17 +156,6 @@ export default class CardStack {
       !this.scene.activeCards.hand
     );
   }
-  private filterCardsByIdList(list: number[]) {
-    const l = list.slice();
-    return this.cards.filter(c => {
-      if (l.includes(c.cardId)) {
-        l.splice(l.indexOf(c.cardId), 1);
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
   private pointerover() {
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
@@ -193,22 +177,9 @@ export default class CardStack {
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c => {
-      const x = this.targetX;
-      const y = this.targetY(c.index);
-      const newCard = new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, c)
-        .setDepth(this.depth)
-        .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
-      return newCard;
-    });
-    this.cards.forEach(c => {
-      c.enableMaximizeOnRightclick();
-      c.image
-        .on('pointerdown', (p: Phaser.Input.Pointer) => {
-          if (p.leftButtonDown()) this.onClickAction(c.data);
-        })
-        .on('pointerover', () => this.pointerover())
-        .on('pointerout', () => this.pointerout())
-        .on('gameout', () => this.pointerout());
+      const card = this.createCard(c);
+      this.enableInteraction(card);
+      return card;
     });
     if (origin) {
       this.cards[0]
@@ -218,6 +189,34 @@ export default class CardStack {
         .setAngle(origin.angle)
         .setXRotation(origin.xRotation);
     }
+  }
+  private createCard(cardData: ClientCard): Card {
+    const x = this.targetX;
+    const y = this.targetY(cardData.index);
+    return new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, cardData)
+      .setDepth(this.depth)
+      .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
+  }
+  private createNewCard(cardData: ClientCard): Card {
+    const card = this.createCard(cardData);
+    this.enableInteraction(card);
+    const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.uuid == cardData.uuid);
+    const x = handCard ? handCard.x : card.placementConfig.deck.x;
+    const y = handCard ? handCard.y : card.placementConfig.deck.y;
+    const angle = handCard
+      ? handCard.image.angle
+      : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
+    return card.setX(x).setY(y).setAngle(angle);
+  }
+  private enableInteraction(card: Card) {
+    card.enableMaximizeOnRightclick();
+    card.image
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction(card.data);
+      })
+      .on('pointerover', () => this.pointerover())
+      .on('pointerout', () => this.pointerout())
+      .on('gameout', () => this.pointerout());
   }
   private targetXExpanded(index: number): CardXPosition {
     const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
@@ -322,18 +321,5 @@ export default class CardStack {
       }
       this.scene.updateView();
     }
-  }
-  private arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
-    const a1 = array1.slice();
-    const a2 = array2.slice();
-    a1.slice().forEach(v1 => {
-      const i1 = a1.indexOf(v1);
-      const i2 = a2.indexOf(v1);
-      if (i1 >= 0 && i2 >= 0) {
-        a1.splice(i1, 1);
-        a2.splice(i2, 1);
-      }
-    });
-    return [a1, a2];
   }
 }
