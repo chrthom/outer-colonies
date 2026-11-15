@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import Mailer from './mailer';
 
 jest.mock('nodemailer', () => ({
-  createTransport: jest.fn(() => ({ sendMail: jest.fn() }))
+  createTransport: jest.fn(() => ({ sendMail: jest.fn(() => Promise.resolve({})) }))
 }));
 
 describe('Mailer', () => {
@@ -28,8 +28,10 @@ describe('Mailer', () => {
   });
 
   describe('sendAccountActivation', () => {
-    it('should send a mail with the account activation subject and link', () => {
-      Mailer.sendAccountActivation('test@example.com', 'Testuser', 'uuid-123');
+    it('should send a mail with the account activation subject and link', async () => {
+      await expect(Mailer.sendAccountActivation('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual(
+        {}
+      );
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           from: 'noreply@outercolonies.de',
@@ -44,8 +46,10 @@ describe('Mailer', () => {
   });
 
   describe('sendEmailConfirmation', () => {
-    it('should send a mail with the email confirmation subject, link and correct wording', () => {
-      Mailer.sendEmailConfirmation('test@example.com', 'Testuser', 'uuid-123');
+    it('should send a mail with the email confirmation subject, link and correct wording', async () => {
+      await expect(Mailer.sendEmailConfirmation('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual(
+        {}
+      );
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           to: 'test@example.com',
@@ -63,8 +67,8 @@ describe('Mailer', () => {
   });
 
   describe('sendPasswordReset', () => {
-    it('should send a mail with the password reset subject and link', () => {
-      Mailer.sendPasswordReset('test@example.com', 'Testuser', 'uuid-123');
+    it('should send a mail with the password reset subject and link', async () => {
+      await expect(Mailer.sendPasswordReset('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual({});
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           to: 'test@example.com',
@@ -74,6 +78,19 @@ describe('Mailer', () => {
       const mail = sendMail().mock.calls[0][0];
       expect(mail.text).toContain(`${config.get('url.base')}/reset-password/uuid-123`);
       expect(mail.html).toContain(`${config.get('url.base')}/reset-password/uuid-123`);
+    });
+  });
+
+  describe('name escaping', () => {
+    it('should escape the user-controlled name in the HTML bodies of all send methods', () => {
+      const maliciousName = '<script>alert("x")</script>&\'';
+      Mailer.sendAccountActivation('test@example.com', maliciousName, 'uuid-123');
+      Mailer.sendEmailConfirmation('test@example.com', maliciousName, 'uuid-123');
+      Mailer.sendPasswordReset('test@example.com', maliciousName, 'uuid-123');
+      for (const [mail] of sendMail().mock.calls) {
+        expect(mail.html).not.toContain('<script>');
+        expect(mail.html).toContain('Hallo &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;');
+      }
     });
   });
 });

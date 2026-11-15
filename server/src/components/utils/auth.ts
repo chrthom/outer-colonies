@@ -65,7 +65,15 @@ export default class Auth {
       .map(c => c.id)
       .forEach(id => DBDecksDAO.create(id, credential.userId, true));
     const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
-    await Mailer.sendAccountActivation(credential.email, credential.username, uuid);
+    try {
+      await Mailer.sendAccountActivation(credential.email, credential.username, uuid);
+    } catch (err) {
+      console.log(
+        `ERROR: Failed to send account activation mail to user ${credential.userId}; ` +
+          `account, profile and activation link require manual cleanup: ${err}`
+      );
+      throw err;
+    }
     return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
