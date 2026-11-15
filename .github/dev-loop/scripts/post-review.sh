@@ -349,10 +349,30 @@ fi
 
 case "$verdict" in
   CLEAN)
-    echo "Verdict CLEAN: the PR stands ready for a human merge decision; no state change."
+    # Clean label (misc/dev-loop.md): a visible merge-ready signal for the
+    # maintainer - the current head passed a CLEAN review. Added here,
+    # removed again by the next non-CLEAN verdict (the removal above this
+    # case). Best-effort like the escalation guards: a failed label call
+    # must not red-run the post-step after a successful review post, and the
+    # next verdict re-offers the sync. The label is created on demand, like
+    # the gates create needs-human/dev-loop.
+    gh label create clean --color 2BB552 \
+      --description "dev-loop: the current head passed a CLEAN review" 2>/dev/null || true
+    if gh pr edit "$PR_NUMBER" --add-label clean >/dev/null 2>&1; then
+      echo "Verdict CLEAN: the PR stands ready for a human merge decision; clean label added."
+    else
+      echo "::warning::Verdict CLEAN, but adding the clean label failed; the review stands - the label can be added manually."
+    fi
     exit 0
     ;;
   CHANGES_NEEDED)
+    # The head no longer stands at a CLEAN verdict: drop the clean label so
+    # the merge-ready signal cannot outlive the verdict it was earned on
+    # (best-effort, membership-checked - a missing label is not an error).
+    if gh pr view "$PR_NUMBER" --json labels --jq 'any(.labels[]; .name == "clean")' 2>/dev/null | grep -q true; then
+      gh pr edit "$PR_NUMBER" --remove-label clean >/dev/null 2>&1 \
+        || echo "::warning::Could not remove the clean label on PR #$PR_NUMBER; remove it manually."
+    fi
     case "$review_post_id" in
       ''|*[!0-9]*)
         # A non-numeric id must never reach the fixer (PR #106: the 422 error JSON crashed the fixer gate).
@@ -369,6 +389,11 @@ case "$verdict" in
     exit 0
     ;;
   NEEDS_HUMAN)
+    # Same label drop as CHANGES_NEEDED: the head did not pass a CLEAN review.
+    if gh pr view "$PR_NUMBER" --json labels --jq 'any(.labels[]; .name == "clean")' 2>/dev/null | grep -q true; then
+      gh pr edit "$PR_NUMBER" --remove-label clean >/dev/null 2>&1 \
+        || echo "::warning::Could not remove the clean label on PR #$PR_NUMBER; remove it manually."
+    fi
     escalate "review verdict NEEDS_HUMAN - at least one finding requires a human decision; see the review just posted"
     exit 0
     ;;

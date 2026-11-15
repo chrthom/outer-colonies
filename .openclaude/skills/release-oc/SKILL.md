@@ -94,27 +94,20 @@ Oriented at the existing style (reference: release v3.0.0 Prometheus).
 ## Closed Issues
 
 ### Features
-- #<N> - <issue title> (size - L|M|S)
+- #<N> - <issue title>
 
-### Enhancements
-- #<N> - <issue title> (size - L|M|S)
-
-### Cards
-- #<N> - <issue title> (size - L|M|S)
-
-### Internal
-- #<N> - <issue title> (size - L|M|S)
+### Tasks
+- #<N> - <issue title>
 
 ### Bugs
-- #<N> - <issue title> (bug)
+- #<N> - <issue title>
 
 ---
 
 *Generated automatically from milestone <x.x> <moon name>*
 ```
 
-- Categories according to the issue type labels (`feature`, `enhancement`, `cards`, `internal`, `bug`); only list non-empty categories.
-- Append the size label in parentheses (bugs have no size label, use "(bug)").
+- Categories according to the issue types (`Feature`, `Task`, `Bug`); only list non-empty categories.
 - Do **not** include the release issue itself ("Create release <x.x> and perform deployment") in the notes.
 
 ## Rules

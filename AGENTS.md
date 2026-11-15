@@ -27,22 +27,20 @@ Maintain consistency across the three subprojects
 - Squash merges only; no direct pushes to `main` (both enforced via GitHub branch protection)
 - PRs are always reviewed and merged by the maintainer
 
-### Issue Labels
-- Every issue has exactly one type label:
-  - `bug` – Something isn't working
-  - `cards` – Game cards to be added or adjusted and game card features to be implemented
-  - `internal` – Database, testing, deployment, refactorings and hosting
-  - `enhancement` – Feature improvements, design enhancements or website content additions
-  - `feature` – A new game or website feature
-- All types except `bug` additionally require exactly one size label: `size - S`, `size - M` or `size - L`
+### Issue Types & Labels
+- Every issue has exactly one GitHub issue type (the `type` field, not a label):
+  - `Feature` – New game or website features, feature improvements, design enhancements, website content additions, and game cards to be added or adjusted
+  - `Task` – Database, testing, deployment, refactorings and hosting
+  - `Bug` – Something isn't working
 - `dev-loop` is the default label if the task can be fully implemented by the AI dev loop; use `needs-human` instead if human work is required (especially adjusting card graphics)
+- The `clean` label on a PR marks that its current head passed a dev-loop review with verdict CLEAN; it is managed by the dev loop (added on a CLEAN verdict, removed on the next non-CLEAN verdict)
 
 ### Milestones, Versions & Releases
 - Each milestone matches exactly one major/minor tag and release and contains all issues for developing that release; hotfix patch tags and releases are additionally assigned to the productive milestone
 - Tags and releases are semantically versioned
 - Milestones only cover major/minor versions; patches (hotfixes) belong to the milestone of the currently productive version
 - The currently productive milestone stays open so productive bugs can be assigned to it; new features and enhancements go to the next milestone
-- Milestone planning: at most one `size - L` issue, few `size - M` issues and any number of `size - S` issues
+- Milestone planning: keep milestones small and focused
 - Milestone names are solar system bodies: Saturn moons in ascending order of the "Nr." column of the German Wikipedia list of Saturn's moons (https://de.wikipedia.org/wiki/Liste_der_Saturnmonde); strictly sequential from now on, next after Pan (XVIII) is Ymir (XIX)
 
 ### Deployment

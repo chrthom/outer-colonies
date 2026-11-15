@@ -38,15 +38,13 @@ fi
 
 ISSUE_TITLE=$(echo "$ISSUE_DATA" | jq -r '.title')
 ISSUE_BODY=$(echo "$ISSUE_DATA" | jq -r '.body')
-ISSUE_LABELS=$(echo "$ISSUE_DATA" | jq -r '[.labels[].name] | join(", ")')
+ISSUE_TYPE=$(echo "$ISSUE_DATA" | jq -r '.type.name // empty')
 ```
 
 4. Determine Issue Type and Branch Prefix
 ```bash
-if echo "$ISSUE_LABELS" | grep -q "bug"; then
+if [ "$ISSUE_TYPE" = "Bug" ]; then
   BRANCH_PREFIX="bugfix"
-elif echo "$ISSUE_LABELS" | grep -qE "(enhancement|feature)"; then
-  BRANCH_PREFIX="feature"
 else
   BRANCH_PREFIX="feature"
 fi
