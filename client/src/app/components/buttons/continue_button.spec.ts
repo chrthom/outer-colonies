@@ -258,6 +258,30 @@ describe('ContinueButton auto-ready', () => {
       expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Combat);
       expect(scene.socket.emit.calls.count()).toBe(1);
     });
+
+    it('does not re-queue an auto-ready after a manual click for the same state', () => {
+      const scene = makeScene(combatState());
+      const button = new ContinueButton(scene);
+
+      button.update();
+      (button as any).onClickAction(); // Manual click on the continue button
+      expect(scene.socket.emit.calls.count()).toBe(1);
+
+      // User interactions while waiting for the server trigger further update() calls
+      button.update();
+      button.update();
+
+      expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
+      fireAutoReadys(scene, animationConfig.duration.attack);
+      expect(scene.socket.emit.calls.count()).toBe(1); // No second Ready for the same pending action
+
+      // A new state (e.g. after a rejected Ready) still queues a new auto-ready
+      scene.state = combatState();
+      button.update();
+      expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(1);
+      fireAutoReadys(scene, animationConfig.duration.attack);
+      expect(scene.socket.emit.calls.count()).toBe(2);
+    });
   });
 
   describe('build phase without interception-ready ships', () => {

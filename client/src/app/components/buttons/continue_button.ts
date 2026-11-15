@@ -147,11 +147,19 @@ export default class ContinueButton {
   }
   /** Cancels a queued automatic Ready message, if one exists. */
   private cancelPendingAutoReady() {
+    this.cancelAutoReadyTimer();
+    this.autoReadyState = undefined;
+  }
+  /**
+   * Removes a queued automatic Ready timer while keeping the state marker, so
+   * that repeated update() calls for the same state do not queue a second
+   * Ready for the same pending action.
+   */
+  private cancelAutoReadyTimer() {
     if (this.autoReadyTimer) {
       this.scene.time.removeEvent(this.autoReadyTimer);
       this.autoReadyTimer = undefined;
     }
-    this.autoReadyState = undefined;
   }
   /**
    * Ready message to automatically send for the current state, or undefined if
@@ -235,8 +243,12 @@ export default class ContinueButton {
   private show(text: string, button: string, onClickAction?: () => void) {
     this.onClickAction = onClickAction
       ? () => {
-          // The player acts himself, so a queued automatic Ready message is obsolete
-          this.cancelPendingAutoReady();
+          // The player acts himself, so a queued automatic Ready message is
+          // obsolete. Only its timer is removed while the state marker is
+          // kept, so that subsequent update() calls for the same state (e.g.
+          // user interactions while waiting for the server) do not queue a
+          // second Ready for the same pending action.
+          this.cancelAutoReadyTimer();
           onClickAction();
         }
       : () => {
