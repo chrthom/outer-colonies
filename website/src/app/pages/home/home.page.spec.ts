@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { HomePage } from './home.page';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
-import { DailyGetResponse } from '../../../../../server/src/shared/interfaces/rest_api';
+import { DailyGetResponse } from '@shared/interfaces/rest_api';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { environment } from 'src/environments/environment';
 

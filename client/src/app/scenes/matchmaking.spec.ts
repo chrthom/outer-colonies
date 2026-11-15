@@ -1,6 +1,6 @@
 import Matchmaking from './matchmaking';
-import { MsgTypeOutbound } from '../../../../server/src/shared/config/enums';
-import ClientGameParams from '../../../../server/src/shared/interfaces/client_game_params';
+import { MsgTypeOutbound } from '@shared/config/enums';
+import ClientGameParams from '@shared/interfaces/client_game_params';
 import Phaser from 'phaser';
 
 describe('Matchmaking scene - socket listener lifecycle', () => {
