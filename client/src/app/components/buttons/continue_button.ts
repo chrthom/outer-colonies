@@ -1,5 +1,5 @@
 import { animationConfig } from 'src/app/config/animation';
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { BattleType, MsgTypeInbound, TurnPhase } from '@shared/config/enums';
 import { ClientGameResult, ClientState } from '@shared/interfaces/client_state';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -224,8 +224,8 @@ export default class ContinueButton {
   }
   private showGameOver(gameResult: ClientGameResult) {
     this.scene.showGameOverIndicator(gameResult);
+    // The Game scene removes all of its socket listeners on scene shutdown
     this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
-      this.scene.socket.off(MsgTypeOutbound.State);
       this.scene.scene.start('Matchmaking');
     });
   }

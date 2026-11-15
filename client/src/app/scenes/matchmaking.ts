@@ -1,4 +1,4 @@
-import io, { Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
@@ -8,6 +8,7 @@ import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
 import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
 import ClientGameParams from '@shared/interfaces/client_game_params';
+import SocketService from '../socket_service';
 
 export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;
@@ -32,7 +33,21 @@ export default class Matchmaking extends Phaser.Scene {
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
     new ExitButton(this);
-    this.socket = io(environment.urls.api, { reconnectionAttempts: 5 });
+    // Disconnects the socket of a previous match before opening a new connection
+    this.socket = SocketService.connect();
+    this.registerSocketListeners();
+    new Background(this);
+    loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
+  }
+
+  /**
+   * Registers the socket listeners of the matchmaking scene.
+   *
+   * All listeners are bound to the scene lifecycle and removed again on scene
+   * shutdown, so that no listeners of a previous session leak into the next
+   * matchmaking or game scene.
+   */
+  private registerSocketListeners(): void {
     this.socket.on(MsgTypeOutbound.Connect, () => {
       this.status.setText('Authentifiziere Nutzer...');
       this.socket.emit(MsgTypeInbound.Login, this.sessionToken);
@@ -55,21 +70,21 @@ export default class Matchmaking extends Phaser.Scene {
             this.status.setText('Suche Mitspieler...');
             break;
           case MatchmakingStatus.Start:
-            this.socket.off(MsgTypeOutbound.Connect);
-            this.socket.off(MsgTypeOutbound.Matchmaking);
-            this.socket.off('disconnect');
-            this.socket.off('connect_error');
-            this.socket.io.off('reconnect_failed');
+            // The game scene fetches the connection from the SocketService itself.
             // Only the Start message carries game params; Search reports the waiting-client count.
             this.scene.start('Game', {
-              socket: this.socket,
               gameParams: payload as ClientGameParams
             });
             break;
         }
       }
     );
-    new Background(this);
-    loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.socket.off(MsgTypeOutbound.Connect);
+      this.socket.off(MsgTypeOutbound.Matchmaking);
+      this.socket.off('disconnect');
+      this.socket.off('connect_error');
+      this.socket.io.off('reconnect_failed');
+    });
   }
 }

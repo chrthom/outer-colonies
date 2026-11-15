@@ -1,5 +1,6 @@
 import Game from './game';
-import { GameResultType, TurnPhase } from '@shared/config/enums';
+import SocketService from '../socket_service';
+import { GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import {
   ClientGameResult,
   ClientHandCard,
@@ -8,6 +9,25 @@ import {
 } from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
 import { Socket } from 'socket.io-client';
+import Phaser from 'phaser';
+
+/** Fake socket that records the game listeners registered and removed by the scene. */
+interface SocketListenerStub {
+  on: jasmine.Spy;
+  off: jasmine.Spy;
+}
+
+/** Handle for overriding socket lifecycle internals of a Game instance in tests. */
+interface GameSocketOverrides {
+  socket: SocketListenerStub;
+  events: { once: jasmine.Spy };
+  registerSocketListeners: () => void;
+}
+
+/** Handle for overriding the private socket factory of the SocketService. */
+interface SocketServiceOverrides {
+  createSocket: () => Socket;
+}
 
 /**
  * Test double for Phaser's clock: records delayed calls so tests can fire
@@ -215,11 +235,71 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
   });
 });
 
+describe('Game scene - socket listener lifecycle', () => {
+  let game: Game;
+  let socket: SocketListenerStub;
+  let shutdownEvent: string;
+  let shutdownHandler: () => void;
+
+  beforeEach(() => {
+    game = new Game();
+    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    const handle = game as unknown as GameSocketOverrides;
+    handle.socket = socket;
+    handle.events = {
+      once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
+        shutdownEvent = event;
+        shutdownHandler = handler;
+      })
+    };
+    handle.registerSocketListeners();
+  });
+
+  it('registers all game listeners in create()', () => {
+    expect(socket.on.calls.allArgs().map(args => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('binds the listener cleanup to the scene shutdown event', () => {
+    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+  });
+
+  it('removes all game listeners on scene shutdown', () => {
+    shutdownHandler();
+
+    expect(socket.off.calls.allArgs().map(args => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('shows the surrender indicator when the socket disconnects', () => {
+    const stubs = makeRenderStubs();
+    game.add = stubs.add as unknown as Phaser.GameObjects.GameObjectFactory;
+    game.tweens = stubs.tweens as unknown as Phaser.Tweens.TweenManager;
+    game.state = emptyClientState;
+
+    const disconnectHandler = socket.on.calls.allArgs().find(args => args[0] == 'disconnect')![1];
+    disconnectHandler();
+
+    expect(game.state.gameResult?.won).toBeFalse();
+    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
+  });
+});
+
 describe('Game scene - showGameOverIndicator', () => {
   let game: Game;
 
   beforeEach(() => {
     game = makeGame();
+  });
+
+  afterEach(() => {
+    SocketService.disconnect();
   });
 
   it('creates the overlay exactly once regardless of how often it is called', () => {
@@ -245,9 +325,14 @@ describe('Game scene - showGameOverIndicator', () => {
   it('shows a fresh overlay in the next match after init() resets the reference', () => {
     game.showSurrenderOnDisconnect();
 
+    // The Game scene fetches its socket from the app-level SocketService, so
+    // open a fake connection instead of passing a socket via the init data.
+    const socket = jasmine.createSpyObj('Socket', ['disconnect']);
+    socket.io = { reconnection: () => undefined };
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
+    SocketService.connect();
     game.init({
-      gameParams: { preloadCardIds: [] },
-      socket: { io: { reconnection: () => undefined } } as unknown as Socket
+      gameParams: { preloadCardIds: [] }
     });
     (game.add.image as unknown as jasmine.Spy).calls.reset();
     (game.add.text as unknown as jasmine.Spy).calls.reset();

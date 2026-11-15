@@ -29,6 +29,7 @@ import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 import OptionPicker from '../components/option_picker';
+import SocketService from '../socket_service';
 import StateUpdateSequencer from '../utils/state_update_sequencer';
 
 interface ActiveCards {
@@ -49,7 +50,6 @@ interface FixedUIElements {
 
 interface InitData {
   gameParams: ClientGameParams;
-  socket: Socket;
 }
 
 interface PlayerUIElements {
@@ -91,7 +91,7 @@ export default class Game extends Phaser.Scene {
   }
 
   init(data: InitData) {
-    this.socket = data.socket;
+    this.socket = SocketService.getSocket();
     this.gameParams = data.gameParams;
     // The server treats any in-game disconnect as a surrender, so a reconnected
     // socket would no longer be bound to this match.
@@ -109,16 +109,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
-      this.updateState(state);
-    });
-    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
-      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
-      (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
-    });
-    this.socket.on('disconnect', () => {
-      this.showSurrenderOnDisconnect();
-    });
+    this.registerSocketListeners();
     this.background.initInterface();
     this.opponent = {
       actionPool: new ActionPool(this, false),
@@ -143,6 +134,31 @@ export default class Game extends Phaser.Scene {
       missionButton: new MissionButton(this)
     };
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
+  }
+
+  /**
+   * Registers the socket listeners of the game scene.
+   *
+   * All listeners are bound to the scene lifecycle and removed again on scene
+   * shutdown, so that no listeners of a finished match leak into the next
+   * matchmaking session.
+   */
+  private registerSocketListeners(): void {
+    this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
+      this.updateState(state);
+    });
+    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
+      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
+      (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
+    });
+    this.socket.on('disconnect', () => {
+      this.showSurrenderOnDisconnect();
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.socket.off(MsgTypeOutbound.State);
+      this.socket.off(MsgTypeOutbound.Countdown);
+      this.socket.off('disconnect');
+    });
   }
 
   /**
