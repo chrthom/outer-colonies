@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ItemListResponseBox } from '../../../../../server/src/shared/interfaces/rest_api';
+import { ItemListResponseBox } from '@shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { MatFabButton } from '@angular/material/button';
 

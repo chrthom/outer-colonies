@@ -1,22 +1,12 @@
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import {
-  BattleType,
-  EventType,
-  MsgTypeInbound,
-  TurnPhase,
-  Zone
-} from '../../../../../server/src/shared/config/enums';
-import {
-  ClientAttack,
-  ClientCard,
-  ClientCardStack
-} from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, EventType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { ClientAttack, ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { constants } from '@shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
