@@ -81,6 +81,7 @@ export default class Game extends Phaser.Scene {
 
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
+  private gameOverIndicator?: GameOverIndicator;
   background!: Background;
   obj!: FixedUIElements;
   player!: PlayerUIElements;
@@ -98,6 +99,9 @@ export default class Game extends Phaser.Scene {
     // The server treats any in-game disconnect as a surrender, so a reconnected
     // socket would no longer be bound to this match.
     this.socket.io.reconnection(false);
+    // Phaser reuses the scene instance for the next match, so reset the
+    // reference to allow a fresh game over overlay in the new game.
+    this.gameOverIndicator = undefined;
     this.background = new Background(this);
   }
 
@@ -144,6 +148,17 @@ export default class Game extends Phaser.Scene {
     this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
   }
 
+  /**
+   * Shows the game over overlay for the given result exactly once per game.
+   * Any later call (e.g. from additional states or user interactions after the game result)
+   * is ignored, so exactly one overlay exists regardless of how many updates arrive.
+   */
+  showGameOverIndicator(gameResult: ClientGameResult) {
+    if (!this.gameOverIndicator) {
+      this.gameOverIndicator = new GameOverIndicator(this, gameResult);
+    }
+  }
+
   showSurrenderOnDisconnect() {
     // The server treats disconnect-during-game as surrender
     if (this.state.gameResult) return;
@@ -155,7 +170,7 @@ export default class Game extends Phaser.Scene {
     // Avoid mutating the shared `emptyClientState` constant if no State
     // message has arrived yet.
     this.state = { ...this.state, gameResult: result };
-    new GameOverIndicator(this, result);
+    this.showGameOverIndicator(result);
   }
 
   updateState(state: ClientState) {
