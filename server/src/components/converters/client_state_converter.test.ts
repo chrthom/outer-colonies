@@ -87,7 +87,7 @@ describe('toClientState', () => {
   });
 
   describe('hand card redaction', () => {
-    test("redacts the opponent's hand cards", () => {
+    test('redacts hand cards of the opponent', () => {
       addHandCard(match.players[1], new MockCard(111));
       addHandCard(match.players[1], new MockCard(112));
 
@@ -104,7 +104,7 @@ describe('toClientState', () => {
       });
     });
 
-    test("keeps the requesting player's own hand cards unredacted", () => {
+    test('keeps own hand cards of the requesting player unredacted', () => {
       const ownCard = addHandCard(match.players[0], new MockCard(211));
 
       const state = toClientState(match, 0);
