@@ -1,5 +1,6 @@
 import Game from './game';
-import { GameResultType, TurnPhase } from '@shared/config/enums';
+import SocketService from '../socket_service';
+import { GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import {
   ClientGameResult,
   ClientHandCard,
@@ -7,6 +8,7 @@ import {
   emptyClientState
 } from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
+import Phaser from 'phaser';
 import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
 
 /**
@@ -137,11 +139,69 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
   });
 });
 
+describe('Game scene - socket listener lifecycle', () => {
+  let game: Game;
+  let socket: any;
+  let shutdownEvent: string;
+  let shutdownHandler: () => void;
+
+  beforeEach(() => {
+    game = new Game();
+    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    (game as any).socket = socket;
+    (game as any).events = {
+      once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
+        shutdownEvent = event;
+        shutdownHandler = handler;
+      })
+    };
+    (game as any).registerSocketListeners();
+  });
+
+  it('registers all game listeners in create()', () => {
+    expect(socket.on.calls.allArgs().map((args: any[]) => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('binds the listener cleanup to the scene shutdown event', () => {
+    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+  });
+
+  it('removes all game listeners on scene shutdown', () => {
+    shutdownHandler();
+
+    expect(socket.off.calls.allArgs().map((args: any[]) => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('shows the surrender indicator when the socket disconnects', () => {
+    (game as any).add = makeAddStub();
+    (game as any).tweens = makeTweensStub();
+    game.state = emptyClientState;
+
+    const disconnectHandler = socket.on.calls.allArgs().find((args: any[]) => args[0] == 'disconnect')![1];
+    disconnectHandler();
+
+    expect(game.state.gameResult?.won).toBeFalse();
+    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
+  });
+});
+
 describe('Game scene - showGameOverIndicator', () => {
   let game: Game;
 
   beforeEach(() => {
     game = makeGame();
+  });
+
+  afterEach(() => {
+    SocketService.disconnect();
   });
 
   it('creates the overlay exactly once regardless of how often it is called', () => {
@@ -167,9 +227,14 @@ describe('Game scene - showGameOverIndicator', () => {
   it('shows a fresh overlay in the next match after init() resets the reference', () => {
     game.showSurrenderOnDisconnect();
 
+    // The Game scene fetches its socket from the app-level SocketService, so
+    // open a fake connection instead of passing a socket via the init data.
+    const socket: any = jasmine.createSpyObj('Socket', ['disconnect']);
+    socket.io = { reconnection: () => undefined };
+    spyOn(SocketService as any, 'createSocket').and.returnValue(socket);
+    SocketService.connect();
     game.init({
-      gameParams: { preloadCardIds: [] },
-      socket: { io: { reconnection: () => undefined } } as any
+      gameParams: { preloadCardIds: [] }
     });
     ((game as any).add.image as jasmine.Spy).calls.reset();
     ((game as any).add.text as jasmine.Spy).calls.reset();
