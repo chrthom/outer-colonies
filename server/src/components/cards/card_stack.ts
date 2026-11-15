@@ -196,13 +196,19 @@ export default abstract class CardStack {
   }
   retract() {
     this.removeCardStack();
-    const retractedCards = this.cards.filter(c => c.canBeRetracted(this.isRootCard));
-    const newHandCardStacks = this.player.takeCards(retractedCards);
+    const retractedCardStacks = this.cardStacks.filter(cs => cs.card.canBeRetracted(this.isRootCard));
+    const newHandCardStacks = this.player.takeCards(retractedCardStacks.map(cs => cs.card));
     this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
     this.cardStacks.forEach(cs => {
-      const newHandCardStackIndex = retractedCards.indexOf(cs.card);
-      if (newHandCardStackIndex >= 0) {
-        this.match.addCardMovementEvent(EventType.Retract, cs, newHandCardStacks[newHandCardStackIndex].uuid);
+      // Pair by sub-stack identity (not by card): two copies of the same card ID share one
+      // Card instance from the registry, so indexOf on cards would match the first occurrence
+      const retractedCardStackIndex = retractedCardStacks.indexOf(cs);
+      if (retractedCardStackIndex >= 0) {
+        this.match.addCardMovementEvent(
+          EventType.Retract,
+          cs,
+          newHandCardStacks[retractedCardStackIndex].uuid
+        );
       } else {
         this.match.addCardMovementEvent(EventType.Discard, cs);
       }

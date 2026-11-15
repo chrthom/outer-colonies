@@ -69,7 +69,8 @@ export default class CardStack {
     this.data = data;
     this.summaryBox = new CardStackSummary(this.scene, this);
     this.filterCardsByUUIDList(newCardUUIDs).forEach(c => {
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.data.cardId == c.cardId);
+      // Attaching keeps the card stack UUID, so the played hand card matches exactly by UUID
+      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.uuid == c.data.uuid);
       const x = handCard ? handCard.x : c.placementConfig.deck.x;
       const y = handCard ? handCard.y : c.placementConfig.deck.y;
       const angle = handCard

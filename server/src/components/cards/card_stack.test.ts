@@ -240,4 +240,40 @@ describe('CardStack.retract', () => {
     );
     expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, equipment);
   });
+
+  test('pairs each of two identical retractable cards with its own new hand card stack UUID', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    // Two copies of the same card ID share one Card instance (static CardCollection registry)
+    const equipmentCard = new MockCard(2, 'Equipment', CardType.Equipment, 1);
+    const equipment1 = new AttachmentCardStack(equipmentCard, ship);
+    const equipment2 = new AttachmentCardStack(equipmentCard, ship);
+    ship.attach(equipment1);
+    ship.attach(equipment2);
+    player.cardStacks.push(ship);
+
+    ship.retract();
+
+    const newHandCardStacks = player.takeCards.mock.results[0].value as CardStack[];
+    expect(player.takeCards).toHaveBeenCalledWith([equipmentCard, equipmentCard, ship.card]);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(3);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      equipment1,
+      newHandCardStacks[0].uuid
+    );
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      equipment2,
+      newHandCardStacks[1].uuid
+    );
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      ship,
+      newHandCardStacks[2].uuid
+    );
+    // Every new hand card stack is referenced by exactly one retract event
+    const newUUIDs = player.match.addCardMovementEvent.mock.calls.map(call => call[2] as string);
+    expect(new Set(newUUIDs).size).toBe(3);
+  });
 });
