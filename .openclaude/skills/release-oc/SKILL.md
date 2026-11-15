@@ -15,7 +15,7 @@ Create a release by following this workflow. The canonical source of truth is `R
 1. The working tree must be clean and `main` in sync with `origin/main`.
 2. Determine the upcoming release from the current state:
    - Version from all three `client/server/website/package.json` (must be identical).
-   - Release name from `client/src/app/components/indicators/version_indicator.ts` or `website/src/app/app.component.html` (format `<Name> (v<x.x.x>)`).
+   - Version and release name from the `version` and `releaseName` constants in `server/src/shared/config/version.ts` - the central module from which all three subprojects (server, client, website) import their displayed version.
    - The upcoming release is the version already present in the package.json files that does **not** yet have a tag/GitHub release (latest tags: `git ls-remote --tags origin`, releases: `gh release list`).
 3. Milestone check: all issues of the corresponding milestone (name = `<major.minor> <moon name>`) are closed except the release issue ("Create release <x.x> and perform deployment"). Also read the **milestone description** - it is the tag description.
    ```bash
@@ -68,7 +68,7 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
    gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
    npm run version   # interactively asks for version (x.x.x) and name
    ```
-   `misc/release/version.sh <V> <N>` sets the version in all three `package.json` files and the display name in `client/src/app/components/indicators/version_indicator.ts` and `website/src/app/app.component.html`.
+   `misc/release/version.sh <V> <N>` sets the version in all three `package.json` files and the `version` and `releaseName` constants in `server/src/shared/config/version.ts`, the central module from which all three subprojects (server, client, website) import their displayed version.
 3. Direct pushes to `main` are forbidden by branch protection (squash merges only): bring the version bump to `main` via a PR (branch type `fix/` or `feature/`, e.g. `fix/version-bump-<x.x>`), conventional commit message ("chore: bump version to v<x.x.x> - <Name>", as in d5b95632). The maintainer merges it.
 4. Optional: after deployment, verify that the productive website/client shows the new version (website footer, client version indicator).
 
