@@ -164,7 +164,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `client_planned_battle_converter.ts`: Planned battle conversion
     - `client_state_converter.ts`: Client state conversion
   - `components/persistence/`: Data persistence
-    - `db_connector.ts`: Database connector
+    - `db_connector.ts`: Database connector and transaction wrapper
     - `db_credentials.ts`: Database credentials management
     - `db_dailies.ts`: Database dailies management
     - `db_decks.ts`: Database decks management

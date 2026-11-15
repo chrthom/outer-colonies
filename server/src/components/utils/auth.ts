@@ -1,5 +1,6 @@
 import CardCollection from '../cards/collection/card_collection';
 import { AuthLoginRequest, AuthRegisterRequest } from '../../shared/interfaces/rest_api';
+import DBConnection from '../persistence/db_connector';
 import DBCredentialsDAO, { DBCredential, DBCredentialWithSessionToken } from '../persistence/db_credentials';
 import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';
@@ -52,21 +53,23 @@ export default class Auth {
     await DBMagicLinksDAO.delete(resetId);
   }
   static async register(registrationData: AuthRegisterRequest): Promise<DBCredential> {
-    await DBCredentialsDAO.create(
-      registrationData.username,
-      registrationData.password,
-      registrationData.email
-    );
-    const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
-    if (!credential) return Promise.reject();
-    DBProfilesDAO.create(credential.userId, registrationData.newsletter);
-    DBDailiesDAO.create(credential.userId);
-    CardCollection.starterDecks[registrationData.starterDeck]
-      .map(c => c.id)
-      .forEach(id => DBDecksDAO.create(id, credential.userId, true));
-    const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
-    Mailer.sendAccountActivation(credential.email, credential.username, uuid);
-    return credential;
+    return DBConnection.instance.transaction(async () => {
+      await DBCredentialsDAO.create(
+        registrationData.username,
+        registrationData.password,
+        registrationData.email
+      );
+      const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
+      if (!credential) return Promise.reject();
+      await DBProfilesDAO.create(credential.userId, registrationData.newsletter);
+      await DBDailiesDAO.create(credential.userId);
+      for (const card of CardCollection.starterDecks[registrationData.starterDeck]) {
+        await DBDecksDAO.create(card.id, credential.userId, true);
+      }
+      const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
+      Mailer.sendAccountActivation(credential.email, credential.username, uuid);
+      return credential;
+    });
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
     const credential = await DBCredentialsDAO.getByUsername(loginData.username, loginData.password).catch(
