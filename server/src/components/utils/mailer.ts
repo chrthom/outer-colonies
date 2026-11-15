@@ -3,20 +3,20 @@ import config from 'config';
 
 export default class Mailer {
   static readonly transporter = nodemailer.createTransport({
-    host: 'thomsen.in',
-    port: 587,
-    secure: false,
+    host: config.get('mail.host'),
+    port: config.get<number>('mail.port'),
+    secure: config.get<boolean>('mail.secure'),
     auth: {
-      user: 'outercolonies',
+      user: config.get('mail.user'),
       pass: <string>process.env['MAIL_PASSWORD']
     }
   });
 
-  static sendAccountActivation(email: string, name: string, linkUUID: string) {
+  static sendAccountActivation(email: string, name: string, linkUUID: string): Promise<any> {
     const link = `${config.get('url.base')}/activate-account/${linkUUID}`;
-    this.send(
+    return this.send(
       email,
-      'Outer Colonies: Passwort zurücksetzen',
+      'Outer Colonies: Account aktivieren',
       `Hallo ${name} und willkommen bei Outer Colonies! ` +
         'Zur Aktivierung deines Accounts öffne bitte folgenden Link in deinem Browser: ' +
         `${link}`,
@@ -26,24 +26,24 @@ export default class Mailer {
     );
   }
 
-  static sendEmailConfirmation(email: string, name: string, linkUUID: string) {
+  static sendEmailConfirmation(email: string, name: string, linkUUID: string): Promise<any> {
     const link = `${config.get('url.base')}/confirm-email/${linkUUID}`;
-    this.send(
+    return this.send(
       email,
       'Outer Colonies: Neue E-Mail-Adresse bestätigen',
       `Hallo ${name}, ` +
-        'Du hast deine E-Mail-Adresse geändert. Bitte bestätigte dies indem du folgenden ' +
+        'Du hast deine E-Mail-Adresse geändert. Bitte bestätige dies, indem du folgenden ' +
         `Link in deinem Browser öffnest: ${link}`,
       `<h2>Hallo ${name},</h2>` +
-        'Du hast deine E-Mail-Adresse geändert. Bitte bestätigte dies indem du ' +
+        'Du hast deine E-Mail-Adresse geändert. Bitte bestätige dies, indem du ' +
         `<a href="${link}">hier</a> klickst oder folgenden Link in deinem Browser öffnest:` +
         `<br /><a href="${link}">${link}</a>`
     );
   }
 
-  static sendPasswordReset(email: string, name: string, linkUUID: string) {
+  static sendPasswordReset(email: string, name: string, linkUUID: string): Promise<any> {
     const link = `${config.get('url.base')}/reset-password/${linkUUID}`;
-    this.send(
+    return this.send(
       email,
       'Outer Colonies: Passwort zurücksetzen',
       `Hallo ${name}, es wurde angefordert das Passwort für deinen Account zurückzusetzen.` +
