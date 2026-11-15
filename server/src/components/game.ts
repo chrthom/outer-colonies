@@ -126,13 +126,14 @@ export function gameSocketListeners(io: Server, socket: Socket) {
           const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
             .flatMap(ship => ship.cardStacks)
             .filter(cs => cs.canAttack);
-          let previousAttack: Attack | undefined;
+          let combinedAttack: Attack | undefined;
           for (const srcWeapon of srcWeapons) {
             match.planAttack(srcWeapon, target);
-            match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
-            previousAttack = match.battle.recentAttack;
             if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
+            // planAttack() reports only the current weapon's attack in recentAttack
+            combinedAttack = combineAttackResults(combinedAttack, match.battle.recentAttack);
           }
+          if (combinedAttack) match.battle.recentAttack = combinedAttack;
         } else {
           console.log('WARN: Tried to attack with all weapons on base before range 1');
         }
