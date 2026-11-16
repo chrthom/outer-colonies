@@ -26,7 +26,7 @@ export default [
       "linebreak-style": ["error", "unix"],
       quotes: ["error", "single"],
       semi: ["error", "always"],
-      "@typescript-eslint/no-unused-vars": ["warn"],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/no-explicit-any": ["off"]
     }
   }

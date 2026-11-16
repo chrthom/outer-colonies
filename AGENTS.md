@@ -52,6 +52,12 @@ Maintain consistency across the three subprojects
 - Add JSDoc comments for new public or protected functions
 - Changes in `server/src/shared/` are picked up by the client and website automatically via the `@shared/*` path alias - no declaration update is required
 
+## Testing Requirements
+- New server game or persistence logic requires Jest coverage: add or extend a `*.test.ts` spec next to the tested source in `server/src/`
+- Bug fixes should come with a reproducing test where feasible: a test that fails before and passes after the fix
+- Frontend specs are `*.spec.ts` files next to the tested source, run through the custom `scripts/test.js` harnesses (Jasmine/Karma via `ng test`) in `client/` and `website/`
+- All tests must pass from the repo root via `npm test` (part of `npm run check`)
+
 ## Decision Making Guidelines
 
 ### Priority System
@@ -63,6 +69,11 @@ Maintain consistency across the three subprojects
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks
+- **Logging**: Leveled logging instead of raw `console.log` calls with `WARN:`/`ERROR:` string prefixes:
+  - **server**: Log through the leveled logger utility (see #870), never `console.*` directly
+  - **website/client**: Log to the browser console only on non-production stages (gate with `environment.stage !== 'production'`); only fatal boot errors may use `console.error` in production
+  - `debug` for verbose diagnostics (development only), `info` for normal operational events (e.g. server startup, connections), `warn` for recoverable problems (e.g. invalid client requests), `error` for failures that need attention (e.g. caught exceptions)
+  - Never log sensitive data (session tokens, credentials, email addresses, request URLs with query parameters)
 - **Angular selectors**: Components use kebab-case element selectors with the subproject's prefix (`oc-…` in `website/`, `app-…` in `client/`), directives use camelCase attribute selectors with the same prefix. Enforced by `@angular-eslint/component-selector` / `directive-selector`; component classes in `website/` end with `Component` or `Page` (`@angular-eslint/component-class-suffix`)
-- **File names**: `website/` uses kebab-case with Angular suffixes (`*.page.ts`, `*.component.ts`, `*.service.ts`, `*.interceptor.ts`; specs as `*.spec.ts`). `client/` and `server/` use snake_case (e.g. `socket_service.ts`, `db_connector.ts`), with server tests as `*.test.ts`. Card type files in `server/` follow `<type>_card.ts` under `src/components/cards/types/`, collection files `<category>_cards.ts`
-- **Shared imports (`@shared/*`)**: Code shared across subprojects lives in `server/src/shared/`. The client and website import it only via the `@shared/*` path alias (e.g. `import { CardType } from '@shared/config/enums'`), while the server imports it relatively within its own root. Relative imports never cross a subproject root (enforced by `no-restricted-imports`)
+- **File names**: `website/` uses kebab-case with Angular suffixes (`*.page.ts`, `*.component.ts`, `*.service.ts`, `*.interceptor.ts`; specs as `*.spec.ts`). `client/` and `server/` use snake_case (e.g. `socket_service.ts`, `db_connector.ts`), with client specs as `*.spec.ts` and server tests as `*.test.ts`. Card type files in `server/` follow `<type>_card.ts` under `src/components/cards/types/`, collection files `<category>_cards.ts`
+- **Shared imports (`@shared/*`)**: Code shared across subprojects lives in `server/src/shared/`. The client and website import it only via the `@shared/*` path alias (e.g. `import { CardType } from '@shared/config/enums'`), while the server imports it relatively within its own root. Relative imports never cross a subproject root; `client/` and `website/` enforce this via `no-restricted-imports` (pattern `**/server/src/**`)
