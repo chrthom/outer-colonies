@@ -48,6 +48,31 @@ export class Card110 extends TacticCard {
   }
 }
 
+export class Card139 extends TacticCard {
+  private readonly deactivations = 4;
+  constructor() {
+    super(139, 'ECM-Emitter', 2, TacticDiscipline.Science);
+  }
+  onEnterGame(player: Player) {
+    this.togglePointDefense(
+      player.match.battle.ships[player.match.waitingPlayerNo],
+      this.deactivations,
+      false
+    );
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(
+      cs =>
+        cs.isInBattle &&
+        cs.type == CardType.Hull &&
+        cs.cardStacks.some(scs => scs.card.profile.pointDefense && scs.defenseAvailable)
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
 export class Card143 extends TacticCard {
   private readonly oneTimeActionPool = new ActionPool(new CardAction(CardType.Equipment));
   constructor() {
@@ -89,6 +114,19 @@ export class Card144 extends TacticCard {
       .filter(cs => cs.card.name == 'Fusionsreaktor' || cs.card.name == 'Kraftwerk')
       .flatMap(cs => cs.card.getValidTargets(player));
     return [...new Map(validTargetsWithDuplicates.map(cs => [cs.uuid, cs])).values()];
+  }
+}
+
+export class Card149 extends TacticCard {
+  private readonly cardsToDraw = 2;
+  constructor() {
+    super(149, 'Expertenkonferenz', 2, TacticDiscipline.Science);
+  }
+  onEnterGame(player: Player) {
+    this.drawSpecificCards(player, c => c.type == CardType.Tactic, this.cardsToDraw);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyColonyTarget(player.cardStacks);
   }
 }
 
@@ -356,8 +394,10 @@ export class Card530 extends TacticCard {
 export const allCards = [
   new Card108(),
   new Card110(),
+  new Card139(),
   new Card143(),
   new Card144(),
+  new Card149(),
   new Card162(),
   new Card229(),
   new Card233(),

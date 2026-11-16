@@ -1,6 +1,7 @@
-import { CardType } from '../../../shared/config/enums';
+import { CardType, TacticDiscipline } from '../../../shared/config/enums';
 import CardProfile, { AttackProfile } from '../card_profile';
 import EquipmentCard from '../types/equipment_card';
+import TacticCard from '../types/tactic_card';
 import CardCollection from './card_collection';
 
 const allCards = CardCollection.allCards.sort((a, b) => a.id - b.id);
@@ -14,6 +15,22 @@ Object.entries(CardCollection.cards).forEach(([key, card]) => {
 test('no two registered cards should share the same id', () => {
   const ids = Object.values(CardCollection.cards).map(c => c.id);
   expect(new Set(ids).size).toBe(ids.length);
+});
+
+// Disciplines re-evaluated in issue #771 (517 explicitly stays Intelligence)
+const reevaluatedTacticDisciplines: Record<number, TacticDiscipline> = {
+  139: TacticDiscipline.Science,
+  149: TacticDiscipline.Science,
+  222: TacticDiscipline.Trade,
+  417: TacticDiscipline.Military,
+  517: TacticDiscipline.Intelligence
+};
+Object.entries(reevaluatedTacticDisciplines).forEach(([id, discipline]) => {
+  test(`card ${id} should have the re-evaluated discipline ${discipline}`, () => {
+    const card = CardCollection.cards[Number(id)];
+    expect(card.type).toBe(CardType.Tactic);
+    expect((<TacticCard>card).discipline).toBe(discipline);
+  });
 });
 
 const equipmentCards = allCards.filter(c => c.type == CardType.Equipment);
