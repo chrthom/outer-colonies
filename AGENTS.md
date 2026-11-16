@@ -62,4 +62,7 @@ Maintain consistency across the three subprojects
 ### Code Style Preferences
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
-- **Error Handling**: Comprehensive try-catch blocks
+- **Error Handling**: Comprehensive try-catch blocks. Every `catch` (or promise/rxjs rejection handler) must:
+  - **Log with a level**: never catch silently. On the server, log via `console.log` with a `WARN:` or `ERROR:` prefix plus context (e.g. `console.log(\`ERROR: Failed to persist earnings for user ${user}: ${err}\`)`); in client and website use `console.error`.
+  - **Rethrow or degrade explicitly**: either rethrow the error for the caller to handle (`throw err`) or degrade deliberately with a visible fallback (return a default, skip the optional step) — the decision must be recognizable in the code.
+  - **Never swallow errors silently**: an empty catch block, or one that only continues without logging, is forbidden.
