@@ -14,6 +14,7 @@ import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer }
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
+import { environment } from 'src/environments/environment';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
@@ -64,10 +65,13 @@ export class ProfilePage implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.profileAPIService.profile.subscribe({
       next: profile => (this.newsletterSubscription = profile.newsletter),
-      error: () => {
-        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
-           errors of handler-less subscriptions as uncaught exceptions. Keeps the
-           default newsletter state */
+      error: err => {
+        /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions as
+           uncaught exceptions. The failure is logged with a level (gated to non-production
+           stages) and the default newsletter state is kept */
+        if (environment.stage !== 'production') {
+          console.warn(`Failed to load profile with status ${err?.status}, keeping default newsletter state`);
+        }
       }
     });
   }
@@ -123,7 +127,17 @@ export class ProfilePage implements OnInit, OnDestroy {
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkEmailExists(control.value)),
         map(exists => (exists ? { exists: true } : null)),
-        catchError(() => of(null)),
+        catchError(err => {
+          // A failed availability check must not block the email address change (the server
+          // re-checks on submit), so the validator degrades to "no error"; the failure is
+          // logged with a level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Email availability check failed with status ${err?.status}, treating email as available`
+            );
+          }
+          return of(null);
+        }),
         takeUntil(this.destroy$)
       );
     };

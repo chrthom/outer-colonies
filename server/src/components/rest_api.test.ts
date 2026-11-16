@@ -70,10 +70,13 @@ describe('RESTAPI Deck Endpoints', () => {
 
   const createRequest = (sessionToken?: string) => ({
     header: jest.fn().mockReturnValue(sessionToken),
-    params: { cardInstanceId: '456' }
+    params: { cardInstanceId: '456' },
+    method: 'POST',
+    path: '/api/deck/456',
+    route: { path: '/api/deck/:cardInstanceId(\\d+)' }
   });
-  const createResponse = () => {
-    const res: any = { send: jest.fn() };
+  const createResponse = (req?: object) => {
+    const res: any = { send: jest.fn(), req: req ?? createRequest() };
     res.status = jest.fn().mockReturnThis();
     return res;
   };
@@ -123,6 +126,86 @@ describe('RESTAPI Deck Endpoints', () => {
 
       expect(setInUseSpy).toHaveBeenCalledWith(123, 456, expectedInUse);
       expect(res.status).toHaveBeenCalledWith(204);
+    });
+  });
+
+  describe('error status logging', () => {
+    const getHandler = () => routes.get('POST /api/deck/:cardInstanceId(\\d+)')!;
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should log a WARN for a rejected request without a session token', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const res = createResponse();
+
+      getHandler()(createRequest(), res);
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 401/));
+    });
+
+    it('should log the route pattern instead of the concrete path', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const res = createResponse();
+
+      getHandler()(createRequest(), res);
+      await flushMicrotasks();
+
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('for POST /api/deck/:cardInstanceId(\\d+) failed with status 401')
+      );
+      expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
+    });
+
+    it('should log a WARN for an invalid session token', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue(APIRejectReason.NotFound);
+      const res = createResponse();
+
+      getHandler()(createRequest('invalid-token'), res);
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
+    });
+
+    it('should log an ERROR for an internal server error', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockResolvedValue({
+        userId: 123,
+        username: 'testuser',
+        email: 'test@example.com',
+        sessionToken: 'valid-token'
+      });
+      jest.spyOn(DBDecksDAO, 'setInUse').mockRejectedValue(new Error('insert failed'));
+      const res = createResponse();
+
+      getHandler()(createRequest('valid-token'), res);
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^ERROR: .*status 500/));
+    });
+
+    it('should not log on a successful response', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockResolvedValue({
+        userId: 123,
+        username: 'testuser',
+        email: 'test@example.com',
+        sessionToken: 'valid-token'
+      });
+      jest.spyOn(DBDecksDAO, 'setInUse').mockResolvedValue(undefined);
+      const res = createResponse();
+
+      getHandler()(createRequest('valid-token'), res);
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(logSpy).not.toHaveBeenCalled();
     });
   });
 });

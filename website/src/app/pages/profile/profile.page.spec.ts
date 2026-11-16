@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { environment } from 'src/environments/environment';
 
 describe('ProfilePage', () => {
   let component: ProfilePage;
@@ -112,6 +113,42 @@ describe('ProfilePage', () => {
     tick(300);
     expect(email?.valid).toBeTrue();
   }));
+
+  it('should log a warning and degrade to no error when the availability check fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      authApiSpy.checkEmailExists.and.returnValue(throwError(() => ({ status: 500 })));
+      const email = component.emailForm.get('email');
+      email?.setValue('new@example.com');
+      tick(300);
+      expect(email?.valid).toBeTrue();
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500.*treating email as available/));
+    } finally {
+      environment.stage = 'production';
+    }
+  }));
+
+  it('should log a warning and keep the default state when loading the profile fails', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      Object.defineProperty(profileApiSpy, 'profile', {
+        get: jasmine.createSpy('profile getter').and.returnValue(throwError(() => ({ status: 500 }))),
+        enumerable: true,
+        configurable: true
+      });
+
+      component.ngOnInit();
+
+      expect(component.newsletterSubscription).toBeFalse();
+      expect(warnSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(/status 500.*keeping default newsletter state/)
+      );
+    } finally {
+      environment.stage = 'production';
+    }
+  });
 
   it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {
     const email = component.emailForm.get('email');

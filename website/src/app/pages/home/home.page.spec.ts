@@ -33,6 +33,28 @@ describe('HomePage', () => {
     expect(component.dailies.length).toBe(13);
   });
 
+  it('should log a warning and keep the default dailies list when loading dailies fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      fixture.detectChanges(); // triggers ngOnInit -> dailies subscription
+
+      const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
+      req.flush(
+        { status: 500, message: 'Internal Server Error' },
+        { status: 500, statusText: 'Internal Server Error' }
+      );
+      tick();
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(/status 500.*keeping default dailies list/)
+      );
+      expect(component.dailies.length).toBe(13);
+    } finally {
+      environment.stage = 'production';
+    }
+  }));
+
   it('should filter dailies to only those marked available in the response', fakeAsync(() => {
     fixture.detectChanges();
 

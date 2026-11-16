@@ -120,4 +120,52 @@ describe('apiErrorInterceptor', () => {
     expect(authServiceSpy.clearSession).not.toHaveBeenCalled();
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
+
+  it('logs a warning for a 4xx API error on non-production stages', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      http.get(`${environment.url.api}/api/something`).subscribe({ error: () => undefined });
+
+      const req = httpMock.expectOne(`${environment.url.api}/api/something`);
+      req.flush({ status: 401, message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 401/));
+    } finally {
+      environment.stage = 'production';
+    }
+  });
+
+  it('logs an error for a 5xx API error on non-production stages', () => {
+    environment.stage = 'development';
+    try {
+      const errorSpy = spyOn(console, 'error');
+      http.get(`${environment.url.api}/api/something`).subscribe({ error: () => undefined });
+
+      const req = httpMock.expectOne(`${environment.url.api}/api/something`);
+      req.flush(
+        { status: 500, message: 'Internal Server Error' },
+        { status: 500, statusText: 'Internal Server Error' }
+      );
+
+      expect(errorSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500/));
+    } finally {
+      environment.stage = 'production';
+    }
+  });
+
+  it('does not log API errors on the production stage', () => {
+    const warnSpy = spyOn(console, 'warn');
+    const errorSpy = spyOn(console, 'error');
+    http.get(`${environment.url.api}/api/something`).subscribe({ error: () => undefined });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/something`);
+    req.flush(
+      { status: 500, message: 'Internal Server Error' },
+      { status: 500, statusText: 'Internal Server Error' }
+    );
+
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
 });

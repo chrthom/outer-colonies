@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DeckCard } from '@shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
-import * as _ from 'lodash-es';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IconService } from '../../icon.service';
@@ -170,8 +169,15 @@ export class DeckPage implements OnInit {
     return cardsNum(this.boxes[0].cards) > this.minCards;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
-    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map(
-      (dc: DeckCard[]) => ({ ...dc[0], numOfCards: dc.length }) as DeckCardStack
-    );
+    const stacks = new Map<number, DeckCardStack>();
+    for (const dc of deckCards) {
+      const stack = stacks.get(dc.cardId);
+      if (stack) {
+        stack.numOfCards++;
+      } else {
+        stacks.set(dc.cardId, { ...dc, numOfCards: 1 });
+      }
+    }
+    return [...stacks.values()].sort((a, b) => a.cardId - b.cardId);
   }
 }
