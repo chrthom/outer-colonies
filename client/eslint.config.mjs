@@ -51,7 +51,7 @@ export default [
       "linebreak-style": ["error", "unix"],
       quotes: ["error", "single"],
       semi: ["error", "always"],
-      "@typescript-eslint/no-explicit-any": ["off"],
+      "@typescript-eslint/no-explicit-any": "error",
       "no-restricted-imports": [
         "error",
         {

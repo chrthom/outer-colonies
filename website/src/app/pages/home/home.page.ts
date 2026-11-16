@@ -59,8 +59,17 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  /** Base URL of the game client (without the session token). */
   get gameUrl(): string {
     return environment.url.game;
+  }
+
+  /**
+   * Link to the game client for the next match. The session token is passed as
+   * the `token` query parameter, which the client's matchmaking scene parses.
+   */
+  get gameLink(): string {
+    return `${this.gameUrl}/?token=${encodeURIComponent(this.authService.token)}`;
   }
 
   private showNextDaily(length: number) {

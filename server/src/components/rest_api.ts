@@ -287,18 +287,22 @@ export default function restAPI(app: Express) {
 
   // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(
-      () => sendStatus(res, 204),
-      () => sendStatus(res, 500)
-    );
+    performWithSessionTokenCheck(req, res, u => {
+      DBDecksDAO.setInUse(u.userId, Number(req.params['cardInstanceId']), true).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
+    });
   });
 
   // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(
-      () => sendStatus(res, 204),
-      () => sendStatus(res, 500)
-    );
+    performWithSessionTokenCheck(req, res, u => {
+      DBDecksDAO.setInUse(u.userId, Number(req.params['cardInstanceId']), false).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
+    });
   });
 
   // Get user profile

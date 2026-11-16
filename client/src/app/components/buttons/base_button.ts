@@ -80,7 +80,6 @@ export abstract class BaseButton {
 
     const gameScene = this.scene as Game;
     return (
-      gameScene.state &&
       gameScene.state.playerPendingAction &&
       gameScene.state.playerIsActive &&
       gameScene.state.turnPhase === TurnPhase.Build &&

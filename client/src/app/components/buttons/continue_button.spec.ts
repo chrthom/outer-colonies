@@ -2,7 +2,9 @@ import ContinueButton from './continue_button';
 import { animationConfig } from '../../config/animation';
 import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
 import { ClientCardStack, ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import { asGameScene, makeSceneStub, SceneStub, TimeStub } from '../../testing/phaser_stubs';
 
+/** A timer event queued by the queue-tracking time double. */
 interface QueuedTimer {
   delay: number;
   callback: () => void;
@@ -11,50 +13,36 @@ interface QueuedTimer {
   fired: boolean;
 }
 
-function makeChainable(): any {
-  const stub: any = {};
-  [
-    'setOrigin',
-    'setDepth',
-    'setAlpha',
-    'setScale',
-    'setInteractive',
-    'setFontSize',
-    'setFontFamily',
-    'setColor',
-    'setAlign',
-    'setText',
-    'setVisible'
-  ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
-  stub.on = jasmine.createSpy('on').and.returnValue(stub);
-  return stub;
+/**
+ * Test double for the scene clock (like the `FakeClock` in game.spec.ts):
+ * records delayed calls so the spec can query, cancel and fire the auto-ready
+ * timers, which makes ContinueButton's auto-ready logic testable without
+ * Phaser timers.
+ */
+type QueuedTimeStub = TimeStub & { timers: QueuedTimer[] };
+
+/** Creates a queue-tracking time double conforming to the shared `TimeStub`. */
+function makeQueuedTimeStub(): QueuedTimeStub {
+  const timers: QueuedTimer[] = [];
+  return {
+    timers,
+    delayedCall: jasmine.createSpy('delayedCall').and.callFake((delay: number, callback: () => void) => {
+      const timerEvent = {};
+      timers.push({ delay, callback, timerEvent, removed: false, fired: false });
+      return timerEvent;
+    }),
+    removeEvent: jasmine.createSpy('removeEvent').and.callFake((timerEvent: object) => {
+      timers.filter(t => t.timerEvent == timerEvent).forEach(t => (t.removed = true));
+    })
+  };
 }
 
-function makeScene(state: ClientState): any {
-  const timers: QueuedTimer[] = [];
-  const scene: any = {
-    state: state,
-    plannedBattle: { type: BattleType.None, shipIds: [] },
-    interceptShipIds: [],
-    socket: { emit: jasmine.createSpy('emit') },
-    add: {
-      image: jasmine.createSpy('image').and.callFake(makeChainable),
-      text: jasmine.createSpy('text').and.callFake(makeChainable)
-    },
-    input: { keyboard: undefined },
-    time: {
-      delayedCall: jasmine.createSpy('delayedCall').and.callFake((delay: number, callback: () => void) => {
-        const timerEvent = {};
-        timers.push({ delay, callback, timerEvent, removed: false, fired: false });
-        return timerEvent;
-      }),
-      removeEvent: jasmine.createSpy('removeEvent').and.callFake((timerEvent: object) => {
-        timers.filter(t => t.timerEvent == timerEvent).forEach(t => (t.removed = true));
-      })
-    }
-  };
-  scene.timers = timers;
-  return scene;
+/** Game scene stub from the shared harness with the queue-tracking time double. */
+type ContinueButtonScene = SceneStub & { time: QueuedTimeStub };
+
+/** Creates a game scene stub from the shared harness for the given state. */
+function makeScene(state: ClientState): ContinueButtonScene {
+  return makeSceneStub({ state, time: makeQueuedTimeStub() }) as ContinueButtonScene;
 }
 
 function makeCardStack(uuid: string, over: Partial<ClientCardStack> = {}): ClientCardStack {
@@ -101,11 +89,11 @@ function buildState(over: Partial<ClientState> = {}): ClientState {
 }
 
 /** Not yet dispatched auto-ready timers queued for the given animation delay. */
-const queuedAutoReadys = (scene: any, delay: number): QueuedTimer[] =>
-  scene.timers.filter((t: QueuedTimer) => !t.removed && !t.fired && t.delay == delay);
+const queuedAutoReadys = (scene: ContinueButtonScene, delay: number): QueuedTimer[] =>
+  scene.time.timers.filter(t => !t.removed && !t.fired && t.delay == delay);
 
 /** Fires all not yet dispatched timers queued for the given animation delay. */
-const fireAutoReadys = (scene: any, delay: number) =>
+const fireAutoReadys = (scene: ContinueButtonScene, delay: number) =>
   queuedAutoReadys(scene, delay).forEach(t => {
     t.fired = true;
     t.callback();
@@ -114,7 +102,7 @@ const fireAutoReadys = (scene: any, delay: number) =>
 describe('ContinueButton auto-ready', () => {
   it('queues no auto-ready while the player is not pending for an action', () => {
     const scene = makeScene({ ...emptyClientState, playerPendingAction: false });
-    const button = new ContinueButton(scene);
+    const button = new ContinueButton(asGameScene(scene));
 
     button.update();
     button.update();
@@ -127,7 +115,7 @@ describe('ContinueButton auto-ready', () => {
   describe('combat phase without battle-ready cards', () => {
     it('queues exactly one auto-ready despite repeated update() calls', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       button.update();
@@ -138,7 +126,7 @@ describe('ContinueButton auto-ready', () => {
 
     it('emits Ready exactly once per state, even after the emission was dispatched', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       fireAutoReadys(scene, animationConfig.duration.attack);
@@ -156,7 +144,7 @@ describe('ContinueButton auto-ready', () => {
 
     it('queues a new auto-ready for a new state, so the player advances once per pending action', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       fireAutoReadys(scene, animationConfig.duration.attack);
@@ -172,7 +160,7 @@ describe('ContinueButton auto-ready', () => {
 
     it('cancels a queued auto-ready once the player can attack again', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(1);
@@ -232,7 +220,7 @@ describe('ContinueButton auto-ready', () => {
           }
         })
       );
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       button.update();
@@ -243,12 +231,12 @@ describe('ContinueButton auto-ready', () => {
 
     it('cancels the queued auto-ready when the player acts himself', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(1);
 
-      (button as any).onClickAction(); // Manual click on the continue button
+      (button as unknown as { onClickAction: () => void }).onClickAction(); // Manual click on the continue button
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
       expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Combat);
@@ -257,10 +245,10 @@ describe('ContinueButton auto-ready', () => {
 
     it('does not re-queue an auto-ready after a manual click for the same state', () => {
       const scene = makeScene(combatState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
-      (button as any).onClickAction(); // Manual click on the continue button
+      (button as unknown as { onClickAction: () => void }).onClickAction(); // Manual click on the continue button
       expect(scene.socket.emit.calls.count()).toBe(1);
 
       // User interactions while waiting for the server trigger further update() calls
@@ -283,7 +271,7 @@ describe('ContinueButton auto-ready', () => {
   describe('build phase without interception-ready ships', () => {
     it('queues exactly one auto-ready and skips with an empty ship list', () => {
       const scene = makeScene(buildState());
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       button.update();
@@ -301,7 +289,7 @@ describe('ContinueButton auto-ready', () => {
       const scene = makeScene(
         buildState({ cardStacks: [makeCardStack('interceptor', { interceptionReady: true })] })
       );
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       button.update();
@@ -312,7 +300,7 @@ describe('ContinueButton auto-ready', () => {
 
     it('queues no auto-ready for the active player', () => {
       const scene = makeScene(buildState({ playerIsActive: true }));
-      const button = new ContinueButton(scene);
+      const button = new ContinueButton(asGameScene(scene));
 
       button.update();
       button.update();

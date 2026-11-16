@@ -201,7 +201,7 @@ export default class ContinueButton {
   }
   private showIncept() {
     let text: string;
-    if (this.scene.state.battle?.type == BattleType.Raid) text = 'Verteidigung beginnen';
+    if (this.scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
     else if (this.scene.interceptShipIds.length > 0) text = 'Abfangen';
     else text = 'Überspringen';
     this.show(text, 'inactive_select', () =>
@@ -248,7 +248,7 @@ export default class ContinueButton {
     this.buttonImages[name as keyof ButtonImages].setVisible(true);
   }
   private waitState() {
-    const button = `${this.scene.state && this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
+    const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
     this.show('', button);
   }
   private get canIntercept() {

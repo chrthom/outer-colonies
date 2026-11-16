@@ -56,7 +56,7 @@ export default class ExitButton extends BaseButton {
   update() {
     this.confirmText.setVisible(false);
     if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
-    else if (this.scene instanceof Game && !this.scene.state?.gameResult) this.updateText('Aufgeben');
+    else if (this.scene instanceof Game && !this.scene.state.gameResult) this.updateText('Aufgeben');
     else this.updateText('Spiel beenden');
   }
 
@@ -66,7 +66,7 @@ export default class ExitButton extends BaseButton {
       window.location.href = environment.urls.website;
     } else if (confirmed) {
       // Surrender - send surrender message to server
-      (this.scene as Game).socket.emit(MsgTypeInbound.Surrender);
+      this.scene.socket.emit(MsgTypeInbound.Surrender);
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
     }
