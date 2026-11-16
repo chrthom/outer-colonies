@@ -9,8 +9,11 @@ import { ApiError } from './api-error';
 /**
  * Central error handling for API requests:
  *
- * - On HTTP 401 the session is cleared and the user is redirected to the
- *   login page (replaces the ad-hoc retry logic formerly in `AuthService.check`).
+ * - On HTTP 401 (no session token provided or failed login) and HTTP 403
+ *   (invalid or expired session token, the only 403 the API emits - see
+ *   `performWithSessionTokenCheck` in `server/src/components/rest_api.ts`)
+ *   the session is cleared and the user is redirected to the login page
+ *   (replaces the ad-hoc retry logic formerly in `AuthService.check`).
  * - Failed API calls are rethrown as typed `ApiError`s (status + message) which
  *   pages can map to their German UI strings.
  */
@@ -23,9 +26,11 @@ export const apiErrorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((response: HttpErrorResponse) => {
       const apiError = ApiError.fromHttpResponse(response);
-      if (apiError.status === 401) {
+      if (apiError.status === 401 || apiError.status === 403) {
         authService.clearSession();
-        router.navigate(['/login']);
+        if (router.url !== '/login') {
+          router.navigate(['/login']);
+        }
       }
       return throwError(() => apiError);
     })

@@ -16,6 +16,7 @@ describe('apiErrorInterceptor', () => {
   beforeEach(() => {
     authServiceSpy = jasmine.createSpyObj('AuthService', ['clearSession']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    Object.defineProperty(routerSpy, 'url', { value: '/deck', writable: true });
 
     TestBed.configureTestingModule({
       providers: [
@@ -44,6 +45,31 @@ describe('apiErrorInterceptor', () => {
 
     expect(authServiceSpy.clearSession).toHaveBeenCalled();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('clears the session and redirects to /login on 403 (invalid or expired session token)', () => {
+    http.get(`${environment.url.api}/api/something`).subscribe({
+      error: (err: ApiError) => expect(err.status).toBe(403)
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/something`);
+    req.flush({ status: 403, message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+
+    expect(authServiceSpy.clearSession).toHaveBeenCalled();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('clears the session but does not redirect when already on the login page', () => {
+    Object.defineProperty(routerSpy, 'url', { value: '/login', writable: true });
+    http.post(`${environment.url.api}/api/auth/login`, {}).subscribe({
+      error: (err: ApiError) => expect(err.status).toBe(401)
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
+    req.flush({ status: 401, message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(authServiceSpy.clearSession).toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('rethrows failed API requests as typed ApiError with status and server message', () => {

@@ -3,8 +3,9 @@ import { TradePage } from './trade.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
-import { of } from 'rxjs';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ApiError } from 'src/app/api/api-error';
+import { of, throwError } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -98,6 +99,34 @@ describe('TradePage', () => {
   it('should buy booster when called', () => {
     component.buyBooster(1);
     expect(itemApiSpy.buyBooster).toHaveBeenCalledWith(1);
+  });
+
+  it('should map a 400 ApiError to the insufficient sol snackbar', () => {
+    const snackBar = TestBed.inject(MatSnackBar);
+    spyOn(snackBar, 'open');
+    itemApiSpy.buyBooster.and.returnValue(throwError(() => new ApiError(400, 'Insufficient sol')));
+
+    component.buyBooster(1);
+
+    expect(component.actionFailed).toBeTrue();
+    expect(snackBar.open).toHaveBeenCalledWith('Du hast nicht genug Sol für diesen Kauf.', 'OK', {
+      duration: 5000
+    });
+  });
+
+  it('should keep the generic snackbar for other ApiErrors', () => {
+    const snackBar = TestBed.inject(MatSnackBar);
+    spyOn(snackBar, 'open');
+    itemApiSpy.buyBooster.and.returnValue(throwError(() => new ApiError(500, 'Internal Server Error')));
+
+    component.buyBooster(1);
+
+    expect(component.actionFailed).toBeTrue();
+    expect(snackBar.open).toHaveBeenCalledWith(
+      'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
+      'OK',
+      { duration: 5000 }
+    );
   });
 
   it('should not buy booster when insufficient sol', () => {

@@ -54,7 +54,8 @@ export default class AuthService {
 
   /**
    * Clears the in-memory session state without touching the persisted
-   * ("remember me") credentials. Called by the API error interceptor on 401.
+   * ("remember me") credentials. Called by the API error interceptor on
+   * 401/403 (missing, invalid or expired session).
    */
   clearSession() {
     this.username = undefined;
