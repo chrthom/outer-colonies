@@ -39,16 +39,26 @@ export default class AuthService {
   logout() {
     if (this.sessionToken) {
       this.authAPIService.logout().subscribe({
-        next: () => {
-          /* Do nothing */
-        },
-        error: err => console.error('Logout API call failed', err)
+        error: () => {
+          /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+             errors of handler-less subscriptions as uncaught exceptions. The session
+             is cleared locally regardless */
+        }
       });
     }
-    this.username = undefined;
-    this.sessionToken = undefined;
+    this.clearSession();
     this.cookieService.delete('u');
     this.cookieService.delete('p');
+  }
+
+  /**
+   * Clears the in-memory session state without touching the persisted
+   * ("remember me") credentials. Called by the API error interceptor on
+   * 401/403 (missing, invalid or expired session).
+   */
+  clearSession() {
+    this.username = undefined;
+    this.sessionToken = undefined;
   }
 
   check(username?: string, password?: string): Observable<boolean> {
@@ -74,12 +84,9 @@ export default class AuthService {
         this.username = r.username;
         return true;
       }),
-      catchError(res => {
-        console.log(`API call to ${res.url} failed with HTTP ${res.status}: ${res.statusText}`);
-        const retry = this.sessionToken != undefined;
-        this.sessionToken = undefined;
-        this.username = undefined;
-        return retry ? this.check() : of(false);
+      catchError(() => {
+        this.clearSession();
+        return of(false);
       })
     );
   }

@@ -24,7 +24,7 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/assets"],
+            "assets": ["src/missing", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": [],
             "browser": "src/main.ts"

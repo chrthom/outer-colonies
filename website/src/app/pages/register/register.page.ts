@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
-import { Observable, map } from 'rxjs';
+import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
@@ -50,9 +50,10 @@ import { RouterLink } from '@angular/router';
     RouterLink
   ]
 })
-export class RegisterPage {
+export class RegisterPage implements OnDestroy {
   private authAPIService = inject(AuthApiService);
   private dialog = inject(MatDialog);
+  private destroy$ = new Subject<void>();
 
   registrationSuccessful: boolean | undefined = undefined;
   registerForm: FormGroup = new FormGroup({
@@ -94,7 +95,7 @@ export class RegisterPage {
     return JSON.stringify(this.username?.errors);
   }
   get starterDeckCards(): MultipleCards[] {
-    return starterDecks[this.starterDeck?.value];
+    return starterDecks[this.starterDeck?.value] ?? [];
   }
   cardIdToUrl(cardId: number): string {
     return `${environment.url.assets}/cards/${cardId}.png`;
@@ -126,25 +127,35 @@ export class RegisterPage {
   openDataPrivacy() {
     this.dialog.open(DataPrivacyPage);
   }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   private get usernameExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkUsernameExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      // Angular cancels the previous async validation subscription on every value change,
+      // so the delay acts as a debounce while typing
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkUsernameExists(control.value)),
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(() => of(null)),
+        takeUntil(this.destroy$)
       );
     };
   }
   private get emailExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkEmailExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkEmailExists(control.value)),
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(() => of(null)),
+        takeUntil(this.destroy$)
       );
     };
   }
