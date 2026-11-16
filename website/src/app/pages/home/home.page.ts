@@ -58,7 +58,9 @@ export class HomePage implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        /* Keep the default dailies list; API errors are handled centrally by the API error interceptor */
+        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+           errors of handler-less subscriptions as uncaught exceptions. Keeps the
+           default dailies list */
       }
     });
   }

@@ -39,11 +39,10 @@ export default class AuthService {
   logout() {
     if (this.sessionToken) {
       this.authAPIService.logout().subscribe({
-        next: () => {
-          /* Do nothing */
-        },
         error: () => {
-          /* The session is cleared locally regardless; errors are handled centrally by the API error interceptor */
+          /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+             errors of handler-less subscriptions as uncaught exceptions. The session
+             is cleared locally regardless */
         }
       });
     }

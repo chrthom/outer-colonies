@@ -65,7 +65,9 @@ export class ProfilePage implements OnInit, OnDestroy {
     this.profileAPIService.profile.subscribe({
       next: profile => (this.newsletterSubscription = profile.newsletter),
       error: () => {
-        /* Keep the default newsletter state; API errors are handled centrally by the API error interceptor */
+        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+           errors of handler-less subscriptions as uncaught exceptions. Keeps the
+           default newsletter state */
       }
     });
   }
