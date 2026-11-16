@@ -41,7 +41,7 @@ describe('AuthApiService', () => {
       expect(result).toBeTrue();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=test%40example.com`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=test@example.com`);
     expect(req.request.method).toBe('GET');
     req.flush({ exists: true });
   });
@@ -61,7 +61,20 @@ describe('AuthApiService', () => {
       expect(result).toBeTrue();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=user%2Btag%40example.com`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=user%2Btag@example.com`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: true });
+  });
+
+  it('should URL-encode query parameters of the exists check', () => {
+    const testEmail = 'foo+bar&baz@example.com';
+    service.checkEmailExists(testEmail).subscribe(() => {
+      // Encoding is verified via the expected request URL below
+    });
+
+    const req = httpMock.expectOne(
+      `${environment.url.api}/api/auth/exists?email=foo%2Bbar%26baz@example.com`
+    );
     expect(req.request.method).toBe('GET');
     req.flush({ exists: true });
   });
@@ -105,6 +118,17 @@ describe('AuthApiService', () => {
     });
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({});
+  });
+
+  it('should request a password reset and URL-encode the user path segment', () => {
+    const testEmail = 'foo+bar@example.com';
+    service.forgotPassword(testEmail).subscribe(() => {
+      // Password reset requested
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/password/foo%2Bbar%40example.com`);
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });
