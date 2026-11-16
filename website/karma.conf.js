@@ -18,7 +18,7 @@ module.exports = function (config) {
       }
     },
     jasmineHtmlReporter: {
-      suppressAll: true // removes the duplicated traces
+      suppressAll: true
     },
     coverageReporter: {
       dir: require("path").join(__dirname, "coverage/outercolonies-website"),
