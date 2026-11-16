@@ -56,10 +56,13 @@ export class HomePage implements OnInit, OnDestroy {
           this.resetAutoAdvance();
         }
       },
-      error: () => {
-        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
-           errors of handler-less subscriptions as uncaught exceptions. Keeps the
-           default dailies list */
+      error: err => {
+        /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions as
+           uncaught exceptions. The failure is logged with a level (gated to non-production
+           stages) and the default dailies list is kept */
+        if (environment.stage !== 'production') {
+          console.warn(`Failed to load dailies with status ${err?.status}, keeping default dailies list`);
+        }
       }
     });
   }

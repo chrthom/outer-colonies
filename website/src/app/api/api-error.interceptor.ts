@@ -9,6 +9,11 @@ import { ApiError } from './api-error';
 /**
  * Central error handling for API requests:
  *
+ * - Every failed API call is logged once with a level (see the Logging rule in `AGENTS.md`):
+ *   `warn` for 4xx (recoverable, e.g. invalid client requests), `error` for 5xx (failures
+ *   that need attention). The log is gated to non-production stages and limited to the
+ *   status code, because the HttpClient message may embed the request URL (which can
+ *   contain query parameters with user data).
  * - On HTTP 401 (no session token provided or failed login) and HTTP 403
  *   (invalid or expired session token, the only 403 the API emits - see
  *   `performWithSessionTokenCheck` in `server/src/components/rest_api.ts`)
@@ -26,6 +31,13 @@ export const apiErrorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((response: HttpErrorResponse) => {
       const apiError = ApiError.fromHttpResponse(response);
+      if (environment.stage !== 'production') {
+        if (apiError.status >= 500) {
+          console.error(`API request failed with status ${apiError.status}`);
+        } else {
+          console.warn(`API request failed with status ${apiError.status}`);
+        }
+      }
       if (apiError.status === 401 || apiError.status === 403) {
         authService.clearSession();
         if (router.url !== '/login') {

@@ -15,6 +15,7 @@ import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
 import { CardImageService } from 'src/app/card-image.service';
+import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
@@ -131,7 +132,17 @@ export class RegisterPage implements OnDestroy {
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkUsernameExists(control.value)),
         map(exists => (exists ? { exists: true } : null)),
-        catchError(() => of(null)),
+        catchError(err => {
+          // A failed availability check must not block registration (the server re-checks on
+          // submit), so the validator degrades to "no error"; the failure is logged with a
+          // level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Username availability check failed with status ${err?.status}, treating username as available`
+            );
+          }
+          return of(null);
+        }),
         takeUntil(this.destroy$)
       );
     };
@@ -144,7 +155,17 @@ export class RegisterPage implements OnDestroy {
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkEmailExists(control.value)),
         map(exists => (exists ? { exists: true } : null)),
-        catchError(() => of(null)),
+        catchError(err => {
+          // A failed availability check must not block registration (the server re-checks on
+          // submit), so the validator degrades to "no error"; the failure is logged with a
+          // level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Email availability check failed with status ${err?.status}, treating email as available`
+            );
+          }
+          return of(null);
+        }),
         takeUntil(this.destroy$)
       );
     };
