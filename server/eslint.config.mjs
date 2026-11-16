@@ -27,7 +27,14 @@ export default [
       quotes: ["error", "single"],
       semi: ["error", "always"],
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/no-explicit-any": ["off"]
+      "@typescript-eslint/no-explicit-any": "error"
+    }
+  },
+  {
+    // The persistence layer is untyped at the DB boundary (see #909); test fixtures may be partial
+    files: ["src/components/persistence/**", "**/*.test.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off"
     }
   }
 ];

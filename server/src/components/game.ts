@@ -11,7 +11,7 @@ import { matchmakingRoom } from './matchmaking';
 import { Attack } from './game_state/battle';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
-  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
+  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) => {
     doWithMatchAndPlayer(socket, (match, player) => {
       if (turnPhase == match.turnPhase) {
         if (turnPhase == TurnPhase.Init) {

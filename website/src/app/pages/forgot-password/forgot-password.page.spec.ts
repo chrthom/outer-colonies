@@ -50,11 +50,11 @@ describe('ForgotPasswordPage', () => {
 
   it('should make username field required', () => {
     const username = component.username;
-    username.setValue('');
-    expect(username.valid).toBeFalse();
+    username?.setValue('');
+    expect(username?.valid).toBeFalse();
 
-    username.setValue('testuser');
-    expect(username.valid).toBeTrue();
+    username?.setValue('testuser');
+    expect(username?.valid).toBeTrue();
   });
 
   it('should not submit when form is invalid', () => {

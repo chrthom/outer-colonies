@@ -1,5 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
@@ -35,7 +42,7 @@ export class ForgotPasswordPage {
     username: new FormControl('', [Validators.required])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  get username(): any {
+  get username(): AbstractControl | null {
     return this.forgotPasswordForm.get('username');
   }
   submit() {
