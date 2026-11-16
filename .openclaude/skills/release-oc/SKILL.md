@@ -65,7 +65,11 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
 
 ## Phase 3 - Completion (only after the user confirmed the deployment)
 
-1. Close the **release issue** ("Create release <x.x> and perform deployment"). Keep the released milestone open - it is now the productive milestone and receives productive bug reports per AGENTS.md; close the previously productive milestone now that the new version is productive. The milestone of the *next* version stays open; new features go there.
+1. Close the **release issue** ("Create release <x.x> and perform deployment"). Keep the released milestone open - it is now the productive milestone and receives productive bug reports per AGENTS.md; close the previously productive milestone now that the new version is productive. The milestone of the *next* version stays open; new features go there. If closing the previous milestone via `gh api -X PATCH` is blocked in the environment, use the REST API with a JSON input file instead:
+   ```bash
+   echo '{"state":"closed"}' > /tmp/milestone-state.json
+   gh api repos/<owner>/<repo>/milestones/<number> --input /tmp/milestone-state.json
+   ```
 2. **Increment the version** to the next development version; version and name come from the next milestone verified in Phase 0 (e.g. after 3.1 Pandora -> 3.2 Pan). If that milestone does not exist yet, create it first after user approval:
    ```bash
    gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
