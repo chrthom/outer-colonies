@@ -3,23 +3,23 @@ import { pickRandom } from '../../utils/helpers';
 import CardStack from '../card_stack';
 import EquipmentCard from '../types/equipment_card';
 
-export class Card104 extends EquipmentCard {
-  private readonly damageToRepair = 10;
+export class Card115 extends EquipmentCard {
   constructor() {
-    super(104, 'Reparaturnaniten', 5, {
+    super(115, 'Reparaturnaniten', 4, {
+      hp: 10,
       energy: -1,
       omega: -1
     });
   }
   override onEndTurn(player: Player, source: CardStack) {
-    this.repairDamage(source.rootCardStack, this.damageToRepair);
+    this.repairAllDamage(source.rootCardStack);
   }
 }
 
-export class Card109 extends EquipmentCard {
+export class Card413 extends EquipmentCard {
   constructor() {
-    super(109, 'Plasmanachbrenner', 4, {
-      energy: -3,
+    super(413, 'Plasmanachbrenner', 3, {
+      energy: -1,
       speed: 2,
       delta: -1
     });
@@ -40,7 +40,7 @@ export class Card124 extends EquipmentCard {
 export class Card161 extends EquipmentCard {
   constructor() {
     super(161, 'Ionenschubdüsen', 1, {
-      energy: -1,
+      energy: 0,
       speed: 1,
       delta: -1
     });
@@ -80,10 +80,11 @@ export class Card241 extends EquipmentCard {
   }
 }
 
-export class Card325 extends EquipmentCard {
-  private readonly damageToRepair = 2;
+export class Card343 extends EquipmentCard {
+  private readonly damageToRepair = 4;
   constructor() {
-    super(325, 'Selbstreparierender Torso', 2, {
+    super(343, 'Selbstreparierender Torso', 1, {
+      hp: 2,
       omega: -1
     });
   }
@@ -92,10 +93,10 @@ export class Card325 extends EquipmentCard {
   }
 }
 
-export class Card434 extends EquipmentCard {
+export class Card441 extends EquipmentCard {
   constructor() {
-    super(434, 'Leichtbauweise', 2, {
-      hp: -3,
+    super(441, 'Leichtbauweise', 1, {
+      hp: 0,
       speed: 1,
       delta: -1
     });
@@ -105,16 +106,17 @@ export class Card434 extends EquipmentCard {
 export class Card449 extends EquipmentCard {
   constructor() {
     super(449, 'Schwerer Rumpf', 1, {
-      hp: 5,
+      hp: 15,
       speed: -1,
       delta: -1
     });
   }
 }
 
-export class Card537 extends EquipmentCard {
+export class Card171 extends EquipmentCard {
   constructor() {
-    super(537, 'Quantenmechanischer Antrieb', 2, {
+    super(171, 'Quantenmechanischer Antrieb', 1, {
+      energy: 0,
       speed: 1,
       delta: -1,
       omega: -1
@@ -132,16 +134,16 @@ export class Card545 extends EquipmentCard {
 }
 
 export const allCards = [
-  new Card104(),
-  new Card109(),
+  new Card115(),
+  new Card413(),
   new Card124(),
   new Card161(),
   new Card211(),
   new Card212(),
   new Card241(),
-  new Card325(),
-  new Card434(),
+  new Card343(),
+  new Card441(),
   new Card449(),
-  new Card537(),
+  new Card171(),
   new Card545()
 ];

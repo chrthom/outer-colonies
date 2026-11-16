@@ -104,12 +104,12 @@ export class Card148 extends ActionInfrastructureCard {
   }
 }
 
-export class Card154 extends ActionInfrastructureCard {
+export class Card183 extends ActionInfrastructureCard {
   constructor() {
     super(
-      154,
+      183,
       'Bergbauaußenposten',
-      2,
+      1,
       {
         energy: -1,
         psi: -1
@@ -119,12 +119,12 @@ export class Card154 extends ActionInfrastructureCard {
   }
 }
 
-export class Card164 extends ActionInfrastructureCard {
+export class Card140 extends ActionInfrastructureCard {
   constructor() {
     super(
-      164,
+      140,
       'Rüstungsschmiede',
-      1,
+      2,
       {
         energy: -2,
         psi: -1
@@ -134,12 +134,12 @@ export class Card164 extends ActionInfrastructureCard {
   }
 }
 
-export class Card183 extends ActionInfrastructureCard {
+export class Card154 extends ActionInfrastructureCard {
   constructor() {
     super(
-      183,
+      154,
       'Industriekomplex',
-      1,
+      2,
       {
         energy: -5
       },
@@ -167,12 +167,12 @@ export class Card219 extends ActionInfrastructureCard {
   }
 }
 
-export class Card320 extends ActionInfrastructureCard {
+export class Card312 extends ActionInfrastructureCard {
   constructor() {
     super(
-      320,
+      312,
       'Legierungsgießerei',
-      2,
+      3,
       {
         energy: -3,
         psi: -1
@@ -214,12 +214,12 @@ export class Card239 extends ActionInfrastructureCard {
   }
 }
 
-export class Card413 extends ActionInfrastructureCard {
+export class Card223 extends ActionInfrastructureCard {
   constructor() {
     super(
-      413,
+      223,
       'Logistikknotenpunkt',
-      3,
+      2,
       {
         energy: -2,
         psi: -1
@@ -240,12 +240,12 @@ export const allCards = [
   new Card138(),
   new Card147(),
   new Card148(),
-  new Card154(),
-  new Card164(),
   new Card183(),
+  new Card140(),
+  new Card154(),
   new Card219(),
   new Card239(),
-  new Card320(),
+  new Card312(),
   new Card336(),
-  new Card413()
+  new Card223()
 ];

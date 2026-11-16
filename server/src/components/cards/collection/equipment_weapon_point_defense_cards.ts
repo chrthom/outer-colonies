@@ -15,7 +15,7 @@ export class Card130 extends EquipmentCardRechargeable {
         damage: 3,
         pointDefense: 0,
         shield: 0,
-        armour: -3
+        armour: -99
       }
     );
   }
@@ -84,12 +84,12 @@ export class Card234 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card237 extends EquipmentCardRechargeable {
+export class Card224 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      237,
+      224,
       'Mini-Railgun',
-      1,
+      2,
       {
         pointDefense: 1,
         theta: -1
@@ -190,12 +190,12 @@ export class Card440 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card441 extends EquipmentCardRechargeable {
+export class Card434 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      441,
+      434,
       'Flechette-Werfer',
-      1,
+      2,
       {
         pointDefense: 1,
         theta: -1
@@ -216,10 +216,10 @@ export const allCards = [
   new Card168(),
   new Card181(),
   new Card234(),
-  new Card237(),
+  new Card224(),
   new Card339(),
   new Card340(),
   new Card424(),
   new Card440(),
-  new Card441()
+  new Card434()
 ];
