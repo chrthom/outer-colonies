@@ -1,14 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { DeckCard, DeckCardProfile } from '@shared/interfaces/rest_api';
+import { DeckCard } from '@shared/interfaces/rest_api';
 import { DeckApiService } from 'src/app/api/deck-api.service';
-import { environment } from 'src/environments/environment';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CardType, TacticDiscipline } from '@shared/config/enums';
 import { IconService } from '../../icon.service';
-import { Sort, MatSort, MatSortHeader } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatCard, MatCardImage } from '@angular/material/card';
 import { MatBadge } from '@angular/material/badge';
@@ -26,6 +22,10 @@ import {
   MatExpansionPanelDescription
 } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
+import { CardImageService } from 'src/app/card-image.service';
+import { CardMetaService } from 'src/app/card-meta.service';
+import { cardsNum, DeckBox } from './deck-box';
+import { DeckCardStack, DeckStatistics, DeckStatisticsTemplate } from './deck.types';
 
 @Component({
   selector: 'oc-page-deck',
@@ -58,8 +58,9 @@ import { CommonModule } from '@angular/common';
 })
 export class DeckPage implements OnInit {
   private deckApiService = inject(DeckApiService);
-  private dialog = inject(MatDialog);
-  private iconService = inject(IconService);
+  protected readonly cardImage = inject(CardImageService);
+  protected readonly cardMeta = inject(CardMetaService);
+  protected readonly icons = inject(IconService);
 
   readonly minCards = 60;
   readonly maxCards = 100;
@@ -153,110 +154,13 @@ export class DeckPage implements OnInit {
       });
     }
   }
-  openImgInModal(card: DeckCard) {
-    this.dialog.open(ImageModalComponent, {
-      data: this.cardIdToUrl(card.cardId),
-      maxHeight: '95vh'
-    });
-  }
-  cardIdToUrl(cardId: number): string {
-    return `${environment.url.assets}/cards/${cardId}.png`;
-  }
-  cardIdToEditionUrl(cardId: number): string {
-    return `${environment.url.assets}/icons/edition${Math.floor(cardId / 100)}.png`;
-  }
-  cardIdToEditionName(cardId: number): string {
-    switch (Math.floor(cardId / 100)) {
-      case 1:
-        return 'Outer Colonies';
-      case 2:
-        return 'Jovians Freihändler';
-      case 3:
-        return 'Marsianische Hegemonie';
-      case 4:
-        return 'Kuiper-Gürtel';
-      default:
-        return '';
-    }
-  }
-  rangeToUrl(range: number): string {
-    return `${environment.url.assets}/utils/range${range}.png`;
-  }
   /**
    * Full CSS class list rendering the icon font glyph for the given icon name.
    * @param name The icon name (e.g. a card type or defense token)
    * @returns The CSS classes (e.g. 'oc-icon oc-icon-hull')
    */
   iconClass(name: string): string {
-    return `oc-icon ${this.iconService.getIconClass(name)}`;
-  }
-  disciplineToText(discipline?: TacticDiscipline): string {
-    switch (discipline) {
-      case TacticDiscipline.Intelligence:
-        return 'Information';
-      case TacticDiscipline.Military:
-        return 'Militär';
-      case TacticDiscipline.Science:
-        return 'Wissenschaft';
-      case TacticDiscipline.Trade:
-        return 'Wirtschaft';
-      default:
-        return '';
-    }
-  }
-  typeTooltip(type: string): string {
-    switch (type) {
-      case 'hull':
-        return 'Rumpf';
-      case 'equipment':
-        return 'Ausrüstung';
-      case 'infrastructure':
-        return 'Infrastruktur';
-      case 'orb':
-        return 'Himmelskörper';
-      case 'tactic':
-        return 'Taktik';
-      default:
-        return '';
-    }
-  }
-  defenseTooltip(defense: string): string {
-    switch (defense) {
-      case 'armour_1':
-        return '1x Panzerung';
-      case 'armour_2':
-        return '2x Panzerung';
-      case 'armour_3':
-        return '3x Panzerung';
-      case 'shield_1':
-        return '1x Schild';
-      case 'shield_2':
-        return '2x Schild';
-      case 'point_defense_1':
-        return '1x Punktabwehr';
-      case 'point_defense_2':
-        return '2x Punktabwehr';
-      default:
-        return '';
-    }
-  }
-  rarityTooltip(rarity: number): string {
-    switch (rarity) {
-      case 0:
-        return 'Häufig';
-      case 1:
-        return 'Gewöhnlich';
-      case 2:
-        return 'Ungewöhnlich';
-      case 3:
-        return 'Selten';
-      case 4:
-        return 'Außergewöhnlich';
-      case 5:
-        return 'Legendär';
-      default:
-        return '';
-    }
+    return `oc-icon ${this.icons.getIconClass(name)}`;
   }
   get canActivateDeckCard() {
     return cardsNum(this.boxes[0].cards) < this.maxCards;
@@ -276,130 +180,4 @@ export class DeckPage implements OnInit {
     }
     return [...stacks.values()];
   }
-}
-
-class DeckBox {
-  private $cards!: BehaviorSubject<DeckCardStack[]>;
-  private _title!: string;
-  private _isActive!: boolean;
-  private _onClick!: (card: DeckCard) => void;
-  private filterControl!: FormControl;
-  private sort?: Sort;
-  constructor(
-    $cards: BehaviorSubject<DeckCardStack[]>,
-    title: string,
-    isActive: boolean,
-    onClick: (card: DeckCard) => void,
-    filterControl: FormControl
-  ) {
-    this.$cards = $cards;
-    this._title = title;
-    this._isActive = isActive;
-    this._onClick = onClick;
-    this.filterControl = filterControl;
-  }
-  get title(): string {
-    return `${this._title} (${cardsNum(this.cardsFiltered)} / ${cardsNum(this.cards)} Karten)`;
-  }
-  get cards(): DeckCardStack[] {
-    return this.$cards.getValue();
-  }
-  get cardsFiltered() {
-    return this.sortCards(
-      this.cards.filter(c => {
-        const filter = this.filterControl.value;
-        return !filter || c.type == filter;
-      })
-    );
-  }
-  get isActiveDeck(): boolean {
-    return this._isActive;
-  }
-  onClick(card: DeckCard) {
-    this._onClick(card);
-  }
-  setSort(sort: Sort) {
-    this.sort = sort;
-  }
-  private sortCards(cardStacks: DeckCardStack[]): DeckCardStack[] {
-    if (!this.sort || !this.sort.active || this.sort.direction == '') {
-      return cardStacks;
-    } else {
-      const isAsc = this.sort.direction == 'asc';
-      return cardStacks.sort((a, b) => {
-        switch (this.sort?.active) {
-          case 'amount':
-            return compare(a.numOfCards, b.numOfCards, isAsc);
-          case 'id':
-            return compare(a.cardId, b.cardId, isAsc);
-          case 'name':
-            return compare(a.name, b.name, isAsc);
-          case 'type':
-            return compare(a.type, b.type, isAsc);
-          case 'discipline':
-            return compare(a.discipline, b.discipline, isAsc);
-          case 'attack':
-            return compare(
-              !a.damage || !a.range ? undefined : a.damage * a.range,
-              !b.damage || !b.range ? undefined : b.damage * b.range,
-              isAsc
-            );
-          case 'defense':
-            return compare(a.defense ?? a.hp, b.defense ?? b.hp, isAsc);
-          case 'rarity':
-            return compare(a.rarity, b.rarity, isAsc);
-          case 'edition':
-            return compare(Math.floor(a.cardId / 100), Math.floor(b.cardId / 100), isAsc);
-          default:
-            return 0;
-        }
-      });
-    }
-  }
-}
-
-/**
- * Compares two sort values, returning `0` for equal values.
- * An `undefined` value is offset in the current sort direction:
- * it lands at the end when sorting ascending and at the start when sorting descending.
- */
-function compare(a: number | string | undefined, b: number | string | undefined, isAsc: boolean) {
-  if (a == undefined && b == undefined) return 0;
-  const offset = a == undefined ? 1 : b == undefined ? -1 : a < b ? -1 : a > b ? 1 : 0;
-  return offset * (isAsc ? 1 : -1);
-}
-
-function cardsNum(cards: DeckCardStack[]): number {
-  return cards.map(dc => dc.numOfCards).reduce((a, b) => a + b, 0);
-}
-
-interface DeckCardStack extends DeckCard {
-  numOfCards: number;
-  // Ensure all DeckCard properties are explicitly available
-  id: number;
-  inUse: boolean;
-  cardId: number;
-  name: string;
-  rarity: number;
-  type: CardType;
-  canAttack: boolean;
-  discipline?: TacticDiscipline;
-  hp?: number;
-  damage?: number;
-  range?: number;
-  defense?: string;
-  profile: DeckCardProfile;
-}
-
-interface DeckStatisticsTemplate {
-  title?: string;
-  energyIcon?: boolean;
-  get: (card: DeckCard) => number;
-}
-
-interface DeckStatistics {
-  title?: string;
-  energyIcon?: boolean;
-  used: number;
-  provided: number;
 }

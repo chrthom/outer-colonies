@@ -181,6 +181,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)
     - `config/constants.ts`: Shared constants
     - `config/dailies.ts`: Daily achievement definitions
+    - `config/editions.ts`: Card edition names (edition number to name mapping)
     - `config/enums.ts`: Game enums
     - `config/rules.ts`: Game rules configuration
     - `config/starter_decks.ts`: Starter deck configurations

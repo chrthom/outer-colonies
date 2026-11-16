@@ -18,7 +18,7 @@
           [matBadgeHidden]="card.numOfCards === 1"
           matBadgeColor="primary"
         >
-          <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
+          <img mat-card-image [src]="cardImage.cardIdToUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
         }
       </div>
@@ -42,9 +42,9 @@
             <h3>{{ card.numOfCards }}x&nbsp;</h3>
             <img
               class="large clickable"
-              [src]="cardIdToUrl(card.cardId)"
+              [src]="cardImage.cardIdToUrl(card.cardId)"
               [alt]="card.name"
-              (click)="openImgInModal(card)"
+              (click)="cardImage.openImgInModal(card.cardId)"
               tabindex="invalid"
             />
           </td>
@@ -53,10 +53,10 @@
           <td class="type-col">
             <span [class]="iconClass(card.type)"></span>
           </td>
-          <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
+          <td class="discipline-col">{{ cardMeta.disciplineToText(card.discipline) }}</td>
           <td class="attack-col">
             @if (card.range) {
-            <img class="big" [src]="rangeToUrl(card.range)" matTooltip="Reichweite" />
+            <img class="big" [src]="cardImage.rangeToUrl(card.range)" matTooltip="Reichweite" />
             } @if (card.damage) {
             <h3>{{ card.damage }}</h3>
             } @if (card.damage) {
@@ -65,7 +65,10 @@
           </td>
           <td class="defense-col">
             @if (card.defense) {
-            <span [class]="iconClass(card.defense)" [matTooltip]="defenseTooltip(card.defense)"></span>
+            <span
+              [class]="iconClass(card.defense)"
+              [matTooltip]="cardMeta.defenseTooltip(card.defense)"
+            ></span>
             } @if (card.hp && card.defense) {
             <h3>+</h3>
             } @if (card.hp) {
@@ -79,13 +82,13 @@
             <div
               class="rarity"
               [class.active]="i <= card.rarity"
-              [matTooltip]="rarityTooltip(card.rarity)"
+              [matTooltip]="cardMeta.rarityTooltip(card.rarity)"
             ></div>
             }
           </td>
           <td class="edition-col">
-            <img [src]="cardIdToEditionUrl(card.cardId)" />
-            {{ cardIdToEditionName(card.cardId) }}
+            <img [src]="cardImage.cardIdToEditionUrl(card.cardId)" />
+            {{ cardMeta.cardIdToEditionName(card.cardId) }}
           </td>
           <td class="action-col">
             <button

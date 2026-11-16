@@ -3,7 +3,6 @@ import { DeckPage } from './deck.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DeckApiService } from 'src/app/api/deck-api.service';
 import { of } from 'rxjs';
-import { TacticDiscipline } from '@shared/config/enums';
 import { DeckCard } from '@shared/interfaces/rest_api';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
@@ -190,62 +189,6 @@ describe('DeckPage', () => {
     component.activateCard({ id: 2, cardId: 102, inUse: false } as any);
 
     expect(deckApiSpy.activateCard).toHaveBeenCalledWith(2);
-  });
-
-  it('should produce the card image URL from cardId', () => {
-    expect(component.cardIdToUrl(101)).toBe('https://assets.outercolonies.de/cards/101.png');
-  });
-
-  it('should produce the edition icon URL from cardId', () => {
-    expect(component.cardIdToEditionUrl(101)).toBe('https://assets.outercolonies.de/icons/edition1.png');
-  });
-
-  it('should map cardId hundreds to the edition name', () => {
-    expect(component.cardIdToEditionName(101)).toBe('Outer Colonies');
-    expect(component.cardIdToEditionName(201)).toBe('Jovians Freihändler');
-    expect(component.cardIdToEditionName(301)).toBe('Marsianische Hegemonie');
-    expect(component.cardIdToEditionName(401)).toBe('Kuiper-Gürtel');
-    expect(component.cardIdToEditionName(99)).toBe('');
-  });
-
-  describe('label mappings', () => {
-    it('disciplineToText maps every TacticDiscipline to a German label', () => {
-      expect(component.disciplineToText(TacticDiscipline.Intelligence)).toBe('Information');
-      expect(component.disciplineToText(TacticDiscipline.Military)).toBe('Militär');
-      expect(component.disciplineToText(TacticDiscipline.Science)).toBe('Wissenschaft');
-      expect(component.disciplineToText(TacticDiscipline.Trade)).toBe('Wirtschaft');
-      expect(component.disciplineToText(undefined)).toBe('');
-    });
-
-    it('typeTooltip maps every card type to a German tooltip', () => {
-      expect(component.typeTooltip('hull')).toBe('Rumpf');
-      expect(component.typeTooltip('equipment')).toBe('Ausrüstung');
-      expect(component.typeTooltip('infrastructure')).toBe('Infrastruktur');
-      expect(component.typeTooltip('orb')).toBe('Himmelskörper');
-      expect(component.typeTooltip('tactic')).toBe('Taktik');
-      expect(component.typeTooltip('unknown')).toBe('');
-    });
-
-    it('defenseTooltip maps each defense token to its German variant', () => {
-      expect(component.defenseTooltip('armour_1')).toBe('1x Panzerung');
-      expect(component.defenseTooltip('armour_2')).toBe('2x Panzerung');
-      expect(component.defenseTooltip('armour_3')).toBe('3x Panzerung');
-      expect(component.defenseTooltip('shield_1')).toBe('1x Schild');
-      expect(component.defenseTooltip('shield_2')).toBe('2x Schild');
-      expect(component.defenseTooltip('point_defense_1')).toBe('1x Punktabwehr');
-      expect(component.defenseTooltip('point_defense_2')).toBe('2x Punktabwehr');
-      expect(component.defenseTooltip('unknown')).toBe('');
-    });
-
-    it('rarityTooltip maps each rarity tier to its German label', () => {
-      expect(component.rarityTooltip(0)).toBe('Häufig');
-      expect(component.rarityTooltip(1)).toBe('Gewöhnlich');
-      expect(component.rarityTooltip(2)).toBe('Ungewöhnlich');
-      expect(component.rarityTooltip(3)).toBe('Selten');
-      expect(component.rarityTooltip(4)).toBe('Außergewöhnlich');
-      expect(component.rarityTooltip(5)).toBe('Legendär');
-      expect(component.rarityTooltip(99)).toBe('');
-    });
   });
 
   describe('capacity guards', () => {
