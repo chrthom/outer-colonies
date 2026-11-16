@@ -10,11 +10,18 @@ export default class DBDecksDAO {
   static async getByUserId(userId: number): Promise<DBDeck[]> {
     return this.getBy('user_id = ?', [userId]);
   }
-  static async setInUse(cardInstanceId: number, inUse: boolean) {
-    await DBConnection.instance.query('UPDATE decks SET in_use = ? WHERE card_instance_id = ?', [
-      inUse,
-      cardInstanceId
-    ]);
+  /**
+   * Sets the in-use flag of a card instance, restricted to the given user's rows so that
+   * only the owning player can modify their own deck.
+   * @param userId id of the user who must own the card instance
+   * @param cardInstanceId id of the card instance to update
+   * @param inUse true to add the card to the active deck, false to put it to reserve
+   */
+  static async setInUse(userId: number, cardInstanceId: number, inUse: boolean) {
+    await DBConnection.instance.query(
+      'UPDATE decks SET in_use = ? WHERE card_instance_id = ? AND user_id = ?',
+      [inUse, cardInstanceId, userId]
+    );
   }
   private static async getBy(whereClause: string, params: any[]): Promise<DBDeck[]> {
     const queryResult: any[] = await DBConnection.instance.query(

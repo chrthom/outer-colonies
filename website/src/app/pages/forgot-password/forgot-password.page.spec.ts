@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ForgotPasswordPage } from './forgot-password.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -81,7 +82,6 @@ describe('ForgotPasswordPage', () => {
   });
 
   it('should set success state on successful password reset request', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ForgotPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 
@@ -92,8 +92,6 @@ describe('ForgotPasswordPage', () => {
 
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
-    // Note: Component doesn't set loading=false in success case, only in error case
-    // expect(freshComponent.loading).toBeFalse();
   });
 
   it('should set failure state on password reset request error', () => {
@@ -113,5 +111,17 @@ describe('ForgotPasswordPage', () => {
     component.submit();
 
     expect(authApiSpy.forgotPassword).not.toHaveBeenCalled();
+  });
+
+  it('should color the submit button warn while loading like the reset-password page', () => {
+    component.forgotPasswordForm.setValue({ username: 'testuser' });
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('button[type="submit"]')).componentInstance;
+
+    expect(button.color).toBe('primary');
+
+    component.loading = true;
+    fixture.detectChanges();
+    expect(button.color).toBe('warn');
   });
 });

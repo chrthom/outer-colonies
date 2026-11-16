@@ -1,0 +1,76 @@
+{
+ "frame": "v25h-Variantenmessung (9.11.2026): Christophers Beschluesse der Vollstaendigkeits-Runde: 103 Adamantiumpanzer hp 2->0, 171 Titanplattenpanzer hp -5->-3; gemessen gegen den unveraenderten #795-POOL (Methodik identisch v25a/e/g: Kampagnen-Frame v2, gamma=1, bewertete Variante zusaetzlich auf Traeger-Slot, CRN gegen Basis, dieselben Zellen -> zellgepaart). 166 SAbz X und 434<->441 brauchen keine Messung: 166 SAbz X bereits metrisch aktiv (v9.FINAL), 434/441 ist ein reiner Raritaetstausch (Referenzverschiebung).",
+ "N": 3000,
+ "n_zellen": 3000,
+ "base": {
+  "n": 3000,
+  "o_gefechte": {
+   "mission": 4.69,
+   "raid": 4.69
+  },
+  "end_dist": {
+   "mission": {
+    "fleet_dead": 0.708,
+    "colony": 0.0,
+    "control": 0.289,
+    "cap": 0.003
+   },
+   "raid": {
+    "fleet_dead": 0.737,
+    "colony": 0.261,
+    "control": 0.0,
+    "cap": 0.002
+   }
+  },
+  "o_hp": -2.89,
+  "o_dealt": -3.12,
+  "o_col": 3.22,
+  "o_ctrl": 3.53
+ },
+ "rows": [
+  {
+   "oid": "v_103hp0",
+   "label": "103hp0",
+   "id": "103",
+   "title": "Adamantiumpanzer",
+   "rarity": 4,
+   "units": 2.4,
+   "n_pl": 1963,
+   "d_hp": 18.481,
+   "d_col": 0.451,
+   "d_ctrl": 3.979,
+   "d_dealt": 20.184,
+   "margin": 43.095,
+   "score": 17.956,
+   "se_score": 0.601,
+   "abw": 1.956,
+   "ref_margin": 45.72,
+   "ref_score": 19.05,
+   "ref": "v25a (hp 2)",
+   "delta_margin": -2.625,
+   "delta_score": -1.094
+  },
+  {
+   "oid": "v_171hp3",
+   "label": "171hp3",
+   "id": "171",
+   "title": "Titanplattenpanzer",
+   "rarity": 3,
+   "units": 1.7,
+   "n_pl": 2287,
+   "d_hp": 7.564,
+   "d_col": 0.34,
+   "d_ctrl": 2.115,
+   "d_dealt": 11.366,
+   "margin": 21.385,
+   "score": 12.58,
+   "se_score": 0.552,
+   "abw": -0.42,
+   "ref_margin": 16.0,
+   "ref_score": 9.412,
+   "ref": "interp (hp -5)",
+   "delta_margin": 5.385,
+   "delta_score": 3.168
+  }
+ ]
+}

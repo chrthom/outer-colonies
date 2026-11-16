@@ -1,0 +1,54 @@
+{
+ "frame": "v25i-Variantenmessung (10.11.2026): 302 Goetterdaemmerung NEU-MESSUNG im #795-Zielzustand (dmg 70, E -3; bisheriger Tabellen-Modus e6 rechnete nur den Nenner mit E -6). Methodik identisch v25a/e/g/h: Kampagnen-Frame v2, gamma=1, bewertete Variante zusaetzlich auf Traeger-Slot, CRN gegen Basis, dieselben Zellen -> zellgepaart. Frame-Check: Energie ist fuer die bewertete Karte rein im Nenner wirksam (place() prueft nur Sockel) -> Erwartung margin ~100,01 wie 302d70.",
+ "N": 3000,
+ "n_zellen": 3000,
+ "base": {
+  "n": 3000,
+  "o_gefechte": {
+   "mission": 4.69,
+   "raid": 4.69
+  },
+  "end_dist": {
+   "mission": {
+    "fleet_dead": 0.708,
+    "colony": 0.0,
+    "control": 0.289,
+    "cap": 0.003
+   },
+   "raid": {
+    "fleet_dead": 0.737,
+    "colony": 0.261,
+    "control": 0.0,
+    "cap": 0.002
+   }
+  },
+  "o_hp": -2.89,
+  "o_dealt": -3.12,
+  "o_col": 3.22,
+  "o_ctrl": 3.53
+ },
+ "rows": [
+  {
+   "oid": "v_302e3",
+   "label": "302e3",
+   "id": "302",
+   "title": "Götterdämmerung",
+   "rarity": 5,
+   "units": 6.4,
+   "n_pl": 980,
+   "d_hp": 24.485,
+   "d_col": 17.351,
+   "d_ctrl": 8.835,
+   "d_dealt": 49.341,
+   "margin": 100.012,
+   "score": 15.627,
+   "se_score": 0.429,
+   "abw": -4.373,
+   "ref_margin": 100.01,
+   "ref_score": 15.627,
+   "ref": "302d70 (dmg 70, E csv -6)",
+   "delta_margin": 0.002,
+   "delta_score": 0.0
+  }
+ ]
+}

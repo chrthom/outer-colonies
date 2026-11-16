@@ -58,7 +58,20 @@ export default [
       "linebreak-style": ["error", "unix"],
       quotes: ["error", "single"],
       semi: ["error", "always"],
-      "@typescript-eslint/no-explicit-any": ["off"]
+      "@typescript-eslint/no-explicit-any": ["off"],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/server/src/**"],
+              message:
+                "Use the @shared/* path alias instead of a relative import that crosses a subproject root (see README.md, Shared Code Boundary)"
+            }
+          ]
+        }
+      ]
     }
   },
   ...compat

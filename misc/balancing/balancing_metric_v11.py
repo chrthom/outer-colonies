@@ -263,8 +263,15 @@ def ship_builds():
     """Komplette Schiffe (Runde 6/7):
     - einteilige Hullen: Schiff = Karte (HP, Speed, Sockel, Raritaet).
     - mehrteilige: Produkt ueber Bug/Kern/Heck (Stationen: Sektionen mit
-      Wiederholung); HP = Summe, Speed = Heck-Speed, Sockel = Summe,
-      GEWICHT = rarste Sektion (Bottleneck, Christophers Runde-6-Punkt 3).
+      Wiederholung); HP = Summe, Sockel = Summe, GEWICHT = rarste Sektion
+      (Bottleneck, Christophers Runde-6-Punkt 3).
+    - H1-SPEED-SUMMEN-FIX (8.11.2026, Christophers Beschluss 6.11.2026
+      „Code = Wahrheit"): `card_profile.ts` `profile.combine()` SUMMIERT
+      die Sektions-Speeds — Schiffs-Speed = SUMME statt Heck-/Max-Speed
+      (die alte v11-Annahme „Speed = Heck-Speed" war eine Vereinfachung;
+      Bug-Sektionen mit sp-1 (120/326/328) reduzieren den realen
+      Schiffsspeed). Historische v11-/v23g-Messungen (bis 8.11.2026)
+      liefen noch auf Heck-/Max-Speed.
     ZWEIstufige Ziehung (Christophers Runde-7-Punkt 3): erst SCHIFFSTYP
     (Korvette, Zerstoerer, Kreuzer, ...), gewichtet mit dem Bottleneck-
     Gewicht der GUENSTIGSTEN Bauweise des Typs (sonst wuerden Karten-
@@ -291,12 +298,15 @@ def ship_builds():
     builds = []
     type_best = {}
 
-    def add(combo, n, typ, speed=None):
+    def add(combo, n, typ):
         socks = {}
         for c in combo:
             for t, k in c['socks'].items():
                 socks[t] = socks.get(t, 0) + k
-        sp = speed if speed is not None else max(c['speed'] for c in combo)
+        # H1-Speed-Summen-Fix (8.11.2026): SUMME der Sektions-Speeds
+        # (Code = Wahrheit, profile.combine()); der speed-Parameter
+        # (Heck-Speed-Sonderfall) entfaellt.
+        sp = sum(c['speed'] for c in combo)
         w = min(c['rw'] for c in combo)
         type_best[(n, typ)] = max(type_best.get((n, typ), 0.0), w)
         builds.append(dict(hp=sum(c['hp'] for c in combo), s=sp, parts=n,
@@ -325,9 +335,7 @@ def ship_builds():
             missing = [p for p in req if p not in by_part]
             assert not missing, f'{base}: Teile fehlen {missing}'
             for combo in itertools.product(*[by_part[p] for p in req]):
-                add(combo, len(req), base,
-                    speed=next(c['speed'] for c in combo
-                               if c['title'].split('(')[-1].rstrip(')').strip() == 'Heck'))
+                add(combo, len(req), base)
     merged = {}
     for b in builds:
         key = (b['hp'], b['s'], b['parts'], b['type'], b['ctrl'],

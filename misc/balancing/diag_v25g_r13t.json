@@ -1,0 +1,37 @@
+{
+ "frame": "v25g-Variantenmessung (9.11.2026): Nachtrag zur Teil-2-Runde - 179 SAbz X (zusaetzlich zum bereits aktiven PzAbz X), gemessen gegen den unveraenderten #795-POOL (Methodik identisch v25a: Kampagnen-Frame v2, gamma=1, Score = Delta-Kriegsbilanz je Platzierung / units, bewertete Variante zusaetzlich auf Traeger-Slot, CRN gegen Basis, dieselben Zellen wie v25a -> Deltas zellgepaart). 104full = Regelvariante: repariert ALLEN Schaden je Runde. 171-Tausch, E-Waehrung degressiv und gamma-Szenarien sind reine Auswertungs-Rechnungen auf v25a-Margins.",
+ "N": 3000,
+ "n_zellen": 3000,
+ "base": {
+  "n": 3000,
+  "o_gefechte": {
+   "mission": 4.69,
+   "raid": 4.69
+  },
+  "o_hp": -2.89,
+  "o_dealt": -3.12,
+  "o_col": 3.22,
+  "o_ctrl": 3.53
+ },
+ "rows": [
+  {
+   "oid": "v_179sx",
+   "label": "179sx",
+   "base_id": "179",
+   "title": "Pulskanone",
+   "rarity": 1,
+   "units": 1,
+   "n_pl": 830,
+   "d_hp": 8.184,
+   "d_col": 1.449,
+   "d_ctrl": 2.703,
+   "d_dealt": 8.889,
+   "margin": 21.225,
+   "score": 21.225,
+   "se_score": 1.167,
+   "orig_score": 30.343,
+   "orig_units": 1,
+   "delta": -9.118
+  }
+ ]
+}

@@ -24,31 +24,6 @@ export class Card129 extends TacticCard {
   }
 }
 
-export class Card139 extends TacticCard {
-  private readonly deactivations = 4;
-  constructor() {
-    super(139, 'ECM-Emitter', 2, TacticDiscipline.Military);
-  }
-  onEnterGame(player: Player) {
-    this.togglePointDefense(
-      player.match.battle.ships[player.match.waitingPlayerNo],
-      this.deactivations,
-      false
-    );
-  }
-  getValidTargets(player: Player): CardStack[] {
-    return player.match.battle.ships[player.match.waitingPlayerNo].filter(
-      cs =>
-        cs.isInBattle &&
-        cs.type == CardType.Hull &&
-        cs.cardStacks.some(scs => scs.card.profile.pointDefense && scs.defenseAvailable)
-    );
-  }
-  protected override get interventionType(): InterventionType | undefined {
-    return InterventionType.BattleRoundStart;
-  }
-}
-
 export class Card173 extends TacticCard {
   constructor() {
     super(173, 'Ausweichmanöver', 1, TacticDiscipline.Military);
@@ -186,6 +161,34 @@ export class Card346 extends TacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.TacticCard;
+  }
+}
+
+export class Card417 extends TacticCard {
+  constructor() {
+    super(
+      417,
+      'Kritischer Treffer',
+      3,
+      TacticDiscipline.Military,
+      {},
+      {
+        range: 0,
+        damage: 6,
+        pointDefense: 0,
+        shield: 0,
+        armour: 0
+      }
+    );
+  }
+  onEnterGame(player: Player, target: CardStack) {
+    this.attackByTactic(player, target);
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[player.match.waitingPlayerNo].filter(cs => cs.damage);
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundEnd;
   }
 }
 
@@ -379,7 +382,6 @@ export class Card550 extends TacticCard {
 
 export const allCards = [
   new Card129(),
-  new Card139(),
   new Card173(),
   new Card174(),
   new Card319(),
@@ -388,6 +390,7 @@ export const allCards = [
   new Card337(),
   new Card338(),
   new Card346(),
+  new Card417(),
   new Card419(),
   new Card428(),
   new Card501(),

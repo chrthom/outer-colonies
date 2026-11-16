@@ -6,6 +6,7 @@ import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
+import { version, releaseName } from '@shared/config/version';
 
 @Component({
   selector: 'oc-root',
@@ -14,15 +15,25 @@ import { RouterOutlet } from '@angular/router';
   imports: [NavbarComponent, RouterOutlet]
 })
 export class AppComponent {
+  /** Number of star background images (background-stars-0 … background-stars-6 in app.component.scss). */
+  private static readonly STAR_BACKGROUND_COUNT = 7;
+
   authService = inject(AuthService);
   private dialog = inject(MatDialog);
 
-  bgNo: number;
+  readonly bgNo: number;
+
   constructor() {
-    this.bgNo = Math.floor(Math.random() * 7);
+    this.bgNo = Math.floor(Math.random() * AppComponent.STAR_BACKGROUND_COUNT);
   }
   get env() {
     return environment;
+  }
+  get version() {
+    return version;
+  }
+  get releaseName() {
+    return releaseName;
   }
   openImprint() {
     this.dialog.open(ImprintPage);

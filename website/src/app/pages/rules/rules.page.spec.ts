@@ -64,7 +64,6 @@ describe('RulesPage', () => {
   it('should return icon font character for known icons', () => {
     const iconName = 'control';
     const result = component.iconUrl(iconName);
-    // iconUrl now returns the Unicode character from the icon font
     expect(result).toBe('\uea02');
   });
 
@@ -78,9 +77,7 @@ describe('RulesPage', () => {
   });
 
   it('should have URL generation methods', () => {
-    // Test URL generation logic
     expect(component.imgUrl('test')).toContain('/rules/test.png');
-    // iconUrl now returns icon font characters, not PNG URLs
     expect(component.iconUrl('test')).toBeNull();
   });
 

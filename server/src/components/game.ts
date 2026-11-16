@@ -18,7 +18,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
           match.players[player.no].ready = true;
           if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
-          // Verify conditions before processing ready event
           if (verifyReadyConditions(player, turnPhase)) {
             if (match.intervention) {
               match.skipIntervention();
@@ -122,17 +121,17 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
       } else if (shipUUID == '*') {
         if (match.battle.range == 1) {
-          // Attack with all available weapons
           const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
             .flatMap(ship => ship.cardStacks)
             .filter(cs => cs.canAttack);
-          let previousAttack: Attack | undefined;
+          let combinedAttack: Attack | undefined;
           for (const srcWeapon of srcWeapons) {
             match.planAttack(srcWeapon, target);
-            match.battle.recentAttack = combineAttackResults(match.battle.recentAttack, previousAttack);
-            previousAttack = match.battle.recentAttack;
             if (match.intervention) break; // Do not perform any more attacks if an intervention is possible
+            // planAttack() reports only the current weapon's attack in recentAttack
+            combinedAttack = combineAttackResults(combinedAttack, match.battle.recentAttack);
           }
+          if (combinedAttack) match.battle.recentAttack = combinedAttack;
         } else {
           console.log('WARN: Tried to attack with all weapons on base before range 1');
         }
@@ -230,11 +229,9 @@ function initMatch(io: Server, match: Match) {
 }
 
 export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
-  // Check hand card limit (only during end of phase)
   if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
     return false;
   }
-  // Check if player has to retract cards
   if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
     return false;
   }

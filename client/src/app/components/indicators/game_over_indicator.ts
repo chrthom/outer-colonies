@@ -1,9 +1,9 @@
 import { animationConfig } from 'src/app/config/animation';
 import { layoutConfig } from 'src/app/config/layout';
 import Game from 'src/app/scenes/game';
-import { ClientGameResult } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientGameResult } from '@shared/interfaces/client_state';
 import { designConfig } from 'src/app/config/design';
-import { GameResultType } from '../../../../../server/src/shared/config/enums';
+import { GameResultType } from '@shared/config/enums';
 import { layoutGameConfig } from 'src/app/config/layout_game';
 
 export default class GameOverIndicator {
@@ -54,7 +54,7 @@ export default class GameOverIndicator {
       .text(
         layoutConfig.scene.width / 2,
         layoutConfig.scene.height / 2 +
-          (gameResult.won ? confYOffset.solGain.winner : confYOffset.solGain.looser),
+          (gameResult.won ? confYOffset.solGain.winner : confYOffset.solGain.loser),
         `${this.gameResult.sol} Sol erhalten`
       )
       .setFontSize(layoutConfig.fontSize.normal)

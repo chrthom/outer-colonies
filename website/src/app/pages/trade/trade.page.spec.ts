@@ -3,11 +3,14 @@ import { TradePage } from './trade.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
-import { of } from 'rxjs';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ApiError } from 'src/app/api/api-error';
+import { of, throwError } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { editions } from '@shared/config/editions';
+import { rules } from '@shared/config/rules';
 
 describe('TradePage', () => {
   let component: TradePage;
@@ -19,7 +22,6 @@ describe('TradePage', () => {
     itemApiSpy = jasmine.createSpyObj('ItemApiService', ['buyBooster', 'open']);
     profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['setNewsletter']);
 
-    // Create getters for the properties
     Object.defineProperty(itemApiSpy, 'items', {
       get: jasmine.createSpy('items getter').and.returnValue(
         of({
@@ -95,13 +97,49 @@ describe('TradePage', () => {
     expect(component.availableBoosters[0].title).toBe('Outer Colonies');
   });
 
+  it('should derive available boosters from the shared edition config', () => {
+    expect(component.availableBoosters.map(b => b.no)).toEqual([1, 2, 3, 4, 5]);
+    for (const booster of component.availableBoosters) {
+      expect(booster.title).toBe(editions[booster.no]);
+      expect(booster.price).toBe(rules.boosterCosts[booster.no]);
+    }
+  });
+
   it('should buy booster when called', () => {
     component.buyBooster(1);
     expect(itemApiSpy.buyBooster).toHaveBeenCalledWith(1);
   });
 
+  it('should map a 400 ApiError to the insufficient sol snackbar', () => {
+    const snackBar = TestBed.inject(MatSnackBar);
+    spyOn(snackBar, 'open');
+    itemApiSpy.buyBooster.and.returnValue(throwError(() => new ApiError(400, 'Insufficient sol')));
+
+    component.buyBooster(1);
+
+    expect(component.actionFailed).toBeTrue();
+    expect(snackBar.open).toHaveBeenCalledWith('Du hast nicht genug Sol für diesen Kauf.', 'OK', {
+      duration: 5000
+    });
+  });
+
+  it('should keep the generic snackbar for other ApiErrors', () => {
+    const snackBar = TestBed.inject(MatSnackBar);
+    spyOn(snackBar, 'open');
+    itemApiSpy.buyBooster.and.returnValue(throwError(() => new ApiError(500, 'Internal Server Error')));
+
+    component.buyBooster(1);
+
+    expect(component.actionFailed).toBeTrue();
+    expect(snackBar.open).toHaveBeenCalledWith(
+      'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
+      'OK',
+      { duration: 5000 }
+    );
+  });
+
   it('should not buy booster when insufficient sol', () => {
-    component.sol = 0; // Set sol to 0
+    component.sol = 0;
     component.buyBooster(1);
     expect(itemApiSpy.buyBooster).not.toHaveBeenCalled();
   });

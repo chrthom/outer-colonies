@@ -25,6 +25,7 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
+import DBConnection from './persistence/db_connector';
 import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
@@ -48,7 +49,25 @@ function performWithSessionTokenCheck(
   }
 }
 
+/**
+ * Sends a status response and logs error statuses with a level beforehand, so no API failure
+ * degrades silently: 4xx are logged as `WARN` (recoverable, e.g. invalid client requests) and
+ * 5xx as `ERROR` (server-side failures that need attention). Only the method and the matched
+ * route pattern are logged - never the query string or the concrete path, whose parameters
+ * may carry credentials, email addresses or one-time UUIDs.
+ * @param res response to send the status to
+ * @param status HTTP status code
+ * @param message optional response message, defaults to the status text
+ */
 function sendStatus(res: Response, status: number, message?: string) {
+  if (status >= 400) {
+    const level = status >= 500 ? 'ERROR' : 'WARN';
+    // The matched route pattern is logged instead of the concrete path: path parameters can
+    // carry usernames, email addresses or one-time UUIDs, which must never end up in logs
+    const route = res.req?.route?.path;
+    const context = res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
+    console.log(`${level}: API request${context} failed with status ${status}`);
+  }
   const r: GenericResponse = {
     status: status
   };
@@ -98,15 +117,21 @@ export default function restAPI(app: Express) {
     fetch(`${config.get('url.assets')}/${file}`)
       .then(actual => {
         if (!actual.body) {
+          console.log(`WARN: Assets response for ${file} has no body, responding with 502`);
           res.status(502).end();
           return;
         }
-        actual.body.pipe(res).on('error', () => res.status(502).end());
+        actual.body.pipe(res).on('error', err => {
+          console.log(`WARN: Assets stream for ${file} failed: ${err}, responding with 502`);
+          res.status(502).end();
+        });
       })
-      .catch(() => res.status(502).end());
+      .catch(err => {
+        console.log(`WARN: Fetching asset ${file} failed: ${err}, responding with 502`);
+        res.status(502).end();
+      });
   });
 
-  // Register new user
   app.post('/api/auth/register', (req, res) => {
     const registerRequest = <AuthRegisterRequest>req.body;
     Auth.checkUsernameExists(registerRequest.username)
@@ -130,7 +155,6 @@ export default function restAPI(app: Express) {
       );
   });
 
-  // Activate user account
   app.put('/api/auth/register/:id', (req, res) => {
     Auth.activateAccount(String(req.params['id'])).then(
       () => sendStatus(res, 204),
@@ -138,7 +162,6 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Login
   app.post('/api/auth/login', (req, res) => {
     Auth.login(<AuthLoginRequest>req.body).then(
       u => {
@@ -153,7 +176,6 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Get user by session token
   app.get('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       const payload: AuthLoginResponse = {
@@ -165,7 +187,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Logout
   app.delete('/api/auth/login', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       Auth.logout(u.sessionToken).then(
@@ -175,7 +196,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Check if username or email exists
   app.get('/api/auth/exists', (req, res) => {
     const sendExistsResponse = (exists: boolean) => {
       const payload: AuthExistsResponse = {
@@ -192,7 +212,6 @@ export default function restAPI(app: Express) {
     else sendStatus(res, 400, 'No username or email parameter was provided');
   });
 
-  // Send password reset link
   app.delete('/api/auth/password/:user', (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
       () => sendStatus(res, 202),
@@ -200,7 +219,6 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Reset password with active session
   app.put('/api/auth/password', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBCredentialsDAO.setPassword(u.userId, (<AuthPasswordRequest>req.body).password).then(
@@ -210,7 +228,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Reset password via magic link
   app.put('/api/auth/password/:id', (req, res) => {
     Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
       () => sendStatus(res, 204),
@@ -218,7 +235,6 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // Send email confirmation link
   app.post('/api/auth/email', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       Auth.sendEmailConfirmation(u.userId, u.username, (<AuthEmailRequest>req.body).email).then(
@@ -228,7 +244,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Confirm new email address via magic link
   app.put('/api/auth/email/:id', (req, res) => {
     Auth.resetEmail(String(req.params['id'])).then(
       () => sendStatus(res, 204),
@@ -236,7 +251,6 @@ export default function restAPI(app: Express) {
     );
   });
 
-  // List all cards
   app.get('/api/deck', (req, res) => {
     const toDeckCard = (c: DBDeck) => {
       const cardData: Card = CardCollection.cards[c.cardId as keyof typeof CardCollection.cards];
@@ -284,23 +298,24 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Add a card to the active deck
   app.post('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), true).then(
-      () => sendStatus(res, 204),
-      () => sendStatus(res, 500)
-    );
+    performWithSessionTokenCheck(req, res, u => {
+      DBDecksDAO.setInUse(u.userId, Number(req.params['cardInstanceId']), true).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
+    });
   });
 
-  // Remove a card from the active deck and put it to reserve
   app.delete('/api/deck/:cardInstanceId(\\d+)', (req, res) => {
-    DBDecksDAO.setInUse(Number(req.params['cardInstanceId']), false).then(
-      () => sendStatus(res, 204),
-      () => sendStatus(res, 500)
-    );
+    performWithSessionTokenCheck(req, res, u => {
+      DBDecksDAO.setInUse(u.userId, Number(req.params['cardInstanceId']), false).then(
+        () => sendStatus(res, 204),
+        () => sendStatus(res, 500)
+      );
+    });
   });
 
-  // Get user profile
   app.get('/api/profile', (req, res) => {
     const sendProfileResponse = (profile: DBProfile) => {
       const payload: ProfileGetResponse = profile;
@@ -313,7 +328,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Activate newsletter subscription
   app.put('/api/profile/newsletter', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.setNewsletter(u.userId, true).then(
@@ -323,7 +337,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Remove newsletter subscription
   app.delete('/api/profile/newsletter', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBProfilesDAO.setNewsletter(u.userId, false).then(
@@ -333,7 +346,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Get daily tasks of user
   app.get('/api/daily', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
       DBDailiesDAO.getByUserId(u.userId).then(
@@ -343,7 +355,6 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // List all items
   app.get('/api/item', (req, res) => {
     const toBox = (i: DBItem) => {
       const content = <DBItemBoxContent[]>JSON.parse(i.content);
@@ -374,66 +385,27 @@ export default function restAPI(app: Express) {
     });
   });
 
-  // Open an item
   app.post('/api/item/:itemId(\\d+)', (req, res) => {
     const itemId = Number(req.params['itemId']);
     performWithSessionTokenCheck(req, res, u => {
-      DBItemsDAO.getByUserId(u.userId)
-        .then(items => {
-          const item = items.find(i => i.itemId == itemId);
-          return item ? Promise.resolve(item) : Promise.reject(APIRejectReason.NotFound);
-        })
-        .then(item => DBItemsDAO.delete(itemId).then(() => item))
-        .then(item => {
-          if (item.type == ItemType.Booster) {
-            const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
-            cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
-            const response: ItemListResponseBox = {
-              itemId: item.itemId,
-              message: item.message,
-              sol: [],
-              cards: cards,
-              boosters: []
-            };
-            res.status(200).send(response);
-          } else if (item.type == ItemType.Box) {
-            const content = <DBItemBoxContent[]>JSON.parse(item.content);
-            content.forEach(e => {
-              switch (e.type) {
-                case ItemBoxContentType.Booster:
-                  DBItemsDAO.createBooster(u.userId, e.value);
-                  break;
-                case ItemBoxContentType.Card:
-                  DBDecksDAO.create(e.value, u.userId);
-                  break;
-                case ItemBoxContentType.Sol:
-                  DBProfilesDAO.increaseSol(u.userId, e.value);
-              }
-            });
-            const response: ItemListResponseBox = {
-              itemId: item.itemId,
-              message: item.message,
-              sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
-              cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
-              boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
-            };
-            res.status(200).send(response);
-          } else {
-            sendStatus(res, 400, 'Invalid item type');
-          }
-        })
-        .catch(reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500));
+      openItem(u.userId, itemId).then(
+        response => res.status(200).send(response),
+        reason =>
+          reason == APIRejectReason.NotFound
+            ? sendStatus(res, 404)
+            : reason == INVALID_ITEM_TYPE
+              ? sendStatus(res, 400, 'Invalid item type')
+              : sendStatus(res, 500)
+      );
     });
   });
 
-  // Buy a booster pack
   app.post('/api/buy/booster/:boosterNo([1-5])', (req, res) => {
     const boosterNo = Number(req.params['boosterNo']);
     performWithSessionTokenCheck(req, res, u => {
-      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo])
-        .then(() => DBItemsDAO.createBooster(u.userId, boosterNo))
-        .then(() => sendStatus(res, 201))
-        .catch(reason => {
+      buyBooster(u.userId, boosterNo).then(
+        () => sendStatus(res, 201),
+        reason => {
           switch (reason) {
             case APIRejectReason.ConditionNotMet:
               sendStatus(res, 400, 'Insufficient sol');
@@ -444,13 +416,16 @@ export default function restAPI(app: Express) {
             default:
               sendStatus(res, 500);
           }
-        });
+        }
+      );
     });
   });
 }
 
-// Single source of truth for projecting a DB daily row into the wire payload:
-// values for dailies active today are preserved, the rest are nulled out.
+/**
+ * Single source of truth for projecting a DB daily row into the wire payload:
+ * values for dailies active today are preserved, the rest are nulled out.
+ */
 export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
   const dailiesOfDay = getDailiesOfDay();
   const typedPayload: DailyGetResponse = {} as DailyGetResponse;
@@ -463,8 +438,82 @@ export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
   return typedPayload;
 }
 
-// Thin wrapper that fetches and projects in one call; retained for tests.
+/** Thin wrapper that fetches and projects in one call; retained for tests. */
 export async function getDailies(userId: number): Promise<DailyGetResponse> {
   const daily = await DBDailiesDAO.getByUserId(userId);
   return getDailiesResponse(daily);
+}
+
+/** Sentinel rejection value for items whose type is neither box nor booster. */
+export const INVALID_ITEM_TYPE = 'invalid_item_type';
+
+/**
+ * Opens an item in a single database transaction: the item is deleted and all granted cards, sol
+ * and boosters are inserted before the transaction commits. The delete is guarded by an
+ * affected-rows check, so a concurrent open of the same item rejects with
+ * `APIRejectReason.NotFound` instead of granting the content twice. Rejects with
+ * `APIRejectReason.NotFound` if the user owns no such item and with `INVALID_ITEM_TYPE` for
+ * unknown item types; any failure rolls the whole operation back.
+ * @param userId id of the user opening the item
+ * @param itemId id of the item to open
+ * @returns the opened item content for the response payload
+ */
+export async function openItem(userId: number, itemId: number): Promise<ItemListResponseBox> {
+  return DBConnection.instance.transaction(async () => {
+    const items = await DBItemsDAO.getByUserId(userId);
+    const item = items.find(i => i.itemId == itemId);
+    if (!item) return Promise.reject(APIRejectReason.NotFound);
+    if (item.type == ItemType.Booster) {
+      const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
+      for (const cardId of cards) {
+        await DBDecksDAO.create(cardId, userId, false, true);
+      }
+      return {
+        itemId: item.itemId,
+        message: item.message,
+        sol: [],
+        cards: cards,
+        boosters: []
+      };
+    } else if (item.type == ItemType.Box) {
+      const content = <DBItemBoxContent[]>JSON.parse(item.content);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
+      for (const entry of content) {
+        switch (entry.type) {
+          case ItemBoxContentType.Booster:
+            await DBItemsDAO.createBooster(userId, entry.value);
+            break;
+          case ItemBoxContentType.Card:
+            await DBDecksDAO.create(entry.value, userId);
+            break;
+          case ItemBoxContentType.Sol:
+            await DBProfilesDAO.increaseSol(userId, entry.value);
+        }
+      }
+      return {
+        itemId: item.itemId,
+        message: item.message,
+        sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
+        cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
+        boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
+      };
+    } else {
+      return Promise.reject(INVALID_ITEM_TYPE);
+    }
+  });
+}
+
+/**
+ * Buys a booster pack in a single database transaction: the sol decrease and the booster item
+ * creation commit together or not at all. Rejects with `APIRejectReason.ConditionNotMet` if the
+ * user cannot afford the booster and with `APIRejectReason.NotFound` if the user is unknown.
+ * @param userId id of the buying user
+ * @param boosterNo edition number of the booster to buy
+ */
+export async function buyBooster(userId: number, boosterNo: number): Promise<void> {
+  return DBConnection.instance.transaction(async () => {
+    await DBProfilesDAO.decreaseSol(userId, rules.boosterCosts[boosterNo]);
+    await DBItemsDAO.createBooster(userId, boosterNo);
+  });
 }

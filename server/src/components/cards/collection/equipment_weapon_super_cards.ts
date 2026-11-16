@@ -9,12 +9,12 @@ export class Card302 extends EquipmentCardRechargeable {
       'Götterdämmerung',
       5,
       {
-        energy: -6,
+        energy: -3,
         xi: -3
       },
       {
         range: 1,
-        damage: 50,
+        damage: 70,
         pointDefense: 0,
         shield: -6,
         armour: -3
@@ -36,7 +36,7 @@ export class Card401 extends EquipmentCardRechargeable {
       },
       {
         range: 2,
-        damage: 30,
+        damage: 35,
         pointDefense: 0,
         shield: -8,
         armour: -3
