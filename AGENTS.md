@@ -63,3 +63,8 @@ Maintain consistency across the three subprojects
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks
+- **Logging**: Leveled logging instead of raw `console.log` calls with `WARN:`/`ERROR:` string prefixes:
+  - **server**: Log through the leveled logger utility (see #870), never `console.*` directly
+  - **website/client**: Log to the browser console only on non-production stages (gate with `environment.stage !== 'production'`); only fatal boot errors may use `console.error` in production
+  - `debug` for verbose diagnostics (development only), `info` for normal operational events (e.g. server startup, connections), `warn` for recoverable problems (e.g. invalid client requests), `error` for failures that need attention (e.g. caught exceptions)
+  - Never log sensitive data (session tokens, credentials, email addresses, request URLs with query parameters)
