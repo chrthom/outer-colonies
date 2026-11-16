@@ -4,6 +4,7 @@ import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';
 import { opponentPlayerNo } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import Match from './match';
 import Player from './player';
 
@@ -101,7 +102,7 @@ export default class GameResult {
     try {
       const c = await DBCredentialsDAO.getByUsername(player.name);
       if (!c) {
-        console.log(`ERROR: Could not find user ${player.name} in database`);
+        logger.error(`Could not find user ${player.name} in database`);
         return;
       }
       DBProfilesDAO.increaseSol(c.userId, sol);
@@ -110,12 +111,12 @@ export default class GameResult {
           try {
             await DBDailiesDAO.achieve(c.userId, dailyType);
           } catch (err) {
-            console.log(`ERROR: Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
+            logger.error(`Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
           }
         }
       }
     } catch (err) {
-      console.log(`ERROR: Failed to persist earnings for user ${player.name}: ${err}`);
+      logger.error(`Failed to persist earnings for user ${player.name}: ${err}`);
     }
   }
 }

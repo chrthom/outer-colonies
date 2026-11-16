@@ -8,6 +8,7 @@ import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import { version, releaseName } from './shared/config/version';
 import restAPI from './components/rest_api';
+import { logger } from './components/utils/logger';
 import process from 'node:process';
 
 const app = express();
@@ -22,9 +23,9 @@ const io = new Server(httpServer, {
 });
 
 io.on(MsgTypeInbound.Connect, socket => {
-  console.log(`Client connected: ${socket.id}`);
+  logger.info(`Client connected: ${socket.id}`);
   socket.on(MsgTypeInbound.Disconnect, () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    logger.info(`Client disconnected: ${socket.id}`);
   });
   matchMakingSocketListeners(io, socket);
   gameSocketListeners(io, socket);
@@ -37,11 +38,11 @@ app.use(express.json());
 restAPI(app);
 
 httpServer.listen(config.get<number>('server.port'), () => {
-  console.log(`Server v${version} (${releaseName}) started on stage ${config.get('stage')}`);
+  logger.info(`Server v${version} (${releaseName}) started on stage ${config.get('stage')}`);
 });
 
 if (!config.get<boolean>('terminate_on_error')) {
   process.on('uncaughtException', err => {
-    console.log(`ERROR: Caught exception: ${err.name} -> ${err.message}${err.stack ? '\n' + err.stack : ''}`);
+    logger.error(`Caught exception: ${err.name} -> ${err.message}${err.stack ? '\n' + err.stack : ''}`);
   });
 }

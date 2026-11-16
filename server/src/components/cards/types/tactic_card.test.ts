@@ -48,7 +48,7 @@ const makeCard = (id: number) => new TestCard(id, `Card${id}`, CardType.Equipmen
 describe('TacticCard.tributeCardFromPile', () => {
   let warnSpy: jest.SpyInstance;
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    warnSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => warnSpy.mockRestore());
 
@@ -105,7 +105,7 @@ describe('TacticCard.tributeCardFromPile', () => {
 describe('TacticCard.tributeHandCard', () => {
   let warnSpy: jest.SpyInstance;
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    warnSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => warnSpy.mockRestore());
 
@@ -159,7 +159,7 @@ describe('TacticCard.tributeMultipleFromPile', () => {
   });
 
   test('silently skips ids that are not in the pile', () => {
-    const warnSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const c1 = makeCard(1);
     const pile = [c1];
     const action = jest.fn();

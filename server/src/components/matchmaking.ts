@@ -7,6 +7,7 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import { logger } from './utils/logger';
 
 export const matchmakingRoom = 'matchmaking';
 const gameRoomPrefix = 'match';
@@ -17,19 +18,19 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     try {
       const user = await DBCredentialsDAO.getBySessionToken(sessionToken);
       if (!user) {
-        console.log(`WARN: Invalid session token ${sessionToken} provided`);
+        logger.warn(`Invalid session token ${sessionToken} provided`);
         return;
       }
       const deckCards = await DBDecksDAO.getByUserId(user.userId);
       const activeDeck = deckCards
         .filter(c => c.inUse)
         .map(c => CardCollection.cards[c.cardId as keyof typeof CardCollection.cards]);
-      console.log(`Player logged in: ${user.username}`);
+      logger.info(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
       socket.join(matchmakingRoom);
       socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
     } catch (err) {
-      console.log(`ERROR: Login failed for session token ${sessionToken}: ${err}`);
+      logger.error(`Login failed for session token ${sessionToken}: ${err}`);
     }
   });
 }
@@ -40,7 +41,7 @@ export function matchMakingCron(io: Server) {
     .filter((c): c is Socket => !!c);
   const numClients = clients.length;
   if (clients.length > 1) {
-    console.log(`Performing matchmaking for ${numClients} clients...`);
+    logger.info(`Performing matchmaking for ${numClients} clients...`);
     let partnerSocket = null;
     for (const client of clients) {
       client.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, numClients - 1);

@@ -1,10 +1,11 @@
 import Player from './player';
 import { rules } from '../../shared/config/rules';
 import { BattleType, CardDurability, CardType, TurnPhase } from '../../shared/config/enums';
-import Battle from './battle';
+import Battle, { Attack } from './battle';
 import ClientPlannedBattle from '../../shared/interfaces/client_planned_battle';
 import CardStack from '../cards/card_stack';
-import { opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
+import { combineAttackResults, opponentPlayerNo, spliceCardStackByUUID } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import { Socket } from 'socket.io';
 import GameResult from './game_result';
 import Intervention, {
@@ -134,6 +135,30 @@ export default class Match {
   planAttack(srcWeapon: CardStack, target: CardStack) {
     new InterventionAttack(this, srcWeapon, target).init();
   }
+  /**
+   * Plans consecutive attacks with every attackable weapon of the pending action player's
+   * fleet against a single target and combines the individual attacks into one reported
+   * attack. The attack-all action is only available at battle range 1; after the first weapon
+   * whose attack opens an intervention window no further attacks are planned.
+   * @param target card stack attacked by all weapons
+   */
+  planAttackWithAllWeapons(target: CardStack) {
+    if (this.battle.range != 1) {
+      logger.warn('Tried to attack with all weapons on base before range 1');
+      return;
+    }
+    const srcWeapons = this.battle.ships[this.pendingActionPlayerNo]
+      .flatMap(ship => ship.cardStacks)
+      .filter(cs => cs.canAttack);
+    let combinedAttack: Attack | undefined;
+    for (const srcWeapon of srcWeapons) {
+      this.planAttack(srcWeapon, target);
+      if (this.intervention) break; // Do not perform any more attacks if an intervention is possible
+      // planAttack() reports only the current weapon's attack in recentAttack
+      combinedAttack = combineAttackResults(combinedAttack, this.battle.recentAttack);
+    }
+    if (combinedAttack) this.battle.recentAttack = combinedAttack;
+  }
   checkToNextPhase() {
     this.intervention?.checkSkip();
   }
@@ -155,9 +180,9 @@ export default class Match {
       })
       .flat();
   }
-  reactivateAllCardStacks(rechargingAttribtuesOnly: boolean = false) {
+  reactivateAllCardStacks(rechargingAttributesOnly: boolean = false) {
     this.players.forEach(player => {
-      player.cardStacks.forEach(cs => cs.combatPhaseReset(!rechargingAttribtuesOnly));
+      player.cardStacks.forEach(cs => cs.combatPhaseReset(!rechargingAttributesOnly));
     });
   }
   adjustControl(control: number) {
