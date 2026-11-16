@@ -8,9 +8,9 @@ export class Card102 extends HullCard {
   constructor() {
     super(102, 'Sternbasis', 5, starFortress, {
       hp: 17,
-      theta: 1,
+      theta: 2,
       xi: 2,
-      phi: 1,
+      phi: 2,
       omega: 3
     });
   }
