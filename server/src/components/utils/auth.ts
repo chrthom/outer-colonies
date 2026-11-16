@@ -13,20 +13,26 @@ export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
     return DBCredentialsDAO.getByUsername(username).then(
       () => true,
-      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject())
+      // NotFound is the expected "username is free" answer; any other rejection is a real
+      // error and is rethrown for the caller to handle
+      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject(reason))
     );
   }
   static async checkEmailExists(email: string): Promise<boolean> {
     return DBCredentialsDAO.getByEmail(email).then(
       () => true,
-      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject())
+      // NotFound is the expected "email is free" answer; any other rejection is a real
+      // error and is rethrown for the caller to handle
+      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject(reason))
     );
   }
   static async sendPasswordReset(usernameOrEmail: string) {
     const credential = await DBCredentialsDAO.getByUsername(usernameOrEmail).catch(reason =>
       reason == APIRejectReason.NotFound
         ? DBCredentialsDAO.getByEmail(usernameOrEmail)
-        : Promise.reject(APIRejectReason.NotFound)
+        : // Only the expected NotFound falls back to the email lookup; real errors are rethrown
+          // instead of being masked as NotFound (which would turn them into a wrong 404)
+          Promise.reject(reason)
     );
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
     await Mailer.sendPasswordReset(credential.email, credential.username, uuid);
@@ -87,7 +93,9 @@ export default class Auth {
       reason =>
         reason == APIRejectReason.NotFound
           ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
-          : Promise.reject(APIRejectReason.NotFound)
+          : // Only the expected NotFound falls back to the email lookup; real errors are rethrown
+            // instead of being masked as NotFound (which would turn them into a wrong 401)
+            Promise.reject(reason)
     );
     try {
       await DBDailiesDAO.achieve(credential.userId, DailyType.Login);

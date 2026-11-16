@@ -33,6 +33,7 @@ Maintain consistency across the three subprojects
   - `Task` – Database, testing, deployment, refactorings and hosting
   - `Bug` – Something isn't working
 - When creating an issue, label it as follows: add `needs-human` whenever the issue cannot be completely implemented by the AI agent in this environment; additionally add `dev-loop` only if any part of it can be automatically implemented by the AI agent there (a fully automatable issue carries only `dev-loop`)
+- Unless stated otherwise, issues assigned to the productive milestone (bugfixes) and to the current in-development milestone always carry the `dev-loop` label; issues on any other milestone do not carry it by default
 - The `clean` label on a PR marks that its current head passed a dev-loop review with verdict CLEAN; it is managed by the dev loop (added on a CLEAN verdict, removed on the next non-CLEAN verdict)
 
 ### Milestones, Versions & Releases
@@ -40,6 +41,7 @@ Maintain consistency across the three subprojects
 - Tags and releases are semantically versioned
 - Milestones only cover major/minor versions; patches (hotfixes) belong to the milestone of the currently productive version
 - The currently productive milestone stays open so productive bugs can be assigned to it; new features and enhancements go to the next milestone
+- When creating an issue, always decide explicitly which milestone it belongs to: no milestone, the milestone currently in development, or the milestone after it; for bugs, the productive milestone (the currently deployed version) is an additional option
 - Milestone planning: keep milestones small and focused
 - Milestone names are solar system bodies: Saturn moons in ascending order of the "Nr." column of the German Wikipedia list of Saturn's moons (https://de.wikipedia.org/wiki/Liste_der_Saturnmonde); strictly sequential from now on, next after Pan (XVIII) is Ymir (XIX)
 
@@ -68,9 +70,15 @@ Maintain consistency across the three subprojects
 ### Code Style Preferences
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
-- **Error Handling**: Comprehensive try-catch blocks
+- **Error Handling**: Comprehensive try-catch blocks. Every `catch` (or promise/rxjs rejection handler) must:
+  - **Never swallow errors silently**: an empty catch block, or one that only continues without logging, is forbidden.
+  - **Log with a level and then either rethrow or degrade explicitly**: log at `warn` or `error` level per the Logging rule below, then either rethrow the error for the caller to handle (`throw err`) or degrade deliberately with a visible fallback (return a default, skip the optional step) — the decision must be recognizable in the code. A bare rethrow without logging is not a silent catch and is acceptable when the caller handles the error.
+- **Inline Comments**: Inline comments are for non-obvious *why* (workarounds, invariants, business rules), never *what*. Do not restate what the code does and do not leave TODO-style notes without an issue reference. All interface documentation belongs in JSDoc.
 - **Logging**: Leveled logging instead of raw `console.log` calls with `WARN:`/`ERROR:` string prefixes:
   - **server**: Log through the leveled logger utility (see #870), never `console.*` directly
   - **website/client**: Log to the browser console only on non-production stages (gate with `environment.stage !== 'production'`); only fatal boot errors may use `console.error` in production
   - `debug` for verbose diagnostics (development only), `info` for normal operational events (e.g. server startup, connections), `warn` for recoverable problems (e.g. invalid client requests), `error` for failures that need attention (e.g. caught exceptions)
   - Never log sensitive data (session tokens, credentials, email addresses, request URLs with query parameters)
+- **Angular selectors**: Components use kebab-case element selectors with the subproject's prefix (`oc-…` in `website/`, `app-…` in `client/`), directives use camelCase attribute selectors with the same prefix. Enforced by `@angular-eslint/component-selector` / `directive-selector`; component classes in `website/` end with `Component` or `Page` (`@angular-eslint/component-class-suffix`)
+- **File names**: `website/` uses kebab-case with Angular suffixes (`*.page.ts`, `*.component.ts`, `*.service.ts`, `*.interceptor.ts`; specs as `*.spec.ts`). `client/` and `server/` use snake_case (e.g. `socket_service.ts`, `db_connector.ts`), with client specs as `*.spec.ts` and server tests as `*.test.ts`. Card type files in `server/` follow `<type>_card.ts` under `src/components/cards/types/`, collection files `<category>_cards.ts`
+- **Shared imports (`@shared/*`)**: Code shared across subprojects lives in `server/src/shared/`. The client and website import it only via the `@shared/*` path alias (e.g. `import { CardType } from '@shared/config/enums'`), while the server imports it relatively within its own root. Relative imports never cross a subproject root; `client/` and `website/` enforce this via `no-restricted-imports` (pattern `**/server/src/**`)

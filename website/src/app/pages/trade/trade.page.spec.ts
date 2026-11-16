@@ -22,7 +22,6 @@ describe('TradePage', () => {
     itemApiSpy = jasmine.createSpyObj('ItemApiService', ['buyBooster', 'open']);
     profileApiSpy = jasmine.createSpyObj('ProfileApiService', ['setNewsletter']);
 
-    // Create getters for the properties
     Object.defineProperty(itemApiSpy, 'items', {
       get: jasmine.createSpy('items getter').and.returnValue(
         of({
@@ -140,7 +139,7 @@ describe('TradePage', () => {
   });
 
   it('should not buy booster when insufficient sol', () => {
-    component.sol = 0; // Set sol to 0
+    component.sol = 0;
     component.buyBooster(1);
     expect(itemApiSpy.buyBooster).not.toHaveBeenCalled();
   });

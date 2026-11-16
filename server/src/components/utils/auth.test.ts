@@ -1,4 +1,4 @@
-import { DailyType } from '../../shared/config/enums';
+import { APIRejectReason, DailyType } from '../../shared/config/enums';
 import { AuthRegisterRequest } from '../../shared/interfaces/rest_api';
 import DBConnection from '../persistence/db_connector';
 import DBCredentialsDAO from '../persistence/db_credentials';
@@ -36,12 +36,14 @@ describe('AuthUtils', () => {
   };
 
   describe('login', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should call DBDailiesDAO.achieve with correct parameters for login', async () => {
-      // Mock the achieve method
       const achieveSpy = jest.spyOn(DBDailiesDAO, 'achieve');
       achieveSpy.mockImplementation(jest.fn());
 
-      // Mock other dependencies
       const mockLoginCredential = {
         userId: 123,
         sessionToken: 'test-token',
@@ -49,19 +51,55 @@ describe('AuthUtils', () => {
         email: 'test@example.com'
       };
 
-      // Mock the getByUsername method to return our mock credential
       jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockLoginCredential);
       jest.spyOn(DBCredentialsDAO, 'login').mockResolvedValue('test-token');
 
-      // Call the login method
       const loginData = { username: 'testuser', password: 'password' };
       await AuthUtils.login(loginData);
 
-      // Verify that achieve was called with the correct parameters
       expect(achieveSpy).toHaveBeenCalledWith(123, DailyType.Login);
 
-      // Clean up
       achieveSpy.mockRestore();
+    });
+
+    it('should rethrow real errors from the credential lookup instead of masking them as NotFound', async () => {
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockRejectedValue(new Error('DB error'));
+
+      await expect(AuthUtils.login({ username: 'testuser', password: 'password' })).rejects.toThrow(
+        'DB error'
+      );
+    });
+  });
+
+  describe('checkUsernameExists', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should resolve to false when the username is unknown', async () => {
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockRejectedValue(APIRejectReason.NotFound);
+      await expect(AuthUtils.checkUsernameExists('unknown')).resolves.toBe(false);
+    });
+
+    it('should rethrow real errors instead of rejecting with undefined', async () => {
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockRejectedValue(new Error('DB error'));
+      await expect(AuthUtils.checkUsernameExists('testuser')).rejects.toThrow('DB error');
+    });
+  });
+
+  describe('checkEmailExists', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should resolve to false when the email is unknown', async () => {
+      jest.spyOn(DBCredentialsDAO, 'getByEmail').mockRejectedValue(APIRejectReason.NotFound);
+      await expect(AuthUtils.checkEmailExists('unknown@example.com')).resolves.toBe(false);
+    });
+
+    it('should rethrow real errors instead of rejecting with undefined', async () => {
+      jest.spyOn(DBCredentialsDAO, 'getByEmail').mockRejectedValue(new Error('DB error'));
+      await expect(AuthUtils.checkEmailExists('test@example.com')).rejects.toThrow('DB error');
     });
   });
 

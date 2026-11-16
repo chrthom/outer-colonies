@@ -3,6 +3,7 @@ import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { AuthLoginResponse } from '@shared/interfaces/rest_api';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -39,10 +40,13 @@ export default class AuthService {
   logout() {
     if (this.sessionToken) {
       this.authAPIService.logout().subscribe({
-        error: () => {
-          /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
-             errors of handler-less subscriptions as uncaught exceptions. The session
-             is cleared locally regardless */
+        error: err => {
+          /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions
+             as uncaught exceptions. The failure is logged with a level (gated to
+             non-production stages) and the session is cleared locally regardless */
+          if (environment.stage !== 'production') {
+            console.warn(`Logout failed with status ${err?.status}, clearing local session anyway`);
+          }
         }
       });
     }
@@ -84,7 +88,13 @@ export default class AuthService {
         this.username = r.username;
         return true;
       }),
-      catchError(() => {
+      catchError(err => {
+        // Failed login or session check: recoverable problem, degrades to the logged-out
+        // state. Logged with a level (gated to non-production stages); only the status is
+        // logged, never credentials or the request URL
+        if (environment.stage !== 'production') {
+          console.warn(`Session check failed with status ${err?.status}, degrading to logged-out state`);
+        }
         this.clearSession();
         return of(false);
       })

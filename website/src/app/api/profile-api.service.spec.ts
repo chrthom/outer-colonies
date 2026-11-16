@@ -37,9 +37,7 @@ describe('ProfileApiService', () => {
   });
 
   it('should set newsletter subscription', () => {
-    service.setNewsletter(true).subscribe(() => {
-      // Newsletter set successfully
-    });
+    service.setNewsletter(true).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/profile/newsletter`);
     expect(req.request.method).toBe('PUT');
@@ -47,9 +45,7 @@ describe('ProfileApiService', () => {
   });
 
   it('should unset newsletter subscription', () => {
-    service.setNewsletter(false).subscribe(() => {
-      // Newsletter unset successfully
-    });
+    service.setNewsletter(false).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/profile/newsletter`);
     expect(req.request.method).toBe('DELETE');
