@@ -55,7 +55,7 @@ Maintain consistency across the three subprojects
 ## Testing Requirements
 - New server game or persistence logic requires Jest coverage: add or extend a `*.test.ts` spec next to the tested source in `server/src/`
 - Bug fixes should come with a reproducing test where feasible: a test that fails before and passes after the fix
-- Frontend specs are `*.spec.ts` files next to the tested source, run through the custom `scripts/test.js` harnesses (Jasmine/Karma via `ng test`) in `client/` and `website/`
+- Frontend specs are `*.spec.ts` files next to the tested source (Jasmine/Karma via `ng test`), in `client/` through the custom `scripts/test.js` wrapper and in `website/` through direct `ng test` npm scripts
 - All tests must pass from the repo root via `npm test` (part of `npm run check`)
 
 ## Decision Making Guidelines
