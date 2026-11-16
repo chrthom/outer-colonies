@@ -14,6 +14,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { starterDecks } from '@shared/config/starter_decks';
+import { environment } from 'src/environments/environment';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -155,6 +156,23 @@ describe('RegisterPage', () => {
     username?.setValue('validusername');
     tick(300);
     expect(username?.valid).toBeTrue();
+  }));
+
+  it('should log a warning and degrade to no error when the availability check fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      authApiSpy.checkUsernameExists.and.returnValue(throwError(() => ({ status: 500 })));
+      const username = component.registerForm.get('username');
+      username?.setValue('validusername');
+      tick(300);
+      expect(username?.valid).toBeTrue();
+      expect(warnSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(/status 500.*treating username as available/)
+      );
+    } finally {
+      environment.stage = 'production';
+    }
   }));
 
   it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {

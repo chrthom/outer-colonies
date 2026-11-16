@@ -49,7 +49,21 @@ function performWithSessionTokenCheck(
   }
 }
 
+/**
+ * Sends a status response and logs error statuses with a level beforehand, so no API failure
+ * degrades silently: 4xx are logged as `WARN` (recoverable, e.g. invalid client requests) and
+ * 5xx as `ERROR` (server-side failures that need attention). Only method and path are logged,
+ * never the query string (it may contain credentials or email addresses).
+ * @param res response to send the status to
+ * @param status HTTP status code
+ * @param message optional response message, defaults to the status text
+ */
 function sendStatus(res: Response, status: number, message?: string) {
+  if (status >= 400) {
+    const level = status >= 500 ? 'ERROR' : 'WARN';
+    const context = res.req ? ` for ${res.req.method} ${res.req.path}` : '';
+    console.log(`${level}: API request${context} failed with status ${status}`);
+  }
   const r: GenericResponse = {
     status: status
   };
@@ -99,12 +113,19 @@ export default function restAPI(app: Express) {
     fetch(`${config.get('url.assets')}/${file}`)
       .then(actual => {
         if (!actual.body) {
+          console.log(`WARN: Assets response for ${file} has no body, responding with 502`);
           res.status(502).end();
           return;
         }
-        actual.body.pipe(res).on('error', () => res.status(502).end());
+        actual.body.pipe(res).on('error', err => {
+          console.log(`WARN: Assets stream for ${file} failed: ${err}, responding with 502`);
+          res.status(502).end();
+        });
       })
-      .catch(() => res.status(502).end());
+      .catch(err => {
+        console.log(`WARN: Fetching asset ${file} failed: ${err}, responding with 502`);
+        res.status(502).end();
+      });
   });
 
   // Register new user

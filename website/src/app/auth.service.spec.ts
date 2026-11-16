@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CookieService } from 'ngx-cookie-service';
 import AuthService from './auth.service';
 import AuthApiService from './api/auth-api.service';
+import { environment } from 'src/environments/environment';
 import { of, throwError } from 'rxjs';
 
 describe('AuthService', () => {
@@ -69,6 +70,23 @@ describe('AuthService', () => {
     expect(cookieSpy.delete).toHaveBeenCalledWith('p');
   });
 
+  it('should log a warning and clear the session locally when the logout call fails', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      service['sessionToken'] = 'test-token';
+      authApiSpy.logout.and.returnValue(throwError(() => ({ status: 500 })));
+
+      service.logout();
+
+      expect(service.isLoggedIn).toBeFalse();
+      expect(cookieSpy.delete).toHaveBeenCalledWith('u');
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500/));
+    } finally {
+      environment.stage = 'production';
+    }
+  });
+
   it('should check session token', () => {
     const mockResponse = { sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' };
     service['sessionToken'] = 'test-token';
@@ -94,6 +112,7 @@ describe('AuthService', () => {
 
   it('should not log the failed request URL to the console in production', () => {
     spyOn(console, 'log');
+    spyOn(console, 'warn');
     service['sessionToken'] = 'invalid-token';
     authApiSpy.checkSessionToken.and.returnValue(
       throwError(() => ({
@@ -106,7 +125,26 @@ describe('AuthService', () => {
     service.check().subscribe(success => {
       expect(success).toBeFalse();
       expect(console.log).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
+  });
+
+  it('should log a warning with the status when the session check fails on non-production stages', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      service['sessionToken'] = 'invalid-token';
+      authApiSpy.checkSessionToken.and.returnValue(throwError(() => ({ status: 401 })));
+
+      service.check().subscribe(success => {
+        expect(success).toBeFalse();
+        expect(service.isLoggedIn).toBeFalse();
+        expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 401/));
+        expect(warnSpy).not.toHaveBeenCalledWith(jasmine.stringMatching(/url/i));
+      });
+    } finally {
+      environment.stage = 'production';
+    }
   });
 
   it('should login from cookies', () => {

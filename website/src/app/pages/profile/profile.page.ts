@@ -14,6 +14,7 @@ import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer }
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
+import { environment } from 'src/environments/environment';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
@@ -64,10 +65,13 @@ export class ProfilePage implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.profileAPIService.profile.subscribe({
       next: profile => (this.newsletterSubscription = profile.newsletter),
-      error: () => {
-        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
-           errors of handler-less subscriptions as uncaught exceptions. Keeps the
-           default newsletter state */
+      error: err => {
+        /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions as
+           uncaught exceptions. The failure is logged with a level (gated to non-production
+           stages) and the default newsletter state is kept */
+        if (environment.stage !== 'production') {
+          console.warn(`Failed to load profile with status ${err?.status}, keeping default newsletter state`);
+        }
       }
     });
   }
