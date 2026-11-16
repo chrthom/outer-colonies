@@ -57,7 +57,11 @@ export class HomePage implements OnInit, OnDestroy {
           this.resetAutoAdvance();
         }
       },
-      error: err => console.error('Failed to load dailies', err)
+      error: () => {
+        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+           errors of handler-less subscriptions as uncaught exceptions. Keeps the
+           default dailies list */
+      }
     });
   }
 

@@ -132,7 +132,7 @@ describe('AuthService', () => {
     });
   });
 
-  it('should fall back to cookie credentials when session-token check fails', () => {
+  it('should not fall back to cookie credentials when the session-token check fails', () => {
     service['sessionToken'] = 'stale-token';
     cookieSpy.get.and.callFake((key: string) => {
       if (key === 'u') return 'cookieuser';
@@ -142,14 +142,20 @@ describe('AuthService', () => {
     authApiSpy.checkSessionToken.and.returnValue(
       throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' }))
     );
-    const mockResponse = { sessionToken: 'new-token', username: 'cookieuser', email: 'c@example.com' };
-    authApiSpy.login.and.returnValue(of(mockResponse));
 
     service.check().subscribe(success => {
-      expect(success).toBeTrue();
-      expect(authApiSpy.login).toHaveBeenCalledWith({ username: 'cookieuser', password: 'cookiepass' });
-      expect(service.isLoggedIn).toBeTrue();
+      expect(success).toBeFalse();
+      expect(authApiSpy.login).not.toHaveBeenCalled();
+      expect(service.isLoggedIn).toBeFalse();
     });
+  });
+
+  it('should clear the session without deleting persisted credentials', () => {
+    service['sessionToken'] = 'stale-token';
+    service.clearSession();
+    expect(service.isLoggedIn).toBeFalse();
+    expect(service.displayname).toBe('');
+    expect(cookieSpy.delete).not.toHaveBeenCalled();
   });
 
   it('should not retry when no session token was set and no cookies are available', () => {

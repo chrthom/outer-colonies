@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
+import { ApiError } from 'src/app/api/api-error';
 import { ItemListResponseBooster, ItemListResponseBox } from '@shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { rules } from '@shared/config/rules';
@@ -108,10 +109,14 @@ export class TradePage implements OnInit {
             }
           );
         },
-        error: () => {
+        error: (err: ApiError) => {
           this.actionFailed = true;
+          // The API responds 400 with 'Insufficient sol' when the balance is
+          // too low for the purchase (see the booster route in rest_api.ts).
           this.snackBar.open(
-            'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
+            err.status == 400
+              ? 'Du hast nicht genug Sol für diesen Kauf.'
+              : 'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
             'OK',
             { duration: 5000 }
           );

@@ -64,7 +64,11 @@ export class ProfilePage implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.profileAPIService.profile.subscribe({
       next: profile => (this.newsletterSubscription = profile.newsletter),
-      error: err => console.error('Failed to load profile', err)
+      error: () => {
+        /* Mandatory swallow of the ApiError rethrown by the interceptor: RxJS rethrows
+           errors of handler-less subscriptions as uncaught exceptions. Keeps the
+           default newsletter state */
+      }
     });
   }
   ngOnDestroy(): void {
