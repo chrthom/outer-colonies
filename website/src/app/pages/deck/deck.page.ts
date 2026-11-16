@@ -76,27 +76,27 @@ export class DeckPage implements OnInit {
   ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
-      title: '&Delta;',
+      title: 'Δ',
       get: (card: DeckCard) => card.profile.delta
     },
     {
-      title: '&Theta;',
+      title: 'Θ',
       get: (card: DeckCard) => card.profile.theta
     },
     {
-      title: '&Xi;',
+      title: 'Ξ',
       get: (card: DeckCard) => card.profile.xi
     },
     {
-      title: '&Phi;',
+      title: 'Φ',
       get: (card: DeckCard) => card.profile.phi
     },
     {
-      title: '&Psi;',
+      title: 'Ψ',
       get: (card: DeckCard) => card.profile.psi
     },
     {
-      title: '&Omega;',
+      title: 'Ω',
       get: (card: DeckCard) => card.profile.omega
     },
     {
@@ -174,18 +174,16 @@ export class DeckPage implements OnInit {
         return '';
     }
   }
-  cardTypeToUrl(cardType: CardType): string | null {
-    return this.iconService.getIconHtml(cardType);
-  }
   rangeToUrl(range: number): string {
     return `${environment.url.assets}/utils/range${range}.png`;
   }
-  toIconUrl(name: string): string | null {
-    return this.iconService.getIconHtml(name);
-  }
-
-  getIconHtml(name: string): string | null {
-    return this.iconService.getIconHtml(name);
+  /**
+   * Full CSS class list rendering the icon font glyph for the given icon name.
+   * @param name The icon name (e.g. a card type or defense token)
+   * @returns The CSS classes (e.g. 'oc-icon oc-icon-hull')
+   */
+  iconClass(name: string): string {
+    return `oc-icon ${this.iconService.getIconClass(name)}`;
   }
   disciplineToText(discipline?: TacticDiscipline): string {
     switch (discipline) {

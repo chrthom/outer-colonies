@@ -237,4 +237,16 @@ describe('DeckPage', () => {
       expect(stats[1].used).toBe(2);
     });
   });
+
+  it('should use plain Unicode characters as statistics titles', () => {
+    component.statistics$.subscribe(stats => {
+      expect(stats.map(s => s.title)).toEqual(['Δ', 'Θ', 'Ξ', 'Φ', 'Ψ', 'Ω', undefined]);
+    });
+  });
+
+  it('should render icon glyphs as CSS classes instead of HTML', () => {
+    expect(component.iconClass('hull')).toBe('oc-icon oc-icon-hull');
+    expect(component.iconClass('armour_1')).toBe('oc-icon oc-icon-armour_1');
+    expect(component.iconClass('equipment')).toBe('oc-icon oc-icon-equipment');
+  });
 });
