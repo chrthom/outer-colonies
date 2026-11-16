@@ -113,6 +113,10 @@
 - **Gesamtauswertung (`diag_tactic_t1_eval.py`):** Mediane je Rarity je Spur + Diff zum Median UND zur Referenz (K: Kurve, W: Parität 1,650); Outlier-Flag |rel. Diff|>50 % oder |Diff~Ref|>50 % Referenz; MERGE W+K+M-Sektion (gemeinsame KB-Skala). K r3/r5-Median-Diffs mit kleiner N vorsichtig interpretieren, deshalb immer beide Diffs mitlesen
 - **Offene Abnahme-Punkte:** BULK_DAMP für 210/149/229/427 (Bulk-Sättigung), TUTOR_PREM (0,25–1,0), SEE_RATE (0,2–0,6), P_COUNTER (0,25–1,0), E_PSI_FREE/P_DESTROY/E_MISSIONS (Trigger); PV_tactic noch Parität 1,0 (Platzhalter bis eigene Taktik-Messung)
 
+### Equipment-Nachjustierung 537/161 (16.11.2026)
+
+- **Dominanz-Befund (Balancing-Review):** 537 Quantenmechanischer Antrieb (Ω+δ = 1,4 Sockel-units) war strikt von 161 Ionenschubdüsen (δ = 0,7 units) dominiert (beide r1, sp+1, E0; v23i-Scores 0,61 vs. 0,80, identischer Zähler bei 2,4× Nenner) — entstanden durch den v23h-Raritätstausch 537 r1⇄343 r2 ohne nachgelassenen Dominanz-Check. **Christophers Entscheidung (16.11.): 537 profilidentisch mit 161** (Ω-Sockel entfällt; r1, sp+1, 1× δ, E0) — vollzieht damit die alte „537 nur Delta"-Vorgabe aus den Kalibrierungs-Reviews 2–11, die in der csv nie umgesetzt war. **Projektion:** Score ~0,80 wie 161 (raus aus dem Kosten-Nenner-Outlier, bleibt als Speed-Struktur-Outlier Teil der v23i-9er-Liste). **Hinweis offen:** Damit existieren drei profilidentische r1-Antriebe (161, 434 nach hp-Bereinigung, 537; Editionen 1/4/5) — bewusstes Reprint-Design über die Editionen oder eigenes Profil für 434, Design-Entscheidung Christopher. Lokale cards.csv synchronisiert; Repo-/Server-Umsetzung läuft über #795 (dort noch nicht sichtbar: Server-Card537 hat noch omega:−1/r2, csv r2).
+
 ## Zielzustand Balancing (Stand 11.11.2026)
 
 - **Währung v25:** Score = ΔKriegsbilanz (γ=1) je Platzierung ÷ units; units = 1 + |E<0| degressiv (1 + [1 + 0,7×(E−1)]) + Sockel (a/e/g 0,7, b/d/f 1,0); Hüllen + T(n) 0/0,3/0,5; **P_Ψ = +2,0 je f-Sockel** (alle Hüllen inkl. Stationen)
