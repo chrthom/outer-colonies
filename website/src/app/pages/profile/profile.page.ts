@@ -127,7 +127,17 @@ export class ProfilePage implements OnInit, OnDestroy {
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkEmailExists(control.value)),
         map(exists => (exists ? { exists: true } : null)),
-        catchError(() => of(null)),
+        catchError(err => {
+          // A failed availability check must not block the email address change (the server
+          // re-checks on submit), so the validator degrades to "no error"; the failure is
+          // logged with a level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Email availability check failed with status ${err?.status}, treating email as available`
+            );
+          }
+          return of(null);
+        }),
         takeUntil(this.destroy$)
       );
     };

@@ -115,6 +115,21 @@ describe('ProfilePage', () => {
     expect(email?.valid).toBeTrue();
   }));
 
+  it('should log a warning and degrade to no error when the availability check fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      authApiSpy.checkEmailExists.and.returnValue(throwError(() => ({ status: 500 })));
+      const email = component.emailForm.get('email');
+      email?.setValue('new@example.com');
+      tick(300);
+      expect(email?.valid).toBeTrue();
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500.*treating email as available/));
+    } finally {
+      environment.stage = 'production';
+    }
+  }));
+
   it('should log a warning and keep the default state when loading the profile fails', () => {
     environment.stage = 'development';
     try {

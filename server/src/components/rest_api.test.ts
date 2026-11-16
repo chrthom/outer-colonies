@@ -72,7 +72,8 @@ describe('RESTAPI Deck Endpoints', () => {
     header: jest.fn().mockReturnValue(sessionToken),
     params: { cardInstanceId: '456' },
     method: 'POST',
-    path: '/api/deck/456'
+    path: '/api/deck/456',
+    route: { path: '/api/deck/:cardInstanceId(\\d+)' }
   });
   const createResponse = (req?: object) => {
     const res: any = { send: jest.fn(), req: req ?? createRequest() };
@@ -144,6 +145,19 @@ describe('RESTAPI Deck Endpoints', () => {
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 401/));
+    });
+
+    it('should log the route pattern instead of the concrete path', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const res = createResponse();
+
+      getHandler()(createRequest(), res);
+      await flushMicrotasks();
+
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('for POST /api/deck/:cardInstanceId(\\d+) failed with status 401')
+      );
+      expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
     });
 
     it('should log a WARN for an invalid session token', async () => {
