@@ -105,6 +105,52 @@ describe('DeckPage', () => {
     expect(component.boxes[1].cards.length).toBe(1);
   });
 
+  it('should stack duplicate cards by cardId and count them per stack', () => {
+    deckApiSpy.listDeck.and.returnValue(
+      of({
+        cards: [
+          {
+            id: 1,
+            cardId: 101,
+            inUse: true,
+            name: 'Card 1',
+            type: 'hull' as any,
+            rarity: 1,
+            canAttack: true,
+            profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+          },
+          {
+            id: 2,
+            cardId: 101,
+            inUse: true,
+            name: 'Card 1',
+            type: 'hull' as any,
+            rarity: 1,
+            canAttack: true,
+            profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+          },
+          {
+            id: 3,
+            cardId: 103,
+            inUse: true,
+            name: 'Card 3',
+            type: 'hull' as any,
+            rarity: 1,
+            canAttack: true,
+            profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+          }
+        ]
+      })
+    );
+
+    component.update();
+
+    expect(component.boxes[0].cards.length).toBe(2);
+    expect(component.boxes[0].cards[0].id).toBe(1);
+    expect(component.boxes[0].cards[0].numOfCards).toBe(2);
+    expect(component.boxes[0].cards[1].numOfCards).toBe(1);
+  });
+
   it('should call activateCard via the API when capacity allows', () => {
     component.activateCard({ id: 2, cardId: 102, inUse: false } as any);
 

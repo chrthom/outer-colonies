@@ -415,8 +415,8 @@ The repository working rules — repository language, branches and merges, issue
    ```
 
    **Website Test Requirements**:
-   - Chromium browser must be installed for Angular tests to run
-   - In Docker containers, install Chromium with: `apt update && apt install -y chromium`
+   - Tests run headless (`ChromeHeadless`); a Chrome or Chromium binary must be available
+   - If no Chrome is found (e.g. in a Docker container with only Chromium installed), set `CHROME_BIN` (e.g. `apt update && apt install -y chromium` and `CHROME_BIN=/usr/bin/chromium`)
 
 4. **Running all of the checks above**:
    ```bash
