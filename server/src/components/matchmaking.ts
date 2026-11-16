@@ -18,7 +18,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     try {
       const user = await DBCredentialsDAO.getBySessionToken(sessionToken);
       if (!user) {
-        logger.warn(`Invalid session token ${sessionToken} provided`);
+        logger.warn('Invalid session token provided');
         return;
       }
       const deckCards = await DBDecksDAO.getByUserId(user.userId);
@@ -30,7 +30,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
       socket.join(matchmakingRoom);
       socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
     } catch (err) {
-      logger.error(`Login failed for session token ${sessionToken}: ${err}`);
+      logger.error(`Login failed: ${err}`);
     }
   });
 }

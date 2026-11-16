@@ -58,8 +58,6 @@ function performWithSessionTokenCheck(
  * @returns the request context, or an empty string if the request is unavailable
  */
 function getStatusContext(res: Response): string {
-  // The matched route pattern is used instead of the concrete path: path parameters can
-  // carry usernames, email addresses or one-time UUIDs, which must never end up in logs
   const route = res.req?.route?.path;
   return res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
 }
@@ -77,7 +75,6 @@ function getStatusContext(res: Response): string {
 function sendStatus(res: Response, status: number, message?: string) {
   if (status >= 400) {
     const messageText = `API request${getStatusContext(res)} failed with status ${status}`;
-    // 4xx are recoverable client errors, 5xx are server failures that need attention
     if (status >= 500) logger.error(messageText);
     else logger.warn(messageText);
   }
@@ -135,12 +132,13 @@ export default function restAPI(app: Express) {
           return;
         }
         // The global fetch returns a web stream; the express response expects a node stream
-        Readable.fromWeb(actual.body)
-          .pipe(res)
-          .on('error', err => {
-            logger.warn(`Assets stream for ${file} failed: ${err}, responding with 502`);
-            res.status(502).end();
-          });
+        const stream = Readable.fromWeb(actual.body);
+        // pipe returns the destination, so the upstream failure handler must sit on the source
+        stream.on('error', err => {
+          logger.warn(`Assets stream for ${file} failed: ${err}, responding with 502`);
+          res.status(502).end();
+        });
+        stream.pipe(res);
       })
       .catch(err => {
         logger.warn(`Fetching asset ${file} failed: ${err}, responding with 502`);

@@ -54,7 +54,7 @@ export default class DBConnection {
       stmt = await conn.prepare(query);
       return await stmt.execute(params);
     } catch (err) {
-      logger.warn(`DB error ${err}`);
+      logger.error(`DB error ${err}`);
       if (!conn && attempt < DBConnection.MAX_ACQUIRE_ATTEMPTS) {
         return this.executeQuery(query, params, attempt + 1);
       }
@@ -81,11 +81,11 @@ export default class DBConnection {
       await conn.commit();
       return result;
     } catch (err) {
-      logger.warn(`DB transaction error ${err}`);
-      await conn.rollback().catch(rollbackErr => logger.warn(`DB rollback error ${rollbackErr}`));
+      logger.error(`DB transaction error ${err}`);
+      await conn.rollback().catch(rollbackErr => logger.error(`DB rollback error ${rollbackErr}`));
       throw err;
     } finally {
-      await conn.release().catch(releaseErr => logger.warn(`DB connection release error ${releaseErr}`));
+      await conn.release().catch(releaseErr => logger.error(`DB connection release error ${releaseErr}`));
     }
   }
   static get instance(): DBConnection {

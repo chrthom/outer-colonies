@@ -81,6 +81,7 @@ function toClientCardStacks(
   });
 }
 
+/** Projects a single card stack, delegating to the cards and attributes helpers. */
 function toClientCardStack(
   match: Match,
   cs: CardStack,
