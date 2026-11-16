@@ -41,7 +41,10 @@ Present the concrete plan to the user for approval before every write operation.
    git tag -a v<x.x.x> -m "<milestone description>"
    git push origin v<x.x.x>
    ```
-3. **GitHub release** referring to the existing tag; title and body see formats below. Generate the release notes from the closed issues of the milestone.
+3. **GitHub release** referring to the existing tag; title and body see formats below. Generate the release notes from the closed issues of the milestone. If `gh release create` is unavailable or blocked in the environment, create the release via the REST API instead:
+   ```bash
+   gh api repos/<owner>/<repo>/releases -f tag_name=v<x.x.x> -f name="<x.x.x> <moon name>" -F body="$(cat <notes file>)"
+   ```
 4. Hand the **checkout and build commands for Phase 2** to the user (see below) and wait for the deployment confirmation.
 
 ## Phase 2 - Build & deployment (manually by the user)
