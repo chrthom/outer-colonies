@@ -24,7 +24,7 @@ Create a release by following this workflow. The canonical source of truth is `R
    ```
 4. **Next milestone check**: verify that a milestone for the **next** version (`<major>.<minor+1>` with the next Saturn moon name, strictly sequential) already exists - its name is the release name for the version bump in Phase 3. If it does not exist yet, ask the user whether to create it before starting the release.
 5. Check open PRs: `gh pr list --repo chrthom/outer-colonies --state open` - DRAFT PRs on other topics do not block; ask the user about open ones belonging to the milestone.
-6. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests require Chromium (in containers: `apt update && apt install -y chromium`).
+6. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests need a Chrome/Chromium binary (in Chromium-only containers also set `CHROME_BIN`, see README.md).
 
 ## Phase 1 - Create the release (write operations, after user approval)
 
