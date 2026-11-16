@@ -14,7 +14,6 @@ import { ClientState } from '../shared/interfaces/client_state';
 import { rules } from '../shared/config/rules';
 import {
   BattleType,
-  CardType,
   GameResultType,
   InterventionType,
   MsgTypeInbound,
