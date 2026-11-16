@@ -52,6 +52,12 @@ Maintain consistency across the three subprojects
 - Add JSDoc comments for new public or protected functions
 - Changes in `server/src/shared/` are picked up by the client and website automatically via the `@shared/*` path alias - no declaration update is required
 
+## Testing Requirements
+- New server game or persistence logic requires Jest coverage: add or extend a `*.test.ts` spec next to the tested source in `server/src/`
+- Bug fixes should come with a reproducing test where feasible: a test that fails before and passes after the fix
+- Frontend specs are `*.spec.ts` files next to the tested source, run through the custom `scripts/test.js` harnesses (Jasmine/Karma via `ng test`) in `client/` and `website/`
+- All tests must pass from the repo root via `npm test` (part of `npm run check`)
+
 ## Decision Making Guidelines
 
 ### Priority System
