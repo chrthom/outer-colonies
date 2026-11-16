@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
-import { MatSelectionList, MatListOption } from '@angular/material/list';
+import { MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IconService } from '../../icon.service';
@@ -43,11 +43,7 @@ export class RulesPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       const section = params['section'];
       if (section && this.chapters.includes(section)) {
-        setTimeout(() => {
-          this.activeChapterList.selectedOptions.select(
-            this.activeChapterList.options.find(option => option.value === section)!
-          );
-        });
+        setTimeout(() => this.selectChapter(section));
       }
     });
   }
@@ -59,16 +55,10 @@ export class RulesPage implements OnInit {
     return this.iconService.getIcon(iconName);
   }
 
-  getIconHtml(iconName: string): string | null {
-    return this.iconService.getIconHtml(iconName);
-  }
-
   previousChapter(): void {
     if (this.currentIndex > 0) {
       const newChapter = this.chapters[this.currentIndex - 1];
-      this.activeChapterList.selectedOptions.select(
-        this.activeChapterList.options.find(option => option.value === newChapter)!
-      );
+      this.selectChapter(newChapter);
       this.updateUrl(newChapter);
     }
   }
@@ -76,9 +66,7 @@ export class RulesPage implements OnInit {
   nextChapter(): void {
     if (this.currentIndex < this.chapters.length - 1) {
       const newChapter = this.chapters[this.currentIndex + 1];
-      this.activeChapterList.selectedOptions.select(
-        this.activeChapterList.options.find(option => option.value === newChapter)!
-      );
+      this.selectChapter(newChapter);
       this.updateUrl(newChapter);
     }
   }
@@ -91,9 +79,22 @@ export class RulesPage implements OnInit {
     });
   }
 
-  onChapterSelected(event: any): void {
-    const selectedChapter = event.options[0].value;
-    this.updateUrl(selectedChapter);
+  onChapterSelected(event: MatSelectionListChange): void {
+    const selectedChapter = event.options[0]?.value;
+    if (selectedChapter) {
+      this.updateUrl(selectedChapter);
+    }
+  }
+
+  /**
+   * Selects the list option of the given chapter, if it exists.
+   * @param chapter The chapter to select
+   */
+  private selectChapter(chapter: string): void {
+    const option = this.activeChapterList.options.find(option => option.value === chapter);
+    if (option) {
+      this.activeChapterList.selectedOptions.select(option);
+    }
   }
 
   get currentIndex(): number {
