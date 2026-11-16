@@ -28,7 +28,9 @@ function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
     return true;
   } else {
-    window.location.protocol = 'https:';
+    window.location.replace(
+      `https://${window.location.host}${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
     return false;
   }
 }

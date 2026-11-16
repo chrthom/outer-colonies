@@ -92,6 +92,23 @@ describe('AuthService', () => {
     });
   });
 
+  it('should not log the failed request URL to the console in production', () => {
+    spyOn(console, 'log');
+    service['sessionToken'] = 'invalid-token';
+    authApiSpy.checkSessionToken.and.returnValue(
+      throwError(() => ({
+        status: 401,
+        statusText: 'Unauthorized',
+        url: 'https://api.example.com/api/auth/login?email=user%40example.com'
+      }))
+    );
+
+    service.check().subscribe(success => {
+      expect(success).toBeFalse();
+      expect(console.log).not.toHaveBeenCalled();
+    });
+  });
+
   it('should login from cookies', () => {
     const mockResponse = { sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' };
     cookieSpy.get.and.callFake((key: string) => {
