@@ -1,3 +1,4 @@
+import { Readable, Writable } from 'node:stream';
 import { APIRejectReason, DailyType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { DAILY_DEFINITIONS } from '../shared/config/dailies';
 import { rules } from '../shared/config/rules';
@@ -207,6 +208,48 @@ describe('RESTAPI Deck Endpoints', () => {
       expect(res.status).toHaveBeenCalledWith(204);
       expect(errorSpy).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('RESTAPI Assets Endpoint', () => {
+  type RouteHandler = (req: any, res: any) => void;
+  const routes = new Map<string, RouteHandler>();
+
+  beforeAll(() => {
+    const fakeApp: any = {
+      get: (path: string, handler: RouteHandler) => routes.set(`GET ${path}`, handler),
+      post: (path: string, handler: RouteHandler) => routes.set(`POST ${path}`, handler),
+      put: (path: string, handler: RouteHandler) => routes.set(`PUT ${path}`, handler),
+      delete: (path: string, handler: RouteHandler) => routes.set(`DELETE ${path}`, handler)
+    };
+    restAPI(fakeApp);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const flushMicrotasks = () => new Promise(resolve => setImmediate(resolve));
+
+  it('should respond with 502 when the upstream asset stream fails mid-stream', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const upstream = new Readable({
+      read() {
+        this.destroy(new Error('boom'));
+      }
+    });
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(<any>{ body: Readable.toWeb(upstream) });
+    // pipe() requires a real stream destination, so the response is a Writable with a spied status
+    const res: any = new Writable({
+      write: (_chunk, _encoding, callback) => callback()
+    });
+    res.status = jest.fn().mockReturnThis();
+
+    routes.get('GET /assets/*')!({ method: 'GET', path: '/assets/test.png' }, res);
+    await flushMicrotasks();
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
   });
 });
 
