@@ -29,11 +29,11 @@ export default class Auth {
         : Promise.reject(APIRejectReason.NotFound)
     );
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
-    Mailer.sendPasswordReset(credential.email, credential.username, uuid);
+    await Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
   static async sendEmailConfirmation(userId: number, username: string, newEmail: string) {
     const uuid = await DBMagicLinksDAO.createEmailConfirmation(userId, newEmail);
-    Mailer.sendEmailConfirmation(newEmail, username, uuid);
+    await Mailer.sendEmailConfirmation(newEmail, username, uuid);
   }
   static async activateAccount(resetId: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);
@@ -71,7 +71,15 @@ export default class Auth {
     });
     // The mail is sent only after the transaction committed, so no activation link is sent for
     // an account that was rolled back.
-    Mailer.sendAccountActivation(credential.email, credential.username, activationUuid);
+    try {
+      await Mailer.sendAccountActivation(credential.email, credential.username, activationUuid);
+    } catch (err) {
+      console.log(
+        `ERROR: Failed to send account activation mail to user ${credential.userId}; ` +
+          `account, profile and activation link require manual cleanup: ${err}`
+      );
+      throw err;
+    }
     return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {

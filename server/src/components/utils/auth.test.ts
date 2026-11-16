@@ -1,4 +1,5 @@
 import { DailyType } from '../../shared/config/enums';
+import { AuthRegisterRequest } from '../../shared/interfaces/rest_api';
 import DBConnection from '../persistence/db_connector';
 import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
@@ -10,18 +11,17 @@ import Mailer from './mailer';
 import AuthUtils from './auth';
 
 describe('AuthUtils', () => {
-  const registrationData = {
-    username: 'testuser',
-    password: 'password',
-    email: 'test@example.com',
-    newsletter: true,
-    starterDeck: 0
-  };
   const credential = {
     userId: 42,
     username: 'testuser',
     email: 'test@example.com',
     sessionToken: null
+  };
+  const mockCredential = {
+    userId: 123,
+    sessionToken: 'test-token',
+    username: 'testuser',
+    email: 'test@example.com'
   };
   let fakeConnection: any;
 
@@ -42,7 +42,7 @@ describe('AuthUtils', () => {
       achieveSpy.mockImplementation(jest.fn());
 
       // Mock other dependencies
-      const mockCredential = {
+      const mockLoginCredential = {
         userId: 123,
         sessionToken: 'test-token',
         username: 'testuser',
@@ -50,7 +50,7 @@ describe('AuthUtils', () => {
       };
 
       // Mock the getByUsername method to return our mock credential
-      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockCredential);
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockLoginCredential);
       jest.spyOn(DBCredentialsDAO, 'login').mockResolvedValue('test-token');
 
       // Call the login method
@@ -66,8 +66,38 @@ describe('AuthUtils', () => {
   });
 
   describe('register', () => {
+    const registrationData: AuthRegisterRequest = {
+      username: 'testuser',
+      password: 'password',
+      email: 'test@example.com',
+      starterDeck: 0,
+      newsletter: false
+    };
+
+    beforeEach(() => {
+      setupFakePool();
+      jest.spyOn(DBCredentialsDAO, 'create').mockResolvedValue(undefined);
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockCredential);
+      jest.spyOn(DBProfilesDAO, 'create').mockResolvedValue(undefined);
+      jest.spyOn(DBDailiesDAO, 'create').mockResolvedValue(undefined);
+      jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
+      jest.spyOn(DBMagicLinksDAO, 'createAccountActivation').mockResolvedValue('uuid-123');
+    });
+
     afterEach(() => {
       jest.restoreAllMocks();
+    });
+
+    it('should send the activation mail and return the credential on success', async () => {
+      const sendMailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockResolvedValue({});
+      const registeredCredential = await AuthUtils.register(registrationData);
+      expect(sendMailSpy).toHaveBeenCalledWith('test@example.com', 'testuser', 'uuid-123');
+      expect(registeredCredential).toEqual(mockCredential);
+    });
+
+    it('should reject if the activation mail cannot be sent', async () => {
+      jest.spyOn(Mailer, 'sendAccountActivation').mockRejectedValue(new Error('SMTP error'));
+      await expect(AuthUtils.register(registrationData)).rejects.toThrow('SMTP error');
     });
 
     it('should run all registration statements inside a committed transaction', async () => {
@@ -82,9 +112,9 @@ describe('AuthUtils', () => {
       fakeConnection.commit.mockImplementation(async () => {
         callOrder.push('commit');
       });
-      const mailSpy = jest
-        .spyOn(Mailer, 'sendAccountActivation')
-        .mockImplementation(() => callOrder.push('mail'));
+      const mailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockImplementation(async () => {
+        callOrder.push('mail');
+      });
 
       const result = await AuthUtils.register(registrationData);
 
@@ -107,7 +137,7 @@ describe('AuthUtils', () => {
       jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(credential);
       jest.spyOn(DBProfilesDAO, 'create').mockRejectedValue(new Error('profile insert failed'));
       const deckCreateSpy = jest.spyOn(DBDecksDAO, 'create').mockResolvedValue(undefined);
-      const mailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockImplementation(() => undefined);
+      const mailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockImplementation(async () => undefined);
 
       await expect(AuthUtils.register(registrationData)).rejects.toThrow('profile insert failed');
 
@@ -115,6 +145,51 @@ describe('AuthUtils', () => {
       expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
       expect(deckCreateSpy).not.toHaveBeenCalled();
       expect(mailSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('sendPasswordReset', () => {
+    beforeEach(() => {
+      jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(mockCredential);
+      jest.spyOn(DBMagicLinksDAO, 'createPasswordReset').mockResolvedValue('uuid-123');
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should send the password reset mail on success', async () => {
+      const sendMailSpy = jest.spyOn(Mailer, 'sendPasswordReset').mockResolvedValue({});
+      await AuthUtils.sendPasswordReset('testuser');
+      expect(sendMailSpy).toHaveBeenCalledWith('test@example.com', 'testuser', 'uuid-123');
+    });
+
+    it('should reject if the password reset mail cannot be sent', async () => {
+      jest.spyOn(Mailer, 'sendPasswordReset').mockRejectedValue(new Error('SMTP error'));
+      await expect(AuthUtils.sendPasswordReset('testuser')).rejects.toThrow('SMTP error');
+    });
+  });
+
+  describe('sendEmailConfirmation', () => {
+    beforeEach(() => {
+      jest.spyOn(DBMagicLinksDAO, 'createEmailConfirmation').mockResolvedValue('uuid-123');
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should send the email confirmation mail on success', async () => {
+      const sendMailSpy = jest.spyOn(Mailer, 'sendEmailConfirmation').mockResolvedValue({});
+      await AuthUtils.sendEmailConfirmation(123, 'testuser', 'new@example.com');
+      expect(sendMailSpy).toHaveBeenCalledWith('new@example.com', 'testuser', 'uuid-123');
+    });
+
+    it('should reject if the email confirmation mail cannot be sent', async () => {
+      jest.spyOn(Mailer, 'sendEmailConfirmation').mockRejectedValue(new Error('SMTP error'));
+      await expect(AuthUtils.sendEmailConfirmation(123, 'testuser', 'new@example.com')).rejects.toThrow(
+        'SMTP error'
+      );
     });
   });
 });
