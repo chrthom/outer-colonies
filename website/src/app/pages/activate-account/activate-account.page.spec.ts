@@ -15,7 +15,6 @@ describe('ActivateAccountPage', () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['activate']);
     authApiSpy.activate.and.returnValue(of(undefined));
 
-    // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
         get: () => 'test-activation-id'
@@ -62,11 +61,9 @@ describe('ActivateAccountPage', () => {
   });
 
   it('should set failure state on activation error', () => {
-    // Reset the spy to clear any previous calls
     authApiSpy.activate.calls.reset();
     authApiSpy.activate.and.returnValue(throwError(() => new Error('Activation failed')));
 
-    // Create a new component instance to test the error case
     const newFixture = TestBed.createComponent(ActivateAccountPage);
     const newComponent = newFixture.componentInstance;
     newFixture.detectChanges(); // This triggers ngOnInit

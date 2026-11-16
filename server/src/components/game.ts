@@ -18,7 +18,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
           match.players[player.no].ready = true;
           if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
-          // Verify conditions before processing ready event
           if (verifyReadyConditions(player, turnPhase)) {
             if (match.intervention) {
               match.skipIntervention();
@@ -122,7 +121,6 @@ export function gameSocketListeners(io: Server, socket: Socket) {
         console.log(`WARN: ${player.name} tried to attack non-exisiting target ${targetId}`);
       } else if (shipUUID == '*') {
         if (match.battle.range == 1) {
-          // Attack with all available weapons
           const srcWeapons = match.battle.ships[match.pendingActionPlayerNo]
             .flatMap(ship => ship.cardStacks)
             .filter(cs => cs.canAttack);
@@ -231,11 +229,9 @@ function initMatch(io: Server, match: Match) {
 }
 
 export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
-  // Check hand card limit (only during end of phase)
   if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
     return false;
   }
-  // Check if player has to retract cards
   if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
     return false;
   }

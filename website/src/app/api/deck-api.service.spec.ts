@@ -64,9 +64,7 @@ describe('DeckApiService', () => {
   it('should activate card', () => {
     const cardInstanceId = 1;
 
-    service.activateCard(cardInstanceId).subscribe(() => {
-      // Card activated successfully
-    });
+    service.activateCard(cardInstanceId).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/deck/${cardInstanceId}`);
     expect(req.request.method).toBe('POST');
@@ -76,9 +74,7 @@ describe('DeckApiService', () => {
   it('should deactivate card', () => {
     const cardInstanceId = 1;
 
-    service.deactivateCard(cardInstanceId).subscribe(() => {
-      // Card deactivated successfully
-    });
+    service.deactivateCard(cardInstanceId).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/deck/${cardInstanceId}`);
     expect(req.request.method).toBe('DELETE');

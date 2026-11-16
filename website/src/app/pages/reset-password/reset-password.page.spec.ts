@@ -20,7 +20,6 @@ describe('ResetPasswordPage', () => {
   beforeEach(async () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['resetPasswordViaMagicLink']);
 
-    // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
         get: () => 'test-reset-id'
@@ -68,13 +67,13 @@ describe('ResetPasswordPage', () => {
     password.setValue('');
     expect(password.valid).toBeFalse();
 
-    password.setValue('short'); // Too short
+    password.setValue('short');
     expect(password.valid).toBeFalse();
 
-    password.setValue('validpassword123'); // Valid
+    password.setValue('validpassword123');
     expect(password.valid).toBeTrue();
 
-    password.setValue('a'.repeat(41)); // Too long
+    password.setValue('a'.repeat(41));
     expect(password.valid).toBeFalse();
   });
 
@@ -95,7 +94,6 @@ describe('ResetPasswordPage', () => {
   });
 
   it('should set success state on successful password reset', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 
@@ -106,12 +104,9 @@ describe('ResetPasswordPage', () => {
 
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
-    // Note: Component doesn't set loading=false in success case, only in error case
-    // expect(freshComponent.loading).toBeFalse();
   });
 
   it('should set failure state on password reset error', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 

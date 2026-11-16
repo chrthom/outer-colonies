@@ -302,27 +302,23 @@ export default class Game extends Phaser.Scene {
   }
 
   private updateCardStacks(newHandCards: ClientHandCard[]) {
-    // Update or remove old cards
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-      if (newData)
-        cs.update(newData); // Move existing card stacks
+      if (newData) cs.update(newData);
       else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
-        // Retract card stack (to deck first)
-        cs.discard(true);
+        cs.discard(true); // to deck first
         this.retractCardsExist = true;
-      } else cs.discard(); // Discard card stack
+      } else cs.discard();
     }, this);
-    // Create new card stacks
     this.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
         let origin: CardImage | undefined;
         if (this.maximizedTacticCard?.cardId == cs.cards[0].id) {
-          origin = this.maximizedTacticCard; // Origin is maximized tactic card
+          origin = this.maximizedTacticCard;
           this.maximizedTacticCard = undefined;
         } else {
-          origin = this.getPlayerUI(cs.ownedByPlayer).hand.find(h => h.uuid == cs.uuid); // Origin is a hand card
+          origin = this.getPlayerUI(cs.ownedByPlayer).hand.find(h => h.uuid == cs.uuid);
         }
         origin?.destroy();
         const cardStack = new CardStack(this, cs);
@@ -342,13 +338,12 @@ export default class Game extends Phaser.Scene {
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
         if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
-        else if (newData)
-          h.update(newData); // Move existing hand card to new position
+        else if (newData) h.update(newData);
         else if (previousTurnPhase != TurnPhase.Build) h.discard();
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
       }, this)
     );
-    newHandCards // Draw new hand cards
+    newHandCards
       .map(c => new HandCard(this, c), this)
       .forEach(h => this.getPlayerUI(h.ownedByPlayer).hand.push(h), this);
     this.forBothPlayers(
@@ -382,7 +377,6 @@ export default class Game extends Phaser.Scene {
       });
       this.cardStacks.forEach(cs => {
         if (this.activeCards.hand) {
-          // Choose target for hand card
           const activeCard = this.player.hand.find(c => c.uuid == this.activeCards.hand);
           if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
         } else {
@@ -390,14 +384,12 @@ export default class Game extends Phaser.Scene {
           switch (this.state.turnPhase) {
             case TurnPhase.Build:
               if (this.plannedBattle.type != BattleType.None) {
-                // Assign ships for battle
                 if (this.plannedBattle.shipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
                 } else if (cs.data.missionReady) {
                   cs.highlightSelectable();
                 }
               } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) {
-                // Assign ships to intercept
                 if (this.interceptShipIds.includes(cs.uuid)) {
                   cs.highlightSelected();
                 } else if (cs.data.interceptionReady) {
