@@ -1,5 +1,6 @@
 import CombatRangeIndicator from './combat_range_indicator';
 import { BattleType, InterventionType } from '@shared/config/enums';
+import { rules } from '@shared/config/rules';
 import { ClientIntervention, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { asGameScene, GameObjectStub, makeSceneStub, SceneStub } from '../../testing/phaser_stubs';
 
@@ -18,7 +19,7 @@ const makeState = (range: number, intervention?: ClientIntervention): ClientStat
 
 /** Ranges whose indicator image is visible after the last update() call. */
 const visibleRanges = (indicator: CombatRangeIndicator): number[] => {
-  const images = (indicator as any).images as GameObjectStub[];
+  const images = (indicator as unknown as { images: GameObjectStub[] }).images;
   return images
     .map((image, i) => (image.setVisible.calls.mostRecent().args[0] ? i + 1 : 0))
     .filter(range => range > 0);
@@ -86,10 +87,17 @@ describe('CombatRangeIndicator', () => {
   });
 
   it('hides the indicator for the pre-battle placeholder range', () => {
-    const indicator = new CombatRangeIndicator(asGameScene(makeScene(makeState(5))));
+    const indicator = new CombatRangeIndicator(asGameScene(makeScene(makeState(rules.maxRange + 1))));
 
     indicator.update();
 
+    expect(visibleRanges(indicator)).toEqual([]);
+  });
+
+  it('does not throw for a range without an indicator image', () => {
+    const indicator = new CombatRangeIndicator(asGameScene(makeScene(makeState(0))));
+
+    expect(() => indicator.update()).not.toThrow();
     expect(visibleRanges(indicator)).toEqual([]);
   });
 });

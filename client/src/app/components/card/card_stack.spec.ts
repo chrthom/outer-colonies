@@ -1,4 +1,5 @@
 import CardStack from './card_stack';
+import Card from './card';
 import { ClientCardStack } from '@shared/interfaces/client_state';
 import { Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
@@ -109,7 +110,7 @@ describe('CardStack', () => {
     function depthOf(zone: Zone, ownedByPlayer: boolean): number {
       const cs = makeCardStack();
       cs.data = makeData({ zone, ownedByPlayer });
-      return (cs as any).depth;
+      return (cs as unknown as { depth: number }).depth;
     }
 
     it('orders zones consistently for the player', () => {
@@ -129,7 +130,7 @@ describe('CardStack', () => {
 
   describe('arrayDiff (private)', () => {
     function arrayDiff<T>(a: T[], b: T[]): [T[], T[]] {
-      return (makeCardStack() as any).arrayDiff(a, b);
+      return (makeCardStack() as unknown as { arrayDiff: <T>(a: T[], b: T[]) => [T[], T[]] }).arrayDiff(a, b);
     }
 
     it('returns the inputs unchanged when nothing overlaps', () => {
@@ -162,10 +163,12 @@ describe('CardStack', () => {
   });
 
   describe('filterCardsByIdList (private)', () => {
-    function filter(cardIds: number[], list: number[]): any[] {
+    function filter(cardIds: number[], list: number[]): Array<{ cardId: number }> {
       const cs = makeCardStack();
-      (cs as any).cards = cardIds.map(id => ({ cardId: id }));
-      return (cs as any).filterCardsByIdList(list);
+      cs.cards = cardIds.map(id => ({ cardId: id })) as unknown as Array<Card>;
+      return (
+        cs as unknown as { filterCardsByIdList: (list: number[]) => Array<{ cardId: number }> }
+      ).filterCardsByIdList(list);
     }
 
     it('returns the cards whose ids are present in the list', () => {

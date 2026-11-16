@@ -15,10 +15,10 @@ describe('ActionPool', () => {
 
   it('should destroy existing images when destroyed', () => {
     // Stub game objects stand in for real Phaser images, hence the cast
-    const mockImage1 = makeGameObjectStub() as any;
-    const mockImage2 = makeGameObjectStub() as any;
+    const mockImage1 = makeGameObjectStub();
+    const mockImage2 = makeGameObjectStub();
 
-    actionPool.images = [mockImage1, mockImage2];
+    actionPool.images = [mockImage1, mockImage2] as unknown as Phaser.GameObjects.Image[];
 
     actionPool.destroy();
 

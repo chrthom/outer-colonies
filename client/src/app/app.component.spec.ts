@@ -25,10 +25,11 @@ describe('AppComponent', () => {
     return destroyed;
   };
 
-  /** Creates the app component, which boots a real Phaser game. */
+  /** Creates the app component and initializes its view, which boots the Phaser game. */
   const createApp = () => {
     fixture = TestBed.createComponent(AppComponent);
     phaserGameDestroyed = false;
+    fixture.detectChanges(); // triggers ngAfterViewInit, which creates the game
   };
 
   beforeEach(async () => {
@@ -39,8 +40,8 @@ describe('AppComponent', () => {
   });
 
   afterEach(async () => {
-    // The component boots its Phaser game in a field initializer, so destroy
-    // it after each run to avoid leaking canvas elements and socket listeners.
+    // The component boots its Phaser game once its view exists, so destroy it
+    // after each run to avoid leaking canvas elements and socket listeners.
     // Await the destroy promise so the canvas is guaranteed to be removed
     // before the next spec boots a new game.
     await destroyPhaserGame();
@@ -60,5 +61,19 @@ describe('AppComponent', () => {
     // frame, which emits the destroy event and removes the canvas from the DOM.
     await destroyed;
     expect(document.querySelectorAll('canvas').length).toBe(0);
+  });
+
+  it('creates the Phaser game with the view and destroys it with the component', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.phaserGame).withContext('not before the view exists').toBeUndefined();
+
+    fixture.detectChanges(); // triggers ngAfterViewInit
+    expect(app.phaserGame).toBeInstanceOf(Phaser.Game);
+
+    const destroySpy = spyOn(app.phaserGame!, 'destroy').and.callThrough();
+    fixture.destroy(); // triggers ngOnDestroy
+    expect(destroySpy).toHaveBeenCalledWith(true);
+    expect(app.phaserGame).toBeUndefined();
   });
 });

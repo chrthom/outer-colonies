@@ -1,4 +1,10 @@
+import { Socket } from 'socket.io-client';
 import SocketService from './socket_service';
+
+/** Handle for overriding the private socket factory of the SocketService. */
+interface SocketServiceOverrides {
+  createSocket: () => Socket;
+}
 
 describe('SocketService', () => {
   beforeEach(() => {
@@ -15,7 +21,7 @@ describe('SocketService', () => {
 
   it('returns the socket opened by connect()', () => {
     const socket = jasmine.createSpyObj('Socket', ['disconnect']);
-    spyOn(SocketService as any, 'createSocket').and.returnValue(socket);
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
 
     expect(SocketService.connect()).toBe(socket);
     expect(SocketService.getSocket()).toBe(socket);
@@ -24,7 +30,7 @@ describe('SocketService', () => {
   it('disconnects the socket of the previous session when opening a new one', () => {
     const first = jasmine.createSpyObj('Socket', ['disconnect']);
     const second = jasmine.createSpyObj('Socket', ['disconnect']);
-    spyOn(SocketService as any, 'createSocket').and.returnValues(first, second);
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValues(first, second);
 
     SocketService.connect();
     SocketService.connect();
@@ -36,7 +42,7 @@ describe('SocketService', () => {
 
   it('disconnects and clears the current connection in disconnect()', () => {
     const socket = jasmine.createSpyObj('Socket', ['disconnect']);
-    spyOn(SocketService as any, 'createSocket').and.returnValue(socket);
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
     SocketService.connect();
 
     SocketService.disconnect();

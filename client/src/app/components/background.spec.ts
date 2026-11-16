@@ -26,7 +26,7 @@ describe('Background', () => {
       // randomBoolean() false (x stays on screen), randomBoolean() true (positive off distance)
       spyOn(Math, 'random').and.returnValues(0.6, 0.4, 0.5);
 
-      const c = (background as any).outCoordinates as Coordinates;
+      const c = (background as unknown as { outCoordinates: Coordinates }).outCoordinates;
 
       expect(c.y).toBe(layoutConfig.scene.height + backgroundConfig.animation.offDistance);
       expect(c.x).toBe((0.5 - 0.25) * 2 * layoutConfig.scene.width);
@@ -37,7 +37,7 @@ describe('Background', () => {
       // randomBoolean() true (x moves off screen), randomBoolean() true (positive off distance)
       spyOn(Math, 'random').and.returnValues(0.4, 0.4, 0.5);
 
-      const c = (background as any).outCoordinates as Coordinates;
+      const c = (background as unknown as { outCoordinates: Coordinates }).outCoordinates;
 
       expect(c.x).toBe(layoutConfig.scene.width + backgroundConfig.animation.offDistance);
       expect(c.y).toBe((0.5 - 0.25) * 2 * layoutConfig.scene.height);
@@ -48,25 +48,25 @@ describe('Background', () => {
     it('is safely false on a matchmaking scene', () => {
       const background = new Background(asScene(makeMatchmakingScene()));
 
-      expect((background as any).inStartOrBuildPhase).toBeFalse();
+      expect((background as unknown as { inStartOrBuildPhase: boolean }).inStartOrBuildPhase).toBeFalse();
     });
 
     it('is true in the start phase of a game', () => {
       const background = new Background(asScene(makeGameScene(TurnPhase.Start)));
 
-      expect((background as any).inStartOrBuildPhase).toBeTrue();
+      expect((background as unknown as { inStartOrBuildPhase: boolean }).inStartOrBuildPhase).toBeTrue();
     });
 
     it('is true in the build phase of a game', () => {
       const background = new Background(asScene(makeGameScene(TurnPhase.Build)));
 
-      expect((background as any).inStartOrBuildPhase).toBeTrue();
+      expect((background as unknown as { inStartOrBuildPhase: boolean }).inStartOrBuildPhase).toBeTrue();
     });
 
     it('is false in other turn phases of a game', () => {
       const background = new Background(asScene(makeGameScene(TurnPhase.Combat)));
 
-      expect((background as any).inStartOrBuildPhase).toBeFalse();
+      expect((background as unknown as { inStartOrBuildPhase: boolean }).inStartOrBuildPhase).toBeFalse();
     });
   });
 
@@ -91,7 +91,7 @@ describe('Background', () => {
 
       background.update();
 
-      expect((background as any).targetRing).toBeDefined();
+      expect((background as unknown as { targetRing?: number }).targetRing).toBeDefined();
     });
   });
 });

@@ -236,7 +236,7 @@ describe('ContinueButton auto-ready', () => {
       button.update();
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(1);
 
-      (button as any).onClickAction(); // Manual click on the continue button
+      (button as unknown as { onClickAction: () => void }).onClickAction(); // Manual click on the continue button
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
       expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Combat);
@@ -248,7 +248,7 @@ describe('ContinueButton auto-ready', () => {
       const button = new ContinueButton(asGameScene(scene));
 
       button.update();
-      (button as any).onClickAction(); // Manual click on the continue button
+      (button as unknown as { onClickAction: () => void }).onClickAction(); // Manual click on the continue button
       expect(scene.socket.emit.calls.count()).toBe(1);
 
       // User interactions while waiting for the server trigger further update() calls

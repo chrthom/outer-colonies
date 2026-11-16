@@ -66,6 +66,10 @@ describe('HomePage', () => {
     expect(component.gameUrl).toContain('game');
   });
 
+  it('should build the game link with the session token as token query parameter', () => {
+    expect(component.gameLink).toBe(`${environment.url.game}/?token=test-token`);
+  });
+
   it('should clear the auto-advance interval on destroy', () => {
     const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
     fixture.detectChanges(); // triggers ngOnInit -> startAutoAdvance
