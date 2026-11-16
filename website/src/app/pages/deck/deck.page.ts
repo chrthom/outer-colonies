@@ -71,32 +71,38 @@ export class DeckPage implements OnInit {
   private activeCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   private reserveCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   boxes = [
-    new DeckBox(this.activeCards$, 'Aktives Deck', (card, page) => page.deactivateCard(card), this),
-    new DeckBox(this.reserveCards$, 'Reserve', (card, page) => page.activateCard(card), this)
+    new DeckBox(
+      this.activeCards$,
+      'Aktives Deck',
+      true,
+      card => this.deactivateCard(card),
+      this.filterFormControl
+    ),
+    new DeckBox(this.reserveCards$, 'Reserve', false, card => this.activateCard(card), this.filterFormControl)
   ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
-      title: '&Delta;',
+      title: 'Δ',
       get: (card: DeckCard) => card.profile.delta
     },
     {
-      title: '&Theta;',
+      title: 'Θ',
       get: (card: DeckCard) => card.profile.theta
     },
     {
-      title: '&Xi;',
+      title: 'Ξ',
       get: (card: DeckCard) => card.profile.xi
     },
     {
-      title: '&Phi;',
+      title: 'Φ',
       get: (card: DeckCard) => card.profile.phi
     },
     {
-      title: '&Psi;',
+      title: 'Ψ',
       get: (card: DeckCard) => card.profile.psi
     },
     {
-      title: '&Omega;',
+      title: 'Ω',
       get: (card: DeckCard) => card.profile.omega
     },
     {
@@ -174,18 +180,16 @@ export class DeckPage implements OnInit {
         return '';
     }
   }
-  cardTypeToUrl(cardType: CardType): string | null {
-    return this.iconService.getIconHtml(cardType);
-  }
   rangeToUrl(range: number): string {
     return `${environment.url.assets}/utils/range${range}.png`;
   }
-  toIconUrl(name: string): string | null {
-    return this.iconService.getIconHtml(name);
-  }
-
-  getIconHtml(name: string): string | null {
-    return this.iconService.getIconHtml(name);
+  /**
+   * Full CSS class list rendering the icon font glyph for the given icon name.
+   * @param name The icon name (e.g. a card type or defense token)
+   * @returns The CSS classes (e.g. 'oc-icon oc-icon-hull')
+   */
+  iconClass(name: string): string {
+    return `oc-icon ${this.iconService.getIconClass(name)}`;
   }
   disciplineToText(discipline?: TacticDiscipline): string {
     switch (discipline) {
@@ -262,30 +266,31 @@ export class DeckPage implements OnInit {
     return cardsNum(this.boxes[0].cards) > this.minCards;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
-    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map((dc: DeckCard[]) => {
-      const stack = dc[0] as DeckCardStack;
-      stack.numOfCards = dc.length;
-      return stack;
-    });
+    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map(
+      (dc: DeckCard[]) => ({ ...dc[0], numOfCards: dc.length }) as DeckCardStack
+    );
   }
 }
 
 class DeckBox {
   private $cards!: BehaviorSubject<DeckCardStack[]>;
   private _title!: string;
-  private _onClick!: (card: DeckCard, page: DeckPage) => void;
-  private page!: DeckPage;
+  private _isActive!: boolean;
+  private _onClick!: (card: DeckCard) => void;
+  private filterControl!: FormControl;
   private sort?: Sort;
   constructor(
     $cards: BehaviorSubject<DeckCardStack[]>,
     title: string,
-    onClick: (card: DeckCard, page: DeckPage) => void,
-    page: DeckPage
+    isActive: boolean,
+    onClick: (card: DeckCard) => void,
+    filterControl: FormControl
   ) {
     this.$cards = $cards;
     this._title = title;
+    this._isActive = isActive;
     this._onClick = onClick;
-    this.page = page;
+    this.filterControl = filterControl;
   }
   get title(): string {
     return `${this._title} (${cardsNum(this.cardsFiltered)} / ${cardsNum(this.cards)} Karten)`;
@@ -296,16 +301,16 @@ class DeckBox {
   get cardsFiltered() {
     return this.sortCards(
       this.cards.filter(c => {
-        const filter = this.page.filterFormControl.value;
+        const filter = this.filterControl.value;
         return !filter || c.type == filter;
       })
     );
   }
   get isActiveDeck(): boolean {
-    return this._title == 'Aktives Deck';
+    return this._isActive;
   }
   onClick(card: DeckCard) {
-    this._onClick(card, this.page);
+    this._onClick(card);
   }
   setSort(sort: Sort) {
     this.sort = sort;
@@ -347,10 +352,15 @@ class DeckBox {
   }
 }
 
+/**
+ * Compares two sort values, returning `0` for equal values.
+ * An `undefined` value is offset in the current sort direction:
+ * it lands at the end when sorting ascending and at the start when sorting descending.
+ */
 function compare(a: number | string | undefined, b: number | string | undefined, isAsc: boolean) {
-  if (a == undefined) return 1;
-  else if (b == undefined) return -1;
-  else return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  if (a == undefined && b == undefined) return 0;
+  const offset = a == undefined ? 1 : b == undefined ? -1 : a < b ? -1 : a > b ? 1 : 0;
+  return offset * (isAsc ? 1 : -1);
 }
 
 function cardsNum(cards: DeckCardStack[]): number {

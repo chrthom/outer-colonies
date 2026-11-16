@@ -1,7 +1,14 @@
+import { Injectable } from '@angular/core';
+
 /**
  * Service for mapping icon names to icon font Unicode characters.
  * This service provides a centralized way to access the Outer Colonies icon font.
+ *
+ * Icons are rendered in templates via CSS classes (`oc-icon oc-icon-<name>`, see
+ * `src/style/outer-colonies-icons.css`), which render the glyph through `::before`
+ * content. This keeps HTML entities and `innerHTML` out of the templates.
  */
+@Injectable({ providedIn: 'root' })
 export class IconService {
   /**
    * Mapping of icon names to their Unicode Private Use Area code points.
@@ -51,19 +58,6 @@ export class IconService {
    */
   getIcon(name: string): string | null {
     return this.iconMap[name.toLowerCase()] ?? null;
-  }
-
-  /**
-   * Get the HTML entity for an icon name.
-   * @param name The icon name
-   * @returns The HTML entity string (e.g., '&#xEA01;'), or null if not found
-   */
-  getIconHtml(name: string): string | null {
-    const icon = this.getIcon(name);
-    if (!icon) return null;
-    // Convert \uea01 to &#xEA01;
-    const codePoint = icon.charCodeAt(0).toString(16).toUpperCase();
-    return `&#x${codePoint};`;
   }
 
   /**
