@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
-import { Observable, map, of, switchMap, timer } from 'rxjs';
+import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
@@ -50,9 +50,10 @@ import { RouterLink } from '@angular/router';
     RouterLink
   ]
 })
-export class RegisterPage {
+export class RegisterPage implements OnDestroy {
   private authAPIService = inject(AuthApiService);
   private dialog = inject(MatDialog);
+  private destroy$ = new Subject<void>();
 
   registrationSuccessful: boolean | undefined = undefined;
   registerForm: FormGroup = new FormGroup({
@@ -126,6 +127,10 @@ export class RegisterPage {
   openDataPrivacy() {
     this.dialog.open(DataPrivacyPage);
   }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   private get usernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
       if (!control.value || control.invalid) {
@@ -135,7 +140,9 @@ export class RegisterPage {
       // so the delay acts as a debounce while typing
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkUsernameExists(control.value)),
-        map(exists => (exists ? { exists: true } : null))
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(() => of(null)),
+        takeUntil(this.destroy$)
       );
     };
   }
@@ -146,7 +153,9 @@ export class RegisterPage {
       }
       return timer(300).pipe(
         switchMap(() => this.authAPIService.checkEmailExists(control.value)),
-        map(exists => (exists ? { exists: true } : null))
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(() => of(null)),
+        takeUntil(this.destroy$)
       );
     };
   }

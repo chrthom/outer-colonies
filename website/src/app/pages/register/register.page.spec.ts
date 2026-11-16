@@ -148,6 +148,30 @@ describe('RegisterPage', () => {
     expect(authApiSpy.checkEmailExists).toHaveBeenCalledWith('latest@example.com');
   }));
 
+  it('should treat a failed availability check as no error', fakeAsync(() => {
+    authApiSpy.checkUsernameExists.and.returnValue(throwError(() => new Error('Server error')));
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    tick(300);
+    expect(username?.valid).toBeTrue();
+  }));
+
+  it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    fixture.destroy();
+    tick(300);
+    expect(authApiSpy.checkUsernameExists).not.toHaveBeenCalled();
+  }));
+
+  it('should mark the form pending during the debounce window', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    expect(component.registerForm.pending).toBeTrue();
+    tick(300);
+    expect(component.registerForm.pending).toBeFalse();
+  }));
+
   it('should require data privacy acceptance', () => {
     const dataPrivacy = component.registerForm.get('dataPrivacy');
     dataPrivacy?.setValue(false);

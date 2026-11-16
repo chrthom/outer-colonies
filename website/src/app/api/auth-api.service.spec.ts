@@ -41,7 +41,27 @@ describe('AuthApiService', () => {
       expect(result).toBeTrue();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=${testEmail}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=test%40example.com`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: true });
+  });
+
+  it('should URL-encode special characters in the username availability check', () => {
+    service.checkUsernameExists('user+name').subscribe(result => {
+      expect(result).toBeFalse();
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?username=user%2Bname`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: false });
+  });
+
+  it('should URL-encode special characters in the email availability check', () => {
+    service.checkEmailExists('user+tag@example.com').subscribe(result => {
+      expect(result).toBeTrue();
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=user%2Btag%40example.com`);
     expect(req.request.method).toBe('GET');
     req.flush({ exists: true });
   });

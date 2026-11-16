@@ -19,10 +19,14 @@ export default class AuthApiService extends OCApi {
     super(http);
   }
   checkUsernameExists(username: string): Observable<boolean> {
-    return this.get<AuthExistsResponse>(`auth/exists?username=${username}`).pipe(map(res => res.exists));
+    return this.get<AuthExistsResponse>(`auth/exists?username=${encodeURIComponent(username)}`).pipe(
+      map(res => res.exists)
+    );
   }
   checkEmailExists(email: string): Observable<boolean> {
-    return this.get<AuthExistsResponse>(`auth/exists?email=${email}`).pipe(map(res => res.exists));
+    return this.get<AuthExistsResponse>(`auth/exists?email=${encodeURIComponent(email)}`).pipe(
+      map(res => res.exists)
+    );
   }
   checkSessionToken(): Observable<AuthLoginResponse> {
     return this.get<AuthLoginResponse>('auth/login');

@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from 'src/app/auth.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -104,6 +104,22 @@ describe('ProfilePage', () => {
     tick(1);
     expect(authApiSpy.checkEmailExists).toHaveBeenCalledTimes(1);
     expect(authApiSpy.checkEmailExists).toHaveBeenCalledWith('new@example.com');
+  }));
+
+  it('should treat a failed availability check as no error', fakeAsync(() => {
+    authApiSpy.checkEmailExists.and.returnValue(throwError(() => new Error('Server error')));
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    tick(300);
+    expect(email?.valid).toBeTrue();
+  }));
+
+  it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    fixture.destroy();
+    tick(300);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
   }));
 
   it('should validate password field', () => {
