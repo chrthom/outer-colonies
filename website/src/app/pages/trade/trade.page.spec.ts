@@ -8,6 +8,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { editions } from '@shared/config/editions';
+import { rules } from '@shared/config/rules';
 
 describe('TradePage', () => {
   let component: TradePage;
@@ -93,6 +95,14 @@ describe('TradePage', () => {
     expect(component.availableBoosters.length).toBe(5);
     expect(component.availableBoosters[0].no).toBe(1);
     expect(component.availableBoosters[0].title).toBe('Outer Colonies');
+  });
+
+  it('should derive available boosters from the shared edition config', () => {
+    expect(component.availableBoosters.map(b => b.no)).toEqual([1, 2, 3, 4, 5]);
+    for (const booster of component.availableBoosters) {
+      expect(booster.title).toBe(editions[booster.no]);
+      expect(booster.price).toBe(rules.boosterCosts[booster.no]);
+    }
   });
 
   it('should buy booster when called', () => {

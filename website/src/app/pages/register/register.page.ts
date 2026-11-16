@@ -14,9 +14,8 @@ import { Observable, map } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
-import { environment } from 'src/environments/environment';
+import { CardImageService } from 'src/app/card-image.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
@@ -53,6 +52,7 @@ import { RouterLink } from '@angular/router';
 export class RegisterPage {
   private authAPIService = inject(AuthApiService);
   private dialog = inject(MatDialog);
+  protected readonly cardImage = inject(CardImageService);
 
   registrationSuccessful: boolean | undefined = undefined;
   registerForm: FormGroup = new FormGroup({
@@ -95,16 +95,6 @@ export class RegisterPage {
   }
   get starterDeckCards(): MultipleCards[] {
     return starterDecks[this.starterDeck?.value];
-  }
-  cardIdToUrl(cardId: number): string {
-    return `${environment.url.assets}/cards/${cardId}.png`;
-  }
-  openImgInModal(cardId: number) {
-    this.dialog.open(ImageModalComponent, {
-      data: this.cardIdToUrl(cardId),
-      height: '95vh',
-      maxHeight: '95vh'
-    });
   }
   submit() {
     this.registerForm.markAllAsTouched();
