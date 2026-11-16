@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of, switchMap, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
@@ -127,24 +127,26 @@ export class RegisterPage {
     this.dialog.open(DataPrivacyPage);
   }
   private get usernameExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkUsernameExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      // Angular cancels the previous async validation subscription on every value change,
+      // so the delay acts as a debounce while typing
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkUsernameExists(control.value)),
+        map(exists => (exists ? { exists: true } : null))
       );
     };
   }
   private get emailExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkEmailExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkEmailExists(control.value)),
+        map(exists => (exists ? { exists: true } : null))
       );
     };
   }

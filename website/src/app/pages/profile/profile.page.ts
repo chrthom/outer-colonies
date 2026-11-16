@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { map, Observable } from 'rxjs';
+import { Observable, map, of, switchMap, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
@@ -105,13 +105,15 @@ export class ProfilePage implements OnInit {
     });
   }
   private get emailExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkEmailExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      // Angular cancels the previous async validation subscription on every value change,
+      // so the delay acts as a debounce while typing
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkEmailExists(control.value)),
+        map(exists => (exists ? { exists: true } : null))
       );
     };
   }

@@ -86,6 +86,26 @@ describe('ProfilePage', () => {
     expect(email?.valid).toBeTrue();
   }));
 
+  it('should not check email availability for empty or invalid values', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('');
+    email?.setValue('invalid-email');
+
+    tick(500);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+  }));
+
+  it('should debounce email availability checks while typing', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    tick(299);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+
+    tick(1);
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledTimes(1);
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledWith('new@example.com');
+  }));
+
   it('should validate password field', () => {
     const password = component.passwordForm.get('password');
     password?.setValue('');
@@ -106,12 +126,13 @@ describe('ProfilePage', () => {
     expect(component.newsletterSubscription).toBeFalse();
   });
 
-  it('should change email on valid form submit', () => {
+  it('should change email on valid form submit', fakeAsync(() => {
     component.emailForm.setValue({ email: 'new@example.com' });
+    tick(300); // Let debounced availability check complete
     component.changeEmail();
     expect(authApiSpy.resetEmail).toHaveBeenCalledWith('new@example.com');
     expect(component.emailResetSuccessful).toBeTrue();
-  });
+  }));
 
   it('should not change email on invalid form submit', () => {
     component.emailForm.setValue({ email: 'invalid-email' });
