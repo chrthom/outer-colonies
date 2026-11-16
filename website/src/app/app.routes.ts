@@ -1,16 +1,9 @@
-import { NgModule, inject } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivateFn,
-  PreloadAllModules,
-  Router,
-  RouterModule,
-  Routes
-} from '@angular/router';
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, Routes } from '@angular/router';
+import { map } from 'rxjs';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
-import { tap } from 'rxjs';
 import { DeckPage } from './pages/deck/deck.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
@@ -24,6 +17,10 @@ import { ActivateAccountPage } from './pages/activate-account/activate-account.p
 import { ProfilePage } from './pages/profile/profile.page';
 import { ConfirmEmailPage } from './pages/confirm-email/confirm-email.page';
 
+/**
+ * Redirects to HTTPS when the environment requires it.
+ * Returns false if a protocol redirect was triggered (the current navigation is abandoned).
+ */
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
     return true;
@@ -34,25 +31,31 @@ function checkHttps(): boolean {
     return false;
   }
 }
+
+/**
+ * Guard for private pages: forces HTTPS, resolves the `?p=` deep link and
+ * redirects unauthenticated users to the login page.
+ */
 const privateGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   if (checkHttps()) {
     const router = inject(Router);
     const initialPath = route.queryParams['p'];
     if (initialPath) {
-      router.navigate(['/' + initialPath]);
-      return false;
+      return router.parseUrl('/' + initialPath);
     } else {
       return inject(AuthService)
         .check()
-        .pipe(tap(b => (!b ? router.navigate(['/login']) : {})));
+        .pipe(map(b => (b ? true : router.parseUrl('/login'))));
     }
   } else {
     return false;
   }
 };
+
+/** Guard for public pages: only forces HTTPS. */
 const publicGuardFn: CanActivateFn = () => checkHttps();
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
@@ -124,9 +127,3 @@ const routes: Routes = [
     redirectTo: ''
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {}
