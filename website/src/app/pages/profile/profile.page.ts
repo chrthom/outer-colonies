@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { map, Observable } from 'rxjs';
+import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
@@ -38,10 +38,11 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
     MatSlideToggle
   ]
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private authAPIService = inject(AuthApiService);
   private profileAPIService = inject(ProfileApiService);
+  private destroy$ = new Subject<void>();
 
   newsletterSubscription!: boolean;
   passwordResetSuccessful = false;
@@ -67,6 +68,10 @@ export class ProfilePage implements OnInit {
         /* Keep the default newsletter state; API errors are handled centrally by the API error interceptor */
       }
     });
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
   get email(): AbstractControl | null {
     return this.emailForm.get('email');
@@ -107,13 +112,17 @@ export class ProfilePage implements OnInit {
     });
   }
   private get emailExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkEmailExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      // Angular cancels the previous async validation subscription on every value change,
+      // so the delay acts as a debounce while typing
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkEmailExists(control.value)),
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(() => of(null)),
+        takeUntil(this.destroy$)
       );
     };
   }
