@@ -25,6 +25,7 @@ import config from 'config';
 import DBProfilesDAO, { DBProfile } from './persistence/db_profiles';
 import DBDailiesDAO, { DBDaily } from './persistence/db_dailies';
 import DBItemsDAO, { DBItem, DBItemBoxContent } from './persistence/db_items';
+import DBConnection from './persistence/db_connector';
 import { APIRejectReason, CardType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { rules } from '../shared/config/rules';
 import TacticCard from './cards/types/tactic_card';
@@ -382,51 +383,15 @@ export default function restAPI(app: Express) {
   app.post('/api/item/:itemId(\\d+)', (req, res) => {
     const itemId = Number(req.params['itemId']);
     performWithSessionTokenCheck(req, res, u => {
-      DBItemsDAO.getByUserId(u.userId)
-        .then(items => {
-          const item = items.find(i => i.itemId == itemId);
-          return item ? Promise.resolve(item) : Promise.reject(APIRejectReason.NotFound);
-        })
-        .then(item => DBItemsDAO.delete(itemId).then(() => item))
-        .then(item => {
-          if (item.type == ItemType.Booster) {
-            const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
-            cards.forEach(cId => DBDecksDAO.create(cId, u.userId, false, true));
-            const response: ItemListResponseBox = {
-              itemId: item.itemId,
-              message: item.message,
-              sol: [],
-              cards: cards,
-              boosters: []
-            };
-            res.status(200).send(response);
-          } else if (item.type == ItemType.Box) {
-            const content = <DBItemBoxContent[]>JSON.parse(item.content);
-            content.forEach(e => {
-              switch (e.type) {
-                case ItemBoxContentType.Booster:
-                  DBItemsDAO.createBooster(u.userId, e.value);
-                  break;
-                case ItemBoxContentType.Card:
-                  DBDecksDAO.create(e.value, u.userId);
-                  break;
-                case ItemBoxContentType.Sol:
-                  DBProfilesDAO.increaseSol(u.userId, e.value);
-              }
-            });
-            const response: ItemListResponseBox = {
-              itemId: item.itemId,
-              message: item.message,
-              sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
-              cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
-              boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
-            };
-            res.status(200).send(response);
-          } else {
-            sendStatus(res, 400, 'Invalid item type');
-          }
-        })
-        .catch(reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500));
+      openItem(u.userId, itemId).then(
+        response => res.status(200).send(response),
+        reason =>
+          reason == APIRejectReason.NotFound
+            ? sendStatus(res, 404)
+            : reason == INVALID_ITEM_TYPE
+              ? sendStatus(res, 400, 'Invalid item type')
+              : sendStatus(res, 500)
+      );
     });
   });
 
@@ -434,10 +399,9 @@ export default function restAPI(app: Express) {
   app.post('/api/buy/booster/:boosterNo([1-5])', (req, res) => {
     const boosterNo = Number(req.params['boosterNo']);
     performWithSessionTokenCheck(req, res, u => {
-      DBProfilesDAO.decreaseSol(u.userId, rules.boosterCosts[boosterNo])
-        .then(() => DBItemsDAO.createBooster(u.userId, boosterNo))
-        .then(() => sendStatus(res, 201))
-        .catch(reason => {
+      buyBooster(u.userId, boosterNo).then(
+        () => sendStatus(res, 201),
+        reason => {
           switch (reason) {
             case APIRejectReason.ConditionNotMet:
               sendStatus(res, 400, 'Insufficient sol');
@@ -448,7 +412,8 @@ export default function restAPI(app: Express) {
             default:
               sendStatus(res, 500);
           }
-        });
+        }
+      );
     });
   });
 }
@@ -471,4 +436,78 @@ export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
 export async function getDailies(userId: number): Promise<DailyGetResponse> {
   const daily = await DBDailiesDAO.getByUserId(userId);
   return getDailiesResponse(daily);
+}
+
+// Sentinel rejection value for items whose type is neither box nor booster.
+export const INVALID_ITEM_TYPE = 'invalid_item_type';
+
+/**
+ * Opens an item in a single database transaction: the item is deleted and all granted cards, sol
+ * and boosters are inserted before the transaction commits. The delete is guarded by an
+ * affected-rows check, so a concurrent open of the same item rejects with
+ * `APIRejectReason.NotFound` instead of granting the content twice. Rejects with
+ * `APIRejectReason.NotFound` if the user owns no such item and with `INVALID_ITEM_TYPE` for
+ * unknown item types; any failure rolls the whole operation back.
+ * @param userId id of the user opening the item
+ * @param itemId id of the item to open
+ * @returns the opened item content for the response payload
+ */
+export async function openItem(userId: number, itemId: number): Promise<ItemListResponseBox> {
+  return DBConnection.instance.transaction(async () => {
+    const items = await DBItemsDAO.getByUserId(userId);
+    const item = items.find(i => i.itemId == itemId);
+    if (!item) return Promise.reject(APIRejectReason.NotFound);
+    if (item.type == ItemType.Booster) {
+      const cards = CardCollection.generateBoosterContent(Number(item.content)).map(c => c.id);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
+      for (const cardId of cards) {
+        await DBDecksDAO.create(cardId, userId, false, true);
+      }
+      return {
+        itemId: item.itemId,
+        message: item.message,
+        sol: [],
+        cards: cards,
+        boosters: []
+      };
+    } else if (item.type == ItemType.Box) {
+      const content = <DBItemBoxContent[]>JSON.parse(item.content);
+      if ((await DBItemsDAO.delete(itemId)) == 0) return Promise.reject(APIRejectReason.NotFound);
+      for (const entry of content) {
+        switch (entry.type) {
+          case ItemBoxContentType.Booster:
+            await DBItemsDAO.createBooster(userId, entry.value);
+            break;
+          case ItemBoxContentType.Card:
+            await DBDecksDAO.create(entry.value, userId);
+            break;
+          case ItemBoxContentType.Sol:
+            await DBProfilesDAO.increaseSol(userId, entry.value);
+        }
+      }
+      return {
+        itemId: item.itemId,
+        message: item.message,
+        sol: content.filter(c => c.type == ItemBoxContentType.Sol).map(c => c.value),
+        cards: content.filter(c => c.type == ItemBoxContentType.Card).map(c => c.value),
+        boosters: content.filter(c => c.type == ItemBoxContentType.Booster).map(c => c.value)
+      };
+    } else {
+      return Promise.reject(INVALID_ITEM_TYPE);
+    }
+  });
+}
+
+/**
+ * Buys a booster pack in a single database transaction: the sol decrease and the booster item
+ * creation commit together or not at all. Rejects with `APIRejectReason.ConditionNotMet` if the
+ * user cannot afford the booster and with `APIRejectReason.NotFound` if the user is unknown.
+ * @param userId id of the buying user
+ * @param boosterNo edition number of the booster to buy
+ */
+export async function buyBooster(userId: number, boosterNo: number): Promise<void> {
+  return DBConnection.instance.transaction(async () => {
+    await DBProfilesDAO.decreaseSol(userId, rules.boosterCosts[boosterNo]);
+    await DBItemsDAO.createBooster(userId, boosterNo);
+  });
 }
