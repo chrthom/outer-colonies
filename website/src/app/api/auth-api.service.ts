@@ -19,12 +19,12 @@ export default class AuthApiService extends OCApi {
     super(http);
   }
   checkUsernameExists(username: string): Observable<boolean> {
-    return this.get<AuthExistsResponse>(`auth/exists?username=${username}`).pipe(
+    return this.get<AuthExistsResponse>('auth/exists', { username: username }).pipe(
       map(res => (res ? res.exists : false))
     );
   }
   checkEmailExists(email: string): Observable<boolean> {
-    return this.get<AuthExistsResponse>(`auth/exists?email=${email}`).pipe(
+    return this.get<AuthExistsResponse>('auth/exists', { email: email }).pipe(
       map(res => (res ? res.exists : false))
     );
   }
@@ -44,7 +44,7 @@ export default class AuthApiService extends OCApi {
     return this.delete('auth/login');
   }
   forgotPassword(user: string): Observable<void> {
-    return this.delete(`auth/password/${user}`);
+    return this.delete(`auth/password/${encodeURIComponent(user)}`);
   }
   resetPassword(password: string): Observable<void> {
     return this.put('auth/password', { password: password });
