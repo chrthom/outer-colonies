@@ -88,9 +88,7 @@ describe('AuthApiService', () => {
       newsletter: false
     };
 
-    service.register(testUser).subscribe(() => {
-      // Registration successful
-    });
+    service.register(testUser).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/register`);
     expect(req.request.method).toBe('POST');
@@ -113,9 +111,7 @@ describe('AuthApiService', () => {
   });
 
   it('should logout user', () => {
-    service.logout().subscribe(() => {
-      // Logout successful
-    });
+    service.logout().subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
     expect(req.request.method).toBe('DELETE');
@@ -124,9 +120,7 @@ describe('AuthApiService', () => {
 
   it('should request a password reset and URL-encode the user path segment', () => {
     const testEmail = 'foo+bar@example.com';
-    service.forgotPassword(testEmail).subscribe(() => {
-      // Password reset requested
-    });
+    service.forgotPassword(testEmail).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/password/foo%2Bbar%40example.com`);
     expect(req.request.method).toBe('DELETE');

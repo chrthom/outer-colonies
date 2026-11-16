@@ -20,7 +20,6 @@ export class IconService {
    * U+EA0D = speed
    */
   private readonly iconMap: Record<string, string> = {
-    // Game resource icons - matching the font mapping
     hp: '\uea06',
     hitpoints: '\uea06',
     damage: '\uea03',
@@ -34,7 +33,6 @@ export class IconService {
     shield_1: '\uea0b',
     shield_2: '\uea0b',
     shield_3: '\uea0b',
-    // Additional icons from the font
     equipment: '\uea05',
     equip: '\uea05',
     hull: '\uea07',

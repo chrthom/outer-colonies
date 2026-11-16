@@ -28,7 +28,6 @@ describe('ProfilePage', () => {
     authApiSpy.resetEmail.and.returnValue(of(undefined));
     authApiSpy.resetPassword.and.returnValue(of(undefined));
 
-    // Create a getter property for profile
     Object.defineProperty(profileApiSpy, 'profile', {
       get: jasmine
         .createSpy('profile getter')
@@ -127,7 +126,7 @@ describe('ProfilePage', () => {
     password?.setValue('');
     expect(password?.valid).toBeFalse();
 
-    password?.setValue('short'); // Too short
+    password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
     password?.setValue('validpassword123');

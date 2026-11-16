@@ -82,7 +82,6 @@ describe('ForgotPasswordPage', () => {
   });
 
   it('should set success state on successful password reset request', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ForgotPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 
@@ -93,8 +92,6 @@ describe('ForgotPasswordPage', () => {
 
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
-    // Note: Component doesn't set loading=false in success case, only in error case
-    // expect(freshComponent.loading).toBeFalse();
   });
 
   it('should set failure state on password reset request error', () => {

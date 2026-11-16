@@ -36,11 +36,10 @@ export default class Matchmaking extends Phaser.Scene {
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
     this.exitButton = new ExitButton(this);
-    // Disconnects the socket of a previous match before opening a new connection
     this.socket = SocketService.connect();
     this.registerSocketListeners();
     new Background(this);
-    loadPreloadableResources(environment.urls.api, this.load); // Continue preloading
+    loadPreloadableResources(environment.urls.api, this.load);
   }
 
   /**
