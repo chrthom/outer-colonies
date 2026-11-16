@@ -55,7 +55,9 @@ export class HomePage implements OnInit, OnDestroy {
             return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
           });
       },
-      error: err => console.error('Failed to load dailies', err)
+      error: () => {
+        /* Keep the default dailies list; API errors are handled centrally by the API error interceptor */
+      }
     });
   }
 

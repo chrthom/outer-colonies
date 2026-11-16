@@ -63,7 +63,9 @@ export class ProfilePage implements OnInit {
   ngOnInit(): void {
     this.profileAPIService.profile.subscribe({
       next: profile => (this.newsletterSubscription = profile.newsletter),
-      error: err => console.error('Failed to load profile', err)
+      error: () => {
+        /* Keep the default newsletter state; API errors are handled centrally by the API error interceptor */
+      }
     });
   }
   get email(): AbstractControl | null {
