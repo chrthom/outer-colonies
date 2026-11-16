@@ -1,5 +1,5 @@
 import Matchmaking from './matchmaking';
-import { MsgTypeOutbound } from '@shared/config/enums';
+import { MatchmakingStatus, MsgTypeOutbound } from '@shared/config/enums';
 import ClientGameParams from '@shared/interfaces/client_game_params';
 import Phaser from 'phaser';
 
@@ -76,5 +76,18 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
     matchmakingHandler('start', gameParams);
 
     expect(start).toHaveBeenCalledWith('Game', { gameParams });
+  });
+
+  it('shows a timeout message when the server ends the search', () => {
+    const setText = jasmine.createSpy('status.setText');
+    (matchmaking as unknown as { status: { setText: typeof setText } }).status = { setText };
+
+    const matchmakingHandler = socket.on.calls
+      .allArgs()
+      .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
+    matchmakingHandler(MatchmakingStatus.Timeout);
+
+    expect(setText).toHaveBeenCalled();
+    expect(setText.calls.mostRecent().args[0]).toContain('Keine Mitspieler');
   });
 });

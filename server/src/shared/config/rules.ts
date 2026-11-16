@@ -6,6 +6,10 @@ class OCRules {
   readonly maxHandCards = 7;
   readonly maxRange = 4;
   readonly countdownTimer = 90;
+  /** Seconds after which a client which searches for an opponent alone receives the matchmaking timeout */
+  readonly matchmakingTimeout = 60;
+  /** Seconds a disconnected player has to reconnect to a running match before it surrenders them */
+  readonly reconnectGracePeriod = 60;
 
   readonly gameEarnings = {
     victory: 50,

@@ -231,7 +231,7 @@ The server provides the following WebSocket events for the game client:
 
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
-  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins, `MatchmakingStatus.Timeout` when the search is ended after the matchmaking timeout)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
@@ -257,7 +257,9 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 - **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
 - **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
 
-**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the matchmaking lobby room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`; a client which waits alone for longer than the matchmaking timeout (`rules.matchmakingTimeout`) receives a `MatchmakingStatus.Timeout` and leaves the lobby. On login, a player whose previous match is still running (see reconnection) rejoins it instead of searching again.
+
+**Reconnection** (`components/match_registry.ts`): Matches are registered in an in-memory registry keyed by their room, so they stay discoverable even while both sockets are disconnected (Socket.IO drops empty rooms). A disconnect during a running match does not end it: the player is marked disconnected and the match stays alive for the reconnection grace window (`rules.reconnectGracePeriod`). Within the window, the player rejoins by logging in again with their session token (e.g. after a page reload); a new socket is bound back to their player. Once the window expires, `gameCron` surrenders the player.
 
 **Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
 

@@ -7,6 +7,8 @@ export default class SocketData {
   activeDeck: Card[] = [];
   playerNo?: number;
   match?: Match;
+  /** Timestamp (ms since epoch) when the client joined the matchmaking search; used for the search timeout */
+  searchStartedAt: number = Date.now();
   constructor(user: DBCredential, activeDeck: Card[]) {
     this.user = user;
     this.activeDeck = activeDeck;

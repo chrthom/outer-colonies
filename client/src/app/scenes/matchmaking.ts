@@ -76,6 +76,10 @@ export default class Matchmaking extends Phaser.Scene {
               gameParams: payload as ClientGameParams
             });
             break;
+          case MatchmakingStatus.Timeout:
+            // The server ended the search; a retry requires a new matchmaking session
+            this.status.setText('Keine Mitspieler gefunden. Bitte später erneut versuchen.');
+            break;
         }
       }
     );

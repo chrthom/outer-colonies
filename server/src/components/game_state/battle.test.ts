@@ -29,7 +29,7 @@ class MockWeaponCard extends EquipmentCard {
 class MockPlayer extends Player {
   constructor(playerNo: number) {
     const mockMatch = new MockMatch() as any as Match;
-    super('test-socket', 'Test Player', mockMatch, playerNo, []);
+    super('test-socket', 0, 'Test Player', mockMatch, playerNo, []);
   }
 }
 

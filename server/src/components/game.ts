@@ -7,7 +7,7 @@ import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
-import { matchmakingRoom } from './matchmaking';
+import { allActiveMatches, unregisterMatch } from './match_registry';
 import { Attack } from './game_state/battle';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
@@ -48,7 +48,10 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     doWithMatchAndPlayer(socket, (match, player) => {
       if (!match.gameResult.gameOver) {
         console.log(`Player ${player.name} disconnected from active game`);
-        match.gameResult.setWinnerBySurrender(player);
+        // The match stays alive for the reconnection grace window so the
+        // player can rejoin with a new socket; the game cron surrenders the
+        // player once the window expires (see gameCron)
+        player.disconnectedSince = Date.now();
       }
       emitState(io, match);
     });
@@ -166,17 +169,24 @@ export function gameSocketListeners(io: Server, socket: Socket) {
 }
 
 export function gameCron(io: Server) {
-  Array.from(io.sockets.adapter.rooms)
-    .filter(room => !room[1].has(room[0]) && room[0] != matchmakingRoom)
-    .map(r => {
-      const [clientId] = r[1];
-      return io.sockets.sockets.get(clientId);
-    })
-    .filter((socket): socket is Socket => !!socket)
-    .map(socket => getSocketData(socket).match)
-    .filter((match): match is Match => !!match)
-    .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
-    .forEach(match => {
+  for (const match of allActiveMatches()) {
+    if (match.gameResult.gameOver) {
+      unregisterMatch(match);
+      continue;
+    }
+    // Surrender players whose reconnection grace window expired
+    const expiredPlayer = match.players.find(
+      p =>
+        p.disconnectedSince != undefined &&
+        Date.now() - p.disconnectedSince >= rules.reconnectGracePeriod * 1000
+    );
+    if (expiredPlayer) {
+      console.log(`Player ${expiredPlayer.name} did not reconnect within the grace period`);
+      match.gameResult.setWinnerBySurrender(expiredPlayer);
+      expiredPlayer.disconnectedSince = undefined;
+      emitState(io, match);
+    }
+    if (match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver) {
       if (--match.countdown <= 0) {
         // Trigger automatic ready event instead of timeout victory
         match.pendingActionPlayer.handleAutomaticReady();
@@ -186,9 +196,11 @@ export function gameCron(io: Server) {
         const socket = getSocket(io, match, playerNo);
         if (socket)
           socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
-        else console.log('WARN: Could not find socket to emit countdown');
+        else if (match.players[playerNo].disconnectedSince == undefined)
+          console.log('WARN: Could not find socket to emit countdown');
       });
-    });
+    }
+  }
 }
 
 function doWithMatchAndPlayer(socket: Socket, f: (m: Match, p: Player) => void) {
@@ -215,7 +227,10 @@ function emitState(io: Server, match: Match) {
   match.forAllPlayers((playerNo: number) => {
     const socket = getSocket(io, match, playerNo);
     if (socket) socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
-    else console.log('WARN: Could not find socket to emit state');
+    // A disconnected player's socket is expectedly absent while the grace
+    // window keeps the match alive
+    else if (match.players[playerNo].disconnectedSince == undefined)
+      console.log('WARN: Could not find socket to emit state');
   });
   match.resetTempStates();
 }

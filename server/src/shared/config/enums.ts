@@ -118,7 +118,8 @@ export enum Zone {
 
 export enum MatchmakingStatus {
   Search = 'search',
-  Start = 'start'
+  Start = 'start',
+  Timeout = 'timeout'
 }
 
 export enum MagicLinkType {

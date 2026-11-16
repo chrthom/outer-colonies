@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
-import { gameSocketListeners } from './game';
+import { gameCron, gameSocketListeners } from './game';
+import { allActiveMatches, registerMatch, unregisterMatch } from './match_registry';
 import Battle from './game_state/battle';
 import Match from './game_state/match';
 import Player from './game_state/player';
@@ -10,9 +11,11 @@ import EquipmentCard from './cards/types/equipment_card';
 import HullCard, { toHullMultipart } from './cards/types/hull_card';
 import TacticCard from './cards/types/tactic_card';
 import { ClientState } from '../shared/interfaces/client_state';
+import { rules } from '../shared/config/rules';
 import {
   BattleType,
   CardType,
+  GameResultType,
   InterventionType,
   MsgTypeInbound,
   MsgTypeOutbound,
@@ -67,7 +70,7 @@ const createSocketMock = (playerNo: number): SocketMock => {
     join: jest.fn(),
     on,
     emit,
-    data: { user: { username: `Player ${playerNo}` }, activeDeck: [] }
+    data: { user: { userId: playerNo + 1, username: `Player ${playerNo}` }, activeDeck: [] }
   };
   return { socket: socket as unknown as Socket, on, emit };
 };
@@ -179,5 +182,80 @@ describe('MsgTypeInbound.Attack with all weapons', () => {
     expect((<InterventionAttack>match.intervention).src).toBe(weapons[1]);
     expect(state.intervention?.attack?.sourceSubUUID).toBe(weapons[1].uuid);
     expect(match.pendingActionPlayerNo).toBe(1);
+  });
+});
+
+describe('MsgTypeInbound.Disconnect with reconnection grace', () => {
+  afterEach(() => {
+    allActiveMatches().forEach(unregisterMatch);
+    jest.restoreAllMocks();
+  });
+
+  test('marks the player as disconnected without ending the match', () => {
+    const { match, socketMocks } = createCombatMatch();
+    gameSocketListeners(createIoMock(socketMocks.map(sm => sm.socket)), socketMocks[0].socket);
+    const registration = socketMocks[0].on.mock.calls.find(([event]) => event == MsgTypeInbound.Disconnect);
+    if (!registration) throw new Error('Disconnect handler was not registered');
+
+    registration[1]();
+
+    expect(match.players[0].disconnectedSince).toBeDefined();
+    expect(match.gameResult.gameOver).toBe(false);
+  });
+});
+
+describe('gameCron with reconnection grace', () => {
+  afterEach(() => {
+    allActiveMatches().forEach(unregisterMatch);
+    jest.restoreAllMocks();
+  });
+
+  test('keeps the match alive while the disconnected player is within the grace window', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    match.players[0].disconnectedSince = Date.now();
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    expect(match.gameResult.gameOver).toBe(false);
+    expect(match.players[0].disconnectedSince).toBeDefined();
+  });
+
+  test('surrenders a player whose grace window expired', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
+    match.players[0].disconnectedSince = Date.now() - (rules.reconnectGracePeriod * 1000 + 1000);
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    expect(match.gameResult.gameOver).toBe(true);
+    expect(match.gameResult.type).toBe(GameResultType.Surrender);
+    expect(match.gameResult.winnerNo).toBe(1);
+    expect(match.players[0].disconnectedSince).toBeUndefined();
+  });
+
+  test('emits the game over state to the remaining player after the grace surrender', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
+    match.players[0].disconnectedSince = Date.now() - (rules.reconnectGracePeriod * 1000 + 1000);
+    socketMocks[0].emit.mockClear();
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    const state = getEmittedState(socketMocks[1]);
+    expect(state.gameResult?.type).toBe(GameResultType.Surrender);
+    expect(state.gameResult?.won).toBe(true);
+  });
+
+  test('unregisters finished matches', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    match.gameResult.gameOver = true;
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    expect(allActiveMatches()).not.toContain(match);
   });
 });
