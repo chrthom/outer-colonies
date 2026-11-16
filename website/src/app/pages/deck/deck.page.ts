@@ -178,6 +178,6 @@ export class DeckPage implements OnInit {
         stacks.set(dc.cardId, { ...dc, numOfCards: 1 });
       }
     }
-    return [...stacks.values()];
+    return [...stacks.values()].sort((a, b) => a.cardId - b.cardId);
   }
 }

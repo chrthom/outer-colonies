@@ -152,6 +152,24 @@ describe('DeckPage', () => {
     expect(component.boxes[0].cards[1].numOfCards).toBe(1);
   });
 
+  it('should return stacks in ascending cardId order regardless of API response order', () => {
+    const card = (id: number, cardId: number) => ({
+      id,
+      cardId,
+      inUse: true,
+      name: `Card ${cardId}`,
+      type: 'hull' as any,
+      rarity: 1,
+      canAttack: true,
+      profile: { delta: 1, theta: 0, xi: 0, phi: 0, psi: 0, omega: 0, energy: 2 }
+    });
+    deckApiSpy.listDeck.and.returnValue(of({ cards: [card(1, 305), card(2, 101), card(3, 203)] }));
+
+    component.update();
+
+    expect(component.boxes[0].cards.map(c => c.cardId)).toEqual([101, 203, 305]);
+  });
+
   it('should group same-card copies into one stack without mutating the API response', () => {
     const responseCards: DeckCard[] = [
       {
