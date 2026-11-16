@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
+import { starterDecks } from '@shared/config/starter_decks';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -188,6 +189,15 @@ describe('RegisterPage', () => {
 
     starterDeck?.setValue('deck1');
     expect(starterDeck?.valid).toBeTrue();
+  });
+
+  it('should return an empty card list before a starter deck is selected', () => {
+    expect(component.starterDeckCards).toEqual([]);
+  });
+
+  it('should return the cards of the selected starter deck', () => {
+    component.starterDeck?.setValue(1);
+    expect(component.starterDeckCards).toEqual(starterDecks[1]);
   });
 
   it('should call auth service on valid form submit', fakeAsync(() => {

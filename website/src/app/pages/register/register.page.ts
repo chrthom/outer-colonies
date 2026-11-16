@@ -95,7 +95,7 @@ export class RegisterPage implements OnDestroy {
     return JSON.stringify(this.username?.errors);
   }
   get starterDeckCards(): MultipleCards[] {
-    return starterDecks[this.starterDeck?.value];
+    return starterDecks[this.starterDeck?.value] ?? [];
   }
   cardIdToUrl(cardId: number): string {
     return `${environment.url.assets}/cards/${cardId}.png`;
