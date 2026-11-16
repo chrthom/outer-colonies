@@ -125,17 +125,14 @@ export default class Player {
    * This method is called by the game cron when a player's timeout expires
    */
   handleAutomaticReady() {
-    // Check if player needs to drop cards
     if (this.hand.length > this.handCardLimit) {
       this.dropExcessCards();
     }
 
-    // Check if player needs to retract cards
     if (this.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
       this.retractInsufficientEnergyCards();
     }
 
-    // Process the ready event based on current turn phase
     const match = this.match;
     if (match.turnPhase == TurnPhase.Build) {
       if (match.pendingActionPlayerNo == this.no) {
@@ -146,14 +143,12 @@ export default class Player {
           // discard the announced battle plan and strand the played card
           match.skipIntervention();
         } else if (match.pendingActionPlayerNo == match.activePlayerNo) {
-          // For automatic ready, create an empty battle plan
           match.prepareBuildPhaseReaction({ type: BattleType.None, shipIds: [] });
         } else {
           // Explicitly close the raid start window on timeout: inaction
           // forfeits the defense fleet nomination, so the intervention is
           // removed instead of being silently discarded later
           if (match.intervention?.type == InterventionType.OpponentRaidStart) match.skipIntervention();
-          // For automatic ready, provide empty array for intercepting ships
           match.prepareCombatPhase([]);
         }
       }
@@ -163,7 +158,7 @@ export default class Player {
       }
     }
 
-    match.countdown = rules.countdownTimer; // Reset countdown
+    match.countdown = rules.countdownTimer;
   }
 
   /**
@@ -172,7 +167,6 @@ export default class Player {
   private dropExcessCards() {
     const cardsToDrop = this.hand.length - this.handCardLimit;
     if (cardsToDrop > 0) {
-      // Drop the first excess cards (simple implementation)
       const handCardUUIDs = this.hand.map(cs => cs.uuid).slice(0, cardsToDrop);
       this.discardHandCards(...handCardUUIDs);
     }
@@ -182,7 +176,6 @@ export default class Player {
    * Retract cards with insufficient energy
    */
   private retractInsufficientEnergyCards() {
-    // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
     const cardStacksToRetract = this.cardStacks
       .filter(cs => cs.hasInsufficientEnergy)
       .sort((a, b) => a.profile.energy - b.profile.energy);

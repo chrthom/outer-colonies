@@ -23,10 +23,8 @@ describe('OpenItemComponent', () => {
   });
 
   it('should calculate box classes correctly', () => {
-    // Test with empty content
     expect(component.outerBoxClasses).toBe('');
 
-    // Test with 3 elements
     component.content = {
       itemId: 1,
       sol: [100],
@@ -35,7 +33,6 @@ describe('OpenItemComponent', () => {
     };
     expect(component.outerBoxClasses).toBe('width-3 height-1');
 
-    // Test with 6 elements
     component.content = {
       itemId: 2,
       sol: [100, 200],

@@ -15,7 +15,6 @@ export default class ExitButton extends BaseButton {
     super(scene, layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'exit', '');
     this.isMatchmaking = !(scene instanceof Game);
 
-    // Create confirmation text
     this.confirmText = scene.add
       .text(
         layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.baseButtons.xTextOffset,
@@ -33,7 +32,6 @@ export default class ExitButton extends BaseButton {
         useHandCursor: true
       });
 
-    // Add confirmation text event listeners
     this.confirmText
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown()) this.onClickAction(true);
@@ -65,7 +63,6 @@ export default class ExitButton extends BaseButton {
       SocketService.disconnect();
       window.location.href = environment.urls.website;
     } else if (confirmed) {
-      // Surrender - send surrender message to server
       this.scene.socket.emit(MsgTypeInbound.Surrender);
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);

@@ -13,9 +13,7 @@ describe('AuthService', () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['login', 'logout', 'checkSessionToken']);
     cookieSpy = jasmine.createSpyObj('CookieService', ['get', 'set', 'delete']);
 
-    // Mock the set method to accept both individual parameters and options object
     cookieSpy.set.and.callFake(() => {
-      // Store the call for verification
       return undefined;
     });
 

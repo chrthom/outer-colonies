@@ -52,7 +52,9 @@ fixed for this run. Change approach or stop with `WALL: <reason>`.
    Every failure is a finding.
 4. Review adversarially: correctness, whether the linked issue is fully solved, tests, security,
    error handling, project code style, and docs (`AGENTS.md`). Report every finding, including
-   minors and nits. Severities: `blocker`, `major`, `minor`, `nit`.
+   minors and nits. Severities: `blocker`, `major`, `minor`, `nit`. Inline comments that violate
+   the comment policy in `AGENTS.md` (restating *what* the code does, TODO-style notes without an
+   issue reference, interface documentation outside JSDoc) are `nit` findings.
 5. Choose the verdict:
    - `CLEAN`: zero findings of severity `blocker`, `major` or `minor`. New `nit` findings do
      not block the verdict: report them (they are still useful feedback for the author), but

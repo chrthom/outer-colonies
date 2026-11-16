@@ -39,7 +39,6 @@ export class HomePage implements OnInit, OnDestroy {
       next: res => {
         const availableDailyKeys = this.getAvailableDailyKeys(res);
 
-        // Filter dailies to only show those that are available today
         this.dailies = this.dailies
           .map(daily => {
             const achieved = daily.matcher(res);
@@ -95,7 +94,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.startAutoAdvance();
   }
 
-  // Helper function to determine which dailies are available today
+  /** Returns the daily keys the server did not null out, i.e. those available today. */
   private getAvailableDailyKeys(response: DailyGetResponse): (keyof DailyGetResponse)[] {
     const availableKeys: (keyof DailyGetResponse)[] = [];
     for (const key in response) {
@@ -106,7 +105,7 @@ export class HomePage implements OnInit, OnDestroy {
     return availableKeys;
   }
 
-  // Generate dailies array dynamically from centralized definitions
+  /** Builds the dailies list from the centralized daily definitions. */
   private generateDailiesArray(): Daily[] {
     return DAILY_DEFINITIONS.map(dailyDef => ({
       key: dailyDef.dbColumn,

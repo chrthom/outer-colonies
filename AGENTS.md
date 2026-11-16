@@ -63,3 +63,4 @@ Maintain consistency across the three subprojects
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks
+- **Inline Comments**: Inline comments are for non-obvious *why* (workarounds, invariants, business rules), never *what*. Do not restate what the code does and do not leave TODO-style notes without an issue reference. All interface documentation belongs in JSDoc.

@@ -79,7 +79,7 @@ describe('RegisterPage', () => {
     username?.setValue('');
     expect(username?.valid).toBeFalse();
 
-    username?.setValue('ab'); // Too short
+    username?.setValue('ab');
     tick(500);
     expect(username?.valid).toBeFalse();
 
@@ -93,7 +93,7 @@ describe('RegisterPage', () => {
     password?.setValue('');
     expect(password?.valid).toBeFalse();
 
-    password?.setValue('short'); // Too short
+    password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
     password?.setValue('validpassword123');
@@ -116,7 +116,7 @@ describe('RegisterPage', () => {
 
   it('should not check availability for empty or invalid values', fakeAsync(() => {
     const username = component.registerForm.get('username');
-    username?.setValue('ab'); // Too short
+    username?.setValue('ab');
     const email = component.registerForm.get('email');
     email?.setValue('invalid-email');
 
