@@ -59,6 +59,7 @@ export default [
       quotes: ["error", "single"],
       semi: ["error", "always"],
       "@typescript-eslint/no-explicit-any": ["off"],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "no-restricted-imports": [
         "error",
         {

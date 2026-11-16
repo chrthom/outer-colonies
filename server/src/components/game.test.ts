@@ -12,7 +12,6 @@ import TacticCard from './cards/types/tactic_card';
 import { ClientState } from '../shared/interfaces/client_state';
 import {
   BattleType,
-  CardType,
   InterventionType,
   MsgTypeInbound,
   MsgTypeOutbound,
