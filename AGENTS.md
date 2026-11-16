@@ -52,6 +52,12 @@ Maintain consistency across the three subprojects
 - Add JSDoc comments for new public or protected functions
 - Changes in `server/src/shared/` are picked up by the client and website automatically via the `@shared/*` path alias - no declaration update is required
 
+## Testing Requirements
+- New server game or persistence logic requires Jest coverage: add or extend a `*.test.ts` spec next to the tested source in `server/src/`
+- Bug fixes should come with a reproducing test where feasible: a test that fails before and passes after the fix
+- Frontend specs are `*.spec.ts` files next to the tested source, run through the custom `scripts/test.js` harnesses (Jasmine/Karma via `ng test`) in `client/` and `website/`
+- All tests must pass from the repo root via `npm test` (part of `npm run check`)
+
 ## Decision Making Guidelines
 
 ### Priority System
@@ -63,6 +69,10 @@ Maintain consistency across the three subprojects
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
 - **Error Handling**: Comprehensive try-catch blocks. Every `catch` (or promise/rxjs rejection handler) must:
-  - **Log with a level**: never catch silently. On the server, log via `console.log` with a `WARN:` or `ERROR:` prefix plus context (e.g. `console.log(\`ERROR: Failed to persist earnings for user ${user}: ${err}\`)`); in client and website use `console.error`.
-  - **Rethrow or degrade explicitly**: either rethrow the error for the caller to handle (`throw err`) or degrade deliberately with a visible fallback (return a default, skip the optional step) — the decision must be recognizable in the code.
   - **Never swallow errors silently**: an empty catch block, or one that only continues without logging, is forbidden.
+  - **Log with a level and then either rethrow or degrade explicitly**: log at `warn` or `error` level per the Logging rule below, then either rethrow the error for the caller to handle (`throw err`) or degrade deliberately with a visible fallback (return a default, skip the optional step) — the decision must be recognizable in the code. A bare rethrow without logging is not a silent catch and is acceptable when the caller handles the error.
+- **Logging**: Leveled logging instead of raw `console.log` calls with `WARN:`/`ERROR:` string prefixes:
+  - **server**: Log through the leveled logger utility (see #870), never `console.*` directly
+  - **website/client**: Log to the browser console only on non-production stages (gate with `environment.stage !== 'production'`); only fatal boot errors may use `console.error` in production
+  - `debug` for verbose diagnostics (development only), `info` for normal operational events (e.g. server startup, connections), `warn` for recoverable problems (e.g. invalid client requests), `error` for failures that need attention (e.g. caught exceptions)
+  - Never log sensitive data (session tokens, credentials, email addresses, request URLs with query parameters)
