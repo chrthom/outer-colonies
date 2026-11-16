@@ -17,13 +17,8 @@ export default class DBConnection {
   }
 
   /**
-   * Executes a query as prepared statement on a connection from the pool.
-   *
-   * The connection and the prepared statement are only released after the query has finished.
-   * If no connection can be acquired, the query is retried a bounded number of times, which is
-   * safe because the statement has not been sent yet. Errors while preparing or executing are
-   * never retried, because re-running a possibly non-idempotent statement (e.g. INSERT) could
-   * create duplicate rows.
+   * Executes a query as prepared statement on a connection from the pool,
+   * releasing connection and statement only after the query has finished.
    *
    * @param query SQL statement to execute
    * @param params parameters to bind to the prepared statement
@@ -34,8 +29,8 @@ export default class DBConnection {
   }
 
   /**
-   * Executes a query, retrying connection acquisition up to
-   * {@link DBConnection.MAX_ACQUIRE_ATTEMPTS} times.
+   * Executes a query, retrying connection acquisition with at most
+   * {@link DBConnection.MAX_ACQUIRE_ATTEMPTS} total acquisition attempts.
    *
    * @param query SQL statement to execute
    * @param params parameters to bind to the prepared statement
