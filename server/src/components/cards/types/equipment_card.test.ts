@@ -172,8 +172,8 @@ describe('EquipmentCard.attack X deduction semantics', () => {
   });
 
   test('numeric shield deduction deactivates the shield card when the damage suffices', () => {
-    // Counterpart to the X deduction: a numeric deduction >= damage deactivates
-    // the defence card (reduction = -3 * -2 = 6 <= 7 damage)
+    // Counterpart to the X deduction: a numeric deduction whose reduction does not
+    // exceed the damage deactivates the defence card (reduction = -3 * -2 = 6 <= 7 damage)
     const weapon = new TestWeaponCard({
       range: 4,
       damage: 7,

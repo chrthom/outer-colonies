@@ -118,8 +118,7 @@ export class Card171 extends EquipmentCard {
     super(171, 'Quantenmechanischer Antrieb', 1, {
       energy: 0,
       speed: 1,
-      delta: -1,
-      omega: -1
+      delta: -1
     });
   }
 }
