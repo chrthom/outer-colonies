@@ -68,7 +68,9 @@ Maintain consistency across the three subprojects
 ### Code Style Preferences
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Formatting**: Prettier configuration in each subproject
-- **Error Handling**: Comprehensive try-catch blocks
+- **Error Handling**: Comprehensive try-catch blocks. Every `catch` (or promise/rxjs rejection handler) must:
+  - **Never swallow errors silently**: an empty catch block, or one that only continues without logging, is forbidden.
+  - **Log with a level and then either rethrow or degrade explicitly**: log at `warn` or `error` level per the Logging rule below, then either rethrow the error for the caller to handle (`throw err`) or degrade deliberately with a visible fallback (return a default, skip the optional step) — the decision must be recognizable in the code. A bare rethrow without logging is not a silent catch and is acceptable when the caller handles the error.
 - **Logging**: Leveled logging instead of raw `console.log` calls with `WARN:`/`ERROR:` string prefixes:
   - **server**: Log through the leveled logger utility (see #870), never `console.*` directly
   - **website/client**: Log to the browser console only on non-production stages (gate with `environment.stage !== 'production'`); only fatal boot errors may use `console.error` in production
