@@ -1,5 +1,5 @@
 import Matchmaking from './matchmaking';
-import { MatchmakingStatus, MsgTypeOutbound } from '@shared/config/enums';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
 import ClientGameParams from '@shared/interfaces/client_game_params';
 import Phaser from 'phaser';
 
@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 interface SocketListenerStub {
   on: jasmine.Spy;
   off: jasmine.Spy;
+  emit: jasmine.Spy;
   io: { on: jasmine.Spy; off: jasmine.Spy };
 }
 
@@ -26,7 +27,7 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
 
   beforeEach(() => {
     matchmaking = new Matchmaking();
-    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    socket = jasmine.createSpyObj('Socket', ['on', 'off', 'emit']);
     socket.io = jasmine.createSpyObj('Manager', ['on', 'off']);
     const handle = matchmaking as unknown as MatchmakingOverrides;
     handle.socket = socket;
@@ -78,16 +79,70 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
     expect(start).toHaveBeenCalledWith('Game', { gameParams });
   });
 
-  it('shows a timeout message when the server ends the search', () => {
+  it('shows a timeout message with a retry affordance when the server ends the search', () => {
     const setText = jasmine.createSpy('status.setText');
-    (matchmaking as unknown as { status: { setText: typeof setText } }).status = { setText };
+    const enableRetry = jasmine.createSpy('status.enableRetry');
+    const exitButtonUpdate = jasmine.createSpy('exitButton.update');
+    (
+      matchmaking as unknown as {
+        status: { setText: typeof setText; enableRetry: typeof enableRetry };
+        exitButton: { update: typeof exitButtonUpdate };
+      }
+    ).status = { setText, enableRetry };
+    (matchmaking as unknown as { exitButton: { update: typeof exitButtonUpdate } }).exitButton = {
+      update: exitButtonUpdate
+    };
 
     const matchmakingHandler = socket.on.calls
       .allArgs()
       .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
     matchmakingHandler(MatchmakingStatus.Timeout);
 
-    expect(setText).toHaveBeenCalled();
     expect(setText.calls.mostRecent().args[0]).toContain('Keine Mitspieler');
+    expect(enableRetry).toHaveBeenCalled();
+    expect(matchmaking.searchEnded).toBeTrue();
+    expect(exitButtonUpdate).toHaveBeenCalled();
+  });
+
+  it('re-emits the login when the player retries the search after the timeout', () => {
+    const enableRetry = jasmine.createSpy('status.enableRetry');
+    (
+      matchmaking as unknown as {
+        status: { setText: jasmine.Spy; enableRetry: typeof enableRetry };
+        exitButton: { update: jasmine.Spy };
+      }
+    ).status = { setText: jasmine.createSpy('status.setText'), enableRetry };
+    (matchmaking as unknown as { exitButton: { update: jasmine.Spy } }).exitButton = {
+      update: jasmine.createSpy('exitButton.update')
+    };
+    (matchmaking as unknown as { sessionToken: string }).sessionToken = 'test-token';
+
+    const matchmakingHandler = socket.on.calls
+      .allArgs()
+      .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
+    matchmakingHandler(MatchmakingStatus.Timeout);
+    const retryAction = enableRetry.calls.mostRecent().args[0] as () => void;
+    retryAction();
+
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Login, 'test-token');
+  });
+
+  it('resets the ended search when the server restarts it', () => {
+    const setText = jasmine.createSpy('status.setText');
+    const exitButtonUpdate = jasmine.createSpy('exitButton.update');
+    (matchmaking as unknown as { status: { setText: typeof setText } }).status = { setText };
+    (matchmaking as unknown as { exitButton: { update: typeof exitButtonUpdate } }).exitButton = {
+      update: exitButtonUpdate
+    };
+    matchmaking.searchEnded = true;
+
+    const matchmakingHandler = socket.on.calls
+      .allArgs()
+      .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
+    matchmakingHandler(MatchmakingStatus.Search, 0);
+
+    expect(matchmaking.searchEnded).toBeFalse();
+    expect(exitButtonUpdate).toHaveBeenCalled();
+    expect(setText.calls.mostRecent().args[0]).toContain('Suche Mitspieler');
   });
 });

@@ -202,6 +202,19 @@ describe('MsgTypeInbound.Disconnect with reconnection grace', () => {
     expect(match.players[0].disconnectedSince).toBeDefined();
     expect(match.gameResult.gameOver).toBe(false);
   });
+
+  test('does not mark the player as disconnected from a stale socket', () => {
+    const { match, socketMocks } = createCombatMatch();
+    gameSocketListeners(createIoMock(socketMocks.map(sm => sm.socket)), socketMocks[0].socket);
+    const registration = socketMocks[0].on.mock.calls.find(([event]) => event == MsgTypeInbound.Disconnect);
+    if (!registration) throw new Error('Disconnect handler was not registered');
+    // The player already rejoined the match with a new socket
+    match.players[0].socketId = 'socket-rejoined';
+
+    registration[1]();
+
+    expect(match.players[0].disconnectedSince).toBeUndefined();
+  });
 });
 
 describe('gameCron with reconnection grace', () => {
@@ -242,17 +255,47 @@ describe('gameCron with reconnection grace', () => {
     match.players[0].disconnectedSince = Date.now() - (rules.reconnectGracePeriod * 1000 + 1000);
     socketMocks[0].emit.mockClear();
 
-    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+    // The surrendered player's socket is gone; only the remaining player is reachable
+    gameCron(createIoMock([socketMocks[1].socket]));
 
     const state = getEmittedState(socketMocks[1]);
     expect(state.gameResult?.type).toBe(GameResultType.Surrender);
     expect(state.gameResult?.won).toBe(true);
+    // The remaining player received the final state and therefore the result;
+    // the surrendered player is still owed the delivery on their next login
+    expect(match.players[1].resultDelivered).toBe(true);
+    expect(match.players[0].resultDelivered).toBeUndefined();
   });
 
-  test('unregisters finished matches', () => {
+  test('unregisters finished matches once every player received the result', () => {
     const { match, socketMocks } = createCombatMatch();
     registerMatch(match);
     match.gameResult.gameOver = true;
+    match.players.forEach(p => {
+      p.resultDelivered = true;
+    });
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    expect(allActiveMatches()).not.toContain(match);
+  });
+
+  test('keeps a finished match registered while a player has not received the result', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    match.gameResult.gameOver = true;
+    match.players[0].resultDelivered = true;
+
+    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
+
+    expect(allActiveMatches()).toContain(match);
+  });
+
+  test('unregisters a finished match after the result delivery period expired', () => {
+    const { match, socketMocks } = createCombatMatch();
+    registerMatch(match);
+    match.gameResult.gameOver = true;
+    match.gameOverSince = Date.now() - (rules.resultDeliveryPeriod * 1000 + 1000);
 
     gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
 

@@ -8,6 +8,7 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import Player from './game_state/player';
 import { findRejoinableMatch, registerMatch } from './match_registry';
 
 // Room name of the matchmaking lobby. Deliberately distinct from the
@@ -32,7 +33,9 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
       console.log(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
       const rejoinableMatch = findRejoinableMatch(user.userId);
-      if (!rejoinableMatch || !rejoinMatch(socket, rejoinableMatch)) {
+      if (rejoinableMatch) {
+        rejoinMatch(io, socket, rejoinableMatch.match, rejoinableMatch.player);
+      } else {
         socket.join(matchmakingRoom);
         socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
       }
@@ -76,26 +79,31 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
 }
 
 /**
- * Binds a socket of a player who reconnected within the grace window back to
- * their running match.
- *
- * @returns true if the socket was bound to the match, false if the player
- * could not be found in it
+ * Binds a socket of a player back to their match: either back to their running
+ * match within the reconnection grace window, or to their finished match whose
+ * final state the player has not received yet, so the client shows the missed
+ * game result (the client pulls the current state with its initial ready event,
+ * exactly like on a fresh match).
  */
-function rejoinMatch(socket: Socket, match: Match): boolean {
+function rejoinMatch(io: Server, socket: Socket, match: Match, player: Player): void {
   const socketData = <SocketData>socket.data;
-  const player = match.players.find(p => p.userId == socketData.user.userId);
-  if (!player) return false;
   console.log(`Player ${player.name} rejoined match ${match.room}`);
+  // Detach the socket of the previous connection: a lingering old socket must
+  // neither act on the match under the player's identity nor re-mark the
+  // rejoined player as disconnected via its late Disconnect event
+  const previousSocket = io.sockets.sockets.get(player.socketId);
+  if (previousSocket && previousSocket.id != socket.id) {
+    const previousSocketData = <SocketData>previousSocket.data;
+    previousSocketData.match = undefined;
+    previousSocketData.playerNo = undefined;
+    previousSocket.leave(match.room);
+  }
   socketData.match = match;
   socketData.playerNo = player.no;
   socket.join(match.room);
   player.socketId = socket.id;
   player.disconnectedSince = undefined;
-  // The client initializes its game scene from the match state after the
-  // start message, exactly like on a fresh match
   socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
-  return true;
 }
 
 function gameParamsFor(match: Match): ClientGameParams {

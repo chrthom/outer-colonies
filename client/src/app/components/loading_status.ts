@@ -23,6 +23,20 @@ export default class LoadingStatus {
   }
   setText(text: string): this {
     this.text.setText(text);
+    // A retry affordance is specific to the message; any new message resets it
+    this.text.off('pointerdown');
+    this.text.disableInteractive();
+    return this;
+  }
+
+  /**
+   * Makes the status text interactive so that a click or tap runs the given
+   * action, e.g. restarting the matchmaking search after a timeout.
+   *
+   * The affordance is reset by the next setText call.
+   */
+  enableRetry(action: () => void): this {
+    this.text.setInteractive({ useHandCursor: true }).on('pointerdown', action);
     return this;
   }
   private createLoadingAnimation() {
