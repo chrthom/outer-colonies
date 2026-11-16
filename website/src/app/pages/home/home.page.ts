@@ -45,15 +45,17 @@ export class HomePage implements OnInit, OnDestroy {
             const achieved = daily.matcher(res);
             return { ...daily, achieved };
           })
-          .filter(daily => {
-            // Extract the daily key from the matcherStr property
-            const matcherStr = daily.matcherStr || daily.matcher.toString();
-            const match = matcherStr.match(/r\.(\w+)/);
-            const dailyKey = match ? match[1] : null;
+          .filter(daily => availableDailyKeys.includes(daily.key));
 
-            // Show daily if it's available today (not null)
-            return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
-          });
+        // Keep the selected tab inside the filtered array
+        if (this.selectedDaily >= this.dailies.length) {
+          this.selectedDaily = 0;
+        }
+
+        // Restart auto-advance so its cycle matches the filtered array
+        if (this.autoAdvanceInterval) {
+          this.resetAutoAdvance();
+        }
       },
       error: () => {
         /* Keep the default dailies list; API errors are handled centrally by the API error interceptor */
@@ -74,16 +76,16 @@ export class HomePage implements OnInit, OnDestroy {
     return `${this.gameUrl}/?token=${encodeURIComponent(this.authService.token)}`;
   }
 
-  private showNextDaily(length: number) {
-    return () => {
-      if (++this.selectedDaily >= length) this.selectedDaily = 0;
-    };
+  /** Advances the selection to the next daily, cycling against the current dailies array. */
+  private showNextDaily() {
+    this.selectedDaily = (this.selectedDaily + 1) % this.dailies.length;
   }
 
   private startAutoAdvance() {
-    this.autoAdvanceInterval = setInterval(this.showNextDaily(this.dailies.length), 3000);
+    this.autoAdvanceInterval = setInterval(() => this.showNextDaily(), 3000);
   }
 
+  /** Clears and restarts the auto-advance interval, e.g. after a reload or manual tab change. */
   resetAutoAdvance() {
     if (this.autoAdvanceInterval) {
       clearInterval(this.autoAdvanceInterval);
@@ -105,8 +107,8 @@ export class HomePage implements OnInit, OnDestroy {
   // Generate dailies array dynamically from centralized definitions
   private generateDailiesArray(): Daily[] {
     return DAILY_DEFINITIONS.map(dailyDef => ({
+      key: dailyDef.dbColumn,
       matcher: (r: DailyGetResponse) => Boolean(r[dailyDef.dbColumn as keyof DailyGetResponse] ?? false),
-      matcherStr: `r.${dailyDef.dbColumn}`, // For compatibility with existing filtering logic
       title: dailyDef.title,
       description: dailyDef.description,
       sol: dailyDef.solReward
@@ -115,8 +117,8 @@ export class HomePage implements OnInit, OnDestroy {
 }
 
 interface Daily {
+  key: string;
   matcher: (dailiesAchieved: DailyGetResponse) => boolean;
-  matcherStr?: string;
   title: string;
   description: string;
   sol: number;
