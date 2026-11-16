@@ -94,7 +94,7 @@ export class RegisterPage {
     return JSON.stringify(this.username?.errors);
   }
   get starterDeckCards(): MultipleCards[] {
-    return starterDecks[this.starterDeck?.value];
+    return starterDecks[this.starterDeck?.value] ?? [];
   }
   submit() {
     this.registerForm.markAllAsTouched();

@@ -80,7 +80,7 @@ describe('filterAndSort', () => {
     }
   });
 
-  it('sorts by discipline with cards without discipline last', () => {
+  it('sorts by discipline, offsetting cards without discipline by sort direction', () => {
     const withDiscipline = stack({ cardId: 302, discipline: TacticDiscipline.Military });
     const withoutDiscipline = stack({ cardId: 101 });
 
@@ -94,10 +94,10 @@ describe('filterAndSort', () => {
     });
 
     expect(asc.map(c => c.cardId)).toEqual([302, 101]);
-    expect(desc.map(c => c.cardId)).toEqual([302, 101]);
+    expect(desc.map(c => c.cardId)).toEqual([101, 302]);
   });
 
-  it('sorts by attack value (damage x range) with cards without weapons last', () => {
+  it('sorts by attack value (damage x range), offsetting cards without weapons by sort direction', () => {
     const weak = stack({ cardId: 101, damage: 4, range: 2 });
     const strong = stack({ cardId: 152, damage: 3, range: 3 });
     const noWeapon = stack({ cardId: 201 });
@@ -106,7 +106,7 @@ describe('filterAndSort', () => {
     const desc = filterAndSort([noWeapon, strong, weak], '', { active: 'attack', direction: 'desc' });
 
     expect(asc.map(c => c.cardId)).toEqual([101, 152, 201]);
-    expect(desc.map(c => c.cardId)).toEqual([152, 101, 201]);
+    expect(desc.map(c => c.cardId)).toEqual([201, 152, 101]);
   });
 
   it('treats weapons without range as no attack value', () => {
@@ -118,7 +118,7 @@ describe('filterAndSort', () => {
     expect(result.map(c => c.cardId)).toEqual([101, 302]);
   });
 
-  it('sorts by defense with hp as fallback and cards without either last', () => {
+  it('sorts by defense with hp as fallback, offsetting cards without either by sort direction', () => {
     const lowHp = stack({ cardId: 102, hp: 3 });
     const highHp = stack({ cardId: 103, hp: 7 });
     const withDefense = stack({ cardId: 101, defense: 'armour_1' });
@@ -131,7 +131,25 @@ describe('filterAndSort', () => {
     expect(byDefense.map(c => c.cardId)).toEqual([101, 104]);
 
     const byDefenseDesc = filterAndSort([without, withDefense], '', { active: 'defense', direction: 'desc' });
-    expect(byDefenseDesc.map(c => c.cardId)).toEqual([101, 104]);
+    expect(byDefenseDesc.map(c => c.cardId)).toEqual([104, 101]);
+  });
+
+  it('keeps the original order of equal values', () => {
+    const first = stack({ cardId: 104, name: 'Same' });
+    const second = stack({ cardId: 105, name: 'Same' });
+
+    const result = filterAndSort([first, second], '', { active: 'name', direction: 'asc' });
+
+    expect(result.map(c => c.cardId)).toEqual([104, 105]);
+  });
+
+  it('keeps the original order when both compared values are undefined', () => {
+    const first = stack({ cardId: 106, name: 'X-Ray' });
+    const second = stack({ cardId: 107, name: 'Yankee' });
+
+    const result = filterAndSort([first, second], '', { active: 'attack', direction: 'asc' });
+
+    expect(result.map(c => c.cardId)).toEqual([106, 107]);
   });
 
   it('keeps the original order for an unknown sort column', () => {
@@ -168,13 +186,13 @@ describe('DeckBox', () => {
   });
 
   it('exposes the cards of its behavior subject', () => {
-    const box = new DeckBox($cards, 'Reserve', filterControl, onClick);
+    const box = new DeckBox($cards, 'Reserve', false, onClick, filterControl);
 
     expect(box.cards).toEqual(cards);
   });
 
   it('applies the filter control value to cardsFiltered', () => {
-    const box = new DeckBox($cards, 'Reserve', filterControl, onClick);
+    const box = new DeckBox($cards, 'Reserve', false, onClick, filterControl);
 
     expect(box.cardsFiltered.map(c => c.cardId)).toEqual([201, 101]);
 
@@ -183,7 +201,7 @@ describe('DeckBox', () => {
   });
 
   it('applies the sort set via setSort to cardsFiltered', () => {
-    const box = new DeckBox($cards, 'Reserve', filterControl, onClick);
+    const box = new DeckBox($cards, 'Reserve', false, onClick, filterControl);
 
     box.setSort({ active: 'id', direction: 'asc' });
     expect(box.cardsFiltered.map(c => c.cardId)).toEqual([101, 201]);
@@ -193,20 +211,20 @@ describe('DeckBox', () => {
   });
 
   it('shows filtered and total card counts in the title', () => {
-    const box = new DeckBox($cards, 'Reserve', filterControl, onClick);
+    const box = new DeckBox($cards, 'Reserve', false, onClick, filterControl);
     expect(box.title).toBe('Reserve (5 / 5 Karten)');
 
     filterControl.setValue('hull');
     expect(box.title).toBe('Reserve (2 / 5 Karten)');
   });
 
-  it('is the active deck only when titled accordingly', () => {
-    expect(new DeckBox($cards, 'Aktives Deck', filterControl, onClick).isActiveDeck).toBeTrue();
-    expect(new DeckBox($cards, 'Reserve', filterControl, onClick).isActiveDeck).toBeFalse();
+  it('is the active deck only when constructed with the active flag', () => {
+    expect(new DeckBox($cards, 'Aktives Deck', true, onClick, filterControl).isActiveDeck).toBeTrue();
+    expect(new DeckBox($cards, 'Reserve', false, onClick, filterControl).isActiveDeck).toBeFalse();
   });
 
   it('triggers the configured action on click', () => {
-    const box = new DeckBox($cards, 'Reserve', filterControl, onClick);
+    const box = new DeckBox($cards, 'Reserve', false, onClick, filterControl);
 
     box.onClick(cards[0]);
 

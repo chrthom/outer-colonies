@@ -51,7 +51,7 @@
           <td class="id-col">{{ card.cardId }}</td>
           <td class="name-col">{{ card.name }}</td>
           <td class="type-col">
-            <span class="oc-icon" [innerHTML]="icons.getIconHtml(card.type) || ''"></span>
+            <span [class]="iconClass(card.type)"></span>
           </td>
           <td class="discipline-col">{{ cardMeta.disciplineToText(card.discipline) }}</td>
           <td class="attack-col">
@@ -60,18 +60,13 @@
             } @if (card.damage) {
             <h3>{{ card.damage }}</h3>
             } @if (card.damage) {
-            <span
-              class="oc-icon"
-              [innerHTML]="icons.getIconHtml('damage') || ''"
-              matTooltip="Verursachter Schaden"
-            ></span>
+            <span class="oc-icon oc-icon-damage" matTooltip="Verursachter Schaden"></span>
             }
           </td>
           <td class="defense-col">
             @if (card.defense) {
             <span
-              class="oc-icon"
-              [innerHTML]="icons.getIconHtml(card.defense) || ''"
+              [class]="iconClass(card.defense)"
               [matTooltip]="cardMeta.defenseTooltip(card.defense)"
             ></span>
             } @if (card.hp && card.defense) {
@@ -79,11 +74,7 @@
             } @if (card.hp) {
             <h3>{{ card.hp }}</h3>
             } @if (card.hp) {
-            <span
-              class="oc-icon"
-              [innerHTML]="icons.getIconHtml('hitpoints') || ''"
-              matTooltip="H&uuml;llenintegrit&auml;t"
-            ></span>
+            <span class="oc-icon oc-icon-hitpoints" matTooltip="H&uuml;llenintegrit&auml;t"></span>
             }
           </td>
           <td class="rarity-col">
@@ -152,9 +143,9 @@
           @for (s of statistics; track s) {
           <th>
             @if (s.title) {
-            <h1 [innerHtml]="s.title"></h1>
+            <h1>{{ s.title }}</h1>
             } @if (s.energyIcon) {
-            <span class="oc-icon big" [innerHTML]="icons.getIconHtml('energy') || ''"></span>
+            <span class="oc-icon oc-icon-energy big"></span>
             }
           </th>
           }

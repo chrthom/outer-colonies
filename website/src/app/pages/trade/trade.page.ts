@@ -48,10 +48,14 @@ export class TradePage implements OnInit {
   loadFailed = false;
   actionFailed = false;
   readonly assetURL = environment.url.assets;
-  readonly availableBoosters = Object.entries(editions).map(([no, title]) => {
-    const editionNo = Number(no);
-    return { no: editionNo, title, price: rules.boosterCosts[editionNo] };
-  });
+  // Editions without a booster price in the rules config are not offered,
+  // so a newly added edition needs a matching boosterCosts entry to become purchasable.
+  readonly availableBoosters = Object.entries(editions)
+    .map(([no, title]) => {
+      const editionNo = Number(no);
+      return { no: editionNo, title, price: rules.boosterCosts[editionNo] };
+    })
+    .filter(booster => booster.price != undefined);
   ngOnInit() {
     this.reload();
   }

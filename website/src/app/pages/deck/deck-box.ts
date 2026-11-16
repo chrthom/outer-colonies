@@ -64,6 +64,7 @@ export function cardsNum(cards: DeckCardStack[]): number {
 export class DeckBox {
   private $cards: BehaviorSubject<DeckCardStack[]>;
   private _title: string;
+  private _isActive: boolean;
   private _onClick: (card: DeckCard) => void;
   private filterControl: FormControl;
   private sort?: Sort;
@@ -71,11 +72,13 @@ export class DeckBox {
   constructor(
     $cards: BehaviorSubject<DeckCardStack[]>,
     title: string,
-    filterControl: FormControl,
-    onClick: (card: DeckCard) => void
+    isActive: boolean,
+    onClick: (card: DeckCard) => void,
+    filterControl: FormControl
   ) {
     this.$cards = $cards;
     this._title = title;
+    this._isActive = isActive;
     this.filterControl = filterControl;
     this._onClick = onClick;
   }
@@ -97,7 +100,7 @@ export class DeckBox {
 
   /** Whether this box is the active deck (as opposed to the reserve). */
   get isActiveDeck(): boolean {
-    return this._title == 'Aktives Deck';
+    return this._isActive;
   }
 
   /** Trigger the box action (activate or deactivate) for a card. */
@@ -111,8 +114,13 @@ export class DeckBox {
   }
 }
 
+/**
+ * Compares two sort values, returning `0` for equal values.
+ * An `undefined` value is offset in the current sort direction:
+ * it lands at the end when sorting ascending and at the start when sorting descending.
+ */
 function compare(a: number | string | undefined, b: number | string | undefined, isAsc: boolean) {
-  if (a == undefined) return 1;
-  else if (b == undefined) return -1;
-  else return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  if (a == undefined && b == undefined) return 0;
+  const offset = a == undefined ? 1 : b == undefined ? -1 : a < b ? -1 : a > b ? 1 : 0;
+  return offset * (isAsc ? 1 : -1);
 }

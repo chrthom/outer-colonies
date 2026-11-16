@@ -4,7 +4,6 @@ import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IconService } from './app/icon.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -48,7 +47,6 @@ bootstrapApplication(AppComponent, {
       ReactiveFormsModule
     ),
     provideHttpClient(withInterceptors([authTokenInterceptor])),
-    provideAnimations(),
-    IconService
+    provideAnimations()
   ]
 }).catch(err => console.error(err));

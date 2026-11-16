@@ -62,6 +62,99 @@ describe('HomePage', () => {
     expect(component.dailies.map(d => d.achieved)).toEqual([true, false, true, false]);
   }));
 
+  it('should cycle auto-advance within the filtered dailies and wrap at their end', fakeAsync(() => {
+    fixture.detectChanges();
+
+    const response: DailyGetResponse = {
+      login: true,
+      victory: false,
+      game: true,
+      energy: false,
+      ships: null,
+      domination: null,
+      destruction: null,
+      control: null,
+      juggernaut: null,
+      stations: null,
+      discard: null,
+      colony: null,
+      colossus: null
+    };
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
+    req.flush(response);
+    tick();
+
+    expect(component.dailies.length).toBe(4);
+    expect(component.selectedDaily).toBe(1);
+
+    tick(3000);
+    expect(component.selectedDaily).toBe(2);
+
+    component.selectedDaily = 3; // Jump to the last filtered tab
+    tick(3000);
+    expect(component.selectedDaily).toBe(0); // Wraps against the filtered length, not the stale full length
+
+    fixture.destroy();
+  }));
+
+  it('should clamp the selected tab into the filtered array after reload', fakeAsync(() => {
+    fixture.detectChanges();
+
+    const response: DailyGetResponse = {
+      login: true,
+      victory: null,
+      game: null,
+      energy: null,
+      ships: null,
+      domination: null,
+      destruction: null,
+      control: null,
+      juggernaut: null,
+      stations: null,
+      discard: null,
+      colony: null,
+      colossus: null
+    };
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
+    req.flush(response);
+    tick();
+
+    expect(component.dailies.length).toBe(1);
+    expect(component.selectedDaily).toBe(0); // Initial index 1 is out of bounds and gets clamped
+
+    fixture.destroy();
+  }));
+
+  it('should restart the auto-advance interval after reload', fakeAsync(() => {
+    const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
+    fixture.detectChanges(); // triggers ngOnInit -> startAutoAdvance
+    const callsBeforeReload = clearIntervalSpy.calls.count();
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/daily`);
+    req.flush({
+      login: true,
+      victory: null,
+      game: null,
+      energy: null,
+      ships: null,
+      domination: null,
+      destruction: null,
+      control: null,
+      juggernaut: null,
+      stations: null,
+      discard: null,
+      colony: null,
+      colossus: null
+    });
+    tick();
+
+    expect(clearIntervalSpy.calls.count()).toBeGreaterThan(callsBeforeReload);
+
+    fixture.destroy();
+  }));
+
   it('should expose the game URL from the environment', () => {
     expect(component.gameUrl).toContain('game');
   });

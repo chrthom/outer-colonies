@@ -72,32 +72,38 @@ export class DeckPage implements OnInit {
   private activeCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   private reserveCards$: BehaviorSubject<DeckCardStack[]> = new BehaviorSubject(<DeckCardStack[]>[]);
   boxes = [
-    new DeckBox(this.activeCards$, 'Aktives Deck', this.filterFormControl, card => this.deactivateCard(card)),
-    new DeckBox(this.reserveCards$, 'Reserve', this.filterFormControl, card => this.activateCard(card))
+    new DeckBox(
+      this.activeCards$,
+      'Aktives Deck',
+      true,
+      card => this.deactivateCard(card),
+      this.filterFormControl
+    ),
+    new DeckBox(this.reserveCards$, 'Reserve', false, card => this.activateCard(card), this.filterFormControl)
   ];
   private readonly statisticsTemplate: DeckStatisticsTemplate[] = [
     {
-      title: '&Delta;',
+      title: 'Δ',
       get: (card: DeckCard) => card.profile.delta
     },
     {
-      title: '&Theta;',
+      title: 'Θ',
       get: (card: DeckCard) => card.profile.theta
     },
     {
-      title: '&Xi;',
+      title: 'Ξ',
       get: (card: DeckCard) => card.profile.xi
     },
     {
-      title: '&Phi;',
+      title: 'Φ',
       get: (card: DeckCard) => card.profile.phi
     },
     {
-      title: '&Psi;',
+      title: 'Ψ',
       get: (card: DeckCard) => card.profile.psi
     },
     {
-      title: '&Omega;',
+      title: 'Ω',
       get: (card: DeckCard) => card.profile.omega
     },
     {
@@ -149,7 +155,14 @@ export class DeckPage implements OnInit {
       });
     }
   }
-
+  /**
+   * Full CSS class list rendering the icon font glyph for the given icon name.
+   * @param name The icon name (e.g. a card type or defense token)
+   * @returns The CSS classes (e.g. 'oc-icon oc-icon-hull')
+   */
+  iconClass(name: string): string {
+    return `oc-icon ${this.icons.getIconClass(name)}`;
+  }
   get canActivateDeckCard() {
     return cardsNum(this.boxes[0].cards) < this.maxCards;
   }
@@ -157,10 +170,8 @@ export class DeckPage implements OnInit {
     return cardsNum(this.boxes[0].cards) > this.minCards;
   }
   private groupDeckCards(deckCards: DeckCard[]): DeckCardStack[] {
-    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map((dc: DeckCard[]) => {
-      const stack = dc[0] as DeckCardStack;
-      stack.numOfCards = dc.length;
-      return stack;
-    });
+    return Object.values(_.groupBy(deckCards, (dc: DeckCard) => dc.cardId)).map(
+      (dc: DeckCard[]) => ({ ...dc[0], numOfCards: dc.length }) as DeckCardStack
+    );
   }
 }
