@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -38,10 +38,16 @@ export default class OCApi {
       .pipe(map<HttpResponse<T | GenericResponse>, T>(this.checkStatus.bind(this)));
   }
 
-  protected get<T>(path: string): Observable<T> {
+  /**
+   * Sends a GET request to the given API path. Query parameters are passed as a record and
+   * URL-encoded via `HttpParams`, so raw user input is never interpolated unencoded into the
+   * request URL (e.g. `&`, `+` or `%` in email addresses).
+   */
+  protected get<T>(path: string, params: Record<string, string> = {}): Observable<T> {
     return this.http
       .get<T | GenericResponse>(`${this.apiHost}/api/${path}`, {
-        observe: 'response'
+        observe: 'response',
+        params: new HttpParams({ fromObject: params })
       })
       .pipe(map<HttpResponse<T | GenericResponse>, T>(this.checkStatus.bind(this)));
   }

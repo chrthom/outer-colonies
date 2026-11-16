@@ -3,6 +3,7 @@ import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { AuthLoginResponse } from '@shared/interfaces/rest_api';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -75,7 +76,9 @@ export default class AuthService {
         return true;
       }),
       catchError(res => {
-        console.log(`API call to ${res.url} failed with HTTP ${res.status}: ${res.statusText}`);
+        if (environment.stage !== 'production') {
+          console.log(`API call to ${res.url} failed with HTTP ${res.status}: ${res.statusText}`);
+        }
         const retry = this.sessionToken != undefined;
         this.sessionToken = undefined;
         this.username = undefined;
