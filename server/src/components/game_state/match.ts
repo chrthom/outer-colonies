@@ -287,8 +287,7 @@ export default class Match {
       }
       // A disconnected player's socket is expectedly absent while the grace
       // window keeps the match alive
-      else if (player.disconnectedSince == undefined)
-        logger.warn('Could not find socket to emit state');
+      else if (player.disconnectedSince == undefined) logger.warn('Could not find socket to emit state');
     });
     this.resetTempStates();
   }
