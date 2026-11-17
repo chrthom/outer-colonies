@@ -12,7 +12,7 @@ import SocketData from './game_state/socket_data';
 import { matchmakingRoom } from './matchmaking';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
-  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) =>
+  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) =>
     doWithMatchAndPlayer(socket, (match, player) => onReady(io, match, player, turnPhase, data))
   );
   socket.on(MsgTypeInbound.Disconnect, () =>
@@ -52,7 +52,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
  * @param turnPhase turn phase the player readied for
  * @param data phase-specific payload: planned battle (Build, active player) or intercepting ship ids
  */
-function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: any) {
+function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: unknown) {
   if (turnPhase == match.turnPhase) {
     if (turnPhase == TurnPhase.Init) {
       match.players[player.no].ready = true;
