@@ -96,8 +96,7 @@ export interface ClientState {
   cardStacks: ClientCardStack[];
   gameResult?: ClientGameResult;
   highlightCardUUID?: string;
-  /** Real card ID of the card revealed via `highlightCardUUID` (tactic card reveal). */
-  highlightCardID?: number;
+  highlightCardId?: number;
   intervention?: ClientIntervention;
   opponent: ClientPlayer;
   player: ClientPlayer;

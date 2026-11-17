@@ -115,14 +115,21 @@ describe('toClientState', () => {
       expect(state.player.hand[0].ownedByPlayer).toBe(true);
     });
 
-    test('keeps the real card ID of a hand card revealed via highlightCardUUID', () => {
-      const revealedCard = addHandCard(match.players[1], new MockCard(113));
+    test('reveals only the card ID of a hand card revealed via highlightCardUUID', () => {
+      const revealedCard = addHandCard(match.players[1], new PlayableTacticCard(113));
       match.highlightCard = revealedCard;
 
       const state = toClientState(match, 0);
 
       const revealedHandCard = state.opponent.hand.find(c => c.uuid == revealedCard.uuid);
       expect(revealedHandCard?.cardId).toBe(113);
+      // The card is playable for its owner, so the redacted values prove that
+      // the reveal exception is limited to the card ID
+      expect(revealedCard.hasValidTargets).toBe(true);
+      expect(revealedHandCard?.playable).toBe(false);
+      expect(revealedHandCard?.validTargets).toEqual([]);
+      expect(revealedHandCard?.optionsToSelect).toBe(0);
+      expect(revealedHandCard?.options).toEqual([]);
     });
   });
 
@@ -141,7 +148,7 @@ describe('toClientState', () => {
       const state = toClientState(match, 0);
 
       expect(state.highlightCardUUID).toBe(tacticCard.uuid);
-      expect(state.highlightCardID).toBe(123);
+      expect(state.highlightCardId).toBe(123);
       // The played card left the opponent's hand and no opponent hand card
       // leaks a real card ID
       expect(state.opponent.hand.some(c => c.uuid == tacticCard.uuid)).toBe(false);

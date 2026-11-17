@@ -44,7 +44,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     cardStacks: cardStacks,
     gameResult: toClientGameResult(match, playerNo),
     highlightCardUUID: match.highlightCard?.uuid,
-    highlightCardID: match.highlightCard?.card.id,
+    highlightCardId: match.highlightCard?.card.id,
     intervention: toClientIntervention(match),
     opponent: players[1],
     player: players[0],
@@ -214,23 +214,26 @@ function combatPhaseAttributes(cs: CardStack, battle: ClientBattle): ClientCardS
 
 /**
  * Projects a player's hand; option pickers are resolved for the player viewing the state.
- * Hand cards of the opposing player are redacted to the card back side (anti-cheat).
+ * Hand cards of the opposing player are redacted to the card back side (anti-cheat); only
+ * the card ID of the card currently revealed via the tactic card reveal stays real.
+ * @param match match whose currently revealed card is exempt from the redaction
+ * @param hand hand of the player to project
+ * @param viewedBy player the state is emitted to
+ * @returns the projected hand cards
  */
 function toClientHandCards(match: Match, hand: CardStack[], viewedBy: Player): ClientHandCard[] {
   return hand.map((c, index) => {
-    // Hide card IDs and playability of opponent hand cards from the requesting
-    // player (anti-cheat). The tactic card currently revealed via
-    // `highlightCardUUID` keeps its real card ID.
-    const revealed = c.player.no == viewedBy.no || c.uuid == match.highlightCard?.uuid;
+    const owned = c.player.no == viewedBy.no;
+    const revealed = owned || c.uuid == match.highlightCard?.uuid;
     return {
       uuid: c.uuid,
       cardId: revealed ? c.card.id : constants.cardBackSideID,
       index: index,
-      playable: revealed ? c.hasValidTargets : false,
-      validTargets: revealed ? c.validTargets.map(cs => cs.uuid) : [],
-      ownedByPlayer: c.player.no == viewedBy.no,
-      optionsToSelect: revealed ? c.card.onEnterGameNumberOfSelectableCardOptions(viewedBy) : 0,
-      options: revealed ? c.card.onEnterGameSelectableCardOptions(viewedBy) : []
+      playable: owned ? c.hasValidTargets : false,
+      validTargets: owned ? c.validTargets.map(cs => cs.uuid) : [],
+      ownedByPlayer: owned,
+      optionsToSelect: owned ? c.card.onEnterGameNumberOfSelectableCardOptions(viewedBy) : 0,
+      options: owned ? c.card.onEnterGameSelectableCardOptions(viewedBy) : []
     };
   });
 }
