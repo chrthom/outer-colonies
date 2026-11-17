@@ -31,7 +31,6 @@ export default [
     }
   },
   {
-    // Test fixtures may be partial; the persistence layer itself is typed (see #869, #909)
     files: ["**/*.test.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off"
