@@ -27,14 +27,7 @@ export default class Card extends CardImage {
     this.cardStackUUID = cardStackUUID;
     this.retractCardButton = data.retractable ? new RetractCardButton(this.scene, this) : undefined;
   }
-  /**
-   * Updates the card in place for a state update: refreshes the underlying data
-   * and syncs the retract button (existence, position and critical appearance)
-   * without recreating the card's game objects.
-   * @param data new client card data (same uuid as before)
-   * @param x target x position (2d) of the card within its stack
-   * @param y target y position (2d) of the card within its stack
-   */
+  /** Updates the card data in place and syncs the retract button, without recreating game objects. */
   update(data: ClientCard, x: number, y: number) {
     this.data = data;
     if (!data.retractable) {
@@ -58,10 +51,7 @@ export default class Card extends CardImage {
   }
   override tween(config: CardTweenConfig) {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
-    // Stack cards are kept across state updates: stop tweens still running
-    // from a previous update or hover expand/collapse (mirroring
-    // RetractCardButton's tweenAnimation?.stop()) so they do not keep writing
-    // the plane positions alongside this tween.
+    // Cards are reused across updates, so kill tweens from a previous update or hover.
     this.killTweens();
     super.tween(config);
   }

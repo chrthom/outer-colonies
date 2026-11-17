@@ -63,17 +63,11 @@ export default class CardStack {
       }
       return this.createNewCard(nc);
     });
-    // Restore data-order rendering: newly created cards are appended to the end
-    // of the display list and would otherwise render above kept cards (e.g.
-    // above the root hull, which is last in data.cards and must stay topmost).
     this.cards.forEach(c => c.bringPlanesToTop());
     if (this.summaryBox) this.summaryBox.update();
     else this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
-    // The card planes are reused, so Phaser never re-fires pointerover on a
-    // pointer resting on the stack (pre-PR the recreated planes got it from
-    // the per-frame input poll): re-apply the hover state to re-expand the
-    // stack, re-show the retract buttons and re-highlight the summary box.
+    // Reused planes never get a new pointerover from Phaser's input poll, so re-apply the hover state.
     if (this.hovered) this.pointerover();
   }
   animateAttack(cardUUID: string) {

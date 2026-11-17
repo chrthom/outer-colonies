@@ -21,11 +21,7 @@ export default class CardStackSummary {
     this.infoBoxes = [];
     this.update();
   }
-  /**
-   * Syncs the info boxes with the current stack attributes: existing boxes are
-   * repositioned and updated in place, surplus boxes are faded out and new
-   * boxes faded in. No objects are recreated for unchanged attributes.
-   */
+  /** Syncs the info boxes with the current stack attributes in place, without recreating objects. */
   update() {
     const config = layoutConfig.game.cards.summaryBox;
     const attributes = this.cardStack.data.attributes;

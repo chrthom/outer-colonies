@@ -37,21 +37,12 @@ export default class RetractCardButton {
     return this;
   }
   hide(): this {
-    // A critical button stays visible (and interactive) when hidden, so only
-    // unbind the handlers when the button actually becomes invisible.
+    // A critical button stays visible when hidden, so its handlers must stay bound.
     if (!this.isCritical) this.unbindInputHandlers();
     this.tween(false, this.card.x.value2d, this.card.y.value2d);
     return this;
   }
-  /**
-   * Syncs the button after a state update: tweens it to the given card
-   * position (same duration and ease as the card's move tween, so a visible
-   * button travels with its card instead of snapping ahead of it) and
-   * refreshes tint and visibility according to the critical state, without
-   * recreating the image.
-   * @param x target x position (2d) of the card
-   * @param y target y position (2d) of the card
-   */
+  /** Syncs the button with the card's current state, moving it in sync with the card's move tween. */
   refresh(x: number, y: number): this {
     this.tweenAnimation?.stop();
     this.tweenAnimation = this.scene.tweens.add({
@@ -88,12 +79,6 @@ export default class RetractCardButton {
       y: y + layoutConfig.game.cards.retractCardButton.yOffset
     });
   }
-  /**
-   * (Re-)binds the pointer handlers so a visible button is interactive: hover
-   * tint feedback, the stack expand/collapse callbacks and the retract
-   * message on click. Called by show() and by refresh() for critical
-   * buttons (with no-op callbacks, like the constructor's critical path).
-   */
   private bindInputHandlers(onPointerOver: () => void, onPointerOut: () => void) {
     this.image
       .off('pointerover')
@@ -113,13 +98,7 @@ export default class RetractCardButton {
           this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
       });
   }
-  /**
-   * Removes the pointer handlers so an invisible button is not interactive:
-   * Phaser hit-testing ignores alpha, so a hidden button with live handlers
-   * would still fire them (e.g. emit a spurious Retract when clicked at its
-   * position). Called by refresh() and hide() when the button loses its
-   * critical (always visible) state; show() rebinds the handlers.
-   */
+  // Phaser hit-testing ignores alpha, so an invisible button must not keep live handlers.
   private unbindInputHandlers() {
     this.image.off('pointerover').off('pointerout').off('pointerdown');
   }
