@@ -24,6 +24,7 @@ type Players = [player1: Player, player2: Player];
  */
 export interface MatchEvent {
   type: EventType;
+  /** Number of the player the moved card belongs to (its owner — for attachments on opponent stacks the caster, not the host stack's player). */
   playerNo: number;
   oldUUID: string;
   newUUID?: string;
@@ -95,7 +96,10 @@ export default class Match {
   addCardMovementEvent(type: EventType, cardStack: CardStack, newUUID?: string) {
     this.events.push({
       type: type,
-      playerNo: cardStack.player.no,
+      // owner, not player: attachments on opponent stacks are routed to the caster's
+      // discard pile (CardStack.discard() and removeDestroyedCardStacks() both use owner),
+      // and playerEvent must flag the player the card belongs to, not the host stack's player
+      playerNo: cardStack.owner.no,
       oldUUID: cardStack.uuid,
       newUUID: newUUID
     });

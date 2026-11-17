@@ -42,6 +42,26 @@ const retractShipWithEquipment = (match: Match): { ship: CardStack; equipment: C
   return { ship, equipment };
 };
 
+/**
+ * Attaches a tactic card played by player 0 to player 1's orbital ship (like card 442
+ * Triebwerksschaden) and discards it, producing one discard movement event whose card is
+ * routed to the playing player, not the host stack's player.
+ */
+const discardAttachmentOnOpponentStack = (match: Match): CardStack => {
+  const caster = match.players[0];
+  const opponent = match.players[1];
+  const opponentShip = new RootCardStack(
+    new MockCard(5, 'Opponent Ship', CardType.Hull, 1),
+    Zone.Orbital,
+    opponent
+  );
+  const tactic = new RootCardStack(new MockCard(6, 'Tactic', CardType.Tactic, 1), Zone.Hand, caster);
+  opponentShip.attach(tactic); // simulates playHandCard attaching the played tactic card
+  opponent.cardStacks.push(opponentShip);
+  tactic.discard();
+  return tactic;
+};
+
 describe('toClientState', () => {
   describe('events', () => {
     test('attaches the movement events with playerEvent = true for the owning player', () => {
@@ -78,6 +98,27 @@ describe('toClientState', () => {
           newUUID: expect.any(String)
         }
       ]);
+    });
+
+    test("marks the discard of an attachment on an opponent stack as the caster's event", () => {
+      const match = createMatch();
+      const tactic = discardAttachmentOnOpponentStack(match);
+
+      const state = toClientState(match, 0);
+
+      expect(state.events).toEqual([{ type: EventType.Discard, playerEvent: true, oldUUID: tactic.uuid }]);
+      // The card is routed to the caster's discard pile, so the flag matches the routing
+      expect(state.player.discardPileIds).toContain(tactic.card.id);
+    });
+
+    test('attaches the same discard event with playerEvent = false for the host stack player', () => {
+      const match = createMatch();
+      const tactic = discardAttachmentOnOpponentStack(match);
+
+      const state = toClientState(match, 1);
+
+      expect(state.events).toEqual([{ type: EventType.Discard, playerEvent: false, oldUUID: tactic.uuid }]);
+      expect(state.opponent.discardPileIds).toContain(tactic.card.id);
     });
 
     test('contains an empty event list when no cards were moved', () => {
