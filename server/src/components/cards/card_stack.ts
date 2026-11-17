@@ -98,6 +98,18 @@ export default abstract class CardStack {
     else if (this.parentPlayer) return this.parentPlayer;
     else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
   }
+  /**
+   * The player who played this card stack. Unlike {@link player}, which resolves
+   * to the owner of the stack this one is attached to, the owner stays the
+   * playing player even for attachments on opponent card stacks (e.g. tactics
+   * attached to enemy ships), so such cards return to the owner's piles when
+   * they expire or the target stack is destroyed.
+   */
+  get owner(): Player {
+    if (this.parentPlayer) return this.parentPlayer;
+    else if (this.parentCardStack) return this.parentCardStack.owner;
+    else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
+  }
   get match(): Match {
     return this.player.match;
   }
@@ -190,7 +202,7 @@ export default abstract class CardStack {
   }
   discard() {
     this.removeCardStack();
-    this.player.discardCards(...this.cards);
+    this.owner.discardCards(...this.cards);
   }
   retract() {
     this.removeCardStack();
