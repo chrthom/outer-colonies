@@ -1,6 +1,6 @@
 import express from 'express';
 import http, { IncomingMessage, RequestOptions } from 'node:http';
-import restAPI from './rest_api';
+import restAPI from './index';
 import authValidation from './auth_validation';
 import Auth from '../utils/auth';
 
@@ -50,7 +50,12 @@ describe('REST API auth validation', () => {
    * @param body optional JSON request body
    * @returns the responded status code and body
    */
-  function request(method: string, path: string, ip: string, body?: object): Promise<TestResponse> {
+  function request(
+    method: string,
+    path: string,
+    ip: string,
+    body?: object
+  ): Promise<TestResponse> {
     const options: RequestOptions = {
       method,
       agent: false,
@@ -175,7 +180,11 @@ describe('REST API auth validation', () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
 
-      const response = await request('GET', `/api/auth/exists?username=${'a'.repeat(21)}`, '192.168.6.1');
+      const response = await request(
+        'GET',
+        `/api/auth/exists?username=${'a'.repeat(21)}`,
+        '192.168.6.1'
+      );
 
       expect(response.status).toBe(400);
       expect(checkUsernameExistsSpy).not.toHaveBeenCalled();
@@ -195,7 +204,11 @@ describe('REST API auth validation', () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset');
 
-      const response = await request('DELETE', `/api/auth/password/${'a'.repeat(61)}`, '192.168.6.3');
+      const response = await request(
+        'DELETE',
+        `/api/auth/password/${'a'.repeat(61)}`,
+        '192.168.6.3'
+      );
 
       expect(response.status).toBe(400);
       expect(sendPasswordResetSpy).not.toHaveBeenCalled();
