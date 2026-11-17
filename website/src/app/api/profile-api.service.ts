@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProfileGetResponse } from '../../../../server/src/shared/interfaces/rest_api';
+import { ProfileGetResponse } from '@shared/interfaces/rest_api';
 import OCApi from './api';
 
 @Injectable({

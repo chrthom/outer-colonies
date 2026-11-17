@@ -2,7 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import AuthApiService from './api/auth-api.service';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { AuthLoginResponse } from '../../../server/src/shared/interfaces/rest_api';
+import { AuthLoginResponse } from '@shared/interfaces/rest_api';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -39,16 +40,29 @@ export default class AuthService {
   logout() {
     if (this.sessionToken) {
       this.authAPIService.logout().subscribe({
-        next: () => {
-          /* Do nothing */
-        },
-        error: err => console.error('Logout API call failed', err)
+        error: err => {
+          /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions
+             as uncaught exceptions. The failure is logged with a level (gated to
+             non-production stages) and the session is cleared locally regardless */
+          if (environment.stage !== 'production') {
+            console.warn(`Logout failed with status ${err?.status}, clearing local session anyway`);
+          }
+        }
       });
     }
-    this.username = undefined;
-    this.sessionToken = undefined;
+    this.clearSession();
     this.cookieService.delete('u');
     this.cookieService.delete('p');
+  }
+
+  /**
+   * Clears the in-memory session state without touching the persisted
+   * ("remember me") credentials. Called by the API error interceptor on
+   * 401/403 (missing, invalid or expired session).
+   */
+  clearSession() {
+    this.username = undefined;
+    this.sessionToken = undefined;
   }
 
   check(username?: string, password?: string): Observable<boolean> {
@@ -74,12 +88,15 @@ export default class AuthService {
         this.username = r.username;
         return true;
       }),
-      catchError(res => {
-        console.log(`API call to ${res.url} failed with HTTP ${res.status}: ${res.statusText}`);
-        const retry = this.sessionToken != undefined;
-        this.sessionToken = undefined;
-        this.username = undefined;
-        return retry ? this.check() : of(false);
+      catchError(err => {
+        // Failed login or session check: recoverable problem, degrades to the logged-out
+        // state. Logged with a level (gated to non-production stages); only the status is
+        // logged, never credentials or the request URL
+        if (environment.stage !== 'production') {
+          console.warn(`Session check failed with status ${err?.status}, degrading to logged-out state`);
+        }
+        this.clearSession();
+        return of(false);
       })
     );
   }

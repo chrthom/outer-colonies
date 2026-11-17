@@ -39,3 +39,73 @@
 /* U+EA0B = shield */
 /* U+EA0C = tactic */
 /* U+EA0D = speed */
+
+/*
+ * Per-icon classes rendering the glyph via ::before content, so templates can
+ * use plain CSS classes (e.g. class="oc-icon oc-icon-hp") instead of injecting
+ * HTML. Keep in sync with the iconMap in src/app/icon.service.ts.
+ */
+.oc-icon-armour::before,
+.oc-icon-armour_1::before,
+.oc-icon-armour_2::before,
+.oc-icon-armour_3::before {
+  content: "\EA01";
+}
+
+.oc-icon-control::before {
+  content: "\EA02";
+}
+
+.oc-icon-damage::before {
+  content: "\EA03";
+}
+
+.oc-icon-energy::before {
+  content: "\EA04";
+}
+
+.oc-icon-equip::before,
+.oc-icon-equipment::before {
+  content: "\EA05";
+}
+
+.oc-icon-hp::before,
+.oc-icon-hitpoints::before {
+  content: "\EA06";
+}
+
+.oc-icon-hull::before {
+  content: "\EA07";
+}
+
+.oc-icon-colony::before,
+.oc-icon-infra::before,
+.oc-icon-infrastructure::before {
+  content: "\EA08";
+}
+
+.oc-icon-orb::before {
+  content: "\EA09";
+}
+
+.oc-icon-point_def::before,
+.oc-icon-point_defense::before,
+.oc-icon-point_defense_1::before,
+.oc-icon-point_defense_2::before {
+  content: "\EA0A";
+}
+
+.oc-icon-shield::before,
+.oc-icon-shield_1::before,
+.oc-icon-shield_2::before,
+.oc-icon-shield_3::before {
+  content: "\EA0B";
+}
+
+.oc-icon-tactic::before {
+  content: "\EA0C";
+}
+
+.oc-icon-speed::before {
+  content: "\EA0D";
+}

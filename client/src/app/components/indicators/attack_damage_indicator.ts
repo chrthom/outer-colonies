@@ -1,5 +1,5 @@
 import { designConfig } from 'src/app/config/design';
-import { ClientAttack } from '../../../../../server/src/shared/interfaces/client_state';
+import { ClientAttack } from '@shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -29,7 +29,6 @@ export default class AttackDamageIndicator {
       ['white', attack.armour * 2],
       ['red', attack.damage * 2]
     ]
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, n]) => Number(n) > 0)
       .map(([color, n]) => {
         const emitter = this.createParticleEmitter(String(color));

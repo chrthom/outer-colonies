@@ -21,7 +21,8 @@ export default class CountdownIndicator {
   }
   update(countdown?: number) {
     const playerData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
-    this.text.setText(`${countdown ? this.formatCountdown(countdown) : ''}  ${playerData.name}`);
+    const countdownPrefix = countdown ? `${this.formatCountdown(countdown)}  ` : '';
+    this.text.setText(`${countdownPrefix}${playerData.name}`);
     this.text.setColor(countdown && countdown < 60 ? designConfig.color.warn : designConfig.color.neutral);
   }
   private formatCountdown(countdown: number): string {

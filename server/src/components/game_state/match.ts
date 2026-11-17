@@ -157,10 +157,8 @@ export default class Match {
   }
   processBattleRound() {
     if (this.pendingActionPlayerNo == this.inactivePlayerNo) {
-      // End of battle round
       new InterventionBattleRoundEnd(this).init();
     } else {
-      // Switch to opponent player in same battle round
       this.battle.processBattleRound(this);
     }
   }

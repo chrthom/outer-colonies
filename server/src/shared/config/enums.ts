@@ -117,6 +117,12 @@ export enum Zone {
   Neutral = 'neutral'
 }
 
+export enum MatchmakingStatus {
+  Search = 'search',
+  Start = 'start',
+  BotRejected = 'bot_rejected'
+}
+
 export enum MagicLinkType {
   AccountActivation = 'account_activation',
   EmailConfirmation = 'email_confirmation',

@@ -1,6 +1,5 @@
 import { CardType, TacticDiscipline } from '../../../shared/config/enums';
 import ActionPool from '../action_pool';
-import CardStack from '../card_stack';
 import Player from '../../game_state/player';
 import OrbCard from './orb_card';
 

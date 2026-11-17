@@ -4,7 +4,7 @@ import Card from './cards/card';
 import CardCollection from './cards/collection/card_collection';
 import { matchmakingRoom, matchMakingSocketListeners } from './matchmaking';
 import { DBCredential } from './persistence/db_credentials';
-import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 
 const activeDeck = CardCollection.starterDecks[0].slice();
 
@@ -68,7 +68,7 @@ describe('StartBotGame handler', () => {
     startBotGame();
 
     expect(socket.leave).not.toHaveBeenCalled();
-    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, 'botRejected');
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.BotRejected);
   });
 
   test('rejects the request without an active deck and keeps the socket in the matchmaking room', () => {
@@ -77,7 +77,7 @@ describe('StartBotGame handler', () => {
     startBotGame();
 
     expect(socket.leave).not.toHaveBeenCalled();
-    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, 'botRejected');
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.BotRejected);
   });
 
   test('rejects the request while already in a match', () => {
@@ -101,7 +101,7 @@ describe('StartBotGame handler', () => {
     expect(socket.leave).toHaveBeenCalledWith(matchmakingRoom);
     expect(broadcast.emit).toHaveBeenCalledWith(
       MsgTypeOutbound.Matchmaking,
-      'start',
+      MatchmakingStatus.Start,
       expect.objectContaining({ preloadCardIds: expect.any(Array) })
     );
     const match = socketData.match;
