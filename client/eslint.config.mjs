@@ -67,6 +67,13 @@ export default [
       ]
     }
   },
+  {
+    // Test files may use partial fixtures and mocks (see #909)
+    files: ["**/*.spec.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  },
   ...compat
     .extends("plugin:@angular-eslint/template/recommended", "plugin:@angular-eslint/template/accessibility")
     .map(config => ({
