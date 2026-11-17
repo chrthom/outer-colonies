@@ -11,6 +11,7 @@ import { opponentPlayerNo, spliceCardById, spliceFrom } from '../../utils/helper
 import Card, { AttackResult, CardRarity } from '../card';
 import { AttackProfile, CardProfileConfig } from '../card_profile';
 import CardStack from '../card_stack';
+import { logger } from '../../utils/logger';
 
 export default abstract class TacticCard extends Card {
   readonly attackProfile?: AttackProfile;
@@ -122,7 +123,7 @@ export default abstract class TacticCard extends Card {
     });
   }
   private warnTributeNotFound() {
-    console.log(`WARN: No card found for optional parameter when playing card '${this.name}'`);
+    logger.warn(`No card found for optional parameter when playing card '${this.name}'`);
   }
   protected drawSpecificCards(
     player: Player,

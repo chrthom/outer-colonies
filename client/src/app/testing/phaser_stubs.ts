@@ -159,7 +159,7 @@ export function makeTimeStub(): TimeStub {
 
 /** Stub of the scene's fixed UI elements (`scene.obj`). */
 export interface ObjStub {
-  exitButton: { show: jasmine.Spy; hide: jasmine.Spy };
+  exitButton: { show: jasmine.Spy; hide: jasmine.Spy; update: jasmine.Spy };
 }
 
 /** Creates a stub of the fixed UI elements with a spied exit button. */
@@ -167,7 +167,8 @@ export function makeObjStub(): ObjStub {
   return {
     exitButton: {
       show: jasmine.createSpy('exitButton.show'),
-      hide: jasmine.createSpy('exitButton.hide')
+      hide: jasmine.createSpy('exitButton.hide'),
+      update: jasmine.createSpy('exitButton.update')
     }
   };
 }

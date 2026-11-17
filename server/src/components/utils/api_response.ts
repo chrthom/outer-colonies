@@ -1,10 +1,23 @@
 import { Response } from 'express';
 import { GenericResponse } from '../../shared/interfaces/rest_api';
+import { logger } from './logger';
+
+/**
+ * Builds the log context of a failed API request. Only the method and the matched route
+ * pattern are used - never the query string or the concrete path, whose parameters may carry
+ * credentials, email addresses or one-time UUIDs.
+ * @param res response whose request is described
+ * @returns the request context, or an empty string if the request is unavailable
+ */
+function getStatusContext(res: Response): string {
+  const route = res.req?.route?.path;
+  return res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
+}
 
 /**
  * Sends a status response and logs error statuses with a level beforehand, so no API failure
- * degrades silently: 4xx are logged as `WARN` (recoverable, e.g. invalid client requests) and
- * 5xx as `ERROR` (server-side failures that need attention). Only the method and the matched
+ * degrades silently: 4xx are logged as `warn` (recoverable, e.g. invalid client requests) and
+ * 5xx as `error` (server-side failures that need attention). Only the method and the matched
  * route pattern are logged - never the query string or the concrete path, whose parameters
  * may carry credentials, email addresses or one-time UUIDs.
  * @param res response to send the status to
@@ -13,12 +26,9 @@ import { GenericResponse } from '../../shared/interfaces/rest_api';
  */
 export function sendStatus(res: Response, status: number, message?: string) {
   if (status >= 400) {
-    const level = status >= 500 ? 'ERROR' : 'WARN';
-    // The matched route pattern is logged instead of the concrete path: path parameters can
-    // carry usernames, email addresses or one-time UUIDs, which must never end up in logs
-    const route = res.req?.route?.path;
-    const context = res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
-    console.log(`${level}: API request${context} failed with status ${status}`);
+    const messageText = `API request${getStatusContext(res)} failed with status ${status}`;
+    if (status >= 500) logger.error(messageText);
+    else logger.warn(messageText);
   }
   const r: GenericResponse = {
     status: status

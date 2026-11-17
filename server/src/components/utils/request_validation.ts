@@ -27,12 +27,16 @@ const strongPassword = z
     message: 'Password must contain at least one letter and one digit'
   });
 
-/** Email constraints, mirrored from the registration form and the `varchar(60)` column. */
+/**
+ * Email constraints, mirrored from the registration form and the `varchar(60)` column. The
+ * value is trimmed and length-checked before the format check runs (via `pipe`), because the
+ * top-level `z.email()` format would otherwise reject padded input before trimming it.
+ */
 const email = z
   .string({ message: 'Email must be a string' })
   .trim()
   .max(60, 'Email must not be longer than 60 characters')
-  .email('Invalid email address');
+  .pipe(z.email('Invalid email address'));
 
 /**
  * Starter deck index: the website sends the selected index as a number, but the select
@@ -107,7 +111,7 @@ export const authPasswordResetUserSchema = z.object({
  * the format keeps oversized or malformed values out of the database lookup.
  */
 export const oneTimeIdSchema = z.object({
-  id: z.string().uuid('Invalid one-time link id')
+  id: z.uuid('Invalid one-time link id')
 });
 
 /**

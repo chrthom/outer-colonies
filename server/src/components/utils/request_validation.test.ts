@@ -201,7 +201,7 @@ describe('RequestValidation', () => {
     };
 
     it('returns the parsed body and sends no response for a valid body', () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const req = createRequest({ email: '  test@example.com  ' });
       const res = createResponse(req);
 
@@ -209,11 +209,11 @@ describe('RequestValidation', () => {
 
       expect(parsed?.email).toBe('test@example.com');
       expect(res.status).not.toHaveBeenCalled();
-      expect(logSpy).not.toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalled();
     });
 
     it('sends a 400 with the first validation error and returns undefined for an invalid body', () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const req = createRequest({ email: 'not-an-email' });
       const res = createResponse(req);
 
@@ -222,11 +222,11 @@ describe('RequestValidation', () => {
       expect(parsed).toBeUndefined();
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ status: 400, message: 'Invalid email address' });
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
     });
 
     it('sends a 400 for a missing body', () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const req = createRequest(undefined);
       const res = createResponse(req);
 

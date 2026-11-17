@@ -1,6 +1,7 @@
 import { Express, Request, Response } from 'express';
-import fetch from 'node-fetch';
+import { Readable } from 'node:stream';
 import Auth from './utils/auth';
+import { logger } from './utils/logger';
 import {
   AuthExistsResponse,
   AuthLoginResponse,
@@ -68,19 +69,33 @@ export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
     fetch(`${config.get('url.assets')}/${file}`)
-      .then(actual => {
-        if (!actual.body) {
-          console.log(`WARN: Assets response for ${file} has no body, responding with 502`);
+      .then(async actual => {
+        // An upstream error body would otherwise be piped to the client with an implicit 200
+        if (!actual.ok) {
+          logger.warn(
+            `Assets request for ${file} failed with upstream status ${actual.status}, responding with 502`
+          );
+          // An unconsumed body would keep the underlying socket out of the keep-alive pool
+          await actual.body?.cancel();
           res.status(502).end();
           return;
         }
-        actual.body.pipe(res).on('error', err => {
-          console.log(`WARN: Assets stream for ${file} failed: ${err}, responding with 502`);
+        if (!actual.body) {
+          logger.warn(`Assets response for ${file} has no body, responding with 502`);
+          res.status(502).end();
+          return;
+        }
+        // The global fetch returns a web stream; the express response expects a node stream
+        const stream = Readable.fromWeb(actual.body);
+        // pipe returns the destination, so the upstream failure handler must sit on the source
+        stream.on('error', err => {
+          logger.warn(`Assets stream for ${file} failed: ${err}, responding with 502`);
           res.status(502).end();
         });
+        stream.pipe(res);
       })
       .catch(err => {
-        console.log(`WARN: Fetching asset ${file} failed: ${err}, responding with 502`);
+        logger.warn(`Fetching asset ${file} failed: ${err}, responding with 502`);
         res.status(502).end();
       });
   });

@@ -1,3 +1,4 @@
+import { Readable, Writable } from 'node:stream';
 import { APIRejectReason, DailyType, ItemBoxContentType, ItemType } from '../shared/config/enums';
 import { DAILY_DEFINITIONS } from '../shared/config/dailies';
 import { rules } from '../shared/config/rules';
@@ -89,6 +90,11 @@ describe('RESTAPI Deck Endpoints', () => {
   ])('%s /api/deck/:cardInstanceId', (method, expectedInUse) => {
     const getHandler = () => routes.get(`${method} /api/deck/:cardInstanceId(\\d+)`)!;
 
+    // The rejected-request tests exercise sendStatus warn paths
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    });
+
     it('should reject requests without a session token', async () => {
       const setInUseSpy = jest.spyOn(DBDecksDAO, 'setInUse');
       const res = createResponse();
@@ -138,31 +144,31 @@ describe('RESTAPI Deck Endpoints', () => {
     });
 
     it('should log a WARN for a rejected request without a session token', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const res = createResponse();
 
       getHandler()(createRequest(), res);
       await flushMicrotasks();
 
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 401/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 401/));
     });
 
     it('should log the route pattern instead of the concrete path', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const res = createResponse();
 
       getHandler()(createRequest(), res);
       await flushMicrotasks();
 
-      expect(logSpy).toHaveBeenCalledWith(
+      expect(errorSpy).toHaveBeenCalledWith(
         expect.stringContaining('for POST /api/deck/:cardInstanceId(\\d+) failed with status 401')
       );
-      expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
+      expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
     });
 
     it('should log a WARN for an invalid session token', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue(APIRejectReason.NotFound);
       const res = createResponse();
 
@@ -170,11 +176,11 @@ describe('RESTAPI Deck Endpoints', () => {
       await flushMicrotasks();
 
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
     });
 
     it('should log an ERROR for an internal server error', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockResolvedValue({
         userId: 123,
         username: 'testuser',
@@ -188,11 +194,11 @@ describe('RESTAPI Deck Endpoints', () => {
       await flushMicrotasks();
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^ERROR: .*status 500/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^ERROR: .*status 500/));
     });
 
     it('should not log on a successful response', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockResolvedValue({
         userId: 123,
         username: 'testuser',
@@ -206,8 +212,76 @@ describe('RESTAPI Deck Endpoints', () => {
       await flushMicrotasks();
 
       expect(res.status).toHaveBeenCalledWith(204);
-      expect(logSpy).not.toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('RESTAPI Assets Endpoint', () => {
+  type RouteHandler = (req: any, res: any) => void;
+  const routes = new Map<string, RouteHandler>();
+
+  beforeAll(() => {
+    const fakeApp: any = {
+      get: (path: string, handler: RouteHandler) => routes.set(`GET ${path}`, handler),
+      post: (path: string, handler: RouteHandler) => routes.set(`POST ${path}`, handler),
+      put: (path: string, handler: RouteHandler) => routes.set(`PUT ${path}`, handler),
+      delete: (path: string, handler: RouteHandler) => routes.set(`DELETE ${path}`, handler)
+    };
+    restAPI(fakeApp);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const flushMicrotasks = () => new Promise(resolve => setImmediate(resolve));
+
+  it('should respond with 502 when the upstream asset stream fails mid-stream', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const upstream = new Readable({
+      read() {
+        this.destroy(new Error('boom'));
+      }
+    });
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(<any>{ ok: true, status: 200, body: Readable.toWeb(upstream) });
+    // pipe() requires a real stream destination, so the response is a Writable with a spied status
+    const res: any = new Writable({
+      write: (_chunk, _encoding, callback) => callback()
+    });
+    res.status = jest.fn().mockReturnThis();
+
+    routes.get('GET /assets/*')!({ method: 'GET', path: '/assets/test.png' }, res);
+    await flushMicrotasks();
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
+  });
+
+  it('should respond with 502 when the upstream responds with an error status', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const upstream = new Readable({
+      read() {
+        this.push('upstream error page');
+        this.push(null);
+      }
+    });
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(<any>{ ok: false, status: 404, body: Readable.toWeb(upstream) });
+    // pipe() requires a real stream destination, so the response is a Writable with a spied status
+    const res: any = new Writable({
+      write: (_chunk, _encoding, callback) => callback()
+    });
+    res.status = jest.fn().mockReturnThis();
+
+    routes.get('GET /assets/*')!({ method: 'GET', path: '/assets/missing.png' }, res);
+    await flushMicrotasks();
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
   });
 });
 
@@ -223,6 +297,11 @@ describe('RESTAPI Item and Booster Endpoints', () => {
     };
     DBConnection.instance.pool = <any>{ getConnection: jest.fn().mockResolvedValue(fakeConnection) };
   };
+
+  // The rejection tests exercise the transaction error logging of the DB connector
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
 
   afterEach(() => {
     jest.restoreAllMocks();
@@ -447,7 +526,7 @@ describe('RESTAPI Auth Endpoints', () => {
     ])(
       'should reject a registration with a %s without touching the database',
       async (_case, invalidBody, ip) => {
-        jest.spyOn(console, 'log').mockImplementation(() => undefined);
+        jest.spyOn(console, 'error').mockImplementation(() => undefined);
         const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
         const res = createResponse(createRequest('POST /api/auth/register', ip));
 
@@ -486,7 +565,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should reject a login with an invalid body without an authentication attempt', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login');
       const res = createResponse(createRequest('POST /api/auth/login', '192.168.2.1'));
 
@@ -501,7 +580,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should reject a password reset with a weak password', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const resetPasswordSpy = jest.spyOn(Auth, 'resetPassword');
       const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.1'));
 
@@ -542,7 +621,7 @@ describe('RESTAPI Auth Endpoints', () => {
 
   describe('request parameter validation', () => {
     it('should reject an exists check with an invalid username without touching the database', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
       const res = createResponse(createRequest('GET /api/auth/exists', '192.168.6.1'));
 
@@ -576,7 +655,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should reject a password reset request with an invalid user param without touching the database', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset');
       const res = createResponse(createRequest('DELETE /api/auth/password/:user', '192.168.6.3'));
 
@@ -593,7 +672,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should reject an account activation with a malformed one-time id without touching the database', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const activateAccountSpy = jest.spyOn(Auth, 'activateAccount');
       const res = createResponse(createRequest('PUT /api/auth/register/:id', '192.168.6.4'));
 
@@ -612,7 +691,7 @@ describe('RESTAPI Auth Endpoints', () => {
 
   describe('rate limiting', () => {
     it('should let at most ten login attempts per IP through and block the next with 429', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
         sessionToken: 'token',
         username: 'testuser',
@@ -639,7 +718,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should not block a login attempt from an IP whose limit was not exhausted by another client', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
         sessionToken: 'token',
         username: 'testuser',
@@ -659,7 +738,7 @@ describe('RESTAPI Auth Endpoints', () => {
     });
 
     it('should let at most five password reset requests per IP through and block the next with 429', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset').mockResolvedValue(undefined);
       const requestPasswordReset = routes.get('DELETE /api/auth/password/:user')!;
 
