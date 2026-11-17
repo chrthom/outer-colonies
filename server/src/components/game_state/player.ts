@@ -189,7 +189,6 @@ export default class Player {
    * phase or when the countdown expires. Also used by the singleplayer bot.
    */
   retractInsufficientEnergyCards() {
-    // Find all card stacks with insufficient energy, sorted by energy profile (lowest first)
     const cardStacksToRetract = this.cardStacks
       .filter(cs => cs.hasInsufficientEnergy)
       .sort((a, b) => a.profile.energy - b.profile.energy);

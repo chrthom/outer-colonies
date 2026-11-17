@@ -2,7 +2,6 @@ import Match, { BotPlayerSetup } from '../game_state/match';
 import Player from '../game_state/player';
 import Bot, { processBotActions } from './bot';
 import CardCollection from '../cards/collection/card_collection';
-import DBCredentialsDAO from '../persistence/db_credentials';
 import { Server, Socket } from 'socket.io';
 import { TurnPhase } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
@@ -76,8 +75,6 @@ describe('Bot', () => {
   });
 
   test('a full game against the bot finishes without the bot stalling', () => {
-    // Prevent real DB access when the game result is persisted
-    jest.spyOn(DBCredentialsDAO, 'getByUsername').mockResolvedValue(undefined as never);
     const { match, io } = createBotMatch();
 
     processBotActions(io, match); // Bot readies up for match initialization

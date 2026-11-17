@@ -4,3 +4,4 @@ node_modules
 .openclaude/settings.local.json
 .claude/
 __pycache__
+/out/
