@@ -1,18 +1,21 @@
 import Match from './game_state/match';
+import { rules } from '../shared/config/rules';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
 import { combineAttackResults, getCardStackByUUID } from './utils/helpers';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
-import { matchmakingRoom } from './matchmaking';
+import { allActiveMatches, unregisterMatch } from './match_registry';
 import { Attack } from './game_state/battle';
 import { processBotActions } from './bot/bot';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) => {
     doWithMatchAndPlayer(socket, (match, player) => {
-      if (turnPhase == match.turnPhase) {
+      // A finished match no longer processes ready events; the initial ready
+      // of a rejoin only fetches the current (final) match state
+      if (turnPhase == match.turnPhase && !match.gameResult.gameOver) {
         if (turnPhase == TurnPhase.Init) {
           if (match.setReadyAndCheck(player.no)) match.startMatch();
         } else if (getSocketData(socket).playerNo == match.pendingActionPlayerNo) {
@@ -43,9 +46,14 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   });
   socket.on(MsgTypeInbound.Disconnect, () => {
     doWithMatchAndPlayer(socket, (match, player) => {
-      if (!match.gameResult.gameOver) {
+      // Only the player's bound socket marks them disconnected: a stale socket
+      // of a previous connection must not re-mark a player who already rejoined
+      // with a new socket (see rejoinMatch in components/matchmaking.ts)
+      if (!match.gameResult.gameOver && player.socketId == socket.id) {
         console.log(`Player ${player.name} disconnected from active game`);
-        match.gameResult.setWinnerBySurrender(player);
+        // The match stays alive for the grace window so the player can rejoin;
+        // gameCron surrenders them once it expires
+        player.disconnectedSince = Date.now();
       }
       emitState(io, match);
     });
@@ -54,6 +62,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
     MsgTypeInbound.Handcard,
     (handCardUUID: string, targetUUID: string, optionalParameters?: number[]) => {
       doWithMatchAndPlayer(socket, (match, player) => {
+        if (match.gameResult.gameOver) return;
         const handCard = getCardStackByUUID(player.hand, handCardUUID);
         const target = getCardStackByUUID(match.allCardStacks, targetUUID);
         if (!handCard) {
@@ -77,6 +86,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   );
   socket.on(MsgTypeInbound.Retract, (rootCardStackUUID: string, subCardStackUUID: string) => {
     doWithMatchAndPlayer(socket, (match, player) => {
+      if (match.gameResult.gameOver) return;
       const rootCardStack = getCardStackByUUID(player.cardStacks, rootCardStackUUID);
       const subCardStack = rootCardStack && getCardStackByUUID(rootCardStack.cardStacks, subCardStackUUID);
       if (!rootCardStack) {
@@ -97,6 +107,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   });
   socket.on(MsgTypeInbound.Discard, (handCardUUID: string) => {
     doWithMatchAndPlayer(socket, (match, player) => {
+      if (match.gameResult.gameOver) return;
       const handCard = getCardStackByUUID(player.hand, handCardUUID);
       if (!handCard) {
         console.log(`WARN: ${player.name} tried to discard non-existing card ${handCardUUID}`);
@@ -112,7 +123,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Attack, (shipUUID: string, weaponUUID: string, targetId: string) => {
     const match = getSocketData(socket).match;
     const player = getPlayer(socket);
-    if (match && player) {
+    if (match && player && !match.gameResult.gameOver) {
       const opponentShips = match.battle.ships[match.waitingPlayerNo];
       const target = opponentShips.find(cs => cs.uuid == targetId);
       if (!target) {
@@ -162,17 +173,29 @@ export function gameSocketListeners(io: Server, socket: Socket) {
 }
 
 export function gameCron(io: Server) {
-  Array.from(io.sockets.adapter.rooms)
-    .filter(room => !room[1].has(room[0]) && room[0] != matchmakingRoom)
-    .map(r => {
-      const [clientId] = r[1];
-      return io.sockets.sockets.get(clientId);
-    })
-    .filter((socket): socket is Socket => !!socket)
-    .map(socket => getSocketData(socket).match)
-    .filter((match): match is Match => !!match)
-    .filter(match => match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver)
-    .forEach(match => {
+  for (const match of allActiveMatches()) {
+    if (match.gameResult.gameOver) {
+      // A finished match stays registered until every player received its final
+      // state, so the missed result is delivered on the next login; the delivery
+      // period bounds the registry against players who never return
+      if (match.gameOverSince == undefined) match.gameOverSince = Date.now();
+      const resultDelivered = match.players.every(p => p.resultDelivered);
+      const deliveryExpired = Date.now() - match.gameOverSince >= rules.resultDeliveryPeriod * 1000;
+      if (resultDelivered || deliveryExpired) unregisterMatch(match);
+      continue;
+    }
+    const expiredPlayer = match.players.find(
+      p =>
+        p.disconnectedSince != undefined &&
+        Date.now() - p.disconnectedSince >= rules.reconnectGracePeriod * 1000
+    );
+    if (expiredPlayer) {
+      console.log(`Player ${expiredPlayer.name} did not reconnect within the grace period`);
+      match.gameResult.setWinnerBySurrender(expiredPlayer);
+      expiredPlayer.disconnectedSince = undefined;
+      emitState(io, match);
+    }
+    if (match.players[0].ready && match.players[1].ready && !match.gameResult.gameOver) {
       if (--match.countdown <= 0) {
         // Trigger automatic ready event instead of timeout victory
         match.pendingActionPlayer.handleAutomaticReady();
@@ -184,9 +207,11 @@ export function gameCron(io: Server) {
         const socket = getSocket(io, match, playerNo);
         if (socket)
           socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
-        else console.log('WARN: Could not find socket to emit countdown');
+        else if (match.players[playerNo].disconnectedSince == undefined)
+          console.log('WARN: Could not find socket to emit countdown');
       });
-    });
+    }
+  }
 }
 
 function doWithMatchAndPlayer(socket: Socket, f: (m: Match, p: Player) => void) {

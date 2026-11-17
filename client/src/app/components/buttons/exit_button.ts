@@ -54,12 +54,16 @@ export default class ExitButton extends BaseButton {
   update() {
     this.confirmText.setVisible(false);
     if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
-    else if (this.scene instanceof Game && !this.scene.state.gameResult) this.updateText('Aufgeben');
+    else if (this.scene instanceof Game && !this.scene.state.gameResult && !this.scene.connectionLost)
+      this.updateText('Aufgeben');
     else this.updateText('Spiel beenden');
   }
 
   protected onClickAction(confirmed?: boolean) {
-    if (this.isMatchmaking || (this.scene instanceof Game && this.scene.state.gameResult)) {
+    if (
+      this.isMatchmaking ||
+      (this.scene instanceof Game && (this.scene.state.gameResult || this.scene.connectionLost))
+    ) {
       SocketService.disconnect();
       window.location.href = environment.urls.website;
     } else if (confirmed) {

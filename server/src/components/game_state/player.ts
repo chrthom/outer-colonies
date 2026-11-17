@@ -21,6 +21,10 @@ export default class Player {
   hand: CardStack[] = [];
   cardStacks: CardStack[];
   actionPool!: ActionPool;
+  /** Timestamp (ms since epoch) when the player's socket disconnected from a running match; undefined while connected */
+  disconnectedSince?: number;
+  /** Whether the player's socket received the final state of the match; a finished match stays registered until every player's result was delivered (see gameCron in components/game.ts) */
+  resultDelivered?: boolean;
   constructor(
     socketId: string | undefined,
     userId: number | undefined,

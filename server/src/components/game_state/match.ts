@@ -60,6 +60,8 @@ export default class Match {
   intervention?: Intervention;
   highlightCard?: CardStack;
   bot?: MatchBot;
+  /** Timestamp (ms since epoch) when the match ended; set by the game cron on its first sight of the finished match */
+  gameOverSince?: number;
   constructor(room: string, player1: Socket | BotPlayerSetup, player2: Socket | BotPlayerSetup) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
@@ -237,17 +239,31 @@ export default class Match {
     this.prepareStartPhase();
   }
   /**
-   * Emits the current state to every connected (human) player and resets
+   * Emits the current state to every connected human player and resets
    * temporary match states afterwards. Bot players have no socket and are
-   * skipped.
+   * skipped; nobody is owed the delivery of a bot's game result.
    */
   emitState(io: Server) {
     this.forAllPlayers((playerNo: number) => {
       const player = this.players[playerNo];
-      if (player.isBot) return;
+      if (player.isBot) {
+        // The bot has no socket, so its game result needs no delivery: without
+        // this, a finished bot match would stay registered for the whole
+        // result delivery period (see gameCron)
+        if (this.gameResult.gameOver) player.resultDelivered = true;
+        return;
+      }
       const socket = player.socketId ? io.sockets.sockets.get(player.socketId) : undefined;
-      if (socket) socket.emit(MsgTypeOutbound.State, toClientState(this, playerNo));
-      else console.log('WARN: Could not find socket to emit state');
+      if (socket) {
+        socket.emit(MsgTypeOutbound.State, toClientState(this, playerNo));
+        // Receiving the final state of a finished match counts as the player's
+        // game result delivery (see gameCron)
+        if (this.gameResult.gameOver) player.resultDelivered = true;
+      }
+      // A disconnected player's socket is expectedly absent while the grace
+      // window keeps the match alive
+      else if (player.disconnectedSince == undefined)
+        console.log('WARN: Could not find socket to emit state');
     });
     this.resetTempStates();
   }
