@@ -31,8 +31,15 @@ export default class DBItemsDAO {
       };
     });
   }
-  static async delete(itemId: number) {
-    await DBConnection.instance.query('DELETE FROM items WHERE item_id = ?', [itemId]);
+  /**
+   * Deletes an item and returns the number of deleted rows: 0 means the item no longer exists,
+   * e.g. because it was concurrently opened, and callers must treat the delete as failed.
+   * @param itemId id of the item to delete
+   * @returns the number of deleted rows
+   */
+  static async delete(itemId: number): Promise<number> {
+    const result: any = await DBConnection.instance.query('DELETE FROM items WHERE item_id = ?', [itemId]);
+    return Number(result.affectedRows);
   }
   static async createBooster(userId: number, boosterNo: number) {
     await this.create(userId, ItemType.Booster, String(boosterNo));

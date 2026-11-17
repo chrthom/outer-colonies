@@ -14,8 +14,8 @@ export class Card166 extends EquipmentCardRechargeable {
         range: 2,
         damage: 3,
         pointDefense: 0,
-        shield: -3,
-        armour: -1
+        shield: -99,
+        armour: -2
       }
     );
   }
@@ -33,21 +33,21 @@ export class Card182 extends EquipmentCardRechargeable {
       },
       {
         range: 2,
-        damage: 6,
+        damage: 5,
         pointDefense: 0,
-        shield: -3,
+        shield: -5,
         armour: -1
       }
     );
   }
 }
 
-export class Card224 extends EquipmentCardColonyKillerRechargeable {
+export class Card237 extends EquipmentCardColonyKillerRechargeable {
   constructor() {
     super(
-      224,
+      237,
       'Bergbaulaser',
-      2,
+      1,
       {
         theta: -1,
         omega: -1
@@ -66,14 +66,14 @@ export class Card224 extends EquipmentCardColonyKillerRechargeable {
   }
 }
 
-export class Card343 extends EquipmentCardRechargeable {
+export class Card325 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      343,
+      325,
       'Laserphalanx',
-      1,
+      2,
       {
-        energy: -1,
+        energy: -2,
         theta: -1
       },
       {
@@ -87,12 +87,12 @@ export class Card343 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card344 extends EquipmentCardRechargeable {
+export class Card333 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      344,
+      333,
       'Fokuslaser',
-      1,
+      2,
       {
         theta: -1
       },
@@ -100,8 +100,8 @@ export class Card344 extends EquipmentCardRechargeable {
         range: 3,
         damage: 2,
         pointDefense: 0,
-        shield: -2,
-        armour: -1
+        shield: -99,
+        armour: -2
       }
     );
   }
@@ -118,9 +118,9 @@ export class Card347 extends EquipmentCardRechargeable {
       },
       {
         range: 2,
-        damage: 5,
+        damage: 4,
         pointDefense: 0,
-        shield: -5,
+        shield: -99,
         armour: -3
       }
     );
@@ -151,9 +151,9 @@ export class Card421 extends EquipmentCardRechargeable {
 export const allCards = [
   new Card166(),
   new Card182(),
-  new Card224(),
-  new Card343(),
-  new Card344(),
+  new Card237(),
+  new Card325(),
+  new Card333(),
   new Card347(),
   new Card421()
 ];

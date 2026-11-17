@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router, RouterOutlet } from '@angular/router';
+import { PreloadAllModules, Router, RouterOutlet, provideRouter, withPreloading } from '@angular/router';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { AppRoutingModule } from './app-routing.module';
+import { routes } from './app.routes';
 import AuthService from './auth.service';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Title } from '@angular/platform-browser';
-import { DailyGetResponse } from '../../../server/src/shared/interfaces/rest_api';
+import { DailyGetResponse } from '@shared/interfaces/rest_api';
 
 @Component({
   template: '<router-outlet></router-outlet>',
@@ -15,7 +15,7 @@ import { DailyGetResponse } from '../../../server/src/shared/interfaces/rest_api
 })
 class RoutingHostComponent {}
 
-describe('AppRoutingModule', () => {
+describe('app routes (public landing and lore pages)', () => {
   let fixture: ComponentFixture<RoutingHostComponent>;
   let router: Router;
   let authSpy: jasmine.SpyObj<AuthService>;
@@ -30,8 +30,11 @@ describe('AppRoutingModule', () => {
     authSpy.check.and.returnValue(of(false));
 
     await TestBed.configureTestingModule({
-      imports: [AppRoutingModule, HttpClientTestingModule, RoutingHostComponent],
-      providers: [{ provide: AuthService, useValue: authSpy }]
+      imports: [HttpClientTestingModule, RoutingHostComponent],
+      providers: [
+        provideRouter(routes, withPreloading(PreloadAllModules)),
+        { provide: AuthService, useValue: authSpy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RoutingHostComponent);

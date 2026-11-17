@@ -126,10 +126,8 @@ export default class Match {
   }
   processBattleRound() {
     if (this.pendingActionPlayerNo == this.inactivePlayerNo) {
-      // End of battle round
       new InterventionBattleRoundEnd(this).init();
     } else {
-      // Switch to opponent player in same battle round
       this.battle.processBattleRound(this);
     }
   }
@@ -172,7 +170,14 @@ export default class Match {
     const socketData: SocketData = <SocketData>socket.data;
     socketData.match = this;
     socketData.playerNo = playerNo;
-    return new Player(socket.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
+    return new Player(
+      socket.id,
+      socketData.user.userId,
+      socketData.user.username,
+      this,
+      playerNo,
+      socketData.activeDeck.slice()
+    );
   }
   private getDestroyedCardStacks(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);

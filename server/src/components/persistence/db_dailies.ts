@@ -4,10 +4,13 @@ import DBConnection from './db_connector';
 import DBProfilesDAO from './db_profiles';
 import { isDailyOfDay } from '../utils/daily_selector';
 
-// DBDaily interface with dynamic properties for all daily columns
+/**
+ * A dailies DB row: dynamic boolean properties for all daily columns plus the
+ * numeric userId.
+ */
 export interface DBDaily {
   userId: number;
-  [key: string]: boolean | number | null; // Dynamic properties for all daily columns (booleans) + userId (number)
+  [key: string]: boolean | number | null;
 }
 
 export default class DBDailiesDAO {
@@ -17,7 +20,6 @@ export default class DBDailiesDAO {
   }
 
   private static async getBy(whereClause: string, params: any[]): Promise<DBDaily[]> {
-    // Generate SQL CASE statements dynamically from daily definitions
     const columnCases = DAILY_DEFINITIONS.map(
       daily =>
         `CASE WHEN ${daily.dbColumn} IS NULL OR ${daily.dbColumn} < CURRENT_DATE() THEN 0 ELSE 1 END AS ${daily.dbColumn}`
@@ -29,7 +31,6 @@ export default class DBDailiesDAO {
     );
 
     return queryResult.map(r => {
-      // Dynamically add all daily properties using map
       const dailyProperties = DAILY_DEFINITIONS.map(dailyDef => ({
         [dailyDef.dbColumn]: Boolean(r[dailyDef.dbColumn])
       }));
@@ -47,11 +48,13 @@ export default class DBDailiesDAO {
     await DBConnection.instance.query('INSERT INTO dailies (user_id) VALUES (?)', [userId]);
   }
 
-  // Generic achieve method that works for any daily type
+  /**
+   * Marks a daily of any type as achieved for the given user, if it is offered
+   * today and not yet achieved, and pays out its sol reward.
+   */
   static async achieve(userId: number, dailyType: DailyType): Promise<void> {
     const dailyDef = DAILY_DEFINITIONS.find(d => d.type === dailyType);
 
-    // Early return if daily definition not found or not available today
     if (!dailyDef || !isDailyOfDay(dailyType)) return;
 
     const rows = await this.getBy(

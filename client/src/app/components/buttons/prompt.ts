@@ -1,5 +1,5 @@
 import { designConfig } from 'src/app/config/design';
-import { BattleType, TurnPhase } from '../../../../../server/src/shared/config/enums';
+import { BattleType, TurnPhase } from '@shared/config/enums';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { animationConfig } from 'src/app/config/animation';
@@ -31,6 +31,9 @@ export default class Prompt {
   }
   update() {
     this.hide();
+    // While the game-over screen is displayed, no phase prompt must be shown
+    // and the exit button must stay visible.
+    if (this.scene.state.gameResult) return;
     if (!this.scene.state.playerPendingAction) {
       this.setText('Warte auf Gegenspieler...');
       this.show(true);
@@ -93,14 +96,14 @@ export default class Prompt {
   }
   private showInterceptPhase() {
     const battleText =
-      this.scene.state.battle?.type == BattleType.Raid
+      this.scene.state.battle.type == BattleType.Raid
         ? 'zur Verteidigung\ndeiner Kolonie'
         : 'zum Abfangen der\ngegenerischen Mission';
     this.setText(`Wähle Schiffe ${battleText}!`);
   }
   private showCombatPhase() {
     this.setText(
-      `Aktuelle Reichweite der Gefechts: ${this.scene.state.battle?.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
+      `Aktuelle Reichweite des Gefechts: ${this.scene.state.battle.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
     );
   }
   private showEndPhase() {

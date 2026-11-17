@@ -13,6 +13,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
+import { starterDecks } from '@shared/config/starter_decks';
+import { environment } from 'src/environments/environment';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -78,7 +80,7 @@ describe('RegisterPage', () => {
     username?.setValue('');
     expect(username?.valid).toBeFalse();
 
-    username?.setValue('ab'); // Too short
+    username?.setValue('ab');
     tick(500);
     expect(username?.valid).toBeFalse();
 
@@ -92,7 +94,7 @@ describe('RegisterPage', () => {
     password?.setValue('');
     expect(password?.valid).toBeFalse();
 
-    password?.setValue('short'); // Too short
+    password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
     password?.setValue('validpassword123');
@@ -113,6 +115,82 @@ describe('RegisterPage', () => {
     expect(email?.valid).toBeTrue();
   }));
 
+  it('should not check availability for empty or invalid values', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('ab');
+    const email = component.registerForm.get('email');
+    email?.setValue('invalid-email');
+
+    tick(500);
+    expect(authApiSpy.checkUsernameExists).not.toHaveBeenCalled();
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+  }));
+
+  it('should debounce availability checks while typing', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    tick(299);
+    expect(authApiSpy.checkUsernameExists).not.toHaveBeenCalled();
+
+    tick(1);
+    expect(authApiSpy.checkUsernameExists).toHaveBeenCalledTimes(1);
+    expect(authApiSpy.checkUsernameExists).toHaveBeenCalledWith('validusername');
+  }));
+
+  it('should only check the latest value after rapid changes', fakeAsync(() => {
+    const email = component.registerForm.get('email');
+    email?.setValue('first@example.com');
+    tick(200);
+    email?.setValue('second@example.com');
+    tick(200);
+    email?.setValue('latest@example.com');
+    tick(300);
+
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledTimes(1);
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledWith('latest@example.com');
+  }));
+
+  it('should treat a failed availability check as no error', fakeAsync(() => {
+    authApiSpy.checkUsernameExists.and.returnValue(throwError(() => new Error('Server error')));
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    tick(300);
+    expect(username?.valid).toBeTrue();
+  }));
+
+  it('should log a warning and degrade to no error when the availability check fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      authApiSpy.checkUsernameExists.and.returnValue(throwError(() => ({ status: 500 })));
+      const username = component.registerForm.get('username');
+      username?.setValue('validusername');
+      tick(300);
+      expect(username?.valid).toBeTrue();
+      expect(warnSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(/status 500.*treating username as available/)
+      );
+    } finally {
+      environment.stage = 'production';
+    }
+  }));
+
+  it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    fixture.destroy();
+    tick(300);
+    expect(authApiSpy.checkUsernameExists).not.toHaveBeenCalled();
+  }));
+
+  it('should mark the form pending during the debounce window', fakeAsync(() => {
+    const username = component.registerForm.get('username');
+    username?.setValue('validusername');
+    expect(component.registerForm.pending).toBeTrue();
+    tick(300);
+    expect(component.registerForm.pending).toBeFalse();
+  }));
+
   it('should require data privacy acceptance', () => {
     const dataPrivacy = component.registerForm.get('dataPrivacy');
     dataPrivacy?.setValue(false);
@@ -131,7 +209,16 @@ describe('RegisterPage', () => {
     expect(starterDeck?.valid).toBeTrue();
   });
 
-  it('should call auth service on valid form submit', () => {
+  it('should return an empty card list before a starter deck is selected', () => {
+    expect(component.starterDeckCards).toEqual([]);
+  });
+
+  it('should return the cards of the selected starter deck', () => {
+    component.starterDeck?.setValue(1);
+    expect(component.starterDeckCards).toEqual(starterDecks[1]);
+  });
+
+  it('should call auth service on valid form submit', fakeAsync(() => {
     component.registerForm.setValue({
       username: 'newuser',
       password: 'password123',
@@ -140,6 +227,7 @@ describe('RegisterPage', () => {
       dataPrivacy: true,
       newsletter: false
     });
+    tick(300); // Let debounced availability checks complete
 
     component.submit();
     expect(authApiSpy.register).toHaveBeenCalledWith({
@@ -149,7 +237,7 @@ describe('RegisterPage', () => {
       starterDeck: 1,
       newsletter: false
     });
-  });
+  }));
 
   it('should not call auth service on invalid form submit', () => {
     component.registerForm.setValue({
@@ -165,7 +253,7 @@ describe('RegisterPage', () => {
     expect(authApiSpy.register).not.toHaveBeenCalled();
   });
 
-  it('should set registrationSuccessful on successful registration', () => {
+  it('should set registrationSuccessful on successful registration', fakeAsync(() => {
     component.registerForm.setValue({
       username: 'newuser',
       password: 'password123',
@@ -174,12 +262,13 @@ describe('RegisterPage', () => {
       dataPrivacy: true,
       newsletter: false
     });
+    tick(300); // Let debounced availability checks complete
 
     component.submit();
     expect(component.registrationSuccessful).toBeTrue();
-  });
+  }));
 
-  it('should set registrationSuccessful to false on failed registration', () => {
+  it('should set registrationSuccessful to false on failed registration', fakeAsync(() => {
     authApiSpy.register.and.returnValue(throwError(() => new Error('Registration failed')));
     component.registerForm.setValue({
       username: 'newuser',
@@ -189,8 +278,9 @@ describe('RegisterPage', () => {
       dataPrivacy: true,
       newsletter: false
     });
+    tick(300); // Let debounced availability checks complete
 
     component.submit();
     expect(component.registrationSuccessful).toBeFalse();
-  });
+  }));
 });

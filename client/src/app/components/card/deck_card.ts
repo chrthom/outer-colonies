@@ -1,7 +1,7 @@
 import CardImage from './card_image';
 import Game from '../../scenes/game';
 import ValueIndicator from '../indicators/value_indicator';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { constants } from '@shared/config/constants';
 import { layoutConfig } from 'src/app/config/layout';
 
 export default class DeckCard extends CardImage {

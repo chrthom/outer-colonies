@@ -1,5 +1,6 @@
 import CardCollection from '../cards/collection/card_collection';
 import { AuthLoginRequest, AuthRegisterRequest } from '../../shared/interfaces/rest_api';
+import DBConnection from '../persistence/db_connector';
 import DBCredentialsDAO, { DBCredential, DBCredentialWithSessionToken } from '../persistence/db_credentials';
 import DBProfilesDAO from '../persistence/db_profiles';
 import DBDailiesDAO from '../persistence/db_dailies';
@@ -12,27 +13,33 @@ export default class Auth {
   static async checkUsernameExists(username: string): Promise<boolean> {
     return DBCredentialsDAO.getByUsername(username).then(
       () => true,
-      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject())
+      // NotFound is the expected "username is free" answer; any other rejection is a real
+      // error and is rethrown for the caller to handle
+      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject(reason))
     );
   }
   static async checkEmailExists(email: string): Promise<boolean> {
     return DBCredentialsDAO.getByEmail(email).then(
       () => true,
-      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject())
+      // NotFound is the expected "email is free" answer; any other rejection is a real
+      // error and is rethrown for the caller to handle
+      reason => (reason == APIRejectReason.NotFound ? false : Promise.reject(reason))
     );
   }
   static async sendPasswordReset(usernameOrEmail: string) {
     const credential = await DBCredentialsDAO.getByUsername(usernameOrEmail).catch(reason =>
       reason == APIRejectReason.NotFound
         ? DBCredentialsDAO.getByEmail(usernameOrEmail)
-        : Promise.reject(APIRejectReason.NotFound)
+        : // Only the expected NotFound falls back to the email lookup; real errors are rethrown
+          // instead of being masked as NotFound (which would turn them into a wrong 404)
+          Promise.reject(reason)
     );
     const uuid = await DBMagicLinksDAO.createPasswordReset(credential.userId);
-    Mailer.sendPasswordReset(credential.email, credential.username, uuid);
+    await Mailer.sendPasswordReset(credential.email, credential.username, uuid);
   }
   static async sendEmailConfirmation(userId: number, username: string, newEmail: string) {
     const uuid = await DBMagicLinksDAO.createEmailConfirmation(userId, newEmail);
-    Mailer.sendEmailConfirmation(newEmail, username, uuid);
+    await Mailer.sendEmailConfirmation(newEmail, username, uuid);
   }
   static async activateAccount(resetId: string) {
     const userId = await DBMagicLinksDAO.getUserId(resetId, MagicLinkType.AccountActivation);
@@ -52,20 +59,33 @@ export default class Auth {
     await DBMagicLinksDAO.delete(resetId);
   }
   static async register(registrationData: AuthRegisterRequest): Promise<DBCredential> {
-    await DBCredentialsDAO.create(
-      registrationData.username,
-      registrationData.password,
-      registrationData.email
-    );
-    const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
-    if (!credential) return Promise.reject();
-    DBProfilesDAO.create(credential.userId, registrationData.newsletter);
-    DBDailiesDAO.create(credential.userId);
-    CardCollection.starterDecks[registrationData.starterDeck]
-      .map(c => c.id)
-      .forEach(id => DBDecksDAO.create(id, credential.userId, true));
-    const uuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
-    Mailer.sendAccountActivation(credential.email, credential.username, uuid);
+    const { credential, activationUuid } = await DBConnection.instance.transaction(async () => {
+      await DBCredentialsDAO.create(
+        registrationData.username,
+        registrationData.password,
+        registrationData.email
+      );
+      const credential = await DBCredentialsDAO.getByUsername(registrationData.username);
+      if (!credential) return Promise.reject();
+      await DBProfilesDAO.create(credential.userId, registrationData.newsletter);
+      await DBDailiesDAO.create(credential.userId);
+      for (const card of CardCollection.starterDecks[registrationData.starterDeck]) {
+        await DBDecksDAO.create(card.id, credential.userId, true);
+      }
+      const activationUuid = await DBMagicLinksDAO.createAccountActivation(credential.userId);
+      return { credential, activationUuid };
+    });
+    // The mail is sent only after the transaction committed, so no activation link is sent for
+    // an account that was rolled back.
+    try {
+      await Mailer.sendAccountActivation(credential.email, credential.username, activationUuid);
+    } catch (err) {
+      console.log(
+        `ERROR: Failed to send account activation mail to user ${credential.userId}; ` +
+          `account, profile and activation link require manual cleanup: ${err}`
+      );
+      throw err;
+    }
     return credential;
   }
   static async login(loginData: AuthLoginRequest): Promise<DBCredentialWithSessionToken> {
@@ -73,7 +93,9 @@ export default class Auth {
       reason =>
         reason == APIRejectReason.NotFound
           ? DBCredentialsDAO.getByEmail(loginData.username, loginData.password)
-          : Promise.reject(APIRejectReason.NotFound)
+          : // Only the expected NotFound falls back to the email lookup; real errors are rethrown
+            // instead of being masked as NotFound (which would turn them into a wrong 401)
+            Promise.reject(reason)
     );
     try {
       await DBDailiesDAO.achieve(credential.userId, DailyType.Login);

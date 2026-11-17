@@ -48,7 +48,6 @@ describe('NavbarComponent', () => {
   });
 
   it('should get active route', () => {
-    // This is a basic test - more comprehensive routing tests would be needed
     expect(component.active).toBeDefined();
   });
 

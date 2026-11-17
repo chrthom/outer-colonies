@@ -5,12 +5,13 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from 'src/app/auth.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { environment } from 'src/environments/environment';
 
 describe('ProfilePage', () => {
   let component: ProfilePage;
@@ -28,7 +29,6 @@ describe('ProfilePage', () => {
     authApiSpy.resetEmail.and.returnValue(of(undefined));
     authApiSpy.resetPassword.and.returnValue(of(undefined));
 
-    // Create a getter property for profile
     Object.defineProperty(profileApiSpy, 'profile', {
       get: jasmine
         .createSpy('profile getter')
@@ -86,12 +86,84 @@ describe('ProfilePage', () => {
     expect(email?.valid).toBeTrue();
   }));
 
+  it('should not check email availability for empty or invalid values', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('');
+    email?.setValue('invalid-email');
+
+    tick(500);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+  }));
+
+  it('should debounce email availability checks while typing', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    tick(299);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+
+    tick(1);
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledTimes(1);
+    expect(authApiSpy.checkEmailExists).toHaveBeenCalledWith('new@example.com');
+  }));
+
+  it('should treat a failed availability check as no error', fakeAsync(() => {
+    authApiSpy.checkEmailExists.and.returnValue(throwError(() => new Error('Server error')));
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    tick(300);
+    expect(email?.valid).toBeTrue();
+  }));
+
+  it('should log a warning and degrade to no error when the availability check fails', fakeAsync(() => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      authApiSpy.checkEmailExists.and.returnValue(throwError(() => ({ status: 500 })));
+      const email = component.emailForm.get('email');
+      email?.setValue('new@example.com');
+      tick(300);
+      expect(email?.valid).toBeTrue();
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500.*treating email as available/));
+    } finally {
+      environment.stage = 'production';
+    }
+  }));
+
+  it('should log a warning and keep the default state when loading the profile fails', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      Object.defineProperty(profileApiSpy, 'profile', {
+        get: jasmine.createSpy('profile getter').and.returnValue(throwError(() => ({ status: 500 }))),
+        enumerable: true,
+        configurable: true
+      });
+
+      component.ngOnInit();
+
+      expect(component.newsletterSubscription).toBeFalse();
+      expect(warnSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(/status 500.*keeping default newsletter state/)
+      );
+    } finally {
+      environment.stage = 'production';
+    }
+  });
+
+  it('should cancel the pending availability check when the component is destroyed', fakeAsync(() => {
+    const email = component.emailForm.get('email');
+    email?.setValue('new@example.com');
+    fixture.destroy();
+    tick(300);
+    expect(authApiSpy.checkEmailExists).not.toHaveBeenCalled();
+  }));
+
   it('should validate password field', () => {
     const password = component.passwordForm.get('password');
     password?.setValue('');
     expect(password?.valid).toBeFalse();
 
-    password?.setValue('short'); // Too short
+    password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
     password?.setValue('validpassword123');
@@ -106,12 +178,13 @@ describe('ProfilePage', () => {
     expect(component.newsletterSubscription).toBeFalse();
   });
 
-  it('should change email on valid form submit', () => {
+  it('should change email on valid form submit', fakeAsync(() => {
     component.emailForm.setValue({ email: 'new@example.com' });
+    tick(300); // Let debounced availability check complete
     component.changeEmail();
     expect(authApiSpy.resetEmail).toHaveBeenCalledWith('new@example.com');
     expect(component.emailResetSuccessful).toBeTrue();
-  });
+  }));
 
   it('should not change email on invalid form submit', () => {
     component.emailForm.setValue({ email: 'invalid-email' });

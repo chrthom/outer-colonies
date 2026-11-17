@@ -1,16 +1,9 @@
-import { NgModule, inject } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivateFn,
-  PreloadAllModules,
-  Router,
-  RouterModule,
-  Routes
-} from '@angular/router';
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, Routes } from '@angular/router';
+import { map } from 'rxjs';
 import { LoginPage } from './pages/login/login.page';
 import { HomePage } from './pages/home/home.page';
 import { RegisterPage } from './pages/register/register.page';
-import { map, tap } from 'rxjs';
 import { DeckPage } from './pages/deck/deck.page';
 import { ImprintPage } from './pages/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
@@ -29,42 +22,53 @@ import { FactionsPage } from './pages/factions/factions.page';
 import { HistoryPage } from './pages/history/history.page';
 import { EditionsPage } from './pages/editions/editions.page';
 
+/**
+ * Redirects to HTTPS when the environment requires it.
+ * Returns false if a protocol redirect was triggered (the current navigation is abandoned).
+ */
 function checkHttps(): boolean {
   if (!environment.https || window.location.protocol == 'https:') {
     return true;
   } else {
-    window.location.protocol = 'https:';
+    window.location.replace(
+      `https://${window.location.host}${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
     return false;
   }
 }
+
+/**
+ * Guard for private pages: forces HTTPS, resolves the `?p=` deep link and
+ * redirects unauthenticated users to the login page.
+ */
 const privateGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   if (checkHttps()) {
     const router = inject(Router);
     const initialPath = route.queryParams['p'];
     if (initialPath) {
-      router.navigate(['/' + initialPath]);
-      return false;
+      return router.parseUrl('/' + initialPath);
     } else {
       return inject(AuthService)
         .check()
-        .pipe(tap(b => (!b ? router.navigate(['/login']) : {})));
+        .pipe(map(b => (b ? true : router.parseUrl('/login'))));
     }
   } else {
     return false;
   }
 };
+
+/** Guard for public pages: only forces HTTPS. */
 const publicGuardFn: CanActivateFn = () => checkHttps();
 
 /**
  * Resolves deep links of the form /?p=<path> (the only deep-link form that works behind the
- * production hosting, see #253) by navigating to the target route, so the target route's own
+ * production hosting, see #253) by redirecting to the target route, so the target route's own
  * guards apply - anonymous deep links to private routes still cascade to /login.
  */
 const deepLinkGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const initialPath = route.queryParams['p'];
   if (initialPath) {
-    inject(Router).navigate(['/' + initialPath]);
-    return false;
+    return inject(Router).parseUrl('/' + initialPath);
   }
   return true;
 };
@@ -88,7 +92,7 @@ const authenticatedGuardFn: CanActivateFn = () => {
     );
 };
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
@@ -203,9 +207,3 @@ const routes: Routes = [
     redirectTo: ''
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {}

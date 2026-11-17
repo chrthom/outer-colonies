@@ -1,16 +1,12 @@
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '../../../../../server/src/shared/config/enums';
-import {
-  ClientAttack,
-  ClientCard,
-  ClientCardStack
-} from '../../../../../server/src/shared/interfaces/client_state';
+import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { ClientAttack, ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
-import { constants } from '../../../../../server/src/shared/config/constants';
+import { constants } from '@shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
@@ -308,7 +304,7 @@ export default class CardStack {
               this.scene.socket.emit(MsgTypeInbound.Attack, '*', '*', this.uuid);
             } else if (
               this.scene.activeCards.stackUUID &&
-              this.scene.state.battle?.opponentShipIds.includes(this.uuid)
+              this.scene.state.battle.opponentShipIds.includes(this.uuid)
             ) {
               this.scene.socket.emit(
                 MsgTypeInbound.Attack,

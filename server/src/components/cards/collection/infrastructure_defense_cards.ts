@@ -48,9 +48,9 @@ export class Card345 extends InfrastructureDefenseCard {
   }
 }
 
-export class Card448 extends InfrastructureDefenseCard {
+export class Card435 extends InfrastructureDefenseCard {
   constructor() {
-    super(448, 'Schildkuppel', 1, {
+    super(435, 'Schildkuppel', 2, {
       hp: 5,
       shield: 1,
       energy: -1
@@ -61,4 +61,4 @@ export class Card448 extends InfrastructureDefenseCard {
   }
 }
 
-export const allCards = [new Card156(), new Card169(), new Card238(), new Card345(), new Card448()];
+export const allCards = [new Card156(), new Card169(), new Card238(), new Card345(), new Card435()];
