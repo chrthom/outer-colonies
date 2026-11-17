@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { starterDecks } from '../../shared/config/starter_decks';
+import { passwordHasLetterAndDigit } from '../../shared/config/password_rules';
 import { sendStatus } from './api_response';
 
 /**
@@ -22,7 +23,7 @@ const strongPassword = z
   .string({ message: 'Password must be a string' })
   .min(8, 'Password must be between 8 and 40 characters long')
   .max(40, 'Password must be between 8 and 40 characters long')
-  .refine(value => /\p{L}/u.test(value) && /\d/.test(value), {
+  .refine(value => passwordHasLetterAndDigit(value), {
     message: 'Password must contain at least one letter and one digit'
   });
 
@@ -83,6 +84,58 @@ export const authEmailSchema = z.object({
 });
 
 /**
+ * Schema for the query params of `GET /api/auth/exists`: at most one of `username` or
+ * `email` is checked per request, so both are optional here and the endpoint rejects a
+ * query carrying neither.
+ */
+export const authExistsQuerySchema = z.object({
+  username: username.optional(),
+  email: email.optional()
+});
+
+/**
+ * Schema for the `:user` path param of `DELETE /api/auth/password/:user`: the account to
+ * send the password reset mail for is identified by its username or its email address.
+ */
+export const authPasswordResetUserSchema = z.object({
+  user: z.union([username, email], { message: 'User must be a username or an email address' })
+});
+
+/**
+ * Schema for the one-time link id path params (`PUT /api/auth/register/:id`,
+ * `PUT /api/auth/password/:id`, `PUT /api/auth/email/:id`): the ids are UUIDs, so bounding
+ * the format keeps oversized or malformed values out of the database lookup.
+ */
+export const oneTimeIdSchema = z.object({
+  id: z.string().uuid('Invalid one-time link id')
+});
+
+/**
+ * Validates a request property against a zod schema. On a validation failure a 400
+ * response with the first validation error as message is sent and `undefined` is
+ * returned; on success the parsed (and potentially transformed, e.g. trimmed) value is
+ * returned.
+ * @param schema zod schema the value must satisfy
+ * @param value the request property value to validate
+ * @param res response the 400 is sent to on a validation failure
+ * @param fallbackMessage response message when the schema yields no specific error
+ * @returns the parsed value, or `undefined` if it is invalid
+ */
+function validate<S extends z.ZodType>(
+  schema: S,
+  value: unknown,
+  res: Response,
+  fallbackMessage: string
+): z.output<S> | undefined {
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    sendStatus(res, 400, result.error.issues[0]?.message ?? fallbackMessage);
+    return undefined;
+  }
+  return result.data;
+}
+
+/**
  * Validates a request body against a zod schema. On a validation failure a 400 response with
  * the first validation error as message is sent and `undefined` is returned; on success the
  * parsed (and potentially transformed, e.g. trimmed) body is returned.
@@ -91,15 +144,30 @@ export const authEmailSchema = z.object({
  * @param res response the 400 is sent to on a validation failure
  * @returns the parsed request body, or `undefined` if the body is invalid
  */
-export function validateBody<S extends z.ZodType>(
-  schema: S,
-  req: Request,
-  res: Response
-): z.output<S> | undefined {
-  const result = schema.safeParse(req.body);
-  if (!result.success) {
-    sendStatus(res, 400, result.error.issues[0]?.message ?? 'Invalid request body');
-    return undefined;
-  }
-  return result.data;
+export function validateBody<S extends z.ZodType>(schema: S, req: Request, res: Response) {
+  return validate(schema, req.body, res, 'Invalid request body');
+}
+
+/**
+ * Validates the query parameters of a request against a zod schema, mirroring
+ * {@link validateBody}.
+ * @param schema zod schema the query parameters must satisfy
+ * @param req request whose query parameters are validated
+ * @param res response the 400 is sent to on a validation failure
+ * @returns the parsed query parameters, or `undefined` if they are invalid
+ */
+export function validateQuery<S extends z.ZodType>(schema: S, req: Request, res: Response) {
+  return validate(schema, req.query, res, 'Invalid query parameters');
+}
+
+/**
+ * Validates the path parameters of a request against a zod schema, mirroring
+ * {@link validateBody}.
+ * @param schema zod schema the path parameters must satisfy
+ * @param req request whose path parameters are validated
+ * @param res response the 400 is sent to on a validation failure
+ * @returns the parsed path parameters, or `undefined` if they are invalid
+ */
+export function validateParams<S extends z.ZodType>(schema: S, req: Request, res: Response) {
+  return validate(schema, req.params, res, 'Invalid path parameters');
 }

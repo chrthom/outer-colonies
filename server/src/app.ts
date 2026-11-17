@@ -12,10 +12,13 @@ import DBConnection from './components/persistence/db_connector';
 import process from 'node:process';
 
 const app = express();
-// The API is deployed behind a local reverse proxy that terminates HTTPS. Trusting only
-// loopback proxies keeps req.ip the real client address there (so the rate limiters of the
-// auth endpoints bucket per client), while direct clients cannot spoof X-Forwarded-For.
-app.set('trust proxy', 'loopback');
+// The API is deployed behind a local reverse proxy that terminates HTTPS: the proxy enters
+// the server container from the Docker bridge gateway, so the private bridge subnet must be
+// trusted alongside loopback for req.ip to resolve to the real client address there (the
+// rate limiters of the auth endpoints bucket per client). There is exactly one trusted
+// proxy hop; direct LAN clients bypassing the proxy are not in the trusted set, so
+// X-Forwarded-For spoofing stays impossible.
+app.set('trust proxy', ['loopback', '172.16.0.0/12']);
 app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {

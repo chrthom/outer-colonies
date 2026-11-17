@@ -1,9 +1,12 @@
 import { starterDecks } from '../../shared/config/starter_decks';
 import {
   authEmailSchema,
+  authExistsQuerySchema,
   authLoginSchema,
+  authPasswordResetUserSchema,
   authPasswordSchema,
   authRegisterSchema,
+  oneTimeIdSchema,
   validateBody
 } from './request_validation';
 
@@ -124,6 +127,61 @@ describe('RequestValidation', () => {
     ])('rejects a %s', (_case, invalidChange) => {
       const result = authEmailSchema.safeParse({ ...validBody, ...invalidChange });
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe('authExistsQuerySchema', () => {
+    it('accepts a username', () => {
+      expect(authExistsQuerySchema.safeParse({ username: 'testuser' }).success).toBe(true);
+    });
+
+    it('accepts an email address', () => {
+      expect(authExistsQuerySchema.safeParse({ email: 'test@example.com' }).success).toBe(true);
+    });
+
+    it('accepts a query with neither username nor email', () => {
+      expect(authExistsQuerySchema.safeParse({}).success).toBe(true);
+    });
+
+    it.each([
+      ['short username', { username: 'ab' }],
+      ['long username', { username: 'a'.repeat(21) }],
+      ['malformed email', { email: 'not-an-email' }],
+      ['long email', { email: `${'a'.repeat(50)}@example.com` }]
+    ])('rejects a query with a %s', (_case, invalidQuery) => {
+      expect(authExistsQuerySchema.safeParse(invalidQuery).success).toBe(false);
+    });
+  });
+
+  describe('authPasswordResetUserSchema', () => {
+    it('accepts a username', () => {
+      expect(authPasswordResetUserSchema.safeParse({ user: 'testuser' }).success).toBe(true);
+    });
+
+    it('accepts an email address', () => {
+      expect(authPasswordResetUserSchema.safeParse({ user: 'test@example.com' }).success).toBe(true);
+    });
+
+    it.each([
+      ['short user', 'ab'],
+      ['junk user beyond the username length', 'a'.repeat(21)],
+      ['long user', 'a'.repeat(61)]
+    ])('rejects a %s', (_case, invalidUser) => {
+      expect(authPasswordResetUserSchema.safeParse({ user: invalidUser }).success).toBe(false);
+    });
+  });
+
+  describe('oneTimeIdSchema', () => {
+    it('accepts a UUID', () => {
+      expect(oneTimeIdSchema.safeParse({ id: 'a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab' }).success).toBe(true);
+    });
+
+    it.each([
+      ['missing id', undefined],
+      ['non-UUID id', 'not-a-uuid'],
+      ['oversized id', 'a'.repeat(37)]
+    ])('rejects a %s', (_case, invalidId) => {
+      expect(oneTimeIdSchema.safeParse({ id: invalidId }).success).toBe(false);
     });
   });
 

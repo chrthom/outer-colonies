@@ -404,7 +404,13 @@ describe('RESTAPI Auth Endpoints', () => {
     jest.restoreAllMocks();
   });
 
-  const createRequest = (route: string, ip: string, body?: unknown) => ({
+  const createRequest = (
+    route: string,
+    ip: string,
+    body?: unknown,
+    params?: Record<string, string>,
+    query?: Record<string, string>
+  ) => ({
     header: jest.fn(),
     body: body,
     ip: ip,
@@ -412,8 +418,8 @@ describe('RESTAPI Auth Endpoints', () => {
     path: route.split(' ')[1],
     headers: {},
     app: { get: () => 'loopback' },
-    params: {},
-    query: {},
+    params: params ?? {},
+    query: query ?? {},
     route: { path: route.split(' ')[1] }
   });
   const createResponse = (req: object) => {
@@ -429,28 +435,32 @@ describe('RESTAPI Auth Endpoints', () => {
     starterDeck: 1,
     newsletter: false
   };
+  const validOneTimeId = 'a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab';
 
   describe('request body validation', () => {
     it.each([
-      ['starter deck out of range', { starterDeck: 99 }],
-      ['weak password', { password: 'password' }],
-      ['malformed email', { email: 'not-an-email' }],
-      ['short username', { username: 'ab' }],
-      ['non-boolean newsletter', { newsletter: 'yes' }]
-    ])('should reject a registration with a %s without touching the database', async (_case, invalidBody) => {
-      jest.spyOn(console, 'log').mockImplementation(() => undefined);
-      const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
-      const res = createResponse(createRequest('POST /api/auth/register', '192.168.1.1'));
+      ['starter deck out of range', { starterDeck: 99 }, '192.168.1.11'],
+      ['weak password', { password: 'password' }, '192.168.1.12'],
+      ['malformed email', { email: 'not-an-email' }, '192.168.1.13'],
+      ['short username', { username: 'ab' }, '192.168.1.14'],
+      ['non-boolean newsletter', { newsletter: 'yes' }, '192.168.1.15']
+    ])(
+      'should reject a registration with a %s without touching the database',
+      async (_case, invalidBody, ip) => {
+        jest.spyOn(console, 'log').mockImplementation(() => undefined);
+        const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
+        const res = createResponse(createRequest('POST /api/auth/register', ip));
 
-      routes.get('POST /api/auth/register')!(
-        createRequest('POST /api/auth/register', '192.168.1.1', { ...validRegisterBody, ...invalidBody }),
-        res
-      );
-      await flushMicrotasks();
+        routes.get('POST /api/auth/register')!(
+          createRequest('POST /api/auth/register', ip, { ...validRegisterBody, ...invalidBody }),
+          res
+        );
+        await flushMicrotasks();
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(checkUsernameExistsSpy).not.toHaveBeenCalled();
-    });
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(checkUsernameExistsSpy).not.toHaveBeenCalled();
+      }
+    );
 
     it('should register with the parsed body and respond with the user id', async () => {
       jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
@@ -496,7 +506,12 @@ describe('RESTAPI Auth Endpoints', () => {
       const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.1'));
 
       routes.get('PUT /api/auth/password/:id')!(
-        createRequest('PUT /api/auth/password/:id', '192.168.3.1', { password: 'password' }),
+        createRequest(
+          'PUT /api/auth/password/:id',
+          '192.168.3.1',
+          { password: 'password' },
+          { id: validOneTimeId }
+        ),
         res
       );
       await flushMicrotasks();
@@ -510,13 +525,88 @@ describe('RESTAPI Auth Endpoints', () => {
       const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.2'));
 
       routes.get('PUT /api/auth/password/:id')!(
-        createRequest('PUT /api/auth/password/:id', '192.168.3.2', { password: 'password1' }),
+        createRequest(
+          'PUT /api/auth/password/:id',
+          '192.168.3.2',
+          { password: 'password1' },
+          { id: validOneTimeId }
+        ),
         res
       );
       await flushMicrotasks();
 
-      expect(resetPasswordSpy).toHaveBeenCalledWith(expect.any(String), 'password1');
+      expect(resetPasswordSpy).toHaveBeenCalledWith(validOneTimeId, 'password1');
       expect(res.status).toHaveBeenCalledWith(204);
+    });
+  });
+
+  describe('request parameter validation', () => {
+    it('should reject an exists check with an invalid username without touching the database', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
+      const res = createResponse(createRequest('GET /api/auth/exists', '192.168.6.1'));
+
+      routes.get('GET /api/auth/exists')!(
+        createRequest('GET /api/auth/exists', '192.168.6.1', undefined, undefined, {
+          username: 'a'.repeat(21)
+        }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(checkUsernameExistsSpy).not.toHaveBeenCalled();
+    });
+
+    it('should answer an exists check for a valid username', async () => {
+      const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(true);
+      const res = createResponse(createRequest('GET /api/auth/exists', '192.168.6.2'));
+
+      routes.get('GET /api/auth/exists')!(
+        createRequest('GET /api/auth/exists', '192.168.6.2', undefined, undefined, {
+          username: 'testuser'
+        }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(checkUsernameExistsSpy).toHaveBeenCalledWith('testuser');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({ exists: true });
+    });
+
+    it('should reject a password reset request with an invalid user param without touching the database', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset');
+      const res = createResponse(createRequest('DELETE /api/auth/password/:user', '192.168.6.3'));
+
+      routes.get('DELETE /api/auth/password/:user')!(
+        createRequest('DELETE /api/auth/password/:user', '192.168.6.3', undefined, {
+          user: 'a'.repeat(61)
+        }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(sendPasswordResetSpy).not.toHaveBeenCalled();
+    });
+
+    it('should reject an account activation with a malformed one-time id without touching the database', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const activateAccountSpy = jest.spyOn(Auth, 'activateAccount');
+      const res = createResponse(createRequest('PUT /api/auth/register/:id', '192.168.6.4'));
+
+      routes.get('PUT /api/auth/register/:id')!(
+        createRequest('PUT /api/auth/register/:id', '192.168.6.4', undefined, {
+          id: 'not-a-uuid'
+        }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(activateAccountSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -548,7 +638,7 @@ describe('RESTAPI Auth Endpoints', () => {
       expect(blockedRes.status).toHaveBeenCalledWith(429);
     });
 
-    it('should block an eleventh login attempt from a different IP not affected by the limit of another', async () => {
+    it('should not block a login attempt from an IP whose limit was not exhausted by another client', async () => {
       jest.spyOn(console, 'log').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
         sessionToken: 'token',
@@ -575,13 +665,18 @@ describe('RESTAPI Auth Endpoints', () => {
 
       for (let i = 0; i < 5; i++) {
         requestPasswordReset(
-          createRequest('DELETE /api/auth/password/:user', '192.168.5.1'),
+          createRequest('DELETE /api/auth/password/:user', '192.168.5.1', undefined, {
+            user: 'testuser'
+          }),
           createResponse({})
         );
         await flushMicrotasks();
       }
       const blockedRes = createResponse(createRequest('DELETE /api/auth/password/:user', '192.168.5.1'));
-      requestPasswordReset(createRequest('DELETE /api/auth/password/:user', '192.168.5.1'), blockedRes);
+      requestPasswordReset(
+        createRequest('DELETE /api/auth/password/:user', '192.168.5.1', undefined, { user: 'testuser' }),
+        blockedRes
+      );
       await flushMicrotasks();
 
       expect(sendPasswordResetSpy).toHaveBeenCalledTimes(5);

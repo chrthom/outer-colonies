@@ -15,10 +15,15 @@ import {
 import { sendStatus } from './utils/api_response';
 import {
   authEmailSchema,
+  authExistsQuerySchema,
   authLoginSchema,
+  authPasswordResetUserSchema,
   authPasswordSchema,
   authRegisterSchema,
-  validateBody
+  oneTimeIdSchema,
+  validateBody,
+  validateParams,
+  validateQuery
 } from './utils/request_validation';
 import {
   existsRateLimiter,
@@ -105,7 +110,9 @@ export default function restAPI(app: Express) {
   });
 
   app.put('/api/auth/register/:id', (req, res) => {
-    Auth.activateAccount(String(req.params['id'])).then(
+    const params = validateParams(oneTimeIdSchema, req, res);
+    if (!params) return;
+    Auth.activateAccount(params.id).then(
       () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
@@ -154,17 +161,19 @@ export default function restAPI(app: Express) {
       };
       res.status(200).send(payload);
     };
-    if (req.query['username'])
-      Auth.checkUsernameExists(String(req.query['username'])).then(sendExistsResponse, () =>
-        sendStatus(res, 500)
-      );
-    else if (req.query['email'])
-      Auth.checkEmailExists(String(req.query['email'])).then(sendExistsResponse, () => sendStatus(res, 500));
+    const existsQuery = validateQuery(authExistsQuerySchema, req, res);
+    if (!existsQuery) return;
+    if (existsQuery.username)
+      Auth.checkUsernameExists(existsQuery.username).then(sendExistsResponse, () => sendStatus(res, 500));
+    else if (existsQuery.email)
+      Auth.checkEmailExists(existsQuery.email).then(sendExistsResponse, () => sendStatus(res, 500));
     else sendStatus(res, 400, 'No username or email parameter was provided');
   });
 
   app.delete('/api/auth/password/:user', passwordResetRateLimiter, (req, res) => {
-    Auth.sendPasswordReset(String(req.params['user'])).then(
+    const params = validateParams(authPasswordResetUserSchema, req, res);
+    if (!params) return;
+    Auth.sendPasswordReset(params.user).then(
       () => sendStatus(res, 202),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
@@ -184,7 +193,9 @@ export default function restAPI(app: Express) {
   app.put('/api/auth/password/:id', (req, res) => {
     const passwordRequest = validateBody(authPasswordSchema, req, res);
     if (!passwordRequest) return;
-    Auth.resetPassword(String(req.params['id']), passwordRequest.password).then(
+    const params = validateParams(oneTimeIdSchema, req, res);
+    if (!params) return;
+    Auth.resetPassword(params.id, passwordRequest.password).then(
       () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
@@ -202,7 +213,9 @@ export default function restAPI(app: Express) {
   });
 
   app.put('/api/auth/email/:id', (req, res) => {
-    Auth.resetEmail(String(req.params['id'])).then(
+    const params = validateParams(oneTimeIdSchema, req, res);
+    if (!params) return;
+    Auth.resetEmail(params.id).then(
       () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
