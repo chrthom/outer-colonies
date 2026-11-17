@@ -2,18 +2,20 @@ import Card from '../cards/card';
 import CardStack from '../cards/card_stack';
 import { Attack } from '../game_state/battle';
 
+/**
+ * Removes the elements both arrays have in common, one occurrence per match, from copies of
+ * both arrays. Neither input array is mutated.
+ * @returns the unmatched elements of array1 and of array2, in their original order
+ */
 export function arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
-  const a1 = array1.slice();
-  const a2 = array2.slice();
-  a1.slice().forEach(v1 => {
-    const i1 = a1.indexOf(v1);
-    const i2 = a2.indexOf(v1);
-    if (i1 >= 0 && i2 >= 0) {
-      a1.splice(i1, 1);
-      a2.splice(i2, 1);
-    }
+  const unmatched2 = array2.slice();
+  const unmatched1 = array1.filter(v1 => {
+    const i2 = unmatched2.indexOf(v1);
+    if (i2 == -1) return true;
+    unmatched2.splice(i2, 1);
+    return false;
   });
-  return [a1, a2];
+  return [unmatched1, unmatched2];
 }
 
 export function getCardStackByUUID(cardStacks: CardStack[], uuid: string): CardStack | undefined {
