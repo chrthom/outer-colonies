@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 interface SocketListenerStub {
   on: jasmine.Spy;
   off: jasmine.Spy;
+  emit: jasmine.Spy;
   io: { on: jasmine.Spy; off: jasmine.Spy };
 }
 
@@ -26,7 +27,7 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
 
   beforeEach(() => {
     matchmaking = new Matchmaking();
-    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    socket = jasmine.createSpyObj('Socket', ['on', 'off', 'emit']);
     socket.io = jasmine.createSpyObj('Manager', ['on', 'off']);
     const handle = matchmaking as unknown as MatchmakingOverrides;
     handle.socket = socket;
