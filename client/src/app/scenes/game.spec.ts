@@ -10,7 +10,7 @@ import {
 import { animationConfig } from '../config/animation';
 import { Socket } from 'socket.io-client';
 import Phaser from 'phaser';
-import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
+import { makeAddStub, makeObjStub, makeTimeStub, makeTweensStub, ObjStub } from '../testing/phaser_stubs';
 
 /** Fake socket that records the game listeners registered and removed by the scene. */
 interface SocketListenerStub {
@@ -134,28 +134,27 @@ function makeGame(): Game {
   return game;
 }
 
-describe('Game scene - showSurrenderOnDisconnect', () => {
+describe('Game scene - showConnectionLostMessage', () => {
   let game: Game;
 
   beforeEach(() => {
     game = makeGame();
   });
 
-  it('synthesises a surrender ClientGameResult and renders the indicator', () => {
-    game.showSurrenderOnDisconnect();
+  it('renders a hint text and marks the connection as lost', () => {
+    game.showConnectionLostMessage();
 
-    expect(game.state.gameResult).toBeDefined();
-    expect(game.state.gameResult?.won).toBeFalse();
-    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
-    expect(game.state.gameResult?.sol).toBe(0);
-    // The GameOverIndicator constructor renders three text labels and one image.
-    expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalled();
-    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalled();
+    expect(game.connectionLost).toBeTrue();
+    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
+    // The server keeps the match alive for a grace window, so no surrender
+    // result is synthesised on the client
+    expect(game.state.gameResult).toBeUndefined();
   });
 
   it('does not mutate the shared emptyClientState constant', () => {
-    game.showSurrenderOnDisconnect();
+    game.showConnectionLostMessage();
 
+    expect(game.state).toBe(emptyClientState);
     expect(emptyClientState.gameResult).toBeUndefined();
   });
 
@@ -166,11 +165,26 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     };
     game.state = existing;
 
-    game.showSurrenderOnDisconnect();
+    game.showConnectionLostMessage();
 
+    expect(game.connectionLost).toBeFalse();
     expect(game.state).toBe(existing);
-    expect(game.state.gameResult?.won).toBeTrue();
-    expect(game.add.image as unknown as jasmine.Spy).not.toHaveBeenCalled();
+    expect(game.add.text as unknown as jasmine.Spy).not.toHaveBeenCalled();
+  });
+
+  it('renders the message exactly once on repeated calls', () => {
+    game.showConnectionLostMessage();
+    game.showConnectionLostMessage();
+
+    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes the exit button so it offers leaving instead of surrendering', () => {
+    (game as unknown as { obj: ObjStub }).obj = makeObjStub();
+
+    game.showConnectionLostMessage();
+
+    expect(game.obj.exitButton.update).toHaveBeenCalled();
   });
 });
 
@@ -216,7 +230,7 @@ describe('Game scene - socket listener lifecycle', () => {
     ]);
   });
 
-  it('shows the surrender indicator when the socket disconnects', () => {
+  it('shows the connection lost message when the socket disconnects', () => {
     game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
     game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
     game.state = emptyClientState;
@@ -224,8 +238,8 @@ describe('Game scene - socket listener lifecycle', () => {
     const disconnectHandler = socket.on.calls.allArgs().find(args => args[0] == 'disconnect')![1];
     disconnectHandler();
 
-    expect(game.state.gameResult?.won).toBeFalse();
-    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
+    expect(game.connectionLost).toBeTrue();
+    expect(game.state.gameResult).toBeUndefined();
   });
 });
 
@@ -284,8 +298,14 @@ describe('Game scene - showGameOverIndicator', () => {
     expectSingleIndicator(game);
   });
 
-  it('does not create a second overlay when updates follow a disconnect surrender', () => {
-    game.showSurrenderOnDisconnect();
+  it('does not create a second overlay when a game result follows a connection loss', () => {
+    game.showConnectionLostMessage();
+    game.state = {
+      ...emptyClientState,
+      gameResult: { won: false, type: GameResultType.Surrender, sol: 0 }
+    };
+    // The connection lost hint is a separate text and not part of the overlay
+    (game.add.text as unknown as jasmine.Spy).calls.reset();
 
     // Simulates the ContinueButton.update() path after further updateView() calls
     game.showGameOverIndicator(game.state.gameResult!);
@@ -295,7 +315,7 @@ describe('Game scene - showGameOverIndicator', () => {
   });
 
   it('shows a fresh overlay in the next match after init() resets the reference', () => {
-    game.showSurrenderOnDisconnect();
+    game.showGameOverIndicator({ won: false, type: GameResultType.Surrender, sol: 0 });
 
     // The Game scene fetches its socket from the app-level SocketService, so
     // open a fake connection instead of passing a socket via the init data.
@@ -312,6 +332,21 @@ describe('Game scene - showGameOverIndicator', () => {
     game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
 
     expectSingleIndicator(game);
+  });
+
+  it('resets the connection lost flag when the next match starts', () => {
+    game.showConnectionLostMessage();
+    expect(game.connectionLost).toBeTrue();
+
+    const socket = jasmine.createSpyObj('Socket', ['disconnect']);
+    socket.io = { reconnection: () => undefined };
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
+    SocketService.connect();
+    game.init({
+      gameParams: { preloadCardIds: [] }
+    });
+
+    expect(game.connectionLost).toBeFalse();
   });
 });
 

@@ -17,6 +17,7 @@ import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId: string;
+  userId: number;
   name: string;
   match: Match;
   no: number;
@@ -26,8 +27,13 @@ export default class Player {
   hand: CardStack[] = [];
   cardStacks: CardStack[];
   actionPool!: ActionPool;
-  constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
-    this.socketId = socketd;
+  /** Timestamp (ms since epoch) when the player's socket disconnected from a running match; undefined while connected */
+  disconnectedSince?: number;
+  /** Whether the player's socket received the final state of the match; a finished match stays registered until every player's result was delivered (see gameCron in components/game.ts) */
+  resultDelivered?: boolean;
+  constructor(socketId: string, userId: number, name: string, match: Match, playerNo: number, deck: Card[]) {
+    this.socketId = socketId;
+    this.userId = userId;
     this.name = name;
     this.match = match;
     this.no = playerNo;
