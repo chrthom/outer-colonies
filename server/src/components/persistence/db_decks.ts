@@ -6,6 +6,13 @@ export interface DBDeck {
   inUse: boolean;
 }
 
+/** Raw `decks` row as the MariaDB driver returns it (the bigint key arrives as BigInt). */
+interface DeckRow {
+  card_instance_id: bigint;
+  card_id: number;
+  in_use: number;
+}
+
 export default class DBDecksDAO {
   static async getByUserId(userId: number): Promise<DBDeck[]> {
     return this.getBy('user_id = ?', [userId]);
@@ -23,12 +30,12 @@ export default class DBDecksDAO {
       [inUse, cardInstanceId, userId]
     );
   }
-  private static async getBy(whereClause: string, params: any[]): Promise<DBDeck[]> {
-    const queryResult: any[] = await DBConnection.instance.query(
+  private static async getBy(whereClause: string, params: unknown[]): Promise<DBDeck[]> {
+    const rows = await DBConnection.instance.query<DeckRow[]>(
       `SELECT card_instance_id, card_id, in_use FROM decks WHERE ${whereClause}`,
       params
     );
-    return queryResult.map(r => {
+    return rows.map(r => {
       return {
         cardInstanceId: Number(r.card_instance_id),
         cardId: Number(r.card_id),
