@@ -2,57 +2,32 @@ import Prompt from './prompt';
 import { BattleType, GameResultType, TurnPhase } from '@shared/config/enums';
 import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { animationConfig } from '../../config/animation';
+import { asGameScene, GameObjectStub, makeSceneStub, SceneStub } from '../../testing/phaser_stubs';
 
-const chainable = (): any => {
-  const stub: any = {};
-  [
-    'setDepth',
-    'setOrigin',
-    'setScale',
-    'setFontSize',
-    'setFontFamily',
-    'setColor',
-    'setAlign',
-    'setText',
-    'setVisible'
-  ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
-  return stub;
-};
-
-const makeScene = (state: ClientState): any => ({
-  state: state,
-  plannedBattle: { type: BattleType.None, shipIds: [] },
-  add: {
-    image: jasmine.createSpy('image').and.callFake(chainable),
-    text: jasmine.createSpy('text').and.callFake(chainable)
-  },
-  time: {
-    delayedCall: jasmine.createSpy('delayedCall')
-  },
-  obj: {
-    exitButton: {
-      show: jasmine.createSpy('exitButton.show'),
-      hide: jasmine.createSpy('exitButton.hide')
-    }
-  }
-});
+const makeScene = (state: ClientState): SceneStub => makeSceneStub({ state });
 
 const makeState = (overrides: Partial<ClientState> = {}): ClientState => ({
   ...emptyClientState,
   ...overrides
 });
 
+/** The private Prompt text object, on which the prompt stubs are recorded. */
+const textOf = (prompt: Prompt): GameObjectStub => (prompt as unknown as { text: GameObjectStub }).text;
+
+/** The private Prompt background image, on which the prompt stubs are recorded. */
+const imageOf = (prompt: Prompt): GameObjectStub => (prompt as unknown as { image: GameObjectStub }).image;
+
 describe('Prompt', () => {
   it('shows the waiting prompt while the opponent is taking their turn', () => {
     const scene = makeScene(makeState({ playerPendingAction: false }));
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(asGameScene(scene));
 
     prompt.update();
 
-    expect((prompt as any).text.setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeTrue();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeTrue();
-    expect(scene.obj.exitButton.hide).toHaveBeenCalled();
+    expect(textOf(prompt).setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeTrue();
+    expect(imageOf(prompt).setVisible.calls.mostRecent().args[0]).toBeTrue();
+    expect(scene.obj?.exitButton.hide).toHaveBeenCalled();
     expect(scene.time.delayedCall).toHaveBeenCalledWith(
       animationConfig.duration.promptShow,
       jasmine.any(Function)
@@ -66,16 +41,16 @@ describe('Prompt', () => {
         gameResult: { won: false, type: GameResultType.Domination, sol: 0 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(asGameScene(scene));
 
     prompt.update();
 
     // Must not fall back to the regular "Warte auf Gegenspieler..." branch
-    expect((prompt as any).text.setText).not.toHaveBeenCalled();
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect(scene.obj.exitButton.show).toHaveBeenCalled();
-    expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
+    expect(textOf(prompt).setText).not.toHaveBeenCalled();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(imageOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(scene.obj?.exitButton.show).toHaveBeenCalled();
+    expect(scene.obj?.exitButton.hide).not.toHaveBeenCalled();
     expect(scene.time.delayedCall).not.toHaveBeenCalled();
   });
 
@@ -88,13 +63,13 @@ describe('Prompt', () => {
         gameResult: { won: true, type: GameResultType.Destruction, sol: 42 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(asGameScene(scene));
 
     prompt.update();
 
-    expect((prompt as any).text.setText).not.toHaveBeenCalled();
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
+    expect(textOf(prompt).setText).not.toHaveBeenCalled();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(scene.obj?.exitButton.hide).not.toHaveBeenCalled();
   });
 
   it('shows the combat phase text with the corrected grammar', () => {
@@ -105,23 +80,23 @@ describe('Prompt', () => {
         battle: { type: BattleType.Mission, playerShipIds: [], opponentShipIds: [], range: 3 }
       })
     );
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(asGameScene(scene));
 
     prompt.update();
 
-    expect((prompt as any).text.setText).toHaveBeenCalledWith(
+    expect(textOf(prompt).setText).toHaveBeenCalledWith(
       'Aktuelle Reichweite des Gefechts: 3\nFühre Angriffe mit deinen\nWaffensystemen durch!'
     );
   });
 
   it('keeps the prompt hidden and the exit button visible when show() is called while the game is over', () => {
     const scene = makeScene(makeState({ gameResult: { won: true, type: GameResultType.Surrender, sol: 0 } }));
-    const prompt = new Prompt(scene);
+    const prompt = new Prompt(asGameScene(scene));
 
     prompt.show();
 
-    expect((prompt as any).text.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect((prompt as any).image.setVisible.calls.mostRecent().args[0]).toBeFalse();
-    expect(scene.obj.exitButton.hide).not.toHaveBeenCalled();
+    expect(textOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(imageOf(prompt).setVisible.calls.mostRecent().args[0]).toBeFalse();
+    expect(scene.obj?.exitButton.hide).not.toHaveBeenCalled();
   });
 });

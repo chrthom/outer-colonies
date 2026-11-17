@@ -1,6 +1,6 @@
 import SocketData from './game_state/socket_data';
 import Match from './game_state/match';
-import { MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
 import ClientGameParams from '../shared/interfaces/client_game_params';
@@ -27,7 +27,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
       console.log(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
       socket.join(matchmakingRoom);
-      socket.emit(MsgTypeOutbound.Matchmaking, 'search', clientsInMatchMaking(io).size - 1);
+      socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
     } catch (err) {
       console.log(`ERROR: Login failed for session token ${sessionToken}: ${err}`);
     }
@@ -43,7 +43,7 @@ export function matchMakingCron(io: Server) {
     console.log(`Performing matchmaking for ${numClients} clients...`);
     let partnerSocket = null;
     for (const client of clients) {
-      client.emit(matchmakingRoom, 'search', numClients - 1);
+      client.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, numClients - 1);
       if (partnerSocket) initGame(io, client, partnerSocket);
       else partnerSocket = client;
     }
@@ -61,5 +61,5 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
   const gameParams: ClientGameParams = {
     preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
-  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, 'start', gameParams);
+  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParams);
 }

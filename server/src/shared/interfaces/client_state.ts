@@ -1,4 +1,5 @@
 import { EventType, BattleType, TurnPhase, Zone, GameResultType, InterventionType } from '../config/enums';
+import { rules } from '../config/rules';
 
 export interface ClientPlayer {
   actionPool: string[];
@@ -113,7 +114,8 @@ export const emptyClientState: ClientState = {
     type: BattleType.None,
     playerShipIds: [],
     opponentShipIds: [],
-    range: 0
+    // The server encodes "no battle" as rules.maxRange + 1
+    range: rules.maxRange + 1
   },
   cardStacks: [],
   events: [],

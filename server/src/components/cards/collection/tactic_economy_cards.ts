@@ -125,6 +125,28 @@ export class Card217 extends TacticCard {
   }
 }
 
+export class Card222 extends TacticCard {
+  private readonly cardsToRestore = 3;
+  constructor() {
+    super(222, 'Wracks plündern', 2, TacticDiscipline.Trade);
+  }
+  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
+    this.tributeMultipleFromPile(optionalParameters, player.discardPile, c => player.deck.push(c));
+    player.shuffleDeck();
+  }
+  getValidTargets(player: Player): CardStack[] {
+    return player.discardPile.filter(c => c.type == CardType.Hull).length > 0
+      ? this.onlyColonyTarget(player.cardStacks)
+      : [];
+  }
+  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
+    return player.discardPile.filter(c => c.type == CardType.Hull).map(c => c.id);
+  }
+  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
+    return Math.min(this.cardsToRestore, player.discardPile.filter(c => c.type == CardType.Hull).length);
+  }
+}
+
 export class Card232 extends TacticCard {
   private readonly cardsToDraw = 2;
   constructor() {
@@ -250,6 +272,7 @@ export const allCards = [
   new Card165(),
   new Card210(),
   new Card217(),
+  new Card222(),
   new Card232(),
   new Card235(),
   new Card236(),

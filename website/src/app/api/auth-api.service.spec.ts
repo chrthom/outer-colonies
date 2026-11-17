@@ -41,7 +41,40 @@ describe('AuthApiService', () => {
       expect(result).toBeTrue();
     });
 
-    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=${testEmail}`);
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=test@example.com`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: true });
+  });
+
+  it('should URL-encode special characters in the username availability check', () => {
+    service.checkUsernameExists('user+name').subscribe(result => {
+      expect(result).toBeFalse();
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?username=user%2Bname`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: false });
+  });
+
+  it('should URL-encode special characters in the email availability check', () => {
+    service.checkEmailExists('user+tag@example.com').subscribe(result => {
+      expect(result).toBeTrue();
+    });
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/exists?email=user%2Btag@example.com`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ exists: true });
+  });
+
+  it('should URL-encode query parameters of the exists check', () => {
+    const testEmail = 'foo+bar&baz@example.com';
+    service.checkEmailExists(testEmail).subscribe(() => {
+      // Encoding is verified via the expected request URL below
+    });
+
+    const req = httpMock.expectOne(
+      `${environment.url.api}/api/auth/exists?email=foo%2Bbar%26baz@example.com`
+    );
     expect(req.request.method).toBe('GET');
     req.flush({ exists: true });
   });
@@ -55,9 +88,7 @@ describe('AuthApiService', () => {
       newsletter: false
     };
 
-    service.register(testUser).subscribe(() => {
-      // Registration successful
-    });
+    service.register(testUser).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/register`);
     expect(req.request.method).toBe('POST');
@@ -80,11 +111,18 @@ describe('AuthApiService', () => {
   });
 
   it('should logout user', () => {
-    service.logout().subscribe(() => {
-      // Logout successful
-    });
+    service.logout().subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/auth/login`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({});
+  });
+
+  it('should request a password reset and URL-encode the user path segment', () => {
+    const testEmail = 'foo+bar@example.com';
+    service.forgotPassword(testEmail).subscribe(() => {});
+
+    const req = httpMock.expectOne(`${environment.url.api}/api/auth/password/foo%2Bbar%40example.com`);
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });

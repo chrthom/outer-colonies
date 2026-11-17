@@ -1,7 +1,9 @@
 import CardStack from './card_stack';
+import Card from './card';
 import { ClientCardStack } from '@shared/interfaces/client_state';
 import { Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
+import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   return {
@@ -18,26 +20,15 @@ function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   };
 }
 
-function makeScene(): any {
-  return {
-    getPlayerState: jasmine.createSpy('getPlayerState').and.returnValue({ discardPileIds: [] }),
-    getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
-    retractCardsExist: false,
-    time: { delayedCall: jasmine.createSpy('delayedCall') },
-    add: jasmine.createSpyObj('add', ['image', 'text']),
-    tweens: jasmine.createSpyObj('tweens', ['add'])
-  };
-}
-
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
-  return new CardStack(makeScene(), makeData(over));
+  return new CardStack(asGameScene(makeSceneStub()), makeData(over));
 }
 
 describe('CardStack', () => {
   describe('constructor', () => {
     it('does not touch the scene (no render side effects)', () => {
-      const scene = makeScene();
-      const cs = new CardStack(scene, makeData());
+      const scene = makeSceneStub();
+      const cs = new CardStack(asGameScene(scene), makeData());
 
       expect(scene.add.image).not.toHaveBeenCalled();
       expect(scene.add.text).not.toHaveBeenCalled();
@@ -48,7 +39,7 @@ describe('CardStack', () => {
 
     it('assigns data and uuid from the input ClientCardStack', () => {
       const data = makeData({ uuid: 'abc-123', ownedByPlayer: false });
-      const cs = new CardStack(makeScene(), data);
+      const cs = new CardStack(asGameScene(makeSceneStub()), data);
 
       expect(cs.uuid).toBe('abc-123');
       expect(cs.data).toBe(data);
@@ -119,7 +110,7 @@ describe('CardStack', () => {
     function depthOf(zone: Zone, ownedByPlayer: boolean): number {
       const cs = makeCardStack();
       cs.data = makeData({ zone, ownedByPlayer });
-      return (cs as any).depth;
+      return (cs as unknown as { depth: number }).depth;
     }
 
     it('orders zones consistently for the player', () => {
@@ -139,7 +130,7 @@ describe('CardStack', () => {
 
   describe('arrayDiff (private)', () => {
     function arrayDiff<T>(a: T[], b: T[]): [T[], T[]] {
-      return (makeCardStack() as any).arrayDiff(a, b);
+      return (makeCardStack() as unknown as { arrayDiff: <T>(a: T[], b: T[]) => [T[], T[]] }).arrayDiff(a, b);
     }
 
     it('returns the inputs unchanged when nothing overlaps', () => {
@@ -172,10 +163,14 @@ describe('CardStack', () => {
   });
 
   describe('filterCardsByUUIDList (private)', () => {
-    function filter(cardUUIDs: string[], list: string[]): any[] {
+    function filter(cardUUIDs: string[], list: string[]): Array<{ data: { uuid: string } }> {
       const cs = makeCardStack();
-      (cs as any).cards = cardUUIDs.map(uuid => ({ data: { uuid } }));
-      return (cs as any).filterCardsByUUIDList(list);
+      cs.cards = cardUUIDs.map(uuid => ({ data: { uuid } })) as unknown as Array<Card>;
+      return (
+        cs as unknown as {
+          filterCardsByUUIDList: (list: string[]) => Array<{ data: { uuid: string } }>;
+        }
+      ).filterCardsByUUIDList(list);
     }
 
     it('returns the cards whose uuids are present in the list', () => {
