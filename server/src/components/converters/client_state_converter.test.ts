@@ -100,7 +100,7 @@ describe('toClientState', () => {
       ]);
     });
 
-    test("marks the discard of an attachment on an opponent stack as the caster's event", () => {
+    test('attributes the discard of an attachment on an opponent stack to the caster', () => {
       const match = createMatch();
       const tactic = discardAttachmentOnOpponentStack(match);
 
