@@ -7,6 +7,7 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import { logger } from './utils/logger';
 import Player from './game_state/player';
 import { findRejoinableMatch, registerMatch } from './match_registry';
 
@@ -22,14 +23,14 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     try {
       const user = await DBCredentialsDAO.getBySessionToken(sessionToken);
       if (!user) {
-        console.log('WARN: Invalid session token provided');
+        logger.warn('Invalid session token provided');
         return;
       }
       const deckCards = await DBDecksDAO.getByUserId(user.userId);
       const activeDeck = deckCards
         .filter(c => c.inUse)
         .map(c => CardCollection.cards[c.cardId as keyof typeof CardCollection.cards]);
-      console.log(`Player logged in: ${user.username}`);
+      logger.info(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
       const rejoinableMatch = findRejoinableMatch(user.userId);
       if (rejoinableMatch) {
@@ -39,7 +40,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
         socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
       }
     } catch (err) {
-      console.log(`ERROR: Login failed: ${err}`);
+      logger.error(`Login failed: ${err}`);
     }
   });
 }
@@ -73,7 +74,7 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
  */
 function rejoinMatch(io: Server, socket: Socket, match: Match, player: Player): void {
   const socketData = <SocketData>socket.data;
-  console.log(`Player ${player.name} rejoined match ${match.room}`);
+  logger.info(`Player ${player.name} rejoined match ${match.room}`);
   // Detach the socket of the previous connection: a lingering old socket must
   // neither act on the match under the player's identity nor re-mark the
   // rejoined player as disconnected via its late Disconnect event

@@ -9,6 +9,7 @@ import { MsgTypeInbound } from './shared/config/enums';
 import { version, releaseName } from './shared/config/version';
 import restAPI from './components/rest_api';
 import DBConnection from './components/persistence/db_connector';
+import { logger } from './components/utils/logger';
 import process from 'node:process';
 
 const app = express();
@@ -23,9 +24,9 @@ const io = new Server(httpServer, {
 });
 
 io.on(MsgTypeInbound.Connect, socket => {
-  console.log(`Client connected: ${socket.id}`);
+  logger.info(`Client connected: ${socket.id}`);
   socket.on(MsgTypeInbound.Disconnect, () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    logger.info(`Client disconnected: ${socket.id}`);
   });
   matchMakingSocketListeners(io, socket);
   gameSocketListeners(io, socket);
@@ -55,14 +56,14 @@ function startCrons() {
 function shutdown(reason: string, exitCode: number) {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.log(`${reason}: shutting down server gracefully`);
+  logger.info(`${reason}: shutting down server gracefully`);
   cronIntervals.forEach(clearInterval);
   cronIntervals = [];
   io.close();
   httpServer.close(() => {
     DBConnection.instance.pool
       .end()
-      .catch(err => console.log(`WARN: Failed to close database pool during shutdown: ${err}`))
+      .catch(err => logger.warn(`Failed to close database pool during shutdown: ${err}`))
       .then(() => process.exit(exitCode));
   });
   // Safety net: exit even if a connection keeps the HTTP server from closing on its own
@@ -75,20 +76,18 @@ async function start() {
     // doing work while the database is not known to be reachable
     await DBConnection.instance.query('SELECT 1', []);
   } catch (err) {
-    console.log(`ERROR: Database is not reachable at startup: ${err}`);
+    logger.error(`Database is not reachable at startup: ${err}`);
     process.exit(1);
   }
   httpServer.listen(config.get<number>('server.port'), () => {
-    console.log(`Server v${version} (${releaseName}) started on stage ${config.get('stage')}`);
+    logger.info(`Server v${version} (${releaseName}) started on stage ${config.get('stage')}`);
     startCrons();
   });
   process.on('SIGTERM', () => shutdown('Received SIGTERM', 0));
   process.on('SIGINT', () => shutdown('Received SIGINT', 0));
   if (!config.get<boolean>('terminate_on_error')) {
     process.on('uncaughtException', err => {
-      console.log(
-        `ERROR: Caught exception: ${err.name} -> ${err.message}${err.stack ? '\n' + err.stack : ''}`
-      );
+      logger.error(`Caught exception: ${err.name} -> ${err.message}${err.stack ? '\n' + err.stack : ''}`);
       // A process that threw an uncaught exception may be corrupted: it must not keep serving
       // requests, so it terminates through the graceful shutdown instead of continuing
       shutdown(`Uncaught exception ${err.name}`, 1);

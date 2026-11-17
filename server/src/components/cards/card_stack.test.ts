@@ -252,3 +252,27 @@ describe('CardStack.playHandCard', () => {
     expect(player.cardStacks).toHaveLength(0);
   });
 });
+
+describe('CardStack.discard', () => {
+  test('discards an attachment on an opponent stack to the owning player', () => {
+    const caster = new MockPlayer();
+    const opponent = new MockPlayer();
+    const opponentShip = new RootCardStack(
+      new MockCard(25, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      opponent as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(26, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    opponentShip.attach(tactic);
+
+    tactic.discard();
+
+    expect(opponentShip.attachedCardStacks).not.toContain(tactic);
+    expect(caster.discardCards).toHaveBeenCalledWith(tactic.card);
+    expect(opponent.discardCards).not.toHaveBeenCalled();
+  });
+});

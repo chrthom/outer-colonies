@@ -98,13 +98,7 @@ export default abstract class CardStack {
     else if (this.parentPlayer) return this.parentPlayer;
     else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
   }
-  /**
-   * The player who played this card stack. Unlike {@link player}, which resolves
-   * to the owner of the stack this one is attached to, the owner stays the
-   * playing player even for attachments on opponent card stacks (e.g. tactics
-   * attached to enemy ships), so such cards return to the owner's piles when
-   * they expire or the target stack is destroyed.
-   */
+  /** The player who played this card stack, even for attachments on opponent card stacks. */
   get owner(): Player {
     if (this.parentPlayer) return this.parentPlayer;
     else if (this.parentCardStack) return this.parentCardStack.owner;
@@ -215,6 +209,10 @@ export default abstract class CardStack {
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);
   }
+  /** Whether this stack has taken at least its full hit points in damage. */
+  get isDestroyed(): boolean {
+    return this.damage > 0 && this.damage >= this.profile.hp;
+  }
   get type(): CardType {
     return this.card.type;
   }
@@ -227,7 +225,7 @@ export default abstract class CardStack {
       } else if (this.parentCardStack) {
         spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
       }
-      this.cards.forEach(c => c.onLeaveGame(this.player));
+      this.cardStacks.forEach(cs => cs.card.onLeaveGame(cs.owner));
     }
   }
   private get isRootCard() {
