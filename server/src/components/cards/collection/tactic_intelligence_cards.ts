@@ -197,6 +197,27 @@ export class Card430 extends TacticCard {
   }
 }
 
+export class Card442 extends TacticCard {
+  private readonly minTargetSpeed = 1;
+  constructor() {
+    super(442, 'Triebwerksschaden', 1, TacticDiscipline.Intelligence, {
+      speed: -1
+    });
+  }
+  override get durability(): CardDurability {
+    return CardDurability.Turn;
+  }
+  onEnterGame() {}
+  getValidTargets(player: Player): CardStack[] {
+    return player.match.battle.ships[opponentPlayerNo(player.no)].filter(
+      cs => cs.isInBattle && cs.type == CardType.Hull && cs.profile.speed >= this.minTargetSpeed
+    );
+  }
+  protected override get interventionType(): InterventionType | undefined {
+    return InterventionType.BattleRoundStart;
+  }
+}
+
 export class Card517 extends TacticCard {
   constructor() {
     super(517, 'Diasporabewegung', 3, TacticDiscipline.Intelligence);
@@ -275,6 +296,7 @@ export const allCards = [
   new Card330(),
   new Card416(),
   new Card430(),
+  new Card442(),
   new Card517(),
   new Card528(),
   new Card529()
