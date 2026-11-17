@@ -7,7 +7,7 @@ export default class OCApi {
 
   constructor(protected http: HttpClient) {}
 
-  protected post<T>(path: string, body?: any): Observable<T> {
+  protected post<T>(path: string, body?: unknown): Observable<T> {
     return this.http.post<T>(`${this.apiHost}/api/${path}`, body, {
       headers: {
         'Content-Type': 'application/json'
@@ -15,7 +15,7 @@ export default class OCApi {
     });
   }
 
-  protected put<T>(path: string, body?: any): Observable<T> {
+  protected put<T>(path: string, body?: unknown): Observable<T> {
     return this.http.put<T>(`${this.apiHost}/api/${path}`, body, {
       headers: {
         'Content-Type': 'application/json'
