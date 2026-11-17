@@ -180,6 +180,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/utils/`: Utility functions
     - `auth.ts`: Authentication utility
     - `helpers.ts`: Helper functions
+    - `logger.ts`: Leveled logging utility (the only place writing to the console)
     - `mailer.ts`: Mailer utility
   - `shared/`: Shared TypeScript interfaces and types used by both website and client
     - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)

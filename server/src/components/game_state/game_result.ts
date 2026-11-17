@@ -3,6 +3,7 @@ import { rules } from '../../shared/config/rules';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';
 import { opponentPlayerNo } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import Match from './match';
 import Player from './player';
 
@@ -117,12 +118,12 @@ export default class GameResult {
           try {
             await DBDailiesDAO.achieve(player.userId, dailyType);
           } catch (err) {
-            console.log(`ERROR: Failed to record daily ${dailyType} for user ${player.userId}: ${err}`);
+            logger.error(`Failed to record daily ${dailyType} for user ${player.userId}: ${err}`);
           }
         }
       }
     } catch (err) {
-      console.log(`ERROR: Failed to persist earnings for user ${player.userId}: ${err}`);
+      logger.error(`Failed to persist earnings for user ${player.userId}: ${err}`);
     }
   }
 }

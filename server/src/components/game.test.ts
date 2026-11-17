@@ -11,6 +11,7 @@ import EquipmentCard from './cards/types/equipment_card';
 import HullCard, { toHullMultipart } from './cards/types/hull_card';
 import TacticCard from './cards/types/tactic_card';
 import { ClientState } from '../shared/interfaces/client_state';
+import { constants } from '../shared/config/constants';
 import { rules } from '../shared/config/rules';
 import {
   BattleType,
@@ -150,7 +151,7 @@ describe('MsgTypeInbound.Attack with all weapons', () => {
   test('accumulates the attack results of all weapons against a single target', () => {
     setupBattle([3, 4]);
 
-    attackWithAllWeapons('*', '*', defenderShip.uuid);
+    attackWithAllWeapons(constants.attackAllID, constants.attackAllID, defenderShip.uuid);
 
     const state = getEmittedState(socketMocks[0]);
     expect(state.battle.recentAttack).toEqual({
@@ -172,7 +173,7 @@ describe('MsgTypeInbound.Attack with all weapons', () => {
     const defender = match.players[1];
     defender.hand.push(new RootCardStack(new DamagedTargetReactionCard(), Zone.Hand, defender));
 
-    attackWithAllWeapons('*', '*', defenderShip.uuid);
+    attackWithAllWeapons(constants.attackAllID, constants.attackAllID, defenderShip.uuid);
 
     // The first weapon attacked before the defender's reaction card became
     // playable, the second weapon's attack is deferred by the intervention

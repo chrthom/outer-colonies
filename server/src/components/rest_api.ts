@@ -1,6 +1,7 @@
 import { Express, Request, Response } from 'express';
-import fetch from 'node-fetch';
+import { Readable } from 'node:stream';
 import Auth from './utils/auth';
+import { logger } from './utils/logger';
 import {
   AuthEmailRequest,
   AuthExistsResponse,
@@ -50,9 +51,21 @@ function performWithSessionTokenCheck(
 }
 
 /**
+ * Builds the log context of a failed API request. Only the method and the matched route
+ * pattern are used - never the query string or the concrete path, whose parameters may carry
+ * credentials, email addresses or one-time UUIDs.
+ * @param res response whose request is described
+ * @returns the request context, or an empty string if the request is unavailable
+ */
+function getStatusContext(res: Response): string {
+  const route = res.req?.route?.path;
+  return res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
+}
+
+/**
  * Sends a status response and logs error statuses with a level beforehand, so no API failure
- * degrades silently: 4xx are logged as `WARN` (recoverable, e.g. invalid client requests) and
- * 5xx as `ERROR` (server-side failures that need attention). Only the method and the matched
+ * degrades silently: 4xx are logged as `warn` (recoverable, e.g. invalid client requests) and
+ * 5xx as `error` (server-side failures that need attention). Only the method and the matched
  * route pattern are logged - never the query string or the concrete path, whose parameters
  * may carry credentials, email addresses or one-time UUIDs.
  * @param res response to send the status to
@@ -61,12 +74,9 @@ function performWithSessionTokenCheck(
  */
 function sendStatus(res: Response, status: number, message?: string) {
   if (status >= 400) {
-    const level = status >= 500 ? 'ERROR' : 'WARN';
-    // The matched route pattern is logged instead of the concrete path: path parameters can
-    // carry usernames, email addresses or one-time UUIDs, which must never end up in logs
-    const route = res.req?.route?.path;
-    const context = res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
-    console.log(`${level}: API request${context} failed with status ${status}`);
+    const messageText = `API request${getStatusContext(res)} failed with status ${status}`;
+    if (status >= 500) logger.error(messageText);
+    else logger.warn(messageText);
   }
   const r: GenericResponse = {
     status: status
@@ -115,19 +125,33 @@ export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
     fetch(`${config.get('url.assets')}/${file}`)
-      .then(actual => {
-        if (!actual.body) {
-          console.log(`WARN: Assets response for ${file} has no body, responding with 502`);
+      .then(async actual => {
+        // An upstream error body would otherwise be piped to the client with an implicit 200
+        if (!actual.ok) {
+          logger.warn(
+            `Assets request for ${file} failed with upstream status ${actual.status}, responding with 502`
+          );
+          // An unconsumed body would keep the underlying socket out of the keep-alive pool
+          await actual.body?.cancel();
           res.status(502).end();
           return;
         }
-        actual.body.pipe(res).on('error', err => {
-          console.log(`WARN: Assets stream for ${file} failed: ${err}, responding with 502`);
+        if (!actual.body) {
+          logger.warn(`Assets response for ${file} has no body, responding with 502`);
+          res.status(502).end();
+          return;
+        }
+        // The global fetch returns a web stream; the express response expects a node stream
+        const stream = Readable.fromWeb(actual.body);
+        // pipe returns the destination, so the upstream failure handler must sit on the source
+        stream.on('error', err => {
+          logger.warn(`Assets stream for ${file} failed: ${err}, responding with 502`);
           res.status(502).end();
         });
+        stream.pipe(res);
       })
       .catch(err => {
-        console.log(`WARN: Fetching asset ${file} failed: ${err}, responding with 502`);
+        logger.warn(`Fetching asset ${file} failed: ${err}, responding with 502`);
         res.status(502).end();
       });
   });
