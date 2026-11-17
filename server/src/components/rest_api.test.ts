@@ -89,6 +89,11 @@ describe('RESTAPI Deck Endpoints', () => {
   ])('%s /api/deck/:cardInstanceId', (method, expectedInUse) => {
     const getHandler = () => routes.get(`${method} /api/deck/:cardInstanceId(\\d+)`)!;
 
+    // The rejected-request tests exercise sendStatus warn paths
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    });
+
     it('should reject requests without a session token', async () => {
       const setInUseSpy = jest.spyOn(DBDecksDAO, 'setInUse');
       const res = createResponse();
@@ -291,6 +296,11 @@ describe('RESTAPI Item and Booster Endpoints', () => {
     };
     DBConnection.instance.pool = <any>{ getConnection: jest.fn().mockResolvedValue(fakeConnection) };
   };
+
+  // The rejection tests exercise the transaction error logging of the DB connector
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
 
   afterEach(() => {
     jest.restoreAllMocks();

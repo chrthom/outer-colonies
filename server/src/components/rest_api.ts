@@ -125,12 +125,14 @@ export default function restAPI(app: Express) {
   app.get('/assets/*', (req, res) => {
     const file = req.path.replace('/assets/', '');
     fetch(`${config.get('url.assets')}/${file}`)
-      .then(actual => {
+      .then(async actual => {
         // An upstream error body would otherwise be piped to the client with an implicit 200
         if (!actual.ok) {
           logger.warn(
             `Assets request for ${file} failed with upstream status ${actual.status}, responding with 502`
           );
+          // An unconsumed body would keep the underlying socket out of the keep-alive pool
+          await actual.body?.cancel();
           res.status(502).end();
           return;
         }
