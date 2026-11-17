@@ -1,4 +1,4 @@
-import CardStack, { RootCardStack } from './card_stack';
+import CardStack, { AttachmentCardStack, RootCardStack } from './card_stack';
 import Card from './card';
 import { CardDurability, CardType, Zone } from '../../shared/config/enums';
 
@@ -174,5 +174,66 @@ describe('CardStack.playHandCard', () => {
     expect(player.discardCards).not.toHaveBeenCalled();
     expect(attachSpy).not.toHaveBeenCalled();
     expect(player.cardStacks).toHaveLength(0);
+  });
+});
+
+describe('CardStack.owner', () => {
+  test('returns the parent player of a root stack', () => {
+    const player = new MockPlayer();
+    const stack = new RootCardStack(new MockCard(20, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+
+    expect(stack.owner).toBe(player);
+  });
+
+  test('resolves through the parent stack for attachments without a parent player', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(21, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    const equipment = new AttachmentCardStack(new MockCard(22, 'Weapon', CardType.Equipment, 1), ship);
+    ship.attach(equipment);
+
+    expect(equipment.owner).toBe(player);
+  });
+
+  test('stays the playing player for attachments on an opponent stack', () => {
+    const caster = new MockPlayer();
+    const opponent = new MockPlayer();
+    const opponentShip = new RootCardStack(
+      new MockCard(23, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      opponent as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(24, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    opponentShip.attach(tactic);
+
+    expect(tactic.player).toBe(opponent);
+    expect(tactic.owner).toBe(caster);
+  });
+});
+
+describe('CardStack.discard', () => {
+  test('discards an attachment on an opponent stack to the owning player', () => {
+    const caster = new MockPlayer();
+    const opponent = new MockPlayer();
+    const opponentShip = new RootCardStack(
+      new MockCard(25, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      opponent as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(26, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    opponentShip.attach(tactic);
+
+    tactic.discard();
+
+    expect(opponentShip.attachedCardStacks).not.toContain(tactic);
+    expect(caster.discardCards).toHaveBeenCalledWith(tactic.card);
+    expect(opponent.discardCards).not.toHaveBeenCalled();
   });
 });

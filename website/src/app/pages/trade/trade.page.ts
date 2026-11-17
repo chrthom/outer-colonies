@@ -94,7 +94,8 @@ export class TradePage implements OnInit {
         error: (err: ApiError) => {
           this.actionFailed = true;
           // The API responds 400 with 'Insufficient sol' when the balance is
-          // too low for the purchase (see the booster route in rest_api.ts).
+          // too low for the purchase (see the booster route in
+          // server/src/components/rest_api/shop_router.ts).
           this.snackBar.open(
             err.status == 400
               ? 'Du hast nicht genug Sol für diesen Kauf.'

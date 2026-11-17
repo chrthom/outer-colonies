@@ -98,6 +98,12 @@ export default abstract class CardStack {
     else if (this.parentPlayer) return this.parentPlayer;
     else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
   }
+  /** The player who played this card stack, even for attachments on opponent card stacks. */
+  get owner(): Player {
+    if (this.parentPlayer) return this.parentPlayer;
+    else if (this.parentCardStack) return this.parentCardStack.owner;
+    else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
+  }
   get match(): Match {
     return this.player.match;
   }
@@ -190,7 +196,7 @@ export default abstract class CardStack {
   }
   discard() {
     this.removeCardStack();
-    this.player.discardCards(...this.cards);
+    this.owner.discardCards(...this.cards);
   }
   retract() {
     this.removeCardStack();
@@ -199,6 +205,10 @@ export default abstract class CardStack {
   }
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);
+  }
+  /** Whether this stack has taken at least its full hit points in damage. */
+  get isDestroyed(): boolean {
+    return this.damage > 0 && this.damage >= this.profile.hp;
   }
   get type(): CardType {
     return this.card.type;

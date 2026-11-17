@@ -145,7 +145,7 @@ function toClientAttributes(
   const profile = cs.profile;
   const attributes: ClientCardStackAttribute[] = [
     { icon: 'damage', value: cs.damage, warning: true },
-    { icon: 'hp', value: profile.hp, warning: cs.damage >= profile.hp }
+    { icon: 'hp', value: profile.hp, warning: cs.isDestroyed }
   ].filter(i => i.value != 0 && i.value < 100);
   if (cs.type == CardType.Colony) {
     attributes.push({
