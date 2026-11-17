@@ -1,6 +1,5 @@
 import { CardType, GameResultType, DailyType } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
-import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';
 import { opponentPlayerNo } from '../utils/helpers';
@@ -100,23 +99,20 @@ export default class GameResult {
 
   async persistEarnings(player: Player, opponent: Player, won: boolean, sol: number): Promise<void> {
     try {
-      const c = await DBCredentialsDAO.getByUsername(player.name);
-      if (!c) {
-        logger.error(`Could not find user ${player.name} in database`);
-        return;
-      }
-      DBProfilesDAO.increaseSol(c.userId, sol);
+      // The user id is carried on the player (from the authenticated socket data), so no
+      // username-based database lookup is needed here - usernames are not a stable join key
+      await DBProfilesDAO.increaseSol(player.userId, sol);
       for (const dailyType of Object.values(DailyType)) {
         if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
           try {
-            await DBDailiesDAO.achieve(c.userId, dailyType);
+            await DBDailiesDAO.achieve(player.userId, dailyType);
           } catch (err) {
-            logger.error(`Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
+            logger.error(`Failed to record daily ${dailyType} for user ${player.userId}: ${err}`);
           }
         }
       }
     } catch (err) {
-      logger.error(`Failed to persist earnings for user ${player.name}: ${err}`);
+      logger.error(`Failed to persist earnings for user ${player.userId}: ${err}`);
     }
   }
 }

@@ -1,4 +1,7 @@
 import GameResult from './game_result';
+import DBCredentialsDAO from '../persistence/db_credentials';
+import DBDailiesDAO from '../persistence/db_dailies';
+import DBProfilesDAO from '../persistence/db_profiles';
 import { CardType, DailyType, GameResultType } from '../../shared/config/enums';
 
 function makeMatch() {
@@ -300,6 +303,79 @@ describe('GameResult', () => {
       const opponent = makePlayer();
 
       expect(result.computeEarnings(player, opponent, false)).toBe(0);
+    });
+  });
+
+  describe('persistEarnings', () => {
+    const makeEarningsPlayer = (userId: number) => ({
+      no: 0,
+      name: 'Player1',
+      userId,
+      colonyCardStack: { damage: 0, profile: { energy: 0 }, cards: [] },
+      deck: [],
+      discardPile: [],
+      cardStacks: []
+    });
+
+    // Directly constructed (not via makeResult): persistEarnings is the method under test here
+    const makePersistableResult = () => {
+      const result = new GameResult(makeMatch() as any);
+      result.type = GameResultType.Domination;
+      return result;
+    };
+
+    test('persists sol and achieved dailies by user id, without a username lookup', async () => {
+      const increaseSol = jest.spyOn(DBProfilesDAO, 'increaseSol').mockResolvedValue(undefined);
+      const achieve = jest.spyOn(DBDailiesDAO, 'achieve').mockResolvedValue(undefined);
+      const getByUsername = jest.spyOn(DBCredentialsDAO, 'getByUsername');
+      const result = makePersistableResult();
+      const match = result.match;
+
+      await result.persistEarnings(makeEarningsPlayer(42) as any, match.players[1] as any, true, 47);
+
+      expect(increaseSol).toHaveBeenCalledWith(42, 47);
+      expect(getByUsername).not.toHaveBeenCalled();
+      // Won Domination: Victory, Game and Domination are achieved, Login never is
+      expect(achieve).toHaveBeenCalledWith(42, DailyType.Victory);
+      expect(achieve).toHaveBeenCalledWith(42, DailyType.Game);
+      expect(achieve).toHaveBeenCalledWith(42, DailyType.Domination);
+      expect(achieve).not.toHaveBeenCalledWith(42, DailyType.Login);
+    });
+
+    test('logs and swallows a failing sol update without recording dailies', async () => {
+      const increaseSol = jest.spyOn(DBProfilesDAO, 'increaseSol').mockRejectedValue(new Error('DB down'));
+      const achieve = jest.spyOn(DBDailiesDAO, 'achieve').mockResolvedValue(undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const result = makePersistableResult();
+      const match = result.match;
+
+      await expect(
+        result.persistEarnings(makeEarningsPlayer(42) as any, match.players[1] as any, true, 47)
+      ).resolves.toBeUndefined();
+
+      expect(increaseSol).toHaveBeenCalledWith(42, 47);
+      expect(achieve).not.toHaveBeenCalled();
+      expect(log).toHaveBeenCalledWith(
+        expect.stringContaining('ERROR: Failed to persist earnings for user 42')
+      );
+    });
+
+    test('a failing daily is logged and does not prevent the remaining dailies', async () => {
+      const increaseSol = jest.spyOn(DBProfilesDAO, 'increaseSol').mockResolvedValue(undefined);
+      const achieve = jest
+        .spyOn(DBDailiesDAO, 'achieve')
+        .mockRejectedValueOnce(new Error('daily failed'))
+        .mockResolvedValue(undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const result = makePersistableResult();
+      const match = result.match;
+
+      await result.persistEarnings(makeEarningsPlayer(42) as any, match.players[1] as any, true, 47);
+
+      // Victory, Game and Domination are achieved; the first failure does not stop the rest
+      expect(increaseSol).toHaveBeenCalledWith(42, 47);
+      expect(achieve).toHaveBeenCalledTimes(3);
+      expect(log).toHaveBeenCalledWith(expect.stringContaining('ERROR: Failed to record daily'));
     });
   });
 });

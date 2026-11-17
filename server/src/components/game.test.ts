@@ -67,7 +67,7 @@ const createSocketMock = (playerNo: number): SocketMock => {
     join: jest.fn(),
     on,
     emit,
-    data: { user: { username: `Player ${playerNo}` }, activeDeck: [] }
+    data: { user: { userId: playerNo, username: `Player ${playerNo}` }, activeDeck: [] }
   };
   return { socket: socket as unknown as Socket, on, emit };
 };
@@ -116,6 +116,15 @@ const getEmittedState = (socketMock: SocketMock): ClientState => {
   if (!emission) throw new Error('No state was emitted');
   return emission[1];
 };
+
+describe('Match player creation', () => {
+  test('players carry the user id of the authenticated socket data', () => {
+    const { match } = createCombatMatch();
+
+    expect(match.players[0].userId).toBe(0);
+    expect(match.players[1].userId).toBe(1);
+  });
+});
 
 describe('MsgTypeInbound.Attack with all weapons', () => {
   let match: Match;
