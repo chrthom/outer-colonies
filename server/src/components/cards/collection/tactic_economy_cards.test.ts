@@ -1,5 +1,12 @@
 import { Socket } from 'socket.io';
-import { CardDurability, CardType, TacticDiscipline, TurnPhase, Zone } from '../../../shared/config/enums';
+import {
+  CardDurability,
+  CardType,
+  GameResultType,
+  TacticDiscipline,
+  TurnPhase,
+  Zone
+} from '../../../shared/config/enums';
 import Card from '../card';
 import CardStack, { RootCardStack } from '../card_stack';
 import { CardProfileConfig } from '../card_profile';
@@ -92,6 +99,27 @@ describe('Card437 Kopfgeld', () => {
 
       expect(player.hand).toHaveLength(handSizeBefore + 4);
       expect(player.deck).toHaveLength(2);
+    });
+
+    test('keeps the destruction result when the bounty draw depletes the deck in the same battle as the colony destruction', () => {
+      jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
+      // Fewer cards left in the deck than the 4-card bounty: the colony's destruction
+      // ends the game first, so the deck depletion triggered by the bounty draw must
+      // neither flip the result nor persist earnings a second time
+      player.deck = [new MockCard(301), new MockCard(302)];
+      const colony = opponent.colonyCardStack;
+      colony.damage = colony.profile.hp;
+      opponentShip.damage = 3;
+      const handSizeBefore = player.hand.length;
+
+      match.removeDestroyedCardStacks();
+
+      expect(match.gameResult.gameOver).toBe(true);
+      expect(match.gameResult.type).toBe(GameResultType.Destruction);
+      expect(match.gameResult.winnerNo).toBe(player.no);
+      expect(match.gameResult.persistEarnings).toHaveBeenCalledTimes(2);
+      expect(player.hand).toHaveLength(handSizeBefore + 2); // partial bounty from the depleted deck
+      expect(player.deck).toHaveLength(0);
     });
 
     test('returns to the playing player discard pile when the ship is destroyed', () => {

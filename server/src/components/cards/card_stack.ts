@@ -159,15 +159,15 @@ export default abstract class CardStack {
     this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
   onMissionCompletion() {
-    this.card.onMissionCompletion(this.player);
+    this.card.onMissionCompletion(this.owner);
     this.attachedCardStacks.forEach(cs => cs.onMissionCompletion());
   }
   onStartTurn() {
-    this.card.onStartTurn(this.player, this);
+    this.card.onStartTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onStartTurn());
   }
   onEndTurn() {
-    this.card.onEndTurn(this.player, this);
+    this.card.onEndTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   get profile(): CardProfile {

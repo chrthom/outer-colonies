@@ -19,23 +19,27 @@ export default class GameResult {
   }
 
   setWinnerByDeckDepletion(depletedPlayer: Player) {
-    this.type = GameResultType.Depletion;
-    this.setGameOver(depletedPlayer);
+    this.setGameOver(GameResultType.Depletion, depletedPlayer);
   }
   setWinnerByDestruction(destroyedPlayer: Player) {
-    this.type = GameResultType.Destruction;
-    this.setGameOver(destroyedPlayer);
+    this.setGameOver(GameResultType.Destruction, destroyedPlayer);
   }
   setWinnerByDomination(dominatedPlayer: Player) {
-    this.type = GameResultType.Domination;
-    this.setGameOver(dominatedPlayer);
+    this.setGameOver(GameResultType.Domination, dominatedPlayer);
   }
   setWinnerBySurrender(surrenderingPlayer: Player) {
-    this.type = GameResultType.Surrender;
-    this.setGameOver(surrenderingPlayer);
+    this.setGameOver(GameResultType.Surrender, surrenderingPlayer);
   }
-  private setGameOver(loser: Player) {
+  /**
+   * Ends the game with the given result type and loser. The first result stands: when
+   * several loss conditions trigger within the same battle (e.g. the defender's colony
+   * destruction plus the attacker's deck depletion through 437 Kopfgeld's bounty draw),
+   * later calls must not flip the winner, the result type or persist earnings twice.
+   */
+  private setGameOver(type: GameResultType, loser: Player) {
+    if (this.gameOver) return;
     this.gameOver = true;
+    this.type = type;
     this.winnerNo = opponentPlayerNo(loser.no);
     const winner = this.match.players[this.winnerNo];
     this.winnerSol = this.computeEarnings(winner, loser, true);

@@ -65,6 +65,18 @@ describe('GameResult', () => {
       expect(result.winnerNo).toBe(1);
       expect(result.type).toBe(GameResultType.Depletion);
     });
+
+    test('keeps the first result when a second loss condition hits after game over', () => {
+      const { result, match } = makeResult();
+
+      result.setWinnerByDestruction(match.players[1]);
+      result.setWinnerByDeckDepletion(match.players[0]);
+
+      expect(result.gameOver).toBe(true);
+      expect(result.type).toBe(GameResultType.Destruction);
+      expect(result.winnerNo).toBe(0);
+      expect(result.persistEarnings).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('shouldAchieveDaily', () => {
