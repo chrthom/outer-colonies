@@ -96,6 +96,7 @@ export interface ClientState {
   cardStacks: ClientCardStack[];
   gameResult?: ClientGameResult;
   highlightCardUUID?: string;
+  highlightCardId?: number;
   intervention?: ClientIntervention;
   opponent: ClientPlayer;
   player: ClientPlayer;
