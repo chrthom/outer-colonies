@@ -20,7 +20,7 @@ const createSocket = (playerNo: number): Socket =>
     id: `socket-${playerNo}`,
     join: jest.fn(),
     data: {
-      user: { username: `Player ${playerNo}` },
+      user: { userId: playerNo + 1, username: `Player ${playerNo}` },
       activeDeck: [1, 2, 3, 4].map(i => new MockCard(i, `Deck Card ${i}`, CardType.Hull, 1))
     }
   }) as unknown as Socket;

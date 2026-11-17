@@ -206,7 +206,12 @@ export default class Match {
           cs => cs.type != CardType.Colony
         );
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
-        player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
+        destroyedCardStacks.forEach(cs =>
+          cs.cardStacks.forEach(subCs => subCs.owner.discardCards(subCs.card))
+        );
+        destroyedCardStacks.forEach(cs =>
+          this.battle.ships.forEach(fleet => spliceCardStackByUUID(fleet, cs.uuid))
+        );
         destroyedCardStacks.forEach(cs =>
           cs.cardStacks.forEach(subCs => this.addCardMovementEvent(EventType.Discard, subCs))
         );
@@ -239,6 +244,6 @@ export default class Match {
     );
   }
   private getDestroyedCardStacks(player: Player): CardStack[] {
-    return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
+    return player.cardStacks.filter(cs => cs.isDestroyed);
   }
 }
