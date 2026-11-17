@@ -126,6 +126,14 @@ export default function restAPI(app: Express) {
     const file = req.path.replace('/assets/', '');
     fetch(`${config.get('url.assets')}/${file}`)
       .then(actual => {
+        // An upstream error body would otherwise be piped to the client with an implicit 200
+        if (!actual.ok) {
+          logger.warn(
+            `Assets request for ${file} failed with upstream status ${actual.status}, responding with 502`
+          );
+          res.status(502).end();
+          return;
+        }
         if (!actual.body) {
           logger.warn(`Assets response for ${file} has no body, responding with 502`);
           res.status(502).end();

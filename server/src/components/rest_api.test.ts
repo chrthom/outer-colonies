@@ -238,7 +238,9 @@ describe('RESTAPI Assets Endpoint', () => {
         this.destroy(new Error('boom'));
       }
     });
-    jest.spyOn(globalThis, 'fetch').mockResolvedValue(<any>{ body: Readable.toWeb(upstream) });
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(<any>{ ok: true, status: 200, body: Readable.toWeb(upstream) });
     // pipe() requires a real stream destination, so the response is a Writable with a spied status
     const res: any = new Writable({
       write: (_chunk, _encoding, callback) => callback()
@@ -250,6 +252,30 @@ describe('RESTAPI Assets Endpoint', () => {
 
     expect(res.status).toHaveBeenCalledWith(502);
     expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
+  });
+
+  it('should respond with 502 when the upstream responds with an error status', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const upstream = new Readable({
+      read() {
+        this.push('upstream error page');
+        this.push(null);
+      }
+    });
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(<any>{ ok: false, status: 404, body: Readable.toWeb(upstream) });
+    // pipe() requires a real stream destination, so the response is a Writable with a spied status
+    const res: any = new Writable({
+      write: (_chunk, _encoding, callback) => callback()
+    });
+    res.status = jest.fn().mockReturnThis();
+
+    routes.get('GET /assets/*')!({ method: 'GET', path: '/assets/missing.png' }, res);
+    await flushMicrotasks();
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
   });
 });
 

@@ -120,7 +120,7 @@ function onHandCard(
     logger.warn(`${player.name} tried to play non-existing card ${handCardUUID}`);
   } else if (!target) {
     logger.warn(
-      `${player.name} tried to play card ${handCard.card.name} on an non-existing target ${targetUUID}`
+      `${player.name} tried to play card ${handCard.card.name} on a non-existing target ${targetUUID}`
     );
   } else if (!handCard.hasValidTargets) {
     logger.warn(`${player.name} tried to play non-playable card ${handCard.card.name}`);

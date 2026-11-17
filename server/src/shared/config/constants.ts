@@ -5,7 +5,7 @@ class OCConstants {
   /**
    * Placeholder id in the attack event for the attack-all action: instead of a single
    * ship and weapon uuid, the client sends this id twice to attack with all weapons.
-   * Only valid against a single target at battle range 1.
+   * The action is only offered against the opponent's colony at battle range 1.
    */
   attackAllID = '*';
 }
