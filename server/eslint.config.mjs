@@ -31,8 +31,7 @@ export default [
     }
   },
   {
-    // The persistence layer is untyped at the DB boundary (see #909); test fixtures may be partial
-    files: ["src/components/persistence/**", "**/*.test.ts"],
+    files: ["**/*.test.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off"
     }
