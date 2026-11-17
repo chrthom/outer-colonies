@@ -1,5 +1,6 @@
 import express from 'express';
 import http, { IncomingMessage, RequestOptions } from 'node:http';
+import { Readable } from 'node:stream';
 import restAPI from './rest_api';
 import Auth from './utils/auth';
 import Mailer from './utils/mailer';
@@ -330,39 +331,39 @@ describe('REST API', () => {
 
   describe('error status logging', () => {
     it('should log a WARN with method and route pattern for a request without a session token', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
       const response = await request('POST', '/api/deck/456');
 
       expect(response.status).toBe(401);
-      expect(logSpy).toHaveBeenCalledWith(
+      expect(errorSpy).toHaveBeenCalledWith(
         expect.stringMatching(/^WARN: API request for POST .* failed with status 401$/)
       );
     });
 
     it('should log the route pattern instead of the concrete path', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
       await request('POST', '/api/deck/456');
 
-      expect(logSpy).toHaveBeenCalledWith(
+      expect(errorSpy).toHaveBeenCalledWith(
         expect.stringContaining('for POST /api/deck/:cardInstanceId(\\d+) failed with status 401')
       );
-      expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
+      expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
     });
 
     it('should log a WARN for an invalid session token', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue(APIRejectReason.NotFound);
 
       const response = await request('POST', '/api/deck/456', 'invalid-token');
 
       expect(response.status).toBe(403);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
     });
 
     it('should log an ERROR for an internal server error', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       mockValidSession();
       jest.spyOn(DBDecksDAO, 'setInUse').mockRejectedValue(new Error('insert failed'));
 
@@ -370,30 +371,67 @@ describe('REST API', () => {
 
       expect(response.status).toBe(500);
       expect(response.body.message).toBe('Internal Server Error');
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^ERROR: .*status 500/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^ERROR: .*status 500/));
     });
 
     it('should not log on a successful response', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       mockValidSession();
       jest.spyOn(DBDecksDAO, 'setInUse').mockResolvedValue(undefined);
 
       const response = await request('POST', '/api/deck/456', 'valid-token');
 
       expect(response.status).toBe(204);
-      expect(logSpy).not.toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('upstream middleware errors', () => {
     it('should preserve the status of a malformed-JSON body-parser error instead of collapsing it to 500', async () => {
-      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
       const response = await request('POST', '/api/auth/login', undefined, '{ not valid json');
 
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('Bad Request');
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
+    });
+  });
+
+  describe('assets proxy', () => {
+    it('should respond with 502 when the upstream asset stream fails mid-stream', async () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const upstream = new Readable({
+        read() {
+          this.destroy(new Error('boom'));
+        }
+      });
+      jest
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(<any>{ ok: true, status: 200, body: Readable.toWeb(upstream) });
+
+      const response = await request('GET', '/assets/test.png');
+
+      expect(response.status).toBe(502);
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
+    });
+
+    it('should respond with 502 when the upstream responds with an error status', async () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const upstream = new Readable({
+        read() {
+          this.push('upstream error page');
+          this.push(null);
+        }
+      });
+      jest
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(<any>{ ok: false, status: 404, body: Readable.toWeb(upstream) });
+
+      const response = await request('GET', '/assets/missing.png');
+
+      expect(response.status).toBe(502);
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
     });
   });
 });
