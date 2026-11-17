@@ -10,6 +10,7 @@ import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId: string;
+  userId: number;
   name: string;
   match: Match;
   no: number;
@@ -19,8 +20,9 @@ export default class Player {
   hand: CardStack[] = [];
   cardStacks: CardStack[];
   actionPool!: ActionPool;
-  constructor(socketd: string, name: string, match: Match, playerNo: number, deck: Card[]) {
+  constructor(socketd: string, userId: number, name: string, match: Match, playerNo: number, deck: Card[]) {
     this.socketId = socketd;
+    this.userId = userId;
     this.name = name;
     this.match = match;
     this.no = playerNo;
