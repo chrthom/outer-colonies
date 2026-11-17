@@ -81,7 +81,7 @@ describe('Card437 Kopfgeld', () => {
 
     test('attaches to the targeted ship and stays owned by the playing player', () => {
       expect(opponentShip.attachedCardStacks).toContain(kopfgeldStack);
-      expect(kopfgeldStack.player).toBe(player);
+      expect(kopfgeldStack.owner).toBe(player);
     });
 
     test('draws 4 cards for the playing player when the ship is destroyed', () => {

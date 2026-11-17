@@ -234,10 +234,6 @@ export class Card437 extends TacticCard {
   override get durability(): CardDurability {
     return CardDurability.Permanent;
   }
-  /**
-   * Kopfgeld is attached to the targeted opponent ship; when that ship is
-   * destroyed, the owning player (the one who played Kopfgeld) draws the bounty.
-   */
   override onDestruction(player: Player) {
     player.drawCards(this.cardsToDraw);
   }
