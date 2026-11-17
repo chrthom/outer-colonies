@@ -10,6 +10,7 @@ import { rules } from '../../shared/config/rules';
 
 export default class Player {
   socketId?: string;
+  userId?: number;
   name: string;
   match: Match;
   no: number;
@@ -22,6 +23,7 @@ export default class Player {
   actionPool!: ActionPool;
   constructor(
     socketId: string | undefined,
+    userId: number | undefined,
     name: string,
     match: Match,
     playerNo: number,
@@ -29,6 +31,7 @@ export default class Player {
     isBot: boolean = false
   ) {
     this.socketId = socketId;
+    this.userId = userId;
     this.name = name;
     this.match = match;
     this.no = playerNo;

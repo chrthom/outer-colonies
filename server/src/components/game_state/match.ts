@@ -198,13 +198,20 @@ export default class Match {
   }
   private newPlayer(player: Socket | BotPlayerSetup, playerNo: number): Player {
     if (isBotPlayerSetup(player)) {
-      return new Player(undefined, player.name, this, playerNo, player.deck, true);
+      return new Player(undefined, undefined, player.name, this, playerNo, player.deck, true);
     }
     player.join(this.room);
     const socketData: SocketData = <SocketData>player.data;
     socketData.match = this;
     socketData.playerNo = playerNo;
-    return new Player(player.id, socketData.user.username, this, playerNo, socketData.activeDeck.slice());
+    return new Player(
+      player.id,
+      socketData.user.userId,
+      socketData.user.username,
+      this,
+      playerNo,
+      socketData.activeDeck.slice()
+    );
   }
   private getDestroyedCardStacks(player: Player): CardStack[] {
     return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
