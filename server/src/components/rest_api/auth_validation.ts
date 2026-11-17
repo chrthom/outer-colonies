@@ -27,28 +27,13 @@ import {
  */
 const authValidation = Router();
 
-authValidation.post(
-  '/api/auth/register',
-  registerRateLimiter,
-  validateBodyMiddleware(authRegisterSchema)
-);
+authValidation.post('/api/auth/register', registerRateLimiter, validateBodyMiddleware(authRegisterSchema));
 
-authValidation.put(
-  '/api/auth/register/:id',
-  validateParamsMiddleware(oneTimeIdSchema)
-);
+authValidation.put('/api/auth/register/:id', validateParamsMiddleware(oneTimeIdSchema));
 
-authValidation.post(
-  '/api/auth/login',
-  loginRateLimiter,
-  validateBodyMiddleware(authLoginSchema)
-);
+authValidation.post('/api/auth/login', loginRateLimiter, validateBodyMiddleware(authLoginSchema));
 
-authValidation.get(
-  '/api/auth/exists',
-  existsRateLimiter,
-  validateQueryMiddleware(authExistsQuerySchema)
-);
+authValidation.get('/api/auth/exists', existsRateLimiter, validateQueryMiddleware(authExistsQuerySchema));
 
 authValidation.delete(
   '/api/auth/password/:user',
@@ -56,10 +41,7 @@ authValidation.delete(
   validateParamsMiddleware(authPasswordResetUserSchema)
 );
 
-authValidation.put(
-  '/api/auth/password',
-  validateBodyMiddleware(authPasswordSchema)
-);
+authValidation.put('/api/auth/password', validateBodyMiddleware(authPasswordSchema));
 
 authValidation.put(
   '/api/auth/password/:id',
@@ -69,9 +51,6 @@ authValidation.put(
 
 authValidation.post('/api/auth/email', validateBodyMiddleware(authEmailSchema));
 
-authValidation.put(
-  '/api/auth/email/:id',
-  validateParamsMiddleware(oneTimeIdSchema)
-);
+authValidation.put('/api/auth/email/:id', validateParamsMiddleware(oneTimeIdSchema));
 
 export default authValidation;
