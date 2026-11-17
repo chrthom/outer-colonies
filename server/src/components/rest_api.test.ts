@@ -9,6 +9,7 @@ import DBItemsDAO from './persistence/db_items';
 import DBProfilesDAO from './persistence/db_profiles';
 import CardCollection from './cards/collection/card_collection';
 import restAPI, { buyBooster, getDailies, getDailiesResponse, INVALID_ITEM_TYPE, openItem } from './rest_api';
+import Auth from './utils/auth';
 import * as dailySelector from './utils/daily_selector';
 
 describe('RESTAPI Daily Endpoints', () => {
@@ -359,6 +360,232 @@ describe('RESTAPI Item and Booster Endpoints', () => {
       expect(createBoosterSpy).not.toHaveBeenCalled();
       expect(fakeConnection.commit).not.toHaveBeenCalled();
       expect(fakeConnection.rollback).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe('RESTAPI Auth Endpoints', () => {
+  type RouteHandler = (req: any, res: any, next?: () => void) => void;
+  const routes = new Map<string, RouteHandler>();
+
+  /**
+   * Chains all handlers of a route like express does: a handler must call `next` to pass
+   * control to the following one. Single-handler routes are returned unchanged. An error
+   * passed to `next` terminates the chain, like express would hand it to its error handler.
+   */
+  const composeRouteHandlers = (handlers: RouteHandler[]): RouteHandler =>
+    handlers.length == 1
+      ? handlers[0]
+      : (req, res) => {
+          let index = 0;
+          const next = (error?: unknown) => {
+            if (error) return;
+            index++;
+            if (index < handlers.length) handlers[index](req, res, next);
+          };
+          handlers[0](req, res, next);
+        };
+
+  beforeAll(() => {
+    const fakeApp: any = {
+      get: (path: string, ...handlers: RouteHandler[]) =>
+        routes.set(`GET ${path}`, composeRouteHandlers(handlers)),
+      post: (path: string, ...handlers: RouteHandler[]) =>
+        routes.set(`POST ${path}`, composeRouteHandlers(handlers)),
+      put: (path: string, ...handlers: RouteHandler[]) =>
+        routes.set(`PUT ${path}`, composeRouteHandlers(handlers)),
+      delete: (path: string, ...handlers: RouteHandler[]) =>
+        routes.set(`DELETE ${path}`, composeRouteHandlers(handlers))
+    };
+    restAPI(fakeApp);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const createRequest = (route: string, ip: string, body?: unknown) => ({
+    header: jest.fn(),
+    body: body,
+    ip: ip,
+    method: route.split(' ')[0],
+    path: route.split(' ')[1],
+    headers: {},
+    app: { get: () => 'loopback' },
+    params: {},
+    query: {},
+    route: { path: route.split(' ')[1] }
+  });
+  const createResponse = (req: object) => {
+    const res: any = { req: req, send: jest.fn(), setHeader: jest.fn(), headersSent: false };
+    res.status = jest.fn().mockReturnThis();
+    return res;
+  };
+  const flushMicrotasks = () => new Promise(resolve => setImmediate(resolve));
+  const validRegisterBody = {
+    username: 'testuser',
+    password: 'password1',
+    email: 'test@example.com',
+    starterDeck: 1,
+    newsletter: false
+  };
+
+  describe('request body validation', () => {
+    it.each([
+      ['starter deck out of range', { starterDeck: 99 }],
+      ['weak password', { password: 'abcdefgh' }],
+      ['malformed email', { email: 'not-an-email' }],
+      ['short username', { username: 'ab' }],
+      ['non-boolean newsletter', { newsletter: 'yes' }]
+    ])('should reject a registration with a %s without touching the database', async (_case, invalidBody) => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
+      const res = createResponse(createRequest('POST /api/auth/register', '192.168.1.1'));
+
+      routes.get('POST /api/auth/register')!(
+        createRequest('POST /api/auth/register', '192.168.1.1', { ...validRegisterBody, ...invalidBody }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(checkUsernameExistsSpy).not.toHaveBeenCalled();
+    });
+
+    it('should register with the parsed body and respond with the user id', async () => {
+      jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
+      jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(false);
+      const registerSpy = jest
+        .spyOn(Auth, 'register')
+        .mockResolvedValue(<any>{ userId: 42, username: 'testuser', email: 'test@example.com' });
+      const res = createResponse(createRequest('POST /api/auth/register', '192.168.1.2'));
+
+      routes.get('POST /api/auth/register')!(
+        createRequest('POST /api/auth/register', '192.168.1.2', {
+          ...validRegisterBody,
+          username: '  testuser  ',
+          starterDeck: '1'
+        }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(registerSpy).toHaveBeenCalledWith({ ...validRegisterBody, starterDeck: 1 });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.send).toHaveBeenCalledWith({ id: 42, username: 'testuser' });
+    });
+
+    it('should reject a login with an invalid body without an authentication attempt', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const loginSpy = jest.spyOn(Auth, 'login');
+      const res = createResponse(createRequest('POST /api/auth/login', '192.168.2.1'));
+
+      routes.get('POST /api/auth/login')!(
+        createRequest('POST /api/auth/login', '192.168.2.1', { username: 'testuser', password: '' }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(loginSpy).not.toHaveBeenCalled();
+    });
+
+    it('should reject a password reset with a weak password', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const resetPasswordSpy = jest.spyOn(Auth, 'resetPassword');
+      const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.1'));
+
+      routes.get('PUT /api/auth/password/:id')!(
+        createRequest('PUT /api/auth/password/:id', '192.168.3.1', { password: 'abcdefgh' }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(resetPasswordSpy).not.toHaveBeenCalled();
+    });
+
+    it('should reset the password with a strong password', async () => {
+      const resetPasswordSpy = jest.spyOn(Auth, 'resetPassword').mockResolvedValue(undefined);
+      const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.2'));
+
+      routes.get('PUT /api/auth/password/:id')!(
+        createRequest('PUT /api/auth/password/:id', '192.168.3.2', { password: 'password1' }),
+        res
+      );
+      await flushMicrotasks();
+
+      expect(resetPasswordSpy).toHaveBeenCalledWith(expect.any(String), 'password1');
+      expect(res.status).toHaveBeenCalledWith(204);
+    });
+  });
+
+  describe('rate limiting', () => {
+    it('should let at most ten login attempts per IP through and block the next with 429', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
+        sessionToken: 'token',
+        username: 'testuser',
+        email: 'test@example.com'
+      });
+      const login = routes.get('POST /api/auth/login')!;
+
+      for (let i = 0; i < 10; i++) {
+        login(
+          createRequest('POST /api/auth/login', '192.168.4.1', { username: 'u', password: 'p' }),
+          createResponse({})
+        );
+        await flushMicrotasks();
+      }
+      const blockedRes = createResponse(createRequest('POST /api/auth/login', '192.168.4.1'));
+      login(
+        createRequest('POST /api/auth/login', '192.168.4.1', { username: 'u', password: 'p' }),
+        blockedRes
+      );
+      await flushMicrotasks();
+
+      expect(loginSpy).toHaveBeenCalledTimes(10);
+      expect(blockedRes.status).toHaveBeenCalledWith(429);
+    });
+
+    it('should block an eleventh login attempt from a different IP not affected by the limit of another', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
+        sessionToken: 'token',
+        username: 'testuser',
+        email: 'test@example.com'
+      });
+      const login = routes.get('POST /api/auth/login')!;
+      const otherClientRes = createResponse(createRequest('POST /api/auth/login', '192.168.4.2'));
+
+      login(
+        createRequest('POST /api/auth/login', '192.168.4.2', { username: 'u', password: 'p' }),
+        otherClientRes
+      );
+      await flushMicrotasks();
+
+      expect(loginSpy).toHaveBeenCalledTimes(1);
+      expect(otherClientRes.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should let at most five password reset requests per IP through and block the next with 429', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset').mockResolvedValue(undefined);
+      const requestPasswordReset = routes.get('DELETE /api/auth/password/:user')!;
+
+      for (let i = 0; i < 5; i++) {
+        requestPasswordReset(
+          createRequest('DELETE /api/auth/password/:user', '192.168.5.1'),
+          createResponse({})
+        );
+        await flushMicrotasks();
+      }
+      const blockedRes = createResponse(createRequest('DELETE /api/auth/password/:user', '192.168.5.1'));
+      requestPasswordReset(createRequest('DELETE /api/auth/password/:user', '192.168.5.1'), blockedRes);
+      await flushMicrotasks();
+
+      expect(sendPasswordResetSpy).toHaveBeenCalledTimes(5);
+      expect(blockedRes.status).toHaveBeenCalledWith(429);
     });
   });
 });

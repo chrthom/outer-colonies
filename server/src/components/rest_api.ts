@@ -2,21 +2,30 @@ import { Express, Request, Response } from 'express';
 import fetch from 'node-fetch';
 import Auth from './utils/auth';
 import {
-  AuthEmailRequest,
   AuthExistsResponse,
-  AuthLoginRequest,
   AuthLoginResponse,
-  AuthPasswordRequest,
-  AuthRegisterRequest,
   AuthRegistrationResponse,
   DailyGetResponse,
   DeckCard,
   DeckListResponse,
-  GenericResponse,
   ItemListResponse,
   ItemListResponseBox,
   ProfileGetResponse
 } from '../shared/interfaces/rest_api';
+import { sendStatus } from './utils/api_response';
+import {
+  authEmailSchema,
+  authLoginSchema,
+  authPasswordSchema,
+  authRegisterSchema,
+  validateBody
+} from './utils/request_validation';
+import {
+  existsRateLimiter,
+  loginRateLimiter,
+  passwordResetRateLimiter,
+  registerRateLimiter
+} from './utils/rate_limiter';
 import DBDecksDAO, { DBDeck } from './persistence/db_decks';
 import DBCredentialsDAO, { DBCredentialWithSessionToken } from './persistence/db_credentials';
 import CardCollection from './cards/collection/card_collection';
@@ -49,67 +58,6 @@ function performWithSessionTokenCheck(
   }
 }
 
-/**
- * Sends a status response and logs error statuses with a level beforehand, so no API failure
- * degrades silently: 4xx are logged as `WARN` (recoverable, e.g. invalid client requests) and
- * 5xx as `ERROR` (server-side failures that need attention). Only the method and the matched
- * route pattern are logged - never the query string or the concrete path, whose parameters
- * may carry credentials, email addresses or one-time UUIDs.
- * @param res response to send the status to
- * @param status HTTP status code
- * @param message optional response message, defaults to the status text
- */
-function sendStatus(res: Response, status: number, message?: string) {
-  if (status >= 400) {
-    const level = status >= 500 ? 'ERROR' : 'WARN';
-    // The matched route pattern is logged instead of the concrete path: path parameters can
-    // carry usernames, email addresses or one-time UUIDs, which must never end up in logs
-    const route = res.req?.route?.path;
-    const context = res.req ? ` for ${res.req.method}${route ? ` ${route}` : ''}` : '';
-    console.log(`${level}: API request${context} failed with status ${status}`);
-  }
-  const r: GenericResponse = {
-    status: status
-  };
-  if (message) {
-    r.message = message;
-  } else {
-    switch (status) {
-      case 200:
-        r.message = 'OK';
-        break;
-      case 201:
-        r.message = 'Created';
-        break;
-      case 202:
-        r.message = 'Accepted';
-        break;
-      case 204:
-        r.message = 'No Content';
-        break;
-      case 400:
-        r.message = 'Bad Request';
-        break;
-      case 401:
-        r.message = 'Unauthorized';
-        break;
-      case 403:
-        r.message = 'Forbidden';
-        break;
-      case 404:
-        r.message = 'Not Found';
-        break;
-      case 409:
-        r.message = 'Conflict';
-        break;
-      case 500:
-        r.message = 'Internal Server Error';
-        break;
-    }
-  }
-  res.status(status).send(r);
-}
-
 export default function restAPI(app: Express) {
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {
@@ -132,8 +80,9 @@ export default function restAPI(app: Express) {
       });
   });
 
-  app.post('/api/auth/register', (req, res) => {
-    const registerRequest = <AuthRegisterRequest>req.body;
+  app.post('/api/auth/register', registerRateLimiter, (req, res) => {
+    const registerRequest = validateBody(authRegisterSchema, req, res);
+    if (!registerRequest) return;
     Auth.checkUsernameExists(registerRequest.username)
       .then(exists => (exists ? Promise.reject('Username') : Promise.resolve()))
       .then(() => Auth.checkEmailExists(registerRequest.email))
@@ -162,8 +111,10 @@ export default function restAPI(app: Express) {
     );
   });
 
-  app.post('/api/auth/login', (req, res) => {
-    Auth.login(<AuthLoginRequest>req.body).then(
+  app.post('/api/auth/login', loginRateLimiter, (req, res) => {
+    const loginRequest = validateBody(authLoginSchema, req, res);
+    if (!loginRequest) return;
+    Auth.login(loginRequest).then(
       u => {
         const payload: AuthLoginResponse = {
           sessionToken: u.sessionToken,
@@ -196,7 +147,7 @@ export default function restAPI(app: Express) {
     });
   });
 
-  app.get('/api/auth/exists', (req, res) => {
+  app.get('/api/auth/exists', existsRateLimiter, (req, res) => {
     const sendExistsResponse = (exists: boolean) => {
       const payload: AuthExistsResponse = {
         exists: exists
@@ -212,7 +163,7 @@ export default function restAPI(app: Express) {
     else sendStatus(res, 400, 'No username or email parameter was provided');
   });
 
-  app.delete('/api/auth/password/:user', (req, res) => {
+  app.delete('/api/auth/password/:user', passwordResetRateLimiter, (req, res) => {
     Auth.sendPasswordReset(String(req.params['user'])).then(
       () => sendStatus(res, 202),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
@@ -221,7 +172,9 @@ export default function restAPI(app: Express) {
 
   app.put('/api/auth/password', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
-      DBCredentialsDAO.setPassword(u.userId, (<AuthPasswordRequest>req.body).password).then(
+      const passwordRequest = validateBody(authPasswordSchema, req, res);
+      if (!passwordRequest) return;
+      DBCredentialsDAO.setPassword(u.userId, passwordRequest.password).then(
         () => sendStatus(res, 204),
         reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
       );
@@ -229,7 +182,9 @@ export default function restAPI(app: Express) {
   });
 
   app.put('/api/auth/password/:id', (req, res) => {
-    Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password).then(
+    const passwordRequest = validateBody(authPasswordSchema, req, res);
+    if (!passwordRequest) return;
+    Auth.resetPassword(String(req.params['id']), passwordRequest.password).then(
       () => sendStatus(res, 204),
       reason => sendStatus(res, reason == APIRejectReason.NotFound ? 404 : 500)
     );
@@ -237,7 +192,9 @@ export default function restAPI(app: Express) {
 
   app.post('/api/auth/email', (req, res) => {
     performWithSessionTokenCheck(req, res, u => {
-      Auth.sendEmailConfirmation(u.userId, u.username, (<AuthEmailRequest>req.body).email).then(
+      const emailRequest = validateBody(authEmailSchema, req, res);
+      if (!emailRequest) return;
+      Auth.sendEmailConfirmation(u.userId, u.username, emailRequest.email).then(
         () => sendStatus(res, 202),
         () => sendStatus(res, 500)
       );

@@ -166,6 +166,9 @@ describe('ProfilePage', () => {
     password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
+    password?.setValue('nodigitshere');
+    expect(password?.valid).toBeFalse();
+
     password?.setValue('validpassword123');
     expect(password?.valid).toBeTrue();
   });

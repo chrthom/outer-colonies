@@ -12,6 +12,10 @@ import DBConnection from './components/persistence/db_connector';
 import process from 'node:process';
 
 const app = express();
+// The API is deployed behind a local reverse proxy that terminates HTTPS. Trusting only
+// loopback proxies keeps req.ip the real client address there (so the rate limiters of the
+// auth endpoints bucket per client), while direct clients cannot spoof X-Forwarded-For.
+app.set('trust proxy', 'loopback');
 app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
