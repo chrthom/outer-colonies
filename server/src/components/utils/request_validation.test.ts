@@ -8,7 +8,6 @@ import {
   authPasswordSchema,
   authRegisterSchema,
   oneTimeIdSchema,
-  validateBody,
   validateBodyMiddleware,
   validateParamsMiddleware,
   validateQueryMiddleware
@@ -63,11 +62,15 @@ describe('RequestValidation', () => {
       ['malformed email', { email: 'not-an-email' }],
       ['long email', { email: `${'a'.repeat(50)}@example.com` }],
       ['missing email', { email: undefined }],
-      ['non-boolean newsletter', { newsletter: 'yes' }],
-      ['missing newsletter', { newsletter: undefined }]
+      ['non-boolean newsletter', { newsletter: 'yes' }]
     ])('rejects a registration body with a %s', (_case, invalidChange) => {
       const result = authRegisterSchema.safeParse({ ...validBody, ...invalidChange });
       expect(result.success).toBe(false);
+    });
+
+    it('defaults a missing newsletter to false for older clients', () => {
+      const result = authRegisterSchema.safeParse({ ...validBody, newsletter: undefined });
+      expect(result.success && result.data.newsletter).toBe(false);
     });
   });
 
@@ -189,56 +192,6 @@ describe('RequestValidation', () => {
     });
   });
 
-  describe('validateBody', () => {
-    const createRequest = (body: unknown) => <{ body: unknown; method: string; route: { path: string } }>(<
-        unknown
-      >{
-        body: body,
-        method: 'POST',
-        route: { path: '/api/test' }
-      });
-    const createResponse = (req: object) => {
-      const res: any = { req: req };
-      res.status = jest.fn().mockReturnThis();
-      res.send = jest.fn();
-      return res;
-    };
-
-    it('returns the parsed body and sends no response for a valid body', () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const req = createRequest({ email: '  test@example.com  ' });
-      const res = createResponse(req);
-
-      const parsed = validateBody(authEmailSchema, <any>req, <any>res);
-
-      expect(parsed?.email).toBe('test@example.com');
-      expect(res.status).not.toHaveBeenCalled();
-      expect(errorSpy).not.toHaveBeenCalled();
-    });
-
-    it('sends a 400 with the first validation error and returns undefined for an invalid body', () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const req = createRequest({ email: 'not-an-email' });
-      const res = createResponse(req);
-
-      const parsed = validateBody(authEmailSchema, <any>req, <any>res);
-
-      expect(parsed).toBeUndefined();
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ status: 400, message: 'Invalid email address' });
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
-    });
-
-    it('sends a 400 for a missing body', () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const req = createRequest(undefined);
-      const res = createResponse(req);
-
-      expect(validateBody(authEmailSchema, <any>req, <any>res)).toBeUndefined();
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-  });
-
   describe('validation middleware', () => {
     const createRequest = (property: 'body' | 'query' | 'params', value: unknown) =>
       <any>{
@@ -274,7 +227,7 @@ describe('RequestValidation', () => {
     });
 
     it('sends a 400 and stops the chain for an invalid body', () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const req = createRequest('body', { email: 'not-an-email' });
 
       const result = invoke(validateBodyMiddleware(authEmailSchema), req);
@@ -282,15 +235,16 @@ describe('RequestValidation', () => {
       expect(result.nextCalled).toBe(false);
       expect(result.res.status).toHaveBeenCalledWith(400);
       expect(result.res.send).toHaveBeenCalledWith({ status: 400, message: 'Invalid email address' });
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
     });
 
-    it('assigns the parsed query parameters back onto the request', () => {
-      const req = createRequest('query', { username: ' testuser ' });
+    it('replaces the query wholesale, dropping keys the schema removed', () => {
+      const req = createRequest('query', { username: ' testuser ', extra: 'junk' });
 
       const result = invoke(validateQueryMiddleware(authExistsQuerySchema), req);
 
       expect(result.nextCalled).toBe(true);
-      expect(req.query['username']).toBe('testuser');
+      expect(req.query).toEqual({ username: 'testuser' });
     });
 
     it('assigns the parsed path parameters back onto the request', () => {

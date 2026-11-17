@@ -15,15 +15,18 @@ import {
   existsRateLimiter,
   loginRateLimiter,
   passwordResetRateLimiter,
-  registerRateLimiter
+  registerRateLimiter,
+  sessionRateLimiter
 } from '../utils/rate_limiter';
 
 /**
  * Express router guarding the auth endpoints of the resource routers: mounted in front of
  * them (see `app.ts`), it validates request bodies, query strings and path parameters with
  * zod schemas - so oversized or malformed values are rejected with a 400 before any session,
- * database or mail access happens downstream - and rate-limits the unauthenticated endpoints
- * against brute force, mail flooding, user enumeration and mass account creation.
+ * database or mail access happens downstream - and rate-limits the auth endpoints: the
+ * unauthenticated ones against brute force, mail flooding, user enumeration and mass
+ * account creation, and the session-resolving login endpoints against cheap database
+ * probing.
  */
 const authValidation = Router();
 
@@ -32,6 +35,10 @@ authValidation.post('/api/auth/register', registerRateLimiter, validateBodyMiddl
 authValidation.put('/api/auth/register/:id', validateParamsMiddleware(oneTimeIdSchema));
 
 authValidation.post('/api/auth/login', loginRateLimiter, validateBodyMiddleware(authLoginSchema));
+
+authValidation.get('/api/auth/login', sessionRateLimiter);
+
+authValidation.delete('/api/auth/login', sessionRateLimiter);
 
 authValidation.get('/api/auth/exists', existsRateLimiter, validateQueryMiddleware(authExistsQuerySchema));
 

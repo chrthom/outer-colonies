@@ -3,6 +3,7 @@ import http, { IncomingMessage, RequestOptions } from 'node:http';
 import restAPI from './index';
 import authValidation from './auth_validation';
 import Auth from '../utils/auth';
+import { APIRejectReason } from '../../shared/config/enums';
 
 /**
  * Integration harness for the validation and rate-limiting layer in front of the auth
@@ -133,6 +134,28 @@ describe('REST API auth validation', () => {
       expect(response.body).toEqual({ id: 42, username: 'testuser' });
     });
 
+    it('should register without newsletter, defaulting to false', async () => {
+      jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
+      jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(false);
+      const registerSpy = jest.spyOn(Auth, 'register').mockResolvedValue(<any>{
+        userId: 42,
+        username: 'testuser',
+        email: 'test@example.com'
+      });
+
+      // Older deployed clients register without the newsletter field
+      const bodyWithoutNewsletter = {
+        username: 'testuser',
+        password: 'password1',
+        email: 'test@example.com',
+        starterDeck: 1
+      };
+      const response = await request('POST', '/api/auth/register', '192.168.1.3', bodyWithoutNewsletter);
+
+      expect(registerSpy).toHaveBeenCalledWith(validRegisterBody);
+      expect(response.status).toBe(201);
+    });
+
     it('should reject a login with an invalid body without an authentication attempt', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login');
@@ -213,13 +236,9 @@ describe('REST API auth validation', () => {
   });
 
   describe('rate limiting', () => {
-    it('should let at most ten login attempts per IP through and block the next with 429', async () => {
+    it('should let at most ten failed login attempts per IP through and block the next with 429', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
-        sessionToken: 'token',
-        username: 'testuser',
-        email: 'test@example.com'
-      });
+      const loginSpy = jest.spyOn(Auth, 'login').mockRejectedValue(APIRejectReason.NotFound);
 
       for (let i = 0; i < 10; i++) {
         await request('POST', '/api/auth/login', '192.168.4.1', { username: 'u', password: 'p' });
@@ -258,6 +277,37 @@ describe('REST API auth validation', () => {
       const blocked = await request('DELETE', '/api/auth/password/testuser', '192.168.5.1');
 
       expect(sendPasswordResetSpy).toHaveBeenCalledTimes(5);
+      expect(blocked.status).toBe(429);
+    });
+
+    it('should not count successful logins towards the login rate limit', async () => {
+      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
+        sessionToken: 'token',
+        username: 'testuser',
+        email: 'test@example.com'
+      });
+
+      for (let i = 0; i < 10; i++) {
+        await request('POST', '/api/auth/login', '192.168.4.3', { username: 'u', password: 'p' });
+      }
+      const eleventh = await request('POST', '/api/auth/login', '192.168.4.3', {
+        username: 'u',
+        password: 'p'
+      });
+
+      expect(loginSpy).toHaveBeenCalledTimes(11);
+      expect(eleventh.status).toBe(200);
+    });
+
+    it('should throttle the session-resolving login endpoint after 120 requests', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+      // Without a session-token header each request is a cheap 401, so no database is touched
+      for (let i = 0; i < 120; i++) {
+        await request('GET', '/api/auth/login', '192.168.7.1');
+      }
+      const blocked = await request('GET', '/api/auth/login', '192.168.7.1');
+
       expect(blocked.status).toBe(429);
     });
   });

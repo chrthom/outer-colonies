@@ -51,13 +51,16 @@ const starterDeck = z
     'Invalid starter deck'
   );
 
-/** Schema for `POST /api/auth/register` request bodies. */
+/**
+ * Schema for `POST /api/auth/register` request bodies. The newsletter defaults to false, so
+ * older deployed clients whose register payloads predate the field keep working.
+ */
 export const authRegisterSchema = z.object({
   username: username,
   password: strongPassword,
   email: email,
   starterDeck: starterDeck,
-  newsletter: z.boolean({ message: 'Newsletter must be a boolean' })
+  newsletter: z.boolean({ message: 'Newsletter must be a boolean' }).default(false)
 });
 
 /**
@@ -114,17 +117,9 @@ export const oneTimeIdSchema = z.object({
   id: z.uuid('Invalid one-time link id')
 });
 
-/**
- * Validates a request property against a zod schema. On a validation failure a 400
- * response with the first validation error as message is sent and `undefined` is
- * returned; on success the parsed (and potentially transformed, e.g. trimmed) value is
- * returned.
- * @param schema zod schema the value must satisfy
- * @param value the request property value to validate
- * @param res response the 400 is sent to on a validation failure
- * @param fallbackMessage response message when the schema yields no specific error
- * @returns the parsed value, or `undefined` if it is invalid
- */
+// Sends the 400 response for a failed validation and returns undefined, so callers can bail
+// out with a bare falsy check; on success the parsed (and potentially transformed, e.g.
+// trimmed) value is returned.
 function validate<S extends z.ZodType>(
   schema: S,
   value: unknown,
@@ -139,55 +134,10 @@ function validate<S extends z.ZodType>(
   return result.data;
 }
 
-/**
- * Validates a request body against a zod schema. On a validation failure a 400 response with
- * the first validation error as message is sent and `undefined` is returned; on success the
- * parsed (and potentially transformed, e.g. trimmed) body is returned.
- * @param schema zod schema the request body must satisfy
- * @param req request whose body is validated
- * @param res response the 400 is sent to on a validation failure
- * @returns the parsed request body, or `undefined` if the body is invalid
- */
-export function validateBody<S extends z.ZodType>(schema: S, req: Request, res: Response) {
-  return validate(schema, req.body, res, 'Invalid request body');
-}
-
-/**
- * Validates the query parameters of a request against a zod schema, mirroring
- * {@link validateBody}.
- * @param schema zod schema the query parameters must satisfy
- * @param req request whose query parameters are validated
- * @param res response the 400 is sent to on a validation failure
- * @returns the parsed query parameters, or `undefined` if they are invalid
- */
-export function validateQuery<S extends z.ZodType>(schema: S, req: Request, res: Response) {
-  return validate(schema, req.query, res, 'Invalid query parameters');
-}
-
-/**
- * Validates the path parameters of a request against a zod schema, mirroring
- * {@link validateBody}.
- * @param schema zod schema the path parameters must satisfy
- * @param req request whose path parameters are validated
- * @param res response the 400 is sent to on a validation failure
- * @returns the parsed path parameters, or `undefined` if they are invalid
- */
-export function validateParams<S extends z.ZodType>(schema: S, req: Request, res: Response) {
-  return validate(schema, req.params, res, 'Invalid path parameters');
-}
-
-/**
- * Builds an express middleware that validates a request property against a zod schema: on
- * success the parsed (and potentially transformed, e.g. trimmed) value replaces the property
- * so downstream handlers operate on validated data, and the chain continues; on a validation
- * failure a 400 response with the first validation error as message short-circuits the
- * request before it reaches the guarded route.
- * @param schema zod schema the request property must satisfy
- * @param read reads the request property to validate off the request
- * @param write replaces the request property with its parsed value
- * @param fallbackMessage response message when the schema yields no specific error
- * @returns the express middleware enforcing the schema
- */
+// Builds the express middleware variant of a validation: on success the parsed value replaces
+// the request property (so downstream handlers operate on validated data) and the chain
+// continues; on a validation failure the 400 short-circuits the request before it reaches the
+// guarded route.
 function validationMiddleware<S extends z.ZodType>(
   schema: S,
   read: (req: Request) => unknown,
@@ -205,7 +155,7 @@ function validationMiddleware<S extends z.ZodType>(
 /**
  * Validates the request body against a zod schema as express middleware: the parsed body
  * replaces `req.body`, so the guarded handler operates on validated (and potentially
- * transformed, e.g. trimmed) data. Middleware counterpart of {@link validateBody}.
+ * transformed, e.g. trimmed) data.
  * @param schema zod schema the request body must satisfy
  * @returns the express middleware enforcing the schema
  */
@@ -221,10 +171,10 @@ export function validateBodyMiddleware<S extends z.ZodType>(schema: S): RequestH
 }
 
 /**
- * Validates the query parameters of a request against a zod schema as express middleware: the
- * parsed parameters are assigned back onto `req.query`, so the guarded handler reads
- * validated (and potentially transformed, e.g. trimmed) values. Middleware counterpart of
- * {@link validateQuery}.
+ * Validates the query parameters of a request against a zod schema as express middleware:
+ * the parsed parameters replace `req.query` wholesale - keys dropped by the schema are
+ * removed instead of lingering on in unvalidated form - so the guarded handler reads
+ * validated (and potentially transformed, e.g. trimmed) values.
  * @param schema zod schema the query parameters must satisfy
  * @returns the express middleware enforcing the schema
  */
@@ -233,6 +183,7 @@ export function validateQueryMiddleware<S extends z.ZodType>(schema: S): Request
     schema,
     req => req.query,
     (req, parsed) => {
+      for (const key of Object.keys(req.query)) delete req.query[key];
       Object.assign(req.query, parsed);
     },
     'Invalid query parameters'
@@ -240,9 +191,10 @@ export function validateQueryMiddleware<S extends z.ZodType>(schema: S): Request
 }
 
 /**
- * Validates the path parameters of a request against a zod schema as express middleware: the
- * parsed parameters are assigned back onto `req.params`, so the guarded handler reads
- * validated values. Middleware counterpart of {@link validateParams}.
+ * Validates the path parameters of a request against a zod schema as express middleware:
+ * the parsed parameters are assigned back onto `req.params`. Express re-derives path
+ * parameters from the URL for every matched route, so the assignment serves this stack;
+ * the schema's lasting effect downstream is the 400 gate for malformed values.
  * @param schema zod schema the path parameters must satisfy
  * @returns the express middleware enforcing the schema
  */
