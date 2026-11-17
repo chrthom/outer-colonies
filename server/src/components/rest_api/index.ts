@@ -9,6 +9,12 @@ import itemRouter from './item_router';
 import shopRouter from './shop_router';
 import { apiErrorHandler } from './api_error';
 
+/**
+ * Mounts the REST API on the given express application: the assets proxy (forwarding to the
+ * asset server to by-pass CORS issues), one router per resource and the central error-handling
+ * middleware.
+ * @param app express application to mount the REST API on
+ */
 export default function restAPI(app: Express) {
   // Forward to assets to by-pass CORS issues
   app.get('/assets/*', (req, res) => {

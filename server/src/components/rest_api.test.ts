@@ -51,17 +51,18 @@ describe('REST API', () => {
    * @param method HTTP method
    * @param path request path (with concrete ids)
    * @param sessionToken optional `session-token` header value
-   * @param body optional JSON request body
+   * @param body optional JSON request body, or a raw payload string sent as-is (e.g. malformed
+   *        JSON to trigger a body-parser error)
    * @returns the responded status code and body
    */
   function request(
     method: string,
     path: string,
     sessionToken?: string,
-    body?: object
+    body?: object | string
   ): Promise<TestResponse> {
     const options: RequestOptions = { method, agent: false };
-    const payload = body === undefined ? undefined : JSON.stringify(body);
+    const payload = body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body);
     if (payload !== undefined) options.headers = { 'Content-Type': 'application/json' };
     if (sessionToken !== undefined) {
       options.headers = { ...(options.headers ?? {}), 'session-token': sessionToken };
@@ -381,6 +382,18 @@ describe('REST API', () => {
 
       expect(response.status).toBe(204);
       expect(logSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('upstream middleware errors', () => {
+    it('should preserve the status of a malformed-JSON body-parser error instead of collapsing it to 500', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const response = await request('POST', '/api/auth/login', undefined, '{ not valid json');
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('Bad Request');
+      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 400/));
     });
   });
 });

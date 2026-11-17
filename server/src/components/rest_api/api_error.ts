@@ -53,9 +53,11 @@ export function asyncRoute(
 }
 
 /**
- * Central error-handling middleware of the REST API: every `ApiError` (and every unknown error,
- * which degrades to an internal server error) is answered with its status and the standard
- * `GenericResponse` body, including the leveled failure log (see `sendStatus`).
+ * Central error-handling middleware of the REST API: every `ApiError` is answered with its status
+ * and the standard `GenericResponse` body, including the leveled failure log (see `sendStatus`).
+ * Non-ApiError errors keep the status they carry (e.g. express.json's malformed-JSON 400 or
+ * payload-too-large 413, which express's default handler would honor as well); errors without a
+ * status degrade to an internal server error.
  */
 export function apiErrorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
   if (res.headersSent) {
@@ -63,8 +65,9 @@ export function apiErrorHandler(err: Error, req: Request, res: Response, next: N
     next(err);
     return;
   }
-  const apiError = err instanceof ApiError ? err : new ApiError(500);
+  const status = err instanceof ApiError ? err.status : ((err as { status?: number }).status ?? 500);
   // An ApiError without a custom message has the Error default '' - let sendStatus fill in the
-  // standard status text instead
-  sendStatus(res, apiError.status, apiError.message || undefined);
+  // standard status text instead; messages of non-ApiError errors are never exposed
+  const message = err instanceof ApiError ? err.message || undefined : undefined;
+  sendStatus(res, status, message);
 }
