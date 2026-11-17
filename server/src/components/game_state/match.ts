@@ -30,6 +30,8 @@ export default class Match {
   gameResult!: GameResult;
   intervention?: Intervention;
   highlightCard?: CardStack;
+  /** Timestamp (ms since epoch) when the match ended; set by the game cron on its first sight of the finished match */
+  gameOverSince?: number;
   constructor(room: string, socket1: Socket, socket2: Socket) {
     this.room = room;
     this.turnPhase = TurnPhase.Init;
