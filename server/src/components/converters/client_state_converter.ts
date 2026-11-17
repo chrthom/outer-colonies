@@ -54,10 +54,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   };
 }
 
-/**
- * Projects the battle for the given player: the player's ships are listed as own ships, the
- * opponent's as opponent ships.
- */
 function toClientBattle(match: Match, playerNo: number): ClientBattle {
   return {
     type: match.battle.type,
@@ -68,10 +64,6 @@ function toClientBattle(match: Match, playerNo: number): ClientBattle {
   };
 }
 
-/**
- * Projects all card stacks of one match participant, grouped by zone. `ownedByPlayer` marks
- * stacks of the player the state is emitted to and gates the build phase attributes.
- */
 function toClientCardStacks(
   match: Match,
   owner: Player,
@@ -86,7 +78,6 @@ function toClientCardStacks(
   });
 }
 
-/** Projects a single card stack, delegating to the cards and attributes helpers. */
 function toClientCardStack(
   match: Match,
   cs: CardStack,
@@ -109,10 +100,6 @@ function toClientCardStack(
   };
 }
 
-/**
- * Projects the sub card stacks of a card stack into its cards. Hull cards are listed after all
- * other cards so they render as the ship's hull parts.
- */
 function toClientCards(cs: CardStack, zone: Zone, ownedByPlayer: boolean): ClientCard[] {
   const toClientCard = (sub: CardStack, index: number): ClientCard => ({
     uuid: sub.uuid,
@@ -125,17 +112,13 @@ function toClientCards(cs: CardStack, zone: Zone, ownedByPlayer: boolean): Clien
   const otherCardStacks = cs.cardStacks
     .filter(sub => zone == Zone.Colony || sub.type != CardType.Hull)
     .map(toClientCard);
+  // Hull cards last, so they render as the ship's hull parts
   const hullCardStacks = cs.cardStacks
     .filter(sub => zone != Zone.Colony && sub.type == CardType.Hull)
     .map(sub => toClientCard(sub, otherCardStacks.length));
   return otherCardStacks.concat(hullCardStacks);
 }
 
-/**
- * Projects the visible attributes of a card stack: damage and hit points always, control for
- * colonies, build attributes for the owning player and combat attributes for battle
- * participants.
- */
 function toClientAttributes(
   match: Match,
   cs: CardStack,
@@ -165,7 +148,6 @@ function toClientAttributes(
   return attributes;
 }
 
-/** Projects the profile attributes shown to the owning player during the build phase. */
 function buildPhaseAttributes(cs: CardStack): ClientCardStackAttribute[] {
   const profile = cs.profile;
   return [
@@ -183,7 +165,6 @@ function buildPhaseAttributes(cs: CardStack): ClientCardStackAttribute[] {
   ];
 }
 
-/** Projects the attributes of a card stack participating in the current battle. */
 function combatPhaseAttributes(cs: CardStack, battle: ClientBattle): ClientCardStackAttribute[] {
   const attributes: ClientCardStackAttribute[] = [];
   if (battle.type == BattleType.Mission) {
@@ -230,7 +211,6 @@ function toClientHandCards(match: Match, hand: CardStack[], viewedBy: Player): C
   });
 }
 
-/** Projects a player, including the retract hint derived from the already projected stacks. */
 function toClientPlayer(
   match: Match,
   p: Player,
@@ -256,7 +236,6 @@ function toClientPlayer(
   };
 }
 
-/** Projects the pending intervention, if any, including the attacked stacks of an attack. */
 function toClientIntervention(match: Match): ClientIntervention | undefined {
   return match.intervention
     ? {
@@ -274,7 +253,6 @@ function toClientIntervention(match: Match): ClientIntervention | undefined {
     : undefined;
 }
 
-/** Projects the game result from the perspective of the given player, if the game is over. */
 function toClientGameResult(match: Match, playerNo: number): ClientGameResult | undefined {
   return match.gameResult.gameOver
     ? {
