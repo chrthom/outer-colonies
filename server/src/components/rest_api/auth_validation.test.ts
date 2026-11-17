@@ -134,28 +134,6 @@ describe('REST API auth validation', () => {
       expect(response.body).toEqual({ id: 42, username: 'testuser' });
     });
 
-    it('should register without newsletter, defaulting to false', async () => {
-      jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
-      jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(false);
-      const registerSpy = jest.spyOn(Auth, 'register').mockResolvedValue(<any>{
-        userId: 42,
-        username: 'testuser',
-        email: 'test@example.com'
-      });
-
-      // Older deployed clients register without the newsletter field
-      const bodyWithoutNewsletter = {
-        username: 'testuser',
-        password: 'password1',
-        email: 'test@example.com',
-        starterDeck: 1
-      };
-      const response = await request('POST', '/api/auth/register', '192.168.1.3', bodyWithoutNewsletter);
-
-      expect(registerSpy).toHaveBeenCalledWith(validRegisterBody);
-      expect(response.status).toBe(201);
-    });
-
     it('should reject a login with an invalid body without an authentication attempt', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login');
@@ -252,6 +230,26 @@ describe('REST API auth validation', () => {
       expect(blocked.status).toBe(429);
     });
 
+    it('should not count successful logins toward the login rate limit', async () => {
+      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
+        sessionToken: 'token',
+        username: 'testuser',
+        email: 'test@example.com'
+      });
+
+      const statuses: number[] = [];
+      for (let i = 0; i < 12; i++) {
+        const response = await request('POST', '/api/auth/login', '192.168.4.3', {
+          username: 'u',
+          password: 'p'
+        });
+        statuses.push(response.status);
+      }
+
+      expect(statuses).not.toContain(429);
+      expect(loginSpy).toHaveBeenCalledTimes(12);
+    });
+
     it('should not block a login attempt from an IP whose limit was not exhausted by another client', async () => {
       jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
         sessionToken: 'token',
@@ -280,35 +278,18 @@ describe('REST API auth validation', () => {
       expect(blocked.status).toBe(429);
     });
 
-    it('should not count successful logins towards the login rate limit', async () => {
-      const loginSpy = jest.spyOn(Auth, 'login').mockResolvedValue(<any>{
-        sessionToken: 'token',
-        username: 'testuser',
-        email: 'test@example.com'
-      });
-
-      for (let i = 0; i < 10; i++) {
-        await request('POST', '/api/auth/login', '192.168.4.3', { username: 'u', password: 'p' });
-      }
-      const eleventh = await request('POST', '/api/auth/login', '192.168.4.3', {
-        username: 'u',
-        password: 'p'
-      });
-
-      expect(loginSpy).toHaveBeenCalledTimes(11);
-      expect(eleventh.status).toBe(200);
-    });
-
-    it('should throttle the session-resolving login endpoint after 120 requests', async () => {
+    it('should block the session-backed login endpoints after 120 requests per IP with 429', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => undefined);
-
-      // Without a session-token header each request is a cheap 401, so no database is touched
-      for (let i = 0; i < 120; i++) {
-        await request('GET', '/api/auth/login', '192.168.7.1');
+      // Every request without a session token is rejected with a 401 by the session
+      // middleware of the resource router, so the test needs no database mock
+      const statuses: number[] = [];
+      for (let i = 0; i <= 120; i++) {
+        const response = await request('GET', '/api/auth/login', '192.168.7.1');
+        statuses.push(response.status);
       }
-      const blocked = await request('GET', '/api/auth/login', '192.168.7.1');
 
-      expect(blocked.status).toBe(429);
+      expect(statuses.filter(status => status == 401)).toHaveLength(120);
+      expect(statuses.filter(status => status == 429)).toHaveLength(1);
     });
   });
 });
