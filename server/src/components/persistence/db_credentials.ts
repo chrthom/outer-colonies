@@ -16,6 +16,14 @@ export interface DBCredentialWithSessionToken {
   sessionToken: string;
 }
 
+/** Raw `credentials` row as the MariaDB driver returns it (the bigint key arrives as BigInt). */
+interface CredentialRow {
+  user_id: bigint;
+  username: string;
+  email: string;
+  session_token: string | null;
+}
+
 export default class DBCredentialsDAO {
   static async getByUsername(username: string, password?: string): Promise<DBCredential> {
     const passwordQuery = password ? 'AND password = ? AND activated = TRUE' : '';
@@ -37,17 +45,17 @@ export default class DBCredentialsDAO {
       })
     );
   }
-  private static async getBy(whereClause: string, params: any[]): Promise<DBCredential> {
-    const queryResult: any[] = await DBConnection.instance.query(
+  private static async getBy(whereClause: string, params: unknown[]): Promise<DBCredential> {
+    const rows = await DBConnection.instance.query<CredentialRow[]>(
       `SELECT user_id, username, email, session_token FROM credentials WHERE ${whereClause}`,
       params
     );
-    return queryResult.length == 1
+    return rows.length == 1
       ? {
-          userId: Number(queryResult[0].user_id),
-          username: String(queryResult[0].username),
-          email: String(queryResult[0].email),
-          sessionToken: queryResult[0].session_token ? String(queryResult[0].session_token) : null
+          userId: Number(rows[0].user_id),
+          username: rows[0].username,
+          email: rows[0].email,
+          sessionToken: rows[0].session_token || null
         }
       : Promise.reject(APIRejectReason.NotFound);
   }

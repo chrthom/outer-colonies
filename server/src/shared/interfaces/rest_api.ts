@@ -90,7 +90,7 @@ interface ItemListResponseElement {
 }
 
 export interface ItemListResponseBox extends ItemListResponseElement {
-  message?: string;
+  message?: string | null;
   sol: number[];
   cards: number[];
   boosters: number[];

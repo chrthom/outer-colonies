@@ -144,7 +144,12 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Backend services for both website and client
 - **Key Components**:
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
-  - `components/rest_api.ts`: REST API endpoints for the website
+  - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
+    - `index.ts`: Router registration and central error-handling middleware
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`: Endpoints per resource
+    - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
+    - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
+    - `api_response.ts`: Status response helper with leveled failure logging
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
   - `components/game_state/`: In-memory game state
