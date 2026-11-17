@@ -64,17 +64,17 @@ describe('ResetPasswordPage', () => {
 
   it('should make password field required with length validation', () => {
     const password = component.password;
-    password.setValue('');
-    expect(password.valid).toBeFalse();
+    password?.setValue('');
+    expect(password?.valid).toBeFalse();
 
-    password.setValue('short');
-    expect(password.valid).toBeFalse();
+    password?.setValue('short');
+    expect(password?.valid).toBeFalse();
 
-    password.setValue('validpassword123');
-    expect(password.valid).toBeTrue();
+    password?.setValue('validpassword123');
+    expect(password?.valid).toBeTrue();
 
-    password.setValue('a'.repeat(41));
-    expect(password.valid).toBeFalse();
+    password?.setValue('a'.repeat(41));
+    expect(password?.valid).toBeFalse();
   });
 
   it('should not submit when form is invalid', () => {

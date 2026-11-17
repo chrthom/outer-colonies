@@ -29,7 +29,7 @@ class MockWeaponCard extends EquipmentCard {
 class MockPlayer extends Player {
   constructor(playerNo: number) {
     const mockMatch = new MockMatch() as any as Match;
-    super('test-socket', 0, 'Test Player', mockMatch, playerNo, []);
+    super('test-socket', playerNo, 'Test Player', mockMatch, playerNo, []);
   }
 }
 
@@ -56,7 +56,7 @@ const createMatch = (): Match => {
       id: `socket-${playerNo}`,
       join: jest.fn(),
       data: {
-        user: { username: `Player ${playerNo}` },
+        user: { userId: playerNo, username: `Player ${playerNo}` },
         activeDeck: [1, 2, 3, 4].map(i => new MockCard(i, `Deck Card ${i}`, CardType.Hull, 1))
       }
     }) as unknown as Socket;

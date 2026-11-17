@@ -119,6 +119,17 @@ const getEmittedState = (socketMock: SocketMock): ClientState => {
   return emission[1];
 };
 
+describe('Match player creation', () => {
+  test('players carry the user id of the authenticated socket data', () => {
+    const { match } = createCombatMatch();
+
+    // The socket mock deliberately uses userId = playerNo + 1, so a passing
+    // expectation proves the id is carried over, not coincidentally equal
+    expect(match.players[0].userId).toBe(1);
+    expect(match.players[1].userId).toBe(2);
+  });
+});
+
 describe('MsgTypeInbound.Attack with all weapons', () => {
   let match: Match;
   let socketMocks: [SocketMock, SocketMock];

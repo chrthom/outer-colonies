@@ -143,7 +143,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 #### Server (Express + Socket.IO)
 - **Purpose**: Backend services for both website and client
 - **Key Components**:
-  - `app.ts`: Main server application
+  - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
   - `components/rest_api.ts`: REST API endpoints for the website
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic

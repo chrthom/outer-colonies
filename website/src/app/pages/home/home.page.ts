@@ -20,7 +20,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   dailies: Daily[] = this.generateDailiesArray();
   selectedDaily = 1;
-  private autoAdvanceInterval: any;
+  private autoAdvanceInterval: ReturnType<typeof setInterval> | undefined;
 
   ngOnInit() {
     this.reload();

@@ -11,7 +11,7 @@ import { allActiveMatches, unregisterMatch } from './match_registry';
 import { Attack } from './game_state/battle';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
-  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: any) => {
+  socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) => {
     doWithMatchAndPlayer(socket, (match, player) => {
       // A finished match no longer processes ready events; the initial ready
       // of a rejoin only fetches the current (final) match state
