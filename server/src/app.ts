@@ -7,12 +7,20 @@ import { matchMakingSocketListeners, matchMakingCron } from './components/matchm
 import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import { version, releaseName } from './shared/config/version';
+import authValidation from './components/rest_api/auth_validation';
 import restAPI from './components/rest_api';
 import DBConnection from './components/persistence/db_connector';
 import { logger } from './components/utils/logger';
 import process from 'node:process';
 
 const app = express();
+// The API is deployed behind a local reverse proxy that terminates HTTPS: the proxy enters
+// the server container from the Docker bridge gateway, so the private bridge subnet must be
+// trusted alongside loopback for req.ip to resolve to the real client address there (the
+// rate limiters of the auth endpoints bucket per client). There is exactly one trusted
+// proxy hop; direct LAN clients bypassing the proxy are not in the trusted set, so
+// X-Forwarded-For spoofing stays impossible.
+app.set('trust proxy', ['loopback', '172.16.0.0/12']);
 app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -33,6 +41,10 @@ io.on(MsgTypeInbound.Connect, socket => {
 });
 
 app.use(express.json());
+// The validation and rate-limiting layer must sit in front of the API routers, so malformed
+// requests are rejected with a 400 and unauthenticated endpoints are throttled before any
+// route handler runs
+app.use(authValidation);
 restAPI(app);
 
 /** Upper bound for the graceful shutdown before the process is exited forcefully. */

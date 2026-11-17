@@ -500,6 +500,8 @@ The full design, budgets and the role chain are documented in [misc/dev-loop.md]
 
 - **Express**: Web framework for handling REST API requests.
 - **Socket.IO**: Library for real-time WebSocket communication between the client and server.
+- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`).
+- **express-rate-limit**: Rate limiting of the auth REST endpoints against brute force, mail flooding and user enumeration (see `server/src/components/utils/rate_limiter.ts`).
 - **Node.js**: JavaScript runtime for the server.
 
 ### Development Tools
