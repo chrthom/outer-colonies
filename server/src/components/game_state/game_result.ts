@@ -44,10 +44,6 @@ export default class GameResult {
     if (!winner.isBot) void this.persistEarnings(winner, loser, true, this.winnerSol);
     if (!loser.isBot) void this.persistEarnings(loser, winner, false, this.loserSol);
   }
-  /**
-   * Sol gains of the human player are halved in bot games (rounded down, as Sol
-   * is an integer currency). The bot itself persists nothing.
-   */
   private halveSolInBotGame(sol: number, botGame: boolean): number {
     return botGame ? Math.floor(sol / 2) : sol;
   }

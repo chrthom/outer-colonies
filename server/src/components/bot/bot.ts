@@ -44,10 +44,6 @@ export default class Bot implements MatchBot {
     }
   }
 
-  /**
-   * Returns whether the bot is expected to act: in the init phase until it is
-   * ready, and in all other phases as long as it is the pending action player.
-   */
   private needsAction(): boolean {
     if (this.match.gameResult.gameOver) return false;
     if (this.match.turnPhase == TurnPhase.Init) return !this.player.ready;
@@ -78,10 +74,6 @@ export default class Bot implements MatchBot {
     }
   }
 
-  /**
-   * Plays an intervention reaction card if the bot has a playable one,
-   * otherwise skips the intervention window.
-   */
   private playInterventionOrSkip() {
     const handCard = selectHandCard(this.player.hand);
     if (handCard) {
@@ -94,11 +86,6 @@ export default class Bot implements MatchBot {
     this.match.skipIntervention();
   }
 
-  /**
-   * The bot's own build phase: retract insufficient energy cards if necessary,
-   * otherwise play the next affordable hand card on a random valid target, and
-   * declare a battle once no more cards can be played.
-   */
   private buildAction() {
     const player = this.player;
     if (player.hasInsufficientEnergyCard) {
@@ -121,13 +108,6 @@ export default class Bot implements MatchBot {
     this.match.prepareBuildPhaseReaction(planBattle(player));
   }
 
-  /**
-   * The combat phase: attack with the first available weapon, focusing all
-   * weapons on one target until it is destroyed, and ready up once no more
-   * attacks are possible. The focus target is kept across battle rounds, as
-   * selectAttack already releases it when it is destroyed or no longer an
-   * alive participant of the battle.
-   */
   private combatAction() {
     const attack = selectAttack(this.player, this.focusTargetUUID);
     if (attack) {
@@ -138,10 +118,6 @@ export default class Bot implements MatchBot {
     }
   }
 
-  /**
-   * The end phase: discard excess hand cards one by one, like the human
-   * discard message does, until the hand card limit is met.
-   */
   private endPhaseAction() {
     const player = this.player;
     if (player.hand.length > player.handCardLimit) {

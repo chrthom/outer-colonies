@@ -61,7 +61,7 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
       logger.warn(`${socketData.user.username} tried to start a bot game while already in a match`);
       return;
     }
-    socket.leave(matchmakingRoom);
+    socket.leave(matchmakingRoom); // The matchmaking cron must no longer pair this player
     initBotGame(io, socket);
   });
 }
@@ -120,13 +120,6 @@ function gameParamsFor(match: Match): ClientGameParams {
   };
 }
 
-/**
- * Starts a singleplayer game between the requesting human player and a bot
- * with a random bot deck. The requesting player is removed from the
- * matchmaking room, so the matchmaking cron can no longer pair it. The match
- * is registered like a human match, so the game cron covers it with the
- * countdown automatic ready and the reconnection grace window.
- */
 function initBotGame(io: Server, socket: Socket): void {
   const match = new Match(
     `${gameRoomPrefix}-${uuidv4()}`,
@@ -136,6 +129,6 @@ function initBotGame(io: Server, socket: Socket): void {
   match.bot = new Bot(match, 1);
   registerMatch(match);
   io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
-  processBotActions(io, match); // Bot readies up for match initialization
+  processBotActions(io, match);
   logger.info(`Player ${(<SocketData>socket.data).user.username} started a bot game`);
 }
