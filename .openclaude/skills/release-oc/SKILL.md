@@ -24,7 +24,7 @@ Create a release by following this workflow. The canonical source of truth is `R
    ```
 4. **Next milestone check**: verify that a milestone for the **next** version (`<major>.<minor+1>` with the next Saturn moon name, strictly sequential) already exists - its name is the release name for the version bump in Phase 3. If it does not exist yet, ask the user whether to create it before starting the release.
 5. Check open PRs: `gh pr list --repo chrthom/outer-colonies --state open` - DRAFT PRs on other topics do not block; ask the user about open ones belonging to the milestone.
-6. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests require Chromium (in containers: `apt update && apt install -y chromium`).
+6. Run quality gates: `npm run check` (format + lint + test for server, client, website) from the repo root. Angular website tests need a Chrome/Chromium binary (in Chromium-only containers also set `CHROME_BIN`, see README.md).
 
 ## Phase 1 - Create the release (write operations, after user approval)
 
@@ -41,7 +41,10 @@ Present the concrete plan to the user for approval before every write operation.
    git tag -a v<x.x.x> -m "<milestone description>"
    git push origin v<x.x.x>
    ```
-3. **GitHub release** referring to the existing tag; title and body see formats below. Generate the release notes from the closed issues of the milestone.
+3. **GitHub release** referring to the existing tag; title and body see formats below. Generate the release notes from the closed issues of the milestone. If `gh release create` is unavailable or blocked in the environment, create the release via the REST API instead:
+   ```bash
+   gh api repos/<owner>/<repo>/releases -f tag_name=v<x.x.x> -f name="<x.x.x> <moon name>" -F body="$(cat <notes file>)"
+   ```
 4. Hand the **checkout and build commands for Phase 2** to the user (see below) and wait for the deployment confirmation.
 
 ## Phase 2 - Build & deployment (manually by the user)
@@ -62,7 +65,11 @@ Prod deployment happens **only** after tag and GitHub release exist (staging on 
 
 ## Phase 3 - Completion (only after the user confirmed the deployment)
 
-1. Close the **release issue** ("Create release <x.x> and perform deployment"). Keep the released milestone open - it is now the productive milestone and receives productive bug reports per AGENTS.md; close the previously productive milestone now that the new version is productive. The milestone of the *next* version stays open; new features go there.
+1. Close the **release issue** ("Create release <x.x> and perform deployment"). Keep the released milestone open - it is now the productive milestone and receives productive bug reports per AGENTS.md; close the previously productive milestone now that the new version is productive. The milestone of the *next* version stays open; new features go there. If closing the previous milestone via `gh api -X PATCH` is blocked in the environment, use the REST API with a JSON input file instead:
+   ```bash
+   echo '{"state":"closed"}' > /tmp/milestone-state.json
+   gh api repos/<owner>/<repo>/milestones/<number> --input /tmp/milestone-state.json
+   ```
 2. **Increment the version** to the next development version; version and name come from the next milestone verified in Phase 0 (e.g. after 3.1 Pandora -> 3.2 Pan). If that milestone does not exist yet, create it first after user approval:
    ```bash
    gh api repos/chrthom/outer-colonies/milestones -f title="<x.x> <moon name>" -f description="<one-sentence summary>"
@@ -94,27 +101,20 @@ Oriented at the existing style (reference: release v3.0.0 Prometheus).
 ## Closed Issues
 
 ### Features
-- #<N> - <issue title> (size - L|M|S)
+- #<N> - <issue title>
 
-### Enhancements
-- #<N> - <issue title> (size - L|M|S)
-
-### Cards
-- #<N> - <issue title> (size - L|M|S)
-
-### Internal
-- #<N> - <issue title> (size - L|M|S)
+### Tasks
+- #<N> - <issue title>
 
 ### Bugs
-- #<N> - <issue title> (bug)
+- #<N> - <issue title>
 
 ---
 
 *Generated automatically from milestone <x.x> <moon name>*
 ```
 
-- Categories according to the issue type labels (`feature`, `enhancement`, `cards`, `internal`, `bug`); only list non-empty categories.
-- Append the size label in parentheses (bugs have no size label, use "(bug)").
+- Categories according to the issue types (`Feature`, `Task`, `Bug`); only list non-empty categories.
 - Do **not** include the release issue itself ("Create release <x.x> and perform deployment") in the notes.
 
 ## Rules

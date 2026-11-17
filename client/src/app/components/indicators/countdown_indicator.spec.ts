@@ -1,25 +1,20 @@
 import CountdownIndicator from './countdown_indicator';
 import { designConfig } from 'src/app/config/design';
 import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import {
+  asGameScene,
+  GameObjectStub,
+  makeGameObjectStub,
+  makeSceneStub,
+  SceneStub
+} from '../../testing/phaser_stubs';
 
-class MockText {
-  setFontSize = jasmine.createSpy('setFontSize').and.returnValue(this);
-  setFontFamily = jasmine.createSpy('setFontFamily').and.returnValue(this);
-  setColor = jasmine.createSpy('setColor').and.returnValue(this);
-  setAlign = jasmine.createSpy('setAlign').and.returnValue(this);
-  setOrigin = jasmine.createSpy('setOrigin').and.returnValue(this);
-  setText = jasmine.createSpy('setText').and.returnValue(this);
-}
-
-const makeScene = (state: ClientState): any => {
-  const text = new MockText();
-  return {
-    state: state,
-    text: text,
-    add: {
-      text: jasmine.createSpy('text').and.returnValue(text)
-    }
-  };
+/** Creates a game scene stub from the shared harness whose text double is exposed as `text`. */
+const makeScene = (state: ClientState): SceneStub & { text: GameObjectStub } => {
+  const text = makeGameObjectStub();
+  const scene = Object.assign(makeSceneStub({ state }), { text });
+  scene.add.text.and.returnValue(text);
+  return scene;
 };
 
 const makeState = (name: string): ClientState => ({
@@ -30,7 +25,7 @@ const makeState = (name: string): ClientState => ({
 describe('CountdownIndicator', () => {
   it('shows only the player name when no countdown is active', () => {
     const scene = makeScene(makeState('Neptune'));
-    const indicator = new CountdownIndicator(scene, true);
+    const indicator = new CountdownIndicator(asGameScene(scene), true);
 
     indicator.update();
 
@@ -39,7 +34,7 @@ describe('CountdownIndicator', () => {
 
   it('prefixes the player name with the formatted countdown', () => {
     const scene = makeScene(makeState('Neptune'));
-    const indicator = new CountdownIndicator(scene, true);
+    const indicator = new CountdownIndicator(asGameScene(scene), true);
 
     indicator.update(125);
 
@@ -52,7 +47,7 @@ describe('CountdownIndicator', () => {
       opponent: { ...emptyClientState.opponent, name: 'Triton' }
     };
     const scene = makeScene(state);
-    const indicator = new CountdownIndicator(scene, false);
+    const indicator = new CountdownIndicator(asGameScene(scene), false);
 
     indicator.update();
 
@@ -61,7 +56,7 @@ describe('CountdownIndicator', () => {
 
   it('warns in color for countdowns below one minute', () => {
     const scene = makeScene(makeState('Neptune'));
-    const indicator = new CountdownIndicator(scene, true);
+    const indicator = new CountdownIndicator(asGameScene(scene), true);
 
     indicator.update(42);
 
@@ -70,7 +65,7 @@ describe('CountdownIndicator', () => {
 
   it('stays neutral in color for countdowns of at least one minute', () => {
     const scene = makeScene(makeState('Neptune'));
-    const indicator = new CountdownIndicator(scene, true);
+    const indicator = new CountdownIndicator(asGameScene(scene), true);
 
     indicator.update(60);
 

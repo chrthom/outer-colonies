@@ -13,7 +13,6 @@ export abstract class BaseButton {
   constructor(scene: Game | Matchmaking, x: number, y: number, iconKey: string, initialText: string) {
     this.scene = scene;
 
-    // Create button icon
     this.image = scene.add
       .image(x, y, 'icon_' + iconKey)
       .setOrigin(0.5)
@@ -21,7 +20,6 @@ export abstract class BaseButton {
         useHandCursor: true
       });
 
-    // Create button text
     this.text = scene.add
       .text(
         x + layoutConfig.game.ui.baseButtons.xTextOffset,
@@ -37,7 +35,6 @@ export abstract class BaseButton {
         useHandCursor: true
       });
 
-    // Add event listeners
     this.setupEventListeners();
   }
 
@@ -75,17 +72,14 @@ export abstract class BaseButton {
    * Only applicable for Game scenes, returns false for Matchmaking scenes
    */
   protected canShowActionButtons(): boolean {
-    // Only applicable for Game scenes
     if (!(this.scene instanceof Game)) return false;
 
     const gameScene = this.scene as Game;
     return (
-      gameScene.state &&
       gameScene.state.playerPendingAction &&
       gameScene.state.playerIsActive &&
       gameScene.state.turnPhase === TurnPhase.Build &&
       !gameScene.activeCards.hand &&
-      // Check if player has at least one stack with missionReady = true
       gameScene.cardStacks.some(stack => stack.ownedByPlayer && stack.data.missionReady)
     );
   }

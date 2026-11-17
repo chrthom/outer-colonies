@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -10,13 +10,13 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
-import { Observable, map } from 'rxjs';
+import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
+import { CardImageService } from 'src/app/card-image.service';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
@@ -50,9 +50,11 @@ import { RouterLink } from '@angular/router';
     RouterLink
   ]
 })
-export class RegisterPage {
+export class RegisterPage implements OnDestroy {
   private authAPIService = inject(AuthApiService);
   private dialog = inject(MatDialog);
+  protected readonly cardImage = inject(CardImageService);
+  private destroy$ = new Subject<void>();
 
   registrationSuccessful: boolean | undefined = undefined;
   registerForm: FormGroup = new FormGroup({
@@ -94,17 +96,7 @@ export class RegisterPage {
     return JSON.stringify(this.username?.errors);
   }
   get starterDeckCards(): MultipleCards[] {
-    return starterDecks[this.starterDeck?.value];
-  }
-  cardIdToUrl(cardId: number): string {
-    return `${environment.url.assets}/cards/${cardId}.png`;
-  }
-  openImgInModal(cardId: number) {
-    this.dialog.open(ImageModalComponent, {
-      data: this.cardIdToUrl(cardId),
-      height: '95vh',
-      maxHeight: '95vh'
-    });
+    return starterDecks[this.starterDeck?.value] ?? [];
   }
   submit() {
     this.registerForm.markAllAsTouched();
@@ -126,25 +118,55 @@ export class RegisterPage {
   openDataPrivacy() {
     this.dialog.open(DataPrivacyPage);
   }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   private get usernameExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkUsernameExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      // Angular cancels the previous async validation subscription on every value change,
+      // so the delay acts as a debounce while typing
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkUsernameExists(control.value)),
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(err => {
+          // A failed availability check must not block registration (the server re-checks on
+          // submit), so the validator degrades to "no error"; the failure is logged with a
+          // level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Username availability check failed with status ${err?.status}, treating username as available`
+            );
+          }
+          return of(null);
+        }),
+        takeUntil(this.destroy$)
       );
     };
   }
   private get emailExistsValidator(): AsyncValidatorFn {
-    return (
-      control: AbstractControl
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-      return this.authAPIService.checkEmailExists(control.value).pipe(
-        map(exists => {
-          return exists ? { exists: true } : null;
-        })
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.invalid) {
+        return of(null);
+      }
+      return timer(300).pipe(
+        switchMap(() => this.authAPIService.checkEmailExists(control.value)),
+        map(exists => (exists ? { exists: true } : null)),
+        catchError(err => {
+          // A failed availability check must not block registration (the server re-checks on
+          // submit), so the validator degrades to "no error"; the failure is logged with a
+          // level, gated to non-production stages
+          if (environment.stage !== 'production') {
+            console.warn(
+              `Email availability check failed with status ${err?.status}, treating email as available`
+            );
+          }
+          return of(null);
+        }),
+        takeUntil(this.destroy$)
       );
     };
   }

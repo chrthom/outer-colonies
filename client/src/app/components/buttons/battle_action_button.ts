@@ -32,11 +32,9 @@ export abstract class BattleActionButton extends BaseButton {
   private updateColor() {
     const isActive = this.gameScene.plannedBattle.type == this.battleType;
 
-    // Update icon tint
     const tintColor = isActive ? designConfig.tint.player : designConfig.tint.neutral;
     this.image.setTint(tintColor, tintColor, tintColor, tintColor);
 
-    // Update text color
     const textColor = isActive ? designConfig.color.player : designConfig.color.neutral;
     this.text.setColor(textColor);
   }

@@ -5,7 +5,7 @@ import InfrastructureCard from '../types/infrastructure_card';
 export class Card230 extends InfrastructureCard {
   constructor() {
     super(230, 'Verwaltungsbüros', 2, {
-      energy: -2,
+      energy: -1,
       psi: -2
     });
   }
@@ -14,9 +14,9 @@ export class Card230 extends InfrastructureCard {
   }
 }
 
-export class Card333 extends InfrastructureCard {
+export class Card344 extends InfrastructureCard {
   constructor() {
-    super(333, 'Marsianisches Konsulat', 2, {
+    super(344, 'Marsianisches Konsulat', 1, {
       energy: -1,
       psi: -1
     });
@@ -26,9 +26,9 @@ export class Card333 extends InfrastructureCard {
   }
 }
 
-export class Card435 extends InfrastructureCard {
+export class Card448 extends InfrastructureCard {
   constructor() {
-    super(435, 'Gewerbegebiet', 2, {
+    super(448, 'Gewerbegebiet', 1, {
       energy: -1,
       psi: -1
     });
@@ -38,4 +38,4 @@ export class Card435 extends InfrastructureCard {
   }
 }
 
-export const allCards = [new Card230(), new Card333(), new Card435()];
+export const allCards = [new Card230(), new Card344(), new Card448()];

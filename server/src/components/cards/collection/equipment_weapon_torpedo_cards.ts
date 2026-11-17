@@ -4,20 +4,20 @@ import { removeFirstMatchingElement } from '../../utils/helpers';
 import CardStack from '../card_stack';
 import EquipmentCard, { EquipmentCardColonyKiller } from '../types/equipment_card';
 
-export class Card101 extends EquipmentCard {
+export class Card109 extends EquipmentCard {
   constructor() {
     super(
-      101,
+      109,
       'Quantentorpedos',
-      5,
+      4,
       {
         energy: -1,
         phi: -1
       },
       {
         range: 2,
-        damage: 24,
-        pointDefense: -9,
+        damage: 28,
+        pointDefense: -11,
         shield: -7,
         armour: -4
       }
@@ -77,9 +77,9 @@ export class Card150 extends EquipmentCardColonyKiller {
       },
       {
         range: 2,
-        damage: 12,
-        pointDefense: -6,
-        shield: -3,
+        damage: 14,
+        pointDefense: -7,
+        shield: -4,
         armour: -4
       }
     );
@@ -120,7 +120,7 @@ export class Card216 extends EquipmentCard {
         damage: 8,
         pointDefense: -2,
         shield: 0,
-        armour: -4
+        armour: -6
       }
     );
   }
@@ -133,13 +133,13 @@ export class Card304 extends EquipmentCard {
       'Antimaterietorpedos',
       5,
       {
-        energy: -2,
+        energy: -1,
         phi: -1
       },
       {
         range: 2,
-        damage: 22,
-        pointDefense: -11,
+        damage: 24,
+        pointDefense: -12,
         shield: 0,
         armour: -1
       }
@@ -159,8 +159,8 @@ export class Card318 extends EquipmentCardColonyKiller {
       },
       {
         range: 2,
-        damage: 14,
-        pointDefense: -7,
+        damage: 16,
+        pointDefense: -8,
         shield: -4,
         armour: -3
       }
@@ -168,19 +168,19 @@ export class Card318 extends EquipmentCardColonyKiller {
   }
 }
 
-export class Card412 extends EquipmentCard {
+export class Card537 extends EquipmentCard {
   constructor() {
     super(
-      412,
+      537,
       'Langstreckentorpedos',
-      3,
+      2,
       {
         phi: -1
       },
       {
         range: 3,
-        damage: 8,
-        pointDefense: -4,
+        damage: 10,
+        pointDefense: -5,
         shield: 0,
         armour: -1
       }
@@ -260,7 +260,7 @@ export class Card555 extends EquipmentCard {
 }
 
 export const allCards = [
-  new Card101(),
+  new Card109(),
   new Card127(),
   new Card136(),
   new Card150(),
@@ -268,7 +268,7 @@ export const allCards = [
   new Card216(),
   new Card304(),
   new Card318(),
-  new Card412(),
+  new Card537(),
   new Card422(),
   new Card554(),
   new Card555()

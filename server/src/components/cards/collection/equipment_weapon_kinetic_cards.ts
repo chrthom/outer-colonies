@@ -7,6 +7,7 @@ export class Card126 extends EquipmentCardRechargeable {
       'Kinetische Artillerie',
       3,
       {
+        energy: -1,
         xi: -2
       },
       {
@@ -20,18 +21,18 @@ export class Card126 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card151 extends EquipmentCardRechargeable {
+export class Card125 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      151,
+      125,
       'Kinetikwaffenbatterie',
-      2,
+      3,
       {
         xi: -1
       },
       {
         range: 2,
-        damage: 5,
+        damage: 4,
         pointDefense: 0,
         shield: 0,
         armour: -4
@@ -53,25 +54,25 @@ export class Card179 extends EquipmentCardRechargeable {
         range: 3,
         damage: 2,
         pointDefense: 0,
-        shield: 0,
-        armour: -2
+        shield: -99,
+        armour: -99
       }
     );
   }
 }
 
-export class Card180 extends EquipmentCardRechargeable {
+export class Card522 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      180,
+      522,
       'Railgun',
-      1,
+      2,
       {
         xi: -1
       },
       {
         range: 3,
-        damage: 3,
+        damage: 2,
         pointDefense: 0,
         shield: 0,
         armour: -2
@@ -80,14 +81,14 @@ export class Card180 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card223 extends EquipmentCardRechargeable {
+export class Card207 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      223,
+      207,
       'Massebeschleuniger',
-      2,
+      4,
       {
-        energy: -1,
+        energy: -2,
         xi: -1
       },
       {
@@ -101,12 +102,12 @@ export class Card223 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card310 extends EquipmentCardRechargeable {
+export class Card103 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      310,
+      103,
       'Gauss Kanone',
-      4,
+      5,
       {
         energy: -3,
         xi: -2
@@ -145,10 +146,10 @@ export class Card420 extends EquipmentCardRechargeable {
 
 export const allCards = [
   new Card126(),
-  new Card151(),
+  new Card125(),
   new Card179(),
-  new Card180(),
-  new Card223(),
-  new Card310(),
+  new Card522(),
+  new Card207(),
+  new Card103(),
   new Card420()
 ];

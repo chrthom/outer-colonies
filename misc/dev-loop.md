@@ -150,8 +150,9 @@ Non-events by design:
 
 | Post-step   | Condition                                                                       | Action                                                                                                                                                                   |
 | ----------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| reviewer    | `Verdict: CHANGES_NEEDED`                                                       | dispatch the fixer with the posted review's id (a direct chain: no GitHub event carries the review id; one of the chained dispatches enumerated in Non-events by design) |
-| reviewer    | `Verdict: NEEDS_HUMAN`                                                          | label `needs-human` + marker escalation comment `@$REPO_OWNER` (the `github.repository_owner`-derived mention every escalation template uses)                            |
+| reviewer    | `Verdict: CLEAN`                                                                | add the `clean` label to the PR (best-effort, created on demand; the loop's merge-ready signal - removed again by the next non-CLEAN verdict) |
+| reviewer    | `Verdict: CHANGES_NEEDED`                                                       | dispatch the fixer with the posted review's id (a direct chain: no GitHub event carries the review id; one of the chained dispatches enumerated in Non-events by design); drop the `clean` label if present |
+| reviewer    | `Verdict: NEEDS_HUMAN`                                                          | label `needs-human` + marker escalation comment `@$REPO_OWNER` (the `github.repository_owner`-derived mention every escalation template uses); drop the `clean` label if present |
 | reviewer    | head SHA moved since review start                                               | re-dispatch reviewer (stale review is not acted on)                                                                                                                      |
 | reviewer    | head-SHA freshness poll errors                                                  | post the review on the reviewed SHA + `::warning` (fail open; the stale-head protection is best-effort)                                                                  |
 | fixer gate  | advisory poll errors (head SHA, mergeability, CI state; pre-agent)              | `::warning` + proceed (fail open — the fixer re-checks live; a skip would strand the reviewer's red-CI dispatch)                                                          |
@@ -162,6 +163,12 @@ Non-events by design:
 | fixer       | outcome `WALL:`/budget stop                                                     | label `needs-human` + escalation comment                                                                                                                                 |
 | implementer | outcome `finished`                                                              | open a **ready** PR (`Closes #<N>`) with the `dev-loop` label; `ready_for_review` fires the first review                                                                 |
 | implementer | outcome `NO_PR`                                                                 | comment questions on the issue + label `needs-human`                                                                                                                     |
+
+Clean-label lifecycle caveat: the label is verdict-driven only - added on a CLEAN verdict,
+dropped by the next non-CLEAN verdict. A push to the PR head after a CLEAN verdict (a human
+edit or a conflict-resolution merge commit) therefore leaves the label on a head that has not
+passed review until the next verdict lands; the push's `synchronize` trigger re-offers a review
+for the new head, and that verdict reconciles the label (CLEAN re-adds it, non-CLEAN drops it).
 
 The reviewer is never called twice for the same work: dispatches on the same PR serialize in
 the shared `dev-loop-pr-<N>` concurrency group, the head-SHA marker dedupe makes at most one

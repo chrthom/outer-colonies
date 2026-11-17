@@ -26,12 +26,14 @@ const weaponStack = (ship: CardStack) => ({ rootCardStack: ship }) as unknown as
 const targetShip = (speed: number, isFlightReady = true) =>
   ({ isFlightReady, profile: { speed }, damage: 0 }) as unknown as CardStack;
 
-const defenderStack = (pointDefense: number) => {
-  const profile = { pointDefense, shield: 0, armour: 0 };
+const defenderStack = (pointDefense: number) =>
+  defenderStackWithProfile({ pointDefense, shield: 0, armour: 0 });
+
+const defenderStackWithProfile = (profile: { pointDefense: number; shield: number; armour: number }) => {
   const obj = {
     card: { profile },
     profile,
-    canDefend: () => true,
+    canDefend: () => obj.defenseAvailable,
     deactivationPriority: 10,
     defenseAvailable: true,
     cardStacks: [] as CardStack[]
@@ -121,5 +123,72 @@ describe('EquipmentCard.attack halving rule', () => {
     expect(result.damage).toBe(0);
     expect(result.pointDefense).toBe(6);
     expect(target.damage).toBe(0);
+  });
+});
+
+describe('EquipmentCard.attack X deduction semantics', () => {
+  test('X shield deduction deals 0 damage and leaves the shield card active', () => {
+    // X deduction (-99): the attack is fully absorbed by the shield card without
+    // deactivating it (issue #795 X switches, e.g. 157 Plasmawerfer)
+    const weapon = new TestWeaponCard({
+      range: 4,
+      damage: 7,
+      pointDefense: 0,
+      shield: -99,
+      armour: -1
+    });
+    const shieldDefender = defenderStackWithProfile({ pointDefense: 0, shield: 2, armour: 0 });
+    const match = createMatch(3, [{ cardStacks: [shieldDefender] } as unknown as CardStack]);
+    const target = targetShip(4);
+
+    const result = weapon.attack(weaponStack(attackingShip(match, 2)), target);
+
+    expect(result.damage).toBe(0);
+    expect(result.shield).toBe(7);
+    expect(target.damage).toBe(0);
+    expect(shieldDefender.defenseAvailable).toBe(true);
+  });
+
+  test('X armour deduction deals 0 damage and leaves the armour card active', () => {
+    // X deduction (-99): the attack is fully absorbed by the armour card without
+    // deactivating it (issue #795 X switches, e.g. 130 Flakartillerie)
+    const weapon = new TestWeaponCard({
+      range: 4,
+      damage: 6,
+      pointDefense: 0,
+      shield: 0,
+      armour: -99
+    });
+    const armourDefender = defenderStackWithProfile({ pointDefense: 0, shield: 0, armour: 3 });
+    const match = createMatch(3, [{ cardStacks: [armourDefender] } as unknown as CardStack]);
+    const target = targetShip(4);
+
+    const result = weapon.attack(weaponStack(attackingShip(match, 2)), target);
+
+    expect(result.damage).toBe(0);
+    expect(result.armour).toBe(6);
+    expect(target.damage).toBe(0);
+    expect(armourDefender.defenseAvailable).toBe(true);
+  });
+
+  test('numeric shield deduction deactivates the shield card when the damage suffices', () => {
+    // Counterpart to the X deduction: a numeric deduction whose reduction does not
+    // exceed the damage deactivates the defence card (reduction = -3 * -2 = 6 <= 7 damage)
+    const weapon = new TestWeaponCard({
+      range: 4,
+      damage: 7,
+      pointDefense: 0,
+      shield: -3,
+      armour: 0
+    });
+    const shieldDefender = defenderStackWithProfile({ pointDefense: 0, shield: 2, armour: 0 });
+    const match = createMatch(3, [{ cardStacks: [shieldDefender] } as unknown as CardStack]);
+    const target = targetShip(4);
+
+    const result = weapon.attack(weaponStack(attackingShip(match, 2)), target);
+
+    expect(result.damage).toBe(1);
+    expect(shieldDefender.defenseAvailable).toBe(false);
+    expect(target.damage).toBe(1);
   });
 });

@@ -1228,7 +1228,6 @@ jobs:
               elif [ "$head_sha_now" != "$HEAD_SHA_BEFORE" ] && push_evidence; then
                 moved_by_fix=1
               fi
-              fi
               retry_review_id="${REVIEW_ID:-none}"
               if [ "$RETRY_COUNT" -lt 1 ] \
                 && gh workflow run dev-loop-fix.yml --ref main -f pr_number="$PR_NUMBER" -f review_id="$retry_review_id" -f retry=1 -f moved_by_fix="$moved_by_fix"; then
