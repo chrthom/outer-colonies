@@ -48,7 +48,7 @@ describe('RequestValidation', () => {
       ['short username', { username: 'ab' }],
       ['long username', { username: 'a'.repeat(21) }],
       ['missing username', { username: undefined }],
-      ['password without a digit', { password: 'abcdefgh' }],
+      ['password without a digit', { password: 'password' }],
       ['password without a letter', { password: '12345678' }],
       ['short password', { password: 'ab1' }],
       ['long password', { password: 'a1'.repeat(21) }],
@@ -100,7 +100,7 @@ describe('RequestValidation', () => {
     });
 
     it.each([
-      ['password without a digit', { password: 'abcdefgh' }],
+      ['password without a digit', { password: 'password' }],
       ['password without a letter', { password: '12345678' }],
       ['short password', { password: 'ab1' }],
       ['missing password', { password: undefined }]

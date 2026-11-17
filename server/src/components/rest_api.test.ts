@@ -433,7 +433,7 @@ describe('RESTAPI Auth Endpoints', () => {
   describe('request body validation', () => {
     it.each([
       ['starter deck out of range', { starterDeck: 99 }],
-      ['weak password', { password: 'abcdefgh' }],
+      ['weak password', { password: 'password' }],
       ['malformed email', { email: 'not-an-email' }],
       ['short username', { username: 'ab' }],
       ['non-boolean newsletter', { newsletter: 'yes' }]
@@ -496,7 +496,7 @@ describe('RESTAPI Auth Endpoints', () => {
       const res = createResponse(createRequest('PUT /api/auth/password/:id', '192.168.3.1'));
 
       routes.get('PUT /api/auth/password/:id')!(
-        createRequest('PUT /api/auth/password/:id', '192.168.3.1', { password: 'abcdefgh' }),
+        createRequest('PUT /api/auth/password/:id', '192.168.3.1', { password: 'password' }),
         res
       );
       await flushMicrotasks();
