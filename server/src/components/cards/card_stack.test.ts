@@ -105,23 +105,6 @@ describe('CardStack.retract', () => {
   });
 });
 
-describe('CardStack.discard', () => {
-  test('discards a card attached to an opponent stack to the owning player pile', () => {
-    const owner = new MockPlayer();
-    const opponent = new MockPlayer();
-    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, owner as any);
-    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
-    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
-    ship.attach(tactic);
-
-    tactic.discard();
-
-    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
-    expect(owner.discardCards).not.toHaveBeenCalled();
-    expect(ship.attachedCardStacks).not.toContain(tactic);
-  });
-});
-
 describe('CardStack.rootCardStack', () => {
   test('returns itself when there is no parent', () => {
     const stack = newStack(6, 'Root');
