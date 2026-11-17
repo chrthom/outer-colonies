@@ -25,6 +25,12 @@ export default abstract class CardStack {
   defenseAvailable: boolean = false;
   protected parentCardStack?: CardStack;
   protected parentPlayer?: Player;
+  /**
+   * Player who played this card stack from hand. Recorded on attach, because
+   * cards attached to an opponent's card stack (e.g. 437 Kopfgeld) would
+   * otherwise resolve to the target owner through the parent chain.
+   */
+  protected owningPlayer?: Player;
   constructor(card: Card) {
     this.card = card;
     this.uuid = uuidv4();
@@ -33,6 +39,7 @@ export default abstract class CardStack {
     return this.cards.map(c => c.actionPool).reduce((a, b) => a.combine(b));
   }
   attach(cardStack: CardStack) {
+    cardStack.owningPlayer ??= cardStack.player;
     cardStack.parentCardStack = this;
     cardStack.zone = undefined;
     this.attachedCardStacks.push(cardStack);
@@ -94,7 +101,8 @@ export default abstract class CardStack {
     return this.attachedCardStacks.flatMap(cs => cs.cardStacks).concat(this);
   }
   get player(): Player {
-    if (this.parentCardStack) return this.parentCardStack.player;
+    if (this.owningPlayer) return this.owningPlayer;
+    else if (this.parentCardStack) return this.parentCardStack.player;
     else if (this.parentPlayer) return this.parentPlayer;
     else throw Error(`ERROR: Invalid Card Stack ${this.uuid} cannot determine owning player`);
   }
@@ -194,8 +202,13 @@ export default abstract class CardStack {
   }
   retract() {
     this.removeCardStack();
-    this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
-    this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
+    // Cards attached to an opponent's stack (e.g. 437 Kopfgeld) must return to
+    // the playing player's piles, so the routing is done per owning player
+    this.cardStacks.forEach(cs =>
+      cs.card.canBeRetracted(this.isRootCard)
+        ? cs.player.takeCards([cs.card])
+        : cs.player.discardCards(cs.card)
+    );
   }
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);

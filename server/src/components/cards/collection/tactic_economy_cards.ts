@@ -1,4 +1,10 @@
-import { CardType, InterventionType, TacticDiscipline, Zone } from '../../../shared/config/enums';
+import {
+  CardDurability,
+  CardType,
+  InterventionType,
+  TacticDiscipline,
+  Zone
+} from '../../../shared/config/enums';
 import Player from '../../game_state/player';
 import { removeFirstMatchingElement } from '../../utils/helpers';
 import ActionPool, { CardAction } from '../action_pool';
@@ -220,6 +226,27 @@ export class Card427 extends TacticCard {
   }
 }
 
+export class Card437 extends TacticCard {
+  private readonly cardsToDraw = 4;
+  constructor() {
+    super(437, 'Kopfgeld', 1, TacticDiscipline.Trade);
+  }
+  override get durability(): CardDurability {
+    return CardDurability.Permanent;
+  }
+  /**
+   * Kopfgeld is attached to the targeted opponent ship; when that ship is
+   * destroyed, the owning player (the one who played Kopfgeld) draws the bounty.
+   */
+  override onDestruction(player: Player) {
+    player.drawCards(this.cardsToDraw);
+  }
+  onEnterGame() {}
+  getValidTargets(player: Player): CardStack[] {
+    return this.onlyOpponentHullTarget(player);
+  }
+}
+
 export class Card509 extends TacticCard {
   constructor() {
     super(509, 'Zahn der Zeit', 4, TacticDiscipline.Trade);
@@ -278,6 +305,7 @@ export const allCards = [
   new Card236(),
   new Card321(),
   new Card427(),
+  new Card437(),
   new Card509(),
   new Card534(),
   new Card542()

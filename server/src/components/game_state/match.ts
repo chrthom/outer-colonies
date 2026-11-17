@@ -152,7 +152,11 @@ export default class Match {
           cs => cs.type != CardType.Colony
         );
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
-        player.discardPile.push(...destroyedCardStacks.flatMap(cs => cs.cards));
+        // Cards attached to an opponent's stack (e.g. 437 Kopfgeld) belong to the
+        // playing player, so every card is routed to its owning player's discard pile
+        destroyedCardStacks.forEach(cs =>
+          cs.cardStacks.forEach(subCs => subCs.player.discardPile.push(subCs.card))
+        );
         return destroyedCardStacks;
       })
       .flat();
