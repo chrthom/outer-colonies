@@ -200,8 +200,6 @@ export default abstract class CardStack {
   }
   retract() {
     this.removeCardStack();
-    // Cards attached to an opponent's stack (e.g. 437 Kopfgeld) must return to
-    // the playing player's piles, so the routing is done per owning player
     this.cardStacks.forEach(cs =>
       cs.card.canBeRetracted(this.isRootCard) ? cs.owner.takeCards([cs.card]) : cs.owner.discardCards(cs.card)
     );

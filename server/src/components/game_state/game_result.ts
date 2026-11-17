@@ -30,12 +30,6 @@ export default class GameResult {
   setWinnerBySurrender(surrenderingPlayer: Player) {
     this.setGameOver(GameResultType.Surrender, surrenderingPlayer);
   }
-  /**
-   * Ends the game with the given result type and loser. The first result stands: when
-   * several loss conditions trigger within the same battle (e.g. the defender's colony
-   * destruction plus the attacker's deck depletion through 437 Kopfgeld's bounty draw),
-   * later calls must not flip the winner, the result type or persist earnings twice.
-   */
   private setGameOver(type: GameResultType, loser: Player) {
     if (this.gameOver) return;
     this.gameOver = true;

@@ -103,9 +103,6 @@ describe('Card437 Kopfgeld', () => {
 
     test('keeps the destruction result when the bounty draw depletes the deck in the same battle as the colony destruction', () => {
       jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
-      // Fewer cards left in the deck than the 4-card bounty: the colony's destruction
-      // ends the game first, so the deck depletion triggered by the bounty draw must
-      // neither flip the result nor persist earnings a second time
       player.deck = [new MockCard(301), new MockCard(302)];
       const colony = opponent.colonyCardStack;
       colony.damage = colony.profile.hp;
