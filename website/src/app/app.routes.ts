@@ -1,26 +1,26 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, Routes } from '@angular/router';
 import { map } from 'rxjs';
-import { LoginPage } from './pages/login/login.page';
-import { HomePage } from './pages/home/home.page';
-import { RegisterPage } from './pages/register/register.page';
-import { DeckPage } from './pages/deck/deck.page';
-import { ImprintPage } from './pages/imprint/imprint.page';
-import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { LoginPage } from './pages/public/login/login.page';
+import { HomePage } from './pages/private/home/home.page';
+import { RegisterPage } from './pages/public/register/register.page';
+import { DeckPage } from './pages/private/deck/deck.page';
+import { ImprintPage } from './pages/public/imprint/imprint.page';
+import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
-import { TradePage } from './pages/trade/trade.page';
-import { RulesPage } from './pages/rules/rules.page';
-import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
-import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
-import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
-import { ProfilePage } from './pages/profile/profile.page';
-import { ConfirmEmailPage } from './pages/confirm-email/confirm-email.page';
-import { LandingPage } from './pages/landing/landing.page';
-import { WorldPage } from './pages/world/world.page';
-import { FactionsPage } from './pages/factions/factions.page';
-import { HistoryPage } from './pages/history/history.page';
-import { EditionsPage } from './pages/editions/editions.page';
+import { TradePage } from './pages/private/trade/trade.page';
+import { RulesPage } from './pages/private/rules/rules.page';
+import { ForgotPasswordPage } from './pages/public/forgot-password/forgot-password.page';
+import { ResetPasswordPage } from './pages/public/reset-password/reset-password.page';
+import { ActivateAccountPage } from './pages/public/activate-account/activate-account.page';
+import { ProfilePage } from './pages/private/profile/profile.page';
+import { ConfirmEmailPage } from './pages/public/confirm-email/confirm-email.page';
+import { LandingPage } from './pages/public/landing/landing.page';
+import { WorldPage } from './pages/public/world/world.page';
+import { FactionsPage } from './pages/public/factions/factions.page';
+import { HistoryPage } from './pages/public/history/history.page';
+import { EditionsPage } from './pages/public/editions/editions.page';
 
 /**
  * Redirects to HTTPS when the environment requires it.

@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { ImprintPage } from './pages/imprint/imprint.page';
-import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { ImprintPage } from './pages/public/imprint/imprint.page';
+import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
 import AuthService from './auth.service';
