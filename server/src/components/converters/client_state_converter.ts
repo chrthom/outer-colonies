@@ -212,18 +212,10 @@ function combatPhaseAttributes(cs: CardStack, battle: ClientBattle): ClientCardS
   return attributes;
 }
 
-/**
- * Projects a player's hand; option pickers are resolved for the player viewing the state.
- * Hand cards of the opposing player are redacted to the card back side (anti-cheat); only
- * the card ID of the card currently revealed via the tactic card reveal stays real.
- * @param match match whose currently revealed card is exempt from the redaction
- * @param hand hand of the player to project
- * @param viewedBy player the state is emitted to
- * @returns the projected hand cards
- */
 function toClientHandCards(match: Match, hand: CardStack[], viewedBy: Player): ClientHandCard[] {
   return hand.map((c, index) => {
     const owned = c.player.no == viewedBy.no;
+    // Anti-cheat (#831): only the currently revealed card keeps its real card ID
     const revealed = owned || c.uuid == match.highlightCard?.uuid;
     return {
       uuid: c.uuid,

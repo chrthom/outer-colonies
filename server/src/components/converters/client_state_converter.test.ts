@@ -22,10 +22,7 @@ class MockCard extends Card {
   onEndTurn() {}
 }
 
-/**
- * Tactic card playable on the opposing player's colony, used to let the
- * opponent open the tactic card reveal window.
- */
+// Playable on the opposing colony, so the opponent can open the tactic card reveal window
 class PlayableTacticCard extends TacticCard {
   constructor(id: number = 9901) {
     super(id, 'Playable Tactic (Test)', 1, TacticDiscipline.Military);
@@ -36,10 +33,7 @@ class PlayableTacticCard extends TacticCard {
   }
 }
 
-/**
- * Tactic counter card which keeps a tactic card intervention window open, so
- * the played tactic card stays revealed via highlightCardUUID.
- */
+// Keeps the intervention window open, so the played tactic card stays revealed
 class CounterTacticCard extends TacticCard {
   constructor() {
     super(9902, 'Counter Tactic (Test)', 1, TacticDiscipline.Intelligence);
@@ -123,8 +117,7 @@ describe('toClientState', () => {
 
       const revealedHandCard = state.opponent.hand.find(c => c.uuid == revealedCard.uuid);
       expect(revealedHandCard?.cardId).toBe(113);
-      // The card is playable for its owner, so the redacted values prove that
-      // the reveal exception is limited to the card ID
+      // The card is playable for its owner, so the redacted fields prove the exception covers only the card ID
       expect(revealedCard.hasValidTargets).toBe(true);
       expect(revealedHandCard?.playable).toBe(false);
       expect(revealedHandCard?.validTargets).toEqual([]);
@@ -140,8 +133,7 @@ describe('toClientState', () => {
 
       match.players[1].playHandCard(tacticCard, match.players[0].colonyCardStack);
 
-      // The counter card keeps the intervention window open, so the tactic
-      // card is currently revealed to player 0 via highlightCardUUID
+      // The counter card keeps the intervention window open, so the tactic card stays revealed
       expect(match.intervention).toBeDefined();
       expect(match.highlightCard?.uuid).toBe(tacticCard.uuid);
 
@@ -149,11 +141,8 @@ describe('toClientState', () => {
 
       expect(state.highlightCardUUID).toBe(tacticCard.uuid);
       expect(state.highlightCardId).toBe(123);
-      // The played card left the opponent's hand and no opponent hand card
-      // leaks a real card ID
       expect(state.opponent.hand.some(c => c.uuid == tacticCard.uuid)).toBe(false);
       expect(state.opponent.hand.every(c => c.cardId == constants.cardBackSideID)).toBe(true);
-      // The own counter card keeps its real data including playability
       const ownCard = state.player.hand.find(c => c.uuid == counterCard.uuid);
       expect(ownCard?.cardId).toBe(9902);
       expect(ownCard?.playable).toBe(true);

@@ -3,11 +3,7 @@ import { ClientHandCard, ClientState, emptyClientState } from '@shared/interface
 import { constants } from '@shared/config/constants';
 import { asGameScene, makeGameObjectStub, makeSceneStub } from '../../testing/phaser_stubs';
 
-/**
- * Stub of a Phaser plane as created by `scene.add.plane`, extended by the 3D
- * model state the `CardImage` setters write to and the bitmap mask API consumed
- * by `setMask`.
- */
+// Extended with the model state the CardImage setters write to and the mask API setMask needs
 function makePlaneStub() {
   return Object.assign(makeGameObjectStub(), {
     createBitmapMask: jasmine.createSpy('createBitmapMask').and.returnValue({}),
