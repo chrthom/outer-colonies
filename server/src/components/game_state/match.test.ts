@@ -2,7 +2,8 @@ import { Socket } from 'socket.io';
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
 import { CardProfileConfig } from '../cards/card_profile';
-import { CardDurability, CardType, Zone } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, Zone } from '../../shared/config/enums';
+import Battle from './battle';
 import Match from './match';
 import Player from './player';
 
@@ -83,6 +84,20 @@ describe('Match.removeDestroyedCardStacks', () => {
 
     expect(destroyed).toEqual([]);
     expect(match.players[0].cardStacks).toContain(colony);
+  });
+
+  test('removes destroyed stacks from the battle ship lists', () => {
+    const match = createMatch();
+    const player = match.players[1];
+    const destroyedShip = createShip(9, player, 4);
+    const survivingShip = createShip(10, player, 4);
+    match.battle = new Battle(BattleType.Raid, 0);
+    match.battle.ships[1] = [destroyedShip, survivingShip];
+    destroyedShip.damage = 4;
+
+    match.removeDestroyedCardStacks();
+
+    expect(match.battle.ships[1]).toEqual([survivingShip]);
   });
 });
 

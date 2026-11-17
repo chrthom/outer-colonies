@@ -184,27 +184,6 @@ describe('Card442 Triebwerksschaden', () => {
 
       expect(targets).toEqual([opponentShip]);
     });
-
-    test('excludes opponent ships destroyed in an earlier battle phase', () => {
-      match.battle = new Battle(BattleType.Raid, 0);
-      const destroyedShip = new RootCardStack(
-        new MockCard(106, CardType.Hull, { speed: 2, hp: 3 }),
-        Zone.Neutral,
-        match.players[1]
-      );
-      destroyedShip.damage = 3;
-      const damagedShip = new RootCardStack(
-        new MockCard(107, CardType.Hull, { speed: 2, hp: 3 }),
-        Zone.Neutral,
-        match.players[1]
-      );
-      damagedShip.damage = 2;
-      // processEndOfBattlePhase splices destroyed stacks from cardStacks but leaves them in battle.ships
-      match.battle.ships[1] = [destroyedShip, damagedShip];
-      match.players[1].cardStacks.push(damagedShip);
-
-      expect(card.getValidTargets(match.players[0])).toEqual([damagedShip]);
-    });
   });
 
   describe('playHandCard', () => {

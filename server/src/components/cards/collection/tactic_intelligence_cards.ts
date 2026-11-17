@@ -210,12 +210,7 @@ export class Card442 extends TacticCard {
   onEnterGame() {}
   getValidTargets(player: Player): CardStack[] {
     return player.match.battle.ships[opponentPlayerNo(player.no)].filter(
-      cs =>
-        cs.isInBattle &&
-        cs.type == CardType.Hull &&
-        cs.profile.speed >= this.minTargetSpeed &&
-        // Destroyed stacks linger in battle.ships after processEndOfBattlePhase and must not be targeted
-        !cs.isDestroyed
+      cs => cs.isInBattle && cs.type == CardType.Hull && cs.profile.speed >= this.minTargetSpeed
     );
   }
   protected override get interventionType(): InterventionType | undefined {
