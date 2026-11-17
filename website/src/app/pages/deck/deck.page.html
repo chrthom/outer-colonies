@@ -18,7 +18,7 @@
           [matBadgeHidden]="card.numOfCards === 1"
           matBadgeColor="primary"
         >
-          <img mat-card-image [src]="cardIdToUrl(card.cardId)" [alt]="card.name" />
+          <img mat-card-image [src]="cardImage.cardIdToUrl(card.cardId)" [alt]="card.name" />
         </mat-card>
         }
       </div>
@@ -42,48 +42,39 @@
             <h3>{{ card.numOfCards }}x&nbsp;</h3>
             <img
               class="large clickable"
-              [src]="cardIdToUrl(card.cardId)"
+              [src]="cardImage.cardIdToUrl(card.cardId)"
               [alt]="card.name"
-              (click)="openImgInModal(card)"
+              (click)="cardImage.openImgInModal(card.cardId)"
               tabindex="invalid"
             />
           </td>
           <td class="id-col">{{ card.cardId }}</td>
           <td class="name-col">{{ card.name }}</td>
           <td class="type-col">
-            <span class="oc-icon" [innerHTML]="cardTypeToUrl(card.type) || ''"></span>
+            <span [class]="iconClass(card.type)"></span>
           </td>
-          <td class="discipline-col">{{ disciplineToText(card.discipline) }}</td>
+          <td class="discipline-col">{{ cardMeta.disciplineToText(card.discipline) }}</td>
           <td class="attack-col">
             @if (card.range) {
-            <img class="big" [src]="rangeToUrl(card.range)" matTooltip="Reichweite" />
+            <img class="big" [src]="cardImage.rangeToUrl(card.range)" matTooltip="Reichweite" />
             } @if (card.damage) {
             <h3>{{ card.damage }}</h3>
             } @if (card.damage) {
-            <span
-              class="oc-icon"
-              [innerHTML]="toIconUrl('damage') || ''"
-              matTooltip="Verursachter Schaden"
-            ></span>
+            <span class="oc-icon oc-icon-damage" matTooltip="Verursachter Schaden"></span>
             }
           </td>
           <td class="defense-col">
             @if (card.defense) {
             <span
-              class="oc-icon"
-              [innerHTML]="toIconUrl(card.defense) || ''"
-              [matTooltip]="defenseTooltip(card.defense)"
+              [class]="iconClass(card.defense)"
+              [matTooltip]="cardMeta.defenseTooltip(card.defense)"
             ></span>
             } @if (card.hp && card.defense) {
             <h3>+</h3>
             } @if (card.hp) {
             <h3>{{ card.hp }}</h3>
             } @if (card.hp) {
-            <span
-              class="oc-icon"
-              [innerHTML]="toIconUrl('hitpoints') || ''"
-              matTooltip="H&uuml;llenintegrit&auml;t"
-            ></span>
+            <span class="oc-icon oc-icon-hitpoints" matTooltip="H&uuml;llenintegrit&auml;t"></span>
             }
           </td>
           <td class="rarity-col">
@@ -91,13 +82,13 @@
             <div
               class="rarity"
               [class.active]="i <= card.rarity"
-              [matTooltip]="rarityTooltip(card.rarity)"
+              [matTooltip]="cardMeta.rarityTooltip(card.rarity)"
             ></div>
             }
           </td>
           <td class="edition-col">
-            <img [src]="cardIdToEditionUrl(card.cardId)" />
-            {{ cardIdToEditionName(card.cardId) }}
+            <img [src]="cardImage.cardIdToEditionUrl(card.cardId)" />
+            {{ cardMeta.cardIdToEditionName(card.cardId) }}
           </td>
           <td class="action-col">
             <button
@@ -152,9 +143,9 @@
           @for (s of statistics; track s) {
           <th>
             @if (s.title) {
-            <h1 [innerHtml]="s.title"></h1>
+            <h1>{{ s.title }}</h1>
             } @if (s.energyIcon) {
-            <span class="oc-icon big" [innerHTML]="toIconUrl('energy') || ''"></span>
+            <span class="oc-icon oc-icon-energy big"></span>
             }
           </th>
           }

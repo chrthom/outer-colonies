@@ -14,5 +14,11 @@
     "user": "outercolonies_staging",
     "connectionLimit": 3
   },
+  "mail": {
+    "host": "thomsen.in",
+    "port": 587,
+    "secure": false,
+    "user": "outercolonies"
+  },
   "terminate_on_error": true
 }

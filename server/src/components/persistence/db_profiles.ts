@@ -40,11 +40,21 @@ export default class DBProfilesDAO {
   static async increaseSol(userId: number, sol: number) {
     await DBConnection.instance.query('UPDATE profiles SET sol = sol + ? WHERE user_id = ?', [sol, userId]);
   }
+  /**
+   * Atomically decreases the sol balance of a user with a single conditional update, so concurrent
+   * decreases cannot drive the balance negative. Rejects with `APIRejectReason.ConditionNotMet`
+   * if the balance is insufficient and with `APIRejectReason.NotFound` if the user is unknown.
+   * @param userId id of the user whose balance is decreased
+   * @param sol amount to subtract from the balance
+   */
   static async decreaseSol(userId: number, sol: number) {
-    const user = await this.getByUserId(userId);
-    if (user.sol >= sol) {
-      return this.increaseSol(userId, -sol);
-    } else {
+    const result: any = await DBConnection.instance.query(
+      'UPDATE profiles SET sol = sol - ? WHERE user_id = ? AND sol >= ?',
+      [sol, userId, sol]
+    );
+    if (result.affectedRows == 0) {
+      // Distinguish an unknown user from an insufficient sol balance
+      await this.getByUserId(userId);
       return Promise.reject(APIRejectReason.ConditionNotMet);
     }
   }

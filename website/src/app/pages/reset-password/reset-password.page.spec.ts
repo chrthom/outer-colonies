@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ResetPasswordPage } from './reset-password.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -19,7 +20,6 @@ describe('ResetPasswordPage', () => {
   beforeEach(async () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['resetPasswordViaMagicLink']);
 
-    // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
         get: () => 'test-reset-id'
@@ -64,17 +64,17 @@ describe('ResetPasswordPage', () => {
 
   it('should make password field required with length validation', () => {
     const password = component.password;
-    password.setValue('');
-    expect(password.valid).toBeFalse();
+    password?.setValue('');
+    expect(password?.valid).toBeFalse();
 
-    password.setValue('short'); // Too short
-    expect(password.valid).toBeFalse();
+    password?.setValue('short');
+    expect(password?.valid).toBeFalse();
 
-    password.setValue('validpassword123'); // Valid
-    expect(password.valid).toBeTrue();
+    password?.setValue('validpassword123');
+    expect(password?.valid).toBeTrue();
 
-    password.setValue('a'.repeat(41)); // Too long
-    expect(password.valid).toBeFalse();
+    password?.setValue('a'.repeat(41));
+    expect(password?.valid).toBeFalse();
   });
 
   it('should not submit when form is invalid', () => {
@@ -94,7 +94,6 @@ describe('ResetPasswordPage', () => {
   });
 
   it('should set success state on successful password reset', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 
@@ -105,12 +104,9 @@ describe('ResetPasswordPage', () => {
 
     expect(freshComponent.passwordResetSuccessful).toBeTrue();
     expect(freshComponent.passwordResetFailed).toBeFalse();
-    // Note: Component doesn't set loading=false in success case, only in error case
-    // expect(freshComponent.loading).toBeFalse();
   });
 
   it('should set failure state on password reset error', () => {
-    // Create a fresh component instance for this test
     const freshFixture = TestBed.createComponent(ResetPasswordPage);
     const freshComponent = freshFixture.componentInstance;
 
@@ -131,5 +127,17 @@ describe('ResetPasswordPage', () => {
     component.submit();
 
     expect(authApiSpy.resetPasswordViaMagicLink).not.toHaveBeenCalled();
+  });
+
+  it('should color the submit button warn while loading like the forgot-password page', () => {
+    component.resetPasswordForm.setValue({ password: 'validpassword123' });
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('button[type="submit"]')).componentInstance;
+
+    expect(button.color).toBe('primary');
+
+    component.loading = true;
+    fixture.detectChanges();
+    expect(button.color).toBe('warn');
   });
 });

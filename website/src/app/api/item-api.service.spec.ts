@@ -42,9 +42,7 @@ describe('ItemApiService', () => {
   it('should buy booster', () => {
     const boosterNo = 1;
 
-    service.buyBooster(boosterNo).subscribe(() => {
-      // Booster bought successfully
-    });
+    service.buyBooster(boosterNo).subscribe(() => {});
 
     const req = httpMock.expectOne(`${environment.url.api}/api/buy/booster/${boosterNo}`);
     expect(req.request.method).toBe('POST');

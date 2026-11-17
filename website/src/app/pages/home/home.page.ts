@@ -20,7 +20,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   dailies: Daily[] = this.generateDailiesArray();
   selectedDaily = 1;
-  private autoAdvanceInterval: any;
+  private autoAdvanceInterval: ReturnType<typeof setInterval> | undefined;
 
   ngOnInit() {
     this.reload();
@@ -39,40 +39,57 @@ export class HomePage implements OnInit, OnDestroy {
       next: res => {
         const availableDailyKeys = this.getAvailableDailyKeys(res);
 
-        // Filter dailies to only show those that are available today
         this.dailies = this.dailies
           .map(daily => {
             const achieved = daily.matcher(res);
             return { ...daily, achieved };
           })
-          .filter(daily => {
-            // Extract the daily key from the matcherStr property
-            const matcherStr = daily.matcherStr || daily.matcher.toString();
-            const match = matcherStr.match(/r\.(\w+)/);
-            const dailyKey = match ? match[1] : null;
+          .filter(daily => availableDailyKeys.includes(daily.key));
 
-            // Show daily if it's available today (not null)
-            return dailyKey ? availableDailyKeys.includes(dailyKey as keyof DailyGetResponse) : false;
-          });
+        // Keep the selected tab inside the filtered array
+        if (this.selectedDaily >= this.dailies.length) {
+          this.selectedDaily = 0;
+        }
+
+        // Restart auto-advance so its cycle matches the filtered array
+        if (this.autoAdvanceInterval) {
+          this.resetAutoAdvance();
+        }
       },
-      error: err => console.error('Failed to load dailies', err)
+      error: err => {
+        /* The swallow is mandatory: RxJS rethrows errors of handler-less subscriptions as
+           uncaught exceptions. The failure is logged with a level (gated to non-production
+           stages) and the default dailies list is kept */
+        if (environment.stage !== 'production') {
+          console.warn(`Failed to load dailies with status ${err?.status}, keeping default dailies list`);
+        }
+      }
     });
   }
 
+  /** Base URL of the game client (without the session token). */
   get gameUrl(): string {
     return environment.url.game;
   }
 
-  private showNextDaily(length: number) {
-    return () => {
-      if (++this.selectedDaily >= length) this.selectedDaily = 0;
-    };
+  /**
+   * Link to the game client for the next match. The session token is passed as
+   * the `token` query parameter, which the client's matchmaking scene parses.
+   */
+  get gameLink(): string {
+    return `${this.gameUrl}/?token=${encodeURIComponent(this.authService.token)}`;
+  }
+
+  /** Advances the selection to the next daily, cycling against the current dailies array. */
+  private showNextDaily() {
+    this.selectedDaily = (this.selectedDaily + 1) % this.dailies.length;
   }
 
   private startAutoAdvance() {
-    this.autoAdvanceInterval = setInterval(this.showNextDaily(this.dailies.length), 3000);
+    this.autoAdvanceInterval = setInterval(() => this.showNextDaily(), 3000);
   }
 
+  /** Clears and restarts the auto-advance interval, e.g. after a reload or manual tab change. */
   resetAutoAdvance() {
     if (this.autoAdvanceInterval) {
       clearInterval(this.autoAdvanceInterval);
@@ -80,7 +97,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.startAutoAdvance();
   }
 
-  // Helper function to determine which dailies are available today
+  /** Returns the daily keys the server did not null out, i.e. those available today. */
   private getAvailableDailyKeys(response: DailyGetResponse): (keyof DailyGetResponse)[] {
     const availableKeys: (keyof DailyGetResponse)[] = [];
     for (const key in response) {
@@ -91,11 +108,11 @@ export class HomePage implements OnInit, OnDestroy {
     return availableKeys;
   }
 
-  // Generate dailies array dynamically from centralized definitions
+  /** Builds the dailies list from the centralized daily definitions. */
   private generateDailiesArray(): Daily[] {
     return DAILY_DEFINITIONS.map(dailyDef => ({
+      key: dailyDef.dbColumn,
       matcher: (r: DailyGetResponse) => Boolean(r[dailyDef.dbColumn as keyof DailyGetResponse] ?? false),
-      matcherStr: `r.${dailyDef.dbColumn}`, // For compatibility with existing filtering logic
       title: dailyDef.title,
       description: dailyDef.description,
       sol: dailyDef.solReward
@@ -104,8 +121,8 @@ export class HomePage implements OnInit, OnDestroy {
 }
 
 interface Daily {
+  key: string;
   matcher: (dailiesAchieved: DailyGetResponse) => boolean;
-  matcherStr?: string;
   title: string;
   description: string;
   sol: number;

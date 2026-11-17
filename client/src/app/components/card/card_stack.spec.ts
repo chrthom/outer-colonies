@@ -6,6 +6,7 @@ import { constants } from '@shared/config/constants';
 import { designConfig } from '../../config/design';
 import { layoutConfig } from '../../config/layout';
 import { animationConfig } from '../../config/animation';
+import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
 import { CardXPosition, CardYPosition } from '../perspective';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
@@ -82,6 +83,9 @@ function makeScene(): any {
   return scene;
 }
 
+// Real Card objects created via makeCardStack() need the plane stubs with
+// modelPosition, so this factory must use the local makeScene() and not the
+// shared scene stub.
 function makeCardStack(over: Partial<ClientCardStack> = {}): CardStack {
   return new CardStack(makeScene(), makeData(over));
 }
@@ -93,8 +97,8 @@ function seedSummaryBox(cs: CardStack) {
 describe('CardStack', () => {
   describe('constructor', () => {
     it('does not touch the scene (no render side effects)', () => {
-      const scene = makeScene();
-      const cs = new CardStack(scene, makeData());
+      const scene = makeSceneStub();
+      const cs = new CardStack(asGameScene(scene), makeData());
 
       expect(scene.add.image).not.toHaveBeenCalled();
       expect(scene.add.text).not.toHaveBeenCalled();
@@ -105,7 +109,7 @@ describe('CardStack', () => {
 
     it('assigns data and uuid from the input ClientCardStack', () => {
       const data = makeData({ uuid: 'abc-123', ownedByPlayer: false });
-      const cs = new CardStack(makeScene(), data);
+      const cs = new CardStack(asGameScene(makeSceneStub()), data);
 
       expect(cs.uuid).toBe('abc-123');
       expect(cs.data).toBe(data);
@@ -176,7 +180,7 @@ describe('CardStack', () => {
     function depthOf(zone: Zone, ownedByPlayer: boolean): number {
       const cs = makeCardStack();
       cs.data = makeData({ zone, ownedByPlayer });
-      return (cs as any).depth;
+      return (cs as unknown as { depth: number }).depth;
     }
 
     it('orders zones consistently for the player', () => {

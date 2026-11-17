@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ItemApiService } from 'src/app/api/item-api.service';
 import { ProfileApiService } from 'src/app/api/profile-api.service';
+import { ApiError } from 'src/app/api/api-error';
 import { ItemListResponseBooster, ItemListResponseBox } from '@shared/interfaces/rest_api';
 import { environment } from 'src/environments/environment';
 import { rules } from '@shared/config/rules';
+import { editions } from '@shared/config/editions';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { InventoryItemComponent } from '../../components/inventory-item/inventory-item.component';
@@ -47,33 +49,14 @@ export class TradePage implements OnInit {
   loadFailed = false;
   actionFailed = false;
   readonly assetURL = environment.url.assets;
-  readonly availableBoosters = [
-    {
-      no: 1,
-      title: 'Outer Colonies',
-      price: rules.boosterCosts[1]
-    },
-    {
-      no: 4,
-      title: 'Kuipergürtel',
-      price: rules.boosterCosts[4]
-    },
-    {
-      no: 2,
-      title: 'Jovians Freihändler',
-      price: rules.boosterCosts[2]
-    },
-    {
-      no: 3,
-      title: 'Marsianische Hegemonie',
-      price: rules.boosterCosts[3]
-    },
-    {
-      no: 5,
-      title: 'Sichere Häfen',
-      price: rules.boosterCosts[5]
-    }
-  ];
+  // Editions without a booster price in the rules config are not offered,
+  // so a newly added edition needs a matching boosterCosts entry to become purchasable.
+  readonly availableBoosters = Object.entries(editions)
+    .map(([no, title]) => {
+      const editionNo = Number(no);
+      return { no: editionNo, title, price: rules.boosterCosts[editionNo] };
+    })
+    .filter(booster => booster.price != undefined);
   ngOnInit() {
     this.reload();
   }
@@ -108,10 +91,14 @@ export class TradePage implements OnInit {
             }
           );
         },
-        error: () => {
+        error: (err: ApiError) => {
           this.actionFailed = true;
+          // The API responds 400 with 'Insufficient sol' when the balance is
+          // too low for the purchase (see the booster route in rest_api.ts).
           this.snackBar.open(
-            'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
+            err.status == 400
+              ? 'Du hast nicht genug Sol für diesen Kauf.'
+              : 'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es später erneut.',
             'OK',
             { duration: 5000 }
           );
