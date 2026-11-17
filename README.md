@@ -153,7 +153,12 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Backend services for both website and client
 - **Key Components**:
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
-  - `components/rest_api.ts`: REST API endpoints for the website
+  - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
+    - `index.ts`: Router registration and central error-handling middleware
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`: Endpoints per resource
+    - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
+    - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
+    - `api_response.ts`: Status response helper with leveled failure logging
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
   - `components/game_state/`: In-memory game state
@@ -185,6 +190,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/utils/`: Utility functions
     - `auth.ts`: Authentication utility
     - `helpers.ts`: Helper functions
+    - `logger.ts`: Leveled logging utility (the only place writing to the console)
     - `mailer.ts`: Mailer utility
   - `shared/`: Shared TypeScript interfaces and types used by both website and client
     - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)
@@ -266,7 +272,9 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 - **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
 - **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
 
-**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the matchmaking lobby room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`. On login, a player whose previous match is still running or still owes them its result (see reconnection) rejoins it instead of searching again.
+
+**Reconnection** (`components/match_registry.ts`): Matches are registered in an in-memory registry keyed by their room, so they stay discoverable even while both sockets are disconnected (Socket.IO drops empty rooms). A disconnect during a running match does not end it: only the player's bound socket marks them disconnected (a stale socket of a previous connection cannot re-mark them), and the match stays alive for the reconnection grace window (`rules.reconnectGracePeriod`). Within the window, the player rejoins by logging in again with their session token (e.g. after a page reload); the new socket is bound back to their player and the previous socket is detached. Once the window expires, `gameCron` surrenders the player. A finished match stays registered until every player received its final state (`rules.resultDeliveryPeriod` at the latest): a player who was offline when the game ended is routed back into it on their next login, so the missed game result is delivered.
 
 **Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
 

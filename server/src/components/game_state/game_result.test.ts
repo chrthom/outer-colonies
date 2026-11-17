@@ -345,7 +345,7 @@ describe('GameResult', () => {
     test('logs and swallows a failing sol update without recording dailies', async () => {
       const increaseSol = jest.spyOn(DBProfilesDAO, 'increaseSol').mockRejectedValue(new Error('DB down'));
       const achieve = jest.spyOn(DBDailiesDAO, 'achieve').mockResolvedValue(undefined);
-      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const result = makePersistableResult();
       const match = result.match;
 
@@ -366,7 +366,7 @@ describe('GameResult', () => {
         .spyOn(DBDailiesDAO, 'achieve')
         .mockRejectedValueOnce(new Error('daily failed'))
         .mockResolvedValue(undefined);
-      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const result = makePersistableResult();
       const match = result.match;
 
