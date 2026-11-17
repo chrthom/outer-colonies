@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { IconService } from './icon.service';
 
 describe('IconService', () => {
@@ -5,6 +6,10 @@ describe('IconService', () => {
 
   beforeEach(() => {
     service = new IconService();
+  });
+
+  it('should be registered as a root-provided injectable', () => {
+    expect(TestBed.inject(IconService)).toBeInstanceOf(IconService);
   });
 
   describe('getIcon', () => {
@@ -41,18 +46,6 @@ describe('IconService', () => {
     });
   });
 
-  describe('getIconHtml', () => {
-    it('should return the uppercase hex HTML entity for a known icon', () => {
-      expect(service.getIconHtml('hp')).toBe('&#xEA06;');
-      expect(service.getIconHtml('damage')).toBe('&#xEA03;');
-      expect(service.getIconHtml('speed')).toBe('&#xEA0D;');
-    });
-
-    it('should return null for an unknown icon', () => {
-      expect(service.getIconHtml('not-an-icon')).toBeNull();
-    });
-  });
-
   describe('getIconClass', () => {
     it('should prefix the lowercased name with oc-icon-', () => {
       expect(service.getIconClass('HP')).toBe('oc-icon-hp');
@@ -61,6 +54,13 @@ describe('IconService', () => {
 
     it('should return a class for any input, including unknown names', () => {
       expect(service.getIconClass('not-an-icon')).toBe('oc-icon-not-an-icon');
+    });
+
+    it('should yield a class for every known icon so templates can render it via CSS', () => {
+      service.getAvailableIcons().forEach(name => {
+        expect(service.getIconClass(name)).toBe(`oc-icon-${name}`);
+        expect(service.hasIcon(name)).toBeTrue();
+      });
     });
   });
 

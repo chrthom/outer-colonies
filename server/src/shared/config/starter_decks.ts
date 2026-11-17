@@ -10,22 +10,22 @@ export const starterDecks: MultipleCards[][] = [
     [2, 134], // Kreuzer
     [2, 446], // Außenposten
     // Equipment (21 - 13/14 Theta, 2/4 Xi)
-    [3, 441], // Flechette-Werfer
+    [3, 434], // Flechette-Werfer
     [3, 234], // Punktabwehrlaser
-    [4, 237], // Fokus-Laser
+    [4, 224], // Mini-Railgun
     [3, 157], // Plasmawerfer
-    [2, 151], // Kinetikwaffenbatterie
+    [2, 125], // Kinetikwaffenbatterie
     [3, 170], // Strahlenschilde
     [3, 163], // Verbundpanzerung
     // Infrastructure (11)
     [2, 185], // Kraftwerk
-    [2, 183], // Industriekomplex
+    [2, 154], // Industriekomplex
     [2, 187], // Atomreaktor
     [1, 188], // Solarpanele
     [1, 172], // Ressourcensilo
     [1, 345], // Autonomer Stützpunkt
     [1, 147], // Kommandozentrale
-    [1, 333], // Marsianisches Konsulat
+    [1, 344], // Marsianisches Konsulat
     // Tactic (12)
     [4, 338], // Nachschub
     [2, 337], // Militärpioniere
@@ -43,20 +43,20 @@ export const starterDecks: MultipleCards[][] = [
     [4, 327], // Schwerer Frachter
     [2, 446], // Außenposten
     // Equipment (21 - 6/6 Theta, 9/9 Xi)
-    [6, 180], // Railgun
+    [6, 522], // Railgun
     [3, 130], // Flakartillerie
-    [2, 224], // Bergbaulaser
-    [2, 237], // Mini-Railgun
+    [2, 237], // Bergbaulaser
+    [2, 224], // Mini-Railgun
     [2, 339], // Gatling
     [3, 184], // Rumpferweiterung
-    [3, 171], // Titanplattenpanzer
+    [3, 412], // Titanplattenpanzer
     // Infrastructure (9)
     [1, 145], // Fusionsreaktor
     [2, 244], // Atomreaktor
     [2, 245], // Solarpanele
     [1, 238], // Schugglernest
     [2, 138], // Handelsposten
-    [1, 435], // Gewerbegebiet
+    [1, 448], // Gewerbegebiet
     // Tactic (11)
     [2, 232], // Warenlieferung
     [2, 165], // Konvoi
@@ -85,11 +85,11 @@ export const starterDecks: MultipleCards[][] = [
     [3, 240], // Ceramo-Stahl
     // Infrastructure (11)
     [2, 350], // Kraftwerk
-    [2, 183], // Industriekomplex
+    [2, 154], // Industriekomplex
     [1, 145], // Fusionsreaktor
     [2, 352], // Atomreaktor
     [1, 353], // Solarpanele
-    [2, 448], // Schildkuppel
+    [2, 435], // Schildkuppel
     [1, 169], // Planetares Verteidigungsnetz
     // Tactic (9)
     [2, 232], // Warenlieferung

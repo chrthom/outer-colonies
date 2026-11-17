@@ -30,7 +30,6 @@ describe('Daily Selector', () => {
       expect(isDailyOfDay(daily, date)).toBe(true);
     });
 
-    // Check that some dailies are not of the day
     const allDailies = getDailiesOfDay(date);
     const nonDailies = ALL_DAILY_TYPES.filter((d: DailyType) => !allDailies.includes(d));
     if (nonDailies.length > 0) {
@@ -39,16 +38,13 @@ describe('Daily Selector', () => {
   });
 
   it('should distribute dailies reasonably evenly over time', () => {
-    // Test over a range of dates to ensure reasonable distribution
     const dateCount = 100;
     const dailyCounts: Record<string, number> = {};
 
-    // Initialize counts
     ALL_DAILY_TYPES.forEach((daily: DailyType) => {
       dailyCounts[daily] = 0;
     });
 
-    // Count occurrences over 100 days
     for (let i = 0; i < dateCount; i++) {
       const date = new Date('2024-01-01');
       date.setDate(date.getDate() + i);
@@ -62,8 +58,8 @@ describe('Daily Selector', () => {
     // Each daily should appear roughly (4/13) * 100 ≈ 30.77 times
     // Allow some variance but ensure no daily is completely missing or dominates
     const expectedCount = (4 / ALL_DAILY_TYPES.length) * dateCount;
-    const minExpected = expectedCount * 0.5; // At least 50% of expected
-    const maxExpected = expectedCount * 1.5; // At most 150% of expected
+    const minExpected = expectedCount * 0.5;
+    const maxExpected = expectedCount * 1.5;
 
     ALL_DAILY_TYPES.forEach((daily: DailyType) => {
       const count = dailyCounts[daily];

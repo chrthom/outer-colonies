@@ -5,22 +5,22 @@ import EquipmentCard, { EquipmentCardRechargeable } from '../types/equipment_car
 
 abstract class ShieldDefenseCard extends EquipmentCardRechargeable {
   override getValidTargets(player: Player): CardStack[] {
-    return super.getValidTargets(player).filter(cs => !cs.cards.find(c => c.id == 312)); // Cannot be attached if "Refraktorfeld" is already attached
+    return super.getValidTargets(player).filter(cs => !cs.cards.find(c => c.id == 320)); // Cannot be attached if "Refraktorfeld" is already attached
   }
 }
 
-export class Card103 extends EquipmentCard {
+export class Card310 extends EquipmentCard {
   constructor() {
-    super(103, 'Adamantiumpanzer', 5, {
+    super(310, 'Adamantiumpanzer', 4, {
       armour: 3,
       omega: -2
     });
   }
 }
 
-export class Card115 extends EquipmentCard {
+export class Card104 extends EquipmentCard {
   constructor() {
-    super(115, 'Ablative Magnetpanzerung', 4, {
+    super(104, 'Ablative Magnetpanzerung', 5, {
       armour: 1,
       omega: -1
     });
@@ -30,10 +30,10 @@ export class Card115 extends EquipmentCard {
   }
 }
 
-export class Card140 extends ShieldDefenseCard {
+export class Card164 extends ShieldDefenseCard {
   constructor() {
-    super(140, 'Deflektorschild', 2, {
-      energy: -2,
+    super(164, 'Deflektorschild', 1, {
+      energy: -1,
       shield: 2,
       omega: -1
     });
@@ -59,9 +59,9 @@ export class Card170 extends ShieldDefenseCard {
   }
 }
 
-export class Card171 extends EquipmentCard {
+export class Card412 extends EquipmentCard {
   constructor() {
-    super(171, 'Titanplattenpanzer', 1, {
+    super(412, 'Titanplattenpanzer', 3, {
       armour: 2,
       hp: -1,
       omega: -1
@@ -81,7 +81,7 @@ export class Card184 extends EquipmentCard {
 export class Card240 extends EquipmentCard {
   constructor() {
     super(240, 'Ceramo-Stahl', 1, {
-      hp: 3,
+      hp: 10,
       speed: -1,
       armour: 1,
       omega: -1
@@ -89,9 +89,9 @@ export class Card240 extends EquipmentCard {
   }
 }
 
-export class Card312 extends EquipmentCardRechargeable {
+export class Card320 extends EquipmentCardRechargeable {
   constructor() {
-    super(312, 'Refraktorfeld', 3, {
+    super(320, 'Refraktorfeld', 2, {
       energy: -2,
       shield: 1,
       omega: -1
@@ -117,7 +117,7 @@ export class Card341 extends EquipmentCard {
 export class Card349 extends EquipmentCard {
   constructor() {
     super(349, 'Dura-Stahl Platten', 1, {
-      hp: 4,
+      hp: 0,
       armour: 2,
       omega: -2
     });
@@ -163,9 +163,9 @@ export class Card447 extends ShieldDefenseCard {
   }
 }
 
-export class Card522 extends ShieldDefenseCard {
+export class Card180 extends ShieldDefenseCard {
   constructor() {
-    super(522, 'Heckdeflektor', 2, {
+    super(180, 'Heckdeflektor', 1, {
       energy: -1,
       shield: 2,
       delta: -1,
@@ -175,19 +175,19 @@ export class Card522 extends ShieldDefenseCard {
 }
 
 export const allCards = [
-  new Card103(),
-  new Card115(),
-  new Card140(),
+  new Card310(),
+  new Card104(),
+  new Card164(),
   new Card163(),
   new Card170(),
-  new Card171(),
+  new Card412(),
   new Card184(),
   new Card240(),
-  new Card312(),
+  new Card320(),
   new Card341(),
   new Card349(),
   new Card406(),
   new Card426(),
   new Card447(),
-  new Card522()
+  new Card180()
 ];

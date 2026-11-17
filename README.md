@@ -111,6 +111,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Actual card game implementation with game logic and rendering
 - **Key Components**:
   - `app.component.ts`: Main game component
+  - `socket_service.ts`: App-level owner of the single Socket.IO connection; opening a new matchmaking session disconnects the socket of the previous match, and scenes bind their socket listeners to their lifecycle
   - `scenes/`: Different game scenes (menus, gameplay, etc.)
     - `game.ts`: Main game scene
     - `matchmaking.ts`: Matchmaking scene
@@ -133,6 +134,8 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `layout_load.ts`: Load layout configuration
     - `layout.ts`: General layout configuration
     - `perspective.ts`: Perspective configuration
+  - `testing/`: Shared test utilities
+    - `phaser_stubs.ts`: Chainable Phaser game object, scene and system stubs for the client specs
   - `utils/`: Utility classes
     - `state_update_sequencer.ts`: Cancel-and-replace sequencer for the state update pipeline
 - **Communication**: Uses WebSockets to communicate with the server for real-time game updates
@@ -163,7 +166,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `client_planned_battle_converter.ts`: Planned battle conversion
     - `client_state_converter.ts`: Client state conversion
   - `components/persistence/`: Data persistence
-    - `db_connector.ts`: Database connector
+    - `db_connector.ts`: Database connector and transaction wrapper
     - `db_credentials.ts`: Database credentials management
     - `db_dailies.ts`: Database dailies management
     - `db_decks.ts`: Database decks management
@@ -178,6 +181,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)
     - `config/constants.ts`: Shared constants
     - `config/dailies.ts`: Daily achievement definitions
+    - `config/editions.ts`: Card edition names (edition number to name mapping)
     - `config/enums.ts`: Game enums
     - `config/rules.ts`: Game rules configuration
     - `config/starter_decks.ts`: Starter deck configurations
@@ -227,7 +231,7 @@ The server provides the following WebSocket events for the game client:
 
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
-  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates
+  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
@@ -253,7 +257,7 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 - **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
 - **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
 
-**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
 
 **Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
 
@@ -412,8 +416,8 @@ The repository working rules — repository language, branches and merges, issue
    ```
 
    **Website Test Requirements**:
-   - Chromium browser must be installed for Angular tests to run
-   - In Docker containers, install Chromium with: `apt update && apt install -y chromium`
+   - Tests run headless (`ChromeHeadless`); a Chrome or Chromium binary must be available
+   - If no Chrome is found (e.g. in a Docker container with only Chromium installed), set `CHROME_BIN` (e.g. `apt update && apt install -y chromium` and `CHROME_BIN=/usr/bin/chromium`)
 
 4. **Running all of the checks above**:
    ```bash

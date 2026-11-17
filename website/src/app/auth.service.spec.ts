@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CookieService } from 'ngx-cookie-service';
 import AuthService from './auth.service';
 import AuthApiService from './api/auth-api.service';
+import { environment } from 'src/environments/environment';
 import { of, throwError } from 'rxjs';
 
 describe('AuthService', () => {
@@ -13,9 +14,7 @@ describe('AuthService', () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['login', 'logout', 'checkSessionToken']);
     cookieSpy = jasmine.createSpyObj('CookieService', ['get', 'set', 'delete']);
 
-    // Mock the set method to accept both individual parameters and options object
     cookieSpy.set.and.callFake(() => {
-      // Store the call for verification
       return undefined;
     });
 
@@ -69,6 +68,23 @@ describe('AuthService', () => {
     expect(cookieSpy.delete).toHaveBeenCalledWith('p');
   });
 
+  it('should log a warning and clear the session locally when the logout call fails', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      service['sessionToken'] = 'test-token';
+      authApiSpy.logout.and.returnValue(throwError(() => ({ status: 500 })));
+
+      service.logout();
+
+      expect(service.isLoggedIn).toBeFalse();
+      expect(cookieSpy.delete).toHaveBeenCalledWith('u');
+      expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500/));
+    } finally {
+      environment.stage = 'production';
+    }
+  });
+
   it('should check session token', () => {
     const mockResponse = { sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' };
     service['sessionToken'] = 'test-token';
@@ -90,6 +106,43 @@ describe('AuthService', () => {
       expect(success).toBeFalse();
       expect(service.isLoggedIn).toBeFalse();
     });
+  });
+
+  it('should not log the failed request URL to the console in production', () => {
+    spyOn(console, 'log');
+    spyOn(console, 'warn');
+    service['sessionToken'] = 'invalid-token';
+    authApiSpy.checkSessionToken.and.returnValue(
+      throwError(() => ({
+        status: 401,
+        statusText: 'Unauthorized',
+        url: 'https://api.example.com/api/auth/login?email=user%40example.com'
+      }))
+    );
+
+    service.check().subscribe(success => {
+      expect(success).toBeFalse();
+      expect(console.log).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should log a warning with the status when the session check fails on non-production stages', () => {
+    environment.stage = 'development';
+    try {
+      const warnSpy = spyOn(console, 'warn');
+      service['sessionToken'] = 'invalid-token';
+      authApiSpy.checkSessionToken.and.returnValue(throwError(() => ({ status: 401 })));
+
+      service.check().subscribe(success => {
+        expect(success).toBeFalse();
+        expect(service.isLoggedIn).toBeFalse();
+        expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 401/));
+        expect(warnSpy).not.toHaveBeenCalledWith(jasmine.stringMatching(/url/i));
+      });
+    } finally {
+      environment.stage = 'production';
+    }
   });
 
   it('should login from cookies', () => {
@@ -115,7 +168,7 @@ describe('AuthService', () => {
     });
   });
 
-  it('should fall back to cookie credentials when session-token check fails', () => {
+  it('should not fall back to cookie credentials when the session-token check fails', () => {
     service['sessionToken'] = 'stale-token';
     cookieSpy.get.and.callFake((key: string) => {
       if (key === 'u') return 'cookieuser';
@@ -125,14 +178,20 @@ describe('AuthService', () => {
     authApiSpy.checkSessionToken.and.returnValue(
       throwError(() => ({ status: 401, statusText: 'Unauthorized', url: 'test' }))
     );
-    const mockResponse = { sessionToken: 'new-token', username: 'cookieuser', email: 'c@example.com' };
-    authApiSpy.login.and.returnValue(of(mockResponse));
 
     service.check().subscribe(success => {
-      expect(success).toBeTrue();
-      expect(authApiSpy.login).toHaveBeenCalledWith({ username: 'cookieuser', password: 'cookiepass' });
-      expect(service.isLoggedIn).toBeTrue();
+      expect(success).toBeFalse();
+      expect(authApiSpy.login).not.toHaveBeenCalled();
+      expect(service.isLoggedIn).toBeFalse();
     });
+  });
+
+  it('should clear the session without deleting persisted credentials', () => {
+    service['sessionToken'] = 'stale-token';
+    service.clearSession();
+    expect(service.isLoggedIn).toBeFalse();
+    expect(service.displayname).toBe('');
+    expect(cookieSpy.delete).not.toHaveBeenCalled();
   });
 
   it('should not retry when no session token was set and no cookies are available', () => {

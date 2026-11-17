@@ -15,7 +15,6 @@ describe('ConfirmEmailPage', () => {
     authApiSpy = jasmine.createSpyObj('AuthApiService', ['confirmEmail']);
     authApiSpy.confirmEmail.and.returnValue(of(undefined));
 
-    // Mock ActivatedRoute with paramMap
     routeSpy = {
       paramMap: of({
         get: () => 'test-confirmation-id'
@@ -62,11 +61,9 @@ describe('ConfirmEmailPage', () => {
   });
 
   it('should set failure state on confirmation error', () => {
-    // Reset the spy to clear any previous calls
     authApiSpy.confirmEmail.calls.reset();
     authApiSpy.confirmEmail.and.returnValue(throwError(() => new Error('Confirmation failed')));
 
-    // Create a new component instance to test the error case
     const newFixture = TestBed.createComponent(ConfirmEmailPage);
     const newComponent = newFixture.componentInstance;
     newFixture.detectChanges(); // This triggers ngOnInit

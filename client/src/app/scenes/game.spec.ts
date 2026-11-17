@@ -1,7 +1,49 @@
 import Game from './game';
-import { GameResultType, TurnPhase } from '@shared/config/enums';
-import { ClientHandCard, ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import SocketService from '../socket_service';
+import { GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import {
+  ClientGameResult,
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '@shared/interfaces/client_state';
 import { animationConfig } from '../config/animation';
+import { Socket } from 'socket.io-client';
+import Phaser from 'phaser';
+import { makeAddStub, makeTimeStub, makeTweensStub } from '../testing/phaser_stubs';
+
+/** Fake socket that records the game listeners registered and removed by the scene. */
+interface SocketListenerStub {
+  on: jasmine.Spy;
+  off: jasmine.Spy;
+}
+
+/** Handle for overriding socket lifecycle internals of a Game instance in tests. */
+interface GameSocketOverrides {
+  socket: SocketListenerStub;
+  events: { once: jasmine.Spy };
+  registerSocketListeners: () => void;
+}
+
+/** Handle for overriding the private socket factory of the SocketService. */
+interface SocketServiceOverrides {
+  createSocket: () => Socket;
+}
+
+/**
+ * Test handle for overriding the private update helpers and Phaser internals
+ * of a Game instance with spies and stubs.
+ */
+interface GameTestOverrides {
+  time: { delayedCall: FakeClock['delayedCall'] };
+  preloader: { destroy: () => void };
+  updateCardStacks: jasmine.Spy;
+  updateHandCards: jasmine.Spy;
+  updateView: jasmine.Spy;
+  highlightAttackIntervention: jasmine.Spy;
+  player: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
+  opponent: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
+}
 
 /**
  * Test double for Phaser's clock: records delayed calls so tests can fire
@@ -48,20 +90,21 @@ function makeState(over: Partial<ClientState> = {}): ClientState {
 function setupGame() {
   const game = new Game();
   const clock = new FakeClock();
-  (game as any).time = { delayedCall: clock.delayedCall };
-  (game as any).preloader = { destroy: () => {} };
+  const overrides = game as unknown as GameTestOverrides;
+  overrides.time = { delayedCall: clock.delayedCall };
+  overrides.preloader = { destroy: () => {} };
   const updateCardStacks = jasmine.createSpy('updateCardStacks');
   const updateHandCards = jasmine.createSpy('updateHandCards');
   const updateView = jasmine.createSpy('updateView');
   const highlightAttackIntervention = jasmine.createSpy('highlightAttackIntervention');
-  (game as any).updateCardStacks = updateCardStacks;
-  (game as any).updateHandCards = updateHandCards;
-  (game as any).updateView = updateView;
-  (game as any).highlightAttackIntervention = highlightAttackIntervention;
+  overrides.updateCardStacks = updateCardStacks;
+  overrides.updateHandCards = updateHandCards;
+  overrides.updateView = updateView;
+  overrides.highlightAttackIntervention = highlightAttackIntervention;
   const playerDiscardPile = jasmine.createSpy('playerDiscardPile.update');
   const opponentDiscardPile = jasmine.createSpy('opponentDiscardPile.update');
-  (game as any).player = { hand: [], discardPile: { update: playerDiscardPile } };
-  (game as any).opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
+  overrides.player = { hand: [], discardPile: { update: playerDiscardPile } };
+  overrides.opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
   return {
     game,
     clock,
@@ -74,47 +117,28 @@ function setupGame() {
   };
 }
 
-function makeRenderStubs() {
-  // GameOverIndicator calls scene.add.image(...).setOrigin().setDepth().setAlpha()
-  // and scene.add.text(...).setFontSize().setFontFamily().setColor().setDepth()
-  //   .setOrigin().setAlpha() then accesses postFX.addShadow.
-  // Return chainable stubs so the whole call sequence is non-throwing.
-  const chainable = (): any => {
-    const stub: any = {
-      postFX: { addShadow: jasmine.createSpy('addShadow'), addShine: jasmine.createSpy('addShine') }
-    };
-    [
-      'setOrigin',
-      'setDepth',
-      'setAlpha',
-      'setFontSize',
-      'setFontFamily',
-      'setColor',
-      'setAlign',
-      'setText',
-      'setVisible'
-    ].forEach(method => (stub[method] = jasmine.createSpy(method).and.returnValue(stub)));
-    return stub;
-  };
-  return {
-    add: {
-      image: jasmine.createSpy('image').and.callFake(chainable),
-      text: jasmine.createSpy('text').and.callFake(chainable),
-      particles: jasmine.createSpy('particles').and.callFake(chainable)
-    },
-    tweens: { add: jasmine.createSpy('tweens.add') }
-  };
+/** The GameOverIndicator constructor renders one image and three text labels. */
+function expectSingleIndicator(game: Game) {
+  expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
+  expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(3);
+}
+
+/** Creates a Game instance with shared-harness render, clock and tween stubs. */
+function makeGame(): Game {
+  const game = new Game();
+  game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
+  // Game.init() constructs the Background, which schedules via scene.time
+  game.time = makeTimeStub() as unknown as Phaser.Time.Clock;
+  game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
+  game.state = emptyClientState;
+  return game;
 }
 
 describe('Game scene - showSurrenderOnDisconnect', () => {
   let game: Game;
 
   beforeEach(() => {
-    game = new Game();
-    const stubs = makeRenderStubs();
-    (game as any).add = stubs.add;
-    (game as any).tweens = stubs.tweens;
-    game.state = emptyClientState;
+    game = makeGame();
   });
 
   it('synthesises a surrender ClientGameResult and renders the indicator', () => {
@@ -125,8 +149,8 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
     expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
     expect(game.state.gameResult?.sol).toBe(0);
     // The GameOverIndicator constructor renders three text labels and one image.
-    expect((game as any).add.image as jasmine.Spy).toHaveBeenCalled();
-    expect((game as any).add.text as jasmine.Spy).toHaveBeenCalled();
+    expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalled();
+    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalled();
   });
 
   it('does not mutate the shared emptyClientState constant', () => {
@@ -146,7 +170,114 @@ describe('Game scene - showSurrenderOnDisconnect', () => {
 
     expect(game.state).toBe(existing);
     expect(game.state.gameResult?.won).toBeTrue();
-    expect((game as any).add.image as jasmine.Spy).not.toHaveBeenCalled();
+    expect(game.add.image as unknown as jasmine.Spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Game scene - socket listener lifecycle', () => {
+  let game: Game;
+  let socket: SocketListenerStub;
+  let shutdownEvent: string;
+  let shutdownHandler: () => void;
+
+  beforeEach(() => {
+    game = new Game();
+    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    const handle = game as unknown as GameSocketOverrides;
+    handle.socket = socket;
+    handle.events = {
+      once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
+        shutdownEvent = event;
+        shutdownHandler = handler;
+      })
+    };
+    handle.registerSocketListeners();
+  });
+
+  it('registers all game listeners in create()', () => {
+    expect(socket.on.calls.allArgs().map(args => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('binds the listener cleanup to the scene shutdown event', () => {
+    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+  });
+
+  it('removes all game listeners on scene shutdown', () => {
+    shutdownHandler();
+
+    expect(socket.off.calls.allArgs().map(args => args[0])).toEqual([
+      MsgTypeOutbound.State,
+      MsgTypeOutbound.Countdown,
+      'disconnect'
+    ]);
+  });
+
+  it('shows the surrender indicator when the socket disconnects', () => {
+    game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
+    game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
+    game.state = emptyClientState;
+
+    const disconnectHandler = socket.on.calls.allArgs().find(args => args[0] == 'disconnect')![1];
+    disconnectHandler();
+
+    expect(game.state.gameResult?.won).toBeFalse();
+    expect(game.state.gameResult?.type).toBe(GameResultType.Surrender);
+  });
+});
+
+describe('Game scene - showGameOverIndicator', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = makeGame();
+  });
+
+  afterEach(() => {
+    SocketService.disconnect();
+  });
+
+  it('creates the overlay exactly once regardless of how often it is called', () => {
+    const result: ClientGameResult = { won: true, type: GameResultType.Domination, sol: 42 };
+
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator(result);
+    game.showGameOverIndicator({ ...result, sol: 0 });
+
+    expectSingleIndicator(game);
+  });
+
+  it('does not create a second overlay when updates follow a disconnect surrender', () => {
+    game.showSurrenderOnDisconnect();
+
+    // Simulates the ContinueButton.update() path after further updateView() calls
+    game.showGameOverIndicator(game.state.gameResult!);
+    game.showGameOverIndicator(game.state.gameResult!);
+
+    expectSingleIndicator(game);
+  });
+
+  it('shows a fresh overlay in the next match after init() resets the reference', () => {
+    game.showSurrenderOnDisconnect();
+
+    // The Game scene fetches its socket from the app-level SocketService, so
+    // open a fake connection instead of passing a socket via the init data.
+    const socket = jasmine.createSpyObj('Socket', ['disconnect']);
+    socket.io = { reconnection: () => undefined };
+    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
+    SocketService.connect();
+    game.init({
+      gameParams: { preloadCardIds: [] }
+    });
+    (game.add.image as unknown as jasmine.Spy).calls.reset();
+    (game.add.text as unknown as jasmine.Spy).calls.reset();
+
+    game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
+
+    expectSingleIndicator(game);
   });
 
   it('destroys a pending option picker that would cover the game over indicator', () => {

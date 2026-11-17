@@ -105,7 +105,6 @@ export default class GameResult {
         return;
       }
       DBProfilesDAO.increaseSol(c.userId, sol);
-      // Check all dailies using centralized logic
       for (const dailyType of Object.values(DailyType)) {
         if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
           try {

@@ -11,19 +11,6 @@ import ActionPool, { CardAction } from '../action_pool';
 import CardStack from '../card_stack';
 import TacticCard from '../types/tactic_card';
 
-export class Card149 extends TacticCard {
-  private readonly cardsToDraw = 2;
-  constructor() {
-    super(149, 'Expertenkonferenz', 2, TacticDiscipline.Intelligence);
-  }
-  onEnterGame(player: Player) {
-    this.drawSpecificCards(player, c => c.type == CardType.Tactic, this.cardsToDraw);
-  }
-  getValidTargets(player: Player): CardStack[] {
-    return this.onlyColonyTarget(player.cardStacks);
-  }
-}
-
 export class Card175 extends TacticCard {
   constructor() {
     super(175, 'Spionagenetzwerk', 1, TacticDiscipline.Intelligence);
@@ -120,28 +107,6 @@ export class Card214 extends TacticCard {
   }
 }
 
-export class Card222 extends TacticCard {
-  private readonly cardsToRestore = 3;
-  constructor() {
-    super(222, 'Wracks plündern', 2, TacticDiscipline.Intelligence);
-  }
-  onEnterGame(player: Player, target: CardStack, cardStack: CardStack, optionalParameters?: number[]) {
-    this.tributeMultipleFromPile(optionalParameters, player.discardPile, c => player.deck.push(c));
-    player.shuffleDeck();
-  }
-  getValidTargets(player: Player): CardStack[] {
-    return player.discardPile.filter(c => c.type == CardType.Hull).length > 0
-      ? this.onlyColonyTarget(player.cardStacks)
-      : [];
-  }
-  override onEnterGameSelectableCardOptions(player: Player): number[] | undefined {
-    return player.discardPile.filter(c => c.type == CardType.Hull).map(c => c.id);
-  }
-  override onEnterGameNumberOfSelectableCardOptions(player: Player): number {
-    return Math.min(this.cardsToRestore, player.discardPile.filter(c => c.type == CardType.Hull).length);
-  }
-}
-
 export class Card231 extends TacticCard {
   private readonly removeActions: CardAction[] = [CardType.Hull, CardType.Equipment].map(
     ct => new CardAction(ct)
@@ -212,34 +177,6 @@ export class Card416 extends TacticCard {
   }
   protected override get interventionType(): InterventionType | undefined {
     return InterventionType.BattleRoundStart;
-  }
-}
-
-export class Card417 extends TacticCard {
-  constructor() {
-    super(
-      417,
-      'Kritischer Treffer',
-      3,
-      TacticDiscipline.Intelligence,
-      {},
-      {
-        range: 0,
-        damage: 6,
-        pointDefense: 0,
-        shield: 0,
-        armour: 0
-      }
-    );
-  }
-  onEnterGame(player: Player, target: CardStack) {
-    this.attackByTactic(player, target);
-  }
-  getValidTargets(player: Player): CardStack[] {
-    return player.match.battle.ships[player.match.waitingPlayerNo].filter(cs => cs.damage);
-  }
-  protected override get interventionType(): InterventionType | undefined {
-    return InterventionType.BattleRoundEnd;
   }
 }
 
@@ -328,18 +265,15 @@ export class Card529 extends TacticCard {
 }
 
 export const allCards = [
-  new Card149(),
   new Card175(),
   new Card176(),
   new Card205(),
   new Card208(),
   new Card214(),
-  new Card222(),
   new Card231(),
   new Card323(),
   new Card330(),
   new Card416(),
-  new Card417(),
   new Card430(),
   new Card517(),
   new Card528(),

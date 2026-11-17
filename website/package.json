@@ -1,6 +1,6 @@
 {
   "name": "outercolonies-website",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Outer Colonies Website",
   "scripts": {
     "ng": "ng",
@@ -14,8 +14,8 @@
     "build:staging": "ng build --configuration staging",
     "bp": "npm run build:prod",
     "build:prod": "ng build --configuration production",
-    "test": "node scripts/test.js",
-    "test:watch": "node scripts/test.js --watch",
+    "test": "ng test --watch=false --code-coverage",
+    "test:watch": "ng test",
     "lint": "ng lint",
     "format": "npx prettier . --write",
     "check": "npm run format && npm run lint && npm run test"
@@ -33,8 +33,6 @@
     "@angular/platform-browser": "^21.2.12",
     "@angular/platform-browser-dynamic": "^21.2.12",
     "@angular/router": "^21.2.12",
-    "@typescript-eslint/utils": "^8.0.0",
-    "lodash-es": "^4.0.0",
     "ngx-cookie-service": "^21.0.0",
     "rxjs": "^7.8.2",
     "zone.js": "^0.16.2"
@@ -51,23 +49,18 @@
     "@eslint/eslintrc": "^3.0.0",
     "@eslint/js": "^9.0.0",
     "@types/jasmine": "^6.0.0",
-    "@types/lodash-es": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "@typescript-eslint/utils": "^8.0.0",
     "eslint": "^9.0.0",
     "eslint-plugin-prefer-arrow": "~1.2.0",
     "jasmine-core": "^6.2.0",
-    "jest": "^30.0.0",
-    "jest-environment-jsdom": "^30.0.0",
-    "jest-preset-angular": "^16.0.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.0.0",
     "karma-coverage": "^2.0.0",
-    "karma-firefox-launcher": "^2.0.0",
     "karma-jasmine": "^5.0.0",
     "karma-jasmine-html-reporter": "^2.0.0",
     "prettier": "^3.0.0",
-    "puppeteer": "^25.0.4",
     "typescript": "^5.9.3"
   }
 }

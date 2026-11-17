@@ -68,18 +68,18 @@ export class Card203 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card207 extends EquipmentCardRechargeable {
+export class Card101 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      207,
+      101,
       'Materiedesintegrator',
-      4,
+      5,
       {
         theta: -1
       },
       {
         range: 3,
-        damage: 4,
+        damage: 3,
         pointDefense: 0,
         shield: -99,
         armour: -2
@@ -136,7 +136,7 @@ export const allCards = [
   new Card106(),
   new Card107(),
   new Card203(),
-  new Card207(),
+  new Card101(),
   new Card405(),
   new Card438()
 ];

@@ -305,7 +305,7 @@ export default class CardStack {
               this.scene.socket.emit(MsgTypeInbound.Attack, '*', '*', this.uuid);
             } else if (
               this.scene.activeCards.stackUUID &&
-              this.scene.state.battle?.opponentShipIds.includes(this.uuid)
+              this.scene.state.battle.opponentShipIds.includes(this.uuid)
             ) {
               this.scene.socket.emit(
                 MsgTypeInbound.Attack,

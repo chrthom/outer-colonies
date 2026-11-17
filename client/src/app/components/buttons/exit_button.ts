@@ -5,6 +5,7 @@ import Game from '../../scenes/game';
 import { designConfig } from 'src/app/config/design';
 import { MsgTypeInbound } from '@shared/config/enums';
 import { BaseButton } from './base_button';
+import SocketService from '../../socket_service';
 
 export default class ExitButton extends BaseButton {
   private isMatchmaking!: boolean;
@@ -14,7 +15,6 @@ export default class ExitButton extends BaseButton {
     super(scene, layoutConfig.game.ui.exitButton.x, layoutConfig.game.ui.exitButton.y, 'exit', '');
     this.isMatchmaking = !(scene instanceof Game);
 
-    // Create confirmation text
     this.confirmText = scene.add
       .text(
         layoutConfig.game.ui.exitButton.x + layoutConfig.game.ui.baseButtons.xTextOffset,
@@ -32,7 +32,6 @@ export default class ExitButton extends BaseButton {
         useHandCursor: true
       });
 
-    // Add confirmation text event listeners
     this.confirmText
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown()) this.onClickAction(true);
@@ -55,17 +54,16 @@ export default class ExitButton extends BaseButton {
   update() {
     this.confirmText.setVisible(false);
     if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
-    else if (this.scene instanceof Game && !this.scene.state?.gameResult) this.updateText('Aufgeben');
+    else if (this.scene instanceof Game && !this.scene.state.gameResult) this.updateText('Aufgeben');
     else this.updateText('Spiel beenden');
   }
 
   protected onClickAction(confirmed?: boolean) {
     if (this.isMatchmaking || (this.scene instanceof Game && this.scene.state.gameResult)) {
-      (this.scene as any).socket.disconnect();
+      SocketService.disconnect();
       window.location.href = environment.urls.website;
     } else if (confirmed) {
-      // Surrender - send surrender message to server
-      (this.scene as Game).socket.emit(MsgTypeInbound.Surrender);
+      this.scene.socket.emit(MsgTypeInbound.Surrender);
     } else {
       this.confirmText.setVisible(!this.confirmText.visible);
     }

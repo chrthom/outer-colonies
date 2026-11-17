@@ -20,12 +20,12 @@ export class Card118 extends EquipmentCardRechargeable {
   }
 }
 
-export class Card125 extends EquipmentCardRechargeable {
+export class Card151 extends EquipmentCardRechargeable {
   constructor() {
     super(
-      125,
+      151,
       'Plasmakanone',
-      3,
+      2,
       {
         energy: -1,
         xi: -1
@@ -54,7 +54,7 @@ export class Card157 extends EquipmentCardRechargeable {
         range: 1,
         damage: 7,
         pointDefense: 0,
-        shield: -7,
+        shield: -99,
         armour: -1
       }
     );
@@ -125,7 +125,7 @@ export class Card409 extends EquipmentCardRechargeable {
 
 export const allCards = [
   new Card118(),
-  new Card125(),
+  new Card151(),
   new Card157(),
   new Card209(),
   new Card303(),

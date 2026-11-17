@@ -1,5 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import AuthApiService from 'src/app/api/auth-api.service';
@@ -40,7 +47,7 @@ export class ResetPasswordPage implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => (this.resetId = params.get('id')!));
   }
-  get password(): any {
+  get password(): AbstractControl | null {
     return this.resetPasswordForm.get('password');
   }
   submit() {

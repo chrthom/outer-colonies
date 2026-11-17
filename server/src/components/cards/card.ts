@@ -112,6 +112,12 @@ export default abstract class Card {
   protected repairDamage(target: CardStack, amount: number) {
     target.damage -= Math.min(amount, target.damage);
   }
+  /**
+   * Removes all damage markers from the given card stack (full repair).
+   */
+  protected repairAllDamage(target: CardStack) {
+    this.repairDamage(target, target.damage);
+  }
   protected additionalCardWhenDrawing(player: Player, ...cardTypes: CardSubtype[]) {
     const relevantCardDrawn = this.getDrawnCards(player).some(c =>
       cardTypes.some(

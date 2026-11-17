@@ -156,7 +156,7 @@ class LayoutGameConfig {
         subtitle: -20,
         solGain: {
           winner: 250,
-          looser: 200
+          loser: 200
         }
       }
     },

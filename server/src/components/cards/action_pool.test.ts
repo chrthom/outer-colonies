@@ -1,7 +1,7 @@
 import { CardType, TacticDiscipline } from '../../shared/config/enums';
 import ActionPool, { CardAction } from './action_pool';
 import { Card102 } from './collection/hull_station_cards';
-import { Card149 } from './collection/tactic_intelligence_cards';
+import { Card149 } from './collection/tactic_science_cards';
 
 test('Single action types shall be consumed from the pool before combinations - version: single first', () => {
   const pool = new ActionPool(
@@ -26,13 +26,13 @@ test('Single action types shall be consumed from the pool before combinations - 
 });
 
 test('Tactic action subtypes hall be consumed from the pool before generic tactic action - version: generic first', () => {
-  const pool = new ActionPool(new CardAction(CardType.Tactic), new CardAction(TacticDiscipline.Intelligence));
+  const pool = new ActionPool(new CardAction(CardType.Tactic), new CardAction(TacticDiscipline.Science));
   pool.activate(new Card149());
-  expect(pool.pool).toContainEqual(new CardAction(TacticDiscipline.Intelligence));
+  expect(pool.pool).toContainEqual(new CardAction(TacticDiscipline.Science));
 });
 
 test('Tactic action subtypes hall be consumed from the pool before generic tactic action - version: subtype first', () => {
-  const pool = new ActionPool(new CardAction(TacticDiscipline.Intelligence), new CardAction(CardType.Tactic));
+  const pool = new ActionPool(new CardAction(TacticDiscipline.Science), new CardAction(CardType.Tactic));
   pool.activate(new Card149());
-  expect(pool.pool).toContainEqual(new CardAction(TacticDiscipline.Intelligence));
+  expect(pool.pool).toContainEqual(new CardAction(TacticDiscipline.Science));
 });

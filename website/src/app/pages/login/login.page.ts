@@ -1,5 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
 import AuthService from 'src/app/auth.service';
@@ -38,10 +45,10 @@ export class LoginPage {
     remember: new FormControl(false, [])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
-  get username(): any {
+  get username(): AbstractControl | null {
     return this.loginForm.get('username');
   }
-  get password(): any {
+  get password(): AbstractControl | null {
     return this.loginForm.get('password');
   }
   submit() {
