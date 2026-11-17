@@ -48,6 +48,8 @@
         <mat-error>Dein Passwort kann nicht l&auml;nger als 40 Zeichen sein</mat-error>
         } @else if (password?.hasError('minlength')) {
         <mat-error>Dein Passwort sollte mindestens 8 Zeichen lang sein</mat-error>
+        } @else if (password?.hasError('strength')) {
+        <mat-error>Dein Passwort muss mindestens einen Buchstaben und eine Zahl enthalten</mat-error>
         } @if (passwordResetSuccessful) {
         <mat-hint>Dein Passwort wurde erfolgreich ge&auml;ndert</mat-hint>
         } @if (passwordResetFailed) {

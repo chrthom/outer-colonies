@@ -16,6 +16,7 @@ import { ProfileApiService } from 'src/app/api/profile-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
+import { passwordStrength } from 'src/app/components/password-strength.validator';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -59,7 +60,12 @@ export class ProfilePage implements OnInit, OnDestroy {
     )
   });
   passwordForm: FormGroup = new FormGroup({
-    password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)])
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+      Validators.maxLength(40),
+      passwordStrength
+    ])
   });
   matcher: ErrorStateMatcher = new OCErrorStateMatcher();
   ngOnInit(): void {
