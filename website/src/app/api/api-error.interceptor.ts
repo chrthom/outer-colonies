@@ -16,7 +16,7 @@ import { ApiError } from './api-error';
  *   contain query parameters with user data).
  * - On HTTP 401 (no session token provided or failed login) and HTTP 403
  *   (invalid or expired session token, the only 403 the API emits - see
- *   `performWithSessionTokenCheck` in `server/src/components/rest_api.ts`)
+ *   `requireSession` in `server/src/components/rest_api/session_middleware.ts`)
  *   the session is cleared and the user is redirected to the login page
  *   (replaces the ad-hoc retry logic formerly in `AuthService.check`).
  * - Failed API calls are rethrown as typed `ApiError`s (status + message) which
