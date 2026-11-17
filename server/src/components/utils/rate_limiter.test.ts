@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 
-jest.mock('./api_response', () => ({
+jest.mock('../rest_api/api_response', () => ({
   sendStatus: jest.fn()
 }));
-import { sendStatus } from './api_response';
+import { sendStatus } from '../rest_api/api_response';
 import { createRateLimiter } from './rate_limiter';
 
 describe('RateLimiter', () => {

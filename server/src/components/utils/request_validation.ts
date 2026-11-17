@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { z } from 'zod';
 import { starterDecks } from '../../shared/config/starter_decks';
 import { passwordHasLetterAndDigit } from '../../shared/config/password_rules';
-import { sendStatus } from './api_response';
+import { sendStatus } from '../rest_api/api_response';
 
 /**
  * Username constraints, mirrored from the registration form in the website and the
@@ -174,4 +174,85 @@ export function validateQuery<S extends z.ZodType>(schema: S, req: Request, res:
  */
 export function validateParams<S extends z.ZodType>(schema: S, req: Request, res: Response) {
   return validate(schema, req.params, res, 'Invalid path parameters');
+}
+
+/**
+ * Builds an express middleware that validates a request property against a zod schema: on
+ * success the parsed (and potentially transformed, e.g. trimmed) value replaces the property
+ * so downstream handlers operate on validated data, and the chain continues; on a validation
+ * failure a 400 response with the first validation error as message short-circuits the
+ * request before it reaches the guarded route.
+ * @param schema zod schema the request property must satisfy
+ * @param read reads the request property to validate off the request
+ * @param write replaces the request property with its parsed value
+ * @param fallbackMessage response message when the schema yields no specific error
+ * @returns the express middleware enforcing the schema
+ */
+function validationMiddleware<S extends z.ZodType>(
+  schema: S,
+  read: (req: Request) => unknown,
+  write: (req: Request, parsed: z.output<S>) => void,
+  fallbackMessage: string
+): RequestHandler {
+  return (req, res, next) => {
+    const parsed = validate(schema, read(req), res, fallbackMessage);
+    if (parsed === undefined) return;
+    write(req, parsed);
+    next();
+  };
+}
+
+/**
+ * Validates the request body against a zod schema as express middleware: the parsed body
+ * replaces `req.body`, so the guarded handler operates on validated (and potentially
+ * transformed, e.g. trimmed) data. Middleware counterpart of {@link validateBody}.
+ * @param schema zod schema the request body must satisfy
+ * @returns the express middleware enforcing the schema
+ */
+export function validateBodyMiddleware<S extends z.ZodType>(schema: S): RequestHandler {
+  return validationMiddleware(
+    schema,
+    req => req.body,
+    (req, parsed) => {
+      req.body = parsed;
+    },
+    'Invalid request body'
+  );
+}
+
+/**
+ * Validates the query parameters of a request against a zod schema as express middleware: the
+ * parsed parameters are assigned back onto `req.query`, so the guarded handler reads
+ * validated (and potentially transformed, e.g. trimmed) values. Middleware counterpart of
+ * {@link validateQuery}.
+ * @param schema zod schema the query parameters must satisfy
+ * @returns the express middleware enforcing the schema
+ */
+export function validateQueryMiddleware<S extends z.ZodType>(schema: S): RequestHandler {
+  return validationMiddleware(
+    schema,
+    req => req.query,
+    (req, parsed) => {
+      Object.assign(req.query, parsed);
+    },
+    'Invalid query parameters'
+  );
+}
+
+/**
+ * Validates the path parameters of a request against a zod schema as express middleware: the
+ * parsed parameters are assigned back onto `req.params`, so the guarded handler reads
+ * validated values. Middleware counterpart of {@link validateParams}.
+ * @param schema zod schema the path parameters must satisfy
+ * @returns the express middleware enforcing the schema
+ */
+export function validateParamsMiddleware<S extends z.ZodType>(schema: S): RequestHandler {
+  return validationMiddleware(
+    schema,
+    req => req.params,
+    (req, parsed) => {
+      Object.assign(req.params, parsed);
+    },
+    'Invalid path parameters'
+  );
 }

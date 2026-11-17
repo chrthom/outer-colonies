@@ -1,3 +1,4 @@
+import { RequestHandler } from 'express';
 import { starterDecks } from '../../shared/config/starter_decks';
 import {
   authEmailSchema,
@@ -7,7 +8,10 @@ import {
   authPasswordSchema,
   authRegisterSchema,
   oneTimeIdSchema,
-  validateBody
+  validateBody,
+  validateBodyMiddleware,
+  validateParamsMiddleware,
+  validateQueryMiddleware
 } from './request_validation';
 
 describe('RequestValidation', () => {
@@ -232,6 +236,70 @@ describe('RequestValidation', () => {
 
       expect(validateBody(authEmailSchema, <any>req, <any>res)).toBeUndefined();
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+  });
+
+  describe('validation middleware', () => {
+    const createRequest = (property: 'body' | 'query' | 'params', value: unknown) =>
+      <any>{
+        body: undefined,
+        query: {},
+        params: {},
+        method: 'POST',
+        route: { path: '/api/test' },
+        [property]: value
+      };
+    const invoke = (middleware: RequestHandler, req: any) => {
+      const res: any = { req: req };
+      res.status = jest.fn().mockReturnThis();
+      res.send = jest.fn();
+      let nextCalled = false;
+      middleware(req, res, () => (nextCalled = true));
+      return {
+        res,
+        get nextCalled() {
+          return nextCalled;
+        }
+      };
+    };
+
+    it('parses the body, replaces it on the request and continues the chain', () => {
+      const req = createRequest('body', { email: '  test@example.com  ' });
+
+      const result = invoke(validateBodyMiddleware(authEmailSchema), req);
+
+      expect(result.nextCalled).toBe(true);
+      expect(req.body).toEqual({ email: 'test@example.com' });
+      expect(result.res.status).not.toHaveBeenCalled();
+    });
+
+    it('sends a 400 and stops the chain for an invalid body', () => {
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const req = createRequest('body', { email: 'not-an-email' });
+
+      const result = invoke(validateBodyMiddleware(authEmailSchema), req);
+
+      expect(result.nextCalled).toBe(false);
+      expect(result.res.status).toHaveBeenCalledWith(400);
+      expect(result.res.send).toHaveBeenCalledWith({ status: 400, message: 'Invalid email address' });
+    });
+
+    it('assigns the parsed query parameters back onto the request', () => {
+      const req = createRequest('query', { username: ' testuser ' });
+
+      const result = invoke(validateQueryMiddleware(authExistsQuerySchema), req);
+
+      expect(result.nextCalled).toBe(true);
+      expect(req.query['username']).toBe('testuser');
+    });
+
+    it('assigns the parsed path parameters back onto the request', () => {
+      const req = createRequest('params', { id: 'a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab' });
+
+      const result = invoke(validateParamsMiddleware(oneTimeIdSchema), req);
+
+      expect(result.nextCalled).toBe(true);
+      expect(req.params['id']).toBe('a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab');
     });
   });
 });

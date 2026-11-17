@@ -7,6 +7,7 @@ import { matchMakingSocketListeners, matchMakingCron } from './components/matchm
 import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import { version, releaseName } from './shared/config/version';
+import authValidation from './components/rest_api/auth_validation';
 import restAPI from './components/rest_api';
 import DBConnection from './components/persistence/db_connector';
 import { logger } from './components/utils/logger';
@@ -40,6 +41,10 @@ io.on(MsgTypeInbound.Connect, socket => {
 });
 
 app.use(express.json());
+// The validation and rate-limiting layer must sit in front of the API routers, so malformed
+// requests are rejected with a 400 and unauthenticated endpoints are throttled before any
+// route handler runs
+app.use(authValidation);
 restAPI(app);
 
 /** Upper bound for the graceful shutdown before the process is exited forcefully. */

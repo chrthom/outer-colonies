@@ -1,5 +1,5 @@
 import { rateLimit } from 'express-rate-limit';
-import { sendStatus } from './api_response';
+import { sendStatus } from '../rest_api/api_response';
 
 /**
  * Creates an IP-based rate limiter for an unauthenticated API endpoint. Requests over the
