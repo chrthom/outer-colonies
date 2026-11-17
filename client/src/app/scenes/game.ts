@@ -9,7 +9,7 @@ import {
   ClientState,
   emptyClientState
 } from '@shared/interfaces/client_state';
-import { BattleType, GameResultType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import GameOverIndicator from '../components/indicators/game_over_indicator';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
@@ -21,12 +21,15 @@ import DiscardPile from '../components/card/discard_pile';
 import ActionPool from '../components/action_pool';
 import Preloader from '../components/preloader';
 import { animationConfig } from '../config/animation';
+import { designConfig } from '../config/design';
 import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
+import { layoutConfig } from '../config/layout';
+import { rules } from '@shared/config/rules';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 import OptionPicker from '../components/option_picker';
 import SocketService from '../socket_service';
@@ -79,6 +82,7 @@ export default class Game extends Phaser.Scene {
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
   private gameOverIndicator?: GameOverIndicator;
+  connectionLost = false;
   background!: Background;
   obj!: FixedUIElements;
   player!: PlayerUIElements;
@@ -93,12 +97,12 @@ export default class Game extends Phaser.Scene {
   init(data: InitData) {
     this.socket = SocketService.getSocket();
     this.gameParams = data.gameParams;
-    // The server treats any in-game disconnect as a surrender, so a reconnected
-    // socket would no longer be bound to this match.
+    // A socket.io reconnect cannot rejoin the match; rejoining happens via a fresh page load
     this.socket.io.reconnection(false);
     // Phaser reuses the scene instance for the next match, so reset the
     // reference to allow a fresh game over overlay in the new game.
     this.gameOverIndicator = undefined;
+    this.connectionLost = false;
     this.background = new Background(this);
   }
 
@@ -152,7 +156,7 @@ export default class Game extends Phaser.Scene {
       (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
     });
     this.socket.on('disconnect', () => {
-      this.showSurrenderOnDisconnect();
+      this.showConnectionLostMessage();
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.socket.off(MsgTypeOutbound.State);
@@ -172,21 +176,29 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  showSurrenderOnDisconnect() {
-    // The server treats disconnect-during-game as surrender
-    if (this.state.gameResult) return;
-    const result: ClientGameResult = {
-      won: false,
-      type: GameResultType.Surrender,
-      sol: 0
-    };
-    // Avoid mutating the shared `emptyClientState` constant if no State
-    // message has arrived yet.
-    this.state = { ...this.state, gameResult: result };
-    // No further state arrives after a disconnect, so destroy a pending option
-    // picker that would otherwise linger over the game over indicator.
+  /**
+   * Shows a reload hint on a mid-game disconnect: the match stays alive for the
+   * reconnection grace window, so the player can rejoin by reloading the page.
+   */
+  showConnectionLostMessage() {
+    if (this.connectionLost || this.state.gameResult) return;
+    this.connectionLost = true;
+    this.add
+      .text(
+        layoutConfig.scene.width / 2,
+        layoutConfig.scene.height / 2,
+        `Verbindung verloren.\nBitte Seite neu laden, um das Spiel fortzusetzen.\nDas Spiel endet ${rules.reconnectGracePeriod} Sekunden nach dem Verbindungsabbruch.`
+      )
+      .setFontSize(layoutConfig.fontSize.normal)
+      .setFontFamily(designConfig.fontFamily.text)
+      .setColor(designConfig.color.warn)
+      .setAlign('center')
+      .setOrigin(0.5)
+      .setDepth(layoutConfig.depth.gameOver);
+    if (this.obj) this.obj.exitButton.update();
+    // No further state arrives while disconnected, so destroy a pending option
+    // picker that would otherwise linger over the connection lost message.
     this.obj?.optionPicker?.destroy();
-    this.showGameOverIndicator(result);
   }
 
   /**

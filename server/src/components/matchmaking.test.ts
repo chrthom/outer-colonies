@@ -1,0 +1,231 @@
+import { Server, Socket } from 'socket.io';
+import { matchMakingCron, matchMakingSocketListeners, matchmakingRoom } from './matchmaking';
+import { allActiveMatches, findRejoinableMatch, registerMatch, unregisterMatch } from './match_registry';
+import { gameSocketListeners } from './game';
+import Match from './game_state/match';
+import SocketData from './game_state/socket_data';
+import DBCredentialsDAO from './persistence/db_credentials';
+import DBDecksDAO from './persistence/db_decks';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
+
+const createUser = (userId: number) => ({
+  userId,
+  username: `Player ${userId}`,
+  email: `player${userId}@example.com`,
+  sessionToken: `token-${userId}`
+});
+
+interface SocketMock {
+  socket: Socket;
+  on: jest.Mock;
+  emit: jest.Mock;
+  join: jest.Mock;
+  leave: jest.Mock;
+  rooms: Set<string>;
+}
+
+const createSocketMock = (userId: number, socketId: string = `socket-${userId}`): SocketMock => {
+  const on = jest.fn();
+  const emit = jest.fn();
+  const rooms = new Set<string>();
+  const join = jest.fn((room: string) => rooms.add(room));
+  const leave = jest.fn((room: string) => rooms.delete(room));
+  const socket = {
+    id: socketId,
+    on,
+    emit,
+    join,
+    leave,
+    data: new SocketData(createUser(userId), [])
+  };
+  return { socket: socket as unknown as Socket, on, emit, join, leave, rooms };
+};
+
+const createIoMock = (socketMocks: SocketMock[]): Server => {
+  const sockets = socketMocks.map(m => m.socket);
+  const io = {
+    sockets: {
+      adapter: { rooms: new Map<string, Set<string>>() },
+      sockets: { get: (id: string) => sockets.find(s => s.id == id) },
+      to: (room: string) => ({
+        emit: (event: string, ...args: unknown[]) =>
+          socketMocks.filter(m => m.rooms.has(room)).forEach(m => m.emit(event, ...args))
+      })
+    }
+  };
+  io.sockets.adapter.rooms.set(matchmakingRoom, new Set(sockets.map(s => s.id)));
+  return io as unknown as Server;
+};
+
+const getLoginHandler = (io: Server, socketMock: SocketMock): ((sessionToken: string) => Promise<void>) => {
+  matchMakingSocketListeners(io, socketMock.socket);
+  const registration = socketMock.on.mock.calls.find(([event]) => event == MsgTypeInbound.Login);
+  if (!registration) throw new Error('Login handler was not registered');
+  return registration[1];
+};
+
+const mockLogin = (userId: number) => {
+  jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockResolvedValue(createUser(userId));
+  jest.spyOn(DBDecksDAO, 'getByUserId').mockResolvedValue([]);
+};
+
+describe('Matchmaking cron', () => {
+  afterEach(() => {
+    allActiveMatches().forEach(unregisterMatch);
+    jest.restoreAllMocks();
+  });
+
+  test('pairs two waiting clients into a match', () => {
+    const socketMocks = [createSocketMock(1), createSocketMock(2)];
+    const io = createIoMock(socketMocks);
+
+    matchMakingCron(io);
+
+    expect(allActiveMatches()).toHaveLength(1);
+    const match = allActiveMatches()[0];
+    expect(socketMocks[0].leave).toHaveBeenCalledWith(matchmakingRoom);
+    expect(socketMocks[1].leave).toHaveBeenCalledWith(matchmakingRoom);
+    expect(socketMocks[0].join).toHaveBeenCalledWith(match.room);
+    expect(socketMocks[1].join).toHaveBeenCalledWith(match.room);
+    socketMocks.forEach(sm =>
+      expect(sm.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, {
+        preloadCardIds: []
+      })
+    );
+    expect((<SocketData>socketMocks[0].socket.data).match).toBe(match);
+    expect((<SocketData>socketMocks[1].socket.data).match).toBe(match);
+  });
+
+  test('pairs an odd client only once and lets the leftover keep searching', () => {
+    const socketMocks = [createSocketMock(1), createSocketMock(2), createSocketMock(3)];
+    const io = createIoMock(socketMocks);
+
+    matchMakingCron(io);
+
+    expect(allActiveMatches()).toHaveLength(1);
+    // The leftover client stays in the matchmaking room and keeps searching
+    expect(socketMocks[0].leave).not.toHaveBeenCalled();
+    expect(socketMocks[0].emit).not.toHaveBeenCalled();
+  });
+});
+
+describe('Matchmaking login', () => {
+  afterEach(() => {
+    allActiveMatches().forEach(unregisterMatch);
+    jest.restoreAllMocks();
+  });
+
+  test('lets a player without a running match join the matchmaking search', async () => {
+    const socketMock = createSocketMock(1);
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([socketMock]), socketMock)('token-1');
+
+    expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
+    expect(socketMock.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, 0);
+  });
+
+  test('does not join the search when the session token is invalid', async () => {
+    const socketMock = createSocketMock(1);
+    jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue('not_found');
+
+    await getLoginHandler(createIoMock([socketMock]), socketMock)('invalid-token');
+
+    expect(socketMock.join).not.toHaveBeenCalled();
+    expect(socketMock.emit).not.toHaveBeenCalled();
+  });
+
+  test('lets a player rejoin their running match instead of searching again', async () => {
+    const matchSockets = [createSocketMock(1), createSocketMock(2)];
+    const match = new Match('test-room', matchSockets[0].socket, matchSockets[1].socket);
+    registerMatch(match);
+    match.players[0].disconnectedSince = Date.now();
+    const rejoinSocket = createSocketMock(1, 'socket-1-rejoin'); // Same user, new socket
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([rejoinSocket]), rejoinSocket)('token-1');
+
+    expect(rejoinSocket.join).toHaveBeenCalledWith('test-room');
+    expect(rejoinSocket.join).not.toHaveBeenCalledWith(matchmakingRoom);
+    expect(rejoinSocket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, {
+      preloadCardIds: []
+    });
+    expect(match.players[0].socketId).toBe(rejoinSocket.socket.id);
+    expect(match.players[0].disconnectedSince).toBeUndefined();
+    expect((<SocketData>rejoinSocket.socket.data).match).toBe(match);
+    expect((<SocketData>rejoinSocket.socket.data).playerNo).toBe(0);
+  });
+
+  test('detaches the previous socket when the player rejoins', async () => {
+    const matchSockets = [createSocketMock(1), createSocketMock(2)];
+    const match = new Match('test-room', matchSockets[0].socket, matchSockets[1].socket);
+    registerMatch(match);
+    const rejoinSocket = createSocketMock(1, 'socket-1-rejoin'); // Same user, new socket
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([rejoinSocket, matchSockets[0]]), rejoinSocket)('token-1');
+
+    // The lingering old socket can neither act on the match nor receive its updates
+    expect((<SocketData>matchSockets[0].socket.data).match).toBeUndefined();
+    expect((<SocketData>matchSockets[0].socket.data).playerNo).toBeUndefined();
+    expect(matchSockets[0].leave).toHaveBeenCalledWith('test-room');
+    expect(matchSockets[0].rooms).not.toContain('test-room');
+  });
+
+  test('does not mark the rejoined player when the replaced socket disconnects late', async () => {
+    const matchSockets = [createSocketMock(1), createSocketMock(2)];
+    const match = new Match('test-room', matchSockets[0].socket, matchSockets[1].socket);
+    registerMatch(match);
+    match.players[0].disconnectedSince = Date.now();
+    const rejoinSocket = createSocketMock(1, 'socket-1-rejoin'); // Same user, new socket
+    mockLogin(1);
+    const io = createIoMock([rejoinSocket, matchSockets[0], matchSockets[1]]);
+
+    await getLoginHandler(io, rejoinSocket)('token-1');
+    expect(match.players[0].disconnectedSince).toBeUndefined();
+
+    // The stale socket of the previous connection disconnects after the rejoin
+    gameSocketListeners(io, matchSockets[0].socket);
+    const registration = matchSockets[0].on.mock.calls.find(([event]) => event == MsgTypeInbound.Disconnect);
+    if (!registration) throw new Error('Disconnect handler was not registered');
+    registration[1]();
+
+    expect(match.players[0].disconnectedSince).toBeUndefined();
+    expect(match.gameResult.gameOver).toBe(false);
+  });
+
+  test('delivers the missed result of a finished match on the next login', async () => {
+    const matchSockets = [createSocketMock(1), createSocketMock(2)];
+    const match = new Match('test-room', matchSockets[0].socket, matchSockets[1].socket);
+    registerMatch(match);
+    // The match ended while the player was offline, so they never saw the result
+    match.gameResult.gameOver = true;
+    const rejoinSocket = createSocketMock(1, 'socket-1-rejoin'); // Same user, new socket
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([rejoinSocket]), rejoinSocket)('token-1');
+
+    expect(rejoinSocket.join).toHaveBeenCalledWith('test-room');
+    expect(rejoinSocket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, {
+      preloadCardIds: []
+    });
+    expect(match.players[0].socketId).toBe(rejoinSocket.socket.id);
+  });
+
+  test('makes a finished match rejoinable no more once its result was delivered', async () => {
+    const matchSockets = [createSocketMock(1), createSocketMock(2)];
+    const match = new Match('test-room', matchSockets[0].socket, matchSockets[1].socket);
+    registerMatch(match);
+    match.gameResult.gameOver = true;
+    match.players.forEach(p => {
+      p.resultDelivered = true;
+    });
+    const socketMock = createSocketMock(1);
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([socketMock]), socketMock)('token-1');
+
+    expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
+    expect(findRejoinableMatch(1)).toBeUndefined();
+  });
+});
