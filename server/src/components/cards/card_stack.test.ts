@@ -17,7 +17,9 @@ class MockPlayer {
   no = 1;
   match = { battle: { recentAttack: null as unknown, range: 1 } };
   cardStacks: CardStack[] = [];
+  hand: CardStack[] = [];
   discardCards = jest.fn();
+  takeCards = jest.fn();
 }
 
 const newStack = (id: number, name: string, type: CardType = CardType.Hull) =>
@@ -43,6 +45,63 @@ describe('CardStack.attach', () => {
     parent.attach(child2);
 
     expect(parent.attachedCardStacks).toEqual([child1, child2]);
+  });
+});
+
+describe('CardStack.owner', () => {
+  test('returns the parent player of a root stack', () => {
+    const player = new MockPlayer();
+    const stack = new RootCardStack(new MockCard(20, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+
+    expect(stack.owner).toBe(player);
+  });
+
+  test('resolves through the parent stack for attachments without a parent player', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(21, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    const equipment = new AttachmentCardStack(new MockCard(22, 'Weapon', CardType.Equipment, 1), ship);
+    ship.attach(equipment);
+
+    expect(equipment.owner).toBe(player);
+  });
+
+  test('stays the playing player for attachments on an opponent stack', () => {
+    const caster = new MockPlayer();
+    const opponent = new MockPlayer();
+    const opponentShip = new RootCardStack(
+      new MockCard(23, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      opponent as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(24, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    opponentShip.attach(tactic);
+
+    expect(tactic.player).toBe(opponent);
+    expect(tactic.owner).toBe(caster);
+  });
+});
+
+describe('CardStack.retract', () => {
+  test('routes retractable cards to the stack owner hand and opponent attachments to their pile', () => {
+    const owner = new MockPlayer();
+    const opponent = new MockPlayer();
+    const shipCard = new MockCard(1, 'Ship', CardType.Hull, 1);
+    const ship = new RootCardStack(shipCard, Zone.Orbital, owner as any);
+    owner.cardStacks.push(ship);
+    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
+    jest.spyOn(tacticCard, 'canBeRetracted').mockReturnValue(false);
+    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
+    ship.attach(tactic);
+
+    ship.retract();
+
+    expect(owner.takeCards).toHaveBeenCalledWith([shipCard]);
+    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
+    expect(owner.discardCards).not.toHaveBeenCalled();
   });
 });
 
@@ -174,43 +233,6 @@ describe('CardStack.playHandCard', () => {
     expect(player.discardCards).not.toHaveBeenCalled();
     expect(attachSpy).not.toHaveBeenCalled();
     expect(player.cardStacks).toHaveLength(0);
-  });
-});
-
-describe('CardStack.owner', () => {
-  test('returns the parent player of a root stack', () => {
-    const player = new MockPlayer();
-    const stack = new RootCardStack(new MockCard(20, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
-
-    expect(stack.owner).toBe(player);
-  });
-
-  test('resolves through the parent stack for attachments without a parent player', () => {
-    const player = new MockPlayer();
-    const ship = new RootCardStack(new MockCard(21, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
-    const equipment = new AttachmentCardStack(new MockCard(22, 'Weapon', CardType.Equipment, 1), ship);
-    ship.attach(equipment);
-
-    expect(equipment.owner).toBe(player);
-  });
-
-  test('stays the playing player for attachments on an opponent stack', () => {
-    const caster = new MockPlayer();
-    const opponent = new MockPlayer();
-    const opponentShip = new RootCardStack(
-      new MockCard(23, 'Ship', CardType.Hull, 1),
-      Zone.Orbital,
-      opponent as any
-    );
-    const tactic = new RootCardStack(
-      new MockCard(24, 'Tactic', CardType.Tactic, 1),
-      Zone.Hand,
-      caster as any
-    );
-    opponentShip.attach(tactic);
-
-    expect(tactic.player).toBe(opponent);
-    expect(tactic.owner).toBe(caster);
   });
 });
 

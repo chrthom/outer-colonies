@@ -155,19 +155,19 @@ export default abstract class CardStack {
     return this.validTargets.length > 0;
   }
   onDestruction() {
-    this.card.onDestruction(this.player);
+    this.card.onDestruction(this.owner);
     this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
   onMissionCompletion() {
-    this.card.onMissionCompletion(this.player);
+    this.card.onMissionCompletion(this.owner);
     this.attachedCardStacks.forEach(cs => cs.onMissionCompletion());
   }
   onStartTurn() {
-    this.card.onStartTurn(this.player, this);
+    this.card.onStartTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onStartTurn());
   }
   onEndTurn() {
-    this.card.onEndTurn(this.player, this);
+    this.card.onEndTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   get profile(): CardProfile {
@@ -200,8 +200,9 @@ export default abstract class CardStack {
   }
   retract() {
     this.removeCardStack();
-    this.player.takeCards(this.cards.filter(c => c.canBeRetracted(this.isRootCard)));
-    this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
+    this.cardStacks.forEach(cs =>
+      cs.card.canBeRetracted(this.isRootCard) ? cs.owner.takeCards([cs.card]) : cs.owner.discardCards(cs.card)
+    );
   }
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);
@@ -222,7 +223,7 @@ export default abstract class CardStack {
       } else if (this.parentCardStack) {
         spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
       }
-      this.cards.forEach(c => c.onLeaveGame(this.player));
+      this.cardStacks.forEach(cs => cs.card.onLeaveGame(cs.owner));
     }
   }
   private get isRootCard() {
