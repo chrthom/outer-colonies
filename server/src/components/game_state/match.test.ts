@@ -2,7 +2,7 @@ import { Socket } from 'socket.io';
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
 import { CardProfileConfig } from '../cards/card_profile';
-import { CardType, Zone } from '../../shared/config/enums';
+import { CardDurability, CardType, Zone } from '../../shared/config/enums';
 import Match from './match';
 import Player from './player';
 
@@ -83,5 +83,26 @@ describe('Match.removeDestroyedCardStacks', () => {
 
     expect(destroyed).toEqual([]);
     expect(match.players[0].cardStacks).toContain(colony);
+  });
+});
+
+describe('Match.prepareStartPhase', () => {
+  test('discards an enemy Turn tactic attachment to the caster at the turn start of the ship owner', () => {
+    const match = createMatch();
+    const caster = match.players[0];
+    const shipOwner = match.players[1];
+    const ship = createShip(5, shipOwner, 4);
+    const tactic = new RootCardStack(new MockCard(6, CardType.Tactic), Zone.Hand, caster);
+    jest.spyOn(tactic.card, 'durability', 'get').mockReturnValue(CardDurability.Turn);
+    ship.attach(tactic); // simulates playHandCard attaching the played tactic card
+    shipOwner.deck = [new MockCard(7, CardType.Equipment), new MockCard(8, CardType.Equipment)];
+    match.activePlayerNo = caster.no; // prepareStartPhase flips to the ship owner
+
+    match.prepareStartPhase();
+
+    expect(ship.attachedCardStacks).not.toContain(tactic);
+    expect(caster.discardPile).toContain(tactic.card);
+    expect(shipOwner.discardPile).not.toContain(tactic.card);
+    expect(shipOwner.cardStacks).toContain(ship);
   });
 });

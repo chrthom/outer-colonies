@@ -187,6 +187,6 @@ export default class Match {
     );
   }
   private getDestroyedCardStacks(player: Player): CardStack[] {
-    return player.cardStacks.filter(cs => cs.damage > 0 && cs.damage >= cs.profile.hp);
+    return player.cardStacks.filter(cs => cs.isDestroyed);
   }
 }

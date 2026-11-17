@@ -212,6 +212,15 @@ export default abstract class CardStack {
   get isInBattle(): boolean {
     return this.match.battle.ships[this.player.no].some(cs => cs.uuid == this.uuid);
   }
+  /**
+   * Whether this stack has taken at least its full hit points in damage and thus
+   * counts as destroyed (see Match.removeDestroyedCardStacks). Destroyed stacks
+   * can linger in battle.ships until the battle ends, so targeting filters must
+   * exclude them explicitly.
+   */
+  get isDestroyed(): boolean {
+    return this.damage > 0 && this.damage >= this.profile.hp;
+  }
   get type(): CardType {
     return this.card.type;
   }
