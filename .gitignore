@@ -4,3 +4,6 @@ node_modules
 .openclaude/settings.local.json
 .claude/
 __pycache__
+
+# dev-loop harness artifacts (see misc/dev-loop.md)
+out/
