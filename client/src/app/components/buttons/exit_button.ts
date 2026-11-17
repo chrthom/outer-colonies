@@ -53,14 +53,7 @@ export default class ExitButton extends BaseButton {
 
   update() {
     this.confirmText.setVisible(false);
-    if (this.isMatchmaking)
-      // After a matchmaking timeout the search already ended, so the button
-      // only offers leaving back to the website
-      this.updateText(
-        this.scene instanceof Matchmaking && this.scene.searchEnded
-          ? 'Zurück zur Website'
-          : 'Spielersuche abbrechen'
-      );
+    if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
     else if (this.scene instanceof Game && !this.scene.state.gameResult && !this.scene.connectionLost)
       this.updateText('Aufgeben');
     else this.updateText('Spiel beenden');

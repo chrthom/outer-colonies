@@ -29,6 +29,7 @@ import ExitButton from '../components/buttons/exit_button';
 import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { layoutConfig } from '../config/layout';
+import { rules } from '@shared/config/rules';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
 import OptionPicker from '../components/option_picker';
 import SocketService from '../socket_service';
@@ -96,9 +97,7 @@ export default class Game extends Phaser.Scene {
   init(data: InitData) {
     this.socket = SocketService.getSocket();
     this.gameParams = data.gameParams;
-    // The server keeps the match alive for a reconnection grace window, but the
-    // game scene does not re-login automatically after a socket.io reconnect,
-    // so rejoining happens via a fresh page load instead.
+    // A socket.io reconnect cannot rejoin the match; rejoining happens via a fresh page load
     this.socket.io.reconnection(false);
     // Phaser reuses the scene instance for the next match, so reset the
     // reference to allow a fresh game over overlay in the new game.
@@ -178,12 +177,8 @@ export default class Game extends Phaser.Scene {
   }
 
   /**
-   * Shows a hint to reload the page when the socket disconnects mid-game.
-   *
-   * The server keeps the match alive for a reconnection grace window, so a
-   * disconnect alone does not end the game: the player can rejoin by reloading
-   * the page. The game over overlay is therefore not shown here; it only
-   * appears once the server reports a game result.
+   * Shows a reload hint on a mid-game disconnect: the match stays alive for the
+   * reconnection grace window, so the player can rejoin by reloading the page.
    */
   showConnectionLostMessage() {
     if (this.connectionLost || this.state.gameResult) return;
@@ -192,9 +187,9 @@ export default class Game extends Phaser.Scene {
       .text(
         layoutConfig.scene.width / 2,
         layoutConfig.scene.height / 2,
-        'Verbindung verloren.\nBitte Seite neu laden, um das Spiel fortzusetzen.'
+        `Verbindung verloren.\nBitte Seite neu laden, um das Spiel fortzusetzen.\nDas Spiel endet ${rules.reconnectGracePeriod} Sekunden nach dem Verbindungsabbruch.`
       )
-      .setFontSize(layoutConfig.fontSize.large)
+      .setFontSize(layoutConfig.fontSize.normal)
       .setFontFamily(designConfig.fontFamily.text)
       .setColor(designConfig.color.warn)
       .setAlign('center')

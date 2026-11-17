@@ -14,9 +14,6 @@ export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;
   status!: LoadingStatus;
   socket!: Socket;
-  exitButton!: ExitButton;
-  /** Whether the matchmaking search ended with a timeout; the exit button label adapts (see ExitButton) */
-  searchEnded = false;
 
   constructor() {
     super({
@@ -35,7 +32,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.sessionToken = searchParams.get('token') ?? window.location.search.substring(1);
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
-    this.exitButton = new ExitButton(this);
+    new ExitButton(this);
     this.socket = SocketService.connect();
     this.registerSocketListeners();
     new Background(this);
@@ -69,8 +66,6 @@ export default class Matchmaking extends Phaser.Scene {
         switch (status) {
           case MatchmakingStatus.Search:
             // The server reports the number of waiting clients, which is not displayed.
-            this.searchEnded = false;
-            this.exitButton.update();
             this.status.setText('Suche Mitspieler...');
             break;
           case MatchmakingStatus.Start:
@@ -79,14 +74,6 @@ export default class Matchmaking extends Phaser.Scene {
             this.scene.start('Game', {
               gameParams: payload as ClientGameParams
             });
-            break;
-          case MatchmakingStatus.Timeout:
-            // The server ended the search; a click on the status text retries
-            // it with a fresh login instead of requiring a page reload
-            this.searchEnded = true;
-            this.exitButton.update();
-            this.status.setText('Keine Mitspieler gefunden.\nKlicke hier, um erneut zu suchen.');
-            this.status.enableRetry(() => this.socket.emit(MsgTypeInbound.Login, this.sessionToken));
             break;
         }
       }

@@ -24,14 +24,4 @@ describe('ExitButton on the matchmaking scene', () => {
 
     expect(labelOf(button)).toBe('Spielersuche abbrechen');
   });
-
-  it('offers leaving to the website after the search ended with a timeout', () => {
-    const scene = makeMatchmakingScene();
-    const button = new ExitButton(scene);
-    scene.searchEnded = true;
-
-    button.update();
-
-    expect(labelOf(button)).toBe('Zurück zur Website');
-  });
 });

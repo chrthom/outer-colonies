@@ -7,7 +7,6 @@ import SocketData from './game_state/socket_data';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
-import { rules } from '../shared/config/rules';
 
 const createUser = (userId: number) => ({
   userId,
@@ -107,28 +106,6 @@ describe('Matchmaking cron', () => {
     // The leftover client stays in the matchmaking room and keeps searching
     expect(socketMocks[0].leave).not.toHaveBeenCalled();
     expect(socketMocks[0].emit).not.toHaveBeenCalled();
-  });
-
-  test('does not end the search of a client which waited briefly', () => {
-    const socketMocks = [createSocketMock(1)];
-    const io = createIoMock(socketMocks);
-
-    matchMakingCron(io);
-
-    expect(socketMocks[0].leave).not.toHaveBeenCalled();
-    expect(socketMocks[0].emit).not.toHaveBeenCalled();
-  });
-
-  test('ends the search of a lone client after the timeout', () => {
-    const socketMocks = [createSocketMock(1)];
-    (<SocketData>socketMocks[0].socket.data).searchStartedAt =
-      Date.now() - (rules.matchmakingTimeout * 1000 + 1000);
-    const io = createIoMock(socketMocks);
-
-    matchMakingCron(io);
-
-    expect(socketMocks[0].leave).toHaveBeenCalledWith(matchmakingRoom);
-    expect(socketMocks[0].emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Timeout);
   });
 });
 

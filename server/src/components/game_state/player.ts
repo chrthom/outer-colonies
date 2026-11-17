@@ -24,8 +24,8 @@ export default class Player {
   disconnectedSince?: number;
   /** Whether the player's socket received the final state of the match; a finished match stays registered until every player's result was delivered (see gameCron in components/game.ts) */
   resultDelivered?: boolean;
-  constructor(socketd: string, userId: number, name: string, match: Match, playerNo: number, deck: Card[]) {
-    this.socketId = socketd;
+  constructor(socketId: string, userId: number, name: string, match: Match, playerNo: number, deck: Card[]) {
+    this.socketId = socketId;
     this.userId = userId;
     this.name = name;
     this.match = match;
