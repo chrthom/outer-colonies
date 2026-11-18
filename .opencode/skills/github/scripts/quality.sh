@@ -9,6 +9,10 @@
 # @returns 0 if all checks pass, non-zero on failure
 run_quality_checks() {
   local subproject=$1
+  if [ -z "$subproject" ]; then
+    check_all_affected
+    return $?
+  fi
   if [ -f "$subproject/package.json" ]; then
     cd "$subproject"
     npm run format && npm run lint
@@ -23,11 +27,13 @@ run_quality_checks() {
 }
 
 # Run quality checks for all affected subprojects
-# Checks staged changes and runs quality checks for any affected subproject
+# Checks working tree, staged, and untracked changes and runs quality checks for any affected subproject
 # @returns 0 if all checks pass, non-zero on failure
 check_all_affected() {
+  local changed_files
+  changed_files=$(git diff --name-only HEAD; git ls-files --others --exclude-standard)
   for subproject in client server website; do
-    if git diff --name-only --cached | grep -q "^${subproject}/"; then
+    if echo "$changed_files" | grep -q "^${subproject}/"; then
       run_quality_checks "$subproject"
     fi
   done
