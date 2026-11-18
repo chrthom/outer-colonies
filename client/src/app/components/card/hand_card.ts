@@ -50,7 +50,7 @@ export default class HandCard extends CardImage {
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)
-      .setCardId(this.data.cardId) // To display if card's origin is opponent's hand
+      .setCardId(this.scene.state.highlightCardId ?? this.data.cardId)
       .highlightReset();
     if (!this.data.ownedByPlayer) this.setAngle(this.angle + 180);
     this.tween({
@@ -61,12 +61,6 @@ export default class HandCard extends CardImage {
       xRotation: layoutConfig.game.cards.perspective.neutral,
       angle: this.shortestAngle(0)
     });
-  }
-  override discard(toDeck?: boolean): this {
-    if (!this.ownedByPlayer && this.cardId == constants.cardBackSideID) {
-      this.setCardId(this.data.cardId);
-    }
-    return super.discard(toDeck);
   }
   private invIndex(index: number) {
     const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
