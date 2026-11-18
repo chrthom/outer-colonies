@@ -40,13 +40,13 @@ reply_to_comment() {
   local body=$2
 
   # Auto-discover PR number and review_id from the comment
-  local comment_data=$(github_api GET "${GITHUB_BASE_URL}/pulls/comments/${comment_id}")
+  local comment_data=$(github_api GET "/pulls/comments/${comment_id}")
   if [ -z "$comment_data" ]; then
     echo "ERROR: Could not fetch comment data for comment ${comment_id}" >&2
     return 1
   fi
 
-  local pr_number=$(echo "$comment_data" | jq -r '.pull_request.url' | grep -oE '/[0-9]+$' | tr -d '/')
+  local pr_number=$(echo "$comment_data" | jq -r '.pull_request_url // .pull_request.url' | grep -oE '/[0-9]+$' | tr -d '/')
   local review_id=$(echo "$comment_data" | jq -r '.pull_request_review_id // empty')
 
   if [ -z "$pr_number" ]; then
@@ -59,7 +59,7 @@ reply_to_comment() {
     return 1
   fi
 
-  github_api POST "${GITHUB_BASE_URL}/pulls/${pr_number}/reviews/${review_id}/comments" \
+  github_api POST "/pulls/${pr_number}/reviews/${review_id}/comments" \
     "{\"body\": \"${body}\", \"in_reply_to\": ${comment_id}}"
 }
 
@@ -71,7 +71,7 @@ reply_to_comment() {
 get_review_id() {
   local pr_number=$1
   local comment_id=$2
-  github_api GET "${GITHUB_BASE_URL}/pulls/${pr_number}/comments/${comment_id}" | jq -r '.pull_request_review_id'
+  github_api GET "/pulls/${pr_number}/comments/${comment_id}" | jq -r '.pull_request_review_id'
 }
 
 # Create PR
