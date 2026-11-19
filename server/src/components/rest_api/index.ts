@@ -8,6 +8,7 @@ import profileRouter from './profile_router';
 import dailyRouter from './daily_router';
 import itemRouter from './item_router';
 import shopRouter from './shop_router';
+import onlineRouter from './online_router';
 import { apiErrorHandler } from './api_error';
 
 /**
@@ -58,5 +59,6 @@ export default function restAPI(app: Express) {
   app.use(dailyRouter);
   app.use(itemRouter);
   app.use(shopRouter);
+  app.use(onlineRouter);
   app.use(apiErrorHandler);
 }

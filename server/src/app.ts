@@ -8,6 +8,7 @@ import { gameCron, gameSocketListeners } from './components/game';
 import { MsgTypeInbound } from './shared/config/enums';
 import { version, releaseName } from './shared/config/version';
 import authValidation from './components/rest_api/auth_validation';
+import { markOffline } from './components/online_users';
 import restAPI from './components/rest_api';
 import DBConnection from './components/persistence/db_connector';
 import { logger } from './components/utils/logger';
@@ -36,6 +37,7 @@ io.on(MsgTypeInbound.Connect, socket => {
   logger.info(`Client connected: ${socket.id}`);
   socket.on(MsgTypeInbound.Disconnect, () => {
     logger.info(`Client disconnected: ${socket.id}`);
+    markOffline(io, socket);
   });
   matchMakingSocketListeners(io, socket);
   gameSocketListeners(io, socket);

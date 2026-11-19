@@ -146,12 +146,13 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
   - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
     - `index.ts`: Router registration and central error-handling middleware
-    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`: Endpoints per resource
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`, `online_router.ts`: Endpoints per resource
     - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
     - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
     - `api_response.ts`: Status response helper with leveled failure logging
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
+  - `components/online_users.ts`: Tracking of unique logged-in users (a user with several sockets counts once) and push of the online count
   - `components/game_state/`: In-memory game state
     - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
     - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
@@ -226,6 +227,9 @@ The server provides the following REST endpoints for the website:
 - **Daily Rewards**:
   - `GET /api/daily`: Get daily rewards
 
+- **Online Users**:
+  - `GET /api/online`: Number of unique logged-in users currently online (unauthenticated, polled by the website home page every 60 seconds)
+
 - **Item Management**:
   - `GET /api/item`: Get user's items
   - `POST /api/item/:itemId`: Use an item
@@ -238,6 +242,7 @@ The server provides the following WebSocket events for the game client:
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
   - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.OnlineCount`: Number of unique logged-in users, pushed to all clients on every login and disconnect which changes it (and to a newly logged-in socket)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
