@@ -448,6 +448,7 @@ The repository working rules — repository language, branches and merges, issue
 
 2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
+   - Remove the old `src` and `config` directories on the target environment before unzipping: the zip only overwrites files it contains, so a file deleted or turned into a directory by the release would otherwise survive and can shadow its replacement (e.g. an orphaned `src/components/rest_api.ts` wins over the new `src/components/rest_api/` directory during module resolution).
    - Unzip the archive on the target environment.
    - If `server/package.json` or `server/package-lock.json` changed since the last deploy (new or updated dependency), run `npm install` (or `npm ci` when the `node_modules` state is unknown) inside the `outercolonies_server` container before restarting it: the container keeps its `node_modules` across deploys, so a new dependency would otherwise be missing at runtime (`Cannot find module '…'`).
    - Restart the `outercolonies_server` container.
