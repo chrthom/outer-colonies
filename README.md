@@ -146,7 +146,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
   - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
     - `index.ts`: Router registration and central error-handling middleware
-    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`: Endpoints per resource
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`, `online_router.ts`: Endpoints per resource
     - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
     - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
     - `api_response.ts`: Status response helper with leveled failure logging
@@ -156,6 +156,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `bot.ts`: Bot actor reacting to state changes with immediate actions
     - `strategy.ts`: Rule-based decision heuristics (card play, battles, target selection)
     - `decks.ts`: Bot deck definitions (independent copy of the starter decks)
+  - `components/online_users.ts`: Tracking of unique logged-in users (a user with several sockets counts once) and push of the online count
   - `components/game_state/`: In-memory game state
     - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
     - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
@@ -230,6 +231,9 @@ The server provides the following REST endpoints for the website:
 - **Daily Rewards**:
   - `GET /api/daily`: Get daily rewards
 
+- **Online Users**:
+  - `GET /api/online`: Number of unique logged-in users currently online (unauthenticated, polled by the website home page every 60 seconds)
+
 - **Item Management**:
   - `GET /api/item`: Get user's items
   - `POST /api/item/:itemId`: Use an item
@@ -243,6 +247,7 @@ The server provides the following WebSocket events for the game client:
   - `MsgTypeInbound.Login`: Login to matchmaking
   - `MsgTypeInbound.StartBotGame`: Start a singleplayer game against the bot
   - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.OnlineCount`: Number of unique logged-in users, pushed to all clients on every login and disconnect which changes it (and to a newly logged-in socket)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
@@ -449,6 +454,7 @@ The repository working rules — repository language, branches and merges, issue
 2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
    - Unzip the archive on the target environment.
+   - If `server/package.json` or `server/package-lock.json` changed since the last deploy (new or updated dependency), run `npm install` (or `npm ci` when the `node_modules` state is unknown) inside the `outercolonies_server` container before restarting it: the container keeps its `node_modules` across deploys, so a new dependency would otherwise be missing at runtime (`Cannot find module '…'`).
    - Restart the `outercolonies_server` container.
 
 3. **Deploy Client**:
@@ -505,6 +511,8 @@ The full design, budgets and the role chain are documented in [misc/dev-loop.md]
 
 - **Express**: Web framework for handling REST API requests.
 - **Socket.IO**: Library for real-time WebSocket communication between the client and server.
+- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`). Email format validation uses the shared `server/src/shared/config/email_rules.ts` rule in both server and website; address ownership is checked by confirmation email.
+- **express-rate-limit**: Rate limiting of the auth REST endpoints against brute force, mail flooding and user enumeration (see `server/src/components/utils/rate_limiter.ts`). Limits are held in memory per server process, so they reset on restart. **Rate limiting is currently not enforced**: `rate_limit.dry_run` is `true` in the default, staging and production configs, so requests over a limit are only logged as a warning (including the client IP, to verify proxy bucketing) and still served. This is a deliberate decision until the limits are validated against real traffic; set `rate_limit.dry_run` to `false` to enforce them (tests run enforced).
 - **Node.js**: JavaScript runtime for the server.
 
 ### Development Tools

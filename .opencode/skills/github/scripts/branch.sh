@@ -23,7 +23,7 @@ create_branch() {
   local branch_name="${prefix}/${issue_number}_${description}"
 
   # Check if branch already exists locally or remotely
-  if git branch -a | grep -qx "$branch_name"; then
+  if git show-ref --verify --quiet "refs/heads/$branch_name" || git show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
     git checkout "$branch_name" || { echo "ERROR: Failed to checkout existing branch $branch_name" >&2; return 1; }
     git pull origin "$branch_name" || { echo "ERROR: Failed to pull branch $branch_name" >&2; return 1; }
   else

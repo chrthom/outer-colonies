@@ -3,6 +3,7 @@ import Background from '../components/background';
 import LoadingStatus from '../components/loading_status';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
 import VersionIndicator from '../components/indicators/version_indicator';
+import OnlineIndicator from '../components/indicators/online_indicator';
 import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
@@ -14,6 +15,7 @@ import SocketService from '../socket_service';
 export default class Matchmaking extends Phaser.Scene {
   sessionToken!: string;
   status!: LoadingStatus;
+  onlineIndicator!: OnlineIndicator;
   socket!: Socket;
 
   constructor() {
@@ -33,6 +35,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.sessionToken = searchParams.get('token') ?? window.location.search.substring(1);
     this.status = new LoadingStatus(this);
     new VersionIndicator(this);
+    this.onlineIndicator = new OnlineIndicator(this);
     new ExitButton(this);
     new BotButton(this);
     this.socket = SocketService.connect();
@@ -83,8 +86,12 @@ export default class Matchmaking extends Phaser.Scene {
         }
       }
     );
+    this.socket.on(MsgTypeOutbound.OnlineCount, (count: number) => {
+      this.onlineIndicator.setCount(count);
+    });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.socket.off(MsgTypeOutbound.Connect);
+      this.socket.off(MsgTypeOutbound.OnlineCount);
       this.socket.off(MsgTypeOutbound.Matchmaking);
       this.socket.off('disconnect');
       this.socket.off('connect_error');

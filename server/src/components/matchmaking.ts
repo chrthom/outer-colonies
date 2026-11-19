@@ -12,6 +12,7 @@ import { pickRandom } from './utils/helpers';
 import { logger } from './utils/logger';
 import Player from './game_state/player';
 import { findRejoinableMatch, registerMatch } from './match_registry';
+import { markOnline } from './online_users';
 
 // Room name of the matchmaking lobby. Deliberately distinct from the
 // MsgTypeOutbound.Matchmaking event name so that the room and the event cannot
@@ -35,6 +36,9 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
         .map(c => CardCollection.cards[c.cardId as keyof typeof CardCollection.cards]);
       logger.info(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
+      // The socket may have disconnected while the login awaited the database: its disconnect
+      // hook already ran, so registering it now would leave a ghost user online
+      if (!socket.disconnected) markOnline(io, socket, user.userId);
       const rejoinableMatch = findRejoinableMatch(user.userId);
       if (rejoinableMatch) {
         rejoinMatch(io, socket, rejoinableMatch.match, rejoinableMatch.player);

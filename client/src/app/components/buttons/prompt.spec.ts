@@ -34,6 +34,52 @@ describe('Prompt', () => {
     );
   });
 
+  const opponentPhaseTexts: [TurnPhase, string][] = [
+    [TurnPhase.Start, 'Warte auf Gegenspieler...\nGegner: Startphase'],
+    [
+      TurnPhase.Build,
+      'Warte auf Gegenspieler...\nGegner: Aufbauphase (Karten ausspielen,\nMission oder Überfall planen)'
+    ],
+    [TurnPhase.Combat, 'Warte auf Gegenspieler...\nGegner: Gefechtsphase'],
+    [TurnPhase.End, 'Warte auf Gegenspieler...\nGegner: Endphase (überzählige Handkarten ablegen)']
+  ];
+  opponentPhaseTexts.forEach(([turnPhase, expected]) => {
+    it(`names the opponent's ${turnPhase} phase while waiting during the opponent's turn`, () => {
+      const scene = makeScene(makeState({ playerPendingAction: false, playerIsActive: false, turnPhase }));
+      const prompt = new Prompt(asGameScene(scene));
+
+      prompt.update();
+
+      expect(textOf(prompt).setText).toHaveBeenCalledWith(expected);
+      expect(scene.time.delayedCall).toHaveBeenCalledWith(
+        animationConfig.duration.promptShow,
+        jasmine.any(Function)
+      );
+    });
+  });
+
+  [TurnPhase.Start, TurnPhase.Build, TurnPhase.Combat, TurnPhase.End].forEach(turnPhase => {
+    it(`keeps the generic waiting text when the active player waits for an opponent reaction in the ${turnPhase} phase`, () => {
+      const scene = makeScene(makeState({ playerPendingAction: false, playerIsActive: true, turnPhase }));
+      const prompt = new Prompt(asGameScene(scene));
+
+      prompt.update();
+
+      expect(textOf(prompt).setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
+    });
+  });
+
+  it('keeps the generic waiting text during the init phase on the opponent turn', () => {
+    const scene = makeScene(
+      makeState({ playerPendingAction: false, playerIsActive: false, turnPhase: TurnPhase.Init })
+    );
+    const prompt = new Prompt(asGameScene(scene));
+
+    prompt.update();
+
+    expect(textOf(prompt).setText).toHaveBeenCalledWith('Warte auf Gegenspieler...');
+  });
+
   it('hides the prompt and keeps the exit button visible while the game is over', () => {
     const scene = makeScene(
       makeState({

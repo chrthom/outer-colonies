@@ -12,6 +12,8 @@ import DBProfilesDAO from './persistence/db_profiles';
 import DBDailiesDAO from './persistence/db_dailies';
 import DBItemsDAO from './persistence/db_items';
 import { APIRejectReason } from '../shared/config/enums';
+import { markOnline, resetOnlineUsers } from './online_users';
+import { Server, Socket } from 'socket.io';
 import { rules } from '../shared/config/rules';
 
 /**
@@ -432,6 +434,31 @@ describe('REST API', () => {
 
       expect(response.status).toBe(502);
       expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
+    });
+  });
+
+  describe('online users', () => {
+    afterEach(() => {
+      resetOnlineUsers();
+    });
+
+    it('should respond with the count of unique online users without a session token', async () => {
+      const io = { emit: jest.fn() } as unknown as Server;
+      markOnline(io, { id: 'a', emit: jest.fn() } as unknown as Socket, 1);
+      markOnline(io, { id: 'b', emit: jest.fn() } as unknown as Socket, 1);
+      markOnline(io, { id: 'c', emit: jest.fn() } as unknown as Socket, 2);
+
+      const response = await request('GET', '/api/online');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ count: 2 });
+    });
+
+    it('should respond with a count of 0 when nobody is online', async () => {
+      const response = await request('GET', '/api/online');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ count: 0 });
     });
   });
 });

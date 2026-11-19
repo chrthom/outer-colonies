@@ -22,6 +22,11 @@ class LayoutLoadConfig {
     x: 2360,
     y: 1340
   };
+  // Sits above the version text, which spans two lines on non-production stages
+  readonly onlineCount = {
+    x: 2360,
+    y: 1260
+  };
 }
 
 export const layoutLoadConfig = new LayoutLoadConfig();

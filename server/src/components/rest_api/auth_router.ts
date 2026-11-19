@@ -13,6 +13,7 @@ import {
 import { APIRejectReason } from '../../shared/config/enums';
 import { ApiError, asyncRoute, RejectMapping } from './api_error';
 import { sendStatus } from './api_response';
+import { validatedParam } from '../utils/request_validation';
 import { requireSession, sessionCredentials } from './session_middleware';
 
 /** Reject mapping for endpoints whose underlying operation fails when the record is unknown. */
@@ -44,7 +45,7 @@ authRouter.post(
 authRouter.put(
   '/api/auth/register/:id',
   asyncRoute(async (req, res) => {
-    await Auth.activateAccount(String(req.params['id']));
+    await Auth.activateAccount(validatedParam(req, res, 'id'));
     sendStatus(res, 204);
   }, notFound)
 );
@@ -112,7 +113,7 @@ authRouter.get(
 authRouter.delete(
   '/api/auth/password/:user',
   asyncRoute(async (req, res) => {
-    await Auth.sendPasswordReset(String(req.params['user']));
+    await Auth.sendPasswordReset(validatedParam(req, res, 'user'));
     sendStatus(res, 202);
   }, notFound)
 );
@@ -132,7 +133,7 @@ authRouter.put(
 authRouter.put(
   '/api/auth/password/:id',
   asyncRoute(async (req, res) => {
-    await Auth.resetPassword(String(req.params['id']), (<AuthPasswordRequest>req.body).password);
+    await Auth.resetPassword(validatedParam(req, res, 'id'), (<AuthPasswordRequest>req.body).password);
     sendStatus(res, 204);
   }, notFound)
 );
@@ -150,7 +151,7 @@ authRouter.post(
 authRouter.put(
   '/api/auth/email/:id',
   asyncRoute(async (req, res) => {
-    await Auth.resetEmail(String(req.params['id']));
+    await Auth.resetEmail(validatedParam(req, res, 'id'));
     sendStatus(res, 204);
   }, notFound)
 );

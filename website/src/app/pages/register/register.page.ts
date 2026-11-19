@@ -13,6 +13,8 @@ import { ErrorStateMatcher, MatOption } from '@angular/material/core';
 import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../components/error-state-matcher';
+import { passwordStrength } from '../../components/password-strength.validator';
+import { emailFormat } from '../../components/email-format.validator';
 import { MultipleCards, starterDecks } from '@shared/config/starter_decks';
 import { CardImageService } from 'src/app/card-image.service';
 import { environment } from 'src/environments/environment';
@@ -63,10 +65,15 @@ export class RegisterPage implements OnDestroy {
       [Validators.required, Validators.minLength(3), Validators.maxLength(20)],
       [this.usernameExistsValidator]
     ),
-    password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(40)]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+      Validators.maxLength(40),
+      passwordStrength
+    ]),
     email: new FormControl(
       '',
-      [Validators.required, Validators.email, Validators.maxLength(60)],
+      [Validators.required, emailFormat, Validators.maxLength(60)],
       [this.emailExistsValidator]
     ),
     starterDeck: new FormControl('', [Validators.required]),
