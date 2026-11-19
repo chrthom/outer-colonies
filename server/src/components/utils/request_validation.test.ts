@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+import { logger } from './logger';
 import { starterDecks } from '../../shared/config/starter_decks';
 import {
   authEmailSchema,
@@ -9,11 +10,17 @@ import {
   authRegisterSchema,
   oneTimeIdSchema,
   validateBodyMiddleware,
+  validatedParam,
   validateParamsMiddleware,
   validateQueryMiddleware
 } from './request_validation';
 
 describe('RequestValidation', () => {
+  beforeEach(() => {
+    // Rejected requests log through the logger (see sendStatus); keep the test output clean
+    jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -203,7 +210,7 @@ describe('RequestValidation', () => {
         [property]: value
       };
     const invoke = (middleware: RequestHandler, req: any) => {
-      const res: any = { req: req };
+      const res: any = { req: req, locals: {} };
       res.status = jest.fn().mockReturnThis();
       res.send = jest.fn();
       let nextCalled = false;
@@ -227,7 +234,6 @@ describe('RequestValidation', () => {
     });
 
     it('sends a 400 and stops the chain for an invalid body', () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const req = createRequest('body', { email: 'not-an-email' });
 
       const result = invoke(validateBodyMiddleware(authEmailSchema), req);
@@ -246,13 +252,21 @@ describe('RequestValidation', () => {
       expect(req.query['username']).toBe('testuser');
     });
 
-    it('assigns the parsed path parameters back onto the request', () => {
-      const req = createRequest('params', { id: 'a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab' });
+    it('stores the parsed path parameters for validatedParam, so handlers read the trimmed value', () => {
+      const req = createRequest('params', { user: '  testuser  ' });
+      const res: any = { req: req, locals: {} };
 
-      const result = invoke(validateParamsMiddleware(oneTimeIdSchema), req);
+      let nextCalled = false;
+      validateParamsMiddleware(authPasswordResetUserSchema)(req, res, () => (nextCalled = true));
 
-      expect(result.nextCalled).toBe(true);
-      expect(req.params['id']).toBe('a1b2c3d4-e5f6-4a1b-8c2d-0123456789ab');
+      expect(nextCalled).toBe(true);
+      expect(validatedParam(req, res, 'user')).toBe('testuser');
+    });
+
+    it('falls back to the raw path parameter for routes without validation', () => {
+      const req = createRequest('params', { id: 'raw' });
+
+      expect(validatedParam(req, <any>{ locals: {} }, 'id')).toBe('raw');
     });
   });
 });

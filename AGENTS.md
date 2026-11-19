@@ -51,7 +51,7 @@ Maintain consistency across the three subprojects
 
 ## Documentation Requirements
 - Update README.md for significant changes
-- Add JSDoc comments for new public or protected functions; private functions get no JSDoc (a brief inline *why* comment is fine)
+- Add JSDoc comments for new public or protected functions
 - Changes in `server/src/shared/` are picked up by the client and website automatically via the `@shared/*` path alias - no declaration update is required
 
 ## Testing Requirements

@@ -17,9 +17,10 @@ const app = express();
 // The API is deployed behind a local reverse proxy that terminates HTTPS: the proxy enters
 // the server container from the Docker bridge gateway, so the private bridge subnet must be
 // trusted alongside loopback for req.ip to resolve to the real client address there (the
-// rate limiters of the auth endpoints bucket per client). There is exactly one trusted
-// proxy hop; direct LAN clients bypassing the proxy are not in the trusted set, so
-// X-Forwarded-For spoofing stays impossible.
+// rate limiters of the auth endpoints bucket per client). Every container on the bridge
+// network is trusted to set X-Forwarded-For, which is acceptable as only the proxy is
+// exposed; direct LAN clients bypassing the proxy are not in the trusted set, so
+// X-Forwarded-For spoofing by them stays impossible.
 app.set('trust proxy', ['loopback', '172.16.0.0/12']);
 app.use(cors());
 const httpServer = createServer(app);

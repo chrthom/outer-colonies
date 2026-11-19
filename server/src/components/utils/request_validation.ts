@@ -137,13 +137,13 @@ function validate<S extends z.ZodType>(
 function validationMiddleware<S extends z.ZodType>(
   schema: S,
   read: (req: Request) => unknown,
-  write: (req: Request, parsed: z.output<S>) => void,
+  write: (req: Request, parsed: z.output<S>, res: Response) => void,
   fallbackMessage: string
 ): RequestHandler {
   return (req, res, next) => {
     const parsed = validate(schema, read(req), res, fallbackMessage);
     if (parsed === undefined) return;
-    write(req, parsed);
+    write(req, parsed, res);
     next();
   };
 }
@@ -187,9 +187,10 @@ export function validateQueryMiddleware<S extends z.ZodType>(schema: S): Request
 }
 
 /**
- * Validates the path parameters of a request against a zod schema as express middleware: the
- * parsed parameters are assigned back onto `req.params`, so the guarded handler reads
- * validated values.
+ * Validates the path parameters of a request against a zod schema as express middleware. The
+ * parsed values are stored in `res.locals.params` and must be read with {@link validatedParam}:
+ * express 4 rebuilds `req.params` for every router from its own route match, so a write to
+ * `req.params` here would not reach the handlers of the resource routers.
  * @param schema zod schema the path parameters must satisfy
  * @returns the express middleware enforcing the schema
  */
@@ -197,9 +198,22 @@ export function validateParamsMiddleware<S extends z.ZodType>(schema: S): Reques
   return validationMiddleware(
     schema,
     req => req.params,
-    (req, parsed) => {
-      Object.assign(req.params, parsed);
+    (req, parsed, res) => {
+      res.locals['params'] = { ...res.locals['params'], ...(<object>parsed) };
     },
     'Invalid path parameters'
   );
+}
+
+/**
+ * Reads a path parameter in a route handler: the validated (and potentially transformed, e.g.
+ * trimmed) value stored by {@link validateParamsMiddleware} if the route is guarded, the raw
+ * `req.params` value otherwise.
+ * @param req request the route handler received
+ * @param res response the route handler received
+ * @param name name of the path parameter
+ * @returns the path parameter value
+ */
+export function validatedParam(req: Request, res: Response, name: string): string {
+  return String(res.locals['params']?.[name] ?? req.params[name]);
 }

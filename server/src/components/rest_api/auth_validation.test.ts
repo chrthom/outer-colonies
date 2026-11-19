@@ -36,6 +36,11 @@ describe('REST API auth validation', () => {
     server.close(done);
   });
 
+  beforeEach(() => {
+    // Rejected requests log through the logger (see sendStatus); keep the test output clean
+    jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -103,7 +108,6 @@ describe('REST API auth validation', () => {
     ])(
       'should reject a registration with a %s without touching the database',
       async (_case, invalidBody, ip) => {
-        jest.spyOn(console, 'error').mockImplementation(() => undefined);
         const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
 
         const response = await request('POST', '/api/auth/register', ip, {
@@ -137,7 +141,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should reject a login with an invalid body without an authentication attempt', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login');
 
       const response = await request('POST', '/api/auth/login', '192.168.2.1', {
@@ -150,7 +153,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should reject a password reset with a weak password', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const resetPasswordSpy = jest.spyOn(Auth, 'resetPassword');
 
       const response = await request('PUT', `/api/auth/password/${validOneTimeId}`, '192.168.3.1', {
@@ -174,8 +176,16 @@ describe('REST API auth validation', () => {
   });
 
   describe('request parameter validation', () => {
+    it('should hand the trimmed path parameter to the route handler', async () => {
+      const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset').mockResolvedValue(undefined);
+
+      const response = await request('DELETE', '/api/auth/password/%20testuser%20', '192.168.6.5');
+
+      expect(sendPasswordResetSpy).toHaveBeenCalledWith('testuser');
+      expect(response.status).toBe(202);
+    });
+
     it('should reject an exists check with an invalid username without touching the database', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const checkUsernameExistsSpy = jest.spyOn(Auth, 'checkUsernameExists');
 
       const response = await request('GET', `/api/auth/exists?username=${'a'.repeat(21)}`, '192.168.6.1');
@@ -195,7 +205,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should reject a password reset request with an invalid user param', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset');
 
       const response = await request('DELETE', `/api/auth/password/${'a'.repeat(61)}`, '192.168.6.3');
@@ -205,7 +214,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should reject an account activation with a malformed one-time id', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const activateAccountSpy = jest.spyOn(Auth, 'activateAccount');
 
       const response = await request('PUT', '/api/auth/register/not-a-uuid', '192.168.6.4');
@@ -217,7 +225,6 @@ describe('REST API auth validation', () => {
 
   describe('rate limiting', () => {
     it('should let at most ten failed login attempts per IP and username through and block the next with 429', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockRejectedValue(APIRejectReason.NotFound);
 
       for (let i = 0; i < 10; i++) {
@@ -238,7 +245,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should not lock out another account on the same IP when one account exhausted its login limit', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockRejectedValue(APIRejectReason.NotFound);
 
       for (let i = 0; i < 10; i++) {
@@ -263,7 +269,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should enforce the IP-wide login ceiling across distinct usernames', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const loginSpy = jest.spyOn(Auth, 'login').mockRejectedValue(APIRejectReason.NotFound);
 
       for (let i = 0; i < 50; i++) {
@@ -317,7 +322,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should let at most ten valid password reset requests per IP through and block the next with 429', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset').mockResolvedValue(undefined);
 
       for (let i = 0; i < 10; i++) {
@@ -330,7 +334,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should not count malformed password reset params against the password reset rate limit', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const sendPasswordResetSpy = jest.spyOn(Auth, 'sendPasswordReset').mockResolvedValue(undefined);
 
       for (let i = 0; i < 12; i++) {
@@ -344,7 +347,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should let at most 25 valid registrations per IP through without counting invalid bodies', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
       jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(false);
       const registerSpy = jest.spyOn(Auth, 'register').mockResolvedValue(<any>{
@@ -394,7 +396,6 @@ describe('REST API auth validation', () => {
     });
 
     it('should block the session-backed login endpoints after 120 requests per IP with 429', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => undefined);
       // Every request without a session token is rejected with a 401 by the session
       // middleware of the resource router, so the test needs no database mock
       const statuses: number[] = [];

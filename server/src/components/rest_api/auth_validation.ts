@@ -29,10 +29,15 @@ import {
  */
 const authValidation = Router();
 
+// Everywhere else the validation runs before the limiter, so malformed requests are rejected
+// cheaply with a 400 and do not consume the budget of legitimate retries
 authValidation.post('/api/auth/register', validateBodyMiddleware(authRegisterSchema), registerRateLimiter);
 
 authValidation.put('/api/auth/register/:id', validateParamsMiddleware(oneTimeIdSchema));
 
+// Unlike the other endpoints, the login limiters run before the body validation: they count
+// failed attempts only, and a rejected (400) body is a failed attempt too, so malformed
+// requests must not be a free way to probe the endpoint
 authValidation.post(
   '/api/auth/login',
   loginIpRateLimiter,
@@ -44,7 +49,7 @@ authValidation.get('/api/auth/login', sessionLoginRateLimiter);
 
 authValidation.delete('/api/auth/login', sessionLoginRateLimiter);
 
-authValidation.get('/api/auth/exists', existsRateLimiter, validateQueryMiddleware(authExistsQuerySchema));
+authValidation.get('/api/auth/exists', validateQueryMiddleware(authExistsQuerySchema), existsRateLimiter);
 
 authValidation.delete(
   '/api/auth/password/:user',
