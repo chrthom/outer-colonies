@@ -14,5 +14,8 @@
     "user": "outercolonies_test",
     "connectionLimit": 3
   },
+  "rate_limit": {
+    "dry_run": false
+  },
   "terminate_on_error": true
 }
