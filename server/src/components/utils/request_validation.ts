@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import { z } from 'zod';
 import { starterDecks } from '../../shared/config/starter_decks';
 import { passwordHasLetterAndDigit } from '../../shared/config/password_rules';
+import { isValidEmail } from '../../shared/config/email_rules';
 import { sendStatus } from '../rest_api/api_response';
 
 /**
@@ -28,15 +29,14 @@ const strongPassword = z
   });
 
 /**
- * Email constraints, mirrored from the registration form and the `varchar(60)` column. The
- * value is trimmed and length-checked before the format check runs (via `pipe`), because the
- * top-level `z.email()` format would otherwise reject padded input before trimming it.
+ * Email constraints shared with the website and bounded by the `varchar(60)` column.
+ * Trim before validating so padded input is normalized consistently for database lookups.
  */
 const email = z
   .string({ message: 'Email must be a string' })
   .trim()
   .max(60, 'Email must not be longer than 60 characters')
-  .pipe(z.email('Invalid email address'));
+  .refine(isValidEmail, 'Invalid email address');
 
 /**
  * Starter deck index: the website sends the selected index as a number, but the select

@@ -113,7 +113,7 @@ describe('RegisterPage', () => {
     tick(500);
     expect(email?.valid).toBeFalse();
 
-    email?.setValue('valid@example.com');
+    email?.setValue('a%b@example.com');
     tick(500);
     expect(email?.valid).toBeTrue();
   }));

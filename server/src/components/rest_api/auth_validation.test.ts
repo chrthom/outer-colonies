@@ -140,6 +140,24 @@ describe('REST API auth validation', () => {
       expect(response.body).toEqual({ id: 42, username: 'testuser' });
     });
 
+    it('should accept previously supported special characters in registration emails', async () => {
+      jest.spyOn(Auth, 'checkUsernameExists').mockResolvedValue(false);
+      const checkEmail = jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(false);
+      const register = jest.spyOn(Auth, 'register').mockResolvedValue(<any>{
+        userId: 42,
+        username: 'testuser'
+      });
+
+      const response = await request('POST', '/api/auth/register', '192.168.1.20', {
+        ...validRegisterBody,
+        email: '  a%b@example.com  '
+      });
+
+      expect(response.status).toBe(201);
+      expect(checkEmail).toHaveBeenCalledWith('a%b@example.com');
+      expect(register).toHaveBeenCalledWith({ ...validRegisterBody, email: 'a%b@example.com' });
+    });
+
     it('should reject a login with an invalid body without an authentication attempt', async () => {
       const loginSpy = jest.spyOn(Auth, 'login');
 
@@ -202,6 +220,15 @@ describe('REST API auth validation', () => {
       expect(checkUsernameExistsSpy).toHaveBeenCalledWith('testuser');
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ exists: true });
+    });
+
+    it('should check availability for an email with special characters', async () => {
+      const checkEmail = jest.spyOn(Auth, 'checkEmailExists').mockResolvedValue(true);
+
+      const response = await request('GET', '/api/auth/exists?email=a%25b%40example.com', '192.168.6.6');
+
+      expect(response.status).toBe(200);
+      expect(checkEmail).toHaveBeenCalledWith('a%b@example.com');
     });
 
     it('should reject a password reset request with an invalid user param', async () => {

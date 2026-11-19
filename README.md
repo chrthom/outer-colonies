@@ -500,7 +500,7 @@ The full design, budgets and the role chain are documented in [misc/dev-loop.md]
 
 - **Express**: Web framework for handling REST API requests.
 - **Socket.IO**: Library for real-time WebSocket communication between the client and server.
-- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`).
+- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`). Email format validation uses the shared `server/src/shared/config/email_rules.ts` rule in both server and website; address ownership is checked by confirmation email.
 - **express-rate-limit**: Rate limiting of the auth REST endpoints against brute force, mail flooding and user enumeration (see `server/src/components/utils/rate_limiter.ts`). Limits are held in memory per server process, so they reset on restart. **Rate limiting is currently not enforced**: `rate_limit.dry_run` is `true` in the default, staging and production configs, so requests over a limit are only logged as a warning (including the client IP, to verify proxy bucketing) and still served. This is a deliberate decision until the limits are validated against real traffic; set `rate_limit.dry_run` to `false` to enforce them (tests run enforced).
 - **Node.js**: JavaScript runtime for the server.
 

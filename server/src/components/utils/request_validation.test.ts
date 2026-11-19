@@ -134,6 +134,24 @@ describe('RequestValidation', () => {
       expect(authEmailSchema.safeParse(validBody).success).toBe(true);
     });
 
+    it.each(['a%b@example.com', 'a!b@example.com'])(
+      'accepts previously supported email %s across all auth schemas',
+      email => {
+        expect(
+          authRegisterSchema.safeParse({
+            username: 'testuser',
+            password: 'password1',
+            email,
+            starterDeck: 0
+          }).success
+        ).toBe(true);
+        expect(authEmailSchema.safeParse({ email: ` ${email} ` }).success).toBe(true);
+        expect(authExistsQuerySchema.safeParse({ email }).success).toBe(true);
+        // A longer address exercises the email branch rather than the username branch.
+        expect(authPasswordResetUserSchema.safeParse({ user: `longer.${email}` }).success).toBe(true);
+      }
+    );
+
     it.each([
       ['malformed email', { email: 'not-an-email' }],
       ['missing email', { email: undefined }],

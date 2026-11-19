@@ -17,6 +17,7 @@ import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
 import OCErrorStateMatcher from 'src/app/components/error-state-matcher';
 import { passwordStrength } from 'src/app/components/password-strength.validator';
+import { emailFormat } from 'src/app/components/email-format.validator';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -55,7 +56,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   emailForm: FormGroup = new FormGroup({
     email: new FormControl(
       '',
-      [Validators.required, Validators.email, Validators.maxLength(60)],
+      [Validators.required, emailFormat, Validators.maxLength(60)],
       [this.emailExistsValidator]
     )
   });
