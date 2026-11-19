@@ -449,6 +449,7 @@ The repository working rules — repository language, branches and merges, issue
 2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
    - Unzip the archive on the target environment.
+   - If `server/package.json` or `server/package-lock.json` changed since the last deploy (new or updated dependency), run `npm install` (or `npm ci` when the `node_modules` state is unknown) inside the `outercolonies_server` container before restarting it: the container keeps its `node_modules` across deploys, so a new dependency would otherwise be missing at runtime (`Cannot find module '…'`).
    - Restart the `outercolonies_server` container.
 
 3. **Deploy Client**:
