@@ -6,6 +6,7 @@ import Match from './game_state/match';
 import SocketData from './game_state/socket_data';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
+import { onlineUserCount, resetOnlineUsers } from './online_users';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 
 const createUser = (userId: number) => ({
@@ -44,6 +45,7 @@ const createSocketMock = (userId: number, socketId: string = `socket-${userId}`)
 const createIoMock = (socketMocks: SocketMock[]): Server => {
   const sockets = socketMocks.map(m => m.socket);
   const io = {
+    emit: jest.fn(),
     sockets: {
       adapter: { rooms: new Map<string, Set<string>>() },
       sockets: { get: (id: string) => sockets.find(s => s.id == id) },
@@ -112,6 +114,7 @@ describe('Matchmaking cron', () => {
 describe('Matchmaking login', () => {
   afterEach(() => {
     allActiveMatches().forEach(unregisterMatch);
+    resetOnlineUsers();
     jest.restoreAllMocks();
   });
 
@@ -123,6 +126,38 @@ describe('Matchmaking login', () => {
 
     expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
     expect(socketMock.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, 0);
+  });
+
+  test('counts the user as online and broadcasts the new count on login', async () => {
+    const socketMock = createSocketMock(1);
+    const io = createIoMock([socketMock]);
+    mockLogin(1);
+
+    await getLoginHandler(io, socketMock)('token-1');
+
+    expect(io.emit).toHaveBeenCalledWith(MsgTypeOutbound.OnlineCount, 1);
+    expect(onlineUserCount()).toBe(1);
+  });
+
+  test('does not count the user as online when the session token is invalid', async () => {
+    const socketMock = createSocketMock(1);
+    const io = createIoMock([socketMock]);
+    jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue('not_found');
+
+    await getLoginHandler(io, socketMock)('invalid-token');
+
+    expect(io.emit).not.toHaveBeenCalled();
+    expect(onlineUserCount()).toBe(0);
+  });
+
+  test('does not count a socket which disconnected during the login', async () => {
+    const socketMock = createSocketMock(1);
+    (socketMock.socket as { disconnected: boolean }).disconnected = true;
+    mockLogin(1);
+
+    await getLoginHandler(createIoMock([socketMock]), socketMock)('token-1');
+
+    expect(onlineUserCount()).toBe(0);
   });
 
   test('does not join the search when the session token is invalid', async () => {

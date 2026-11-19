@@ -97,6 +97,9 @@ describe('RegisterPage', () => {
     password?.setValue('short');
     expect(password?.valid).toBeFalse();
 
+    password?.setValue('nodigitshere');
+    expect(password?.valid).toBeFalse();
+
     password?.setValue('validpassword123');
     expect(password?.valid).toBeTrue();
   });
@@ -110,7 +113,7 @@ describe('RegisterPage', () => {
     tick(500);
     expect(email?.valid).toBeFalse();
 
-    email?.setValue('valid@example.com');
+    email?.setValue('a%b@example.com');
     tick(500);
     expect(email?.valid).toBeTrue();
   }));

@@ -72,6 +72,7 @@ describe('app routes (public landing and lore pages)', () => {
     expect(router.url).toBe('/home');
     expect(fixture.nativeElement.querySelector('oc-page-home')).toBeTruthy();
     httpMock.expectOne(`${environment.url.api}/api/daily`).flush(emptyDailies());
+    httpMock.expectOne(`${environment.url.api}/api/online`).flush({ count: 0 });
     fixture.destroy(); // clears the home page auto-advance interval
     tick();
   }));
