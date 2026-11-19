@@ -3,6 +3,16 @@ import { APIRejectReason, MagicLinkType } from '../../shared/config/enums';
 import DBConnection from './db_connector';
 import { v4 as uuidv4 } from 'uuid';
 
+/** Raw `magic_links` row for the user id lookup (the bigint key arrives as BigInt). */
+interface MagicLinkUserIdRow {
+  user_id: bigint;
+}
+
+/** Raw `magic_links` row for the value lookup. */
+interface MagicLinkValueRow {
+  value: string | null;
+}
+
 export default class DBMagicLinksDAO {
   static async createAccountActivation(userId: number): Promise<string> {
     await this.deleteForUserAndType(userId, MagicLinkType.AccountActivation);
@@ -26,20 +36,20 @@ export default class DBMagicLinksDAO {
     ]);
   }
   static async getUserId(id: string, type: MagicLinkType): Promise<number> {
-    const queryResult: any[] = await DBConnection.instance.query(
+    const rows = await DBConnection.instance.query<MagicLinkUserIdRow[]>(
       'SELECT user_id FROM magic_links WHERE id = ? AND type = ? AND valid_until >= NOW()',
       [id, type]
     );
-    return queryResult.length == 1 ? queryResult[0].user_id : Promise.reject(APIRejectReason.NotFound);
+    return rows.length == 1 ? Number(rows[0].user_id) : Promise.reject(APIRejectReason.NotFound);
   }
   static async getValue(id: string, type: MagicLinkType): Promise<string | null> {
-    const queryResult: any[] = await DBConnection.instance.query(
+    const rows = await DBConnection.instance.query<MagicLinkValueRow[]>(
       'SELECT value FROM magic_links WHERE id = ? AND type = ? AND valid_until >= NOW()',
       [id, type]
     );
-    return queryResult.length == 1 ? queryResult[0].value : Promise.reject(APIRejectReason.NotFound);
+    return rows.length == 1 ? rows[0].value : Promise.reject(APIRejectReason.NotFound);
   }
-  private static async create(userId: number, type: MagicLinkType, value?: any): Promise<string> {
+  private static async create(userId: number, type: MagicLinkType, value?: string): Promise<string> {
     const uuid = uuidv4();
     return DBConnection.instance
       .query(

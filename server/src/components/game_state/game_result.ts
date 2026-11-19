@@ -1,9 +1,9 @@
 import { CardType, GameResultType, DailyType } from '../../shared/config/enums';
 import { rules } from '../../shared/config/rules';
-import DBCredentialsDAO from '../persistence/db_credentials';
 import DBDailiesDAO from '../persistence/db_dailies';
 import DBProfilesDAO from '../persistence/db_profiles';
 import { opponentPlayerNo } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import Match from './match';
 import Player from './player';
 
@@ -19,23 +19,21 @@ export default class GameResult {
   }
 
   setWinnerByDeckDepletion(depletedPlayer: Player) {
-    this.type = GameResultType.Depletion;
-    this.setGameOver(depletedPlayer);
+    this.setGameOver(GameResultType.Depletion, depletedPlayer);
   }
   setWinnerByDestruction(destroyedPlayer: Player) {
-    this.type = GameResultType.Destruction;
-    this.setGameOver(destroyedPlayer);
+    this.setGameOver(GameResultType.Destruction, destroyedPlayer);
   }
   setWinnerByDomination(dominatedPlayer: Player) {
-    this.type = GameResultType.Domination;
-    this.setGameOver(dominatedPlayer);
+    this.setGameOver(GameResultType.Domination, dominatedPlayer);
   }
   setWinnerBySurrender(surrenderingPlayer: Player) {
-    this.type = GameResultType.Surrender;
-    this.setGameOver(surrenderingPlayer);
+    this.setGameOver(GameResultType.Surrender, surrenderingPlayer);
   }
-  private setGameOver(loser: Player) {
+  private setGameOver(type: GameResultType, loser: Player) {
+    if (this.gameOver) return;
     this.gameOver = true;
+    this.type = type;
     this.winnerNo = opponentPlayerNo(loser.no);
     const winner = this.match.players[this.winnerNo];
     this.winnerSol = this.computeEarnings(winner, loser, true);
@@ -75,7 +73,10 @@ export default class GameResult {
       case DailyType.Colony:
         return player.colonyCardStack.cards.length > 7;
       case DailyType.Colossus:
-        return readyCardStacks.find(cs => cs.cards.length >= 7) !== undefined;
+        return (
+          readyCardStacks.find(cs => cs.cardStacks.filter(sub => sub.owner == player).length >= 7) !==
+          undefined
+        );
       default:
         return false; // Login achievement is handled separately in auth
     }
@@ -85,7 +86,10 @@ export default class GameResult {
     let sol = 0;
     sol += player.discardPile.length * rules.gameEarnings.discardPile;
     sol += opponent.colonyCardStack.damage * rules.gameEarnings.dealtColonyDamage;
-    const ingameCards = player.cardStacks.flatMap(c => c.cards).length - 1;
+    // Count per owning player so opponent attachments (e.g. 437 Kopfgeld on one of
+    // this player's ships) do not pay cards-in-game sol to the stack owner
+    const ingameCards =
+      player.cardStacks.flatMap(c => c.cardStacks).filter(cs => cs.owner == player).length - 1;
     sol += ingameCards * rules.gameEarnings.cardsInGame;
     if (
       won &&
@@ -99,23 +103,20 @@ export default class GameResult {
 
   async persistEarnings(player: Player, opponent: Player, won: boolean, sol: number): Promise<void> {
     try {
-      const c = await DBCredentialsDAO.getByUsername(player.name);
-      if (!c) {
-        console.log(`ERROR: Could not find user ${player.name} in database`);
-        return;
-      }
-      DBProfilesDAO.increaseSol(c.userId, sol);
+      // The user id is carried on the player (from the authenticated socket data), so no
+      // username-based database lookup is needed here - usernames are not a stable join key
+      await DBProfilesDAO.increaseSol(player.userId, sol);
       for (const dailyType of Object.values(DailyType)) {
         if (this.shouldAchieveDaily(dailyType, player, opponent, won)) {
           try {
-            await DBDailiesDAO.achieve(c.userId, dailyType);
+            await DBDailiesDAO.achieve(player.userId, dailyType);
           } catch (err) {
-            console.log(`ERROR: Failed to record daily ${dailyType} for user ${c.userId}: ${err}`);
+            logger.error(`Failed to record daily ${dailyType} for user ${player.userId}: ${err}`);
           }
         }
       }
     } catch (err) {
-      console.log(`ERROR: Failed to persist earnings for user ${player.name}: ${err}`);
+      logger.error(`Failed to persist earnings for user ${player.userId}: ${err}`);
     }
   }
 }

@@ -1,6 +1,16 @@
 import mariadb, { Pool, PoolConnection, Prepare } from 'mariadb';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import config from 'config';
+import { logger } from '../utils/logger';
+
+/**
+ * Result of a data-changing statement (INSERT, UPDATE, DELETE): the MariaDB driver returns the
+ * number of affected rows, which callers use to distinguish a successful change from a no-op,
+ * e.g. when a concurrently deleted row loses the race in a transaction.
+ */
+export interface DBChangeResult {
+  affectedRows: number;
+}
 
 export default class DBConnection {
   private static con: DBConnection;
@@ -24,16 +34,17 @@ export default class DBConnection {
    *
    * @param query SQL statement to execute
    * @param params parameters to bind to the prepared statement
-   * @returns the result of the executed statement
+   * @returns the typed result of the executed statement: the row array for queries, a
+   * {@link DBChangeResult} for data-changing statements
    */
-  async query(query: string, params: any[]): Promise<any> {
+  async query<T = unknown>(query: string, params: unknown[]): Promise<T> {
     const transactionConnection = this.transactionContext.getStore();
     if (transactionConnection) {
       // Inside a transaction every statement must run on the transaction connection and must not
       // be retried on another connection: an error aborts the whole transaction via rollback.
       return transactionConnection.prepare(query).then(q => q.execute(params));
     }
-    return this.executeQuery(query, params, 1);
+    return this.executeQuery<T>(query, params, 1);
   }
 
   /**
@@ -43,9 +54,9 @@ export default class DBConnection {
    * @param query SQL statement to execute
    * @param params parameters to bind to the prepared statement
    * @param attempt current connection acquisition attempt (1-based)
-   * @returns the result of the executed statement
+   * @returns the typed result of the executed statement
    */
-  private async executeQuery(query: string, params: any[], attempt: number): Promise<any> {
+  private async executeQuery<T>(query: string, params: unknown[], attempt: number): Promise<T> {
     let conn: PoolConnection | undefined;
     let stmt: Prepare | undefined;
     try {
@@ -53,7 +64,7 @@ export default class DBConnection {
       stmt = await conn.prepare(query);
       return await stmt.execute(params);
     } catch (err) {
-      console.log(`WARN: DB error ${err}`);
+      logger.error(`DB error ${err}`);
       if (!conn && attempt < DBConnection.MAX_ACQUIRE_ATTEMPTS) {
         return this.executeQuery(query, params, attempt + 1);
       }
@@ -80,13 +91,11 @@ export default class DBConnection {
       await conn.commit();
       return result;
     } catch (err) {
-      console.log(`WARN: DB transaction error ${err}`);
-      await conn.rollback().catch(rollbackErr => console.log(`WARN: DB rollback error ${rollbackErr}`));
+      logger.error(`DB transaction error ${err}`);
+      await conn.rollback().catch(rollbackErr => logger.error(`DB rollback error ${rollbackErr}`));
       throw err;
     } finally {
-      await conn
-        .release()
-        .catch(releaseErr => console.log(`WARN: DB connection release error ${releaseErr}`));
+      await conn.release().catch(releaseErr => logger.error(`DB connection release error ${releaseErr}`));
     }
   }
   static get instance(): DBConnection {

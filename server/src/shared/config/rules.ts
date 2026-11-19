@@ -6,6 +6,10 @@ class OCRules {
   readonly maxHandCards = 7;
   readonly maxRange = 4;
   readonly countdownTimer = 90;
+  /** Seconds a disconnected player has to reconnect to a running match before it surrenders them */
+  readonly reconnectGracePeriod = 60;
+  /** Seconds a finished match stays registered to deliver its result to players who were offline when it ended */
+  readonly resultDeliveryPeriod = 24 * 60 * 60;
 
   readonly gameEarnings = {
     victory: 50,

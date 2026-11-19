@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 interface SocketListenerStub {
   on: jasmine.Spy;
   off: jasmine.Spy;
+  emit: jasmine.Spy;
   io: { on: jasmine.Spy; off: jasmine.Spy };
 }
 
@@ -16,6 +17,7 @@ interface MatchmakingOverrides {
   events: { once: jasmine.Spy };
   registerSocketListeners: () => void;
   scene: { start: jasmine.Spy };
+  onlineIndicator: { setCount: jasmine.Spy };
 }
 
 describe('Matchmaking scene - socket listener lifecycle', () => {
@@ -26,7 +28,7 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
 
   beforeEach(() => {
     matchmaking = new Matchmaking();
-    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
+    socket = jasmine.createSpyObj('Socket', ['on', 'off', 'emit']);
     socket.io = jasmine.createSpyObj('Manager', ['on', 'off']);
     const handle = matchmaking as unknown as MatchmakingOverrides;
     handle.socket = socket;
@@ -44,7 +46,8 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
       MsgTypeOutbound.Connect,
       'disconnect',
       'connect_error',
-      MsgTypeOutbound.Matchmaking
+      MsgTypeOutbound.Matchmaking,
+      MsgTypeOutbound.OnlineCount
     ]);
     expect(socket.io.on.calls.allArgs().map(args => args[0])).toEqual(['reconnect_failed']);
   });
@@ -58,6 +61,7 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
 
     expect(socket.off.calls.allArgs().map(args => args[0])).toEqual([
       MsgTypeOutbound.Connect,
+      MsgTypeOutbound.OnlineCount,
       MsgTypeOutbound.Matchmaking,
       'disconnect',
       'connect_error'
@@ -76,5 +80,17 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
     matchmakingHandler('start', gameParams);
 
     expect(start).toHaveBeenCalledWith('Game', { gameParams });
+  });
+
+  it('forwards the pushed online count to the online indicator', () => {
+    const setCount = jasmine.createSpy('onlineIndicator.setCount');
+    (matchmaking as unknown as MatchmakingOverrides).onlineIndicator = { setCount };
+
+    const onlineCountHandler = socket.on.calls
+      .allArgs()
+      .find(args => args[0] == MsgTypeOutbound.OnlineCount)![1];
+    onlineCountHandler(7);
+
+    expect(setCount).toHaveBeenCalledWith(7);
   });
 });

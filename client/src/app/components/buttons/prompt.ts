@@ -35,7 +35,7 @@ export default class Prompt {
     // and the exit button must stay visible.
     if (this.scene.state.gameResult) return;
     if (!this.scene.state.playerPendingAction) {
-      this.setText('Warte auf Gegenspieler...');
+      this.showWaiting();
       this.show(true);
     } else if (this.scene.state.intervention) {
       this.showIntervention();
@@ -75,6 +75,27 @@ export default class Prompt {
     this.text.setVisible(visible);
     this.image.setVisible(visible);
     return this;
+  }
+  private showWaiting() {
+    const waitingText = 'Warte auf Gegenspieler...';
+    // Only name the phase while the opponent is active; when the player is active and just waits for a
+    // reaction, the opponent's phase would be ambiguous.
+    const phaseText = this.scene.state.playerIsActive ? undefined : this.opponentPhaseText();
+    this.setText(phaseText ? `${waitingText}\nGegner: ${phaseText}` : waitingText);
+  }
+  private opponentPhaseText(): string | undefined {
+    switch (this.scene.state.turnPhase) {
+      case TurnPhase.Start:
+        return 'Startphase';
+      case TurnPhase.Build:
+        return 'Aufbauphase (Karten ausspielen,\nMission oder Überfall planen)';
+      case TurnPhase.Combat:
+        return 'Gefechtsphase';
+      case TurnPhase.End:
+        return 'Endphase (überzählige Handkarten ablegen)';
+      default:
+        return undefined;
+    }
   }
   private showBuildPhase() {
     let text: string;

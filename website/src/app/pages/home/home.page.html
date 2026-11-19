@@ -7,6 +7,9 @@
       </p>
       <br />
       <a mat-raised-button color="primary" [href]="gameLink"> Suche n&auml;chstes Spiel </a>
+      @if (onlineCount !== undefined) {
+      <p id="online-count">{{ onlineCount }} Spieler online</p>
+      }
     </oc-content-box>
   </div>
   <div id="note-box" class="inner-box">

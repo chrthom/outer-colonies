@@ -16,6 +16,7 @@ describe('DBConnection', () => {
     db = DBConnection.instance;
     db.pool = <any>{ getConnection: jest.fn().mockResolvedValue(fakeConnection) };
     jest.spyOn(console, 'log').mockImplementation(() => undefined);
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
