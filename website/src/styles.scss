@@ -75,6 +75,12 @@ ul {
   width: 32px;
   font-size: 32px;
 }
+// Outlined buttons have no fill, so the label sits directly on the dark panel or the teal navbar
+// gradient, where the brand teal only reaches about 3.2:1
+.mat-mdc-outlined-button.mat-primary {
+  --mat-button-outlined-label-text-color: var(--color-primary-light);
+  --mat-button-outlined-outline-color: var(--color-primary);
+}
 .primary-color {
   color: var(--color-primary);
 }

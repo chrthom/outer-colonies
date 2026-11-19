@@ -41,7 +41,7 @@
             @if (sol >= booster.price) {
             <button mat-raised-button (click)="buyBooster(booster.no)" color="primary">Kaufen</button>
             } @if (sol < booster.price) {
-            <button mat-raised-button color="warn">Ungen&uuml;gend Sol</button>
+            <button mat-raised-button color="primary" disabled>Ungen&uuml;gend Sol</button>
             }
           </mat-card-actions>
         </mat-card>

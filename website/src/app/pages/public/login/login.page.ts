@@ -52,6 +52,7 @@ export class LoginPage {
     return this.loginForm.get('password');
   }
   submit() {
+    this.loginForm.markAllAsTouched();
     if (this.loginForm.valid) {
       this.authService
         .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)

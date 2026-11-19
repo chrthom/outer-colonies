@@ -65,12 +65,7 @@
       <mat-checkbox formControlName="newsletter">
         <mat-label>Ich möchte Neuigkeiten zu Outer Colonies per E-Mail erhalten.</mat-label>
       </mat-checkbox>
-      <button
-        mat-raised-button
-        type="submit"
-        [color]="registerForm.valid ? 'primary' : 'warn'"
-        [disabled]="registerForm.pending"
-      >
+      <button mat-raised-button type="submit" color="primary" [disabled]="registerForm.pending">
         Neuen Nutzer registrieren
       </button>
       @if (registrationSuccessful === false) {

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginPage } from './login.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import AuthService from 'src/app/auth.service';
 import { of } from 'rxjs';
@@ -87,6 +88,18 @@ describe('LoginPage', () => {
     });
 
     component.submit();
+    expect(authSpy.login).not.toHaveBeenCalled();
+  });
+
+  it('should show the required errors and keep the button primary after submitting an empty form', () => {
+    const button = fixture.debugElement.query(By.css('button[type="submit"]')).componentInstance;
+    expect(button.color).toBe('primary');
+
+    fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', null);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('mat-error').length).toBe(2);
+    expect(button.color).toBe('primary');
     expect(authSpy.login).not.toHaveBeenCalled();
   });
 

@@ -4,7 +4,7 @@
       <mat-label>Nutzername</mat-label>
       <input matInput readonly="readonly" [value]="username" />
     </mat-form-field>
-    <form id="email-form" [formGroup]="emailForm" (ngSubmit)="emailForm.valid ? changeEmail() : {}">
+    <form id="email-form" [formGroup]="emailForm" (ngSubmit)="changeEmail()">
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neue E-Mail</mat-label>
         <input matInput formControlName="email" [errorStateMatcher]="matcher" />
@@ -25,20 +25,11 @@
         >
         }
       </mat-form-field>
-      <button
-        mat-raised-button
-        type="submit"
-        [color]="emailForm.valid ? 'primary' : 'warn'"
-        [disabled]="emailForm.pending"
-      >
+      <button mat-raised-button type="submit" color="primary" [disabled]="emailForm.pending">
         E-Mail &auml;ndern
       </button>
     </form>
-    <form
-      id="password-form"
-      [formGroup]="passwordForm"
-      (ngSubmit)="passwordForm.valid ? changePassword() : {}"
-    >
+    <form id="password-form" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
       <mat-form-field class="wide" appearance="outline">
         <mat-label>Neues Passwort</mat-label>
         <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" />
@@ -59,9 +50,7 @@
         >
         }
       </mat-form-field>
-      <button mat-raised-button type="submit" [color]="passwordForm.valid ? 'primary' : 'warn'">
-        Passwort &auml;ndern
-      </button>
+      <button mat-raised-button type="submit" color="primary">Passwort &auml;ndern</button>
     </form>
     <mat-slide-toggle
       color="primary"

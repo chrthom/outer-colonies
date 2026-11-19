@@ -1,7 +1,7 @@
 @use "@angular/material" as mat;
 @use "./color.scss" as oc;
 
-$theme-primary: mat.m2-define-palette(oc.$primary-palette, 500, 200, 800);
+$theme-primary: mat.m2-define-palette(oc.$primary-palette, 700, 200, 800);
 $theme-accent: mat.m2-define-palette(oc.$secondary-palette, 500, 100, 700);
 $theme-warn: mat.m2-define-palette(oc.$secondary-palette, A400, A100, A700);
 $theme: mat.m2-define-dark-theme(

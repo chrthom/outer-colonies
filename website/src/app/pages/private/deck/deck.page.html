@@ -94,7 +94,8 @@
             <button
               mat-raised-button
               (click)="box.onClick(card)"
-              [color]="box.isActiveDeck && canDeactivateDeckCard || !box.isActiveDeck && canActivateDeckCard ? 'primary' : 'warn'"
+              color="primary"
+              [disabled]="box.isActiveDeck ? !canDeactivateDeckCard : !canActivateDeckCard"
             >
               <h1>{{ box.isActiveDeck ? '-' : '+' }}</h1>
             </button>

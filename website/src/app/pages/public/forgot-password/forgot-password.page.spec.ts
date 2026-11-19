@@ -113,15 +113,25 @@ describe('ForgotPasswordPage', () => {
     expect(authApiSpy.forgotPassword).not.toHaveBeenCalled();
   });
 
-  it('should color the submit button warn while loading like the reset-password page', () => {
-    component.forgotPasswordForm.setValue({ username: 'testuser' });
+  it('should keep the submit button primary and disable it only while loading', () => {
+    component.forgotPasswordForm.setValue({ username: '' });
     fixture.detectChanges();
     const button = fixture.debugElement.query(By.css('button[type="submit"]')).componentInstance;
 
     expect(button.color).toBe('primary');
+    expect(button.disabled).toBeFalse();
 
     component.loading = true;
     fixture.detectChanges();
-    expect(button.color).toBe('warn');
+    expect(button.color).toBe('primary');
+    expect(button.disabled).toBeTrue();
+  });
+
+  it('should show the required error after submitting an empty form', () => {
+    fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', null);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('mat-error')?.textContent).toContain('Bitte gib deinen');
+    expect(authApiSpy.forgotPassword).not.toHaveBeenCalled();
   });
 });
