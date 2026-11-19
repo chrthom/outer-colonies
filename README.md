@@ -144,9 +144,15 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Backend services for both website and client
 - **Key Components**:
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
-  - `components/rest_api.ts`: REST API endpoints for the website
+  - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
+    - `index.ts`: Router registration and central error-handling middleware
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`, `online_router.ts`: Endpoints per resource
+    - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
+    - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
+    - `api_response.ts`: Status response helper with leveled failure logging
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
+  - `components/online_users.ts`: Tracking of unique logged-in users (a user with several sockets counts once) and push of the online count
   - `components/game_state/`: In-memory game state
     - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
     - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
@@ -176,6 +182,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/utils/`: Utility functions
     - `auth.ts`: Authentication utility
     - `helpers.ts`: Helper functions
+    - `logger.ts`: Leveled logging utility (the only place writing to the console)
     - `mailer.ts`: Mailer utility
   - `shared/`: Shared TypeScript interfaces and types used by both website and client
     - `interfaces/`: REST API and client message interfaces (`rest_api.ts`, `client_game_params.ts`, `client_planned_battle.ts`, `client_state.ts`)
@@ -220,6 +227,9 @@ The server provides the following REST endpoints for the website:
 - **Daily Rewards**:
   - `GET /api/daily`: Get daily rewards
 
+- **Online Users**:
+  - `GET /api/online`: Number of unique logged-in users currently online (unauthenticated, polled by the website home page every 60 seconds)
+
 - **Item Management**:
   - `GET /api/item`: Get user's items
   - `POST /api/item/:itemId`: Use an item
@@ -232,6 +242,7 @@ The server provides the following WebSocket events for the game client:
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
   - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.OnlineCount`: Number of unique logged-in users, pushed to all clients on every login and disconnect which changes it (and to a newly logged-in socket)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
@@ -257,7 +268,9 @@ Game state is kept in memory only; matches are not persisted to the database. Co
 - **`Intervention`** (`intervention.ts`): Interrupt-driven reaction mechanic. Interventions occur at opponent turn start, on raid announcement, at battle round start/end, before attacks and for tactic cards, and are skipped automatically if the pending player has no valid targets.
 - **`GameResult`** (`game_result.ts`): Win conditions (domination at control limit, destruction, deck depletion, surrender); computes Sol earnings and daily achievements.
 
-**Matchmaking** (`components/matchmaking.ts`): Players log in to the `matchmaking` Socket.IO room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`.
+**Matchmaking** (`components/matchmaking.ts`): Players log in to the matchmaking lobby room with their session token. The website passes the session token to the client as the `token` query parameter of the game URL (the client's matchmaking scene parses it, with a fallback to the legacy raw query string format). `matchMakingCron` (registered in `app.ts` via `setInterval`, running every second) pairs waiting clients two-by-two and creates a `Match` in a room `match-<uuid>`. On login, a player whose previous match is still running or still owes them its result (see reconnection) rejoins it instead of searching again.
+
+**Reconnection** (`components/match_registry.ts`): Matches are registered in an in-memory registry keyed by their room, so they stay discoverable even while both sockets are disconnected (Socket.IO drops empty rooms). A disconnect during a running match does not end it: only the player's bound socket marks them disconnected (a stale socket of a previous connection cannot re-mark them), and the match stays alive for the reconnection grace window (`rules.reconnectGracePeriod`). Within the window, the player rejoins by logging in again with their session token (e.g. after a page reload); the new socket is bound back to their player and the previous socket is detached. Once the window expires, `gameCron` surrenders the player. A finished match stays registered until every player received its final state (`rules.resultDeliveryPeriod` at the latest): a player who was offline when the game ended is routed back into it on their next login, so the missed game result is delivered.
 
 **Countdown** (`components/game.ts`): `gameCron` (also every second) decrements the 90-second countdown of running matches in which both players are ready; on timeout it triggers an automatic ready event instead of a timeout victory.
 
@@ -436,6 +449,7 @@ The repository working rules — repository language, branches and merges, issue
 2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
    - Unzip the archive on the target environment.
+   - If `server/package.json` or `server/package-lock.json` changed since the last deploy (new or updated dependency), run `npm install` (or `npm ci` when the `node_modules` state is unknown) inside the `outercolonies_server` container before restarting it: the container keeps its `node_modules` across deploys, so a new dependency would otherwise be missing at runtime (`Cannot find module '…'`).
    - Restart the `outercolonies_server` container.
 
 3. **Deploy Client**:
@@ -492,6 +506,8 @@ The full design, budgets and the role chain are documented in [misc/dev-loop.md]
 
 - **Express**: Web framework for handling REST API requests.
 - **Socket.IO**: Library for real-time WebSocket communication between the client and server.
+- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`). Email format validation uses the shared `server/src/shared/config/email_rules.ts` rule in both server and website; address ownership is checked by confirmation email.
+- **express-rate-limit**: Rate limiting of the auth REST endpoints against brute force, mail flooding and user enumeration (see `server/src/components/utils/rate_limiter.ts`). Limits are held in memory per server process, so they reset on restart. **Rate limiting is currently not enforced**: `rate_limit.dry_run` is `true` in the default, staging and production configs, so requests over a limit are only logged as a warning (including the client IP, to verify proxy bucketing) and still served. This is a deliberate decision until the limits are validated against real traffic; set `rate_limit.dry_run` to `false` to enforce them (tests run enforced).
 - **Node.js**: JavaScript runtime for the server.
 
 ### Development Tools

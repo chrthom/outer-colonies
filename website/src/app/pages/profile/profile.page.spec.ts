@@ -81,7 +81,7 @@ describe('ProfilePage', () => {
     tick(500);
     expect(email?.valid).toBeFalse();
 
-    email?.setValue('valid@example.com');
+    email?.setValue('a!b@example.com');
     tick(500);
     expect(email?.valid).toBeTrue();
   }));
@@ -164,6 +164,9 @@ describe('ProfilePage', () => {
     expect(password?.valid).toBeFalse();
 
     password?.setValue('short');
+    expect(password?.valid).toBeFalse();
+
+    password?.setValue('nodigitshere');
     expect(password?.valid).toBeFalse();
 
     password?.setValue('validpassword123');

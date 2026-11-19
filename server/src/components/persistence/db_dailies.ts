@@ -13,24 +13,33 @@ export interface DBDaily {
   [key: string]: boolean | number | null;
 }
 
+/**
+ * Raw `dailies` query row: the bigint key arrives as BigInt, every daily column is selected as a
+ * 0/1 flag via a `CASE WHEN` expression (see {@link DBDailiesDAO.getBy}).
+ */
+interface DailyRow {
+  user_id: bigint;
+  [dbColumn: string]: number | bigint;
+}
+
 export default class DBDailiesDAO {
   static async getByUserId(userId: number): Promise<DBDaily> {
     const result = await this.getBy('user_id = ?', [userId]);
     return result.length ? result[0] : Promise.reject(APIRejectReason.NotFound);
   }
 
-  private static async getBy(whereClause: string, params: any[]): Promise<DBDaily[]> {
+  private static async getBy(whereClause: string, params: unknown[]): Promise<DBDaily[]> {
     const columnCases = DAILY_DEFINITIONS.map(
       daily =>
         `CASE WHEN ${daily.dbColumn} IS NULL OR ${daily.dbColumn} < CURRENT_DATE() THEN 0 ELSE 1 END AS ${daily.dbColumn}`
     ).join(', ');
 
-    const queryResult: any[] = await DBConnection.instance.query(
+    const rows = await DBConnection.instance.query<DailyRow[]>(
       `SELECT user_id, ${columnCases} FROM dailies WHERE ${whereClause}`,
       params
     );
 
-    return queryResult.map(r => {
+    return rows.map(r => {
       const dailyProperties = DAILY_DEFINITIONS.map(dailyDef => ({
         [dailyDef.dbColumn]: Boolean(r[dailyDef.dbColumn])
       }));

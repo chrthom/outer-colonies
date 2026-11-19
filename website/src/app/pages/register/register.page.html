@@ -24,6 +24,8 @@
         <mat-error> Dein Passwort kann nicht l&auml;nger als 40 Zeichen sein </mat-error>
         } @else if (password?.hasError('minlength')) {
         <mat-error> Dein Passwort sollte mindestens 8 Zeichen lang sein </mat-error>
+        } @else if (password?.hasError('strength')) {
+        <mat-error> Dein Passwort muss mindestens einen Buchstaben und eine Zahl enthalten </mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline">
@@ -42,9 +44,9 @@
       <mat-form-field appearance="outline">
         <mat-label>Start-Deck</mat-label>
         <mat-select formControlName="starterDeck">
-          <mat-option value="0">Terranische Siedler</mat-option>
-          <mat-option value="1">Freih&auml;ndler-Clans</mat-option>
-          <mat-option value="2">Trans-Jupiter Expedition</mat-option>
+          <mat-option [value]="0">Terranische Siedler</mat-option>
+          <mat-option [value]="1">Freih&auml;ndler-Clans</mat-option>
+          <mat-option [value]="2">Trans-Jupiter Expedition</mat-option>
         </mat-select>
         @if (starterDeck?.hasError('required')) {
         <mat-error> Bitte w&auml;hle ein Start-Deck </mat-error>

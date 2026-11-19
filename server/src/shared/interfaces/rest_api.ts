@@ -80,6 +80,10 @@ export interface DailyGetResponse {
   [key: string]: boolean | number | null;
 }
 
+export interface OnlineGetResponse {
+  count: number;
+}
+
 export interface ItemListResponse {
   boxes: ItemListResponseBox[];
   boosters: ItemListResponseBooster[];
@@ -90,7 +94,7 @@ interface ItemListResponseElement {
 }
 
 export interface ItemListResponseBox extends ItemListResponseElement {
-  message?: string;
+  message?: string | null;
   sol: number[];
   cards: number[];
   boosters: number[];

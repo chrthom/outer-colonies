@@ -7,6 +7,7 @@ import DBDailiesDAO from '../persistence/db_dailies';
 import DBDecksDAO from '../persistence/db_decks';
 import DBMagicLinksDAO from '../persistence/db_magic_links';
 import Mailer from './mailer';
+import { logger } from './logger';
 import { APIRejectReason, MagicLinkType, DailyType } from '../../shared/config/enums';
 
 export default class Auth {
@@ -80,8 +81,8 @@ export default class Auth {
     try {
       await Mailer.sendAccountActivation(credential.email, credential.username, activationUuid);
     } catch (err) {
-      console.log(
-        `ERROR: Failed to send account activation mail to user ${credential.userId}; ` +
+      logger.error(
+        `Failed to send account activation mail to user ${credential.userId}; ` +
           `account, profile and activation link require manual cleanup: ${err}`
       );
       throw err;
@@ -100,7 +101,7 @@ export default class Auth {
     try {
       await DBDailiesDAO.achieve(credential.userId, DailyType.Login);
     } catch (err) {
-      console.log(`ERROR: Failed to record login daily for user ${credential.userId}: ${err}`);
+      logger.error(`Failed to record login daily for user ${credential.userId}: ${err}`);
     }
     const sessionToken = await DBCredentialsDAO.login(credential.userId);
     credential.sessionToken = sessionToken;

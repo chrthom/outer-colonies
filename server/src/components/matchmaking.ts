@@ -7,8 +7,15 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import { logger } from './utils/logger';
+import Player from './game_state/player';
+import { findRejoinableMatch, registerMatch } from './match_registry';
+import { markOnline } from './online_users';
 
-export const matchmakingRoom = 'matchmaking';
+// Room name of the matchmaking lobby. Deliberately distinct from the
+// MsgTypeOutbound.Matchmaking event name so that the room and the event cannot
+// be mixed up (they share the socket.io namespace otherwise).
+export const matchmakingRoom = 'matchmaking-lobby';
 const gameRoomPrefix = 'match';
 
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
@@ -17,19 +24,27 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     try {
       const user = await DBCredentialsDAO.getBySessionToken(sessionToken);
       if (!user) {
-        console.log(`WARN: Invalid session token ${sessionToken} provided`);
+        logger.warn('Invalid session token provided');
         return;
       }
       const deckCards = await DBDecksDAO.getByUserId(user.userId);
       const activeDeck = deckCards
         .filter(c => c.inUse)
         .map(c => CardCollection.cards[c.cardId as keyof typeof CardCollection.cards]);
-      console.log(`Player logged in: ${user.username}`);
+      logger.info(`Player logged in: ${user.username}`);
       socket.data = new SocketData(user, activeDeck);
-      socket.join(matchmakingRoom);
-      socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
+      // The socket may have disconnected while the login awaited the database: its disconnect
+      // hook already ran, so registering it now would leave a ghost user online
+      if (!socket.disconnected) markOnline(io, socket, user.userId);
+      const rejoinableMatch = findRejoinableMatch(user.userId);
+      if (rejoinableMatch) {
+        rejoinMatch(io, socket, rejoinableMatch.match, rejoinableMatch.player);
+      } else {
+        socket.join(matchmakingRoom);
+        socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, clientsInMatchMaking(io).size - 1);
+      }
     } catch (err) {
-      console.log(`ERROR: Login failed for session token ${sessionToken}: ${err}`);
+      logger.error(`Login failed: ${err}`);
     }
   });
 }
@@ -38,15 +53,9 @@ export function matchMakingCron(io: Server) {
   const clients: Socket[] = Array.from(clientsInMatchMaking(io))
     .map(cid => io.sockets.sockets.get(cid))
     .filter((c): c is Socket => !!c);
-  const numClients = clients.length;
-  if (clients.length > 1) {
-    console.log(`Performing matchmaking for ${numClients} clients...`);
-    let partnerSocket = null;
-    for (const client of clients) {
-      client.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, numClients - 1);
-      if (partnerSocket) initGame(io, client, partnerSocket);
-      else partnerSocket = client;
-    }
+  while (clients.length > 1) {
+    const [client1, client2] = [clients.pop()!, clients.pop()!];
+    initGame(io, client1, client2);
   }
 }
 
@@ -58,8 +67,38 @@ function initGame(io: Server, socket1: Socket, socket2: Socket): void {
   socket1.leave(matchmakingRoom);
   socket2.leave(matchmakingRoom);
   const match = new Match(`${gameRoomPrefix}-${uuidv4()}`, socket1, socket2);
-  const gameParams: ClientGameParams = {
+  registerMatch(match);
+  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
+}
+
+/**
+ * Binds a socket of a player back to their match: to the running match within
+ * the reconnection grace window, or to a finished match which still owes them
+ * its result (the client pulls the current state with its initial ready event).
+ */
+function rejoinMatch(io: Server, socket: Socket, match: Match, player: Player): void {
+  const socketData = <SocketData>socket.data;
+  logger.info(`Player ${player.name} rejoined match ${match.room}`);
+  // Detach the socket of the previous connection: a lingering old socket must
+  // neither act on the match under the player's identity nor re-mark the
+  // rejoined player as disconnected via its late Disconnect event
+  const previousSocket = io.sockets.sockets.get(player.socketId);
+  if (previousSocket && previousSocket.id != socket.id) {
+    const previousSocketData = <SocketData>previousSocket.data;
+    previousSocketData.match = undefined;
+    previousSocketData.playerNo = undefined;
+    previousSocket.leave(match.room);
+  }
+  socketData.match = match;
+  socketData.playerNo = player.no;
+  socket.join(match.room);
+  player.socketId = socket.id;
+  player.disconnectedSince = undefined;
+  socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
+}
+
+function gameParamsFor(match: Match): ClientGameParams {
+  return {
     preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
-  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParams);
 }
