@@ -79,6 +79,7 @@ export enum MsgTypeOutbound {
   Connect = 'connect',
   Countdown = 'countdown',
   Matchmaking = 'matchmaking',
+  OnlineCount = 'online_count',
   State = 'state'
 }
 

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
+import { OnlineApiService } from 'src/app/api/online-api.service';
 import AuthService from 'src/app/auth.service';
 import { environment } from 'src/environments/environment';
 import { DailyGetResponse } from '@shared/interfaces/rest_api';
@@ -7,6 +8,9 @@ import { DAILY_DEFINITIONS } from '@shared/config/dailies';
 import { ContentBoxComponent } from '../../components/content-box/content-box.component';
 import { MatAnchor } from '@angular/material/button';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
+
+/** Interval in which the number of online users is refreshed. */
+const ONLINE_POLL_INTERVAL_MS = 60000;
 
 @Component({
   selector: 'oc-page-home',
@@ -17,17 +21,25 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
 export class HomePage implements OnInit, OnDestroy {
   authService = inject(AuthService);
   private dailyApiService = inject(DailyApiService);
+  private onlineApiService = inject(OnlineApiService);
 
   dailies: Daily[] = this.generateDailiesArray();
   selectedDaily = 1;
+  /** Number of online users, undefined until the first successful poll. */
+  onlineCount?: number;
   private autoAdvanceInterval: ReturnType<typeof setInterval> | undefined;
+  private onlinePollInterval: ReturnType<typeof setInterval> | undefined;
 
   ngOnInit() {
     this.reload();
     this.startAutoAdvance();
+    this.loadOnlineCount();
+    this.onlinePollInterval = setInterval(() => this.loadOnlineCount(), ONLINE_POLL_INTERVAL_MS);
   }
 
   ngOnDestroy() {
+    clearInterval(this.onlinePollInterval);
+    this.onlinePollInterval = undefined;
     if (this.autoAdvanceInterval) {
       clearInterval(this.autoAdvanceInterval);
       this.autoAdvanceInterval = undefined;
@@ -62,6 +74,20 @@ export class HomePage implements OnInit, OnDestroy {
            stages) and the default dailies list is kept */
         if (environment.stage !== 'production') {
           console.warn(`Failed to load dailies with status ${err?.status}, keeping default dailies list`);
+        }
+      }
+    });
+  }
+
+  private loadOnlineCount() {
+    this.onlineApiService.online.subscribe({
+      next: res => (this.onlineCount = res.count),
+      error: err => {
+        /* The previously shown count is kept (or none, if the first poll failed): the next
+           poll retries. The handler is mandatory, as RxJS rethrows errors of handler-less
+           subscriptions as uncaught exceptions */
+        if (environment.stage !== 'production') {
+          console.warn(`Failed to load online count with status ${err?.status}, keeping last value`);
         }
       }
     });

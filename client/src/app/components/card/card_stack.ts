@@ -302,7 +302,12 @@ export default class CardStack {
               this.scene.activeCards.cardUUID = cardData.uuid;
               this.scene.activeCards.hand = undefined;
             } else if (this.canPerformAllAttackOnBase) {
-              this.scene.socket.emit(MsgTypeInbound.Attack, '*', '*', this.uuid);
+              this.scene.socket.emit(
+                MsgTypeInbound.Attack,
+                constants.attackAllID,
+                constants.attackAllID,
+                this.uuid
+              );
             } else if (
               this.scene.activeCards.stackUUID &&
               this.scene.state.battle.opponentShipIds.includes(this.uuid)

@@ -23,6 +23,8 @@ const reevaluatedTacticDisciplines: Record<number, TacticDiscipline> = {
   149: TacticDiscipline.Science,
   222: TacticDiscipline.Trade,
   417: TacticDiscipline.Military,
+  437: TacticDiscipline.Trade,
+  442: TacticDiscipline.Intelligence,
   517: TacticDiscipline.Intelligence
 };
 Object.entries(reevaluatedTacticDisciplines).forEach(([id, discipline]) => {

@@ -65,6 +65,18 @@ describe('GameResult', () => {
       expect(result.winnerNo).toBe(1);
       expect(result.type).toBe(GameResultType.Depletion);
     });
+
+    test('keeps the first result when a second loss condition hits after game over', () => {
+      const { result, match } = makeResult();
+
+      result.setWinnerByDestruction(match.players[1]);
+      result.setWinnerByDeckDepletion(match.players[0]);
+
+      expect(result.gameOver).toBe(true);
+      expect(result.type).toBe(GameResultType.Destruction);
+      expect(result.winnerNo).toBe(0);
+      expect(result.persistEarnings).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('shouldAchieveDaily', () => {
@@ -212,20 +224,24 @@ describe('GameResult', () => {
       expect(check(DailyType.Colony, exactly7, player(), true)).toBe(false);
     });
 
-    test('Colossus requires a flight-ready stack with at least 7 cards', () => {
-      const colossus = player({
-        cardStacks: [stack({ cards: new Array(7).fill({}) })]
-      });
-      const notReady = player({
-        cardStacks: [stack({ isFlightReady: false, cards: new Array(10).fill({}) })]
-      });
-      const small = player({
-        cardStacks: [stack({ cards: new Array(6).fill({}) })]
-      });
+    test('Colossus requires a flight-ready stack with at least 7 own cards', () => {
+      const ownSubStacks = (p: any, n: number) => new Array(n).fill({}).map(() => ({ owner: p }));
+      const colossus = player();
+      colossus.cardStacks = [stack({ cardStacks: ownSubStacks(colossus, 7) })];
+      const notReady = player();
+      notReady.cardStacks = [stack({ isFlightReady: false, cardStacks: ownSubStacks(notReady, 10) })];
+      const small = player();
+      small.cardStacks = [stack({ cardStacks: ownSubStacks(small, 6) })];
+      const withOpponentAttachment = player();
+      // 6 own cards plus an opponent attachment (e.g. 437 Kopfgeld) do not make a colossus.
+      withOpponentAttachment.cardStacks = [
+        stack({ cardStacks: [...ownSubStacks(withOpponentAttachment, 6), { owner: player() }] })
+      ];
 
       expect(check(DailyType.Colossus, colossus, player(), true)).toBe(true);
       expect(check(DailyType.Colossus, notReady, player(), true)).toBe(false);
       expect(check(DailyType.Colossus, small, player(), true)).toBe(false);
+      expect(check(DailyType.Colossus, withOpponentAttachment, player(), true)).toBe(false);
     });
 
     test('Login is never achieved through shouldAchieveDaily', () => {
@@ -245,15 +261,13 @@ describe('GameResult', () => {
       // No DB-stubbing spy here — proves computeEarnings is side-effect-free.
       const result = new GameResult(makeMatch() as any);
       const player = makePlayer({
-        discardPile: new Array(4).fill({}), // 4 * 1 = 4
-        cardStacks: [
-          // ingameCards = total cards across stacks - 1 (the colony card itself)
-          // 3 stacks * 2 cards = 6, then -1 => 5 * 3 = 15
-          { cards: [{}, {}] },
-          { cards: [{}, {}] },
-          { cards: [{}, {}] }
-        ]
+        discardPile: new Array(4).fill({}) // 4 * 1 = 4
       });
+      // ingameCards = own cards across stacks - 1 (the colony card itself)
+      // 3 stacks * 2 own cards = 6, then -1 => 5 * 3 = 15
+      player.cardStacks = [1, 2, 3].map(() => ({
+        cardStacks: [{ owner: player }, { owner: player }]
+      }));
       const opponent = makePlayer({
         colonyCardStack: { damage: 7, profile: { energy: 0 }, cards: [] } // 7 * 1 = 7
       });
@@ -261,6 +275,18 @@ describe('GameResult', () => {
       // Non-surrender loss: no victory bonus, so 4 + 7 + 15 = 26.
       result.type = GameResultType.Destruction;
       expect(result.computeEarnings(player, opponent, false)).toBe(26);
+    });
+
+    test('does not count opponent attachments on own stacks as in-game cards', () => {
+      const result = new GameResult(makeMatch() as any);
+      const player = makePlayer();
+      const opponent = makePlayer();
+      // Stack with 2 own cards and 1 opponent attachment (e.g. 437 Kopfgeld):
+      // only the 2 own cards count, then -1 for the colony card => ingameCards = 1 => 3 sol.
+      player.cardStacks = [{ cardStacks: [{ owner: player }, { owner: player }, { owner: opponent }] }];
+
+      result.type = GameResultType.Destruction;
+      expect(result.computeEarnings(player, opponent, false)).toBe(3);
     });
 
     test('adds the victory bonus when the player won a non-surrender game', () => {
@@ -345,7 +371,7 @@ describe('GameResult', () => {
     test('logs and swallows a failing sol update without recording dailies', async () => {
       const increaseSol = jest.spyOn(DBProfilesDAO, 'increaseSol').mockRejectedValue(new Error('DB down'));
       const achieve = jest.spyOn(DBDailiesDAO, 'achieve').mockResolvedValue(undefined);
-      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const result = makePersistableResult();
       const match = result.match;
 
@@ -366,7 +392,7 @@ describe('GameResult', () => {
         .spyOn(DBDailiesDAO, 'achieve')
         .mockRejectedValueOnce(new Error('daily failed'))
         .mockResolvedValue(undefined);
-      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const result = makePersistableResult();
       const match = result.match;
 
