@@ -1,19 +1,23 @@
+import config from 'config';
 import { Request, Response } from 'express';
+import { ipKeyGenerator } from 'express-rate-limit';
 import { EventEmitter } from 'node:events';
 
 jest.mock('../rest_api/api_response', () => ({
   sendStatus: jest.fn()
 }));
 import { sendStatus } from '../rest_api/api_response';
+import { logger } from './logger';
 import { createRateLimiter } from './rate_limiter';
 
 describe('RateLimiter', () => {
   const WINDOW_MS = 1000;
 
-  const createRequest = (ip: string) => <Partial<Request>>(<unknown>{
+  const createRequest = (ip: string, body?: Record<string, unknown>) => <Partial<Request>>(<unknown>{
       ip: ip,
       method: 'POST',
       headers: {},
+      body: body,
       app: { get: () => 'loopback' },
       route: { path: '/api/test' }
     });
@@ -25,8 +29,8 @@ describe('RateLimiter', () => {
   };
   // The rate limiter middleware resolves asynchronously, so the nextCalled flag must be
   // read through a getter instead of a captured (stale) boolean value
-  const invoke = (limiter: any, ip: string) => {
-    const req = createRequest(ip);
+  const invoke = (limiter: any, ip: string, body?: Record<string, unknown>) => {
+    const req = createRequest(ip, body);
     const res = createResponse(req);
     let nextCalled = false;
     limiter(req, res, () => (nextCalled = true));
@@ -40,11 +44,12 @@ describe('RateLimiter', () => {
   const flushMicrotasks = () => new Promise(resolve => setImmediate(resolve));
 
   afterEach(() => {
+    jest.restoreAllMocks();
     jest.clearAllMocks();
   });
 
   it('lets requests pass while the limit is not exceeded', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 2);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 2 });
 
     const first = invoke(limiter, '1.2.3.4');
     await flushMicrotasks();
@@ -57,7 +62,7 @@ describe('RateLimiter', () => {
   });
 
   it('rejects the request exceeding the limit with a 429 and stops the chain', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 2);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 2 });
     invoke(limiter, '1.2.3.4');
     await flushMicrotasks();
     invoke(limiter, '1.2.3.4');
@@ -71,7 +76,7 @@ describe('RateLimiter', () => {
   });
 
   it('tracks the limits of different IPs independently', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 1);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1 });
     invoke(limiter, '1.2.3.4');
     await flushMicrotasks();
 
@@ -82,8 +87,55 @@ describe('RateLimiter', () => {
     expect(sendStatus).not.toHaveBeenCalled();
   });
 
+  it('tracks custom keyGenerator buckets independently on the same IP', async () => {
+    const limiter = createRateLimiter({
+      windowMs: WINDOW_MS,
+      limit: 1,
+      keyGenerator: req => `${ipKeyGenerator(req.ip ?? '')}:${req.body?.username ?? ''}`
+    });
+    invoke(limiter, '1.2.3.4', { username: 'alice' });
+    await flushMicrotasks();
+
+    const blockedSameUser = invoke(limiter, '1.2.3.4', { username: 'alice' });
+    await flushMicrotasks();
+    const otherUserSameIp = invoke(limiter, '1.2.3.4', { username: 'bob' });
+    await flushMicrotasks();
+
+    expect(blockedSameUser.nextCalled).toBe(false);
+    expect(otherUserSameIp.nextCalled).toBe(true);
+  });
+
+  it('logs a warning and lets the request pass in dry-run mode', async () => {
+    const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1, dryRun: true });
+    invoke(limiter, '1.2.3.4');
+    await flushMicrotasks();
+
+    const second = invoke(limiter, '1.2.3.4');
+    await flushMicrotasks();
+
+    expect(second.nextCalled).toBe(true);
+    expect(sendStatus).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('Rate limit exceeded (dry-run) for POST /api/test from IP 1.2.3.4');
+  });
+
+  it('reads rate_limit.dry_run from config when no override is passed', async () => {
+    const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+    jest.spyOn(config, 'get').mockReturnValue(true);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1 });
+    invoke(limiter, '1.2.3.4');
+    await flushMicrotasks();
+
+    const second = invoke(limiter, '1.2.3.4');
+    await flushMicrotasks();
+
+    expect(second.nextCalled).toBe(true);
+    expect(sendStatus).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('Rate limit exceeded (dry-run) for POST /api/test from IP 1.2.3.4');
+  });
+
   it('does not count successful responses toward the limit when successful requests are skipped', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 1, true);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1, skipSuccessfulRequests: true });
     // A response the library can observe: it resolves the successful-request detection via
     // the finish event, so the response mock must be an event emitter whose send() finishes
     // the response like express does
@@ -123,7 +175,7 @@ describe('RateLimiter', () => {
   });
 
   it('opens a new window after the previous one expired', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 1);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1 });
     invoke(limiter, '1.2.3.4');
     await flushMicrotasks();
     const blocked = invoke(limiter, '1.2.3.4');
@@ -139,7 +191,7 @@ describe('RateLimiter', () => {
   });
 
   it('sets the standard rate limit headers on every response', async () => {
-    const limiter = createRateLimiter(WINDOW_MS, 1);
+    const limiter = createRateLimiter({ windowMs: WINDOW_MS, limit: 1 });
     const { res } = invoke(limiter, '1.2.3.4');
     await flushMicrotasks();
 

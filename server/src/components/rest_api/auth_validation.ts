@@ -13,6 +13,7 @@ import {
 } from '../utils/request_validation';
 import {
   existsRateLimiter,
+  loginIpRateLimiter,
   loginRateLimiter,
   passwordResetRateLimiter,
   registerRateLimiter,
@@ -28,11 +29,16 @@ import {
  */
 const authValidation = Router();
 
-authValidation.post('/api/auth/register', registerRateLimiter, validateBodyMiddleware(authRegisterSchema));
+authValidation.post('/api/auth/register', validateBodyMiddleware(authRegisterSchema), registerRateLimiter);
 
 authValidation.put('/api/auth/register/:id', validateParamsMiddleware(oneTimeIdSchema));
 
-authValidation.post('/api/auth/login', loginRateLimiter, validateBodyMiddleware(authLoginSchema));
+authValidation.post(
+  '/api/auth/login',
+  loginIpRateLimiter,
+  loginRateLimiter,
+  validateBodyMiddleware(authLoginSchema)
+);
 
 authValidation.get('/api/auth/login', sessionLoginRateLimiter);
 
@@ -42,8 +48,8 @@ authValidation.get('/api/auth/exists', existsRateLimiter, validateQueryMiddlewar
 
 authValidation.delete(
   '/api/auth/password/:user',
-  passwordResetRateLimiter,
-  validateParamsMiddleware(authPasswordResetUserSchema)
+  validateParamsMiddleware(authPasswordResetUserSchema),
+  passwordResetRateLimiter
 );
 
 authValidation.put('/api/auth/password', validateBodyMiddleware(authPasswordSchema));
