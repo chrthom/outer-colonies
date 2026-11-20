@@ -1,12 +1,6 @@
 <div class="space"></div>
 <div class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
-  <a
-    class="logo"
-    id="navbar-logo"
-    [class.compact]="!isLoggedIn"
-    routerLink="/"
-    aria-label="Outer Colonies – Startseite"
-  >
+  <a class="logo" id="navbar-logo" routerLink="/" aria-label="Outer Colonies – Startseite">
     <img src="../../../assets/logo.png" alt="" width="300" height="188" />
   </a>
   @if (isLoggedIn) {
@@ -82,10 +76,30 @@
         <a routerLink="/" [class.active]="active === ''" [attr.aria-current]="active === '' ? 'page' : null"
           >Startseite</a
         >
-        <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
-        <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
-        <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
-        <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
+        <a
+          routerLink="/world"
+          [class.active]="active === 'world'"
+          [attr.aria-current]="active === 'world' ? 'page' : null"
+          >Die Welt</a
+        >
+        <a
+          routerLink="/factions"
+          [class.active]="active === 'factions'"
+          [attr.aria-current]="active === 'factions' ? 'page' : null"
+          >Die Mächte</a
+        >
+        <a
+          routerLink="/history"
+          [class.active]="active === 'history'"
+          [attr.aria-current]="active === 'history' ? 'page' : null"
+          >Die Geschichte</a
+        >
+        <a
+          routerLink="/editions"
+          [class.active]="active === 'editions'"
+          [attr.aria-current]="active === 'editions' ? 'page' : null"
+          >Die Editionen</a
+        >
         <a
           routerLink="/rules"
           [class.active]="active === 'rules'"
