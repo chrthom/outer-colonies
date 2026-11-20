@@ -1,0 +1,16 @@
+#background-stars {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-dark);
+  background-image: url("https://assets.outercolonies.de/background/stars1.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+#background-layer {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-dark);
+  opacity: 0.4;
+}

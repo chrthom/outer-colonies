@@ -1,0 +1,141 @@
+#rules-box {
+  h4,
+  h5 {
+    display: inline;
+  }
+  width: calc(100% - 50px);
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  #main-table {
+    width: 100%;
+    .mobile-chapter-hint {
+      display: none;
+    }
+    #table-of-content {
+      width: 250px;
+    }
+    #rules-content {
+      padding-left: 40px;
+      h2 {
+        display: block;
+        margin-bottom: 15px;
+      }
+      p,
+      ul,
+      ol {
+        margin-bottom: 30px;
+      }
+      table {
+        border-collapse: collapse;
+        margin-top: 10px;
+        margin-bottom: 20px;
+      }
+      td,
+      th {
+        border: 1px ridge color-mix(in srgb, var(--color-light), transparent 50%);
+        padding: 8px;
+      }
+      tr:nth-child(even) {
+        background-color: color-mix(in srgb, var(--color-primary), transparent 80%);
+      }
+      tr:hover {
+        background-color: color-mix(in srgb, var(--color-accent), transparent 60%);
+      }
+      th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        vertical-align: middle;
+        background-color: var(--color-primary);
+        color: var(--color-light);
+      }
+      .left {
+        float: left;
+        margin-right: 20px;
+      }
+      .right {
+        float: right;
+        margin-left: 20px;
+      }
+      .size-20 {
+        max-width: 20%;
+      }
+      .size-30 {
+        max-width: 30%;
+      }
+      .size-40 {
+        max-width: 40%;
+      }
+      .nav-button {
+        margin: 5px 5px 20px 0;
+      }
+      .nav-button:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  #rules-box {
+    width: calc(100% - 24px);
+    margin-top: 20px;
+
+    #main-table,
+    #main-table > tbody,
+    #main-table > tbody > tr,
+    #main-table #table-of-content,
+    #main-table #rules-content {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    #main-table #table-of-content {
+      .mobile-chapter-hint {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      mat-selection-list {
+        max-height: 260px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-color: var(--color-primary-light) var(--color-dark);
+      }
+    }
+
+    #main-table #rules-content {
+      padding: 20px 0 0;
+      overflow-wrap: anywhere;
+
+      table {
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      td,
+      th {
+        padding: 6px;
+      }
+
+      img.left,
+      img.right {
+        float: none;
+        display: block;
+        margin: 0 auto 20px;
+      }
+
+      .size-20 {
+        max-width: 40%;
+      }
+
+      .size-30,
+      .size-40 {
+        max-width: 70%;
+      }
+    }
+  }
+}
