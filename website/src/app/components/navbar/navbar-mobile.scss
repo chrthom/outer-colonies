@@ -1,0 +1,47 @@
+@media (max-width: 759px) {
+  .menu {
+    display: block;
+    min-height: 44px;
+    padding: 0 8px;
+    background: transparent;
+    color: var(--color-primary-light);
+    font:
+      14px "Latin Modern Mono Caps",
+      monospace;
+    cursor: pointer;
+  }
+  .links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: var(--color-dark);
+    border: 1px solid var(--color-primary-dark);
+    padding: 8px 16px;
+    &.open {
+      display: flex;
+    }
+    a {
+      padding: 14px 8px;
+      font-size: 16px;
+    }
+  }
+  .actions {
+    gap: 4px;
+    padding: 0 8px 0 0;
+  }
+}
+@media (max-width: 400px) {
+  .logo.compact {
+    --logo-width: 64px;
+    padding-inline: 8px;
+  }
+  .zone {
+    padding-left: 80px;
+  }
+  .actions a {
+    padding-inline: 8px;
+  }
+}

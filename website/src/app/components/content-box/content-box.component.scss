@@ -55,7 +55,7 @@
 .content-box-fill {
   position: absolute;
   inset: 81px 42px 42px 43px;
-  background-color: color-mix(in srgb, var(--color-primary), transparent 93%);
+  background-color: var(--color-panel-tint);
 }
 
 .content-box-right {

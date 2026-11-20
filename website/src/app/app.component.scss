@@ -1,45 +1,20 @@
-#background-stars {
+.skip-link {
   position: fixed;
-  inset: 0;
-  background-color: var(--color-dark);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+  z-index: 100;
+  top: 8px;
+  left: 8px;
+  padding: 12px;
+  background: var(--color-dark);
+  transform: translateY(-200%);
+  &:focus-visible {
+    transform: none;
+  }
 }
 
-.background-stars-0 {
-  background-image: url("https://assets.outercolonies.de/background/stars0.jpg");
-}
-
-.background-stars-1 {
-  background-image: url("https://assets.outercolonies.de/background/stars1.jpg");
-}
-
-.background-stars-2 {
-  background-image: url("https://assets.outercolonies.de/background/stars2.jpg");
-}
-
-.background-stars-3 {
-  background-image: url("https://assets.outercolonies.de/background/stars3.jpg");
-}
-
-.background-stars-4 {
-  background-image: url("https://assets.outercolonies.de/background/stars4.jpg");
-}
-
-.background-stars-5 {
-  background-image: url("https://assets.outercolonies.de/background/stars5.jpg");
-}
-
-.background-stars-6 {
-  background-image: url("https://assets.outercolonies.de/background/stars6.jpg");
-}
-
-#background-layer {
-  position: fixed;
-  inset: 0;
-  background-color: var(--color-dark);
-  opacity: 0.4;
+header {
+  position: sticky;
+  top: -25px;
+  z-index: 50;
 }
 
 #root-content {
@@ -54,6 +29,10 @@
 
 router-outlet {
   display: none;
+}
+
+#main-content {
+  scroll-margin-top: 95px;
 }
 
 #footer {
@@ -78,17 +57,39 @@ router-outlet {
   margin-left: 16px;
 }
 
-#footer-links a {
+#footer-links a,
+#footer-links button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-primary-light);
+  font: inherit;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
   }
 }
 
+#footer-links button {
+  min-width: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+
 #version {
   margin-left: auto;
   text-align: right;
   text-decoration: none;
+}
+
+.version-stage,
+.version-name {
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-weight: bold;
+}
+
+.version-name {
+  font-size: 1.17em;
 }
 
 ul li {
