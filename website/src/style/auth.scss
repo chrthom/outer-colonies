@@ -2,13 +2,17 @@
   width: min(560px, 100%);
   min-width: 0;
   margin: var(--space-xl) auto var(--space-md);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  hyphens: auto;
 
   &.oc-auth-register {
     width: min(760px, 100%);
   }
 
   mat-form-field {
+    --mat-form-field-outlined-error-outline-color: var(--color-accent-light);
+    --mat-form-field-outlined-error-focus-outline-color: var(--color-accent-light);
+    --mat-form-field-outlined-error-hover-outline-color: var(--color-accent-light);
     width: 100%;
     min-width: 0;
     margin-bottom: var(--space-md);
@@ -34,7 +38,7 @@
     .mdc-button__label {
       white-space: normal;
       line-height: 1.5;
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
     }
   }
 
@@ -51,7 +55,10 @@
 
   .request-error {
     color: var(--color-accent-light);
-    margin-top: var(--space-md);
+
+    &.has-error {
+      margin-top: var(--space-md);
+    }
   }
 
   mat-error {
