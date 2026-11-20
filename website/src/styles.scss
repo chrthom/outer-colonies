@@ -26,9 +26,10 @@
   vertical-align: baseline;
   font-family: "Latin Modern Sans";
 }
+// The brand teal drops to about 2:1 as text over the brighter parts of the background image
 a,
 a:visited {
-  color: var(--color-primary);
+  color: var(--color-primary-light);
 }
 html,
 body {
@@ -75,6 +76,12 @@ ul {
   width: 32px;
   font-size: 32px;
 }
+// Outlined buttons have no fill, so the label sits directly on the dark panel or the teal navbar
+// gradient, where the brand teal only reaches about 3.2:1
+.mat-mdc-outlined-button.mat-primary {
+  --mat-button-outlined-label-text-color: var(--color-primary-light);
+  --mat-button-outlined-outline-color: var(--color-primary);
+}
 .primary-color {
   color: var(--color-primary);
 }
@@ -83,4 +90,15 @@ ul {
 }
 .clickable {
   cursor: pointer;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  white-space: nowrap;
 }

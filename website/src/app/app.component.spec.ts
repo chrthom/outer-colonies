@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
@@ -7,11 +7,13 @@ import { of } from 'rxjs';
 
 describe('AppComponent', () => {
   let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
   let authSpy: jasmine.SpyObj<AuthService>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   beforeEach(async () => {
-    authSpy = jasmine.createSpyObj('AuthService', ['check'], { isLoggedIn: false, displayname: '' });
+    authSpy = jasmine.createSpyObj('AuthService', ['check'], { displayname: '' });
+    Object.assign(authSpy, { isLoggedIn: false }); // plain property, as jasmine accessors cannot be reassigned
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     authSpy.check.and.returnValue(of(false));
@@ -25,7 +27,7 @@ describe('AppComponent', () => {
       ]
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(AppComponent);
+    fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -54,8 +56,21 @@ describe('AppComponent', () => {
     expect(dialogSpy.open).toHaveBeenCalled();
   });
 
-  it('should have public authService for template access', () => {
-    expect(component.authService).toBeDefined();
-    expect(component.authService.isLoggedIn).toBeFalse();
+  it('should render the navbar for anonymous users', () => {
+    expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
+  });
+
+  it('should render the navbar for logged-in users', () => {
+    Object.assign(authSpy, { isLoggedIn: true });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
+  });
+
+  it('should render the footer links on every page', () => {
+    const footer = fixture.nativeElement.querySelector('#footer');
+    expect(footer).toBeTruthy();
+    expect(footer.textContent).toContain('Impressum');
+    expect(footer.textContent).toContain('Datenschutz');
   });
 });

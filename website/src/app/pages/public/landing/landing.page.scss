@@ -1,0 +1,121 @@
+#landing-page {
+  padding-bottom: 40px;
+}
+
+#hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 60vh;
+  padding: 40px 20px 60px;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+}
+
+#beta-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 4px 12px;
+  border: 1px solid var(--color-warn);
+  color: var(--color-warn);
+  font-family: "Latin Modern Mono Caps";
+  font-size: 14px;
+}
+
+#hero-logo {
+  width: 140px;
+  margin-bottom: 10px;
+}
+
+#hero-title {
+  display: block;
+  font-size: 56px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#hero-tagline {
+  margin-top: 10px;
+  font-size: 20px;
+  color: var(--color-primary-light);
+}
+
+#hero-ctas {
+  margin-top: 30px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+#hero-login {
+  font-size: 18px;
+}
+
+.landing-section {
+  margin-top: 40px;
+}
+
+.landing-text {
+  max-width: 75ch;
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  ul {
+    margin: 0 0 12px 20px;
+  }
+  li {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+}
+
+.more-link {
+  color: var(--color-primary-light);
+}
+
+#lore-teasers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.teaser-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.teaser-text {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  #hero {
+    min-height: 50vh;
+  }
+  #hero-title {
+    font-size: 40px;
+  }
+  #lore-teasers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  #hero {
+    padding: 20px 10px 40px;
+  }
+  #hero-title {
+    font-size: 32px;
+  }
+}

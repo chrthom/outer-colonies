@@ -3,7 +3,8 @@ import { CookieService } from 'ngx-cookie-service';
 import AuthService from './auth.service';
 import AuthApiService from './api/auth-api.service';
 import { environment } from 'src/environments/environment';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
+import { AuthLoginResponse } from '@shared/interfaces/rest_api';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -204,5 +205,28 @@ describe('AuthService', () => {
       expect(success).toBeFalse();
       expect(authApiSpy.login).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('should share a single in-flight check between concurrent callers', () => {
+    const response$ = new Subject<AuthLoginResponse>();
+    cookieSpy.get.and.callFake((key: string) => (key === 'u' ? 'testuser' : key === 'p' ? 'password' : ''));
+    authApiSpy.login.and.returnValue(response$.asObservable());
+
+    const results: boolean[] = [];
+    service.check().subscribe(success => results.push(success));
+    service.check().subscribe(success => results.push(success));
+    expect(authApiSpy.login).toHaveBeenCalledTimes(1); // both callers share one request
+
+    response$.next({ sessionToken: 'shared-token', username: 'testuser', email: 'test@example.com' });
+    response$.complete();
+    expect(results).toEqual([true, true]);
+    expect(service.isLoggedIn).toBeTrue();
+
+    // Once the shared check has settled, the cache is cleared and a new check issues a fresh request:
+    authApiSpy.checkSessionToken.and.returnValue(
+      of({ sessionToken: 'next-token', username: 'testuser', email: 'test@example.com' })
+    );
+    service.check().subscribe(success => expect(success).toBeTrue());
+    expect(authApiSpy.checkSessionToken).toHaveBeenCalledTimes(1);
   });
 });

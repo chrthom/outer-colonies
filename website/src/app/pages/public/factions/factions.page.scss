@@ -1,0 +1,55 @@
+.lore-page {
+  width: min(860px, 100%);
+  margin: 40px auto 20px;
+  > oc-content-box {
+    margin-top: 40px;
+  }
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}
+
+.lore-intro {
+  font-size: 20px;
+  line-height: 1.7;
+  color: var(--color-primary-light);
+}
+
+.faction-role {
+  font-family: "Latin Modern Mono Caps";
+  font-size: 14px;
+  color: var(--color-primary);
+  margin-bottom: 15px;
+}
+
+h3.lore-headline {
+  display: block;
+  font-size: 20px;
+  color: var(--color-primary);
+  margin: 20px 0 15px;
+}
+
+.house-table {
+  width: 100%;
+  margin: 15px 0 20px;
+  border-collapse: collapse;
+  th {
+    font-family: "Latin Modern Mono Caps";
+    font-size: 16px;
+    color: var(--color-primary);
+    text-align: left;
+    vertical-align: top;
+    padding: 8px 16px 8px 0;
+    white-space: nowrap;
+  }
+  td {
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 8px 0;
+  }
+  tr {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-primary), transparent 75%);
+  }
+}

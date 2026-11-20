@@ -1,0 +1,72 @@
+.lore-page {
+  width: min(860px, 100%);
+  margin: 40px auto 20px;
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}
+
+.timeline {
+  position: relative;
+  margin: 20px 0 30px;
+  padding-left: 24px;
+  border-left: 2px solid var(--color-primary);
+}
+
+.era {
+  position: relative;
+  margin-bottom: 30px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.era-marker {
+  position: absolute;
+  left: -30px;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+
+h3.era-header {
+  display: block;
+  font-size: 20px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  .era-date {
+    font-size: 16px;
+    color: var(--color-primary-light);
+  }
+}
+
+.era-entry {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 15px;
+  margin-bottom: 10px;
+  p {
+    margin-bottom: 0;
+  }
+  ol {
+    margin: 12px 0 12px 20px;
+  }
+  li {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  &.kallisto {
+    border-left: 3px solid var(--color-warn);
+  }
+}
+
+.history-closing {
+  margin-top: 30px;
+  a {
+    margin-top: 10px;
+  }
+}

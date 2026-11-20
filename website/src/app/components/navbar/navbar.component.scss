@@ -83,3 +83,89 @@ h2.navbar-right {
   padding: 15px 25px;
   z-index: 51;
 }
+
+/*
+ * Compact logo variant for the anonymous navbar: the logo has no intrinsic size rule otherwise
+ * (natural 300x188 plus padding = ~350px box), which would overlap the centered lore links.
+ * Shrunk to 100px the box (100px + 2x10px padding = 120px) fits the space #navbar-anon-zone reserves.
+ */
+#navbar-logo.compact {
+  padding: 15px 10px;
+  transform: translateY(-15%);
+  img {
+    width: 100px;
+  }
+}
+
+/*
+ * Anonymous three-zone layout: compact logo (space reserved via padding) / centered lore links / auth actions.
+ * The flex zones reserve their space, so the links can never collide with logo or action buttons.
+ */
+#navbar-anon-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 120px; /* reserves exactly the compact logo box (see #navbar-logo.compact) */
+}
+
+#navbar-anon-links {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden; /* clips instead of overlapping the action buttons if the viewport is too narrow */
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  a {
+    font-family: "Latin Modern Mono Caps";
+    font-size: 16px;
+    color: var(--color-primary-light);
+    text-decoration: none;
+    white-space: nowrap;
+    &.active,
+    &:hover {
+      color: var(--color-light);
+      text-decoration: underline;
+    }
+  }
+}
+
+#navbar-anon-actions {
+  flex: 0 0 auto;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+}
+
+@media (max-width: 960px) {
+  #navbar-anon-links {
+    gap: 20px;
+    a {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  #navbar-anon-links {
+    gap: 12px;
+    a {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  /* The text links no longer fit next to logo and action buttons; the landing page teasers keep the lore pages reachable. */
+  #navbar-anon-links {
+    display: none;
+  }
+}

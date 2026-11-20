@@ -1,0 +1,19 @@
+.lore-page {
+  width: min(860px, 100%);
+  margin: 40px auto 20px;
+  h3.lore-headline {
+    display: block;
+    font-size: 20px;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+  }
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}
+
+.more-link {
+  color: var(--color-primary-light);
+}

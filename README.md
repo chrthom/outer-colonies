@@ -78,33 +78,42 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Key Components**:
   - `app.component.ts`: Main application component
   - `auth.service.ts`: Authentication service
-  - `pages/`: Various pages for deck management, user management and settings
-    - `activate-account/`: Account activation page
-    - `confirm-email/`: Email confirmation page
-    - `data-privacy/`: Data privacy information page
-    - `deck/`: Deck management page
-    - `forgot-password/`: Forgot password page
-    - `home/`: Home page
-    - `imprint/`: Imprint page
-    - `login/`: Login page
-    - `profile/`: User profile page
-    - `register/`: Registration page
-    - `reset-password/`: Reset password page
-    - `rules/`: Game rules page
-    - `trade/`: Trade page
+  - `pages/`: Pages of the website, substructured by accessibility
+    - `private/`: Pages for authenticated players (behind `privateGuardFn`)
+      - `deck/`: Deck management page
+      - `home/`: Home page (game home for logged-in players at `/home`)
+      - `profile/`: User profile page
+      - `rules/`: Game rules page
+      - `trade/`: Trade page
+    - `public/`: Pages for anonymous visitors (behind `publicGuardFn`)
+      - `activate-account/`: Account activation page
+      - `confirm-email/`: Email confirmation page
+      - `data-privacy/`: Data privacy information page
+      - `editions/`: Public lore page "Die Editionen" (edition stories)
+      - `factions/`: Public lore page "Die Mächte" (Terra, Mars, Venus, Outer Colonies)
+      - `forgot-password/`: Forgot password page
+      - `history/`: Public lore page "Die Geschichte" (timeline)
+      - `imprint/`: Imprint page
+      - `landing/`: Public landing page for anonymous visitors at `/`
+      - `login/`: Login page
+      - `register/`: Registration page
+      - `reset-password/`: Reset password page
+      - `world/`: Public lore page "Die Welt" (setting intro)
   - `components/`: Reusable UI components
     - `content-box/`: Content box component - A styled container with a title and content area. Used in various pages to display information in a boxed layout.
-      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck
+      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck, landing, world, factions, history, editions
     - `error-state-matcher.ts`: Error state matcher utility - A utility class for handling form error states in Angular Material forms.
       - **Used in pages**: reset-password, forgot-password, profile, register, login
     - `image-modal/`: Image modal component - A modal dialog for displaying images. Used to show larger versions of images when clicked.
       - **Used in pages**: register, deck
     - `inventory-item/`: Inventory item component - A component for displaying inventory items with an image and text.
       - **Used in pages**: trade
-    - `navbar/`: Navigation bar component - The main navigation bar for the website, providing links to different sections of the site and user information.
+    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, text links to the public lore pages plus register/login buttons for anonymous visitors.
       - **Used in**: app.component.html (global navigation)
     - `open-item/`: Open item component - A component for displaying the contents of opened items (e.g., booster packs).
       - **Used in pages**: trade
+    - `quote/`: Quote component (`oc-quote`) - A presentational figure quote with teal left border and attribution line. Used as narrative insert on the public lore pages.
+      - **Used in pages**: world, factions
 - **Communication**: Uses REST API to communicate with the server
 
 #### Client (Phaser 3)

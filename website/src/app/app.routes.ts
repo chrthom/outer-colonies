@@ -1,21 +1,26 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, Routes } from '@angular/router';
 import { map } from 'rxjs';
-import { LoginPage } from './pages/login/login.page';
-import { HomePage } from './pages/home/home.page';
-import { RegisterPage } from './pages/register/register.page';
-import { DeckPage } from './pages/deck/deck.page';
-import { ImprintPage } from './pages/imprint/imprint.page';
-import { DataPrivacyPage } from './pages/data-privacy/data-privacy.page';
+import { LoginPage } from './pages/public/login/login.page';
+import { HomePage } from './pages/private/home/home.page';
+import { RegisterPage } from './pages/public/register/register.page';
+import { DeckPage } from './pages/private/deck/deck.page';
+import { ImprintPage } from './pages/public/imprint/imprint.page';
+import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
-import { TradePage } from './pages/trade/trade.page';
-import { RulesPage } from './pages/rules/rules.page';
-import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
-import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
-import { ActivateAccountPage } from './pages/activate-account/activate-account.page';
-import { ProfilePage } from './pages/profile/profile.page';
-import { ConfirmEmailPage } from './pages/confirm-email/confirm-email.page';
+import { TradePage } from './pages/private/trade/trade.page';
+import { RulesPage } from './pages/private/rules/rules.page';
+import { ForgotPasswordPage } from './pages/public/forgot-password/forgot-password.page';
+import { ResetPasswordPage } from './pages/public/reset-password/reset-password.page';
+import { ActivateAccountPage } from './pages/public/activate-account/activate-account.page';
+import { ProfilePage } from './pages/private/profile/profile.page';
+import { ConfirmEmailPage } from './pages/public/confirm-email/confirm-email.page';
+import { LandingPage } from './pages/public/landing/landing.page';
+import { WorldPage } from './pages/public/world/world.page';
+import { FactionsPage } from './pages/public/factions/factions.page';
+import { HistoryPage } from './pages/public/history/history.page';
+import { EditionsPage } from './pages/public/editions/editions.page';
 
 /**
  * Redirects to HTTPS when the environment requires it.
@@ -55,72 +60,147 @@ const privateGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
 /** Guard for public pages: only forces HTTPS. */
 const publicGuardFn: CanActivateFn = () => checkHttps();
 
+/**
+ * Resolves deep links of the form /?p=<path> (the only deep-link form that works behind the
+ * production hosting, see #253) by redirecting to the target route, so the target route's own
+ * guards apply - anonymous deep links to private routes still cascade to /login.
+ */
+const deepLinkGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const initialPath = route.queryParams['p'];
+  if (initialPath) {
+    return inject(Router).parseUrl('/' + initialPath);
+  }
+  return true;
+};
+
+/**
+ * Redirects already authenticated visitors from the public landing page to the game home page,
+ * so logged-in players always end up in the game instead of on the marketing page.
+ */
+const authenticatedGuardFn: CanActivateFn = () => {
+  const router = inject(Router);
+  return inject(AuthService)
+    .check()
+    .pipe(
+      map(authenticated => {
+        if (authenticated) {
+          router.navigate(['/home']);
+          return false;
+        }
+        return true;
+      })
+    );
+};
+
 export const routes: Routes = [
   {
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
-    component: ActivateAccountPage
+    component: ActivateAccountPage,
+    title: 'Outer Colonies – Nutzerkonto aktivieren'
   },
   {
     path: 'confirm-email/:id',
     canActivate: [publicGuardFn],
-    component: ConfirmEmailPage
+    component: ConfirmEmailPage,
+    title: 'Outer Colonies – E-Mail bestätigen'
   },
   {
     path: 'deck',
     canActivate: [privateGuardFn],
-    component: DeckPage
+    component: DeckPage,
+    title: 'Outer Colonies – Deck-Manager'
+  },
+  {
+    path: 'editions',
+    canActivate: [publicGuardFn],
+    component: EditionsPage,
+    title: 'Outer Colonies – Die Editionen'
+  },
+  {
+    path: 'factions',
+    canActivate: [publicGuardFn],
+    component: FactionsPage,
+    title: 'Outer Colonies – Die Mächte'
   },
   {
     path: 'forgot-password',
     canActivate: [publicGuardFn],
-    component: ForgotPasswordPage
+    component: ForgotPasswordPage,
+    title: 'Outer Colonies – Passwort vergessen'
+  },
+  {
+    path: 'history',
+    canActivate: [publicGuardFn],
+    component: HistoryPage,
+    title: 'Outer Colonies – Die Geschichte'
+  },
+  {
+    path: 'home',
+    canActivate: [privateGuardFn],
+    component: HomePage,
+    title: 'Outer Colonies – Spielsuche & Aktuelles'
   },
   {
     path: 'imprint',
     canActivate: [publicGuardFn],
-    component: ImprintPage
+    component: ImprintPage,
+    title: 'Outer Colonies – Impressum'
   },
   {
     path: 'login',
     canActivate: [publicGuardFn],
-    component: LoginPage
+    component: LoginPage,
+    title: 'Outer Colonies – Login'
   },
   {
     path: 'privacy',
     canActivate: [publicGuardFn],
-    component: DataPrivacyPage
+    component: DataPrivacyPage,
+    title: 'Outer Colonies – Datenschutzerklärung'
   },
   {
     path: 'profile',
     canActivate: [privateGuardFn],
-    component: ProfilePage
+    component: ProfilePage,
+    title: 'Outer Colonies – Profil'
   },
   {
     path: 'register',
     canActivate: [publicGuardFn],
-    component: RegisterPage
+    component: RegisterPage,
+    title: 'Outer Colonies – Registrieren'
   },
   {
     path: 'reset-password/:id',
     canActivate: [publicGuardFn],
-    component: ResetPasswordPage
+    component: ResetPasswordPage,
+    title: 'Outer Colonies – Neues Passwort setzen'
   },
   {
     path: 'rules',
     canActivate: [privateGuardFn],
-    component: RulesPage
+    component: RulesPage,
+    title: 'Outer Colonies – Spielregeln'
   },
   {
     path: 'trade',
     canActivate: [privateGuardFn],
-    component: TradePage
+    component: TradePage,
+    title: 'Outer Colonies – Inventar & Markt'
+  },
+  {
+    path: 'world',
+    canActivate: [publicGuardFn],
+    component: WorldPage,
+    title: 'Outer Colonies – Die Welt'
   },
   {
     path: '',
-    canActivate: [privateGuardFn],
-    component: HomePage,
-    pathMatch: 'full'
+    canActivate: [publicGuardFn, deepLinkGuardFn, authenticatedGuardFn],
+    component: LandingPage,
+    pathMatch: 'full',
+    title: 'Outer Colonies – Das Online-Sammelkartenspiel'
   },
   {
     path: '**',
