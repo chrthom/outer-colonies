@@ -1,10 +1,10 @@
 import { ItemType } from '../../shared/config/enums';
-import DBConnection from './db_connector';
+import DBConnection, { DBChangeResult } from './db_connector';
 
 export interface DBItem {
   itemId: number;
   type: ItemType;
-  message?: string;
+  message: string | null;
   content: string;
 }
 
@@ -13,16 +13,24 @@ export interface DBItemBoxContent {
   value: number;
 }
 
+/** Raw `items` row as the MariaDB driver returns it (the bigint key arrives as BigInt). */
+interface ItemRow {
+  item_id: bigint;
+  type: string;
+  message: string | null;
+  content: string;
+}
+
 export default class DBItemsDAO {
   static async getByUserId(userId: number): Promise<DBItem[]> {
     return this.getBy('user_id = ?', [userId]);
   }
-  private static async getBy(whereClause: string, params: any[]): Promise<DBItem[]> {
-    const queryResult: any[] = await DBConnection.instance.query(
+  private static async getBy(whereClause: string, params: unknown[]): Promise<DBItem[]> {
+    const rows = await DBConnection.instance.query<ItemRow[]>(
       `SELECT item_id, type, message, content FROM items WHERE ${whereClause}`,
       params
     );
-    return queryResult.map(r => {
+    return rows.map(r => {
       return {
         itemId: Number(r.item_id),
         type: r.type == 'booster' ? ItemType.Booster : ItemType.Box,
@@ -38,8 +46,10 @@ export default class DBItemsDAO {
    * @returns the number of deleted rows
    */
   static async delete(itemId: number): Promise<number> {
-    const result: any = await DBConnection.instance.query('DELETE FROM items WHERE item_id = ?', [itemId]);
-    return Number(result.affectedRows);
+    const result = await DBConnection.instance.query<DBChangeResult>('DELETE FROM items WHERE item_id = ?', [
+      itemId
+    ]);
+    return result.affectedRows;
   }
   static async createBooster(userId: number, boosterNo: number) {
     await this.create(userId, ItemType.Booster, String(boosterNo));

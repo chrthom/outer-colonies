@@ -75,37 +75,48 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 
 #### Website (Angular)
 - **Purpose**: User management, deck configuration, settings, and opponent search
+- **Loading**: Secondary pages are loaded on demand without automatic route preloading; the landing page remains in the initial bundle. Legal dialogs load their page components when opened.
 - **Key Components**:
-  - `app.component.ts`: Main application component
+    - `app.component.ts`: Main application component; uses the fixed teal star field with a dark fallback and veil across public and private pages
   - `auth.service.ts`: Authentication service
-  - `pages/`: Various pages for deck management, user management and settings
-    - `activate-account/`: Account activation page
-    - `confirm-email/`: Email confirmation page
-    - `data-privacy/`: Data privacy information page
-    - `deck/`: Deck management page
-    - `forgot-password/`: Forgot password page
-    - `home/`: Home page
-    - `imprint/`: Imprint page
-    - `login/`: Login page
-    - `profile/`: User profile page
-    - `register/`: Registration page
-    - `reset-password/`: Reset password page
-    - `rules/`: Game rules page
-    - `trade/`: Trade page
+  - `pages/`: Pages of the website, substructured by accessibility
+    - `private/`: Pages for authenticated players (behind `privateGuardFn`)
+      - `deck/`: Deck management page
+      - `home/`: Home page (game home for logged-in players at `/home`)
+      - `profile/`: User profile page
+      - `rules/`: Public game rules reference (available to anonymous and authenticated visitors)
+      - `trade/`: Trade page
+    - `public/`: Pages for anonymous visitors (behind `publicGuardFn`)
+      - `activate-account/`: Account activation page
+      - `confirm-email/`: Email confirmation page
+      - `data-privacy/`: Data privacy information page
+      - `editions/`: Public lore page "Die Editionen" (edition stories)
+      - `factions/`: Public lore page "Die Mächte" (Terra, Mars, Venus, Outer Colonies)
+      - `forgot-password/`: Forgot password page
+      - `history/`: Public lore page "Die Geschichte" (timeline)
+      - `imprint/`: Imprint page
+      - `landing/`: Public landing page for anonymous visitors at `/`
+      - `login/`: Login page
+      - `register/`: Registration page
+      - `reset-password/`: Reset password page
+      - `world/`: Public lore page "Die Welt" (setting intro)
   - `components/`: Reusable UI components
     - `content-box/`: Content box component - A styled container with a title and content area. Used in various pages to display information in a boxed layout.
-      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck
+      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck, landing, world, factions, history, editions, imprint, data-privacy
     - `error-state-matcher.ts`: Error state matcher utility - A utility class for handling form error states in Angular Material forms.
       - **Used in pages**: reset-password, forgot-password, profile, register, login
     - `image-modal/`: Image modal component - A modal dialog for displaying images. Used to show larger versions of images when clicked.
       - **Used in pages**: register, deck
     - `inventory-item/`: Inventory item component - A component for displaying inventory items with an image and text.
       - **Used in pages**: trade
-    - `navbar/`: Navigation bar component - The main navigation bar for the website, providing links to different sections of the site and user information.
+    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, a visible public home link and accessible lore links with a mobile menu, and registration-first account actions for anonymous visitors. The shell also provides a skip-to-content link and keyboard focus indicators; the footer retains legal links and contextual lore wayfinding.
       - **Used in**: app.component.html (global navigation)
     - `open-item/`: Open item component - A component for displaying the contents of opened items (e.g., booster packs).
       - **Used in pages**: trade
+    - `quote/`: Quote component (`oc-quote`) - A presentational figure quote with teal left border and attribution line. Used as narrative insert on the public lore pages.
+      - **Used in pages**: world, factions
 - **Communication**: Uses REST API to communicate with the server
+- **Public account forms**: Authentication and account-token pages use responsive centered layouts, autocomplete hints, accessible request feedback and page headings. Registration exposes username/password rules and a separate keyboard-operable privacy dialog trigger; login and registration prevent duplicate in-flight requests.
 
 #### Client (Phaser 3)
 - **Purpose**: Actual card game implementation with game logic and rendering
@@ -144,9 +155,15 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: Backend services for both website and client
 - **Key Components**:
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
-  - `components/rest_api.ts`: REST API endpoints for the website
+  - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
+    - `index.ts`: Router registration and central error-handling middleware
+    - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`, `online_router.ts`: Endpoints per resource
+    - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
+    - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
+    - `api_response.ts`: Status response helper with leveled failure logging
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
+  - `components/online_users.ts`: Tracking of unique logged-in users (a user with several sockets counts once) and push of the online count
   - `components/game_state/`: In-memory game state
     - `match.ts`: Central match state (players, turn phases, battle, control, interventions)
     - `player.ts`: Player state (deck, hand, discard pile, card stacks, action pool)
@@ -221,6 +238,9 @@ The server provides the following REST endpoints for the website:
 - **Daily Rewards**:
   - `GET /api/daily`: Get daily rewards
 
+- **Online Users**:
+  - `GET /api/online`: Number of unique logged-in users currently online (unauthenticated, polled by the website home page every 60 seconds)
+
 - **Item Management**:
   - `GET /api/item`: Get user's items
   - `POST /api/item/:itemId`: Use an item
@@ -233,6 +253,7 @@ The server provides the following WebSocket events for the game client:
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
   - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.OnlineCount`: Number of unique logged-in users, pushed to all clients on every login and disconnect which changes it (and to a newly logged-in socket)
 
 - **Game**:
   - `MsgTypeInbound.Connect`: Connect to a match
@@ -439,6 +460,7 @@ The repository working rules — repository language, branches and merges, issue
 2. **Deploy Server**:
    - Upload the built zip file to the target environment under `server`.
    - Unzip the archive on the target environment.
+   - If `server/package.json` or `server/package-lock.json` changed since the last deploy (new or updated dependency), run `npm install` (or `npm ci` when the `node_modules` state is unknown) inside the `outercolonies_server` container before restarting it: the container keeps its `node_modules` across deploys, so a new dependency would otherwise be missing at runtime (`Cannot find module '…'`).
    - Restart the `outercolonies_server` container.
 
 3. **Deploy Client**:
@@ -495,6 +517,8 @@ The full design, budgets and the role chain are documented in [misc/dev-loop.md]
 
 - **Express**: Web framework for handling REST API requests.
 - **Socket.IO**: Library for real-time WebSocket communication between the client and server.
+- **Zod**: Schema validation of REST API request bodies (see `server/src/components/utils/request_validation.ts`). Email format validation uses the shared `server/src/shared/config/email_rules.ts` rule in both server and website; address ownership is checked by confirmation email.
+- **express-rate-limit**: Rate limiting of the auth REST endpoints against brute force, mail flooding and user enumeration (see `server/src/components/utils/rate_limiter.ts`). Limits are held in memory per server process, so they reset on restart. **Rate limiting is currently not enforced**: `rate_limit.dry_run` is `true` in the default, staging and production configs, so requests over a limit are only logged as a warning (including the client IP, to verify proxy bucketing) and still served. This is a deliberate decision until the limits are validated against real traffic; set `rate_limit.dry_run` to `false` to enforce them (tests run enforced).
 - **Node.js**: JavaScript runtime for the server.
 
 ### Development Tools

@@ -1,0 +1,35 @@
+.more-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: "Latin Modern Mono Caps";
+  font-size: 16px;
+  color: var(--color-primary-light);
+}
+
+.lore-page {
+  width: min(860px, 100%);
+  margin: 40px auto;
+
+  > oc-content-box + oc-content-box {
+    margin-top: 40px;
+  }
+
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  blockquote {
+    max-width: min(66ch, var(--measure-body));
+    text-wrap: pretty;
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}

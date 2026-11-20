@@ -1,0 +1,141 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { RulesPage } from './rules.page';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { IconService } from 'src/app/icon.service';
+
+describe('RulesPage', () => {
+  let component: RulesPage;
+  let fixture: ComponentFixture<RulesPage>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [RulesPage, RouterTestingModule],
+      providers: [IconService]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(RulesPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should have default active chapter', () => {
+    const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
+    expect(selectedValue).toBe('setup');
+  });
+
+  it('labels the keyboard-operable chapter list and keeps both navigation button sets', () => {
+    const list: HTMLElement = fixture.nativeElement.querySelector('mat-selection-list');
+    expect(list.getAttribute('aria-label')).toBe('Kapitel der Spielregeln');
+    expect(list.getAttribute('role')).toBe('listbox');
+    expect(fixture.nativeElement.querySelectorAll('.nav-button').length).toBe(4);
+  });
+
+  it('updates the chapter deep link without discarding other query parameters', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    component.nextChapter();
+    expect(component.activeChapterList.selectedOptions.selected[0]?.value).toBe('symbols');
+    expect(navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { section: 'symbols' },
+        queryParamsHandling: 'merge'
+      })
+    );
+  });
+
+  it('scrolls the chapter list to show a selection outside its visible area', () => {
+    const list: HTMLElement = fixture.nativeElement.querySelector('mat-selection-list');
+    const option: HTMLElement = list.querySelector('mat-list-option[value="symbols"]')!;
+    Object.defineProperty(list, 'scrollHeight', { value: 800 });
+    Object.defineProperty(list, 'clientHeight', { value: 200 });
+    spyOn(list, 'getBoundingClientRect').and.returnValue({ top: 0, bottom: 200 } as DOMRect);
+    spyOn(option, 'getBoundingClientRect').and.returnValue({ top: 300, bottom: 348 } as DOMRect);
+
+    component.nextChapter();
+
+    expect(list.scrollTop).toBe(224);
+  });
+
+  it('should register every sidebar chapter in the chapters array', () => {
+    const optionValues = fixture.debugElement
+      .queryAll(By.css('mat-list-option'))
+      .map(option => option.nativeElement.getAttribute('value'));
+    expect(optionValues.length).toBeGreaterThan(0);
+    optionValues.forEach(value => expect(component.chapters).toContain(value));
+  });
+
+  it('should generate correct image URL', () => {
+    const imgName = 'test';
+    const expectedUrl = `${environment.url.assets}/rules/${imgName}.png`;
+    expect(component.imgUrl(imgName)).toBe(expectedUrl);
+  });
+
+  it('should return icon font character for known icons', () => {
+    const iconName = 'control';
+    const result = component.iconUrl(iconName);
+    expect(result).toBe('\uea02');
+  });
+
+  it('should return null for unknown icons', () => {
+    const iconName = 'unknown-icon';
+    expect(component.iconUrl(iconName)).toBeNull();
+  });
+
+  it('should return asset URL from environment', () => {
+    expect(component.assetUrl).toBe(environment.url.assets);
+  });
+
+  it('should have URL generation methods', () => {
+    expect(component.imgUrl('test')).toContain('/rules/test.png');
+    expect(component.iconUrl('test')).toBeNull();
+  });
+
+  it('should describe the mission reward instead of mission cards', () => {
+    selectChapter('missions');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('Missionsbelohnung');
+    expect(chapterText).toContain('Eine Mission ist erfolgreich');
+    expect(chapterText).toContain('legst du die oberste Karte deines Ablagestapels unter dein Deck');
+    expect(chapterText).toContain('unter dein Deck und ziehst 1 Karte');
+    expect(chapterText).toContain('mindestens jedoch 0');
+    expect(chapterText).not.toContain('Missionskarte');
+  });
+
+  it('should halve attacks also on speed ties in the glossary', () => {
+    selectChapter('glossar');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('sind kleiner oder gleich der');
+    expect(chapterText).not.toContain('sind kleiner als die');
+  });
+
+  it('should show a speed tie in the second damage calculation example', () => {
+    selectChapter('attacks');
+    const chapterText = fixture.debugElement.nativeElement.textContent;
+    expect(chapterText).toContain('= 5 ≤ 5');
+    expect(chapterText).not.toContain('nicht halbiert');
+  });
+
+  it('should not mention mission cards in the glossary', () => {
+    selectChapter('glossar');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  it('should not mention mission cards in the turn overview', () => {
+    selectChapter('turn-overview');
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('Missionskarte');
+  });
+
+  function selectChapter(chapter: string): void {
+    component.activeChapterList.selectedOptions.select(
+      component.activeChapterList.options.find(option => option.value === chapter)!
+    );
+    fixture.detectChanges();
+  }
+});

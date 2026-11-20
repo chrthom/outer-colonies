@@ -18,6 +18,7 @@ import { InterventionAttack } from '../game_state/intervention';
 import CardStack from '../cards/card_stack';
 import Player from '../game_state/player';
 import { rules } from '../../shared/config/rules';
+import { constants } from '../../shared/config/constants';
 
 /**
  * Projects the server match state into the client representation of the given player. All
@@ -35,13 +36,17 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
     ...toClientCardStacks(match, player, true, battle),
     ...toClientCardStacks(match, opponent, false, battle)
   ];
-  const players = [toClientPlayer(player, player, cardStacks), toClientPlayer(opponent, player, cardStacks)];
+  const players = [
+    toClientPlayer(match, player, player, cardStacks),
+    toClientPlayer(match, opponent, player, cardStacks)
+  ];
   return {
     battle: battle,
     cardStacks: cardStacks,
     events: toClientEvents(match, playerNo),
     gameResult: toClientGameResult(match, playerNo),
     highlightCardUUID: match.highlightCard?.uuid,
+    highlightCardId: match.highlightCard?.card.id,
     intervention: toClientIntervention(match),
     opponent: players[1],
     player: players[0],
@@ -51,10 +56,6 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   };
 }
 
-/**
- * Projects the battle for the given player: the player's ships are listed as own ships, the
- * opponent's as opponent ships.
- */
 function toClientBattle(match: Match, playerNo: number): ClientBattle {
   return {
     type: match.battle.type,
@@ -65,10 +66,6 @@ function toClientBattle(match: Match, playerNo: number): ClientBattle {
   };
 }
 
-/**
- * Projects all card stacks of one match participant, grouped by zone. `ownedByPlayer` marks
- * stacks of the player the state is emitted to and gates the build phase attributes.
- */
 function toClientCardStacks(
   match: Match,
   owner: Player,
@@ -83,7 +80,6 @@ function toClientCardStacks(
   });
 }
 
-/** Projects a single card stack, delegating to the cards and attributes helpers. */
 function toClientCardStack(
   match: Match,
   cs: CardStack,
@@ -106,10 +102,6 @@ function toClientCardStack(
   };
 }
 
-/**
- * Projects the sub card stacks of a card stack into its cards. Hull cards are listed after all
- * other cards so they render as the ship's hull parts.
- */
 function toClientCards(cs: CardStack, zone: Zone, ownedByPlayer: boolean): ClientCard[] {
   const toClientCard = (sub: CardStack, index: number): ClientCard => ({
     uuid: sub.uuid,
@@ -122,17 +114,13 @@ function toClientCards(cs: CardStack, zone: Zone, ownedByPlayer: boolean): Clien
   const otherCardStacks = cs.cardStacks
     .filter(sub => zone == Zone.Colony || sub.type != CardType.Hull)
     .map(toClientCard);
+  // Hull cards last, so they render as the ship's hull parts
   const hullCardStacks = cs.cardStacks
     .filter(sub => zone != Zone.Colony && sub.type == CardType.Hull)
     .map(sub => toClientCard(sub, otherCardStacks.length));
   return otherCardStacks.concat(hullCardStacks);
 }
 
-/**
- * Projects the visible attributes of a card stack: damage and hit points always, control for
- * colonies, build attributes for the owning player and combat attributes for battle
- * participants.
- */
 function toClientAttributes(
   match: Match,
   cs: CardStack,
@@ -162,7 +150,6 @@ function toClientAttributes(
   return attributes;
 }
 
-/** Projects the profile attributes shown to the owning player during the build phase. */
 function buildPhaseAttributes(cs: CardStack): ClientCardStackAttribute[] {
   const profile = cs.profile;
   return [
@@ -180,7 +167,6 @@ function buildPhaseAttributes(cs: CardStack): ClientCardStackAttribute[] {
   ];
 }
 
-/** Projects the attributes of a card stack participating in the current battle. */
 function combatPhaseAttributes(cs: CardStack, battle: ClientBattle): ClientCardStackAttribute[] {
   const attributes: ClientCardStackAttribute[] = [];
   if (battle.type == BattleType.Mission) {
@@ -209,22 +195,30 @@ function combatPhaseAttributes(cs: CardStack, battle: ClientBattle): ClientCardS
   return attributes;
 }
 
-/** Projects a player's hand; option pickers are resolved for the player viewing the state. */
-function toClientHandCards(hand: CardStack[], viewedBy: Player): ClientHandCard[] {
-  return hand.map((c, index) => ({
-    uuid: c.uuid,
-    cardId: c.card.id,
-    index: index,
-    playable: c.hasValidTargets,
-    validTargets: c.validTargets.map(cs => cs.uuid),
-    ownedByPlayer: c.player.no == viewedBy.no,
-    optionsToSelect: c.card.onEnterGameNumberOfSelectableCardOptions(viewedBy),
-    options: c.card.onEnterGameSelectableCardOptions(viewedBy)
-  }));
+function toClientHandCards(match: Match, hand: CardStack[], viewedBy: Player): ClientHandCard[] {
+  return hand.map((c, index) => {
+    const owned = c.player.no == viewedBy.no;
+    // Anti-cheat (#831): only the currently revealed card keeps its real card ID
+    const revealed = owned || c.uuid == match.highlightCard?.uuid;
+    return {
+      uuid: c.uuid,
+      cardId: revealed ? c.card.id : constants.cardBackSideID,
+      index: index,
+      playable: owned ? c.hasValidTargets : false,
+      validTargets: owned ? c.validTargets.map(cs => cs.uuid) : [],
+      ownedByPlayer: owned,
+      optionsToSelect: owned ? c.card.onEnterGameNumberOfSelectableCardOptions(viewedBy) : 0,
+      options: owned ? c.card.onEnterGameSelectableCardOptions(viewedBy) : []
+    };
+  });
 }
 
-/** Projects a player, including the retract hint derived from the already projected stacks. */
-function toClientPlayer(p: Player, viewedBy: Player, cardStacks: ClientCardStack[]): ClientPlayer {
+function toClientPlayer(
+  match: Match,
+  p: Player,
+  viewedBy: Player,
+  cardStacks: ClientCardStack[]
+): ClientPlayer {
   const actionPool = p.actionPool.pool
     .filter(a => a.possibleCardTypes[0] != CardType.Orb)
     .sort(ActionPool.sortOrder)
@@ -237,14 +231,13 @@ function toClientPlayer(p: Player, viewedBy: Player, cardStacks: ClientCardStack
     actionPool: actionPool,
     deckSize: p.deck.length,
     discardPileIds: p.discardPile.map(c => c.id),
-    hand: toClientHandCards(p.hand, viewedBy),
+    hand: toClientHandCards(match, p.hand, viewedBy),
     handCardLimit: p.handCardLimit,
     hasToRetractCards: hasToRetractCards,
     name: p.name
   };
 }
 
-/** Projects the pending intervention, if any, including the attacked stacks of an attack. */
 function toClientIntervention(match: Match): ClientIntervention | undefined {
   return match.intervention
     ? {
@@ -262,7 +255,6 @@ function toClientIntervention(match: Match): ClientIntervention | undefined {
     : undefined;
 }
 
-/** Projects the game result from the perspective of the given player, if the game is over. */
 function toClientGameResult(match: Match, playerNo: number): ClientGameResult | undefined {
   return match.gameResult.gameOver
     ? {

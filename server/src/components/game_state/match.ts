@@ -210,6 +210,7 @@ export default class Match {
           cs => cs.type != CardType.Colony
         );
         destroyedCardStacks.forEach(cs => spliceCardStackByUUID(player.cardStacks, cs.uuid));
+        // opponent attachments (e.g. 437 Kopfgeld) return to the caster's pile
         destroyedCardStacks.forEach(cs =>
           cs.cardStacks.forEach(subCs => subCs.owner.discardCards(subCs.card))
         );

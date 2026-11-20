@@ -1,0 +1,22 @@
+<div id="activate-account-box" class="oc-auth-page">
+  <h1 class="sr-only">Nutzerkonto aktivieren</h1>
+  <oc-content-box title="Nutzerkonto aktivieren">
+    <div role="status" class="request-status">
+      @if (loading) {
+      <p>Dein Nutzerkonto wird aktiviert …</p>
+      } @else if (activationSuccessful) {
+      <h3>Dein Benutzerkonto wurde aktiviert</h3>
+      <p>Du kannst dich jetzt <a routerLink="/login">einloggen</a>.</p>
+      } @else if (activationFailed) {
+      <h3>Fehler</h3>
+      <p>
+        Der &uuml;bertragene Aktivierungscode ist ung&uuml;ltig oder abgelaufen. Bitte registriere dich
+        erneut.
+      </p>
+      }
+    </div>
+    <p id="back-link">
+      <a routerLink="/">&lt; Zur&uuml;ck</a>
+    </p>
+  </oc-content-box>
+</div>

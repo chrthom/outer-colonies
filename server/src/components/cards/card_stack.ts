@@ -156,19 +156,19 @@ export default abstract class CardStack {
     return this.validTargets.length > 0;
   }
   onDestruction() {
-    this.card.onDestruction(this.player);
+    this.card.onDestruction(this.owner);
     this.attachedCardStacks.forEach(cs => cs.onDestruction());
   }
   onMissionCompletion() {
-    this.card.onMissionCompletion(this.player);
+    this.card.onMissionCompletion(this.owner);
     this.attachedCardStacks.forEach(cs => cs.onMissionCompletion());
   }
   onStartTurn() {
-    this.card.onStartTurn(this.player, this);
+    this.card.onStartTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onStartTurn());
   }
   onEndTurn() {
-    this.card.onEndTurn(this.player, this);
+    this.card.onEndTurn(this.owner, this);
     this.attachedCardStacks.forEach(cs => cs.onEndTurn());
   }
   get profile(): CardProfile {
@@ -203,19 +203,18 @@ export default abstract class CardStack {
   retract() {
     this.removeCardStack();
     const retractedCardStacks = this.cardStacks.filter(cs => cs.card.canBeRetracted(this.isRootCard));
-    const newHandCardStacks = this.player.takeCards(retractedCardStacks.map(cs => cs.card));
-    this.player.discardCards(...this.cards.filter(c => !c.canBeRetracted(this.isRootCard)));
+    const newHandCardStacks = new Map<CardStack, CardStack>();
+    new Set(retractedCardStacks.map(cs => cs.owner)).forEach(owner => {
+      const ownerStacks = retractedCardStacks.filter(cs => cs.owner === owner);
+      const created = owner.takeCards(ownerStacks.map(cs => cs.card));
+      ownerStacks.forEach((cs, i) => newHandCardStacks.set(cs, created[i]));
+    });
     this.cardStacks.forEach(cs => {
-      // Pair by sub-stack identity (not by card): two copies of the same card ID share one
-      // Card instance from the registry, so indexOf on cards would match the first occurrence
-      const retractedCardStackIndex = retractedCardStacks.indexOf(cs);
-      if (retractedCardStackIndex >= 0) {
-        this.match.addCardMovementEvent(
-          EventType.Retract,
-          cs,
-          newHandCardStacks[retractedCardStackIndex].uuid
-        );
+      const newHandCardStack = newHandCardStacks.get(cs);
+      if (newHandCardStack) {
+        this.match.addCardMovementEvent(EventType.Retract, cs, newHandCardStack.uuid);
       } else {
+        cs.owner.discardCards(cs.card);
         this.match.addCardMovementEvent(EventType.Discard, cs);
       }
     });
@@ -239,7 +238,7 @@ export default abstract class CardStack {
       } else if (this.parentCardStack) {
         spliceCardStackByUUID(this.parentCardStack.attachedCardStacks, this.uuid);
       }
-      this.cards.forEach(c => c.onLeaveGame(this.player));
+      this.cardStacks.forEach(cs => cs.card.onLeaveGame(cs.owner));
     }
   }
   private get isRootCard() {

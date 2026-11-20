@@ -101,6 +101,7 @@ export interface ClientState {
   events: ClientEvent[];
   gameResult?: ClientGameResult;
   highlightCardUUID?: string;
+  highlightCardId?: number;
   intervention?: ClientIntervention;
   opponent: ClientPlayer;
   player: ClientPlayer;

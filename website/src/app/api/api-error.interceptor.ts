@@ -5,6 +5,7 @@ import { catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import AuthService from '../auth.service';
 import { ApiError } from './api-error';
+import { SKIP_AUTH_ERROR_REDIRECT } from './api-error-context';
 
 /**
  * Central error handling for API requests:
@@ -16,9 +17,11 @@ import { ApiError } from './api-error';
  *   contain query parameters with user data).
  * - On HTTP 401 (no session token provided or failed login) and HTTP 403
  *   (invalid or expired session token, the only 403 the API emits - see
- *   `performWithSessionTokenCheck` in `server/src/components/rest_api.ts`)
+ *   `requireSession` in `server/src/components/rest_api/session_middleware.ts`)
  *   the session is cleared and the user is redirected to the login page
  *   (replaces the ad-hoc retry logic formerly in `AuthService.check`).
+ *   Explicitly handled requests can opt out through their HTTP context; responses from
+ *   requests started before logout cannot invalidate or redirect a later session.
  * - Failed API calls are rethrown as typed `ApiError`s (status + message) which
  *   pages can map to their German UI strings.
  */
@@ -28,6 +31,7 @@ export const apiErrorInterceptor: HttpInterceptorFn = (req, next) => {
   }
   const authService = inject(AuthService);
   const router = inject(Router);
+  const sessionGeneration = authService.sessionGeneration;
   return next(req).pipe(
     catchError((response: HttpErrorResponse) => {
       const apiError = ApiError.fromHttpResponse(response);
@@ -38,7 +42,11 @@ export const apiErrorInterceptor: HttpInterceptorFn = (req, next) => {
           console.warn(`API request failed with status ${apiError.status}`);
         }
       }
-      if (apiError.status === 401 || apiError.status === 403) {
+      if (
+        (apiError.status === 401 || apiError.status === 403) &&
+        !req.context.get(SKIP_AUTH_ERROR_REDIRECT) &&
+        sessionGeneration === authService.sessionGeneration
+      ) {
         authService.clearSession();
         if (router.url !== '/login') {
           router.navigate(['/login']);
