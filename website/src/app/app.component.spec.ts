@@ -36,6 +36,10 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should check the session once on startup', () => {
+    expect(authSpy.check).toHaveBeenCalledTimes(1);
+  });
+
   it('should have a random background number between 0-6', () => {
     expect(component.bgNo).toBeGreaterThanOrEqual(0);
     expect(component.bgNo).toBeLessThan(7);

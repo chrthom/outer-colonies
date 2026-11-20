@@ -1,5 +1,6 @@
 #outer-box {
   position: relative;
+  display: flow-root;
   width: min(100%, 940px);
   margin: auto;
   margin-top: 40px;
