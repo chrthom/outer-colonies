@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ErrorStateMatcher, MatOption } from '@angular/material/core';
-import { Observable, Subject, catchError, map, of, switchMap, takeUntil, timer } from 'rxjs';
+import { Observable, Subject, catchError, finalize, map, of, switchMap, takeUntil, timer } from 'rxjs';
 import AuthApiService from 'src/app/api/auth-api.service';
 import OCErrorStateMatcher from '../../../components/error-state-matcher';
 import { passwordStrength } from '../../../components/password-strength.validator';
@@ -21,7 +21,7 @@ import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { DataPrivacyPage } from '../data-privacy/data-privacy.page';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
-import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -42,6 +42,7 @@ import { RouterLink } from '@angular/router';
     MatLabel,
     MatInput,
     MatError,
+    MatHint,
     MatSelect,
     MatOption,
     MatCheckbox,
@@ -59,6 +60,7 @@ export class RegisterPage implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   registrationSuccessful: boolean | undefined = undefined;
+  loading = false;
   registerForm: FormGroup = new FormGroup({
     username: new FormControl(
       '',
@@ -105,9 +107,12 @@ export class RegisterPage implements OnDestroy {
   get starterDeckCards(): MultipleCards[] {
     return starterDecks[this.starterDeck?.value] ?? [];
   }
+  /** Registers a valid account after availability checks, preventing duplicate requests. */
   submit() {
     this.registerForm.markAllAsTouched();
-    if (this.registerForm.valid) {
+    if (this.registerForm.valid && !this.loading && !this.registrationSuccessful) {
+      this.loading = true;
+      this.registrationSuccessful = undefined;
       this.authAPIService
         .register({
           username: this.registerForm.value.username.trim(),
@@ -116,14 +121,23 @@ export class RegisterPage implements OnDestroy {
           starterDeck: this.registerForm.value.starterDeck,
           newsletter: !!this.registerForm.value.newsletter
         })
+        .pipe(finalize(() => (this.loading = false)))
         .subscribe({
           next: () => (this.registrationSuccessful = true),
-          error: () => (this.registrationSuccessful = false)
+          error: () => {
+            if (environment.stage !== 'production') console.warn('Registration request failed');
+            this.registrationSuccessful = false;
+          }
         });
     }
   }
+  /** Opens privacy information without changing consent; Material restores trigger focus. */
   openDataPrivacy() {
-    this.dialog.open(DataPrivacyPage);
+    this.dialog.open(DataPrivacyPage, {
+      ariaLabel: 'Datenschutzbestimmungen',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true
+    });
   }
   ngOnDestroy(): void {
     this.destroy$.next();

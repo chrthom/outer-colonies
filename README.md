@@ -116,6 +116,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
     - `quote/`: Quote component (`oc-quote`) - A presentational figure quote with teal left border and attribution line. Used as narrative insert on the public lore pages.
       - **Used in pages**: world, factions
 - **Communication**: Uses REST API to communicate with the server
+- **Public account forms**: Authentication and account-token pages use responsive centered layouts, autocomplete hints, accessible request feedback and page headings. Registration exposes username/password rules and a separate keyboard-operable privacy dialog trigger; login and registration prevent duplicate in-flight requests.
 
 #### Client (Phaser 3)
 - **Purpose**: Actual card game implementation with game logic and rendering

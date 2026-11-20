@@ -4,7 +4,7 @@ import { ForgotPasswordPage } from './forgot-password.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -133,5 +133,44 @@ describe('ForgotPasswordPage', () => {
 
     expect(fixture.nativeElement.querySelector('mat-error')?.textContent).toContain('Bitte gib deinen');
     expect(authApiSpy.forgotPassword).not.toHaveBeenCalled();
+  });
+  it('should preserve email recovery as well as username recovery', () => {
+    component.forgotPasswordForm.setValue({ username: '  player@example.com  ' });
+    component.submit();
+    expect(authApiSpy.forgotPassword).toHaveBeenCalledWith('player@example.com');
+    expect(component.passwordResetSuccessful).toBeTrue();
+  });
+
+  it('should expose text recovery semantics, one heading and a login back link', () => {
+    const element = fixture.nativeElement;
+    expect(element.querySelectorAll('h1').length).toBe(1);
+    const input = element.querySelector('input');
+    expect(input.type).toBe('text');
+    expect(input.autocomplete).toBe('username');
+    expect(element.querySelector('#back-link a').getAttribute('href')).toBe('/login');
+  });
+
+  it('should announce a failed request without nested live regions', () => {
+    authApiSpy.forgotPassword.and.returnValue(throwError(() => new Error('Offline')));
+    component.forgotPasswordForm.setValue({ username: 'testuser' });
+    component.submit();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('nicht gefunden');
+    expect(fixture.nativeElement.querySelector('[role="alert"] mat-error')).toBeNull();
+  });
+  it('should prevent concurrent recovery requests and restore retry after failure', () => {
+    const request = new Subject<void>();
+    authApiSpy.forgotPassword.and.returnValue(request);
+    component.forgotPasswordForm.setValue({ username: 'testuser' });
+    component.submit();
+    component.submit();
+    expect(authApiSpy.forgotPassword).toHaveBeenCalledTimes(1);
+    request.error(new Error('Offline'));
+    expect(component.loading).toBeFalse();
+    authApiSpy.forgotPassword.and.returnValue(of(undefined));
+    component.submit();
+    expect(authApiSpy.forgotPassword).toHaveBeenCalledTimes(2);
+    expect(component.passwordResetSuccessful).toBeTrue();
+    expect(component.passwordResetFailed).toBeFalse();
   });
 });

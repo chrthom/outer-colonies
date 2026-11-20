@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivateAccountPage } from './activate-account.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 describe('ActivateAccountPage', () => {
@@ -82,5 +82,31 @@ describe('ActivateAccountPage', () => {
     component = fixture.componentInstance;
 
     expect(() => component.ngOnInit()).not.toThrow();
+  });
+  it('should announce pending activation followed by success', () => {
+    const request = new Subject<void>();
+    authApiSpy.activate.and.returnValue(request);
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.loading).toBeTrue();
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('wird aktiviert');
+    expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    request.next();
+    request.complete();
+    fixture.detectChanges();
+    expect(component.loading).toBeFalse();
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('wurde aktiviert');
+  });
+
+  it('should announce the corrected failure text after pending activation', () => {
+    const request = new Subject<void>();
+    authApiSpy.activate.and.returnValue(request);
+    component.ngOnInit();
+    request.error(new Error('Expired'));
+    fixture.detectChanges();
+    expect(component.loading).toBeFalse();
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain(
+      'Der übertragene Aktivierungscode'
+    );
   });
 });
