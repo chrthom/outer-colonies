@@ -22,6 +22,7 @@ describe('NavbarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([
+          { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
           { path: 'factions', component: TestPageComponent },
           {
@@ -73,6 +74,7 @@ describe('NavbarComponent', () => {
     expect(iconElements.length).toBe(5);
     expect(element.querySelector('.user-name')?.textContent).toBe('testuser');
     expect(element.querySelector('#navbar-anon-links')).toBeFalsy();
+    expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
     expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(false);
     expect(element.querySelector('#navbar-logo').getAttribute('aria-label')).toBe(
       'Outer Colonies – Startseite'
@@ -238,9 +240,17 @@ describe('NavbarComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement;
+    expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeFalse();
     const links = Array.from<Element>(element.querySelectorAll('#navbar-anon-links a'));
-    expect(links.map(a => a.getAttribute('href'))).toEqual(['/world', '/factions', '/history', '/editions']);
+    expect(links.map(a => a.getAttribute('href'))).toEqual([
+      '/',
+      '/world',
+      '/factions',
+      '/history',
+      '/editions'
+    ]);
     expect(links.map(a => a.textContent?.trim())).toEqual([
+      'Startseite',
       'Die Welt',
       'Die Mächte',
       'Die Geschichte',
@@ -249,9 +259,32 @@ describe('NavbarComponent', () => {
 
     const actions = Array.from<Element>(element.querySelectorAll('#navbar-anon-actions a'));
     expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
-    expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Login']);
+    expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Einloggen']);
     expect(element.querySelector('.item.center')).toBeFalsy();
     // The compact logo keeps the logo box within the space the anon zone reserves for it:
     expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(true);
+  });
+
+  it('navigates home from the mobile menu and marks the current page', async () => {
+    await router.navigateByUrl('/world');
+    Object.assign(authSpy, { isLoggedIn: false });
+    fixture.detectChanges();
+    const toggle: HTMLButtonElement = fixture.nativeElement.querySelector('#navbar-menu-toggle');
+    toggle.style.display = 'block';
+    toggle.click();
+    fixture.detectChanges();
+    const home: HTMLAnchorElement = fixture.nativeElement.querySelector('#navbar-anon-links a[href="/"]');
+    home.focus();
+    const onMenuNavigation = jasmine.createSpy('onMenuNavigation');
+    component.menuNavigation.subscribe(onMenuNavigation);
+
+    home.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/');
+    expect(component.menuOpen).toBeFalse();
+    expect(onMenuNavigation).toHaveBeenCalledTimes(1);
+    expect(home.getAttribute('aria-current')).toBe('page');
   });
 });

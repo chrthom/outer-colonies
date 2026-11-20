@@ -1,4 +1,4 @@
-<div id="background-stars" [class]="'background-stars-' + bgNo">
+<div id="background-stars" aria-hidden="true">
   <div id="background-layer"></div>
 </div>
 
@@ -17,9 +17,11 @@
     <div id="footer-links">
       <ul>
         <li><a routerLink="/world">Die Welt</a></li>
-        <li><a routerLink="/factions">Die Mächte</a></li>
-        <li><a routerLink="/history">Die Geschichte</a></li>
-        <li><a routerLink="/editions">Die Editionen</a></li>
+        @if (!isLandingPage) {
+          <li><a routerLink="/factions">Die Mächte</a></li>
+          <li><a routerLink="/history">Die Geschichte</a></li>
+          <li><a routerLink="/editions">Die Editionen</a></li>
+        }
         <li><button type="button" (click)="openImprint()">Impressum</button></li>
         <li><button type="button" (click)="openDataPrivacy()">Datenschutz</button></li>
       </ul>

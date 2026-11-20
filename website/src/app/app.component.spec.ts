@@ -6,6 +6,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({ template: '' })
+class TestPageComponent {}
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -21,7 +26,10 @@ describe('AppComponent', () => {
     authSpy.check.and.returnValue(of(false));
 
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, MatDialogModule],
+      imports: [
+        RouterTestingModule.withRoutes([{ path: 'world', component: TestPageComponent }]),
+        MatDialogModule
+      ],
       declarations: [],
       providers: [
         { provide: AuthService, useValue: authSpy },
@@ -42,9 +50,18 @@ describe('AppComponent', () => {
     expect(authSpy.check).toHaveBeenCalledTimes(1);
   });
 
-  it('should have a random background number between 0-6', () => {
-    expect(component.bgNo).toBeGreaterThanOrEqual(0);
-    expect(component.bgNo).toBeLessThan(7);
+  it('uses the same veiled star field and dark fallback for both login states', () => {
+    const stars: HTMLElement = fixture.nativeElement.querySelector('#background-stars');
+    const veil: HTMLElement = fixture.nativeElement.querySelector('#background-layer');
+    const checkBackground = () => {
+      expect(getComputedStyle(stars).backgroundImage).toContain('/background/stars1.jpg');
+      expect(getComputedStyle(stars).backgroundColor).toBe('rgb(0, 0, 0)');
+      expect(getComputedStyle(veil).opacity).toBe('0.4');
+    };
+    checkBackground();
+    Object.assign(authSpy, { isLoggedIn: true });
+    fixture.detectChanges();
+    checkBackground();
   });
 
   it('should expose environment via env getter', () => {
@@ -73,15 +90,31 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
   });
 
-  it('should render the footer links on every page', () => {
+  it('keeps legal links and concise wayfinding on the landing page', () => {
     const footer = fixture.nativeElement.querySelector('#footer');
     expect(footer).toBeTruthy();
+    expect(footer.textContent).toContain('Die Welt');
+    expect(footer.textContent).not.toContain('Die Mächte');
+    expect(footer.textContent).not.toContain('Die Geschichte');
+    expect(footer.textContent).not.toContain('Die Editionen');
+    expect(footer.textContent).toContain('Impressum');
+    expect(footer.textContent).toContain('Datenschutz');
+    expect(footer.querySelector('#version')).toBeTruthy();
+  });
+
+  it('keeps the full lore navigation on other public and private pages', async () => {
+    await TestBed.inject(Router).navigateByUrl('/world?from=landing');
+    fixture.detectChanges();
+    const footer = fixture.nativeElement.querySelector('#footer');
     expect(footer.textContent).toContain('Die Welt');
     expect(footer.textContent).toContain('Die Mächte');
     expect(footer.textContent).toContain('Die Geschichte');
     expect(footer.textContent).toContain('Die Editionen');
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');
+    Object.assign(authSpy, { isLoggedIn: true });
+    fixture.detectChanges();
+    expect(footer.textContent).toContain('Die Editionen');
   });
 
   it('provides landmarks and a skip link to the focusable main content', () => {
