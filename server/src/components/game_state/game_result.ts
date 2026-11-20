@@ -36,10 +36,14 @@ export default class GameResult {
     this.type = type;
     this.winnerNo = opponentPlayerNo(loser.no);
     const winner = this.match.players[this.winnerNo];
-    this.winnerSol = this.computeEarnings(winner, loser, true);
-    this.loserSol = this.computeEarnings(loser, winner, false);
-    void this.persistEarnings(winner, loser, true, this.winnerSol);
-    void this.persistEarnings(loser, winner, false, this.loserSol);
+    const botGame = winner.isBot || loser.isBot;
+    this.winnerSol = this.halveSolInBotGame(this.computeEarnings(winner, loser, true), botGame);
+    this.loserSol = this.halveSolInBotGame(this.computeEarnings(loser, winner, false), botGame);
+    if (!winner.isBot) void this.persistEarnings(winner, loser, true, this.winnerSol);
+    if (!loser.isBot) void this.persistEarnings(loser, winner, false, this.loserSol);
+  }
+  private halveSolInBotGame(sol: number, botGame: boolean): number {
+    return botGame ? Math.floor(sol / 2) : sol;
   }
   private shouldAchieveDaily(dailyType: DailyType, player: Player, opponent: Player, won: boolean): boolean {
     const readyCardStacks = player.cardStacks.filter(cs => cs.isFlightReady);
@@ -102,6 +106,9 @@ export default class GameResult {
   }
 
   async persistEarnings(player: Player, opponent: Player, won: boolean, sol: number): Promise<void> {
+    // Bot players have no user account to persist earnings for (their user id
+    // is undefined); setGameOver already skips them, this guards later callers
+    if (player.userId == undefined) return;
     try {
       // The user id is carried on the player (from the authenticated socket data), so no
       // username-based database lookup is needed here - usernames are not a stable join key

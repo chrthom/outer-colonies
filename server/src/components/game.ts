@@ -1,15 +1,15 @@
 import Match from './game_state/match';
-import toClientState from './converters/client_state_converter';
 import { rules } from '../shared/config/rules';
 import { constants } from '../shared/config/constants';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
+import { getCardStackByUUID } from './utils/helpers';
 import { logger } from './utils/logger';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { allActiveMatches, unregisterMatch } from './match_registry';
+import { processBotActions } from './bot/bot';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) =>
@@ -57,8 +57,7 @@ function onReady(io: Server, match: Match, player: Player, turnPhase: string, da
   // of a rejoin only fetches the current (final) match state
   if (turnPhase == match.turnPhase && !match.gameResult.gameOver) {
     if (turnPhase == TurnPhase.Init) {
-      match.players[player.no].ready = true;
-      if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
+      if (match.setReadyAndCheck(player.no)) match.startMatch();
     } else if (player.no == match.pendingActionPlayerNo) {
       if (verifyReadyConditions(player, turnPhase)) {
         if (match.intervention) {
@@ -288,6 +287,8 @@ export function gameCron(io: Server) {
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
+        const player = match.players[playerNo];
+        if (player.isBot) return; // Bot players have no socket to emit to
         const socket = getSocket(io, match, playerNo);
         if (socket)
           socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
@@ -316,7 +317,8 @@ function getSocketData(socket: Socket): SocketData {
 }
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket | undefined {
-  return io.sockets.sockets.get(match.players[playerNo].socketId);
+  const socketId = match.players[playerNo].socketId;
+  return socketId ? io.sockets.sockets.get(socketId) : undefined;
 }
 
 function getPlayer(socket: Socket): Player | undefined {
@@ -325,42 +327,14 @@ function getPlayer(socket: Socket): Player | undefined {
 }
 
 /**
- * Emits the current match state, projected per player, to both players and resets the match's
- * temporary states afterwards.
+ * Emits the current match state, projected per player, to both players, resets the match's
+ * temporary states and triggers pending bot actions afterwards.
  * @param io server instance used to look up the players' sockets
  * @param match match whose state is emitted
  */
 function emitState(io: Server, match: Match) {
-  match.forAllPlayers((playerNo: number) => {
-    const socket = getSocket(io, match, playerNo);
-    if (socket) {
-      socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
-      // Receiving the final state of a finished match counts as the player's
-      // game result delivery (see gameCron)
-      if (match.gameResult.gameOver) match.players[playerNo].resultDelivered = true;
-    }
-    // A disconnected player's socket is expectedly absent while the grace
-    // window keeps the match alive
-    else if (match.players[playerNo].disconnectedSince == undefined)
-      logger.warn('Could not find socket to emit state');
-  });
-  match.resetTempStates();
-}
-
-/**
- * Starts a match once both players readied: nominates the second player, shuffles and draws
- * the initial hands and prepares the first start phase.
- * @param io server instance used to emit the new state to both players
- * @param match match to initialize
- */
-function initMatch(io: Server, match: Match) {
-  match.setSecondPlayer();
-  match.players.forEach(player => {
-    player.shuffleDeck();
-    player.drawCards(rules.initialCardsToDraw);
-  });
-  match.prepareStartPhase();
-  emitState(io, match);
+  match.emitState(io);
+  processBotActions(io, match);
 }
 
 /**
