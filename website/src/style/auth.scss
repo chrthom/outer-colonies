@@ -1,0 +1,64 @@
+.oc-auth-page {
+  width: min(560px, 100%);
+  min-width: 0;
+  margin: var(--space-xl) auto var(--space-md);
+  overflow-wrap: anywhere;
+
+  &.oc-auth-register {
+    width: min(760px, 100%);
+  }
+
+  mat-form-field {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: var(--space-md);
+  }
+
+  .mat-mdc-form-field-infix {
+    min-width: 0;
+    width: auto;
+  }
+
+  mat-checkbox,
+  mat-slide-toggle {
+    display: block;
+    margin-bottom: var(--space-md);
+  }
+
+  button[type="submit"] {
+    max-width: 100%;
+    height: auto;
+    min-height: 44px;
+    padding-block: var(--space-sm);
+
+    .mdc-button__label {
+      white-space: normal;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .privacy-trigger {
+    height: auto;
+    min-height: 44px;
+    max-width: 100%;
+    margin-bottom: var(--space-sm);
+
+    .mdc-button__label {
+      white-space: normal;
+    }
+  }
+
+  .request-error {
+    color: var(--color-accent-light);
+    margin-top: var(--space-md);
+  }
+
+  mat-error {
+    color: var(--color-accent-light);
+  }
+
+  .request-status {
+    margin-top: var(--space-md);
+  }
+}

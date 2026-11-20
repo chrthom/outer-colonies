@@ -3,6 +3,7 @@
 @use "./style/fonts.scss";
 @use "./style/outer-colonies-icons.css";
 @use "./style/lore.scss";
+@use "./style/auth.scss";
 @include mat.elevation-classes();
 @include mat.app-background();
 @include mat.all-component-themes(oc.$theme);

@@ -16,6 +16,7 @@ import { ContentBoxComponent } from '../../../components/content-box/content-box
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'oc-page-reset-password',
@@ -56,15 +57,18 @@ export class ResetPasswordPage implements OnInit {
   get password(): AbstractControl | null {
     return this.resetPasswordForm.get('password');
   }
+  /** Sets a valid new password while preventing concurrent reset requests. */
   submit() {
     this.resetPasswordForm.markAllAsTouched();
     if (this.resetPasswordForm.valid && !this.loading) {
       this.loading = true;
+      this.passwordResetFailed = false;
       this.authAPIService
         .resetPasswordViaMagicLink(this.resetId, this.resetPasswordForm.value.password)
         .subscribe({
           next: () => (this.passwordResetSuccessful = true),
           error: () => {
+            if (environment.stage !== 'production') console.warn('Password reset request failed');
             this.passwordResetFailed = true;
             this.loading = false;
           }

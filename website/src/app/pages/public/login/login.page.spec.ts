@@ -5,9 +5,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import AuthService from 'src/app/auth.service';
-import { of } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -140,5 +140,44 @@ describe('LoginPage', () => {
     component.submit();
 
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+  it('should prevent duplicate pending logins and allow retry after failure', () => {
+    const request = new Subject<boolean>();
+    authSpy.login.and.returnValue(request);
+    component.loginForm.setValue({ username: 'testuser', password: 'password123', remember: false });
+    component.submit();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBeTrue();
+    component.submit();
+    expect(authSpy.login).toHaveBeenCalledTimes(1);
+    request.next(false);
+    request.complete();
+    expect(component.loading).toBeFalse();
+    expect(component.loginFailed).toBeTrue();
+    authSpy.login.and.returnValue(of(true));
+    component.submit();
+    expect(authSpy.login).toHaveBeenCalledTimes(2);
+    expect(component.loading).toBeFalse();
+    expect(component.loginFailed).toBeFalse();
+  });
+
+  it('should announce request errors and restore retry', () => {
+    authSpy.login.and.returnValue(throwError(() => new Error('Offline')));
+    component.loginForm.setValue({ username: 'testuser', password: 'password123', remember: false });
+    component.submit();
+    fixture.detectChanges();
+    expect(component.loading).toBeFalse();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('fehlgeschlagen');
+    expect(fixture.nativeElement.querySelector('[role="alert"] mat-error')).toBeNull();
+  });
+
+  it('should expose a page heading, autocomplete and the intended matchers', () => {
+    expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('[formControlName="username"]').autocomplete).toBe('username');
+    expect(fixture.nativeElement.querySelector('[formControlName="password"]').autocomplete).toBe(
+      'current-password'
+    );
+    const inputs = fixture.debugElement.queryAll(By.css('input[matInput]'));
+    inputs.forEach(input => expect(input.injector.get(MatInput).errorStateMatcher).toBe(component.matcher));
   });
 });

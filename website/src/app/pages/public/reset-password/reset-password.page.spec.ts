@@ -4,7 +4,7 @@ import { ResetPasswordPage } from './reset-password.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -152,5 +152,36 @@ describe('ResetPasswordPage', () => {
 
     expect(fixture.nativeElement.querySelector('mat-error')).not.toBeNull();
     expect(authApiSpy.resetPasswordViaMagicLink).not.toHaveBeenCalled();
+  });
+  it('should expose the corrected heading and new-password autocomplete', () => {
+    expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('h1').textContent).toBe('Neues Passwort setzen');
+    expect(fixture.nativeElement.querySelector('input').autocomplete).toBe('new-password');
+  });
+
+  it('should announce reset failure without nested live regions', () => {
+    authApiSpy.resetPasswordViaMagicLink.and.returnValue(throwError(() => new Error('Expired')));
+    component.resetPasswordForm.setValue({ password: 'password123' });
+    component.submit();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
+      'neuen Passwort-Link'
+    );
+    expect(fixture.nativeElement.querySelector('[role="alert"] mat-error')).toBeNull();
+  });
+  it('should prevent concurrent reset requests and restore retry after failure', () => {
+    const request = new Subject<void>();
+    authApiSpy.resetPasswordViaMagicLink.and.returnValue(request);
+    component.resetPasswordForm.setValue({ password: 'password123' });
+    component.submit();
+    component.submit();
+    expect(authApiSpy.resetPasswordViaMagicLink).toHaveBeenCalledTimes(1);
+    request.error(new Error('Offline'));
+    expect(component.loading).toBeFalse();
+    authApiSpy.resetPasswordViaMagicLink.and.returnValue(of(undefined));
+    component.submit();
+    expect(authApiSpy.resetPasswordViaMagicLink).toHaveBeenCalledTimes(2);
+    expect(component.passwordResetSuccessful).toBeTrue();
+    expect(component.passwordResetFailed).toBeFalse();
   });
 });

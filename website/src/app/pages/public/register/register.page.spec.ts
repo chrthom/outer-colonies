@@ -3,7 +3,7 @@ import { RegisterPage } from './register.page';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import AuthApiService from 'src/app/api/auth-api.service';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { starterDecks } from '@shared/config/starter_decks';
 import { environment } from 'src/environments/environment';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -285,5 +286,111 @@ describe('RegisterPage', () => {
 
     component.submit();
     expect(component.registrationSuccessful).toBeFalse();
+  }));
+  it('should guard async validation and in-flight registration and allow retry', fakeAsync(() => {
+    const request = new Subject<void>();
+    authApiSpy.register.and.returnValue(request);
+    component.registerForm.setValue({
+      username: 'newuser',
+      password: 'password123',
+      email: 'new@example.com',
+      starterDeck: 1,
+      dataPrivacy: true,
+      newsletter: false
+    });
+    component.submit();
+    expect(authApiSpy.register).not.toHaveBeenCalled();
+    tick(300);
+    component.submit();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBeTrue();
+    component.submit();
+    expect(authApiSpy.register).toHaveBeenCalledTimes(1);
+    request.error(new Error('Offline'));
+    fixture.detectChanges();
+    expect(component.loading).toBeFalse();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Bitte versuche');
+    authApiSpy.register.and.returnValue(of(undefined));
+    component.submit();
+    expect(component.registrationSuccessful).toBeTrue();
+    expect(component.loading).toBeFalse();
+    component.submit();
+    expect(authApiSpy.register).toHaveBeenCalledTimes(2);
+    tick(500);
+  }));
+
+  it('should expose input semantics and rules before validation errors', () => {
+    const element = fixture.nativeElement;
+    expect(element.querySelectorAll('h1').length).toBe(1);
+    expect(element.querySelector('[formControlName="username"]').autocomplete).toBe('username');
+    expect(element.querySelector('[formControlName="password"]').autocomplete).toBe('new-password');
+    expect(element.querySelector('[formControlName="email"]').type).toBe('email');
+    expect(element.querySelector('[formControlName="email"]').autocomplete).toBe('email');
+    expect(element.querySelector('#username-rules').textContent).toContain('3–20');
+    expect(element.querySelector('#password-rules').textContent).toContain('8–40');
+    expect(element.querySelector('#password-rules').textContent).toContain('Buchstabe und eine Zahl');
+  });
+
+  it('should open privacy outside the consent label and request focus restoration', () => {
+    const trigger: HTMLButtonElement = fixture.nativeElement.querySelector('.privacy-trigger');
+    expect(trigger.type).toBe('button');
+    expect(trigger.closest('mat-checkbox')).toBeNull();
+    for (const consent of [false, true]) {
+      component.dataPrivacy?.setValue(consent);
+      trigger.focus();
+      trigger.click();
+      expect(component.dataPrivacy?.value).toBe(consent);
+      expect(dialogSpy.open).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        jasmine.objectContaining({
+          restoreFocus: true,
+          autoFocus: 'first-tabbable',
+          ariaLabel: 'Datenschutzbestimmungen'
+        })
+      );
+    }
+  });
+});
+
+describe('RegisterPage privacy dialog keyboard interaction', () => {
+  it('should close on Escape and restore trigger focus without changing consent', fakeAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [RegisterPage, RouterTestingModule, NoopAnimationsModule],
+      providers: [
+        {
+          provide: AuthApiService,
+          useValue: jasmine.createSpyObj('AuthApiService', [
+            'register',
+            'checkUsernameExists',
+            'checkEmailExists'
+          ])
+        }
+      ]
+    });
+    const fixture = TestBed.createComponent(RegisterPage);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    const trigger: HTMLButtonElement = fixture.nativeElement.querySelector('.privacy-trigger');
+    const dialog = TestBed.inject(MatDialog);
+    for (const consent of [false, true]) {
+      fixture.componentInstance.dataPrivacy?.setValue(consent);
+      trigger.focus();
+      trigger.click();
+      fixture.detectChanges();
+      tick();
+      expect(dialog.openDialogs.length).toBe(1);
+      expect(document.activeElement?.closest('[role="dialog"]')).not.toBeNull();
+      expect(fixture.componentInstance.dataPrivacy?.value).toBe(consent);
+      const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+      Object.defineProperty(escape, 'keyCode', { value: 27 });
+      document.activeElement?.dispatchEvent(escape);
+      fixture.detectChanges();
+      tick();
+      expect(dialog.openDialogs.length).toBe(0);
+      expect(document.activeElement).toBe(trigger);
+      expect(fixture.componentInstance.dataPrivacy?.value).toBe(consent);
+    }
+    fixture.destroy();
+    fixture.nativeElement.remove();
   }));
 });

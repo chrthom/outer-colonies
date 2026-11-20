@@ -16,6 +16,8 @@ import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatButton } from '@angular/material/button';
+import { finalize } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'oc-page-login',
@@ -39,6 +41,7 @@ export class LoginPage {
   private router = inject(Router);
 
   loginFailed = false;
+  loading = false;
   loginForm: FormGroup = new FormGroup({
     username: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
@@ -51,14 +54,24 @@ export class LoginPage {
   get password(): AbstractControl | null {
     return this.loginForm.get('password');
   }
+  /** Submits valid credentials once and restores retry after a failed request. */
   submit() {
     this.loginForm.markAllAsTouched();
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && !this.loading) {
+      this.loading = true;
+      this.loginFailed = false;
       this.authService
         .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
-        .subscribe(success => {
-          if (success) this.router.navigate(['/']);
-          else this.loginFailed = true;
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
+          next: success => {
+            if (success) this.router.navigate(['/']);
+            else this.loginFailed = true;
+          },
+          error: () => {
+            if (environment.stage !== 'production') console.warn('Login request failed');
+            this.loginFailed = true;
+          }
         });
     }
   }
