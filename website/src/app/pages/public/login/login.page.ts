@@ -1,0 +1,78 @@
+import { Component, inject } from '@angular/core';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
+import OCErrorStateMatcher from '../../../components/error-state-matcher';
+import AuthService from 'src/app/auth.service';
+import { Router, RouterLink } from '@angular/router';
+import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatButton } from '@angular/material/button';
+import { finalize } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
+@Component({
+  selector: 'oc-page-login',
+  templateUrl: './login.page.html',
+  styleUrl: './login.page.scss',
+  imports: [
+    ContentBoxComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatSlideToggle,
+    MatButton,
+    MatError,
+    RouterLink
+  ]
+})
+export class LoginPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  loginFailed = false;
+  loading = false;
+  loginForm: FormGroup = new FormGroup({
+    username: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
+    remember: new FormControl(false, [])
+  });
+  matcher: ErrorStateMatcher = new OCErrorStateMatcher();
+  get username(): AbstractControl | null {
+    return this.loginForm.get('username');
+  }
+  get password(): AbstractControl | null {
+    return this.loginForm.get('password');
+  }
+  /** Submits valid credentials once and restores retry after a failed request. */
+  submit() {
+    this.loginForm.markAllAsTouched();
+    if (this.loginForm.valid && !this.loading) {
+      this.loading = true;
+      this.loginFailed = false;
+      this.authService
+        .login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.remember)
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
+          next: success => {
+            if (success) this.router.navigate(['/']);
+            else this.loginFailed = true;
+          },
+          error: () => {
+            if (environment.stage !== 'production') console.warn('Login request failed');
+            this.loginFailed = true;
+          }
+        });
+    }
+  }
+}

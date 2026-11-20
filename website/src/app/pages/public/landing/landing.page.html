@@ -1,0 +1,102 @@
+<div id="landing-page">
+  <section id="hero" [style.backgroundImage]="heroBackground">
+    <span id="beta-badge" matTooltip="Outer Colonies befindet sich in der Beta-Phase">Offene Beta</span>
+    <img id="hero-logo" src="../../../../assets/logo.png" width="140" height="88" alt="" />
+    <h1 id="hero-title">Outer Colonies</h1>
+    <p id="hero-tagline">Baue deine Kolonie am Rand des Lichts.</p>
+    <div id="hero-ctas">
+      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
+      <a id="hero-login" routerLink="/login">Einloggen</a>
+    </div>
+  </section>
+
+  <oc-content-box title="Das Spiel" class="landing-section">
+    <div class="landing-text">
+      <p>
+        Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts.
+        Keine Warp-Antriebe, keine fremden Zivilisationen, keine Wundermaschinen – nur Physik, Wasser, Metalle
+        und Lichtgeschwindigkeit. Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen, Waffen und
+        Infrastruktur zusammen, fliegst Missionen und Überfälle und führst Gefechte über bis zu vier
+        Reichweiten-Phasen.
+      </p>
+      <ul>
+        <li>
+          Deck aus 60–100 Karten · Rümpfe, Ausrüstung, Infrastruktur, Himmelskörper und Taktiken in vier
+          Disziplinen
+        </li>
+        <li>Vier Siegesbedingungen: Vorherrschaft, Zerstörung, Erschöpfung, Kapitulation</li>
+        <li>Gegnersuche: Spiele Matches nach Standardregeln gegen die Community</li>
+        <li>Verdiene Sol durch tägliche Aufgaben, erweitere dein Inventar auf dem Markt</li>
+        <li>Verwalte dein Deck und deine Sammlung im Deck-Manager</li>
+      </ul>
+      <a routerLink="/rules" class="more-link">Spielregeln lesen</a>
+    </div>
+  </oc-content-box>
+
+  <oc-content-box title="Die Welt" class="landing-section">
+    <div class="landing-text">
+      <p>
+        Das Sonnensystem, 2250: Vier Mächte ringen um Ordnung, Geld und Aufmerksamkeit – und am Rand des
+        Lichts bauen hunderte junge Kolonien an ihrer Zukunft.
+      </p>
+      <a routerLink="/world" class="more-link">Mehr über die Welt</a>
+    </div>
+  </oc-content-box>
+
+  <div id="lore-teasers" class="landing-section">
+    <oc-content-box title="Die Mächte" class="teaser-card">
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('maechte')"
+          (error)="showPlaceholder($event, 'stars1')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Martianische Flotten über dem Mars"
+        />
+        <p class="teaser-text">
+          Terra ernährt. Mars bewaffnet. Venus besitzt. Und wir draußen behaupten uns.
+        </p>
+        <a routerLink="/factions" class="more-link">Mehr über die Mächte</a>
+      </div>
+    </oc-content-box>
+    <oc-content-box title="Die Geschichte" class="teaser-card">
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('geschichte')"
+          (error)="showPlaceholder($event, 'stars2')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Ruinen einer Kolonie nach dem Kallisto-Krieg"
+        />
+        <p class="teaser-text">Von der Besiedlung des Mars bis zur Säuberung von Kallisto.</p>
+        <a routerLink="/history" class="more-link">Mehr zur Geschichte</a>
+      </div>
+    </oc-content-box>
+    <oc-content-box title="Die Editionen" class="teaser-card">
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('editionen')"
+          (error)="showPlaceholder($event, 'stars3')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Freihändler an einer Handelsstation im Asteroidengürtel"
+        />
+        <p class="teaser-text">Vier Editionen erzählen die Geschichten draußen – jede für sich lesbar.</p>
+        <a routerLink="/editions" class="more-link">Mehr zu den Editionen</a>
+      </div>
+    </oc-content-box>
+  </div>
+
+  <oc-content-box title="Baue auf." class="landing-section">
+    <div class="landing-text">
+      <p>
+        Was du nicht selbst baust, gehört dir nicht. Was du nicht verteidigst, gehört bald jemand anderem.
+        Baue auf.
+      </p>
+      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
+    </div>
+  </oc-content-box>
+</div>

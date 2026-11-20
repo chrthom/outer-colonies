@@ -1,0 +1,50 @@
+#outer-box {
+  position: relative;
+  display: flow-root;
+  width: min(100%, 940px);
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+.inner-box {
+  margin: 10px;
+  float: left;
+}
+#inventory-box,
+#buy-box {
+  width: 450px;
+}
+.scroll {
+  height: max(calc(100vh - 400px), 300px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.item {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 5px;
+  float: left;
+  img {
+    position: relative;
+    height: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+.card {
+  position: relative;
+  background-color: color-mix(in srgb, var(--color-dark), transparent 70%);
+  width: 164px;
+  float: left;
+  margin: 5px;
+  img {
+    max-width: 100%;
+  }
+  button {
+    width: 100%;
+  }
+}
+mat-card-subtitle h5 {
+  display: inline;
+}
