@@ -89,12 +89,13 @@ oc-content-box.landing-section {
 }
 
 .landing-text {
-  max-width: 75ch;
+  max-width: 66ch;
   p,
   li {
     font-size: 18px;
     line-height: 1.7;
     margin-bottom: 10px;
+    text-wrap: pretty;
   }
   ul {
     margin: 0 0 12px 20px;

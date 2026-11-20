@@ -4,6 +4,7 @@
 }
 
 .content-box {
+  --top-right-width: clamp(0px, calc(100% - 85px), 175px);
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -26,9 +27,11 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 175px;
+  width: var(--top-right-width);
   height: 81px;
   background-image: url("../../../assets/content_box_top_right.png");
+  background-size: 100% 81px;
+  background-repeat: no-repeat;
 }
 
 .content-box-top {
@@ -36,7 +39,7 @@
   top: 0;
   left: 43px;
   height: 81px;
-  width: max(0px, calc(100% - 218px));
+  width: max(0px, calc(100% - 43px - var(--top-right-width)));
   background-image: url("../../../assets/content_box_top.png");
 }
 
@@ -114,7 +117,7 @@
 
 @media (max-width: 600px) {
   .content-box {
-    padding: 44px 32px 36px;
+    padding: 44px 20px 28px;
   }
   .content-box-title {
     min-height: 37px;

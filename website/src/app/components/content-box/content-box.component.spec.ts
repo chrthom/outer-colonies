@@ -58,4 +58,16 @@ describe('ContentBoxComponent', () => {
 
     expect(bodyEl.getBoundingClientRect().top).toBeGreaterThanOrEqual(titleH2.getBoundingClientRect().bottom);
   });
+
+  it('should not overlap top-left and top-right frame pieces on narrow containers', () => {
+    fixture.componentInstance.width = 195;
+    fixture.detectChanges();
+
+    const topLeft: HTMLElement = fixture.nativeElement.querySelector('.content-box-top-left');
+    const topRight: HTMLElement = fixture.nativeElement.querySelector('.content-box-top-right');
+
+    expect(Math.round(topRight.getBoundingClientRect().left)).toBeGreaterThanOrEqual(
+      Math.round(topLeft.getBoundingClientRect().right)
+    );
+  });
 });
