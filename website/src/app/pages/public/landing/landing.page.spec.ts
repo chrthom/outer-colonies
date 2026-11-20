@@ -66,6 +66,23 @@ describe('LandingPage', () => {
     expect(cta).toBeTruthy();
   });
 
+  it('should vary surface variants across game, world, lore teasers and closing sections', () => {
+    const element: HTMLElement = fixture.nativeElement;
+    expect(
+      element.querySelector('oc-content-box[title="Das Spiel"] .content-box')?.getAttribute('data-variant')
+    ).toBe('panel');
+    expect(
+      element.querySelector('oc-content-box[title="Die Welt"] .content-box')?.getAttribute('data-variant')
+    ).toBe('open');
+    expect(
+      element.querySelector('oc-content-box[title="Baue auf."] .content-box')?.getAttribute('data-variant')
+    ).toBe('open');
+    const teaserVariants = Array.from(
+      element.querySelectorAll('#lore-teasers .teaser-card .content-box')
+    ).map(el => el.getAttribute('data-variant'));
+    expect(teaserVariants).toEqual(['brackets', 'brackets', 'brackets']);
+  });
+
   it('should set meta description and Open Graph tags with the hero artwork', () => {
     expect(meta.getTag('name="description"')?.content).toContain('Online-Sammelkartenspiel');
     expect(meta.getTag('property="og:title"')?.content).toBe('Outer Colonies – Das Online-Sammelkartenspiel');

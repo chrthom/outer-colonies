@@ -65,7 +65,7 @@ components:
   content-box:
     backgroundColor: "{colors.signal-teal-bright}"
     textColor: "{colors.hologram-white}"
-    padding: "81px 42px 42px 43px"
+    padding: "26px 32px 30px"
   table-header:
     backgroundColor: "{colors.signal-teal-bright}"
     textColor: "{colors.hologram-white}"
@@ -96,7 +96,7 @@ Typography is German-language and pairs a Latin Modern Sans reading face with La
 
 **Key Characteristics:**
 - Dark-only: black void, teal signal, red alert. There is no light theme.
-- Chamfered hologram frames (image-based) around every content block.
+- Scalable Flight-Console surfaces: restrained CSS chamfered panels, fine card-corner brackets and open ruled sections over the translucent grid.
 - Teal means idle and information, red means interaction and state change.
 - Mono-caps titles, sans body text, with no other typefaces.
 - Flat: depth comes from glow, translucency and layering, never from drop shadows.
@@ -139,7 +139,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 
 ### Hierarchy
 - **Display** (Mono Caps, 56px, uppercase, 0.05em tracking, shrinks to 40px under 900px and 32px under 600px): The landing hero title only.
-- **Headline** (Mono Caps, h2 default 1.5em): Content-box titles, which sit on the frame's top edge, and rules-page section heads.
+- **Headline** (Mono Caps, h2 default 1.5em): Content-box titles underscored by a fine teal horizon rule with a luminous pale-teal lead segment, and rules-page section heads.
 - **Title** (Mono Caps, 16px): Anonymous navbar links, Material card titles and subtitles.
 - **Body** (Sans, 18px, line-height 1.7, max 75ch): Landing and lore prose, list items and quotes (quotes in italic).
 - **Body compact** (Sans, 16px, line-height 1.6): Teasers and secondary text.
@@ -169,7 +169,7 @@ Angular Material's elevation classes are included, so default Material component
 
 ## Shapes
 
-The form language is the hologram chamfer. The content-box frame is nine images: a stepped top edge with a diagonal cut, a notched top-right plate (175×81px) and 42px corner pieces. Its lines are 2–3px teal light beams, slightly glowing, with a translucent teal wedge fill. The inventory zone corners are 60×60px L-shaped brackets in teal that turn red on hover. The rarity pips are 12×20px parallelograms (skewed −20°).
+The form language is the hologram chamfer and fine card-corner bracket, informed by actual Outer Colonies card framing rather than raster slices. `oc-content-box` renders its default `panel` frame as a single continuous CSS chamfered octagon (`14px` symmetric 45° corners, `8px`–`14px` responsive clamp, `1px` teal stroke over a unified translucent console fill) with no raster joins. Its `brackets` variant and the landing hero use four fine luminous L-brackets (`15px`–`16px` arms, `1.5px` Signal Teal Pale stroke with a subtle teal halo), and its `open` variant omits the enclosing box so sections sit directly on `#root-content`'s square-grid backdrop behind a shared title rule. The inventory zone corners are 60×60px L-shaped brackets in teal that turn red on hover. The rarity pips are 12×20px parallelograms (skewed −20°).
 
 Custom CSS shapes should follow the same logic: no plain right-angle outlines and no pill shapes. The `rounded` token is `0px`. The few right-angle boxes that exist (tables, the Beta badge with a 1px red border) are functional, not a model.
 
@@ -183,7 +183,10 @@ Mostly Angular Material `mat-raised-button` (21 uses), with a few `mat-button` t
 - **Text link CTA:** A bare teal link (`--color-primary`) next to the primary button, as for "Einloggen".
 
 ### Content Box (signature)
-The framed container, `oc-content-box`. It has the nine-piece chamfered teal frame, a translucent primary-teal centre (7% mix) and a Mono Caps h2 title sitting on the top edge at 30px/42px. Padding is 81px top (to clear the frame), 42px sides and bottom. Every page's main content lives in one.
+The shared Flight-Console surface container, `oc-content-box`, with three scalable `variant` treatments:
+- **`panel` (default):** Restrained symmetric chamfered CSS frame (`1px` stroke, unified dark-teal translucent fill) with `26px 32px 30px` desktop padding (`20px 18px 22px` at `≤600px`) and a full-width Mono Caps `h2` underscored by a `1px` teal horizon rule with a `48px × 2px` Signal Teal Pale lead beam. Used for primary reading dossiers, forms and authenticated game tools.
+- **`brackets`:** Four fine luminous card-corner L-brackets over a lighter translucent tint (`22px 24px 24px` padding), used for preview tiles such as lore teasers.
+- **`open`:** Unboxed section (`4px 32px` desktop, `4px 18px` mobile) sitting directly on `#root-content`'s translucent grid with the shared Mono Caps `h2` horizon rule, breaking up repetitive boxed layouts on landing and public pages.
 
 ### Navigation
 - **Style:** A sticky 62px bar with a black-to-deep-teal gradient (90°, black 50% to #0a7c7c 130%) and 3px `ridge` borders in Signal Teal Deep at top and bottom.
@@ -209,7 +212,7 @@ A 1px Alert Red Bright outline with Mono Caps 14px text and a 4px 12px padding, 
 
 ### Do:
 - **Do** shift teal elements to red on hover, focus and selection (Alert Red #991111 fills, Alert Red Pale text), and keep red out of idle surfaces.
-- **Do** frame images and text blocks in a content box or with chamfered, beam-like lines; follow the zone-corner and frame art for any new shape.
+- **Do** choose from the Flight-Console surface family (chamfered `panel`, fine card-corner `brackets` or `open` ruled sections) rather than wrapping every section in an identical outlined box.
 - **Do** set titles, labels and navigation in Latin Modern Mono Caps and prose in Latin Modern Sans at 18px, line-height 1.7, capped at 75ch.
 - **Do** use Signal Teal Pale (#88cccc) or white for small text on black, and keep WCAG AA contrast.
 - **Do** keep the 40% black veil under all content and keep the page flat (halo and translucent tint, no shadows).
