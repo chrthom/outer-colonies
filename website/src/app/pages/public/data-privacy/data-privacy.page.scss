@@ -1,7 +1,7 @@
 h1,
 h2,
 h3,
-h5 {
+h4 {
   display: block;
 }
 
@@ -13,6 +13,21 @@ h3 {
   padding-top: 15px;
 }
 
-h5 {
+h4 {
   padding-top: 5px;
+}
+
+p,
+li {
+  max-width: 66ch;
+  text-wrap: pretty;
+  line-height: 1.7;
+}
+
+.legal-page {
+  margin: 40px auto 20px;
+}
+
+a[mat-stroked-button] {
+  margin-top: 20px;
 }

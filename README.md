@@ -101,7 +101,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
       - `world/`: Public lore page "Die Welt" (setting intro)
   - `components/`: Reusable UI components
     - `content-box/`: Content box component - A styled container with a title and content area. Used in various pages to display information in a boxed layout.
-      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck, landing, world, factions, history, editions
+      - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck, landing, world, factions, history, editions, imprint, data-privacy
     - `error-state-matcher.ts`: Error state matcher utility - A utility class for handling form error states in Angular Material forms.
       - **Used in pages**: reset-password, forgot-password, profile, register, login
     - `image-modal/`: Image modal component - A modal dialog for displaying images. Used to show larger versions of images when clicked.
