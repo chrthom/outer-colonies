@@ -75,6 +75,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 
 #### Website (Angular)
 - **Purpose**: User management, deck configuration, settings, and opponent search
+- **Loading**: Secondary pages are loaded on demand without automatic route preloading; the landing page remains in the initial bundle. Legal dialogs load their page components when opened.
 - **Key Components**:
     - `app.component.ts`: Main application component; uses the fixed teal star field with a dark fallback and veil across public and private pages
   - `auth.service.ts`: Authentication service

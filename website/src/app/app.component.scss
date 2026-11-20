@@ -76,6 +76,12 @@ router-outlet {
   cursor: pointer;
 }
 
+.legal-load-error:not(:empty) {
+  max-width: 32ch;
+  margin-top: 8px;
+  color: var(--color-light);
+}
+
 #version {
   margin-left: auto;
   text-align: right;

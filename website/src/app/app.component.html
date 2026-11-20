@@ -22,8 +22,28 @@
           <li><a routerLink="/history">Die Geschichte</a></li>
           <li><a routerLink="/editions">Die Editionen</a></li>
         }
-        <li><button type="button" (click)="openImprint()">Impressum</button></li>
-        <li><button type="button" (click)="openDataPrivacy()">Datenschutz</button></li>
+        <li>
+          <button type="button" [attr.aria-busy]="legalLoading.imprint" (click)="openImprint()">
+            Impressum
+          </button>
+          <p class="legal-load-error" role="status">
+            @if (legalLoadErrors.imprint) {
+              Das Impressum konnte nicht geladen werden. Bitte prüfe deine Verbindung und versuche es erneut
+              oder lade die Seite neu.
+            }
+          </p>
+        </li>
+        <li>
+          <button type="button" [attr.aria-busy]="legalLoading.privacy" (click)="openDataPrivacy()">
+            Datenschutz
+          </button>
+          <p class="legal-load-error" role="status">
+            @if (legalLoadErrors.privacy) {
+              Die Datenschutzerklärung konnte nicht geladen werden. Bitte prüfe deine Verbindung und versuche
+              es erneut oder lade die Seite neu.
+            }
+          </p>
+        </li>
       </ul>
     </div>
     <a

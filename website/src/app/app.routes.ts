@@ -10,26 +10,9 @@ import {
   withPreloading
 } from '@angular/router';
 import { map } from 'rxjs';
-import { LoginPage } from './pages/public/login/login.page';
-import { HomePage } from './pages/private/home/home.page';
-import { RegisterPage } from './pages/public/register/register.page';
-import { DeckPage } from './pages/private/deck/deck.page';
-import { ImprintPage } from './pages/public/imprint/imprint.page';
-import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
-import { TradePage } from './pages/private/trade/trade.page';
-import { RulesPage } from './pages/private/rules/rules.page';
-import { ForgotPasswordPage } from './pages/public/forgot-password/forgot-password.page';
-import { ResetPasswordPage } from './pages/public/reset-password/reset-password.page';
-import { ActivateAccountPage } from './pages/public/activate-account/activate-account.page';
-import { ProfilePage } from './pages/private/profile/profile.page';
-import { ConfirmEmailPage } from './pages/public/confirm-email/confirm-email.page';
 import { LandingPage } from './pages/public/landing/landing.page';
-import { WorldPage } from './pages/public/world/world.page';
-import { FactionsPage } from './pages/public/factions/factions.page';
-import { HistoryPage } from './pages/public/history/history.page';
-import { EditionsPage } from './pages/public/editions/editions.page';
 
 /**
  * Redirects to HTTPS when the environment requires it.
@@ -105,103 +88,107 @@ export const routes: Routes = [
   {
     path: 'activate-account/:id',
     canActivate: [publicGuardFn],
-    component: ActivateAccountPage,
+    loadComponent: () =>
+      import('./pages/public/activate-account/activate-account.page').then(m => m.ActivateAccountPage),
     title: 'Outer Colonies – Nutzerkonto aktivieren'
   },
   {
     path: 'confirm-email/:id',
     canActivate: [publicGuardFn],
-    component: ConfirmEmailPage,
+    loadComponent: () =>
+      import('./pages/public/confirm-email/confirm-email.page').then(m => m.ConfirmEmailPage),
     title: 'Outer Colonies – E-Mail bestätigen'
   },
   {
     path: 'deck',
     canActivate: [privateGuardFn],
-    component: DeckPage,
+    loadComponent: () => import('./pages/private/deck/deck.page').then(m => m.DeckPage),
     title: 'Outer Colonies – Deck-Manager'
   },
   {
     path: 'editions',
     canActivate: [publicGuardFn],
-    component: EditionsPage,
+    loadComponent: () => import('./pages/public/editions/editions.page').then(m => m.EditionsPage),
     title: 'Outer Colonies – Die Editionen'
   },
   {
     path: 'factions',
     canActivate: [publicGuardFn],
-    component: FactionsPage,
+    loadComponent: () => import('./pages/public/factions/factions.page').then(m => m.FactionsPage),
     title: 'Outer Colonies – Die Mächte'
   },
   {
     path: 'forgot-password',
     canActivate: [publicGuardFn],
-    component: ForgotPasswordPage,
+    loadComponent: () =>
+      import('./pages/public/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
     title: 'Outer Colonies – Passwort vergessen'
   },
   {
     path: 'history',
     canActivate: [publicGuardFn],
-    component: HistoryPage,
+    loadComponent: () => import('./pages/public/history/history.page').then(m => m.HistoryPage),
     title: 'Outer Colonies – Die Geschichte'
   },
   {
     path: 'home',
     canActivate: [privateGuardFn],
-    component: HomePage,
+    loadComponent: () => import('./pages/private/home/home.page').then(m => m.HomePage),
     title: 'Outer Colonies – Spielsuche & Aktuelles'
   },
   {
     path: 'imprint',
     canActivate: [publicGuardFn],
-    component: ImprintPage,
+    loadComponent: () => import('./pages/public/imprint/imprint.page').then(m => m.ImprintPage),
     title: 'Outer Colonies – Impressum'
   },
   {
     path: 'login',
     canActivate: [publicGuardFn],
-    component: LoginPage,
+    loadComponent: () => import('./pages/public/login/login.page').then(m => m.LoginPage),
     title: 'Outer Colonies – Login'
   },
   {
     path: 'privacy',
     canActivate: [publicGuardFn],
-    component: DataPrivacyPage,
+    loadComponent: () => import('./pages/public/data-privacy/data-privacy.page').then(m => m.DataPrivacyPage),
     title: 'Outer Colonies – Datenschutzerklärung'
   },
   {
     path: 'profile',
     canActivate: [privateGuardFn],
-    component: ProfilePage,
+    loadComponent: () => import('./pages/private/profile/profile.page').then(m => m.ProfilePage),
     title: 'Outer Colonies – Profil'
   },
   {
     path: 'register',
     canActivate: [publicGuardFn],
-    component: RegisterPage,
+    loadComponent: () => import('./pages/public/register/register.page').then(m => m.RegisterPage),
     title: 'Outer Colonies – Registrieren'
   },
   {
     path: 'reset-password/:id',
     canActivate: [publicGuardFn],
-    component: ResetPasswordPage,
+    loadComponent: () =>
+      import('./pages/public/reset-password/reset-password.page').then(m => m.ResetPasswordPage),
     title: 'Outer Colonies – Neues Passwort setzen'
   },
   {
     path: 'rules',
     canActivate: [privateGuardFn],
-    component: RulesPage,
+    loadComponent: () => import('./pages/private/rules/rules.page').then(m => m.RulesPage),
     title: 'Outer Colonies – Spielregeln'
   },
   {
     path: 'trade',
     canActivate: [privateGuardFn],
-    component: TradePage,
+    loadComponent: () => import('./pages/private/trade/trade.page').then(m => m.TradePage),
     title: 'Outer Colonies – Inventar & Markt'
   },
   {
     path: 'world',
     canActivate: [publicGuardFn],
-    component: WorldPage,
+    loadComponent: () => import('./pages/public/world/world.page').then(m => m.WorldPage),
     title: 'Outer Colonies – Die Welt'
   },
   {
