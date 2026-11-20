@@ -2,11 +2,11 @@
   <div id="background-layer"></div>
 </div>
 
-<a class="skip-link" href="#main-content" (click)="$event.preventDefault(); mainContent.focus()"
+<a class="skip-link" href="#main-content" (click)="$event.preventDefault(); focusMainContent(mainContent)"
   >Zum Inhalt springen</a
 >
 <header>
-  <oc-navbar></oc-navbar>
+  <oc-navbar (menuNavigation)="focusMainContent(mainContent)"></oc-navbar>
 </header>
 
 <div id="root-content">

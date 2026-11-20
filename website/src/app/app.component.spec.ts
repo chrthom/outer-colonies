@@ -4,6 +4,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { of } from 'rxjs';
+import { By } from '@angular/platform-browser';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -93,10 +95,21 @@ describe('AppComponent', () => {
     expect(element.querySelector('#version h3, #version h4')).toBeNull();
   });
 
-  it('moves focus to the main content when the skip link is activated', () => {
+  it('scrolls and moves focus to the start of the main content when the skip link is activated', () => {
     const skip: HTMLAnchorElement = fixture.nativeElement.querySelector('.skip-link');
+    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
+    const scrollSpy = spyOn(main, 'scrollIntoView');
     skip.click();
-    expect(document.activeElement).toBe(fixture.nativeElement.querySelector('#main-content'));
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
+    expect(document.activeElement).toBe(main);
+  });
+
+  it('moves focus to the main content after mobile menu navigation', () => {
+    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
+    const scrollSpy = spyOn(main, 'scrollIntoView');
+    fixture.debugElement.query(By.directive(NavbarComponent)).componentInstance.menuNavigation.emit();
+    expect(document.activeElement).toBe(main);
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
   });
 
   it('opens legal dialogs through semantic footer buttons', () => {

@@ -29,6 +29,13 @@ export class AppComponent {
     // where no route guard triggers the session check.
     this.authService.check().subscribe();
   }
+
+  /** Moves focus and the viewport to the start of the page content. */
+  focusMainContent(mainContent: HTMLElement): void {
+    mainContent.scrollIntoView({ block: 'start' });
+    mainContent.focus({ preventScroll: true });
+  }
+
   get env() {
     return environment;
   }

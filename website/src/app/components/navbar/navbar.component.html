@@ -72,7 +72,13 @@
       >
         Menü
       </button>
-      <nav class="links" id="navbar-anon-links" aria-label="Hauptnavigation" [class.open]="menuOpen">
+      <nav
+        #menuLinks
+        class="links"
+        id="navbar-anon-links"
+        aria-label="Hauptnavigation"
+        [class.open]="menuOpen"
+      >
         <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
         <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
         <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
