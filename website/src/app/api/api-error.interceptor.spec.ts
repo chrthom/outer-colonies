@@ -72,6 +72,19 @@ describe('apiErrorInterceptor', () => {
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
+  it('does not clear or redirect a newer session when an old request fails after logout', () => {
+    Object.defineProperty(authServiceSpy, 'sessionGeneration', { value: 0, writable: true });
+    http.get(`${environment.url.api}/api/something`).subscribe({ error: () => undefined });
+
+    Object.defineProperty(authServiceSpy, 'sessionGeneration', { value: 1, writable: true });
+    httpMock
+      .expectOne(`${environment.url.api}/api/something`)
+      .flush({}, { status: 403, statusText: 'Forbidden' });
+
+    expect(authServiceSpy.clearSession).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
   it('rethrows failed API requests as typed ApiError with status and server message', () => {
     http.get(`${environment.url.api}/api/something`).subscribe({
       error: (err: ApiError) => {

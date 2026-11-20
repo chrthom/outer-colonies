@@ -39,12 +39,12 @@ describe('NavbarComponent', () => {
     expect(authSpy.logout).toHaveBeenCalled();
   });
 
-  it('should navigate to /login after logout', () => {
+  it('should navigate to the public landing page after logout', () => {
     const navigateSpy = spyOn(router, 'navigate');
 
     component.logout();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/']);
   });
 
   it('should get active route', () => {

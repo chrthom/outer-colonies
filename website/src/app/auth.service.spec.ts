@@ -80,6 +80,7 @@ describe('AuthService', () => {
 
       expect(service.isLoggedIn).toBeFalse();
       expect(cookieSpy.delete).toHaveBeenCalledWith('u');
+      expect(cookieSpy.delete).toHaveBeenCalledWith('p');
       expect(warnSpy).toHaveBeenCalledWith(jasmine.stringMatching(/status 500/));
     } finally {
       environment.stage = 'production';
@@ -228,5 +229,49 @@ describe('AuthService', () => {
     );
     service.check().subscribe(success => expect(success).toBeTrue());
     expect(authApiSpy.checkSessionToken).toHaveBeenCalledTimes(1);
+  });
+
+  it('should ignore a session check that completes after logout', () => {
+    const response$ = new Subject<AuthLoginResponse>();
+    service['sessionToken'] = 'old-token';
+    authApiSpy.checkSessionToken.and.returnValue(response$);
+    authApiSpy.logout.and.returnValue(of(undefined));
+    cookieSpy.get.and.returnValue('');
+    const results: boolean[] = [];
+
+    service.check().subscribe(success => results.push(success));
+    service.logout();
+    service.check().subscribe(success => results.push(success));
+    response$.next({ sessionToken: 'old-token', username: 'testuser', email: 'test@example.com' });
+    response$.complete();
+
+    expect(results).toEqual([false, false]);
+    expect(service.isLoggedIn).toBeFalse();
+    expect(service.displayname).toBe('');
+    expect(cookieSpy.delete).toHaveBeenCalledWith('u');
+    expect(cookieSpy.delete).toHaveBeenCalledWith('p');
+  });
+
+  it('should not let an old check clear a newer pending check or session after logout', () => {
+    const oldResponse$ = new Subject<AuthLoginResponse>();
+    const newResponse$ = new Subject<AuthLoginResponse>();
+    service['sessionToken'] = 'old-token';
+    authApiSpy.checkSessionToken.and.returnValue(oldResponse$);
+    authApiSpy.logout.and.returnValue(of(undefined));
+    service.check().subscribe();
+    service.logout();
+
+    cookieSpy.get.and.callFake((key: string) => (key === 'u' ? 'newuser' : 'newpass'));
+    authApiSpy.login.and.returnValue(newResponse$);
+    const results: boolean[] = [];
+    service.check().subscribe(success => results.push(success));
+    oldResponse$.error({ status: 401 });
+    service.check().subscribe(success => results.push(success));
+    expect(authApiSpy.login).toHaveBeenCalledTimes(1);
+
+    newResponse$.next({ sessionToken: 'new-token', username: 'newuser', email: 'test@example.com' });
+    newResponse$.complete();
+    expect(results).toEqual([true, true]);
+    expect(service.token).toBe('new-token');
   });
 });

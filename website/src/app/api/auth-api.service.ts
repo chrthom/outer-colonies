@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import {
@@ -8,6 +8,7 @@ import {
   AuthLoginResponse
 } from '@shared/interfaces/rest_api';
 import OCApi from './api';
+import { SKIP_AUTH_ERROR_REDIRECT } from './api-error-context';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,9 @@ export default class AuthApiService extends OCApi {
     return this.post<AuthLoginResponse>('auth/login', body);
   }
   logout(): Observable<void> {
-    return this.delete('auth/login');
+    return this.http.delete<void>(`${this.apiHost}/api/auth/login`, {
+      context: new HttpContext().set(SKIP_AUTH_ERROR_REDIRECT, true)
+    });
   }
   forgotPassword(user: string): Observable<void> {
     return this.delete(`auth/password/${encodeURIComponent(user)}`);
