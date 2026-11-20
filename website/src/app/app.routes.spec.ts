@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { PreloadAllModules, Router, provideRouter, withPreloading } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { routes } from './app.routes';
 import AuthService from './auth.service';
@@ -16,16 +16,40 @@ describe('app routes', () => {
     environment.https = false;
     authSpy = jasmine.createSpyObj('AuthService', ['check']);
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter(routes, withPreloading(PreloadAllModules)),
-        { provide: AuthService, useValue: authSpy }
-      ]
+      providers: [provideRouter(routes), { provide: AuthService, useValue: authSpy }]
     });
     router = TestBed.inject(Router);
   });
 
   afterEach(() => {
     environment.https = originalHttps;
+  });
+
+  it('loads all secondary pages on demand', () => {
+    const secondaryRoutes = routes.filter(route => route.path !== '' && route.path !== '**');
+    expect(secondaryRoutes.length).toBe(17);
+    for (const route of secondaryRoutes) {
+      expect(route.component)
+        .withContext(route.path ?? '')
+        .toBeUndefined();
+      expect(route.loadComponent)
+        .withContext(route.path ?? '')
+        .toBeDefined();
+    }
+  });
+
+  it('does not load a private page when its guard rejects navigation', async () => {
+    authSpy.check.and.returnValue(of(false));
+    const deckRoute = router.config.find(route => route.path === 'deck')!;
+    const loadDeck = jasmine.createSpy('loadDeck').and.callFake(deckRoute.loadComponent!);
+    router.resetConfig(
+      router.config.map(route => (route.path === 'deck' ? { ...route, loadComponent: loadDeck } : route))
+    );
+
+    await router.navigate(['/deck']);
+
+    expect(router.url).toBe('/login');
+    expect(loadDeck).not.toHaveBeenCalled();
   });
 
   it('should activate a private route when the auth check succeeds', async () => {

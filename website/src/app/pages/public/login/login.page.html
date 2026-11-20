@@ -1,0 +1,40 @@
+<div id="login-box" class="oc-auth-page">
+  <h1 class="sr-only">Login</h1>
+  <oc-content-box title="Login">
+    <form id="login-form" [formGroup]="loginForm" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Nutzername oder E-Mail Adresse</mat-label>
+        <input matInput autocomplete="username" formControlName="username" [errorStateMatcher]="matcher" />
+        @if (username?.hasError('required')) {
+        <mat-error>Bitte gib deinen Nutzernamen oder deine E-Mail Adresse ein</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Passwort</mat-label>
+        <input
+          matInput
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+          [errorStateMatcher]="matcher"
+        />
+        @if (password?.hasError('required')) {
+        <mat-error>Bitte gib dein Passwort ein</mat-error>
+        }
+      </mat-form-field>
+      <mat-slide-toggle color="primary" formControlName="remember">
+        <mat-label>Zugangsdaten merken</mat-label>
+      </mat-slide-toggle>
+      <button mat-raised-button type="submit" color="primary" [disabled]="loading">Anmelden</button>
+      <div role="alert" class="request-error" [class.has-error]="loginFailed">
+        @if (loginFailed) { Die Anmeldung ist fehlgeschlagen. Bitte pr&uuml;fe deine Zugangsdaten und versuche
+        es erneut. }
+      </div>
+    </form>
+    <p id="register-link">
+      <a routerLink="/register">Neuen Nutzer registrieren</a>
+      |
+      <a routerLink="/forgot-password">Passwort vergessen</a>
+    </p>
+  </oc-content-box>
+</div>
