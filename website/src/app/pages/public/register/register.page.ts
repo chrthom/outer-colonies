@@ -134,9 +134,7 @@ export class RegisterPage implements OnDestroy {
   /** Opens privacy information without changing consent; Material restores trigger focus. */
   openDataPrivacy() {
     this.dialog.open(DataPrivacyPage, {
-      ariaLabel: 'Datenschutzbestimmungen',
-      autoFocus: 'first-tabbable',
-      restoreFocus: true
+      ariaLabel: 'Datenschutzbestimmungen'
     });
   }
   ngOnDestroy(): void {

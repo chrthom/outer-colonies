@@ -5,13 +5,7 @@
     <form id="register-form" [formGroup]="registerForm" (ngSubmit)="submit()">
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Nutzername</mat-label>
-        <input
-          matInput
-          autocomplete="username"
-          formControlName="username"
-          [errorStateMatcher]="matcher"
-          aria-describedby="username-rules"
-        />
+        <input matInput autocomplete="username" formControlName="username" [errorStateMatcher]="matcher" />
         <mat-hint id="username-rules">3–20 Zeichen</mat-hint>
         @if (username?.hasError('required')) {
         <mat-error> Bitte w&auml;hle einen Nutzernamen </mat-error>
@@ -31,7 +25,6 @@
           autocomplete="new-password"
           formControlName="password"
           [errorStateMatcher]="matcher"
-          aria-describedby="password-rules"
         />
         <mat-hint id="password-rules">8–40 Zeichen, mindestens ein Buchstabe und eine Zahl</mat-hint>
         @if (password?.hasError('required')) {
@@ -97,7 +90,7 @@
       <button mat-raised-button type="submit" color="primary" [disabled]="registerForm.pending || loading">
         Neuen Nutzer registrieren
       </button>
-      <div role="alert" class="request-error">
+      <div role="alert" class="request-error" [class.has-error]="registrationSuccessful === false">
         @if (registrationSuccessful === false) { Ein unerwarteter Fehler ist bei der Registrierung
         aufgetreten. Bitte versuche es sp&auml;ter erneut. }
       </div>
