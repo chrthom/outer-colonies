@@ -1,5 +1,14 @@
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, Router, Routes } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  PreloadAllModules,
+  Router,
+  Routes,
+  provideRouter,
+  withInMemoryScrolling,
+  withPreloading
+} from '@angular/router';
 import { map } from 'rxjs';
 import AuthService from './auth.service';
 import { environment } from 'src/environments/environment';
@@ -194,3 +203,9 @@ export const routes: Routes = [
     redirectTo: ''
   }
 ];
+
+export const appRouterProviders = provideRouter(
+  routes,
+  withPreloading(PreloadAllModules),
+  withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
+);

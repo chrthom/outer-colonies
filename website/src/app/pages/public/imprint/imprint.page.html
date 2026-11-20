@@ -1,16 +1,28 @@
+@if (isDialog) {
 <mat-dialog-content>
   <h1>Impressum</h1>
-  <br />
-  <h3>Angaben gem&auml;&szlig; &sect; 5 TMG</h3>
+  <ng-container *ngTemplateOutlet="legalContent"></ng-container>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" mat-dialog-close>Schlie&szlig;en</button>
+</mat-dialog-actions>
+} @else {
+<div class="lore-page legal-page">
+  <h1 class="sr-only">Impressum</h1>
+  <oc-content-box title="Impressum">
+    <ng-container *ngTemplateOutlet="legalContent"></ng-container>
+    <a mat-stroked-button color="primary" routerLink="/">Zur Startseite</a>
+  </oc-content-box>
+</div>
+}
+
+<ng-template #legalContent>
+  <h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>
   <p>
     Christopher Thomsen<br />
     Poggenm&uuml;hle 5<br />
     20457 Hamburg
   </p>
-  <br />
-  <h3>Kontakt</h3>
+  <h2>Kontakt</h2>
   <p>E-Mail: contact&#64;outercolonies.de</p>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-raised-button color="primary" mat-dialog-close>Schlie&szlig;en</button>
-</mat-dialog-actions>
+</ng-template>
