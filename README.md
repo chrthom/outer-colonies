@@ -84,7 +84,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
       - `deck/`: Deck management page
       - `home/`: Home page (game home for logged-in players at `/home`)
       - `profile/`: User profile page
-      - `rules/`: Game rules page
+      - `rules/`: Public game rules reference (available to anonymous and authenticated visitors)
       - `trade/`: Trade page
     - `public/`: Pages for anonymous visitors (behind `publicGuardFn`)
       - `activate-account/`: Account activation page

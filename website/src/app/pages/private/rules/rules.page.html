@@ -3,10 +3,12 @@
     <table id="main-table">
       <tr>
         <td id="table-of-content">
+          <p class="mobile-chapter-hint">Kapitel auswählen und Liste scrollen</p>
           <mat-selection-list
             #activeChapter
             [multiple]="false"
             color="primary"
+            aria-label="Kapitel der Spielregeln"
             (selectionChange)="onChapterSelected($event)"
           >
             <h5>Allgemeines</h5>

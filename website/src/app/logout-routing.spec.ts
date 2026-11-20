@@ -64,10 +64,7 @@ describe('logout navigation', () => {
         .flush({ sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' });
       router.navigate(['/rules']);
       tick();
-      http
-        .expectOne(authUrl)
-        .flush({ sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' });
-      tick();
+      http.expectNone(authUrl);
       fixture.detectChanges();
       expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
       expect(fixture.nativeElement.querySelector('.user-name')).toBeTruthy();
@@ -103,10 +100,7 @@ describe('logout navigation', () => {
       .flush({ sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' });
     router.navigate(['/rules']);
     tick();
-    http
-      .expectOne(authUrl)
-      .flush({ sessionToken: 'test-token', username: 'testuser', email: 'test@example.com' });
-    tick();
+    http.expectNone(authUrl);
     fixture.detectChanges();
 
     auth.check().subscribe(result => expect(result).toBeFalse());

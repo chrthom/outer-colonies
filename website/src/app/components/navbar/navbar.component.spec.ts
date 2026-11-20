@@ -25,6 +25,7 @@ describe('NavbarComponent', () => {
           { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
           { path: 'factions', component: TestPageComponent },
+          { path: 'rules', component: TestPageComponent },
           {
             path: 'history',
             component: TestPageComponent,
@@ -247,14 +248,16 @@ describe('NavbarComponent', () => {
       '/world',
       '/factions',
       '/history',
-      '/editions'
+      '/editions',
+      '/rules'
     ]);
     expect(links.map(a => a.textContent?.trim())).toEqual([
       'Startseite',
       'Die Welt',
       'Die Mächte',
       'Die Geschichte',
-      'Die Editionen'
+      'Die Editionen',
+      'Spielregeln'
     ]);
 
     const actions = Array.from<Element>(element.querySelectorAll('#navbar-anon-actions a'));
@@ -263,6 +266,26 @@ describe('NavbarComponent', () => {
     expect(element.querySelector('.item.center')).toBeFalsy();
     // The compact logo keeps the logo box within the space the anon zone reserves for it:
     expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(true);
+  });
+
+  it('navigates to the rules from the mobile menu and marks the current page', async () => {
+    Object.assign(authSpy, { isLoggedIn: false });
+    fixture.detectChanges();
+    const toggle: HTMLButtonElement = fixture.nativeElement.querySelector('#navbar-menu-toggle');
+    toggle.style.display = 'block';
+    toggle.click();
+    fixture.detectChanges();
+    const rules: HTMLAnchorElement = fixture.nativeElement.querySelector(
+      '#navbar-anon-links a[href="/rules"]'
+    );
+    rules.focus();
+    rules.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/rules');
+    expect(component.menuOpen).toBeFalse();
+    expect(rules.getAttribute('aria-current')).toBe('page');
   });
 
   it('navigates home from the mobile menu and marks the current page', async () => {
