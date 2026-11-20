@@ -108,7 +108,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
       - **Used in pages**: register, deck
     - `inventory-item/`: Inventory item component - A component for displaying inventory items with an image and text.
       - **Used in pages**: trade
-    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, text links to the public lore pages plus register/login buttons for anonymous visitors.
+    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, accessible public lore links with a mobile menu, and register/login buttons for anonymous visitors. The shell also provides a skip-to-content link and keyboard focus indicators.
       - **Used in**: app.component.html (global navigation)
     - `open-item/`: Open item component - A component for displaying the contents of opened items (e.g., booster packs).
       - **Used in pages**: trade

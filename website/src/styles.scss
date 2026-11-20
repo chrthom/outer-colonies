@@ -15,17 +15,33 @@
   --color-accent-dark: #{mat.m2-get-color-from-palette(oc.$theme-accent, 700)};
   --color-accent-light: #{mat.m2-get-color-from-palette(oc.$theme-accent, 100)};
   --color-warn: #{mat.m2-get-color-from-palette(oc.$theme-accent, A400)};
-  --color-light: white;
-  --color-dark: black;
+  --color-light: #ffffff;
+  --color-dark: #000000;
+  --color-surface: #303030;
+  --color-panel-tint: color-mix(in srgb, var(--color-primary), transparent 93%);
+  --color-panel-backdrop: color-mix(in srgb, var(--color-dark), transparent 70%);
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 30px;
+  --space-xl: 40px;
+  --measure-body: 75ch;
 }
 
 * {
   margin: 0;
   padding: 0;
   border: 0;
-  outline: 0;
   vertical-align: baseline;
-  font-family: "Latin Modern Sans";
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 3px;
+}
+// Material's component styles otherwise suppress the native outline on its buttons.
+.mat-mdc-button-base:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 3px;
 }
 // The brand teal drops to about 2:1 as text over the brighter parts of the background image
 a,
@@ -39,19 +55,12 @@ body {
 }
 body {
   color: var(--color-light);
+  font-family: "Latin Modern Sans", sans-serif;
 }
 mat-card-title,
 mat-card-subtitle {
   color: var(--color-light) !important;
   font-family: "Latin Modern Mono Caps" !important;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  display: inline;
 }
 h1,
 h2,
@@ -80,6 +89,10 @@ ul {
 }
 // Outlined buttons have no fill, so the label sits directly on the dark panel or the teal navbar
 // gradient, where the brand teal only reaches about 3.2:1
+.mat-mdc-raised-button.mat-primary {
+  --mat-button-protected-container-color: var(--color-primary-dark);
+  --mat-button-protected-label-text-color: var(--color-light);
+}
 .mat-mdc-outlined-button.mat-primary {
   --mat-button-outlined-label-text-color: var(--color-primary-light);
   --mat-button-outlined-outline-color: var(--color-primary);
@@ -103,4 +116,15 @@ ul {
   clip: rect(0, 0, 0, 0);
   overflow: hidden;
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -55,7 +55,7 @@ spacing:
   xl: "40px"
 components:
   button-primary:
-    backgroundColor: "{colors.signal-teal}"
+    backgroundColor: "{colors.signal-teal-deep}"
     textColor: "{colors.hologram-white}"
     rounded: "{rounded.none}"
   button-default:
@@ -106,9 +106,9 @@ Typography is German-language and pairs a Latin Modern Sans reading face with La
 A near-monochrome teal-on-black palette with one warm counter-signal. The palette is the Angular Material M2 dark theme with custom teal (primary) and red (accent and warn) palettes. The values here are the shades the code actually uses.
 
 ### Primary
-- **Signal Teal** (#0c8686, palette 700): The Material theme primary, used for raised primary buttons and filled controls.
+- **Signal Teal** (#0c8686, palette 700): The Material theme primary, used for filled controls other than raised primary buttons.
 - **Signal Teal Bright** (#119999, palette 500, `--color-primary`): Links, quote rules, table headers, striped-row tint, content-box centre tint and idle navbar glow. This is the signal colour of the whole site.
-- **Signal Teal Deep** (#0a7c7c, palette 800, `--color-primary-dark`): The navbar ridge borders and the right-hand end of the navbar gradient.
+- **Signal Teal Deep** (#0a7c7c, palette 800, `--color-primary-dark`): The navbar ridge borders, navbar gradient and primary raised-button fill. White text on this shade meets WCAG AA (approximately 5:1).
 - **Signal Teal Pale** (#88cccc, palette 200, `--color-primary-light`): Idle navbar labels and the landing tagline. It is the only teal that is comfortable as small text on black.
 
 ### Secondary
@@ -120,7 +120,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 ### Neutral
 - **Void Black** (#000000, `--color-dark`): The footer, overlays, the navbar start and the veil over the star photograph (40% opacity).
 - **Hologram White** (#ffffff, `--color-light`): Body text on the dark background, and card titles.
-- **Surface Dark** (#303030): The Material M2 dark-theme surface, used by default Material controls (form fields, default buttons).
+- **Surface Dark** (#303030, `--color-surface`): The Material M2 dark-theme surface, used by default Material controls (form fields, default buttons). `--color-panel-tint` and `--color-panel-backdrop` name the translucent teal and black panel tints.
 
 ### Named Rules
 **The Teal-to-Red Rule.** Idle is teal and interaction is red. A hover or selected state shifts a teal element to red (or a red-tinted glow); it never introduces a third hue. Red at rest is reserved for warnings and errors.
@@ -135,7 +135,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 **Body Font:** Latin Modern Sans (with sans-serif fallback)
 **Icon Font:** outer-colonies-icons (13 game glyphs, 24px, 32px `.big`)
 
-**Character:** A technical-manual pairing. Mono Caps gives titles, navigation and table labels an engraved, instrument-plate voice. Latin Modern Sans keeps long German lore text readable. All headings are set `display: inline` by default and styled by their context.
+**Character:** A technical-manual pairing. Mono Caps gives titles, navigation and table labels an engraved, instrument-plate voice. Latin Modern Sans keeps long German lore text readable. Headings are block-level by default; legacy inline headings are scoped to their private-page contexts.
 
 ### Hierarchy
 - **Display** (Mono Caps, 56px, uppercase, 0.05em tracking, shrinks to 40px under 900px and 32px under 600px): The landing hero title only.
@@ -148,7 +148,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 ### Named Rules
 **The Two-Face Rule.** Titles, labels and navigation are Mono Caps, and everything that is read as a sentence is Sans. Never set a paragraph in Mono Caps or a title in Sans.
 
-**The No-Third-Font Rule.** Only the two Latin Modern faces plus the icon font. The Material default Roboto must not leak in; the global `*` rule forces Latin Modern Sans.
+**The No-Third-Font Rule.** Only the two Latin Modern faces plus the icon font. The body and Material typography configuration use Latin Modern Sans, without overriding icon fonts.
 
 ## Layout
 
@@ -156,7 +156,7 @@ A single centred column over the fixed star field: `#root-content` is `min(1400p
 
 Pages place one or more framed content boxes in the column. Public lore pages use a single text column at 75ch maximum, the landing page has a 60vh hero followed by stacked sections and a three-column teaser grid. Private pages vary: the home page uses floated boxes of 400, 500 and 550px inside a 940px container. Profile and login are centred at 50% width, and deck and rules use the full column width (`calc(100% - 50px)`).
 
-The spacing rhythm is loose multiples of 4: 8, 12, 15, 20, 24, 30 and 40px. Section gap is 40px, card grid gap is 20px, and action rows use 12–24px. Breakpoints in use are 960, 900, 800, 760 and 600px. At 900px the teaser grid collapses to one column, at 760px the anonymous lore links leave the navbar. Mobile for private pages (deck, trade) is not yet a confirmed requirement.
+The spacing rhythm is loose multiples of 4: 8, 12, 15, 20, 24, 30 and 40px. `--space-xs` through `--space-xl` expose 8, 12, 20, 30 and 40px, and `--measure-body` sets the 75ch reading limit. Section gap is 40px, card grid gap is 20px, and action rows use 12–24px. Breakpoints in use are 960, 900, 800, 760 and 600px. At 900px the teaser grid collapses to one column, below 760px the anonymous lore links move into a mobile menu. Mobile for private pages (deck, trade) is not yet a confirmed requirement.
 
 ## Elevation & Depth
 
@@ -178,7 +178,7 @@ Custom CSS shapes should follow the same logic: no plain right-angle outlines an
 ### Buttons
 Mostly Angular Material `mat-raised-button` (21 uses), with a few `mat-button` text buttons.
 - **Shape:** Material M2 default radius (4px), which is inherited and does not yet follow the chamfer language.
-- **Primary:** Signal Teal fill (#0c8686) with white text, used for the main call to action ("Jetzt mitspielen", "Registrieren").
+- **Primary:** Signal Teal Deep fill (#0a7c7c) with white text, used for the main call to action ("Jetzt mitspielen", "Registrieren").
 - **Default:** Surface Dark (#303030) with white text, for secondary actions such as "Login".
 - **Text link CTA:** A bare teal link (`--color-primary`) next to the primary button, as for "Einloggen".
 
@@ -188,7 +188,7 @@ The framed container, `oc-content-box`. It has the nine-piece chamfered teal fra
 ### Navigation
 - **Style:** A sticky 62px bar with a black-to-deep-teal gradient (90°, black 50% to #0a7c7c 130%) and 3px `ridge` borders in Signal Teal Deep at top and bottom.
 - **Logged-in:** Icon-only elements (50px PNG icons with tinted filters) on a radial glow, with a logo that overhangs the bar on a black halo. Hover or active shifts the glow from teal (30% mix) to red (50% mix) and the icon filter from teal-grey to red-grey.
-- **Anonymous:** Mono Caps 16px links in Signal Teal Pale, centred between a compact logo and the auth buttons. Hover and active turn Signal Teal Bright and add an underline. The links hide below 760px.
+- **Anonymous:** Mono Caps links in Signal Teal Pale, centred between a compact logo and the auth buttons. Hover and active turn white and add an underline. Below 760px, a keyboard-accessible menu exposes the same links.
 
 ### Tables
 Used for the deck builder and the rules pages. Sticky header cells in Signal Teal Bright with white text, which turn Alert Red on hover. Even rows get an 80%-transparent teal tint, and a hovered row is a 60%-transparent red tint. Cells have 0 8px padding and no wrap. Rarity shows as skewed teal pips, with filled ones red.

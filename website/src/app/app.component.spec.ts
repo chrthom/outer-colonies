@@ -4,6 +4,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { of } from 'rxjs';
+import { By } from '@angular/platform-browser';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -80,5 +82,43 @@ describe('AppComponent', () => {
     expect(footer.textContent).toContain('Die Editionen');
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');
+  });
+
+  it('provides landmarks and a skip link to the focusable main content', () => {
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('header oc-navbar')).toBeTruthy();
+    expect(element.querySelector('main#main-content[tabindex="-1"] router-outlet')).toBeTruthy();
+    expect(element.querySelector('footer#footer')).toBeTruthy();
+    expect(element.querySelector('a.skip-link')?.getAttribute('href')).toBe('#main-content');
+    expect(element.querySelector('[tabindex="invalid"]')).toBeNull();
+    expect(element.querySelector('#version')?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(element.querySelector('#version h3, #version h4')).toBeNull();
+  });
+
+  it('scrolls and moves focus to the start of the main content when the skip link is activated', () => {
+    const skip: HTMLAnchorElement = fixture.nativeElement.querySelector('.skip-link');
+    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
+    const scrollSpy = spyOn(main, 'scrollIntoView');
+    skip.click();
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
+    expect(document.activeElement).toBe(main);
+  });
+
+  it('moves focus to the main content after mobile menu navigation', () => {
+    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
+    const scrollSpy = spyOn(main, 'scrollIntoView');
+    fixture.debugElement.query(By.directive(NavbarComponent)).componentInstance.menuNavigation.emit();
+    expect(document.activeElement).toBe(main);
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
+  });
+
+  it('opens legal dialogs through semantic footer buttons', () => {
+    const buttons: NodeListOf<HTMLButtonElement> =
+      fixture.nativeElement.querySelectorAll('#footer-links button');
+    expect(buttons.length).toBe(2);
+    expect(Array.from(buttons).map(button => button.type)).toEqual(['button', 'button']);
+    buttons[0].click();
+    buttons[1].click();
+    expect(dialogSpy.open).toHaveBeenCalledTimes(2);
   });
 });
