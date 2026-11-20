@@ -76,7 +76,7 @@ describe('NavbarComponent', () => {
     expect(element.querySelector('.user-name')?.textContent).toBe('testuser');
     expect(element.querySelector('#navbar-anon-links')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(false);
+    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
     expect(element.querySelector('#navbar-logo').getAttribute('aria-label')).toBe(
       'Outer Colonies – Startseite'
     );
@@ -264,8 +264,21 @@ describe('NavbarComponent', () => {
     expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
     expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Einloggen']);
     expect(element.querySelector('.item.center')).toBeFalsy();
-    // The compact logo keeps the logo box within the space the anon zone reserves for it:
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBe(true);
+    // Both logged-in and anonymous views share the exact same logo sizing and overhanging layout:
+    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
+  });
+
+  it('marks the active lore link with aria-current="page"', async () => {
+    await router.navigateByUrl('/world');
+    Object.assign(authSpy, { isLoggedIn: false });
+    fixture.detectChanges();
+
+    const world: HTMLAnchorElement = fixture.nativeElement.querySelector(
+      '#navbar-anon-links a[href="/world"]'
+    );
+    const home: HTMLAnchorElement = fixture.nativeElement.querySelector('#navbar-anon-links a[href="/"]');
+    expect(world.getAttribute('aria-current')).toBe('page');
+    expect(home.getAttribute('aria-current')).toBeNull();
   });
 
   it('navigates to the rules from the mobile menu and marks the current page', async () => {
