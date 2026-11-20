@@ -89,8 +89,12 @@ describe('ConfirmEmailPage', () => {
     component.ngOnInit();
     fixture.detectChanges();
     expect(component.loading).toBeTrue();
-    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('wird bestätigt');
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain(
+      'Deine E-Mail-Adresse wird bestätigt'
+    );
     expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('h1').textContent).toBe('E-Mail bestätigen');
+    expect(fixture.nativeElement.querySelector('h2').textContent).toBe('E-Mail bestätigen');
     request.next();
     request.complete();
     fixture.detectChanges();
