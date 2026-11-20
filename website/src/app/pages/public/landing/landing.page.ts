@@ -44,7 +44,7 @@ export class LandingPage implements OnDestroy {
   /** Hero background: gradient overlay on top of the hero artwork (star field as long as the artwork is pending). */
   get heroBackground(): string {
     return (
-      'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%), ' +
+      'linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(5, 24, 24, 0.55) 55%, rgba(0, 0, 0, 0.45) 100%), ' +
       `url("${this.heroArtworkUrl}"), ` +
       `url("${environment.url.assets}/background/stars4.jpg")`
     );

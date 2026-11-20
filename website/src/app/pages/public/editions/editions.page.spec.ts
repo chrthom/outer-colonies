@@ -43,12 +43,14 @@ describe('EditionsPage', () => {
     ]);
   });
 
-  it('should render the edition stories verbatim', () => {
+  it('should render the edition stories verbatim without leaked outline prefixes', () => {
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Wir kamen mit dem, was die Trägerschiffe übrig ließen');
     expect(text).toContain('Die Legende ist teurer.');
     expect(text).toContain('Man verliert ihn nur langsamer als andere.');
-    expect(text).toContain('Wir haben beschlossen, das lassen zu sein. Meistens.');
+    expect(text).toContain('einem Plasmabeschleuniger, der niemandem gehört.');
+    expect(text).toContain('Wir haben beschlossen, das sein zu lassen. Meistens.');
+    expect(text).not.toContain('Beleuchteter Weltausschnitt');
   });
 
   it('should not contain any edition 5 elements', () => {

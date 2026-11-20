@@ -1,21 +1,16 @@
 #navbar-space {
-  position: relative;
   height: 25px;
-  width: 100%;
 }
 #navbar-main {
   position: sticky;
   top: 0;
-  left: 0;
   background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
-  border-top: 3px ridge var(--color-primary-dark);
-  border-bottom: 3px ridge var(--color-primary-dark);
+  border-block: 3px ridge var(--color-primary-dark);
   height: 62px;
-  width: 100%;
   margin-bottom: 30px;
-  -webkit-box-align: center;
-  -webkit-box-pack: center;
-  display: -webkit-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 50;
 }
 .navbar-element {
@@ -23,47 +18,34 @@
   background: radial-gradient(
     closest-side,
     color-mix(in srgb, var(--color-primary), transparent 70%) 30%,
-    rgba(0, 0, 0, 0)
+    transparent
   );
-  h1 {
-    color: var(--color-primary-light);
-  }
   img {
     width: 50px;
     filter: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
   }
 }
 .navbar-center {
-  position: relative;
-  float: left;
-  left: 0;
-  padding: 10px 36px 10px 36px;
+  padding: 10px 36px;
 }
 .navbar-right {
   position: absolute;
   top: 0;
+  right: 20px;
   height: 50px;
-  padding: 5px 15px 5px 15px;
-  left: calc(100% - 100px);
+  padding: 5px 15px;
 }
 h2.navbar-right {
+  right: 100px;
   padding-top: 13px;
-  left: calc(100% - 100px);
-  transform: translateX(-100%);
 }
 .active,
 .navbar-element:hover {
   background: radial-gradient(
     closest-side,
     color-mix(in srgb, var(--color-accent), transparent 50%) 40%,
-    rgba(0, 0, 0, 0)
+    transparent
   );
-}
-.active,
-.navbar-element:hover {
-  h1 {
-    color: var(--color-accent-light);
-  }
   img {
     filter: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
   }
@@ -74,97 +56,62 @@ h2.navbar-right {
   top: 0;
   left: 0;
   transform: translateY(-30%);
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-dark), transparent 20%) 75%,
-    rgba(0, 0, 0, 0)
-  );
-  width: fit-content;
+  background: radial-gradient(closest-side, #000c 75%, transparent);
   padding: 15px 25px;
   z-index: 51;
-}
-
-/*
- * Compact logo variant for the anonymous navbar: the logo has no intrinsic size rule otherwise
- * (natural 300x188 plus padding = ~350px box), which would overlap the centered lore links.
- * Shrunk to 100px the box (100px + 2x10px padding = 120px) fits the space #navbar-anon-zone reserves.
- */
-#navbar-logo.compact {
-  padding: 15px 10px;
-  transform: translateY(-15%);
   img {
-    width: 100px;
+    display: block;
   }
 }
-
-/*
- * Anonymous three-zone layout: compact logo (space reserved via padding) / centered lore links / auth actions.
- * The flex zones reserve their space, so the links can never collide with logo or action buttons.
- */
+#navbar-logo.compact {
+  top: 50%;
+  padding: 3px 12px;
+  transform: translateY(-50%);
+  img {
+    width: 88px;
+  }
+}
 #navbar-anon-zone {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 62px;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-left: 120px; /* reserves exactly the compact logo box (see #navbar-logo.compact) */
+  padding-left: 112px;
 }
-
 #navbar-anon-links {
-  flex: 1 1 0;
+  flex: 1;
   min-width: 0;
-  overflow: hidden; /* clips instead of overlapping the action buttons if the viewport is too narrow */
-  height: 62px;
+  overflow: hidden;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: clamp(12px, 2.2vw, 32px);
   a {
-    font-family: "Latin Modern Mono Caps";
-    font-size: 16px;
-    color: var(--color-primary-light);
+    font: clamp(13px, 1.5vw, 16px) "Latin Modern Mono Caps";
     text-decoration: none;
     white-space: nowrap;
-    &.active,
-    &:hover {
-      color: var(--color-light);
-      text-decoration: underline;
-    }
+  }
+  a.active,
+  a:hover {
+    color: var(--color-light);
+    text-decoration: underline;
   }
 }
-
 #navbar-anon-actions {
-  flex: 0 0 auto;
-  height: 62px;
   display: flex;
-  align-items: center;
   gap: 12px;
   padding: 0 15px;
 }
-
-@media (max-width: 960px) {
-  #navbar-anon-links {
-    gap: 20px;
-    a {
-      font-size: 14px;
+@media (max-width: 1560px) {
+  #navbar-logo {
+    top: 50%;
+    padding: 4px 12px;
+    transform: translateY(-50%);
+    img {
+      width: 104px;
     }
   }
 }
-
-@media (max-width: 800px) {
-  #navbar-anon-links {
-    gap: 12px;
-    a {
-      font-size: 13px;
-    }
-  }
-}
-
 @media (max-width: 760px) {
-  /* The text links no longer fit next to logo and action buttons; the landing page teasers keep the lore pages reachable. */
   #navbar-anon-links {
     display: none;
   }
