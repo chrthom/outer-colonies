@@ -1,7 +1,7 @@
 <div id="landing-page">
   <section id="hero" [style.backgroundImage]="heroBackground">
-    <span id="beta-badge" matTooltip="Outer Colonies befindet sich in der Beta-Phase">Beta</span>
-    <img id="hero-logo" src="../../../../assets/logo.png" alt="" />
+    <span id="beta-badge" matTooltip="Outer Colonies befindet sich in der Beta-Phase">Offene Beta</span>
+    <img id="hero-logo" src="../../../../assets/logo.png" width="140" height="88" alt="" />
     <h1 id="hero-title">Outer Colonies</h1>
     <p id="hero-tagline">Baue deine Kolonie am Rand des Lichts.</p>
     <div id="hero-ctas">
@@ -44,34 +44,48 @@
 
   <div id="lore-teasers" class="landing-section">
     <oc-content-box title="Die Mächte" class="teaser-card">
-      <img
-        class="teaser-image"
-        [src]="teaserUrl('maechte')"
-        (error)="showPlaceholder($event, 'stars1')"
-        alt="Illustration: Martianische Flotten über dem Mars"
-      />
-      <p class="teaser-text">Terra ernährt. Mars bewaffnet. Venus besitzt. Und wir draußen behaupten uns.</p>
-      <a routerLink="/factions" class="more-link">Mehr …</a>
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('maechte')"
+          (error)="showPlaceholder($event, 'stars1')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Martianische Flotten über dem Mars"
+        />
+        <p class="teaser-text">
+          Terra ernährt. Mars bewaffnet. Venus besitzt. Und wir draußen behaupten uns.
+        </p>
+        <a routerLink="/factions" class="more-link">Mehr über die Mächte</a>
+      </div>
     </oc-content-box>
     <oc-content-box title="Die Geschichte" class="teaser-card">
-      <img
-        class="teaser-image"
-        [src]="teaserUrl('geschichte')"
-        (error)="showPlaceholder($event, 'stars2')"
-        alt="Illustration: Ruinen einer Kolonie nach dem Kallisto-Krieg"
-      />
-      <p class="teaser-text">Von der Besiedlung des Mars bis zur Säuberung von Kallisto.</p>
-      <a routerLink="/history" class="more-link">Mehr …</a>
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('geschichte')"
+          (error)="showPlaceholder($event, 'stars2')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Ruinen einer Kolonie nach dem Kallisto-Krieg"
+        />
+        <p class="teaser-text">Von der Besiedlung des Mars bis zur Säuberung von Kallisto.</p>
+        <a routerLink="/history" class="more-link">Mehr zur Geschichte</a>
+      </div>
     </oc-content-box>
     <oc-content-box title="Die Editionen" class="teaser-card">
-      <img
-        class="teaser-image"
-        [src]="teaserUrl('editionen')"
-        (error)="showPlaceholder($event, 'stars3')"
-        alt="Illustration: Freihändler an einer Handelsstation im Asteroidengürtel"
-      />
-      <p class="teaser-text">Vier Editionen erzählen die Geschichten draußen – jede für sich lesbar.</p>
-      <a routerLink="/editions" class="more-link">Mehr …</a>
+      <div class="teaser-body">
+        <img
+          class="teaser-image"
+          [src]="teaserUrl('editionen')"
+          (error)="showPlaceholder($event, 'stars3')"
+          loading="lazy"
+          decoding="async"
+          alt="Illustration: Freihändler an einer Handelsstation im Asteroidengürtel"
+        />
+        <p class="teaser-text">Vier Editionen erzählen die Geschichten draußen – jede für sich lesbar.</p>
+        <a routerLink="/editions" class="more-link">Mehr zu den Editionen</a>
+      </div>
     </oc-content-box>
   </div>
 

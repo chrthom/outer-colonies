@@ -32,7 +32,7 @@ describe('LandingPage', () => {
     );
     expect(element.querySelector('#hero-ctas a[routerLink="/register"]')).toBeTruthy();
     expect(element.querySelector('#hero-ctas a[routerLink="/login"]')).toBeTruthy();
-    expect(element.querySelector('#beta-badge')?.textContent).toContain('Beta');
+    expect(element.querySelector('#beta-badge')?.textContent).toBe('Offene Beta');
   });
 
   it('should render the game pitch with feature bullets', () => {
@@ -45,9 +45,15 @@ describe('LandingPage', () => {
   it('should link the world teaser and the three lore teasers to the lore pages', () => {
     const element = fixture.nativeElement;
     expect(element.querySelector('a[routerLink="/world"]')?.textContent).toContain('Mehr über die Welt');
-    expect(element.querySelector('.teaser-card a[routerLink="/factions"]')).toBeTruthy();
-    expect(element.querySelector('.teaser-card a[routerLink="/history"]')).toBeTruthy();
-    expect(element.querySelector('.teaser-card a[routerLink="/editions"]')).toBeTruthy();
+    expect(element.querySelector('.teaser-card a[routerLink="/factions"]')?.textContent).toBe(
+      'Mehr über die Mächte'
+    );
+    expect(element.querySelector('.teaser-card a[routerLink="/history"]')?.textContent).toBe(
+      'Mehr zur Geschichte'
+    );
+    expect(element.querySelector('.teaser-card a[routerLink="/editions"]')?.textContent).toBe(
+      'Mehr zu den Editionen'
+    );
   });
 
   it('should render the closing proverb with registration CTA', () => {

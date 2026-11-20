@@ -70,6 +70,10 @@ describe('AppComponent', () => {
   it('should render the footer links on every page', () => {
     const footer = fixture.nativeElement.querySelector('#footer');
     expect(footer).toBeTruthy();
+    expect(footer.textContent).toContain('Die Welt');
+    expect(footer.textContent).toContain('Die Mächte');
+    expect(footer.textContent).toContain('Die Geschichte');
+    expect(footer.textContent).toContain('Die Editionen');
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');
   });

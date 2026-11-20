@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImprintPage } from './pages/public/imprint/imprint.page';
 import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import AuthService from './auth.service';
 import { version, releaseName } from '@shared/config/version';
 
@@ -12,7 +12,7 @@ import { version, releaseName } from '@shared/config/version';
   selector: 'oc-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [NavbarComponent, RouterOutlet]
+  imports: [NavbarComponent, RouterLink, RouterOutlet]
 })
 export class AppComponent {
   /** Number of star background images (background-stars-0 … background-stars-6 in app.component.scss). */
