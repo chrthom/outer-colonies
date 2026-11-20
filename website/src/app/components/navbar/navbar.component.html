@@ -86,6 +86,12 @@
         <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
         <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
         <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
+        <a
+          routerLink="/rules"
+          [class.active]="active === 'rules'"
+          [attr.aria-current]="active === 'rules' ? 'page' : null"
+          >Spielregeln</a
+        >
       </nav>
       <div class="actions" id="navbar-anon-actions">
         <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>

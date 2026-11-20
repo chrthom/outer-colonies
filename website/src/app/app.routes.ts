@@ -60,7 +60,11 @@ const publicGuardFn: CanActivateFn = () => checkHttps();
 const deepLinkGuardFn: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const initialPath = route.queryParams['p'];
   if (initialPath) {
-    return inject(Router).parseUrl('/' + initialPath);
+    const target = inject(Router).parseUrl('/' + initialPath);
+    const queryParams = { ...route.queryParams };
+    delete queryParams['p'];
+    target.queryParams = { ...target.queryParams, ...queryParams };
+    return target;
   }
   return true;
 };
@@ -175,7 +179,7 @@ export const routes: Routes = [
   },
   {
     path: 'rules',
-    canActivate: [privateGuardFn],
+    canActivate: [publicGuardFn],
     loadComponent: () => import('./pages/private/rules/rules.page').then(m => m.RulesPage),
     title: 'Outer Colonies – Spielregeln'
   },

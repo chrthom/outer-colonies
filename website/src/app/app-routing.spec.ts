@@ -8,6 +8,8 @@ import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Title } from '@angular/platform-browser';
 import { DailyGetResponse } from '@shared/interfaces/rest_api';
+import { AppComponent } from './app.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   template: '<router-outlet></router-outlet>',
@@ -118,6 +120,83 @@ describe('app routes (public landing and lore pages)', () => {
     expect(router.url).toBe('/world');
     expect(fixture.nativeElement.querySelector('oc-page-world')).toBeTruthy();
     expect(title.getTitle()).toBe('Outer Colonies – Die Welt');
+  }));
+
+  for (const loggedIn of [false, true]) {
+    for (const [url, expectedUrl, chapter] of [
+      ['/rules?section=missions', '/rules?section=missions', 'missions'],
+      ['/?p=rules', '/rules', 'setup'],
+      ['/?p=rules&section=missions', '/rules?section=missions', 'missions']
+    ]) {
+      it(`opens ${url} for ${loggedIn ? 'authenticated' : 'anonymous'} visitors`, fakeAsync(() => {
+        authSpy.check.and.returnValue(of(loggedIn));
+        Object.assign(authSpy, { isLoggedIn: loggedIn });
+        router.navigateByUrl(url);
+        tick();
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        expect(router.url).toBe(expectedUrl);
+        expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
+        expect(
+          fixture.nativeElement
+            .querySelector(`mat-list-option[value="${chapter}"]`)
+            ?.getAttribute('aria-selected')
+        ).toBe('true');
+        expect(title.getTitle()).toBe('Outer Colonies – Spielregeln');
+      }));
+    }
+  }
+
+  it('preserves other query parameters for public and authenticated private deep links', fakeAsync(() => {
+    router.navigateByUrl('/?p=world&from=landing');
+    tick();
+    expect(router.url).toBe('/world?from=landing');
+
+    authSpy.check.and.returnValue(of(true));
+    router.navigateByUrl('/?p=deck&from=landing');
+    tick();
+    expect(router.url).toBe('/deck?from=landing');
+  }));
+});
+
+describe('rules session restoration in the app shell', () => {
+  const originalHttps = environment.https;
+
+  beforeEach(async () => {
+    environment.https = false;
+    const cookies = jasmine.createSpyObj<CookieService>('CookieService', ['get', 'set', 'delete']);
+    cookies.get.and.callFake(name => (name === 'u' ? 'player' : name === 'p' ? 'password' : ''));
+    await TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, AppComponent],
+      providers: [provideRouter(routes), { provide: CookieService, useValue: cookies }]
+    }).compileComponents();
+  });
+
+  afterEach(() => {
+    TestBed.inject(HttpTestingController).verify();
+    environment.https = originalHttps;
+  });
+
+  it('restores a saved session on a direct public rules visit', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const router = TestBed.inject(Router);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    router.navigateByUrl('/rules?section=missions');
+    tick();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeTruthy();
+
+    http
+      .expectOne(`${environment.url.api}/api/auth/login`)
+      .flush({ sessionToken: 'token', username: 'player' });
+    fixture.detectChanges();
+    expect(router.url).toBe('/rules?section=missions');
+    expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('a[aria-label="Spielregeln"][href="/rules"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeNull();
   }));
 });
 

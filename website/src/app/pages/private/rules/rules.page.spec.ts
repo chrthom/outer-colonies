@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IconService } from 'src/app/icon.service';
 
@@ -27,6 +28,39 @@ describe('RulesPage', () => {
   it('should have default active chapter', () => {
     const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
     expect(selectedValue).toBe('setup');
+  });
+
+  it('labels the keyboard-operable chapter list and keeps both navigation button sets', () => {
+    const list: HTMLElement = fixture.nativeElement.querySelector('mat-selection-list');
+    expect(list.getAttribute('aria-label')).toBe('Kapitel der Spielregeln');
+    expect(list.getAttribute('role')).toBe('listbox');
+    expect(fixture.nativeElement.querySelectorAll('.nav-button').length).toBe(4);
+  });
+
+  it('updates the chapter deep link without discarding other query parameters', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    component.nextChapter();
+    expect(component.activeChapterList.selectedOptions.selected[0]?.value).toBe('symbols');
+    expect(navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { section: 'symbols' },
+        queryParamsHandling: 'merge'
+      })
+    );
+  });
+
+  it('scrolls the chapter list to show a selection outside its visible area', () => {
+    const list: HTMLElement = fixture.nativeElement.querySelector('mat-selection-list');
+    const option: HTMLElement = list.querySelector('mat-list-option[value="symbols"]')!;
+    Object.defineProperty(list, 'scrollHeight', { value: 800 });
+    Object.defineProperty(list, 'clientHeight', { value: 200 });
+    spyOn(list, 'getBoundingClientRect').and.returnValue({ top: 0, bottom: 200 } as DOMRect);
+    spyOn(option, 'getBoundingClientRect').and.returnValue({ top: 300, bottom: 348 } as DOMRect);
+
+    component.nextChapter();
+
+    expect(list.scrollTop).toBe(224);
   });
 
   it('should register every sidebar chapter in the chapters array', () => {

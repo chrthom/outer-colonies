@@ -40,6 +40,9 @@ describe('LandingPage', () => {
     expect(element.textContent).toContain('browserbasiertes Online-Sammelkartenspiel');
     const bullets = element.querySelectorAll('.landing-text ul li');
     expect(bullets.length).toBe(5);
+    const rules = element.querySelector('oc-content-box[title="Das Spiel"] a[routerLink="/rules"]');
+    expect(rules?.getAttribute('href')).toBe('/rules');
+    expect(rules?.textContent).toContain('Spielregeln');
   });
 
   it('should link the world teaser and the three lore teasers to the lore pages', () => {

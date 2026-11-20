@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 import { MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
@@ -14,6 +14,7 @@ import { IconService } from '../../../icon.service';
 })
 export class RulesPage implements OnInit {
   @ViewChild('activeChapter') activeChapterList!: MatSelectionList;
+  @ViewChild('activeChapter', { read: ElementRef }) private chapterListElement!: ElementRef<HTMLElement>;
 
   private iconService = inject(IconService);
 
@@ -94,6 +95,15 @@ export class RulesPage implements OnInit {
     const option = this.activeChapterList.options.find(option => option.value === chapter);
     if (option) {
       this.activeChapterList.selectedOptions.select(option);
+      const list = this.chapterListElement.nativeElement;
+      const selected = list.querySelector<HTMLElement>(`mat-list-option[value="${chapter}"]`);
+      if (selected && list.scrollHeight > list.clientHeight) {
+        const listBounds = list.getBoundingClientRect();
+        const optionBounds = selected.getBoundingClientRect();
+        if (optionBounds.top < listBounds.top || optionBounds.bottom > listBounds.bottom) {
+          list.scrollTop += (optionBounds.top + optionBounds.bottom - listBounds.top - listBounds.bottom) / 2;
+        }
+      }
     }
   }
 
