@@ -1,9 +1,8 @@
-#navbar-space {
+.space {
   height: 25px;
 }
-#navbar-main {
-  position: sticky;
-  top: 0;
+.bar {
+  position: relative;
   background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
   border-block: 3px ridge var(--color-primary-dark);
   height: 62px;
@@ -11,108 +10,94 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
 }
-.navbar-element {
+.item {
   cursor: pointer;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-primary), transparent 70%) 30%,
-    transparent
-  );
+  --g: color-mix(in srgb, var(--color-primary), transparent 70%);
+  --f: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
+  background: radial-gradient(closest-side, var(--g), transparent);
   img {
+    display: block;
     width: 50px;
-    filter: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
+    filter: var(--f);
+  }
+  &:hover,
+  &.active {
+    --g: color-mix(in srgb, var(--color-accent), transparent 50%);
+    --f: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
   }
 }
-.navbar-center {
+.center {
   padding: 10px 36px;
 }
-.navbar-right {
+.right {
   position: absolute;
   top: 0;
   right: 20px;
   height: 50px;
   padding: 5px 15px;
 }
-h2.navbar-right {
+h2.right {
   right: 100px;
   padding-top: 13px;
 }
-.active,
-.navbar-element:hover {
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-accent), transparent 50%) 40%,
-    transparent
-  );
-  img {
-    filter: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
-  }
-}
-#navbar-logo {
-  cursor: pointer;
+.logo {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
-  transform: translateY(-30%);
+  transform: translateY(-50%);
   background: radial-gradient(closest-side, #000c 75%, transparent);
-  padding: 15px 25px;
-  z-index: 51;
+  padding: 4px 12px;
+  z-index: 1;
   img {
     display: block;
+    height: auto;
+    width: var(--logo-width, 104px);
+  }
+  &.compact {
+    --logo-width: 88px;
+    padding: 3px 12px;
   }
 }
-#navbar-logo.compact {
-  top: 50%;
-  padding: 3px 12px;
-  transform: translateY(-50%);
-  img {
-    width: 88px;
-  }
-}
-#navbar-anon-zone {
+.zone {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding-left: 112px;
 }
-#navbar-anon-links {
+.links {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   gap: clamp(12px, 2.2vw, 32px);
   a {
-    font: clamp(13px, 1.5vw, 16px) "Latin Modern Mono Caps";
+    font:
+      clamp(13px, 1.5vw, 16px) "Latin Modern Mono Caps",
+      monospace;
     text-decoration: none;
     white-space: nowrap;
-  }
-  a.active,
-  a:hover {
-    color: var(--color-light);
-    text-decoration: underline;
+    &:hover,
+    &.active {
+      color: var(--color-light);
+      text-decoration: underline;
+    }
   }
 }
-#navbar-anon-actions {
+.menu {
+  display: none;
+}
+.actions {
   display: flex;
   gap: 12px;
   padding: 0 15px;
 }
-@media (max-width: 1560px) {
-  #navbar-logo {
-    top: 50%;
-    padding: 4px 12px;
-    transform: translateY(-50%);
-    img {
-      width: 104px;
-    }
-  }
-}
-@media (max-width: 760px) {
-  #navbar-anon-links {
-    display: none;
+@media (min-width: 1561px) {
+  .logo:not(.compact) {
+    --logo-width: 300px;
+    top: 0;
+    padding: 15px 25px;
+    transform: translateY(-30%);
   }
 }

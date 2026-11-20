@@ -2,26 +2,38 @@
   <div id="background-layer"></div>
 </div>
 
-<oc-navbar></oc-navbar>
+<a class="skip-link" href="#main-content" (click)="$event.preventDefault(); mainContent.focus()"
+  >Zum Inhalt springen</a
+>
+<header>
+  <oc-navbar></oc-navbar>
+</header>
 
 <div id="root-content">
-  <router-outlet></router-outlet>
-  <div id="footer">
+  <main #mainContent id="main-content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+  <footer id="footer">
     <div id="footer-links">
       <ul>
         <li><a routerLink="/world">Die Welt</a></li>
         <li><a routerLink="/factions">Die Mächte</a></li>
         <li><a routerLink="/history">Die Geschichte</a></li>
         <li><a routerLink="/editions">Die Editionen</a></li>
-        <li><span class="clickable" tabindex="invalid" (click)="openImprint()">Impressum</span></li>
-        <li><span class="clickable" tabindex="invalid" (click)="openDataPrivacy()">Datenschutz</span></li>
+        <li><button type="button" (click)="openImprint()">Impressum</button></li>
+        <li><button type="button" (click)="openDataPrivacy()">Datenschutz</button></li>
       </ul>
     </div>
-    <a id="version" href="https://github.com/chrthom/outer-colonies/releases" target="_blank">
+    <a
+      id="version"
+      href="https://github.com/chrthom/outer-colonies/releases"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       @if (env.stage !== "production") {
-        <h4>{{ env.stage }} environment<br /></h4>
+        <span class="version-stage">{{ env.stage }} environment</span><br />
       }
-      <h3>Outer Colonies - {{ releaseName }} (v{{ version }})</h3>
+      <span class="version-name">Outer Colonies - {{ releaseName }} (v{{ version }})</span>
     </a>
-  </div>
+  </footer>
 </div>

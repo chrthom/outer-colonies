@@ -11,11 +11,11 @@ import { version, releaseName } from '@shared/config/version';
 @Component({
   selector: 'oc-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.component.scss', './background.scss'],
   imports: [NavbarComponent, RouterLink, RouterOutlet]
 })
 export class AppComponent {
-  /** Number of star background images (background-stars-0 … background-stars-6 in app.component.scss). */
+  /** Number of star background images (background-stars-0 … background-stars-6 in background.scss). */
   private static readonly STAR_BACKGROUND_COUNT = 7;
 
   private dialog = inject(MatDialog);

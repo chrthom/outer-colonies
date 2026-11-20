@@ -81,4 +81,31 @@ describe('AppComponent', () => {
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');
   });
+
+  it('provides landmarks and a skip link to the focusable main content', () => {
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('header oc-navbar')).toBeTruthy();
+    expect(element.querySelector('main#main-content[tabindex="-1"] router-outlet')).toBeTruthy();
+    expect(element.querySelector('footer#footer')).toBeTruthy();
+    expect(element.querySelector('a.skip-link')?.getAttribute('href')).toBe('#main-content');
+    expect(element.querySelector('[tabindex="invalid"]')).toBeNull();
+    expect(element.querySelector('#version')?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(element.querySelector('#version h3, #version h4')).toBeNull();
+  });
+
+  it('moves focus to the main content when the skip link is activated', () => {
+    const skip: HTMLAnchorElement = fixture.nativeElement.querySelector('.skip-link');
+    skip.click();
+    expect(document.activeElement).toBe(fixture.nativeElement.querySelector('#main-content'));
+  });
+
+  it('opens legal dialogs through semantic footer buttons', () => {
+    const buttons: NodeListOf<HTMLButtonElement> =
+      fixture.nativeElement.querySelectorAll('#footer-links button');
+    expect(buttons.length).toBe(2);
+    expect(Array.from(buttons).map(button => button.type)).toEqual(['button', 'button']);
+    buttons[0].click();
+    buttons[1].click();
+    expect(dialogSpy.open).toHaveBeenCalledTimes(2);
+  });
 });
