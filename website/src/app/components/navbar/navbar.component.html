@@ -1,50 +1,102 @@
-<div id="navbar-space"></div>
-<div id="navbar-main">
-  <div id="navbar-logo" routerLink="/">
-    <img src="../../../assets/logo.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Spielsuche & Aktuelles"
-    [class.active]="active === ''"
+<div class="space"></div>
+<div class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
+  <a
+    class="logo"
+    id="navbar-logo"
+    [class.compact]="!isLoggedIn"
     routerLink="/"
+    aria-label="Outer Colonies – Startseite"
   >
-    <img src="../../../assets/icons/home.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Spielregeln"
-    [class.active]="active === 'rules'"
-    routerLink="/rules"
-  >
-    <img src="../../../assets/icons/rules.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Deck-Manager"
-    [class.active]="active === 'deck'"
-    routerLink="/deck"
-  >
-    <img src="../../../assets/icons/deck.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Inventar und Markt"
-    [class.active]="active === 'trade'"
-    routerLink="/trade"
-  >
-    <img src="../../../assets/icons/trade.png" />
-  </div>
-  <div
-    class="navbar-element navbar-center"
-    matTooltip="Verwalte dein Profil"
-    [class.active]="active === 'profile'"
-    routerLink="/profile"
-  >
-    <img src="../../../assets/icons/profile.png" />
-  </div>
-  <h2 class="user-name navbar-right">{{ username }}</h2>
-  <div class="navbar-element navbar-right" matTooltip="Abmelden" (click)="logout()" tabindex="invalid">
-    <img src="../../../assets/icons/logout.png" />
-  </div>
+    <img src="../../../assets/logo.png" alt="" width="300" height="188" />
+  </a>
+  @if (isLoggedIn) {
+    <a
+      class="item center"
+      matTooltip="Spielsuche & Aktuelles"
+      aria-label="Spielsuche & Aktuelles"
+      [class.active]="active === 'home'"
+      routerLink="/home"
+    >
+      <img src="../../../assets/icons/home.png" alt="" />
+    </a>
+    <a
+      class="item center"
+      matTooltip="Spielregeln"
+      aria-label="Spielregeln"
+      [class.active]="active === 'rules'"
+      routerLink="/rules"
+    >
+      <img src="../../../assets/icons/rules.png" alt="" />
+    </a>
+    <a
+      class="item center"
+      matTooltip="Deck-Manager"
+      aria-label="Deck-Manager"
+      [class.active]="active === 'deck'"
+      routerLink="/deck"
+    >
+      <img src="../../../assets/icons/deck.png" alt="" />
+    </a>
+    <a
+      class="item center"
+      matTooltip="Inventar und Markt"
+      aria-label="Inventar und Markt"
+      [class.active]="active === 'trade'"
+      routerLink="/trade"
+    >
+      <img src="../../../assets/icons/trade.png" alt="" />
+    </a>
+    <a
+      class="item center"
+      matTooltip="Verwalte dein Profil"
+      aria-label="Verwalte dein Profil"
+      [class.active]="active === 'profile'"
+      routerLink="/profile"
+    >
+      <img src="../../../assets/icons/profile.png" alt="" />
+    </a>
+    <h2 class="user-name right" [title]="username">{{ username }}</h2>
+    <button type="button" class="item right" matTooltip="Abmelden" aria-label="Abmelden" (click)="logout()">
+      <img src="../../../assets/icons/logout.png" alt="" />
+    </button>
+  } @else {
+    <div class="zone" id="navbar-anon-zone">
+      <button
+        #menuToggle
+        class="menu"
+        id="navbar-menu-toggle"
+        type="button"
+        aria-controls="navbar-anon-links"
+        [attr.aria-expanded]="menuOpen"
+        (click)="menuOpen = !menuOpen"
+      >
+        Menü
+      </button>
+      <nav
+        #menuLinks
+        class="links"
+        id="navbar-anon-links"
+        aria-label="Hauptnavigation"
+        [class.open]="menuOpen"
+      >
+        <a routerLink="/" [class.active]="active === ''" [attr.aria-current]="active === '' ? 'page' : null"
+          >Startseite</a
+        >
+        <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
+        <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
+        <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
+        <a routerLink="/editions" [class.active]="active === 'editions'">Die Editionen</a>
+        <a
+          routerLink="/rules"
+          [class.active]="active === 'rules'"
+          [attr.aria-current]="active === 'rules' ? 'page' : null"
+          >Spielregeln</a
+        >
+      </nav>
+      <div class="actions" id="navbar-anon-actions">
+        <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
+        <a mat-stroked-button color="primary" routerLink="/login">Einloggen</a>
+      </div>
+    </div>
+  }
 </div>

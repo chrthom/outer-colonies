@@ -1,25 +1,61 @@
-<div id="background-stars" [class]="'background-stars-' + bgNo">
+<div id="background-stars" aria-hidden="true">
   <div id="background-layer"></div>
 </div>
 
-@if (authService.isLoggedIn) {
-  <oc-navbar></oc-navbar>
-}
+<a class="skip-link" href="#main-content" (click)="$event.preventDefault(); focusMainContent(mainContent)"
+  >Zum Inhalt springen</a
+>
+<header>
+  <oc-navbar (menuNavigation)="focusMainContent(mainContent)"></oc-navbar>
+</header>
 
 <div id="root-content">
-  <router-outlet></router-outlet>
-  <div id="footer">
+  <main #mainContent id="main-content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+  <footer id="footer">
     <div id="footer-links">
       <ul>
-        <li><span class="clickable" tabindex="invalid" (click)="openImprint()">Impressum</span></li>
-        <li><span class="clickable" tabindex="invalid" (click)="openDataPrivacy()">Datenschutz</span></li>
+        <li><a routerLink="/world">Die Welt</a></li>
+        @if (!isLandingPage) {
+          <li><a routerLink="/factions">Die Mächte</a></li>
+          <li><a routerLink="/history">Die Geschichte</a></li>
+          <li><a routerLink="/editions">Die Editionen</a></li>
+        }
+        <li>
+          <button type="button" [attr.aria-busy]="legalLoading.imprint" (click)="openImprint()">
+            Impressum
+          </button>
+          <p class="legal-load-error" role="status">
+            @if (legalLoadErrors.imprint) {
+              Das Impressum konnte nicht geladen werden. Bitte prüfe deine Verbindung und versuche es erneut
+              oder lade die Seite neu.
+            }
+          </p>
+        </li>
+        <li>
+          <button type="button" [attr.aria-busy]="legalLoading.privacy" (click)="openDataPrivacy()">
+            Datenschutz
+          </button>
+          <p class="legal-load-error" role="status">
+            @if (legalLoadErrors.privacy) {
+              Die Datenschutzerklärung konnte nicht geladen werden. Bitte prüfe deine Verbindung und versuche
+              es erneut oder lade die Seite neu.
+            }
+          </p>
+        </li>
       </ul>
     </div>
-    <a id="version" href="https://github.com/chrthom/outer-colonies/releases" target="_blank">
+    <a
+      id="version"
+      href="https://github.com/chrthom/outer-colonies/releases"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       @if (env.stage !== "production") {
-        <h4>{{ env.stage }} environment<br /></h4>
+        <span class="version-stage">{{ env.stage }} environment</span><br />
       }
-      <h3>Outer Colonies - {{ releaseName }} (v{{ version }})</h3>
+      <span class="version-name">Outer Colonies - {{ releaseName }} (v{{ version }})</span>
     </a>
-  </div>
+  </footer>
 </div>

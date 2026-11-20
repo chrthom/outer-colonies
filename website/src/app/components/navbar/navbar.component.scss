@@ -1,85 +1,117 @@
-#navbar-space {
-  position: relative;
+.space {
   height: 25px;
-  width: 100%;
 }
-#navbar-main {
-  position: sticky;
-  top: 0;
-  left: 0;
-  background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
-  border-top: 3px ridge var(--color-primary-dark);
-  border-bottom: 3px ridge var(--color-primary-dark);
-  height: 62px;
-  width: 100%;
-  margin-bottom: 30px;
-  -webkit-box-align: center;
-  -webkit-box-pack: center;
-  display: -webkit-box;
-  z-index: 50;
-}
-.navbar-element {
-  cursor: pointer;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-primary), transparent 70%) 30%,
-    rgba(0, 0, 0, 0)
-  );
-  h1 {
-    color: var(--color-primary-light);
-  }
-  img {
-    width: 50px;
-    filter: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
-  }
-}
-.navbar-center {
+.bar {
   position: relative;
-  float: left;
-  left: 0;
-  padding: 10px 36px 10px 36px;
+  background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
+  border-block: 3px ridge var(--color-primary-dark);
+  height: 62px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.navbar-right {
-  position: absolute;
-  top: 0;
-  height: 50px;
-  padding: 5px 15px 5px 15px;
-  left: calc(100% - 100px);
-}
-h2.navbar-right {
-  padding-top: 13px;
-  left: calc(100% - 100px);
-  transform: translateX(-100%);
-}
-.active,
-.navbar-element:hover {
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-accent), transparent 50%) 40%,
-    rgba(0, 0, 0, 0)
-  );
-}
-.active,
-.navbar-element:hover {
-  h1 {
-    color: var(--color-accent-light);
-  }
-  img {
-    filter: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
-  }
-}
-#navbar-logo {
+.item {
   cursor: pointer;
+  --g: color-mix(in srgb, var(--color-primary), transparent 70%);
+  --f: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
+  background: radial-gradient(closest-side, var(--g), transparent);
+  img {
+    display: block;
+    width: 50px;
+    filter: var(--f);
+  }
+  &:hover,
+  &.active {
+    --g: color-mix(in srgb, var(--color-accent), transparent 50%);
+    --f: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
+  }
+}
+.center {
+  padding: 10px 36px;
+}
+.right {
   position: absolute;
   top: 0;
+  right: 20px;
+  height: 50px;
+  padding: 5px 15px;
+}
+h2.right {
+  right: 100px;
+  padding-top: 13px;
+  max-width: clamp(120px, (100vw - 1000px) / 2, 300px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.logo {
+  position: absolute;
+  top: 50%;
   left: 0;
-  transform: translateY(-30%);
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-dark), transparent 20%) 75%,
-    rgba(0, 0, 0, 0)
-  );
-  width: fit-content;
-  padding: 15px 25px;
-  z-index: 51;
+  transform: translateY(-50%);
+  background: radial-gradient(closest-side, #000c 75%, transparent);
+  padding: 4px 12px;
+  z-index: 1;
+  img {
+    display: block;
+    height: auto;
+    width: var(--logo-width, 104px);
+  }
+  &.compact {
+    --logo-width: 132px;
+    padding: 4px 12px;
+  }
+}
+.zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 156px;
+}
+.links {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  gap: clamp(4px, 1vw, 18px);
+  a {
+    --g: color-mix(in srgb, var(--color-primary), transparent 82%);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 6px;
+    color: var(--color-primary-light);
+    font:
+      clamp(13px, 1.1vw, 16px) "Latin Modern Mono Caps",
+      monospace;
+    text-decoration: none;
+    white-space: nowrap;
+    background: radial-gradient(closest-side, var(--g), transparent);
+    &:hover,
+    &.active {
+      color: var(--color-accent-light);
+      text-decoration: underline;
+      text-underline-offset: 5px;
+      --g: color-mix(in srgb, var(--color-accent), transparent 72%);
+    }
+  }
+}
+.menu {
+  display: none;
+}
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+  padding: 0 15px;
+}
+@media (min-width: 1561px) {
+  .logo:not(.compact) {
+    --logo-width: 300px;
+    top: 0;
+    padding: 15px 25px;
+    transform: translateY(-30%);
+  }
 }
