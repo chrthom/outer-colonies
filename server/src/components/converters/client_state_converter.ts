@@ -7,6 +7,7 @@ import {
   ClientCard,
   ClientCardStack,
   ClientCardStackAttribute,
+  ClientEvent,
   ClientGameResult,
   ClientHandCard,
   ClientIntervention,
@@ -42,6 +43,7 @@ export default function toClientState(match: Match, playerNo: number): ClientSta
   return {
     battle: battle,
     cardStacks: cardStacks,
+    events: toClientEvents(match, playerNo),
     gameResult: toClientGameResult(match, playerNo),
     highlightCardUUID: match.highlightCard?.uuid,
     highlightCardId: match.highlightCard?.card.id,
@@ -261,4 +263,19 @@ function toClientGameResult(match: Match, playerNo: number): ClientGameResult | 
         sol: match.gameResult.winnerNo == playerNo ? match.gameResult.winnerSol : match.gameResult.loserSol
       }
     : undefined;
+}
+
+/**
+ * Projects the card movement events accumulated on the match into receiver-relative client
+ * events: the playerEvent flag marks movements of cards owned by the receiving player.
+ */
+function toClientEvents(match: Match, playerNo: number): ClientEvent[] {
+  return match.events.map(e => {
+    return {
+      type: e.type,
+      playerEvent: e.playerNo == playerNo,
+      oldUUID: e.oldUUID,
+      newUUID: e.newUUID
+    };
+  });
 }

@@ -1,6 +1,6 @@
 import Game from './game';
 import SocketService from '../socket_service';
-import { GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { EventType, GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import {
   ClientGameResult,
   ClientHandCard,
@@ -243,6 +243,40 @@ describe('Game scene - socket listener lifecycle', () => {
   });
 });
 
+describe('Game scene - getCardMovementEvent', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game();
+    game.state = {
+      ...emptyClientState,
+      events: [
+        { type: EventType.Retract, playerEvent: true, oldUUID: 'card-1', newUUID: 'hand-1' },
+        { type: EventType.Discard, playerEvent: false, oldUUID: 'card-2' }
+      ]
+    };
+  });
+
+  it('returns the movement event for a card that was moved by the server', () => {
+    const event = game.getCardMovementEvent('card-1');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Retract);
+    expect(event?.newUUID).toBe('hand-1');
+  });
+
+  it('returns the discard event for a discarded card regardless of the owning player', () => {
+    const event = game.getCardMovementEvent('card-2');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Discard);
+  });
+
+  it('returns undefined for cards without a movement event', () => {
+    expect(game.getCardMovementEvent('card-3')).toBeUndefined();
+  });
+});
+
 describe('Game scene - showGameOverIndicator', () => {
   let game: Game;
 
@@ -338,9 +372,9 @@ describe('Game scene - state update pipeline', () => {
     clock.fireAll();
 
     expect(updateCardStacks).toHaveBeenCalledTimes(1);
-    expect(updateCardStacks).toHaveBeenCalledWith([handCard('p1', 10)]);
+    expect(updateCardStacks).toHaveBeenCalledWith();
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)], TurnPhase.Init);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)]);
     expect(updateView).toHaveBeenCalledTimes(1);
     expect(highlightAttackIntervention).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([7]);
@@ -368,10 +402,10 @@ describe('Game scene - state update pipeline', () => {
     expect(game.state).toBe(state2);
     // Each chain ran its card stacks step exactly once
     expect(updateCardStacks).toHaveBeenCalledTimes(2);
-    // The hand update ran only for the newest state, with the turn phase
-    // captured when the superseded state was still current
+    // The hand update ran only for the newest state, with the new hand
+    // cards captured from that state
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)], TurnPhase.Build);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
     // The discard piles were updated from the newest state only
     expect(playerDiscardPile).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([3]);
@@ -393,7 +427,7 @@ describe('Game scene - state update pipeline', () => {
 
     expect(updateCardStacks).toHaveBeenCalledTimes(1);
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)], TurnPhase.Init);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
     expect(playerDiscardPile).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([2]);
   });

@@ -3,13 +3,14 @@ import ContinueButton from '../components/buttons/continue_button';
 import RaidButton from '../components/buttons/raid_button';
 import MissionButton from '../components/buttons/mission_button';
 import {
+  ClientEvent,
   ClientGameResult,
   ClientHandCard,
   ClientPlayer,
   ClientState,
   emptyClientState
 } from '@shared/interfaces/client_state';
-import { BattleType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { BattleType, EventType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import GameOverIndicator from '../components/indicators/game_over_indicator';
 import HandCard from '../components/card/hand_card';
 import CardStack from '../components/card/card_stack';
@@ -207,7 +208,6 @@ export default class Game extends Phaser.Scene {
    * animating only the remaining delta.
    */
   updateState(state: ClientState) {
-    const previousTurnPhase = this.state.turnPhase;
     this.state = state;
     this.preloader.destroy();
     this.resetSelection();
@@ -219,13 +219,13 @@ export default class Game extends Phaser.Scene {
         action: () => {
           newHandCards = this.newHandCards;
           this.retractCardsExist = false; // If true, then the hand animations are delayed
-          this.updateCardStacks(newHandCards);
+          this.updateCardStacks();
         }
       },
       {
         delay: () => (this.retractCardsExist ? animationConfig.duration.move : 0),
         action: () => {
-          this.updateHandCards(newHandCards, previousTurnPhase);
+          this.updateHandCards(newHandCards);
           this.updateView();
           this.highlightAttackIntervention();
         }
@@ -267,6 +267,15 @@ export default class Game extends Phaser.Scene {
 
   getPlayerState(isPlayer: boolean): ClientPlayer {
     return isPlayer ? this.state.player : this.state.opponent;
+  }
+
+  /**
+   * Returns the card movement event (retract or discard) which the server attached to the current
+   * state for the card with the given UUID, or undefined if that card did not move.
+   * @param cardUUID UUID of the card (stack) to look up
+   */
+  getCardMovementEvent(cardUUID: string): ClientEvent | undefined {
+    return this.state.events.find(e => e.oldUUID == cardUUID);
   }
 
   discardMaximizedTacticCard() {
@@ -313,14 +322,19 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  private updateCardStacks(newHandCards: ClientHandCard[]) {
+  private updateCardStacks() {
     this.cardStacks.forEach(cs => {
       const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
-      if (newData) cs.update(newData);
-      else if (newHandCards.some(h => cs.data.cards.some(c => c.id == h.cardId))) {
-        cs.discard(true); // to deck first
-        this.retractCardsExist = true;
-      } else cs.discard();
+      if (newData) {
+        cs.update(newData);
+      } else {
+        // Vanished card stack: the server's movement events determine each card's destination
+        cs.discard(card => {
+          const toDeck = this.getCardMovementEvent(card.data.uuid)?.type == EventType.Retract;
+          if (toDeck) this.retractCardsExist = true; // Delay hand animations until the retract animation finished
+          return toDeck;
+        });
+      }
     }, this);
     this.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
@@ -344,14 +358,14 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  private updateHandCards(newHandCards: ClientHandCard[], previousTurnPhase: TurnPhase) {
+  private updateHandCards(newHandCards: ClientHandCard[]) {
     this.discardMaximizedTacticCard();
     this.forBothPlayers((state, ui) =>
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
         if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
         else if (newData) h.update(newData);
-        else if (previousTurnPhase != TurnPhase.Build) h.discard();
+        else if (this.getCardMovementEvent(h.uuid)?.type == EventType.Discard) h.discard();
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
       }, this)
     );
