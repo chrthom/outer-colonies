@@ -1,37 +1,232 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-19T12:00:00.000Z",
+  "generatedAt": "2026-11-20T17:47:44.986Z",
   "title": "Design System: Outer Colonies Website",
   "extensions": {
     "colorMeta": {
-      "signal-teal": { "role": "primary", "displayName": "Signal Teal", "canonical": "#0c8686", "tonalRamp": ["#033d3d", "#045252", "#056b6b", "#0a7c7c", "#0c8686", "#35a8a8", "#88cccc", "#e2f3f3"] },
-      "signal-teal-bright": { "role": "primary", "displayName": "Signal Teal Bright", "canonical": "#119999", "tonalRamp": ["#033d3d", "#056b6b", "#0a7c7c", "#0f9191", "#119999", "#35a8a8", "#88cccc", "#e2f3f3"] },
-      "signal-teal-deep": { "role": "primary", "displayName": "Signal Teal Deep", "canonical": "#0a7c7c", "tonalRamp": ["#022b2b", "#033d3d", "#056b6b", "#0a7c7c", "#0c8686", "#35a8a8", "#88cccc", "#e2f3f3"] },
-      "signal-teal-pale": { "role": "primary", "displayName": "Signal Teal Pale", "canonical": "#88cccc", "tonalRamp": ["#0a7c7c", "#119999", "#35a8a8", "#58b8b8", "#88cccc", "#b8e0e0", "#d3eded", "#e2f3f3"] },
-      "alert-red": { "role": "secondary", "displayName": "Alert Red", "canonical": "#991111", "tonalRamp": ["#3a0202", "#520404", "#6b0505", "#860c0c", "#991111", "#a83535", "#cc8888", "#f3e2e2"] },
-      "alert-red-deep": { "role": "secondary", "displayName": "Alert Red Deep", "canonical": "#860c0c", "tonalRamp": ["#2b0101", "#3a0202", "#520404", "#6b0505", "#860c0c", "#a83535", "#cc8888", "#f3e2e2"] },
-      "alert-red-pale": { "role": "secondary", "displayName": "Alert Red Pale", "canonical": "#e0b8b8", "tonalRamp": ["#a83535", "#b85858", "#cc8888", "#d6a0a0", "#e0b8b8", "#ead0d0", "#f3e2e2", "#faf1f1"] },
-      "alert-red-bright": { "role": "secondary", "displayName": "Alert Red Bright", "canonical": "#ff3535", "tonalRamp": ["#6b0505", "#991111", "#cc1f1f", "#ff1b1b", "#ff3535", "#ff6868", "#ff9b9b", "#ffd0d0"] },
-      "void-black": { "role": "neutral", "displayName": "Void Black", "canonical": "#000000", "tonalRamp": ["#000000", "#0a0a0a", "#141414", "#1f1f1f", "#2a2a2a", "#3a3a3a", "#555555", "#808080"] },
-      "hologram-white": { "role": "neutral", "displayName": "Hologram White", "canonical": "#ffffff", "tonalRamp": ["#808080", "#999999", "#b3b3b3", "#c8c8c8", "#d9d9d9", "#e8e8e8", "#f4f4f4", "#ffffff"] },
-      "surface-dark": { "role": "neutral", "displayName": "Surface Dark", "canonical": "#303030", "tonalRamp": ["#0a0a0a", "#141414", "#1f1f1f", "#262626", "#303030", "#424242", "#616161", "#9e9e9e"] }
+      "signal-teal": {
+        "role": "primary",
+        "displayName": "Signal Teal",
+        "canonical": "#0c8686",
+        "tonalRamp": [
+          "#033d3d",
+          "#045252",
+          "#056b6b",
+          "#0a7c7c",
+          "#0c8686",
+          "#35a8a8",
+          "#88cccc",
+          "#e2f3f3"
+        ]
+      },
+      "signal-teal-bright": {
+        "role": "primary",
+        "displayName": "Signal Teal Bright",
+        "canonical": "#119999",
+        "tonalRamp": [
+          "#033d3d",
+          "#056b6b",
+          "#0a7c7c",
+          "#0f9191",
+          "#119999",
+          "#35a8a8",
+          "#88cccc",
+          "#e2f3f3"
+        ]
+      },
+      "signal-teal-deep": {
+        "role": "primary",
+        "displayName": "Signal Teal Deep",
+        "canonical": "#0a7c7c",
+        "tonalRamp": [
+          "#022b2b",
+          "#033d3d",
+          "#056b6b",
+          "#0a7c7c",
+          "#0c8686",
+          "#35a8a8",
+          "#88cccc",
+          "#e2f3f3"
+        ]
+      },
+      "signal-teal-pale": {
+        "role": "primary",
+        "displayName": "Signal Teal Pale",
+        "canonical": "#88cccc",
+        "tonalRamp": [
+          "#0a7c7c",
+          "#119999",
+          "#35a8a8",
+          "#58b8b8",
+          "#88cccc",
+          "#b8e0e0",
+          "#d3eded",
+          "#e2f3f3"
+        ]
+      },
+      "alert-red": {
+        "role": "secondary",
+        "displayName": "Alert Red",
+        "canonical": "#991111",
+        "tonalRamp": [
+          "#3a0202",
+          "#520404",
+          "#6b0505",
+          "#860c0c",
+          "#991111",
+          "#a83535",
+          "#cc8888",
+          "#f3e2e2"
+        ]
+      },
+      "alert-red-deep": {
+        "role": "secondary",
+        "displayName": "Alert Red Deep",
+        "canonical": "#860c0c",
+        "tonalRamp": [
+          "#2b0101",
+          "#3a0202",
+          "#520404",
+          "#6b0505",
+          "#860c0c",
+          "#a83535",
+          "#cc8888",
+          "#f3e2e2"
+        ]
+      },
+      "alert-red-pale": {
+        "role": "secondary",
+        "displayName": "Alert Red Pale",
+        "canonical": "#e0b8b8",
+        "tonalRamp": [
+          "#a83535",
+          "#b85858",
+          "#cc8888",
+          "#d6a0a0",
+          "#e0b8b8",
+          "#ead0d0",
+          "#f3e2e2",
+          "#faf1f1"
+        ]
+      },
+      "alert-red-bright": {
+        "role": "secondary",
+        "displayName": "Alert Red Bright",
+        "canonical": "#ff3535",
+        "tonalRamp": [
+          "#6b0505",
+          "#991111",
+          "#cc1f1f",
+          "#ff1b1b",
+          "#ff3535",
+          "#ff6868",
+          "#ff9b9b",
+          "#ffd0d0"
+        ]
+      },
+      "void-black": {
+        "role": "neutral",
+        "displayName": "Void Black",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#000000",
+          "#0a0a0a",
+          "#141414",
+          "#1f1f1f",
+          "#2a2a2a",
+          "#3a3a3a",
+          "#555555",
+          "#808080"
+        ]
+      },
+      "hologram-white": {
+        "role": "neutral",
+        "displayName": "Hologram White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#808080",
+          "#999999",
+          "#b3b3b3",
+          "#c8c8c8",
+          "#d9d9d9",
+          "#e8e8e8",
+          "#f4f4f4",
+          "#ffffff"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface Dark",
+        "canonical": "#303030",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#141414",
+          "#1f1f1f",
+          "#262626",
+          "#303030",
+          "#424242",
+          "#616161",
+          "#9e9e9e"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Landing hero title only, uppercase with 0.05em tracking." },
-      "headline": { "displayName": "Headline", "purpose": "Content-box titles on the frame's top edge and rules section heads." },
-      "title": { "displayName": "Title", "purpose": "Anonymous navbar links and Material card titles." },
-      "body": { "displayName": "Body", "purpose": "Lore and landing prose, capped at 75ch." },
-      "body-compact": { "displayName": "Body Compact", "purpose": "Teasers and secondary text." },
-      "label": { "displayName": "Label", "purpose": "Badges, quote attribution and table headers." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero title only, uppercase with 0.05em tracking."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Content-box titles on the frame's top edge and rules section heads."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Anonymous navbar links and Material card titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Lore and landing prose, capped at 75ch."
+      },
+      "body-compact": {
+        "displayName": "Body Compact",
+        "purpose": "Teasers and secondary text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Badges, quote attribution and table headers."
+      }
     },
     "shadows": [],
     "motion": [],
     "breakpoints": [
-      { "name": "lg", "value": "960px" },
-      { "name": "md", "value": "900px" },
-      { "name": "navbar-compact", "value": "800px" },
-      { "name": "navbar-hide-links", "value": "760px" },
-      { "name": "sm", "value": "600px" }
+      {
+        "name": "navbar-wide",
+        "value": "1561px"
+      },
+      {
+        "name": "navbar-logged-in-compact",
+        "value": "1200px"
+      },
+      {
+        "name": "landing-teasers",
+        "value": "1100px"
+      },
+      {
+        "name": "navbar-hide-links",
+        "value": "1050px"
+      },
+      {
+        "name": "sm",
+        "value": "600px"
+      },
+      {
+        "name": "lore-mobile",
+        "value": "520px"
+      },
+      {
+        "name": "navbar-narrow",
+        "value": "400px"
+      }
     ]
   },
   "components": [
@@ -41,7 +236,7 @@
       "refersTo": "button-primary",
       "description": "Main call to action: registration and play.",
       "html": "<button class=\"ds-btn-primary\">Jetzt mitspielen</button>",
-      "css": ".ds-btn-primary { background: #0c8686; color: #fff; padding: 0 16px; height: 36px; border: none; border-radius: 4px; font-size: 14px; letter-spacing: 0.0892857143em; text-transform: none; cursor: pointer; transition: background 0.2s; } .ds-btn-primary:hover { background: #119999; } .ds-btn-primary:focus-visible { outline: 2px solid #88cccc; outline-offset: 2px; }"
+      "css": ".ds-btn-primary { background: var(--color-primary-dark, #0a7c7c); color: var(--color-light, #fff); padding: 0 16px; height: 36px; border: none; border-radius: 4px; font-family: 'Latin Modern Sans', sans-serif; font-size: 14px; letter-spacing: 0.0892857143em; cursor: pointer; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--color-primary-dark, #0a7c7c), white 8%); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; }"
     },
     {
       "name": "Default Button",
@@ -49,7 +244,14 @@
       "refersTo": "button-default",
       "description": "Secondary action next to a primary button.",
       "html": "<button class=\"ds-btn-default\">Login</button>",
-      "css": ".ds-btn-default { background: #303030; color: #fff; padding: 0 16px; height: 36px; border: none; border-radius: 4px; font-size: 14px; letter-spacing: 0.0892857143em; cursor: pointer; transition: background 0.2s; } .ds-btn-default:hover { background: #424242; } .ds-btn-default:focus-visible { outline: 2px solid #88cccc; outline-offset: 2px; }"
+      "css": ".ds-btn-default { background: var(--color-surface, #303030); color: var(--color-light, #fff); padding: 0 16px; height: 36px; border: none; border-radius: 4px; font-family: 'Latin Modern Sans', sans-serif; font-size: 14px; letter-spacing: 0.0892857143em; cursor: pointer; } .ds-btn-default:hover { background: #424242; } .ds-btn-default:focus-visible { outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; }"
+    },
+    {
+      "name": "Outlined Field",
+      "kind": "input",
+      "description": "Full-width Material dark-theme field used in forms.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Nutzername oder E-Mail Adresse</span><input class=\"ds-field-input\" type=\"text\" autocomplete=\"username\"></label>",
+      "css": ".ds-field { position: relative; display: block; margin: 8px 0 15px; font-family: 'Latin Modern Sans', sans-serif; } .ds-field-label { position: absolute; top: -7px; left: 12px; padding: 0 4px; background: var(--color-surface, #303030); color: var(--color-light, #fff); font-size: 12px; } .ds-field-input { box-sizing: border-box; width: 100%; height: 56px; padding: 12px 16px; border: 1px solid #aaa; border-radius: 4px; background: var(--color-surface, #303030); color: var(--color-light, #fff); font: 16px 'Latin Modern Sans', sans-serif; } .ds-field-input:hover { border-color: var(--color-light, #fff); } .ds-field-input:focus-visible { border-color: var(--color-primary, #119999); outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; }"
     },
     {
       "name": "Anonymous Nav Link",
@@ -57,15 +259,15 @@
       "refersTo": "title",
       "description": "Lore links in the public navbar.",
       "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Die Welt</a><a class=\"ds-nav-link ds-active\" href=\"#\">Die Mächte</a><a class=\"ds-nav-link\" href=\"#\">Die Geschichte</a></nav>",
-      "css": ".ds-nav { display: flex; gap: 32px; align-items: center; height: 62px; padding: 0 20px; background: linear-gradient(90deg, #000 50%, #0a7c7c 130%); border-top: 3px ridge #0a7c7c; border-bottom: 3px ridge #0a7c7c; } .ds-nav-link { font-family: 'Latin Modern Mono Caps', monospace; font-size: 16px; color: #88cccc; text-decoration: none; white-space: nowrap; } .ds-nav-link:hover, .ds-nav-link.ds-active { color: #119999; text-decoration: underline; } .ds-nav-link:focus-visible { outline: 2px solid #88cccc; outline-offset: 4px; }"
+      "css": ".ds-nav { display: flex; gap: clamp(4px, 1vw, 18px); align-items: center; height: 62px; padding: 0 20px; background: linear-gradient(90deg, var(--color-dark, #000) 50%, var(--color-primary-dark, #0a7c7c) 130%); border-block: 3px ridge var(--color-primary-dark, #0a7c7c); } .ds-nav-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-family: 'Latin Modern Mono Caps', monospace; font-size: clamp(13px, 1.1vw, 16px); color: var(--color-primary-light, #88cccc); text-decoration: none; white-space: nowrap; background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary, #119999), transparent 82%), transparent); } .ds-nav-link:hover, .ds-nav-link.ds-active { color: var(--color-accent-light, #e0b8b8); text-decoration: underline; text-underline-offset: 5px; background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent, #991111), transparent 72%), transparent); } .ds-nav-link:focus-visible { outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; }"
     },
     {
       "name": "Navbar Glow Element",
       "kind": "nav",
       "refersTo": "title",
       "description": "Logged-in navbar item with the teal-to-red halo on hover and active.",
-      "html": "<div class=\"ds-glow-row\"><div class=\"ds-glow\">Home</div><div class=\"ds-glow ds-active\">Deck</div></div>",
-      "css": ".ds-glow-row { display: flex; background: #000; } .ds-glow { font-family: 'Latin Modern Mono Caps', monospace; font-size: 16px; padding: 10px 36px; color: #88cccc; cursor: pointer; background: radial-gradient(closest-side, color-mix(in srgb, #119999, transparent 70%) 30%, rgba(0,0,0,0)); } .ds-glow:hover, .ds-glow.ds-active { color: #e0b8b8; background: radial-gradient(closest-side, color-mix(in srgb, #991111, transparent 50%) 40%, rgba(0,0,0,0)); }"
+      "html": "<nav class=\"ds-glow-row\" aria-label=\"Spielnavigation\"><a class=\"ds-glow\" href=\"#\">Home</a><a class=\"ds-glow ds-active\" href=\"#\" aria-current=\"page\">Deck</a></nav>",
+      "css": ".ds-glow-row { display: flex; background: var(--color-dark, #000); } .ds-glow { font-family: 'Latin Modern Mono Caps', monospace; font-size: 16px; padding: 10px 36px; color: var(--color-primary-light, #88cccc); text-decoration: none; cursor: pointer; background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary, #119999), transparent 70%), transparent); } .ds-glow:hover, .ds-glow.ds-active { color: var(--color-accent-light, #e0b8b8); background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent, #991111), transparent 50%), transparent); } .ds-glow:focus-visible { outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; }"
     },
     {
       "name": "Quote",
@@ -73,7 +275,7 @@
       "refersTo": "quote",
       "description": "In-world quotation with a teal rule.",
       "html": "<figure class=\"ds-quote\"><blockquote>Am Rand des Lichts zählt jeder Tropfen Wasser.</blockquote><figcaption>Kolonistin, Ceres</figcaption></figure>",
-      "css": ".ds-quote { margin: 20px 0; padding-left: 16px; border-left: 3px solid #119999; color: #fff; } .ds-quote blockquote { font-size: 18px; font-style: italic; line-height: 1.7; } .ds-quote figcaption { margin-top: 8px; font-family: 'Latin Modern Mono Caps', monospace; font-size: 14px; color: #119999; }"
+      "css": ".ds-quote { margin: 20px 0; padding-left: 16px; border-left: 3px solid var(--color-primary, #119999); color: var(--color-light, #fff); } .ds-quote blockquote { font-family: 'Latin Modern Sans', sans-serif; font-size: 18px; font-style: italic; line-height: 1.7; } .ds-quote figcaption { margin-top: 8px; font-family: 'Latin Modern Mono Caps', monospace; font-size: 14px; color: var(--color-primary-light, #88cccc); }"
     },
     {
       "name": "Table Row",
@@ -88,8 +290,8 @@
       "kind": "card",
       "refersTo": "content-box",
       "description": "Inventory item framed by four L-shaped corner brackets that turn from teal to red on hover.",
-      "html": "<div class=\"ds-tile\"><span class=\"ds-c ds-tl\"></span><span class=\"ds-c ds-tr\"></span><span class=\"ds-c ds-bl\"></span><span class=\"ds-c ds-br\"></span><span class=\"ds-tile-label\">Booster</span></div>",
-      "css": ".ds-tile { position: relative; width: 160px; height: 160px; margin: 20px; cursor: pointer; background: color-mix(in srgb, #119999, transparent 93%); } .ds-c { position: absolute; width: 28px; height: 28px; border: 2px solid #35ffff; filter: drop-shadow(0 0 4px #119999); transition: border-color 0.2s; } .ds-tl { top: -8px; left: -8px; border-right: 0; border-bottom: 0; } .ds-tr { top: -8px; right: -8px; border-left: 0; border-bottom: 0; } .ds-bl { bottom: -8px; left: -8px; border-right: 0; border-top: 0; } .ds-br { bottom: -8px; right: -8px; border-left: 0; border-top: 0; } .ds-tile:hover .ds-c { border-color: #ff6868; filter: drop-shadow(0 0 4px #991111); } .ds-tile-label { position: absolute; bottom: 8px; width: 100%; text-align: center; font-family: 'Latin Modern Mono Caps', monospace; color: #fff; }"
+      "html": "<button type=\"button\" class=\"ds-tile\"><span class=\"ds-c ds-tl\"></span><span class=\"ds-c ds-tr\"></span><span class=\"ds-c ds-bl\"></span><span class=\"ds-c ds-br\"></span><span class=\"ds-tile-label\">Booster</span></button>",
+      "css": ".ds-tile { position: relative; display: block; width: 160px; height: 185px; margin: 20px; border: 0; cursor: pointer; background: color-mix(in srgb, var(--color-primary, #119999), transparent 93%); } .ds-c { position: absolute; width: 28px; height: 28px; border: 2px solid #35ffff; filter: drop-shadow(0 0 4px var(--color-primary, #119999)); } .ds-tl { top: -8px; left: -8px; border-right: 0; border-bottom: 0; } .ds-tr { top: -8px; right: -8px; border-left: 0; border-bottom: 0; } .ds-bl { bottom: 17px; left: -8px; border-right: 0; border-top: 0; } .ds-br { bottom: 17px; right: -8px; border-left: 0; border-top: 0; } .ds-tile:hover .ds-c, .ds-tile:focus-visible .ds-c { border-color: #ff6868; filter: drop-shadow(0 0 4px var(--color-accent, #991111)); } .ds-tile:focus-visible { outline: 2px solid var(--color-primary-light, #88cccc); outline-offset: 3px; } .ds-tile-label { position: absolute; top: 160px; left: 0; width: 100%; text-align: center; font-family: 'Latin Modern Mono Caps', monospace; color: var(--color-light, #fff); }"
     },
     {
       "name": "Beta Badge",
@@ -102,7 +304,7 @@
   ],
   "narrative": {
     "northStar": "The Flight Console",
-    "overview": "The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: a fixed star-field photograph under a 40% black veil, and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.\n\nEdges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red.\n\nTypography is German-language and pairs a Latin Modern Sans reading face with Latin Modern Mono Caps for every title, label and navigation item, which gives a technical-manual voice. Density is moderate on lore pages and dense on deck and trade screens so card data stays exact and legible.",
+    "overview": "The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 40% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.\n\nEdges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red. This is the one recurring gesture of the system, and it appears in the navbar glow, the table rows, the zone-corner brackets on inventory items and the rarity pips.\n\nTypography is German-language and pairs a Latin Modern Sans reading face with Latin Modern Mono Caps for every title, label and navigation item, which gives a technical-manual voice. Density is moderate. Lore pages breathe at 18px with generous leading, while deck and trade screens are tabular and dense so card data stays exact and legible.",
     "keyCharacteristics": [
       "Dark-only: black void, teal signal, red alert. There is no light theme.",
       "Chamfered hologram frames (image-based) around every content block.",
@@ -111,12 +313,36 @@
       "Flat: depth comes from glow, translucency and layering, never from drop shadows."
     ],
     "rules": [
-      { "name": "The Teal-to-Red Rule", "body": "Idle is teal and interaction is red. A hover or selected state shifts a teal element to red (or a red-tinted glow); it never introduces a third hue. Red at rest is reserved for warnings and errors.", "section": "colors" },
-      { "name": "The Pale-for-Small-Text Rule", "body": "Signal Teal Bright and Alert Red do not carry small text on black at WCAG AA. Body-size text on the dark background is white, Signal Teal Pale, Alert Red Pale or Alert Red Bright. Saturated teal and red are for lines, fills, large labels and icons.", "section": "colors" },
-      { "name": "The Veil Rule", "body": "The star photograph is always under the 40% black veil. Never place content straight on the unveiled sky.", "section": "colors" },
-      { "name": "The Two-Face Rule", "body": "Titles, labels and navigation are Mono Caps, and everything that is read as a sentence is Sans. Never set a paragraph in Mono Caps or a title in Sans.", "section": "typography" },
-      { "name": "The No-Third-Font Rule", "body": "Only the two Latin Modern faces plus the icon font. The Material default Roboto must not leak in; the global `*` rule forces Latin Modern Sans.", "section": "typography" },
-      { "name": "The Glow-Not-Shadow Rule", "body": "Emphasis is a halo or a line of light, never a cast shadow. Never add `box-shadow` to custom components.", "section": "elevation" }
+      {
+        "name": "The Teal-to-Red Rule",
+        "body": "Idle is teal and interaction is red. A hover or selected state shifts a teal element to red (or a red-tinted glow); it never introduces a third hue. Red at rest is reserved for warnings and errors.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pale-for-Small-Text Rule",
+        "body": "Signal Teal Bright and Alert Red do not carry small text on black at WCAG AA. Body-size text on the dark background is white, Signal Teal Pale, Alert Red Pale or Alert Red Bright. Saturated teal and red are for lines, fills, large labels and icons.",
+        "section": "colors"
+      },
+      {
+        "name": "The Veil Rule",
+        "body": "The star photograph is always under the 40% black veil. Never place content straight on the unveiled sky.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Face Rule",
+        "body": "Titles, labels and navigation are Mono Caps, and everything that is read as a sentence is Sans. Never set a paragraph in Mono Caps or a title in Sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Third-Font Rule",
+        "body": "Only the two Latin Modern faces plus the icon font. The body and Material typography configuration use Latin Modern Sans, without overriding icon fonts.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow-Not-Shadow Rule",
+        "body": "Emphasis is a halo or a line of light, never a cast shadow. Never add `box-shadow` to custom components.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do shift teal elements to red on hover, focus and selection (Alert Red #991111 fills, Alert Red Pale text), and keep red out of idle surfaces.",
