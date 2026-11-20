@@ -52,14 +52,16 @@ describe('AppComponent', () => {
     expect(component.env.stage).toBeDefined();
   });
 
-  it('should open imprint dialog when called', () => {
-    component.openImprint();
-    expect(dialogSpy.open).toHaveBeenCalled();
+  it('should open imprint dialog when called', async () => {
+    await component.openImprint();
+    const { ImprintPage } = await import('./pages/public/imprint/imprint.page');
+    expect(dialogSpy.open).toHaveBeenCalledWith(ImprintPage);
   });
 
-  it('should open data privacy dialog when called', () => {
-    component.openDataPrivacy();
-    expect(dialogSpy.open).toHaveBeenCalled();
+  it('should open data privacy dialog when called', async () => {
+    await component.openDataPrivacy();
+    const { DataPrivacyPage } = await import('./pages/public/data-privacy/data-privacy.page');
+    expect(dialogSpy.open).toHaveBeenCalledWith(DataPrivacyPage);
   });
 
   it('should render the navbar for anonymous users', () => {
@@ -112,13 +114,14 @@ describe('AppComponent', () => {
     expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
   });
 
-  it('opens legal dialogs through semantic footer buttons', () => {
+  it('opens legal dialogs through semantic footer buttons', async () => {
     const buttons: NodeListOf<HTMLButtonElement> =
       fixture.nativeElement.querySelectorAll('#footer-links button');
     expect(buttons.length).toBe(2);
     expect(Array.from(buttons).map(button => button.type)).toEqual(['button', 'button']);
     buttons[0].click();
     buttons[1].click();
+    await fixture.whenStable();
     expect(dialogSpy.open).toHaveBeenCalledTimes(2);
   });
 });

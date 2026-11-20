@@ -3,7 +3,7 @@ import { authTokenInterceptor } from './app/api/auth-token.interceptor';
 import { apiErrorInterceptor } from './app/api/api-error.interceptor';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { provideZoneChangeDetection } from '@angular/core';
 import { routes } from './app/app.routes';
@@ -11,7 +11,7 @@ import { routes } from './app/app.routes';
 bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideRouter(routes),
     provideHttpClient(withInterceptors([authTokenInterceptor, apiErrorInterceptor])),
     provideAnimations()
   ]

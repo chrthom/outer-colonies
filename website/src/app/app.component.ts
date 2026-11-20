@@ -1,8 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { ImprintPage } from './pages/public/imprint/imprint.page';
-import { DataPrivacyPage } from './pages/public/data-privacy/data-privacy.page';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import AuthService from './auth.service';
@@ -45,10 +43,14 @@ export class AppComponent {
   get releaseName() {
     return releaseName;
   }
-  openImprint() {
+  /** Loads and opens the imprint dialog on demand. */
+  async openImprint(): Promise<void> {
+    const { ImprintPage } = await import('./pages/public/imprint/imprint.page');
     this.dialog.open(ImprintPage);
   }
-  openDataPrivacy() {
+  /** Loads and opens the data privacy dialog on demand. */
+  async openDataPrivacy(): Promise<void> {
+    const { DataPrivacyPage } = await import('./pages/public/data-privacy/data-privacy.page');
     this.dialog.open(DataPrivacyPage);
   }
 }
