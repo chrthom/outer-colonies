@@ -1,4 +1,8 @@
 #rules-box {
+  h4,
+  h5 {
+    display: inline;
+  }
   width: calc(100% - 50px);
   margin: auto;
   margin-top: 40px;
