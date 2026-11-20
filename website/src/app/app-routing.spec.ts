@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { PreloadAllModules, Router, RouterOutlet, provideRouter, withPreloading } from '@angular/router';
+import { Router, RouterOutlet, provideRouter } from '@angular/router';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { routes } from './app.routes';
 import AuthService from './auth.service';
@@ -31,10 +31,7 @@ describe('app routes (public landing and lore pages)', () => {
 
     await TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RoutingHostComponent],
-      providers: [
-        provideRouter(routes, withPreloading(PreloadAllModules)),
-        { provide: AuthService, useValue: authSpy }
-      ]
+      providers: [provideRouter(routes), { provide: AuthService, useValue: authSpy }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RoutingHostComponent);
