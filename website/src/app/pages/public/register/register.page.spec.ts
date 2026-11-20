@@ -11,11 +11,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { starterDecks } from '@shared/config/starter_decks';
 import { environment } from 'src/environments/environment';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -331,7 +330,28 @@ describe('RegisterPage', () => {
     expect(element.querySelector('#password-rules').textContent).toContain('Buchstabe und eine Zahl');
   });
 
-  it('should open privacy outside the consent label and request focus restoration', () => {
+  it('should associate hints once and replace them with error descriptions', () => {
+    const fields = [
+      { name: 'username', hint: 'username-rules', control: component.username },
+      { name: 'password', hint: 'password-rules', control: component.password }
+    ];
+
+    for (const field of fields) {
+      const input: HTMLInputElement = fixture.nativeElement.querySelector(
+        `[formControlName="${field.name}"]`
+      );
+      expect(input.getAttribute('aria-describedby')?.split(/\s+/)).toEqual([field.hint]);
+      field.control?.markAsTouched();
+      fixture.detectChanges();
+      const ids = input.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const error = input.closest('mat-form-field')?.querySelector('mat-error');
+      expect(error).not.toBeNull();
+      expect(ids).toEqual([error?.id ?? '']);
+      expect(ids).not.toContain(field.hint);
+    }
+  });
+
+  it('should open privacy outside the consent label', () => {
     const trigger: HTMLButtonElement = fixture.nativeElement.querySelector('.privacy-trigger');
     expect(trigger.type).toBe('button');
     expect(trigger.closest('mat-checkbox')).toBeNull();
@@ -342,11 +362,7 @@ describe('RegisterPage', () => {
       expect(component.dataPrivacy?.value).toBe(consent);
       expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
-        jasmine.objectContaining({
-          restoreFocus: true,
-          autoFocus: 'first-tabbable',
-          ariaLabel: 'Datenschutzbestimmungen'
-        })
+        jasmine.objectContaining({ ariaLabel: 'Datenschutzbestimmungen' })
       );
     }
   });

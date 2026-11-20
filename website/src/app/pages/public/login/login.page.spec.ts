@@ -168,6 +168,7 @@ describe('LoginPage', () => {
     fixture.detectChanges();
     expect(component.loading).toBeFalse();
     expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('fehlgeschlagen');
+    expect(fixture.nativeElement.querySelector('[role="alert"]').classList.contains('has-error')).toBeTrue();
     expect(fixture.nativeElement.querySelector('[role="alert"] mat-error')).toBeNull();
   });
 

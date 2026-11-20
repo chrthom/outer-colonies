@@ -26,7 +26,7 @@
         <mat-label>Zugangsdaten merken</mat-label>
       </mat-slide-toggle>
       <button mat-raised-button type="submit" color="primary" [disabled]="loading">Anmelden</button>
-      <div role="alert" class="request-error">
+      <div role="alert" class="request-error" [class.has-error]="loginFailed">
         @if (loginFailed) { Die Anmeldung ist fehlgeschlagen. Bitte pr&uuml;fe deine Zugangsdaten und versuche
         es erneut. }
       </div>
