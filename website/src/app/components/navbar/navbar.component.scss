@@ -40,6 +40,10 @@
 h2.right {
   right: 100px;
   padding-top: 13px;
+  max-width: clamp(120px, (100vw - 1000px) / 2, 300px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .logo {
   position: absolute;
@@ -55,8 +59,8 @@ h2.right {
     width: var(--logo-width, 104px);
   }
   &.compact {
-    --logo-width: 88px;
-    padding: 3px 12px;
+    --logo-width: 132px;
+    padding: 4px 12px;
   }
 }
 .zone {
@@ -64,24 +68,33 @@ h2.right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-left: 112px;
+  padding-left: 156px;
 }
 .links {
   flex: 1;
   min-width: 0;
   display: flex;
   justify-content: center;
-  gap: clamp(12px, 2.2vw, 32px);
+  gap: clamp(4px, 1vw, 18px);
   a {
+    --g: color-mix(in srgb, var(--color-primary), transparent 82%);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 6px;
+    color: var(--color-primary-light);
     font:
-      clamp(13px, 1.5vw, 16px) "Latin Modern Mono Caps",
+      clamp(13px, 1.1vw, 16px) "Latin Modern Mono Caps",
       monospace;
     text-decoration: none;
     white-space: nowrap;
+    background: radial-gradient(closest-side, var(--g), transparent);
     &:hover,
     &.active {
-      color: var(--color-light);
+      color: var(--color-accent-light);
       text-decoration: underline;
+      text-underline-offset: 5px;
+      --g: color-mix(in srgb, var(--color-accent), transparent 72%);
     }
   }
 }
@@ -90,6 +103,7 @@ h2.right {
 }
 .actions {
   display: flex;
+  flex-shrink: 0;
   gap: 12px;
   padding: 0 15px;
 }

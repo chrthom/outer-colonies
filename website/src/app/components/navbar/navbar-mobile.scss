@@ -1,4 +1,10 @@
-@media (max-width: 759px) {
+@media (max-width: 1050px) {
+  .logo.compact {
+    --logo-width: 88px;
+  }
+  .zone {
+    padding-left: 112px;
+  }
   .menu {
     display: block;
     min-height: 44px;
@@ -9,6 +15,7 @@
       14px "Latin Modern Mono Caps",
       monospace;
     cursor: pointer;
+    white-space: nowrap;
   }
   .links {
     display: none;
@@ -34,14 +41,66 @@
   }
 }
 @media (max-width: 400px) {
+  .logged-in {
+    .logo {
+      --logo-width: 48px;
+      padding-inline: 4px;
+    }
+    .item img {
+      width: 32px;
+      margin: auto;
+    }
+  }
   .logo.compact {
-    --logo-width: 64px;
-    padding-inline: 8px;
+    --logo-width: 56px;
+    padding-inline: 6px;
   }
   .zone {
-    padding-left: 80px;
+    padding-left: 68px;
   }
   .actions a {
-    padding-inline: 8px;
+    min-width: 0;
+    padding-inline: 6px;
+    font-size: 12px;
+    letter-spacing: normal;
+  }
+}
+@media (max-width: 1200px) {
+  .logged-in {
+    justify-content: space-between;
+
+    .logo {
+      position: static;
+      transform: none;
+      flex-shrink: 0;
+    }
+
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1 1 0;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+    }
+
+    .user-name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    button.right {
+      position: static;
+      flex-shrink: 0;
+      min-width: 44px;
+      height: 44px;
+      padding: 0;
+    }
   }
 }

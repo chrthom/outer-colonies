@@ -88,7 +88,7 @@ components:
 
 **Creative North Star: "The Flight Console"**
 
-The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: a fixed star-field photograph under a 40% black veil, and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.
+The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 40% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.
 
 Edges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red. This is the one recurring gesture of the system, and it appears in the navbar glow, the table rows, the zone-corner brackets on inventory items and the rarity pips.
 
@@ -156,7 +156,7 @@ A single centred column over the fixed star field: `#root-content` is `min(1400p
 
 Pages place one or more framed content boxes in the column. Public lore pages use a single text column at 75ch maximum, the landing page has a 60vh hero followed by stacked sections and a three-column teaser grid. Private pages vary: the home page uses floated boxes of 400, 500 and 550px inside a 940px container. Profile and login are centred at 50% width, and deck and rules use the full column width (`calc(100% - 50px)`).
 
-The spacing rhythm is loose multiples of 4: 8, 12, 15, 20, 24, 30 and 40px. `--space-xs` through `--space-xl` expose 8, 12, 20, 30 and 40px, and `--measure-body` sets the 75ch reading limit. Section gap is 40px, card grid gap is 20px, and action rows use 12–24px. Breakpoints in use are 960, 900, 800, 760 and 600px. At 900px the teaser grid collapses to one column, below 760px the anonymous lore links move into a mobile menu. Mobile for private pages (deck, trade) is not yet a confirmed requirement.
+The spacing rhythm is loose multiples of 4: 8, 12, 15, 20, 24, 30 and 40px. `--space-xs` through `--space-xl` expose 8, 12, 20, 30 and 40px, and `--measure-body` sets the 75ch reading limit. Section gap is 40px, card grid gap is 20px, and action rows use 12–24px. At 900px the teaser grid collapses to one column; at 1050px and below the anonymous navigation moves into a mobile menu. Mobile for private pages (deck, trade) is not yet a confirmed requirement.
 
 ## Elevation & Depth
 
@@ -187,8 +187,8 @@ The framed container, `oc-content-box`. It has the nine-piece chamfered teal fra
 
 ### Navigation
 - **Style:** A sticky 62px bar with a black-to-deep-teal gradient (90°, black 50% to #0a7c7c 130%) and 3px `ridge` borders in Signal Teal Deep at top and bottom.
-- **Logged-in:** Icon-only elements (50px PNG icons with tinted filters) on a radial glow, with a logo that overhangs the bar on a black halo. Hover or active shifts the glow from teal (30% mix) to red (50% mix) and the icon filter from teal-grey to red-grey.
-- **Anonymous:** Mono Caps links in Signal Teal Pale, centred between a compact logo and the auth buttons. Hover and active turn white and add an underline. Below 760px, a keyboard-accessible menu exposes the same links.
+- **Logged-in:** Icon-only elements (50px PNG icons with tinted filters) on a radial glow, with a logo that overhangs the bar on a black halo. Hover or active shifts the glow from teal (30% mix) to red (50% mix) and the icon filter from teal-grey to red-grey. At 1200px and below the icons share the available width and the username remains available to assistive technology without overlapping controls; on narrow phones the logo and icons shrink while retaining 44px navigation targets.
+- **Anonymous:** A prominent overhanging logo and labelled Mono Caps links sit on the same teal-to-red glows as the game navigation. The links include Startseite; registration is the filled primary action and Einloggen the outlined secondary action. At 1050px and below, a keyboard-accessible menu exposes the same links while the actions remain visible. The footer keeps legal links and version everywhere, with the complete lore navigation on non-landing pages and a single world link on the landing page, whose previews already link to every lore page.
 
 ### Tables
 Used for the deck builder and the rules pages. Sticky header cells in Signal Teal Bright with white text, which turn Alert Red on hover. Even rows get an 80%-transparent teal tint, and a hovered row is a 60%-transparent red tint. Cells have 0 8px padding and no wrap. Rarity shows as skewed teal pips, with filled ones red.

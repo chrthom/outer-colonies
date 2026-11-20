@@ -1,5 +1,5 @@
 <div class="space"></div>
-<div class="bar" id="navbar-main">
+<div class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
   <a
     class="logo"
     id="navbar-logo"
@@ -55,7 +55,7 @@
     >
       <img src="../../../assets/icons/profile.png" alt="" />
     </a>
-    <h2 class="user-name right">{{ username }}</h2>
+    <h2 class="user-name right" [title]="username">{{ username }}</h2>
     <button type="button" class="item right" matTooltip="Abmelden" aria-label="Abmelden" (click)="logout()">
       <img src="../../../assets/icons/logout.png" alt="" />
     </button>
@@ -79,6 +79,9 @@
         aria-label="Hauptnavigation"
         [class.open]="menuOpen"
       >
+        <a routerLink="/" [class.active]="active === ''" [attr.aria-current]="active === '' ? 'page' : null"
+          >Startseite</a
+        >
         <a routerLink="/world" [class.active]="active === 'world'">Die Welt</a>
         <a routerLink="/factions" [class.active]="active === 'factions'">Die Mächte</a>
         <a routerLink="/history" [class.active]="active === 'history'">Die Geschichte</a>
@@ -86,7 +89,7 @@
       </nav>
       <div class="actions" id="navbar-anon-actions">
         <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
-        <a mat-stroked-button color="primary" routerLink="/login">Login</a>
+        <a mat-stroked-button color="primary" routerLink="/login">Einloggen</a>
       </div>
     </div>
   }

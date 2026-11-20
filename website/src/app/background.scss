@@ -2,15 +2,10 @@
   position: fixed;
   inset: 0;
   background-color: var(--color-dark);
+  background-image: url("https://assets.outercolonies.de/background/stars1.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-}
-
-@for $i from 0 through 6 {
-  .background-stars-#{$i} {
-    background-image: url("https://assets.outercolonies.de/background/stars#{$i}.jpg");
-  }
 }
 
 #background-layer {

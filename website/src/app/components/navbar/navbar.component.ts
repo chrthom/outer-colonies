@@ -93,7 +93,7 @@ export class NavbarComponent {
     return this.authService.isLoggedIn;
   }
   get active(): string {
-    return this.router.url.replace('/', '');
+    return this.router.url.split(/[?#]/, 1)[0].replace('/', '');
   }
   get username(): string | undefined {
     return this.authService.displayname;

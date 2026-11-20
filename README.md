@@ -77,7 +77,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Purpose**: User management, deck configuration, settings, and opponent search
 - **Loading**: Secondary pages are loaded on demand without automatic route preloading; the landing page remains in the initial bundle. Legal dialogs load their page components when opened.
 - **Key Components**:
-  - `app.component.ts`: Main application component
+    - `app.component.ts`: Main application component; uses the fixed teal star field with a dark fallback and veil across public and private pages
   - `auth.service.ts`: Authentication service
   - `pages/`: Pages of the website, substructured by accessibility
     - `private/`: Pages for authenticated players (behind `privateGuardFn`)
@@ -109,7 +109,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
       - **Used in pages**: register, deck
     - `inventory-item/`: Inventory item component - A component for displaying inventory items with an image and text.
       - **Used in pages**: trade
-    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, accessible public lore links with a mobile menu, and register/login buttons for anonymous visitors. The shell also provides a skip-to-content link and keyboard focus indicators.
+    - `navbar/`: Navigation bar component - The main navigation bar for the website: icon-based navigation for logged-in players, a visible public home link and accessible lore links with a mobile menu, and registration-first account actions for anonymous visitors. The shell also provides a skip-to-content link and keyboard focus indicators; the footer retains legal links and contextual lore wayfinding.
       - **Used in**: app.component.html (global navigation)
     - `open-item/`: Open item component - A component for displaying the contents of opened items (e.g., booster packs).
       - **Used in pages**: trade
