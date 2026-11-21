@@ -23,7 +23,6 @@
   p,
   li,
   blockquote {
-    max-width: min(66ch, var(--measure-body));
     text-wrap: pretty;
   }
 

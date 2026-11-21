@@ -119,7 +119,7 @@ describe('LandingPage', () => {
   it('should render the closing proverb with Registrieren CTA', () => {
     const element: HTMLElement = fixture.nativeElement;
     expect(element.textContent).toContain('Was du nicht selbst baust, gehört dir nicht.');
-    const cta = element.querySelector('oc-content-box[title="Baue auf."] a[routerLink="/register"]');
+    const cta = element.querySelector('oc-content-box[title="Baue auf"] a[routerLink="/register"]');
     expect(cta?.textContent).toContain('Registrieren');
   });
 
@@ -132,7 +132,7 @@ describe('LandingPage', () => {
       element.querySelector('oc-content-box[title="Die Welt"] .content-box')?.getAttribute('data-variant')
     ).toBe('open');
     expect(
-      element.querySelector('oc-content-box[title="Baue auf."] .content-box')?.getAttribute('data-variant')
+      element.querySelector('oc-content-box[title="Baue auf"] .content-box')?.getAttribute('data-variant')
     ).toBe('open');
     const teaserVariants = Array.from(
       element.querySelectorAll('#lore-teasers .teaser-card .content-box')

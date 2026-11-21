@@ -110,10 +110,10 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
   });
 
-  it('keeps legal links and concise wayfinding on the landing page', () => {
+  it('keeps legal links and omits header lore links on the landing page', () => {
     const footer = fixture.nativeElement.querySelector('#footer');
     expect(footer).toBeTruthy();
-    expect(footer.textContent).toContain('Die Welt');
+    expect(footer.textContent).not.toContain('Die Welt');
     expect(footer.textContent).not.toContain('Die Mächte');
     expect(footer.textContent).not.toContain('Die Geschichte');
     expect(footer.textContent).not.toContain('Die Editionen');
