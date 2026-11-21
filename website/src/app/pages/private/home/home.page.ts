@@ -1,4 +1,4 @@
-import { Component, InjectionToken, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, InjectionToken, OnDestroy, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import { OnlineApiService } from 'src/app/api/online-api.service';
 import AuthService from 'src/app/auth.service';
@@ -137,7 +137,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.departureActive = true;
   }
 
-  /** Navigates to the game client once the departure sequence finishes or is skipped. */
+  /** Navigates to the game client once the departure sequence finishes. */
   onDepartureComplete(): void {
     this.navigateToGame(this.gameLink);
   }
@@ -147,6 +147,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.departureActive = false;
     this.launchTrigger?.focus({ preventScroll: true });
     this.launchTrigger = null;
+  }
+
+  /** Clears a lingering departure curtain if the browser restores this page from bfcache. */
+  @HostListener('window:pageshow', ['$event'])
+  onPageShow(event: PageTransitionEvent): void {
+    if (event.persisted && this.departureActive) {
+      this.departureActive = false;
+      this.launchTrigger = null;
+    }
   }
 
   /** Advances the selection to the next daily, cycling against the current dailies array. */

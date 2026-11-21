@@ -88,6 +88,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private startTimestamp = 0;
   private completed = false;
+  private destroyed = false;
   private width = 0;
   private height = 0;
   private dpr = 1;
@@ -145,6 +146,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
 
   /** Stops any active animation frame and timers when the component is destroyed. */
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.teardownSequence();
   }
 
@@ -190,7 +192,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
 
     // Defer canvas setup and focus one microtask so ViewChild elements exist in the DOM.
     Promise.resolve().then(() => {
-      if (!this.active) {
+      if (!this.active || this.destroyed) {
         return;
       }
       this.overlayContainer?.nativeElement.focus({ preventScroll: true });

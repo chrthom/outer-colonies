@@ -354,4 +354,34 @@ describe('HomePage', () => {
 
     fixture.destroy();
   }));
+
+  it('clears departureActive when restored from bfcache via pageshow', fakeAsync(() => {
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false
+    } as MediaQueryList);
+
+    fixture.detectChanges();
+    const launchBtn: HTMLAnchorElement = fixture.nativeElement.querySelector('.launch-match-button');
+    launchBtn.click();
+    fixture.detectChanges();
+    tick(300);
+
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false }));
+    fixture.detectChanges();
+    expect(component.departureActive).toBeTrue();
+
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    fixture.detectChanges();
+    expect(component.departureActive).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.departure-overlay')).toBeNull();
+
+    fixture.destroy();
+  }));
 });

@@ -147,4 +147,29 @@ describe('DepartureTransitComponent', () => {
 
     tick(DEPARTURE_REDUCED_MOTION_MS);
   }));
+
+  it('normalizes transfer-arc pathLength to 240 to stay synchronized with vesselPoint', fakeAsync(() => {
+    setReducedMotion(false);
+    spyOn(window, 'requestAnimationFrame').and.returnValue(1);
+    activate();
+    tick();
+
+    const arc: SVGPathElement | null = fixture.nativeElement.querySelector('.transfer-arc');
+    expect(arc?.getAttribute('pathLength')).toBe('240');
+
+    fixture.destroy();
+  }));
+
+  it('does not start the animation or listeners if destroyed before the setup microtask runs', fakeAsync(() => {
+    setReducedMotion(false);
+    const rafSpy = spyOn(window, 'requestAnimationFrame');
+    const addListenerSpy = spyOn(window, 'addEventListener').and.callThrough();
+
+    activate();
+    fixture.destroy();
+    tick();
+
+    expect(rafSpy).not.toHaveBeenCalled();
+    expect(addListenerSpy).not.toHaveBeenCalledWith('resize', jasmine.any(Function), jasmine.anything());
+  }));
 });

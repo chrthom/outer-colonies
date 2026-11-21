@@ -1,67 +1,53 @@
 .item {
   position: relative;
-  display: block;
   width: 160px;
   height: 185px;
   margin: 5px;
-  padding: 0;
   float: left;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: center;
-
+  cursor: pointer;
   .image {
     position: relative;
-    display: block;
     max-height: 160px;
     max-width: 160px;
-    margin: 0 auto;
-    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    left: 50%;
+    transform: translateX(-50%);
   }
-
   .title {
     position: absolute;
     top: 160px;
     left: 50%;
-    width: 100%;
     transform: translateX(-50%);
-    white-space: nowrap;
   }
-
   .corners {
     position: absolute;
     width: 160px;
     height: 160px;
     top: 0;
     left: 0;
-    pointer-events: none;
-
     div {
       position: absolute;
       width: 60px;
       height: 60px;
       background-image: url("../../../assets/zone_corner_blue.png");
     }
-
+    div:hover {
+      background-image: url("../../../assets/zone_corner_red.png");
+    }
     .top_left {
       top: 0;
       left: 0;
       transform: translateX(-30%) translateY(-30%);
     }
-
     .top_right {
       top: 0;
       right: 0;
       transform: rotate(90deg) translateX(-30%) translateY(-30%);
     }
-
     .bottom_left {
       bottom: 0;
       left: 0;
       transform: rotate(270deg) translateX(-30%) translateY(-30%);
     }
-
     .bottom_right {
       bottom: 0;
       right: 0;
@@ -69,27 +55,6 @@
     }
   }
 }
-
-.item--interactive {
-  cursor: pointer;
-
-  &:hover:not(:disabled) > .corners > div,
-  &:focus-visible > .corners > div {
-    background-image: url("../../../assets/zone_corner_red.png");
-  }
-
-  &:hover:not(:disabled) .image,
-  &:focus-visible .image {
-    transform: translateY(-3px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-accent-light);
-    outline-offset: 4px;
-  }
-
-  &.is-loading {
-    cursor: progress;
-    opacity: 0.72;
-  }
+.item:hover > .corners > div {
+  background-image: url("../../../assets/zone_corner_red.png");
 }
