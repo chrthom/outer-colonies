@@ -19,6 +19,13 @@ import {
 } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';
 import { OpenItemComponent } from '../../../components/open-item/open-item.component';
+import { BoosterOpeningComponent } from '../../../components/booster-opening/booster-opening.component';
+
+/** Active booster opening session payload handed to the unboxing stage. */
+export interface OpenedBoosterSession {
+  boosterNo: number;
+  content: ItemListResponseBox;
+}
 
 @Component({
   selector: 'oc-page-trade',
@@ -34,7 +41,8 @@ import { OpenItemComponent } from '../../../components/open-item/open-item.compo
     MatCardContent,
     MatCardActions,
     MatButton,
-    OpenItemComponent
+    OpenItemComponent,
+    BoosterOpeningComponent
   ]
 })
 export class TradePage implements OnInit {
@@ -46,6 +54,8 @@ export class TradePage implements OnInit {
   boxes: ItemListResponseBox[] = [];
   boosters: ItemListResponseBooster[] = [];
   openedBoxContent?: ItemListResponseBox;
+  openedBooster?: OpenedBoosterSession;
+  openingItemId?: number;
   loadFailed = false;
   actionFailed = false;
   readonly assetURL = environment.url.assets;
@@ -75,6 +85,10 @@ export class TradePage implements OnInit {
       },
       error: () => (this.loadFailed = true)
     });
+  }
+  /** Returns the localized edition name for a booster pack number. */
+  boosterTitle(boosterNo: number): string {
+    return editions[boosterNo] ?? `Booster ${boosterNo}`;
   }
   buyBooster(boosterNo: number) {
     if (this.sol >= rules.boosterCosts[boosterNo]) {
@@ -107,14 +121,26 @@ export class TradePage implements OnInit {
       });
     }
   }
-  open(itemId: number) {
+  /**
+   * Opens an inventory box or booster pack on the server.
+   * When `boosterNo` is supplied, opens the physical card-by-card booster unboxing stage.
+   */
+  open(itemId: number, boosterNo?: number) {
+    if (this.openingItemId !== undefined) return;
     this.actionFailed = false;
+    this.openingItemId = itemId;
     this.itemApiService.open(itemId).subscribe({
       next: content => {
+        this.openingItemId = undefined;
         this.reload();
-        this.openedBoxContent = content;
+        if (boosterNo !== undefined && content.cards.length > 0) {
+          this.openedBooster = { boosterNo, content };
+        } else {
+          this.openedBoxContent = content;
+        }
       },
       error: () => {
+        this.openingItemId = undefined;
         this.actionFailed = true;
         this.snackBar.open('Das Item konnte nicht geöffnet werden. Bitte versuche es später erneut.', 'OK', {
           duration: 5000
@@ -124,6 +150,11 @@ export class TradePage implements OnInit {
   }
   boxClosed() {
     this.openedBoxContent = undefined;
+    this.reload();
+  }
+  /** Closes the booster unboxing stage and refreshes the inventory. */
+  boosterClosed() {
+    this.openedBooster = undefined;
     this.reload();
   }
 }

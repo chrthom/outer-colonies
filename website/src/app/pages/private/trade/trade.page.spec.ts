@@ -150,6 +150,55 @@ describe('TradePage', () => {
     expect(component.openedBoxContent).toBeDefined();
   });
 
+  it('should open the physical booster stage when a booster pack is opened', () => {
+    const boosterCards = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110];
+    itemApiSpy.open.and.returnValue(
+      of({
+        itemId: 1,
+        sol: [],
+        boosters: [],
+        cards: boosterCards
+      })
+    );
+
+    component.open(1, 2);
+    fixture.detectChanges();
+
+    expect(itemApiSpy.open).toHaveBeenCalledWith(1);
+    expect(component.openedBooster).toEqual({
+      boosterNo: 2,
+      content: {
+        itemId: 1,
+        sol: [],
+        boosters: [],
+        cards: boosterCards
+      }
+    });
+    expect(component.openedBoxContent).toBeUndefined();
+    expect(fixture.nativeElement.querySelector('oc-booster-opening')).toBeTruthy();
+  });
+
+  it('should clear opened booster and reload on boosterClosed', () => {
+    component.openedBooster = {
+      boosterNo: 1,
+      content: { itemId: 1, sol: [], boosters: [], cards: [101, 102] }
+    };
+    component.boosterClosed();
+    expect(component.openedBooster).toBeUndefined();
+  });
+
+  it('should ignore duplicate open calls while an open request is in flight and reset on error', () => {
+    itemApiSpy.open.and.returnValue(throwError(() => new ApiError(500, 'Server Error')));
+    component.openingItemId = 99;
+    component.open(1, 1);
+    expect(itemApiSpy.open).not.toHaveBeenCalled();
+
+    component.openingItemId = undefined;
+    component.open(1, 1);
+    expect(component.openingItemId).toBeUndefined();
+    expect(component.actionFailed).toBeTrue();
+  });
+
   it('should close opened box', () => {
     component.openedBoxContent = {
       itemId: 1,
