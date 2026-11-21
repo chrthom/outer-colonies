@@ -100,4 +100,18 @@ describe('NavbarComponent', () => {
     // Both logged-in and anonymous views share the exact same logo sizing and overhanging layout:
     expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
   });
+
+  it('should render the decorative energy stream canvas and react to mouse hover without throwing', () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const bar = element.querySelector('#navbar-main') as HTMLElement;
+    const canvas = element.querySelector('canvas.energy-stream') as HTMLCanvasElement;
+
+    expect(canvas).toBeTruthy();
+    expect(canvas.getAttribute('aria-hidden')).toBe('true');
+
+    expect(() => {
+      bar.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 30, bubbles: true }));
+      bar.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    }).not.toThrow();
+  });
 });

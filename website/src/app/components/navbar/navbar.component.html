@@ -1,5 +1,6 @@
 <div class="space"></div>
-<div class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
+<div #barElement class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
+  <canvas #energyCanvas class="energy-stream" aria-hidden="true"></canvas>
   <a class="logo" id="navbar-logo" routerLink="/" aria-label="Outer Colonies – Startseite">
     <img src="../../../assets/logo.png" alt="" width="300" height="188" />
   </a>
