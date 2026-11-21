@@ -1,12 +1,20 @@
 <div id="outer-box">
   <div id="game-box" class="inner-box">
     <oc-content-box title="Gegnersuche">
-      <p>
+      <p class="game-intro">
         Starte die Suche nach einem anderen Outer Colonies Spieler f&uuml;r ein schneller Match nach
         Standardregeln.
       </p>
-      <br />
-      <a mat-raised-button color="primary" [href]="gameLink"> Suche n&auml;chstes Spiel </a>
+      <a
+        mat-raised-button
+        color="primary"
+        class="launch-match-button"
+        [class.is-launching]="departureActive"
+        [href]="gameLink"
+        (click)="onLaunchMatch($event)"
+      >
+        Suche n&auml;chstes Spiel
+      </a>
       @if (onlineCount !== undefined) {
       <p id="online-count">{{ onlineCount }} Spieler online</p>
       }
@@ -14,15 +22,20 @@
   </div>
   <div id="note-box" class="inner-box">
     <oc-content-box title="Feedback erw&uuml;nscht">
-      Die derzeitige Version von Outer Colonies befindet sich noch in der Beta Phase. Es kann zwischenzeitlich
-      zu Ausf&auml;llen und Fehlern in der Programmausf&uuml;hrung kommen. Du kannst die Weiterentwicklung und
-      Stabilisierung des Projektes unterst&uuml;tzen, indem du
-      <a href="https://github.com/chrthom/outer-colonies/issues/new/choose" target="_blank"
-        >Fehler meldest sowie neue Funktionalit&auml;ten und Verbesserungen vorschl&auml;gst</a
-      >
-      (du benötigst hierfür einen GitHub Account). Alternativ kannst du eine E-Mail an
-      <a href="mailto:feedback@outercolonies.de">feedback&#64;outercolonies.de</a>
-      schreiben.
+      <p>
+        Die derzeitige Version von Outer Colonies befindet sich noch in der Beta Phase. Es kann
+        zwischenzeitlich zu Ausf&auml;llen und Fehlern in der Programmausf&uuml;hrung kommen. Du kannst die
+        Weiterentwicklung und Stabilisierung des Projektes unterst&uuml;tzen, indem du
+        <a
+          href="https://github.com/chrthom/outer-colonies/issues/new/choose"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Fehler meldest sowie neue Funktionalit&auml;ten und Verbesserungen vorschl&auml;gst</a
+        >
+        (du ben&ouml;tigst hierf&uuml;r einen GitHub Account). Alternativ kannst du eine E-Mail an
+        <a href="mailto:feedback@outercolonies.de">feedback&#64;outercolonies.de</a>
+        schreiben.
+      </p>
     </oc-content-box>
   </div>
   <div id="daily-box" class="inner-box">
@@ -33,24 +46,32 @@
         (selectedIndexChange)="resetAutoAdvance()"
       >
         @for (daily of dailies; track daily) {
-        <mat-tab label="&oplus;">
-          <h3>{{ daily.title }}</h3>
-          <p>{{ daily.description }}</p>
-          @if (daily.achieved) {
-          <span>
-            <i>Erledigt: </i>
-            <h4 class="daily-done">{{ daily.sol }} Sol</h4>
-            <i> erhalten</i>
-          </span>
-          } @if (!daily.achieved) {
-          <span>
-            <i>Belohnung: </i>
-            <h4 class="daily-open">{{ daily.sol }} Sol</h4>
-          </span>
-          }
+        <mat-tab label="&oplus;" [aria-label]="daily.title">
+          <div class="daily-entry">
+            <h3>{{ daily.title }}</h3>
+            <p class="daily-description">{{ daily.description }}</p>
+            @if (daily.achieved) {
+            <p class="daily-status daily-status--done">
+              <span class="daily-status-label">Erledigt:</span>
+              <span class="daily-done">{{ daily.sol }} Sol</span>
+              <span class="daily-status-suffix">erhalten</span>
+            </p>
+            } @if (!daily.achieved) {
+            <p class="daily-status daily-status--open">
+              <span class="daily-status-label">Belohnung:</span>
+              <span class="daily-open">{{ daily.sol }} Sol</span>
+            </p>
+            }
+          </div>
         </mat-tab>
         }
       </mat-tab-group>
     </oc-content-box>
   </div>
 </div>
+
+<oc-departure-transit
+  [active]="departureActive"
+  (complete)="onDepartureComplete()"
+  (cancelled)="onDepartureCancelled()"
+></oc-departure-transit>

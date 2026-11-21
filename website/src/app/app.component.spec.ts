@@ -4,8 +4,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { By } from '@angular/platform-browser';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -68,13 +66,15 @@ describe('AppComponent', () => {
     expect(authSpy.check).toHaveBeenCalledTimes(1);
   });
 
-  it('uses the same veiled star field and dark fallback for both login states', () => {
+  it('uses the same veiled procedural starfield and dark fallback for both login states', () => {
     const stars: HTMLElement = fixture.nativeElement.querySelector('#background-stars');
+    const canvas: HTMLCanvasElement = fixture.nativeElement.querySelector('#background-canvas');
     const veil: HTMLElement = fixture.nativeElement.querySelector('#background-layer');
     const checkBackground = () => {
-      expect(getComputedStyle(stars).backgroundImage).toContain('/background/stars1.jpg');
+      expect(canvas).toBeTruthy();
+      expect(getComputedStyle(stars).backgroundImage).toBe('none');
       expect(getComputedStyle(stars).backgroundColor).toBe('rgb(0, 0, 0)');
-      expect(getComputedStyle(veil).opacity).toBe('0.4');
+      expect(getComputedStyle(veil).opacity).toBe('0.6');
     };
     checkBackground();
     Object.assign(authSpy, { isLoggedIn: true });
@@ -110,31 +110,28 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
   });
 
-  it('keeps legal links and concise wayfinding on the landing page', () => {
-    const footer = fixture.nativeElement.querySelector('#footer');
-    expect(footer).toBeTruthy();
-    expect(footer.textContent).toContain('Die Welt');
-    expect(footer.textContent).not.toContain('Die Mächte');
-    expect(footer.textContent).not.toContain('Die Geschichte');
-    expect(footer.textContent).not.toContain('Die Editionen');
-    expect(footer.textContent).toContain('Impressum');
-    expect(footer.textContent).toContain('Datenschutz');
-    expect(footer.querySelector('#version')).toBeTruthy();
-  });
+  it('links all public content subpages and legal links in the footer across public and private pages', async () => {
+    const assertFooterLinks = () => {
+      const footer = fixture.nativeElement.querySelector('#footer');
+      expect(footer).toBeTruthy();
+      expect(footer.textContent).toContain('Die Welt');
+      expect(footer.textContent).toContain('Die Mächte');
+      expect(footer.textContent).toContain('Die Editionen');
+      expect(footer.textContent).toContain('Spielregeln');
+      expect(footer.textContent).toContain('Impressum');
+      expect(footer.textContent).toContain('Datenschutz');
+      expect(footer.querySelector('#version')).toBeTruthy();
+    };
 
-  it('keeps the full lore navigation on other public and private pages', async () => {
+    assertFooterLinks();
+
     await TestBed.inject(Router).navigateByUrl('/world?from=landing');
     fixture.detectChanges();
-    const footer = fixture.nativeElement.querySelector('#footer');
-    expect(footer.textContent).toContain('Die Welt');
-    expect(footer.textContent).toContain('Die Mächte');
-    expect(footer.textContent).toContain('Die Geschichte');
-    expect(footer.textContent).toContain('Die Editionen');
-    expect(footer.textContent).toContain('Impressum');
-    expect(footer.textContent).toContain('Datenschutz');
+    assertFooterLinks();
+
     Object.assign(authSpy, { isLoggedIn: true });
     fixture.detectChanges();
-    expect(footer.textContent).toContain('Die Editionen');
+    assertFooterLinks();
   });
 
   it('provides landmarks and a skip link to the focusable main content', () => {
@@ -155,14 +152,6 @@ describe('AppComponent', () => {
     skip.click();
     expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
     expect(document.activeElement).toBe(main);
-  });
-
-  it('moves focus to the main content after mobile menu navigation', () => {
-    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
-    const scrollSpy = spyOn(main, 'scrollIntoView');
-    fixture.debugElement.query(By.directive(NavbarComponent)).componentInstance.menuNavigation.emit();
-    expect(document.activeElement).toBe(main);
-    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
   });
 
   it('opens legal dialogs through semantic footer buttons', async () => {

@@ -1,0 +1,398 @@
+<div
+  class="booster-overlay"
+  [class.is-climax]="isClimaxActive || isNextCardClimax"
+  [class.is-reduced-motion]="reducedMotion"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="'Booster-Pack öffnen: ' + editionName"
+>
+  <div class="stage-brackets" aria-hidden="true">
+    <span class="bracket bracket--tl"></span>
+    <span class="bracket bracket--tr"></span>
+    <span class="bracket bracket--bl"></span>
+    <span class="bracket bracket--br"></span>
+  </div>
+
+  <div class="booster-console" cdkTrapFocus>
+    <header class="booster-header">
+      <div class="booster-title-group">
+        <h2 class="booster-title">{{ editionName }}</h2>
+        <span class="booster-counter" aria-hidden="true">
+          @if (phase === "sealed" || phase === "unsealing") {
+            {{ formatSlotNumber(totalCards) }} Karten versiegelt
+          } @else {
+            {{ formatSlotNumber(revealedCount) }} / {{ formatSlotNumber(totalCards) }} aufgedeckt
+          }
+        </span>
+      </div>
+
+      <div class="booster-header-actions">
+        @if (phase !== "summary" && revealedCount < totalCards) {
+          <button type="button" class="console-button console-button--ghost" (click)="revealAll()">
+            Alle aufdecken
+          </button>
+        }
+        <button
+          #closeButton
+          type="button"
+          class="console-button console-button--close"
+          [disabled]="!canClose"
+          [attr.aria-label]="
+            canClose
+              ? 'Booster-Ansicht schließen'
+              : 'Booster-Ansicht schließen (erst aktiv, nachdem alle Karten gezogen wurden)'
+          "
+          (click)="close()"
+        >
+          Schließen
+        </button>
+      </div>
+    </header>
+
+    <div class="booster-progress-rail" aria-hidden="true">
+      <div
+        class="booster-progress-fill"
+        [class.is-climax]="isClimaxActive"
+        [style.transform]="'scaleX(' + progressFraction + ')'"
+      ></div>
+    </div>
+
+    <p class="booster-status" role="status" aria-live="polite">{{ statusText }}</p>
+
+    @if (phase !== "summary") {
+      <div class="unbox-stage">
+        <section class="pack-bay" aria-label="Booster-Packung">
+          <div
+            #packShell
+            class="pack-shell"
+            [class.is-sealed]="phase === 'sealed'"
+            [class.is-unsealing]="phase === 'unsealing'"
+            [class.is-open]="phase !== 'sealed' && phase !== 'unsealing'"
+            [class.is-empty]="isPackEmpty"
+            [class.is-dragging-tear]="isDraggingTear"
+            [class.is-dragging-pull]="isDraggingPull"
+            [class.is-next-climax]="isNextCardClimax || (phase === 'ready' && isClimaxActive)"
+            [style.--tear-progress]="tearProgress"
+            [style.--pull-progress]="pullProgress"
+          >
+            <div class="pack-interior" aria-hidden="true"></div>
+
+            @if (phase !== "sealed" && !isPackEmpty) {
+              @for (layer of stackLayers; track layer) {
+                <div class="pack-stack-layer" [style.--layer-index]="layer" aria-hidden="true"></div>
+              }
+
+              <button
+                type="button"
+                class="pack-top-card"
+                [class.is-extracting]="phase === 'extracting'"
+                [class.is-climax-next]="isNextCardClimax || (phase === 'ready' && isClimaxActive)"
+                [attr.aria-label]="
+                  isNextCardClimax || (phase === 'ready' && isClimaxActive)
+                    ? 'Abschlusskarte aus der Packung ziehen'
+                    : 'Nächste Karte aus der Packung ziehen'
+                "
+                (click)="onPullClick($event)"
+                (pointerdown)="onPullPointerDown($event)"
+                (pointermove)="onPullPointerMove($event)"
+                (pointerup)="onPullPointerUp($event)"
+                (pointercancel)="onPullPointerCancel($event)"
+              >
+                @if (!cardBackImageError) {
+                  <img
+                    class="card-face-image oc-card-mask"
+                    [src]="cardBackUrl"
+                    alt="Verdeckte Karte"
+                    draggable="false"
+                    (error)="cardBackImageError = true"
+                  />
+                } @else {
+                  <span class="card-back-fallback">
+                    <span class="card-back-monogram">OC</span>
+                    <span class="card-back-sub">Verdeckt</span>
+                  </span>
+                }
+                <span class="pack-pull-cue" aria-hidden="true">
+                  {{
+                    isNextCardClimax || (phase === "ready" && isClimaxActive)
+                      ? "Letzte Karte · Ziehen"
+                      : "Ziehen"
+                  }}
+                </span>
+              </button>
+            }
+
+            <div class="pack-pouch" aria-hidden="true">
+              @if (!boosterImageError) {
+                <img
+                  class="pack-art pack-art--body"
+                  [src]="boosterImageUrl"
+                  alt=""
+                  width="660"
+                  height="1200"
+                  draggable="false"
+                  (error)="boosterImageError = true"
+                />
+              } @else {
+                <div class="pack-fallback pack-fallback--body">
+                  <span class="pack-fallback-edition">{{ editionName }}</span>
+                  <span class="pack-fallback-label">Booster-Pack</span>
+                </div>
+              }
+              <div class="pack-torn-edge"></div>
+            </div>
+
+            <div class="pack-top-cap" aria-hidden="true">
+              @if (!boosterImageError) {
+                <img
+                  class="pack-art pack-art--cap"
+                  [src]="boosterImageUrl"
+                  alt=""
+                  width="660"
+                  height="1200"
+                  draggable="false"
+                  (error)="boosterImageError = true"
+                />
+              } @else {
+                <div class="pack-fallback pack-fallback--cap">
+                  <span class="pack-fallback-label">Siegel</span>
+                </div>
+              }
+            </div>
+
+            @if (phase === "sealed") {
+              <button
+                type="button"
+                class="pack-tear-seam"
+                aria-label="Siegel des Booster-Packs aufreißen"
+                (click)="onSealClick($event)"
+                (pointerdown)="onSealPointerDown($event)"
+                (pointermove)="onSealPointerMove($event)"
+                (pointerup)="onSealPointerUp($event)"
+                (pointercancel)="onSealPointerCancel($event)"
+              >
+                <span class="tear-line" aria-hidden="true"></span>
+                <span class="tear-laser" aria-hidden="true"></span>
+                <span class="tear-tag" aria-hidden="true">
+                  <svg viewBox="0 0 20 12" width="18" height="11" fill="none">
+                    <path d="M1 6H17M12 1L18 6L12 11" stroke="currentColor" stroke-width="1.5" />
+                  </svg>
+                  Aufreißen
+                </span>
+              </button>
+            }
+          </div>
+
+          <div class="pack-telemetry">
+            @if (phase === "sealed") {
+              <span>Siegel aufziehen oder klicken</span>
+            } @else if (isPackEmpty) {
+              <span>Packung geleert</span>
+            } @else {
+              <span>Noch {{ remainingInPack }} im Fach</span>
+            }
+          </div>
+        </section>
+
+        <section class="spotlight-bay" aria-label="Gezogene Karte">
+          <div
+            class="spotlight-stage"
+            [class.is-empty]="spotlightCardId === undefined"
+            [class.is-extracting]="phase === 'extracting'"
+            [class.is-flipping]="phase === 'flipping'"
+            [class.is-revealed]="phase === 'revealed'"
+            [class.is-climax]="spotlightCardId !== undefined && slotTier(currentIndex) === 'climax'"
+            [class.is-elevated]="spotlightCardId !== undefined && slotTier(currentIndex) === 'elevated'"
+          >
+            <div class="spotlight-meta">
+              @if (spotlightCardId !== undefined) {
+                <span class="slot-number">
+                  Karte {{ formatSlotNumber(currentIndex + 1) }} / {{ formatSlotNumber(totalCards) }}
+                </span>
+                <span
+                  class="slot-tier"
+                  [class.slot-tier--elevated]="slotTier(currentIndex) === 'elevated'"
+                  [class.slot-tier--climax]="slotTier(currentIndex) === 'climax'"
+                >
+                  {{ slotTierLabel(currentIndex) }}
+                </span>
+              } @else {
+                <span class="slot-number">Karte 00 / {{ formatSlotNumber(totalCards) }}</span>
+                <span class="slot-tier">Bereit</span>
+              }
+            </div>
+
+            @if (spotlightCardId !== undefined) {
+              <div class="spotlight-card-frame" [class.is-interactive]="phase === 'revealed'">
+                <div class="card-perspective">
+                  <div class="card-3d" [class.is-flipped]="isSpotlightFlipped">
+                    <div class="card-face card-face--back">
+                      @if (!cardBackImageError) {
+                        <img
+                          class="card-face-image oc-card-mask"
+                          [src]="cardBackUrl"
+                          alt="Verdeckte Karte"
+                          draggable="false"
+                          (error)="cardBackImageError = true"
+                        />
+                      } @else {
+                        <div class="card-back-fallback">
+                          <span class="card-back-monogram">OC</span>
+                          <span class="card-back-sub">Outer Colonies</span>
+                        </div>
+                      }
+                    </div>
+
+                    <button
+                      type="button"
+                      class="card-face card-face--front"
+                      [disabled]="phase !== 'revealed'"
+                      [attr.aria-label]="'Karte #' + spotlightCardId + ' vergrößern'"
+                      (click)="openCardModal(spotlightCardId, currentIndex)"
+                    >
+                      @if (!hasCardImageError(spotlightCardId)) {
+                        <img
+                          class="card-face-image oc-card-mask"
+                          [src]="cardThumbnailUrl(spotlightCardId)"
+                          [alt]="'Gezogene Karte #' + spotlightCardId"
+                          draggable="false"
+                          (error)="onCardImageError(spotlightCardId)"
+                        />
+                      } @else {
+                        <span class="card-front-fallback">
+                          <span class="card-fallback-edition">{{ editionName }}</span>
+                          <span class="card-fallback-id">Karte #{{ spotlightCardId }}</span>
+                          <span class="card-fallback-tier">{{ slotTierLabel(currentIndex) }}</span>
+                        </span>
+                      }
+                      <span class="card-reveal-scanline oc-card-mask" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="dock-frame">
+                <span class="dock-corners" aria-hidden="true"></span>
+                <p class="dock-label">
+                  @if (phase === "sealed" || phase === "unsealing") {
+                    Versiegelt – Karten bereit zur Entnahme
+                  } @else {
+                    Klicke oder ziehe eine Karte aus der Packung
+                  }
+                </p>
+              </div>
+            }
+
+            <div class="spotlight-hint">
+              @if (spotlightCardId !== undefined && phase === "revealed") {
+                <button
+                  type="button"
+                  class="zoom-link"
+                  (click)="openCardModal(spotlightCardId, currentIndex)"
+                >
+                  Karte vergrößern
+                </button>
+              } @else if (spotlightCardId !== undefined) {
+                <span>Entnahme läuft …</span>
+              } @else {
+                <span>Ablage bereit</span>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <nav class="drawn-strip" aria-label="Kartenfolge im Booster">
+        @for (cardId of cards; track $index) {
+          @if ($index < revealedCount) {
+            <button
+              type="button"
+              class="strip-slot strip-slot--revealed"
+              [class.is-active]="$index === currentIndex && phase === 'revealed'"
+              [class.is-climax]="slotTier($index) === 'climax'"
+              [attr.aria-label]="'Karte ' + ($index + 1) + ': #' + cardId + ' vergrößern'"
+              (click)="inspectDrawnCard($index)"
+            >
+              @if (!hasCardImageError(cardId)) {
+                <img
+                  class="strip-thumb oc-card-mask"
+                  [src]="cardThumbnailUrl(cardId)"
+                  [alt]="'Karte #' + cardId"
+                  draggable="false"
+                  (error)="onCardImageError(cardId)"
+                />
+              } @else {
+                <span class="strip-fallback">#{{ cardId }}</span>
+              }
+            </button>
+          } @else {
+            <div
+              class="strip-slot strip-slot--pending"
+              [class.is-climax]="slotTier($index) === 'climax'"
+              aria-hidden="true"
+            >
+              <span class="strip-index">{{ formatSlotNumber($index + 1) }}</span>
+            </div>
+          }
+        }
+      </nav>
+    } @else {
+      <section class="summary-spread" aria-label="Alle gezogenen Karten">
+        <div class="summary-grid">
+          @for (cardId of cards; track $index) {
+            <button
+              type="button"
+              class="summary-card"
+              [class.is-climax]="slotTier($index) === 'climax'"
+              [class.is-elevated]="slotTier($index) === 'elevated'"
+              [attr.aria-label]="
+                'Karte ' + ($index + 1) + ': #' + cardId + ' (' + slotTierLabel($index) + ') vergrößern'
+              "
+              (click)="openCardModal(cardId, $index)"
+            >
+              <span class="summary-card-frame">
+                @if (!hasCardImageError(cardId)) {
+                  <img
+                    class="summary-card-image oc-card-mask"
+                    [src]="cardThumbnailUrl(cardId)"
+                    [alt]="'Karte #' + cardId"
+                    draggable="false"
+                    (error)="onCardImageError(cardId)"
+                  />
+                } @else {
+                  <span class="card-front-fallback">
+                    <span class="card-fallback-edition">{{ editionName }}</span>
+                    <span class="card-fallback-id">Karte #{{ cardId }}</span>
+                    <span class="card-fallback-tier">{{ slotTierLabel($index) }}</span>
+                  </span>
+                }
+              </span>
+              <span class="summary-card-meta">
+                <span>{{ formatSlotNumber($index + 1) }}</span>
+                <span class="summary-card-tier">{{ slotTierLabel($index) }}</span>
+              </span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <footer class="booster-footer">
+      <button
+        #primaryActionButton
+        type="button"
+        class="console-button console-button--primary"
+        [class.is-climax]="isClimaxActive || isNextCardClimax"
+        (click)="handlePrimaryAction()"
+      >
+        {{ primaryActionLabel }}
+      </button>
+
+      @if (phase === "revealed" && currentIndex === totalCards - 1) {
+        <button type="button" class="console-button console-button--secondary" (click)="close()">
+          Abschließen
+        </button>
+      }
+    </footer>
+  </div>
+</div>

@@ -1,80 +1,22 @@
 @media (max-width: 1200px) {
-  .logo.compact {
-    --logo-width: 88px;
+  .bar {
+    justify-content: space-between;
+  }
+  .logo {
+    position: static;
+    transform: none;
+    flex-shrink: 0;
   }
   .zone {
-    padding-left: 112px;
-  }
-  .menu {
-    display: block;
-    min-height: 44px;
-    padding: 0 8px;
-    background: transparent;
-    color: var(--color-primary-light);
-    font:
-      14px "Latin Modern Mono Caps",
-      monospace;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    flex-direction: column;
-    gap: 0;
-    background: var(--color-dark);
-    border: 1px solid var(--color-primary-dark);
-    padding: 8px 16px;
-    &.open {
-      display: flex;
-    }
-    a {
-      padding: 14px 8px;
-      font-size: 16px;
-    }
+    min-width: 0;
+    padding-left: 0;
+    gap: 8px;
   }
   .actions {
     gap: 4px;
     padding: 0 8px 0 0;
   }
-}
-@media (max-width: 400px) {
   .logged-in {
-    .logo {
-      --logo-width: 48px;
-      padding-inline: 4px;
-    }
-    .item img {
-      width: 32px;
-      margin: auto;
-    }
-  }
-  .logo.compact {
-    --logo-width: 56px;
-    padding-inline: 6px;
-  }
-  .zone {
-    padding-left: 68px;
-  }
-  .actions a {
-    min-width: 0;
-    padding-inline: 6px;
-    font-size: 12px;
-    letter-spacing: normal;
-  }
-}
-@media (max-width: 1200px) {
-  .logged-in {
-    justify-content: space-between;
-
-    .logo {
-      position: static;
-      transform: none;
-      flex-shrink: 0;
-    }
-
     .center {
       display: flex;
       justify-content: center;
@@ -83,6 +25,12 @@
       min-width: 44px;
       min-height: 44px;
       padding: 0;
+    }
+
+    .right {
+      position: static;
+      flex-shrink: 0;
+      gap: 0;
     }
 
     .user-name {
@@ -95,12 +43,34 @@
       white-space: nowrap;
     }
 
-    button.right {
-      position: static;
-      flex-shrink: 0;
+    .profile,
+    .logout {
       min-width: 44px;
       height: 44px;
       padding: 0;
+      gap: 0;
+      justify-content: center;
     }
+  }
+}
+@media (max-width: 480px) {
+  .zone {
+    gap: 4px;
+  }
+  .actions a {
+    min-width: 0;
+    padding-inline: 6px;
+    font-size: 12px;
+    letter-spacing: normal;
+  }
+}
+@media (max-width: 400px) {
+  .logo {
+    --logo-width: 48px;
+    padding-inline: 4px;
+  }
+  .logged-in .item img {
+    width: 32px;
+    margin: auto;
   }
 }

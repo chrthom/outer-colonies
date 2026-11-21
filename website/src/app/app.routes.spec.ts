@@ -27,7 +27,7 @@ describe('app routes', () => {
 
   it('loads all secondary pages on demand', () => {
     const secondaryRoutes = routes.filter(route => route.path !== '' && route.path !== '**');
-    expect(secondaryRoutes.length).toBe(17);
+    expect(secondaryRoutes.length).toBe(16);
     for (const route of secondaryRoutes) {
       expect(route.component)
         .withContext(route.path ?? '')
