@@ -30,6 +30,9 @@ export default class CardImage {
   private imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
   private imagePile: Phaser.GameObjects.Plane;
+  private positionTween?: Phaser.Tweens.Tween;
+  private rotationTween?: Phaser.Tweens.Tween;
+  private discarding = false;
   constructor(
     scene: Game,
     x: PerspectivePosition,
@@ -70,12 +73,16 @@ export default class CardImage {
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
   destroy(): this {
+    this.rotationTween?.stop();
+    this.positionTween?.stop();
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
     return this;
   }
   discard(toDeck?: boolean): this {
+    if (this.discarding) return this;
+    this.image.disableInteractive(true);
     const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
@@ -96,6 +103,8 @@ export default class CardImage {
         this.destroy();
       }
     });
+    // Mark after starting the discard tween so no subsequent hover/un-expand tween can overwrite it
+    this.discarding = true;
     return this;
   }
   highlightDisabled(): this {
@@ -193,6 +202,9 @@ export default class CardImage {
     return this;
   }
   tween(config: CardTweenConfig) {
+    if (this.discarding) return;
+    this.rotationTween?.stop();
+    this.positionTween?.stop();
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
       duration: config.duration,
@@ -209,8 +221,8 @@ export default class CardImage {
     };
     if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
     if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    this.scene.tweens.add(rTweenConfig);
-    this.scene.tweens.add(pTweenConfig);
+    this.rotationTween = this.scene.tweens.add(rTweenConfig);
+    this.positionTween = this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);

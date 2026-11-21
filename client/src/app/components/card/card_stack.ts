@@ -19,6 +19,7 @@ export default class CardStack {
   summaryBox!: CardStackSummary;
   private scene: Game;
   private initialized = false;
+  private discarded = false;
 
   constructor(scene: Game, data: ClientCardStack) {
     this.scene = scene;
@@ -39,6 +40,7 @@ export default class CardStack {
    * to the deck, from where it is redrawn into the hand) and false if it was discarded
    */
   discard(toDeckFor?: (card: Card) => boolean) {
+    this.discarded = true;
     this.destroyIndicators();
     this.cards.forEach(c => c.discard(toDeckFor?.(c)));
   }
@@ -58,6 +60,16 @@ export default class CardStack {
     this.createCards();
     this.data = data;
     this.summaryBox = new CardStackSummary(this.scene, this);
+    // Preserve surviving cards' current transform so expanded stacks un-expand smoothly
+    replacedCards.forEach(oldCard => {
+      this.cards
+        .find(c => c.data.uuid == oldCard.data.uuid)
+        ?.setX(oldCard.x)
+        .setY(oldCard.y)
+        .setZ(oldCard.z)
+        .setAngle(oldCard.angle)
+        .setXRotation(oldCard.xRotation);
+    });
     this.filterCardsByUUIDList(newCardUUIDs).forEach(c => {
       // Attaching keeps the card stack UUID, so the played hand card matches exactly by UUID
       const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.uuid == c.data.uuid);
@@ -130,6 +142,7 @@ export default class CardStack {
     return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
   }
   tween(expand?: boolean) {
+    if (this.discarded) return;
     this.cards.forEach(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
@@ -173,6 +186,7 @@ export default class CardStack {
     });
   }
   private pointerover() {
+    if (this.discarded) return;
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
@@ -187,6 +201,7 @@ export default class CardStack {
     this.summaryBox.highlight();
   }
   private pointerout() {
+    if (this.discarded) return;
     this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();

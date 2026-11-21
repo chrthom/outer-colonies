@@ -1,9 +1,9 @@
 import CardStack from './card_stack';
 import Card from './card';
-import { ClientCardStack } from '@shared/interfaces/client_state';
-import { Zone } from '@shared/config/enums';
+import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
+import { EventType, Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
-import { asGameScene, makeSceneStub } from '../../testing/phaser_stubs';
+import { asGameScene, makeGameObjectStub, makeSceneStub, SceneStub } from '../../testing/phaser_stubs';
 
 function makeData(over: Partial<ClientCardStack> = {}): ClientCardStack {
   return {
@@ -228,6 +228,122 @@ describe('CardStack', () => {
       expect(summaryBox.destroy).toHaveBeenCalled();
       expect(card.destroyRetractButton).toHaveBeenCalled();
       expect(card.discard).toHaveBeenCalledWith(undefined);
+    });
+
+    it('ignores subsequent pointerout and pointerover events so un-expand does not collide with retract', () => {
+      const cs = makeCardStack();
+      const card1 = {
+        ...makeFakeCard('u-1'),
+        data: {
+          uuid: 'u-1',
+          id: 1,
+          index: 0,
+          battleReady: false,
+          retractable: true,
+          insufficientEnergy: false
+        },
+        setDepth: jasmine.createSpy('setDepth'),
+        shortestAngle: jasmine.createSpy('shortestAngle').and.returnValue(0),
+        tween: jasmine.createSpy('tween')
+      };
+      const card2 = {
+        ...makeFakeCard('u-2'),
+        data: {
+          uuid: 'u-2',
+          id: 2,
+          index: 1,
+          battleReady: false,
+          retractable: true,
+          insufficientEnergy: false
+        },
+        setDepth: jasmine.createSpy('setDepth'),
+        shortestAngle: jasmine.createSpy('shortestAngle').and.returnValue(0),
+        tween: jasmine.createSpy('tween')
+      };
+      (cs as unknown as { cards: unknown[] }).cards = [card1, card2];
+      const summaryBox = {
+        destroy: jasmine.createSpy('destroy'),
+        highlight: jasmine.createSpy('highlight'),
+        toDefaultAlpha: jasmine.createSpy('toDefaultAlpha')
+      };
+      (cs as unknown as { summaryBox: typeof summaryBox }).summaryBox = summaryBox;
+
+      cs.discard(() => true);
+      const stackHandlers = cs as unknown as { pointerout: () => void; pointerover: () => void };
+      stackHandlers.pointerout();
+      stackHandlers.pointerover();
+
+      expect(card1.discard).toHaveBeenCalledWith(true);
+      expect(card2.discard).toHaveBeenCalledWith(true);
+      expect(card1.tween).not.toHaveBeenCalled();
+      expect(card2.tween).not.toHaveBeenCalled();
+      expect(summaryBox.toDefaultAlpha).not.toHaveBeenCalled();
+      expect(summaryBox.highlight).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('update(data) on a multi-card stack', () => {
+    function makePlaneStub() {
+      return Object.assign(makeGameObjectStub(), {
+        createBitmapMask: jasmine.createSpy('createBitmapMask').and.returnValue({}),
+        modelPosition: { x: 0, y: 0, z: 0 },
+        modelRotation: { x: 0, y: 0, z: 0 }
+      });
+    }
+
+    function makeClientCard(uuid: string, id: number, index: number): ClientCard {
+      return {
+        uuid,
+        id,
+        index,
+        battleReady: false,
+        retractable: true,
+        insufficientEnergy: false
+      };
+    }
+
+    it('animates the retracted attachment to the deck and preserves surviving card transforms for un-expand', () => {
+      const equipCard = makeClientCard('u-equip', 20, 0);
+      const hullCard = makeClientCard('u-hull', 10, 1);
+      const scene: SceneStub & {
+        activeCards: { hand?: string; stackUUID?: string };
+        isAttackAnimating: boolean;
+        getCardMovementEvent: jasmine.Spy;
+      } = Object.assign(makeSceneStub(), {
+        activeCards: {},
+        isAttackAnimating: false,
+        getCardMovementEvent: jasmine
+          .createSpy('getCardMovementEvent')
+          .and.callFake((uuid: string) => (uuid == 'u-equip' ? { type: EventType.Retract } : undefined))
+      });
+      scene.add.plane.and.callFake(makePlaneStub);
+      scene.tweens.add.and.callFake(() => ({ stop: jasmine.createSpy('tween.stop') }));
+
+      const cs = new CardStack(
+        asGameScene(scene),
+        makeData({ uuid: 'u-hull', zone: Zone.Orbital, cards: [equipCard, hullCard] })
+      );
+      cs.init();
+
+      // Simulate expanded state on the surviving hull card prior to retracting the attachment
+      const [oldEquip, oldHull] = cs.cards;
+      oldHull.image.modelPosition.x = 123;
+      oldHull.image.modelPosition.y = -45;
+      oldHull.image.modelPosition.z = 1.5;
+      const expandedHullX = oldHull.x.value3d;
+      const expandedHullY = oldHull.y.value3d;
+
+      const updatedHull = makeClientCard('u-hull', 10, 0);
+      cs.update(makeData({ uuid: 'u-hull', zone: Zone.Orbital, cards: [updatedHull] }));
+
+      expect(scene.retractCardsExist).toBeTrue();
+      expect(
+        (oldEquip.image as unknown as { disableInteractive: jasmine.Spy }).disableInteractive
+      ).toHaveBeenCalledWith(true);
+      expect(cs.cards.length).toBe(1);
+      expect(cs.cards[0].x.value3d).toBeCloseTo(expandedHullX, 5);
+      expect(cs.cards[0].y.value3d).toBeCloseTo(expandedHullY, 5);
+      expect(cs.cards[0].z).toBe(1.5);
     });
   });
 });

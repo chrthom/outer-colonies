@@ -33,6 +33,7 @@ export default class Card extends CardImage {
   }
   destroyRetractButton() {
     this.retractCardButton?.destroy();
+    this.retractCardButton = undefined;
   }
   animateAttack() {
     this.highlightSelected();
