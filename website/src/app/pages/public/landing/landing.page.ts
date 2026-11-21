@@ -70,10 +70,11 @@ export class LandingPage implements OnDestroy {
     this.meta.removeTag('property="og:image"');
   }
 
-  /** Hero background: dark-teal gradient veil over the hero artwork and matching teal star-field fallback. */
+  /** Hero background: dark-teal gradient veil with a soft central scrim over the hero artwork and teal star-field fallback. */
   get heroBackground(): string {
     return (
-      'linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(5, 24, 24, 0.62) 55%, rgba(0, 0, 0, 0.5) 100%), ' +
+      'radial-gradient(ellipse 72% 64% at 50% 48%, rgba(0, 8, 10, 0.56) 0%, rgba(0, 8, 10, 0) 100%), ' +
+      'linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(4, 20, 20, 0.72) 55%, rgba(0, 0, 0, 0.56) 100%), ' +
       `url("${this.heroArtworkUrl}"), ` +
       `url("${environment.url.assets}/background/stars1.jpg")`
     );

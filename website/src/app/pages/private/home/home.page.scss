@@ -61,7 +61,7 @@
         active-label-text-color: var(--color-primary-light),
         active-focus-label-text-color: var(--color-accent-light),
         active-hover-label-text-color: var(--color-accent-light),
-        inactive-label-text-color: color-mix(in srgb, var(--color-primary-light) 70%, transparent),
+        inactive-label-text-color: color-mix(in srgb, var(--color-primary-light) 85%, var(--color-dark)),
         inactive-focus-label-text-color: var(--color-accent-light),
         inactive-hover-label-text-color: var(--color-accent-light),
         pagination-icon-color: var(--color-primary-light),
