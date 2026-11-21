@@ -1,97 +1,190 @@
 <div class="lore-page">
   <h1 class="sr-only">Die Editionen</h1>
   <oc-content-box title="Edition 1 – Outer Colonies">
-    <h3 class="edition-subtitle">Neue Heimat</h3>
-    <p class="edition-scope">
-      Die Geburtsstunde einer Kolonie – Ankunft, Aufbau, erste Bedrohung. Die jungen Monde: Titan, Europa,
-      Ganymed.
-    </p>
-    <p>
-      Wir kamen mit dem, was die Trägerschiffe übrig ließen: eine Rumpferweiterung als Halle, ein Reaktor als
-      Herzschlag, ein orbitaler Außenposten als erstes Dach über unseren Köpfen. Die ersten Monate bestanden
-      aus Bodenproben, Bohrungen, Fehlkalkulationen – und aus dem, was man aus Titan-Amethysten, europäischem
-      Wasser und Ganymeds Metall herausholen kann.
-    </p>
-    <p>
-      Dann kam der Asteroideneinschlag, der nicht auf dem Plan stand. Er zeigte uns, woran wir wirklich waren:
-      nicht an unsere Ausrüstung, sondern an unsere Entscheidung, trotzdem weiterzubauen. Als unsere erste
-      eigene Werft vom Stapel lief, wussten wir: Draußen zählt nur, was man sich selbst baut.
-    </p>
-    <p>
-      Diese Ausgabe erzählt vom Anfang – und davon, dass der Anfang nie endet: Jede Kolonie, die heute am Rand
-      des Lichts startet, fängt genau hier wieder an.
-    </p>
+    <div class="edition-layout">
+      <div class="edition-copy">
+        <h3 class="edition-subtitle">Neue Heimat</h3>
+        <p class="edition-scope">
+          Die Geburtsstunde einer Kolonie – Ankunft, Aufbau, erste Bedrohung. Die jungen Monde: Titan, Europa,
+          Ganymed.
+        </p>
+        <p>
+          Wir kamen mit dem, was die Trägerschiffe übrig ließen: eine Rumpferweiterung als Halle, ein Reaktor
+          als Herzschlag, ein orbitaler Außenposten als erstes Dach über unseren Köpfen. Die ersten Monate
+          bestanden aus Bodenproben, Bohrungen, Fehlkalkulationen – und aus dem, was man aus Titan-Amethysten,
+          europäischem Wasser und Ganymeds Metall herausholen kann.
+        </p>
+        <p>
+          Dann kam der Asteroideneinschlag, der nicht auf dem Plan stand. Er zeigte uns, woran wir wirklich
+          waren: nicht an unsere Ausrüstung, sondern an unsere Entscheidung, trotzdem weiterzubauen. Als
+          unsere erste eigene Werft vom Stapel lief, wussten wir: Draußen zählt nur, was man sich selbst baut.
+        </p>
+        <p>
+          Diese Ausgabe erzählt vom Anfang – und davon, dass der Anfang nie endet: Jede Kolonie, die heute am
+          Rand des Lichts startet, fängt genau hier wieder an.
+        </p>
+      </div>
+      <figure class="edition-booster">
+        <span class="edition-booster-frame">
+          @if (!hasBoosterImageError(1)) {
+          <img
+            class="edition-booster-image"
+            [src]="boosterImageUrl(1)"
+            alt="Booster-Packung der Edition 1: Outer Colonies"
+            width="660"
+            height="1200"
+            (error)="onBoosterImageError(1)"
+          />
+          } @else {
+          <span class="edition-booster-fallback" aria-hidden="true">
+            <span class="edition-booster-fallback-label">Booster-Pack</span>
+            <span class="edition-booster-fallback-name">Outer Colonies</span>
+          </span>
+          }
+        </span>
+      </figure>
+    </div>
   </oc-content-box>
   <oc-content-box title="Edition 2 – Jovians Freihändler">
-    <h3 class="edition-subtitle">Der graue Markt</h3>
-    <p class="edition-scope">
-      Die Jupitermonde – die stärkste Wirtschaft außerhalb der inneren Welten: Rohstoffabbau, Industrie,
-      Informationsinfrastruktur, viel Handel. Hier ringen die Freihändler um ihre Vorherrschaft, während Venus
-      und Mars versuchen, Kontrolle zu gewinnen.
-    </p>
-    <p>
-      Um den Jupiter liegt die stärkste Wirtschaft, die es außerhalb der inneren Welten gibt. Hier wird
-      Rohstoff gefördert, hier wird in Industrie investiert, hier laufen die Transmissionen zusammen. Und
-      überall, wo viel gehandelt wird, stehen bald die Inneren vor der Tür: Venus über Anteile und Kredite,
-      Mars über Flotten und Konsulate.
-    </p>
-    <p>
-      Wir kamen wegen der Arbeit und blieben wegen des Marktes. Die Freihändlerclans fahren hier seit
-      Generationen ihre Routen – zwischen den Werften Ganymeds, den Bergbaukolonien und den Kontoren auf Ceres
-      – und sie verteidigen ihre Vorherrschaft gegen jeden, der den Handel „ordnen“ will. Venus nennt sie eine
-      Übernahmechance. Die Häuser nennen sie ein Problem. Sie selbst nennen sich die letzten freien Händler
-      des Systems.
-    </p>
-    <p>
-      Und alle reden sie über die Morgenröte. Manche sagen, das legendäre Schiff existiere noch immer –
-      irgendwo, einsatzbereit. Wir haben gelernt, zwischen Ware und Legende zu unterscheiden: Die Legende ist
-      teurer.
-    </p>
+    <div class="edition-layout">
+      <div class="edition-copy">
+        <h3 class="edition-subtitle">Der graue Markt</h3>
+        <p class="edition-scope">
+          Die Jupitermonde – die stärkste Wirtschaft außerhalb der inneren Welten: Rohstoffabbau, Industrie,
+          Informationsinfrastruktur, viel Handel. Hier ringen die Freihändler um ihre Vorherrschaft, während
+          Venus und Mars versuchen, Kontrolle zu gewinnen.
+        </p>
+        <p>
+          Um den Jupiter liegt die stärkste Wirtschaft, die es außerhalb der inneren Welten gibt. Hier wird
+          Rohstoff gefördert, hier wird in Industrie investiert, hier laufen die Transmissionen zusammen. Und
+          überall, wo viel gehandelt wird, stehen bald die Inneren vor der Tür: Venus über Anteile und
+          Kredite, Mars über Flotten und Konsulate.
+        </p>
+        <p>
+          Wir kamen wegen der Arbeit und blieben wegen des Marktes. Die Freihändlerclans fahren hier seit
+          Generationen ihre Routen – zwischen den Werften Ganymeds, den Bergbaukolonien und den Kontoren auf
+          Ceres – und sie verteidigen ihre Vorherrschaft gegen jeden, der den Handel „ordnen“ will. Venus
+          nennt sie eine Übernahmechance. Die Häuser nennen sie ein Problem. Sie selbst nennen sich die
+          letzten freien Händler des Systems.
+        </p>
+        <p>
+          Und alle reden sie über die Morgenröte. Manche sagen, das legendäre Schiff existiere noch immer –
+          irgendwo, einsatzbereit. Wir haben gelernt, zwischen Ware und Legende zu unterscheiden: Die Legende
+          ist teurer.
+        </p>
+      </div>
+      <figure class="edition-booster">
+        <span class="edition-booster-frame">
+          @if (!hasBoosterImageError(2)) {
+          <img
+            class="edition-booster-image"
+            [src]="boosterImageUrl(2)"
+            alt="Booster-Packung der Edition 2: Jovians Freihändler"
+            width="660"
+            height="1200"
+            (error)="onBoosterImageError(2)"
+          />
+          } @else {
+          <span class="edition-booster-fallback" aria-hidden="true">
+            <span class="edition-booster-fallback-label">Booster-Pack</span>
+            <span class="edition-booster-fallback-name">Jovians Freihändler</span>
+          </span>
+          }
+        </span>
+      </figure>
+    </div>
   </oc-content-box>
   <oc-content-box title="Edition 3 – Marsianische Hegemonie">
-    <h3 class="edition-subtitle">Der Schatten des Mars</h3>
-    <p class="edition-scope">
-      Kallisto und die martianische Ordnungsmacht. Konsulate, Protektorate, Space Marines – der Kalte Krieg
-      der Häuser, ausgetragen über den Köpfen der Kolonien.
-    </p>
-    <p>
-      Das Konsulat kam mit einem Dekret und einer Ehrengarde. Offiziell nannten es alle „Kooperation“. Der
-      Konsul nannte es „Protektorat“ – ein Wort, das Sicherheit verspricht und Autonomie meint.
-    </p>
-    <p>
-      Wir haben studiert, was aus den Kolonien wurde, die vorher unterschrieben haben: eine Steigerung der
-      Ausfuhrquoten, eine Reduzierung der Eigenbewaffnung, und das Recht, martianische Torpedoboote in unseren
-      Gewässern zu melden – nicht zu kontrollieren. Die Häuser nutzen die OC als Währungsreserve: Der Friede,
-      den sie kaufen, wird draußen geliefert.
-    </p>
-    <p>
-      Diese Ausgabe erzählt von dem Jahr, in dem der Schatten des Mars unsere Kolonie erreichte – und davon,
-      wie schnell aus Nachbarn Vormünder werden, wenn man etwas besitzt, das ein Haus gerade braucht. Ein
-      Protektorats-Vertrag wird nicht gekündigt, sagt man. Man verliert ihn nur langsamer als andere.
-    </p>
+    <div class="edition-layout">
+      <div class="edition-copy">
+        <h3 class="edition-subtitle">Der Schatten des Mars</h3>
+        <p class="edition-scope">
+          Kallisto und die martianische Ordnungsmacht. Konsulate, Protektorate, Space Marines – der Kalte
+          Krieg der Häuser, ausgetragen über den Köpfen der Kolonien.
+        </p>
+        <p>
+          Das Konsulat kam mit einem Dekret und einer Ehrengarde. Offiziell nannten es alle „Kooperation“. Der
+          Konsul nannte es „Protektorat“ – ein Wort, das Sicherheit verspricht und Autonomie meint.
+        </p>
+        <p>
+          Wir haben studiert, was aus den Kolonien wurde, die vorher unterschrieben haben: eine Steigerung der
+          Ausfuhrquoten, eine Reduzierung der Eigenbewaffnung, und das Recht, martianische Torpedoboote in
+          unseren Gewässern zu melden – nicht zu kontrollieren. Die Häuser nutzen die OC als Währungsreserve:
+          Der Friede, den sie kaufen, wird draußen geliefert.
+        </p>
+        <p>
+          Diese Ausgabe erzählt von dem Jahr, in dem der Schatten des Mars unsere Kolonie erreichte – und
+          davon, wie schnell aus Nachbarn Vormünder werden, wenn man etwas besitzt, das ein Haus gerade
+          braucht. Ein Protektorats-Vertrag wird nicht gekündigt, sagt man. Man verliert ihn nur langsamer als
+          andere.
+        </p>
+      </div>
+      <figure class="edition-booster">
+        <span class="edition-booster-frame">
+          @if (!hasBoosterImageError(3)) {
+          <img
+            class="edition-booster-image"
+            [src]="boosterImageUrl(3)"
+            alt="Booster-Packung der Edition 3: Marsianische Hegemonie"
+            width="660"
+            height="1200"
+            (error)="onBoosterImageError(3)"
+          />
+          } @else {
+          <span class="edition-booster-fallback" aria-hidden="true">
+            <span class="edition-booster-fallback-label">Booster-Pack</span>
+            <span class="edition-booster-fallback-name">Marsianische Hegemonie</span>
+          </span>
+          }
+        </span>
+      </figure>
+    </div>
   </oc-content-box>
   <oc-content-box title="Edition 4 – Kuiper-Gürtel">
-    <h3 class="edition-subtitle">Am Rand des Lichts</h3>
-    <p class="edition-scope">
-      Die Kuiper-Frontier: Pluto, Miranda, Oberon, Triton. Immigranten aus einem erschöpften Terra,
-      Schatzsuche, und die Legende der Guillotine.
-    </p>
-    <p>
-      Am Rand des Lichts ist die Sonne nur der hellste Stern. Hierher ziehen die, die auf Terra keine Zukunft
-      mehr sehen und woanders keine Erlaubnis mehr bekommen: Immigranten, Prospektoren, Leute mit doppelten
-      Namen und halben Papieren.
-    </p>
-    <p>
-      Und hierher ziehen die, die einer Legende folgen: der Blauabdruck der Guillotine – jenes Kriegsschiffs,
-      mit dem die Kallisto-Dissidenten einst die Ordnung des Systems herausforderten. Der Blauabdruck
-      existiert nachweislich nirgends. Das hat noch niemanden davon abgehalten, alles dafür herzugeben. Wir
-      haben gesehen, wie ganze Familien auf Oberon ihr Hab und Gut in eine vermeintliche Karte der
-      Wrackpositionen steckten – und wie auf Pluto jemand jedes Jahr von neuem behauptet, die Kommandodaten
-      gefunden zu haben. Die Legende ist längst eine Industrie.
-    </p>
-    <p>
-      Und irgendwo da draußen, das wissen wir nur vom Hörensagen, existiert eine Ruine mit einem
-      Plasmabeschleuniger, der niemandem gehört. Wir haben beschlossen, das sein zu lassen. Meistens.
-    </p>
+    <div class="edition-layout">
+      <div class="edition-copy">
+        <h3 class="edition-subtitle">Am Rand des Lichts</h3>
+        <p class="edition-scope">
+          Die Kuiper-Frontier: Pluto, Miranda, Oberon, Triton. Immigranten aus einem erschöpften Terra,
+          Schatzsuche, und die Legende der Guillotine.
+        </p>
+        <p>
+          Am Rand des Lichts ist die Sonne nur der hellste Stern. Hierher ziehen die, die auf Terra keine
+          Zukunft mehr sehen und woanders keine Erlaubnis mehr bekommen: Immigranten, Prospektoren, Leute mit
+          doppelten Namen und halben Papieren.
+        </p>
+        <p>
+          Und hierher ziehen die, die einer Legende folgen: der Blauabdruck der Guillotine – jenes
+          Kriegsschiffs, mit dem die Kallisto-Dissidenten einst die Ordnung des Systems herausforderten. Der
+          Blauabdruck existiert nachweislich nirgends. Das hat noch niemanden davon abgehalten, alles dafür
+          herzugeben. Wir haben gesehen, wie ganze Familien auf Oberon ihr Hab und Gut in eine vermeintliche
+          Karte der Wrackpositionen steckten – und wie auf Pluto jemand jedes Jahr von neuem behauptet, die
+          Kommandodaten gefunden zu haben. Die Legende ist längst eine Industrie.
+        </p>
+        <p>
+          Und irgendwo da draußen, das wissen wir nur vom Hörensagen, existiert eine Ruine mit einem
+          Plasmabeschleuniger, der niemandem gehört. Wir haben beschlossen, das sein zu lassen. Meistens.
+        </p>
+      </div>
+      <figure class="edition-booster">
+        <span class="edition-booster-frame">
+          @if (!hasBoosterImageError(4)) {
+          <img
+            class="edition-booster-image"
+            [src]="boosterImageUrl(4)"
+            alt="Booster-Packung der Edition 4: Kuiper-Gürtel"
+            width="660"
+            height="1200"
+            (error)="onBoosterImageError(4)"
+          />
+          } @else {
+          <span class="edition-booster-fallback" aria-hidden="true">
+            <span class="edition-booster-fallback-label">Booster-Pack</span>
+            <span class="edition-booster-fallback-name">Kuiper-Gürtel</span>
+          </span>
+          }
+        </span>
+      </figure>
+    </div>
   </oc-content-box>
 </div>
