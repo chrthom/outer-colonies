@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { environment } from 'src/environments/environment';
 import { EditionsPage } from './editions.page';
 
 describe('EditionsPage', () => {
@@ -7,7 +9,7 @@ describe('EditionsPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditionsPage]
+      imports: [EditionsPage, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditionsPage);
@@ -43,6 +45,33 @@ describe('EditionsPage', () => {
     ]);
   });
 
+  it('should render the booster pack image for each edition next to the text', () => {
+    const images = Array.from<HTMLImageElement>(
+      fixture.nativeElement.querySelectorAll('img.edition-booster-image')
+    );
+    expect(images.map(img => img.getAttribute('src'))).toEqual([
+      `${environment.url.assets}/items/booster1.png`,
+      `${environment.url.assets}/items/booster2.png`,
+      `${environment.url.assets}/items/booster3.png`,
+      `${environment.url.assets}/items/booster4.png`
+    ]);
+    expect(images.map(img => img.getAttribute('alt'))).toEqual([
+      'Booster-Packung der Edition 1: Outer Colonies',
+      'Booster-Packung der Edition 2: Jovians Freihändler',
+      'Booster-Packung der Edition 3: Marsianische Hegemonie',
+      'Booster-Packung der Edition 4: Kuiper-Gürtel'
+    ]);
+  });
+
+  it('should render a readable fallback inside the booster frame when an image fails to load', () => {
+    component.onBoosterImageError(1);
+    fixture.detectChanges();
+
+    const firstBox = fixture.nativeElement.querySelector('oc-content-box');
+    expect(firstBox?.querySelector('img.edition-booster-image')).toBeNull();
+    expect(firstBox?.querySelector('.edition-booster-fallback')?.textContent).toContain('Outer Colonies');
+  });
+
   it('should render the edition stories verbatim without leaked outline prefixes', () => {
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Wir kamen mit dem, was die Trägerschiffe übrig ließen');
@@ -51,6 +80,15 @@ describe('EditionsPage', () => {
     expect(text).toContain('einem Plasmabeschleuniger, der niemandem gehört.');
     expect(text).toContain('Wir haben beschlossen, das sein zu lassen. Meistens.');
     expect(text).not.toContain('Beleuchteter Weltausschnitt');
+  });
+
+  it('should render links back to the landing page at top and bottom', () => {
+    const links = Array.from<Element>(
+      fixture.nativeElement.querySelectorAll('.lore-back-nav a[routerLink="/"]')
+    );
+    expect(links.length).toBe(2);
+    expect(links.every(link => link.textContent?.includes('Zurück zur Startseite'))).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.lore-back-nav--bottom a[routerLink="/"]')).toBeTruthy();
   });
 
   it('should not contain any edition 5 elements', () => {

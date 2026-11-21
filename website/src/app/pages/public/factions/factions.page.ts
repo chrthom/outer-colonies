@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatAnchor } from '@angular/material/button';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 import { QuoteComponent } from '../../../components/quote/quote.component';
 
@@ -10,6 +12,6 @@ import { QuoteComponent } from '../../../components/quote/quote.component';
   selector: 'oc-page-factions',
   templateUrl: './factions.page.html',
   styleUrls: ['./factions.page.scss'],
-  imports: [ContentBoxComponent, QuoteComponent]
+  imports: [RouterLink, MatAnchor, ContentBoxComponent, QuoteComponent]
 })
 export class FactionsPage {}

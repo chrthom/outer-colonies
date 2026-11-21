@@ -82,7 +82,7 @@ describe('logout navigation', () => {
 
       expect(router.url).toBe('/');
       expect(fixture.nativeElement.querySelector('oc-page-landing')).toBeTruthy();
-      expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeTruthy();
+      expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeTruthy();
       expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeFalsy();
       expect(fixture.nativeElement.querySelector('.user-name')).toBeFalsy();
       expect(auth.isLoggedIn).toBeFalse();
@@ -116,7 +116,7 @@ describe('logout navigation', () => {
 
     expect(router.url).toBe('/');
     expect(fixture.nativeElement.querySelector('oc-page-landing')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeFalsy();
     expect(auth.isLoggedIn).toBeFalse();
     expect(credentials['u']).toBeUndefined();

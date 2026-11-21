@@ -101,7 +101,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
       - `reset-password/`: Reset password page
       - `world/`: Public lore page "Die Welt" (setting intro)
   - `components/`: Reusable UI components
-    - `content-box/`: Content box component - A styled container with a title and content area. Used in various pages to display information in a boxed layout.
+    - `content-box/`: Content box component (`oc-content-box`) - A shared Flight-Console surface container with a heading and projected content area, supporting `panel` (chamfered frame), `brackets` (fine luminous card-corner brackets) and `open` (unboxed ruled section) variants.
       - **Used in pages**: reset-password, forgot-password, profile, register, confirm-email, login, trade, home, rules, activate-account, deck, landing, world, factions, history, editions, imprint, data-privacy
     - `error-state-matcher.ts`: Error state matcher utility - A utility class for handling form error states in Angular Material forms.
       - **Used in pages**: reset-password, forgot-password, profile, register, login
@@ -366,9 +366,17 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
 3. **Configuration**:
    - Copy the configuration files from `server/config/` and adjust as needed.
    - Ensure the database connection settings are correctly configured.
-   - Set the environment variables for the database and mail service:
-     - `DB_PASSWORD`: Database password
+   - Set the environment variables for the database and mail service. They are read from the process environment only (no `.env` file is loaded), so export them in the shell before starting the server:
+     - `DB_PASSWORD`: Database password (required, the server cannot connect to the database without it)
      - `MAIL_PASSWORD`: Mail service password (optional for development)
+
+     ```bash
+     export DB_PASSWORD='your-database-password'
+     export MAIL_PASSWORD='your-mail-password'   # optional
+     cd server && npm run s
+     ```
+
+     The database user, host, port and name are taken from `server/config/` (see `database` in `default.json`). Override them in a local `server/config/local.json` if your database runs elsewhere.
 
 ### Development Workflow
 

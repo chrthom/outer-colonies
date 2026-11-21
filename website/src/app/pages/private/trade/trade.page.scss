@@ -15,7 +15,9 @@
   width: 450px;
 }
 .scroll {
+  box-sizing: border-box;
   height: max(calc(100vh - 400px), 300px);
+  padding: 10px 6px 0;
   overflow-y: auto;
   overflow-x: hidden;
 }

@@ -304,7 +304,7 @@
   ],
   "narrative": {
     "northStar": "The Flight Console",
-    "overview": "The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 40% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.\n\nEdges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red. This is the one recurring gesture of the system, and it appears in the navbar glow, the table rows, the zone-corner brackets on inventory items and the rarity pips.\n\nTypography is German-language and pairs a Latin Modern Sans reading face with Latin Modern Mono Caps for every title, label and navigation item, which gives a technical-manual voice. Density is moderate. Lore pages breathe at 18px with generous leading, while deck and trade screens are tabular and dense so card data stays exact and legible.",
+    "overview": "The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 60% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.\n\nEdges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red. This is the one recurring gesture of the system, and it appears in the navbar glow, the table rows, the zone-corner brackets on inventory items and the rarity pips.\n\nTypography is German-language and pairs a Latin Modern Sans reading face with Latin Modern Mono Caps for every title, label and navigation item, which gives a technical-manual voice. Density is moderate. Lore pages breathe at 18px with generous leading, while deck and trade screens are tabular and dense so card data stays exact and legible.",
     "keyCharacteristics": [
       "Dark-only: black void, teal signal, red alert. There is no light theme.",
       "Chamfered hologram frames (image-based) around every content block.",
@@ -325,7 +325,7 @@
       },
       {
         "name": "The Veil Rule",
-        "body": "The star photograph is always under the 40% black veil. Never place content straight on the unveiled sky.",
+        "body": "The deep-void starfield is always under the 60% black veil. Never place content straight on the unveiled sky.",
         "section": "colors"
       },
       {
@@ -349,7 +349,7 @@
       "Do frame images and text blocks in a content box or with chamfered, beam-like lines; follow the zone-corner and frame art for any new shape.",
       "Do set titles, labels and navigation in Latin Modern Mono Caps and prose in Latin Modern Sans at 18px, line-height 1.7, capped at 75ch.",
       "Do use Signal Teal Pale (#88cccc) or white for small text on black, and keep WCAG AA contrast.",
-      "Do keep the 40% black veil under all content and keep the page flat (halo and translucent tint, no shadows).",
+      "Do keep the 60% black veil under all content and keep the page flat (halo and translucent tint, no shadows).",
       "Do show a placeholder (the star field) when card or lore images are missing, and keep page structure intact.",
       "Do give every interactive element a visible focus state. This is the product's accessibility default."
     ],

@@ -9,15 +9,21 @@
       <div class="scroll">
         @if (sol > 0) {
         <oc-inventory-item [img]="assetURL + '/items/sol.png'" [text]="sol + ' Sol'"></oc-inventory-item>
-        } @for (box of boxes; track box) {
+        } @for (box of boxes; track box.itemId) {
         <oc-inventory-item
-          (click)="open(box.itemId)"
+          [interactive]="true"
+          [loading]="openingItemId === box.itemId"
+          [actionLabel]="'Geschenk öffnen'"
+          (activate)="open(box.itemId)"
           [img]="assetURL + '/items/box.png'"
           text="Geschenk"
         ></oc-inventory-item>
-        } @for (booster of boosters; track booster) {
+        } @for (booster of boosters; track booster.itemId) {
         <oc-inventory-item
-          (click)="open(booster.itemId)"
+          [interactive]="true"
+          [loading]="openingItemId === booster.itemId"
+          [actionLabel]="'Booster-Pack ' + boosterTitle(booster.no) + ' öffnen'"
+          (activate)="open(booster.itemId, booster.no)"
           [img]="assetURL + '/items/booster' + booster.no + '.png'"
           text="Booster"
         ></oc-inventory-item>
@@ -28,14 +34,14 @@
   <div id="buy-box" class="inner-box">
     <oc-content-box title="Booster kaufen">
       <div class="scroll">
-        @for (booster of availableBoosters; track booster) {
+        @for (booster of availableBoosters; track booster.no) {
         <mat-card class="card">
           <mat-card-header>
             <mat-card-title>{{ booster.title }}</mat-card-title>
             <mat-card-subtitle><h5>{{ booster.price }} Sol</h5></mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <img [src]="assetURL + '/items/booster' + booster.no + '.png'" />
+            <img [src]="assetURL + '/items/booster' + booster.no + '.png'" [alt]="booster.title" />
           </mat-card-content>
           <mat-card-actions>
             @if (sol >= booster.price) {
@@ -52,4 +58,10 @@
 </div>
 @if (openedBoxContent) {
 <oc-open-item [content]="openedBoxContent" (done)="boxClosed()"></oc-open-item>
+} @if (openedBooster) {
+<oc-booster-opening
+  [boosterNo]="openedBooster.boosterNo"
+  [cards]="openedBooster.content.cards"
+  (done)="boosterClosed()"
+></oc-booster-opening>
 }
