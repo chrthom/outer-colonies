@@ -40,6 +40,8 @@
   background: #000c;
   color: var(--color-warn);
   font: 14px "Latin Modern Mono Caps";
+  cursor: default;
+  user-select: none;
 }
 
 #hero-title {

@@ -32,10 +32,10 @@ describe('LandingPage', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the hero with mission H1, subline, CTAs and beta badge without duplicate hero logo', () => {
+  it('should render the hero with mission H1, subline, CTA and beta badge without duplicate hero logo', () => {
     const element: HTMLElement = fixture.nativeElement;
     expect(element.querySelector('#hero-logo')).toBeNull();
-    expect(element.querySelector('#hero-title')?.textContent).toBe('Baue deine Kolonie am Rand des Lichts.');
+    expect(element.querySelector('#hero-title')?.textContent).toBe('Baue deine Kolonie am Rand des Lichts');
     expect(element.querySelector('#hero-tagline')?.textContent).toContain(
       'Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel'
     );
@@ -43,8 +43,10 @@ describe('LandingPage', () => {
     const registerCta = element.querySelector('#hero-ctas a[routerLink="/register"]');
     const loginCta = element.querySelector('#hero-ctas a[routerLink="/login"]');
     expect(registerCta?.textContent).toContain('Registrieren');
-    expect(loginCta?.textContent).toContain('Einloggen');
-    expect(element.querySelector('#beta-badge')?.textContent).toBe('Offene Beta');
+    expect(loginCta).toBeNull();
+    const betaBadge = element.querySelector('#beta-badge') as HTMLElement | null;
+    expect(betaBadge?.textContent).toBe('Offene Beta');
+    expect(betaBadge ? getComputedStyle(betaBadge).cursor : '').toBe('default');
   });
 
   it('should render the game pitch with feature bullets and rules link', () => {
@@ -68,11 +70,11 @@ describe('LandingPage', () => {
     }));
 
     expect(rendered).toEqual([
-      { type: 'Rumpf', name: 'Kanonenboot' },
-      { type: 'Ausrüstung', name: 'Railgun' },
+      { type: 'Rumpf', name: 'Blockadebrecher' },
+      { type: 'Ausrüstung', name: 'Plasmakanone' },
       { type: 'Infrastruktur', name: 'Fusionsreaktor' },
-      { type: 'Himmelskörper', name: 'Titan' },
-      { type: 'Taktik', name: 'Space Marines' }
+      { type: 'Himmelskörper', name: 'Ganymed' },
+      { type: 'Taktik', name: 'Verräter an Bord' }
     ]);
   });
 
@@ -85,19 +87,19 @@ describe('LandingPage', () => {
 
     firstCard?.click();
 
-    expect(cardImageSpy.openImgInModal).toHaveBeenCalledOnceWith(348, {
-      title: 'Rumpf: Kanonenboot',
-      alt: 'Spielkarte Kanonenboot (Rumpf)'
+    expect(cardImageSpy.openImgInModal).toHaveBeenCalledOnceWith(220, {
+      title: 'Rumpf: Blockadebrecher',
+      alt: 'Spielkarte Blockadebrecher (Rumpf)'
     });
   });
 
   it('should render a readable fallback inside the card frame when a showcase card image fails to load', () => {
-    component.onCardImageError(348);
+    component.onCardImageError(220);
     fixture.detectChanges();
 
     const firstCard = fixture.nativeElement.querySelector('#card-showcase button.showcase-card');
     expect(firstCard?.querySelector('.showcase-card-image')).toBeNull();
-    expect(firstCard?.querySelector('.showcase-card-fallback')?.textContent).toContain('Kanonenboot');
+    expect(firstCard?.querySelector('.showcase-card-fallback')?.textContent).toContain('Blockadebrecher');
   });
 
   it('should link the world teaser and the three lore teasers to the lore pages', () => {

@@ -37,11 +37,11 @@ export class LandingPage implements OnDestroy {
 
   /** Verified representative cards covering all five Outer Colonies card types. */
   readonly showcaseCards: readonly ShowcaseCard[] = [
-    { id: 348, type: 'Rumpf', name: 'Kanonenboot' },
-    { id: 522, type: 'Ausrüstung', name: 'Railgun' },
+    { id: 220, type: 'Rumpf', name: 'Blockadebrecher' },
+    { id: 151, type: 'Ausrüstung', name: 'Plasmakanone' },
     { id: 145, type: 'Infrastruktur', name: 'Fusionsreaktor' },
-    { id: 112, type: 'Himmelskörper', name: 'Titan' },
-    { id: 346, type: 'Taktik', name: 'Space Marines' }
+    { id: 159, type: 'Himmelskörper', name: 'Ganymed' },
+    { id: 528, type: 'Taktik', name: 'Verräter an Bord' }
   ];
 
   private readonly failedCardImages = new Set<number>();
