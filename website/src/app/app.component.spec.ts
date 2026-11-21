@@ -72,7 +72,7 @@ describe('AppComponent', () => {
     const checkBackground = () => {
       expect(getComputedStyle(stars).backgroundImage).toContain('/background/stars1.jpg');
       expect(getComputedStyle(stars).backgroundColor).toBe('rgb(0, 0, 0)');
-      expect(getComputedStyle(veil).opacity).toBe('0.4');
+      expect(getComputedStyle(veil).opacity).toBe('0.6');
     };
     checkBackground();
     Object.assign(authSpy, { isLoggedIn: true });

@@ -88,7 +88,7 @@ components:
 
 **Creative North Star: "The Flight Console"**
 
-The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 40% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.
+The website is a flight console looking out on the Solar System of 2250. It is a dark, sober instrument panel: the fixed teal `stars1.jpg` photograph under a 60% black veil (with a black fallback), and on top of it content held in teal hologram frames. Everything is lit from within, with thin luminous lines and no soft fills. The setting is hard science (physics, water, metals, the speed of light), so the interface reads as equipment, not fantasy. Decoration is limited to frames, rules and corner brackets, as if drawn by light.
 
 Edges are never plain right angles. Frames are chamfered, with diagonal cut corners and lines that look like coloured light beams. Text and images always sit inside such a frame or behind a rule. State is signalled by a shift from teal to red: the idle signal is teal, and hover, selection and active states warm to red. This is the one recurring gesture of the system, and it appears in the navbar glow, the table rows, the zone-corner brackets on inventory items and the rarity pips.
 
@@ -118,7 +118,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 - **Alert Red Bright** (#ff3535, palette A400, `--color-warn`): Warnings, errors, the Beta badge and anything that must read as text on black.
 
 ### Neutral
-- **Void Black** (#000000, `--color-dark`): The footer, overlays, the navbar start and the veil over the star photograph (40% opacity).
+- **Void Black** (#000000, `--color-dark`): The footer, overlays, the navbar start and the veil over the star photograph (60% opacity).
 - **Hologram White** (#ffffff, `--color-light`): Body text on the dark background, and card titles.
 - **Surface Dark** (#303030, `--color-surface`): The Material M2 dark-theme surface, used by default Material controls (form fields, default buttons). `--color-panel-tint` and `--color-panel-backdrop` name the translucent teal and black panel tints.
 
@@ -127,7 +127,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 
 **The Pale-for-Small-Text Rule.** Signal Teal Bright and Alert Red do not carry small text on black at WCAG AA. Body-size text on the dark background is white, Signal Teal Pale, Alert Red Pale or Alert Red Bright. Saturated teal and red are for lines, fills, large labels and icons.
 
-**The Veil Rule.** The star photograph is always under the 40% black veil. Never place content straight on the unveiled sky.
+**The Veil Rule.** The star photograph is always under the 60% black veil. Never place content straight on the unveiled sky.
 
 ## Typography
 
@@ -160,7 +160,7 @@ The spacing rhythm is loose multiples of 4: 8, 12, 15, 20, 24, 30 and 40px. `--s
 
 ## Elevation & Depth
 
-The system is flat and luminous. There are no drop shadows. Depth is built from three things: the star photograph, the 40% black veil, and translucent teal-tinted panels (content-box centre is the primary teal at 7% opacity, black at 70% transparency behind cards). Light-emitting glow, not shadow, signals focus and activity: the navbar elements use a radial gradient halo that turns from teal (30% mix) to red (50% mix) when active or hovered.
+The system is flat and luminous. There are no drop shadows. Depth is built from three things: the star photograph, the 60% black veil, and translucent teal-tinted panels (content-box centre is the primary teal at 7% opacity, black at 70% transparency behind cards). Light-emitting glow, not shadow, signals focus and activity: the navbar elements use a radial gradient halo that turns from teal (30% mix) to red (50% mix) when active or hovered.
 
 Angular Material's elevation classes are included, so default Material components (raised buttons, menus, dialogs) carry the M2 dark-theme shadow. This is inherited rather than a deliberate part of the visual language.
 
@@ -215,7 +215,7 @@ A 1px Alert Red Bright outline with Mono Caps 14px text and a 4px 12px padding, 
 - **Do** choose from the Flight-Console surface family (chamfered `panel`, fine card-corner `brackets` or `open` ruled sections) rather than wrapping every section in an identical outlined box.
 - **Do** set titles, labels and navigation in Latin Modern Mono Caps and prose in Latin Modern Sans at 18px, line-height 1.7, capped at 75ch.
 - **Do** use Signal Teal Pale (#88cccc) or white for small text on black, and keep WCAG AA contrast.
-- **Do** keep the 40% black veil under all content and keep the page flat (halo and translucent tint, no shadows).
+- **Do** keep the 60% black veil under all content and keep the page flat (halo and translucent tint, no shadows).
 - **Do** show a placeholder (the star field) when card or lore images are missing, and keep page structure intact.
 - **Do** give every interactive element a visible focus state. This is the product's accessibility default.
 
