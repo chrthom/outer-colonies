@@ -1,35 +1,108 @@
 <div id="landing-page">
   <section id="hero" [style.backgroundImage]="heroBackground">
     <span id="beta-badge" matTooltip="Outer Colonies befindet sich in der Beta-Phase">Offene Beta</span>
-    <img id="hero-logo" src="../../../../assets/logo.png" width="140" height="88" alt="" />
-    <h1 id="hero-title">Outer Colonies</h1>
-    <p id="hero-tagline">Baue deine Kolonie am Rand des Lichts.</p>
+    <h1 id="hero-title">Baue deine Kolonie am Rand des Lichts</h1>
+    <p id="hero-tagline">
+      Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts.
+    </p>
     <div id="hero-ctas">
-      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
-      <a id="hero-login" routerLink="/login">Einloggen</a>
+      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
     </div>
   </section>
 
-  <oc-content-box title="Das Spiel" class="landing-section">
-    <div class="landing-text">
-      <p>
-        Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts.
-        Keine Warp-Antriebe, keine fremden Zivilisationen, keine Wundermaschinen – nur Physik, Wasser, Metalle
-        und Lichtgeschwindigkeit. Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen, Waffen und
-        Infrastruktur zusammen, fliegst Missionen und Überfälle und führst Gefechte über bis zu vier
-        Reichweiten-Phasen.
-      </p>
-      <ul>
+  <oc-content-box title="Das Spiel" class="landing-section landing-section--wide">
+    <div class="landing-text landing-text--split">
+      <div class="landing-overview">
+        <p class="overview-lead">
+          Keine Warp-Antriebe, keine fremden Zivilisationen, keine Wundermaschinen – nur Physik, Wasser,
+          Metalle und Lichtgeschwindigkeit.
+        </p>
+        <p class="overview-copy">
+          Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen, Waffen und Infrastruktur zusammen,
+          fliegst Missionen und Überfälle und führst Gefechte über bis zu vier Reichweiten-Phasen.
+        </p>
+        <div class="overview-actions">
+          <a routerLink="/rules" class="rules-cta">
+            <span class="rules-cta-pip" aria-hidden="true"></span>
+            <span class="rules-cta-label">Spielregeln lesen</span>
+            <svg
+              class="rules-cta-arrow"
+              viewBox="0 0 20 20"
+              width="18"
+              height="18"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 10h11M11 5l5 5-5 5"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="square"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+      <ul class="landing-features">
         <li>
-          Deck aus 60–100 Karten · Rümpfe, Ausrüstung, Infrastruktur, Himmelskörper und Taktiken in vier
-          Disziplinen
+          <strong class="feature-lead">Deck aus 60–100 Karten</strong> · Rümpfe, Ausrüstung, Infrastruktur,
+          Himmelskörper und Taktiken in vier Disziplinen
         </li>
-        <li>Vier Siegesbedingungen: Vorherrschaft, Zerstörung, Erschöpfung, Kapitulation</li>
-        <li>Gegnersuche: Spiele Matches nach Standardregeln gegen die Community</li>
-        <li>Verdiene Sol durch tägliche Aufgaben, erweitere dein Inventar auf dem Markt</li>
-        <li>Verwalte dein Deck und deine Sammlung im Deck-Manager</li>
+        <li>
+          <strong class="feature-lead">Vier Siegesbedingungen:</strong> Vorherrschaft, Zerstörung,
+          Erschöpfung, Kapitulation
+        </li>
+        <li>
+          <strong class="feature-lead">Gegnersuche:</strong> Spiele Matches nach Standardregeln gegen die
+          Community
+        </li>
+        <li>
+          <strong class="feature-lead">Verdiene Sol</strong> durch tägliche Aufgaben, erweitere dein Inventar
+          auf dem Markt
+        </li>
+        <li><strong class="feature-lead">Verwalte dein Deck</strong> und deine Sammlung im Deck-Manager</li>
       </ul>
-      <a routerLink="/rules" class="more-link">Spielregeln lesen</a>
+    </div>
+
+    <div class="card-showcase-section">
+      <div class="showcase-header">
+        <h3 class="showcase-heading">Die fünf Kartentypen</h3>
+        <p class="showcase-hint">Klicke auf eine Karte, um sie in voller Größe zu prüfen.</p>
+      </div>
+      <div id="card-showcase">
+        @for (card of showcaseCards; track card.id) {
+        <button
+          type="button"
+          class="showcase-card"
+          [attr.aria-label]="card.type + ': ' + card.name + ' vergrößert anzeigen'"
+          (click)="openCardModal(card)"
+        >
+          <span class="showcase-card-frame">
+            @if (!hasCardImageError(card.id)) {
+            <img
+              class="showcase-card-image"
+              [src]="cardImageUrl(card.id)"
+              [alt]="card.type + ': ' + card.name"
+              width="411"
+              height="561"
+              loading="lazy"
+              decoding="async"
+              (error)="onCardImageError(card.id)"
+            />
+            } @else {
+            <span class="showcase-card-fallback" aria-hidden="true">
+              <span class="showcase-card-fallback-type">{{ card.type }}</span>
+              <span class="showcase-card-fallback-name">{{ card.name }}</span>
+            </span>
+            }
+          </span>
+          <span class="showcase-card-meta">
+            <span class="showcase-card-type">{{ card.type }}</span>
+            <span class="showcase-card-name">{{ card.name }}</span>
+          </span>
+        </button>
+        }
+      </div>
     </div>
   </oc-content-box>
 
@@ -39,7 +112,6 @@
         Das Sonnensystem, 2250: Vier Mächte ringen um Ordnung, Geld und Aufmerksamkeit – und am Rand des
         Lichts bauen hunderte junge Kolonien an ihrer Zukunft.
       </p>
-      <a routerLink="/world" class="more-link">Mehr über die Welt</a>
     </div>
   </oc-content-box>
 
@@ -71,7 +143,7 @@
           alt="Illustration: Ruinen einer Kolonie nach dem Kallisto-Krieg"
         />
         <p class="teaser-text">Von der Besiedlung des Mars bis zur Säuberung von Kallisto.</p>
-        <a routerLink="/history" class="more-link">Mehr zur Geschichte</a>
+        <a routerLink="/world" class="more-link">Mehr zur Welt &amp; Geschichte</a>
       </div>
     </oc-content-box>
     <oc-content-box title="Die Editionen" variant="brackets" class="teaser-card">
@@ -90,13 +162,13 @@
     </oc-content-box>
   </div>
 
-  <oc-content-box title="Baue auf." variant="open" class="landing-section">
+  <oc-content-box title="Baue auf" variant="open" class="landing-section">
     <div class="landing-text">
       <p>
         Was du nicht selbst baust, gehört dir nicht. Was du nicht verteidigst, gehört bald jemand anderem.
         Baue auf.
       </p>
-      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
+      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
     </div>
   </oc-content-box>
 </div>

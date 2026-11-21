@@ -1,5 +1,6 @@
 <div class="space"></div>
-<div class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
+<div #barElement class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
+  <canvas #energyCanvas class="energy-stream" aria-hidden="true"></canvas>
   <a class="logo" id="navbar-logo" routerLink="/" aria-label="Outer Colonies – Startseite">
     <img src="../../../assets/logo.png" alt="" width="300" height="188" />
   </a>
@@ -55,58 +56,6 @@
     </button>
   } @else {
     <div class="zone" id="navbar-anon-zone">
-      <button
-        #menuToggle
-        class="menu"
-        id="navbar-menu-toggle"
-        type="button"
-        aria-controls="navbar-anon-links"
-        [attr.aria-expanded]="menuOpen"
-        (click)="menuOpen = !menuOpen"
-      >
-        Menü
-      </button>
-      <nav
-        #menuLinks
-        class="links"
-        id="navbar-anon-links"
-        aria-label="Hauptnavigation"
-        [class.open]="menuOpen"
-      >
-        <a routerLink="/" [class.active]="active === ''" [attr.aria-current]="active === '' ? 'page' : null"
-          >Startseite</a
-        >
-        <a
-          routerLink="/world"
-          [class.active]="active === 'world'"
-          [attr.aria-current]="active === 'world' ? 'page' : null"
-          >Die Welt</a
-        >
-        <a
-          routerLink="/factions"
-          [class.active]="active === 'factions'"
-          [attr.aria-current]="active === 'factions' ? 'page' : null"
-          >Die Mächte</a
-        >
-        <a
-          routerLink="/history"
-          [class.active]="active === 'history'"
-          [attr.aria-current]="active === 'history' ? 'page' : null"
-          >Die Geschichte</a
-        >
-        <a
-          routerLink="/editions"
-          [class.active]="active === 'editions'"
-          [attr.aria-current]="active === 'editions' ? 'page' : null"
-          >Die Editionen</a
-        >
-        <a
-          routerLink="/rules"
-          [class.active]="active === 'rules'"
-          [attr.aria-current]="active === 'rules' ? 'page' : null"
-          >Spielregeln</a
-        >
-      </nav>
       <div class="actions" id="navbar-anon-actions">
         <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
         <a mat-stroked-button color="primary" routerLink="/login">Einloggen</a>

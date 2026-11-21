@@ -1,1 +1,16 @@
-<img [src]="data" />
+<div class="image-modal">
+  <div class="modal-header">
+    @if (title) {
+      <h2 class="modal-title">{{ title }}</h2>
+    }
+    <button type="button" class="modal-close" aria-label="Schließen" title="Schließen" (click)="close()">
+      <span aria-hidden="true">&times;</span>
+      <span>Schließen</span>
+    </button>
+  </div>
+  @if (!imageFailed) {
+    <img [src]="imageSrc" [alt]="imageAlt" (error)="onImageError()" />
+  } @else {
+    <p class="modal-fallback" role="status">Kartenbild konnte nicht geladen werden.</p>
+  }
+</div>

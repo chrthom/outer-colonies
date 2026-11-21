@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 #outer-box {
   position: relative;
   display: flow-root;
@@ -5,32 +7,144 @@
   margin: auto;
   margin-top: 40px;
   margin-bottom: 20px;
+
+  p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.62;
+    letter-spacing: 0.008em;
+    color: var(--color-light);
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+  }
 }
+
 .inner-box {
   margin: 10px;
   float: left;
   max-width: calc(100% - 20px);
 }
+
 #game-box {
   width: 400px;
-}
-#note-box {
-  width: 500px;
-}
-#daily-box {
-  width: 550px;
-  h3,
-  h4 {
-    display: inline;
-    margin-bottom: 15px;
+
+  .game-intro {
+    margin-bottom: 20px;
   }
 }
-#online-count {
-  margin-top: 15px;
+
+#note-box {
+  width: 500px;
+
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    overflow-wrap: break-word;
+    transition: color 140ms ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-accent-light);
+    }
+  }
 }
-.daily-done {
-  color: var(--color-accent);
+
+#daily-box {
+  width: 550px;
+
+  mat-tab-group {
+    @include mat.tabs-overrides(
+      (
+        active-indicator-color: var(--color-primary-light),
+        active-focus-indicator-color: var(--color-accent-light),
+        active-hover-indicator-color: var(--color-accent-light),
+        active-label-text-color: var(--color-primary-light),
+        active-focus-label-text-color: var(--color-accent-light),
+        active-hover-label-text-color: var(--color-accent-light),
+        inactive-label-text-color: color-mix(in srgb, var(--color-primary-light) 70%, transparent),
+        inactive-focus-label-text-color: var(--color-accent-light),
+        inactive-hover-label-text-color: var(--color-accent-light),
+        pagination-icon-color: var(--color-primary-light),
+        label-text-font: (
+          "Latin Modern Mono Caps",
+          monospace
+        ),
+        label-text-size: 16px,
+        label-text-weight: 400
+      )
+    );
+  }
+
+  h3 {
+    display: block;
+    margin: 0 0 8px;
+    font-family: "Latin Modern Mono Caps", monospace;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    color: var(--color-primary-light);
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
 }
+
+.daily-entry {
+  padding-bottom: 18px;
+
+  .daily-description {
+    margin-bottom: 14px;
+  }
+
+  .daily-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35em;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: 0.008em;
+  }
+}
+
+.daily-status-label,
+.daily-status-suffix {
+  color: color-mix(in srgb, var(--color-light) 82%, var(--color-primary-light));
+}
+
+.daily-status--done {
+  .daily-status-label,
+  .daily-status-suffix {
+    color: color-mix(in srgb, var(--color-light) 82%, var(--color-accent-light));
+  }
+}
+
+.daily-done,
 .daily-open {
-  color: var(--color-primary);
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-done {
+  color: var(--color-accent-light);
+}
+
+.daily-open {
+  color: var(--color-primary-light);
+}
+
+#outer-box #online-count {
+  margin-top: 18px;
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary-light);
 }

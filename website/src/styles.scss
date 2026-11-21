@@ -48,6 +48,11 @@
 a,
 a:visited {
   color: var(--color-primary-light);
+  text-underline-offset: 0.22em;
+}
+::selection {
+  background: color-mix(in srgb, var(--color-primary), transparent 35%);
+  color: var(--color-light);
 }
 html,
 body {
@@ -57,17 +62,18 @@ body {
 body {
   color: var(--color-light);
   font-family: "Latin Modern Sans", sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 mat-card-title,
 mat-card-subtitle {
   color: var(--color-light) !important;
-  font-family: "Latin Modern Mono Caps" !important;
+  font-family: "Latin Modern Mono Caps", monospace !important;
 }
 h1,
 h2,
 h3,
 h4 {
-  font-family: "Latin Modern Mono Caps";
+  font-family: "Latin Modern Mono Caps", monospace;
 }
 h5 {
   font-size: 1.1em;
@@ -99,10 +105,10 @@ ul {
   --mat-button-outlined-outline-color: var(--color-primary);
 }
 .primary-color {
-  color: var(--color-primary);
+  color: var(--color-primary-light);
 }
 .accent-color {
-  color: var(--color-accent);
+  color: var(--color-accent-light);
 }
 .clickable {
   cursor: pointer;
