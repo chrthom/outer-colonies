@@ -12,7 +12,7 @@
   justify-content: center;
   align-items: center;
   min-height: clamp(320px, 46vh, 480px);
-  padding: clamp(36px, 5vw, 48px) 20px;
+  padding: clamp(56px, 7vw, 68px) 24px clamp(40px, 5vw, 52px);
   border: 1px solid color-mix(in srgb, var(--color-primary), transparent 62%);
   background: var(--color-dark) center / cover;
   text-align: center;
@@ -42,23 +42,23 @@
   font: 14px "Latin Modern Mono Caps";
 }
 
-#hero-logo {
-  height: auto;
-  margin-bottom: 12px;
-}
-
 #hero-title {
   display: block;
-  font-size: clamp(32px, 5vw, 56px);
-  line-height: 1.15;
+  max-width: 22ch;
+  font-size: clamp(28px, 4.4vw, 52px);
+  line-height: 1.18;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-wrap: balance;
 }
 
 #hero-tagline {
-  margin-top: 10px;
-  font-size: 20px;
+  margin-top: 14px;
+  max-width: 58ch;
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.55;
   color: var(--color-primary-light);
+  text-wrap: pretty;
 }
 
 #hero-ctas {
@@ -66,22 +66,22 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px 24px;
+  gap: 16px 20px;
   align-items: center;
-}
-
-#hero-login {
-  font: 16px "Latin Modern Mono Caps";
-  padding: 8px 4px;
 }
 
 oc-content-box.landing-section {
   width: min(860px, 100%);
   margin: 40px auto 0;
+
+  &.landing-section--wide {
+    width: min(1240px, 100%);
+  }
 }
 
 .landing-text {
   max-width: 66ch;
+
   p,
   li {
     font-size: 18px;
@@ -89,9 +89,164 @@ oc-content-box.landing-section {
     margin-bottom: 10px;
     text-wrap: pretty;
   }
+
   ul {
     margin: 0 0 12px 20px;
   }
+}
+
+.card-showcase-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary), transparent 65%);
+}
+
+.showcase-header {
+  margin-bottom: 18px;
+}
+
+.showcase-heading {
+  font-size: 18px;
+  line-height: 1.25;
+  color: var(--color-light);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.showcase-hint {
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-primary-light);
+}
+
+#card-showcase {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.showcase-card {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+
+  &:hover,
+  &:focus-visible {
+    .showcase-card-frame {
+      background: color-mix(in srgb, var(--color-accent) 12%, rgb(0 8 10 / 45%));
+
+      &::before {
+        border-color: var(--color-accent-light);
+        filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-accent), transparent 25%));
+      }
+    }
+
+    .showcase-card-type {
+      color: var(--color-accent-light);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-light);
+    outline-offset: 4px;
+  }
+}
+
+.showcase-card-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 411 / 561;
+  padding: 6px;
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--color-primary) 5%, rgb(0 8 10 / 40%));
+  transition: background-color 140ms ease;
+
+  &::before {
+    --s: 12px;
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 1.5px solid var(--color-primary-light);
+    mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s))
+      calc(100% - var(--s));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-primary), transparent 35%));
+    transition:
+      border-color 140ms ease,
+      filter 140ms ease;
+  }
+}
+
+.showcase-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.showcase-card-fallback {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  text-align: center;
+  background: color-mix(in srgb, var(--color-dark), transparent 20%);
+  border: 1px solid color-mix(in srgb, var(--color-primary), transparent 60%);
+}
+
+.showcase-card-fallback-type {
+  font:
+    12px / 1.2 "Latin Modern Mono Caps",
+    monospace;
+  color: var(--color-primary-light);
+}
+
+.showcase-card-fallback-name {
+  font:
+    15px / 1.25 "Latin Modern Mono Caps",
+    monospace;
+  color: var(--color-light);
+}
+
+.showcase-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 4px 2px;
+}
+
+.showcase-card-type {
+  font:
+    13px / 1.2 "Latin Modern Mono Caps",
+    monospace;
+  color: var(--color-primary-light);
+  letter-spacing: 0.04em;
+  overflow-wrap: break-word;
+  transition: color 140ms ease;
+}
+
+.showcase-card-name {
+  font:
+    16px / 1.25 "Latin Modern Mono Caps",
+    monospace;
+  color: var(--color-light);
+  overflow-wrap: break-word;
 }
 
 #lore-teasers {
@@ -130,5 +285,19 @@ oc-content-box.landing-section {
   #lore-teasers {
     width: min(860px, 100%);
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1020px) {
+  #card-showcase {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  #card-showcase {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 }

@@ -1,19 +1,19 @@
 <div id="landing-page">
   <section id="hero" [style.backgroundImage]="heroBackground">
     <span id="beta-badge" matTooltip="Outer Colonies befindet sich in der Beta-Phase">Offene Beta</span>
-    <img id="hero-logo" src="../../../../assets/logo.png" width="140" height="88" alt="" />
-    <h1 id="hero-title">Outer Colonies</h1>
-    <p id="hero-tagline">Baue deine Kolonie am Rand des Lichts.</p>
+    <h1 id="hero-title">Baue deine Kolonie am Rand des Lichts.</h1>
+    <p id="hero-tagline">
+      Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts.
+    </p>
     <div id="hero-ctas">
-      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
-      <a id="hero-login" routerLink="/login">Einloggen</a>
+      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
+      <a mat-stroked-button color="primary" routerLink="/login">Einloggen</a>
     </div>
   </section>
 
-  <oc-content-box title="Das Spiel" class="landing-section">
+  <oc-content-box title="Das Spiel" class="landing-section landing-section--wide">
     <div class="landing-text">
       <p>
-        Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts.
         Keine Warp-Antriebe, keine fremden Zivilisationen, keine Wundermaschinen – nur Physik, Wasser, Metalle
         und Lichtgeschwindigkeit. Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen, Waffen und
         Infrastruktur zusammen, fliegst Missionen und Überfälle und führst Gefechte über bis zu vier
@@ -30,6 +30,47 @@
         <li>Verwalte dein Deck und deine Sammlung im Deck-Manager</li>
       </ul>
       <a routerLink="/rules" class="more-link">Spielregeln lesen</a>
+    </div>
+
+    <div class="card-showcase-section">
+      <div class="showcase-header">
+        <h3 class="showcase-heading">Die fünf Kartentypen</h3>
+        <p class="showcase-hint">Klicke auf eine Karte, um sie in voller Größe zu prüfen.</p>
+      </div>
+      <div id="card-showcase">
+        @for (card of showcaseCards; track card.id) {
+        <button
+          type="button"
+          class="showcase-card"
+          [attr.aria-label]="card.type + ': ' + card.name + ' vergrößert anzeigen'"
+          (click)="openCardModal(card)"
+        >
+          <span class="showcase-card-frame">
+            @if (!hasCardImageError(card.id)) {
+            <img
+              class="showcase-card-image"
+              [src]="cardImageUrl(card.id)"
+              [alt]="card.type + ': ' + card.name"
+              width="411"
+              height="561"
+              loading="lazy"
+              decoding="async"
+              (error)="onCardImageError(card.id)"
+            />
+            } @else {
+            <span class="showcase-card-fallback" aria-hidden="true">
+              <span class="showcase-card-fallback-type">{{ card.type }}</span>
+              <span class="showcase-card-fallback-name">{{ card.name }}</span>
+            </span>
+            }
+          </span>
+          <span class="showcase-card-meta">
+            <span class="showcase-card-type">{{ card.type }}</span>
+            <span class="showcase-card-name">{{ card.name }}</span>
+          </span>
+        </button>
+        }
+      </div>
     </div>
   </oc-content-box>
 
@@ -96,7 +137,7 @@
         Was du nicht selbst baust, gehört dir nicht. Was du nicht verteidigst, gehört bald jemand anderem.
         Baue auf.
       </p>
-      <a mat-raised-button color="primary" routerLink="/register">Jetzt mitspielen</a>
+      <a mat-raised-button color="primary" routerLink="/register">Registrieren</a>
     </div>
   </oc-content-box>
 </div>

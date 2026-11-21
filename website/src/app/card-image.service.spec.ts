@@ -39,5 +39,23 @@ describe('CardImageService', () => {
     const config = dialogSpy.open.calls.mostRecent().args[1];
     expect(config?.data).toBe('https://assets.outercolonies.de/cards/101.png');
     expect(config?.maxHeight).toBe('95vh');
+    expect(config?.restoreFocus).toBeTrue();
+  });
+
+  it('openImgInModal passes structured metadata and ariaLabel when meta is provided', () => {
+    service.openImgInModal(348, {
+      title: 'Rumpf: Kanonenboot',
+      alt: 'Spielkarte Kanonenboot (Rumpf)'
+    });
+
+    expect(dialogSpy.open).toHaveBeenCalledTimes(1);
+    const config = dialogSpy.open.calls.mostRecent().args[1];
+    expect(config?.data).toEqual({
+      src: 'https://assets.outercolonies.de/cards/348.png',
+      title: 'Rumpf: Kanonenboot',
+      alt: 'Spielkarte Kanonenboot (Rumpf)'
+    });
+    expect(config?.ariaLabel).toBe('Rumpf: Kanonenboot');
+    expect(config?.restoreFocus).toBeTrue();
   });
 });

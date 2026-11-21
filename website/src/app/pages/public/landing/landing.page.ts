@@ -4,11 +4,22 @@ import { Meta } from '@angular/platform-browser';
 import { MatAnchor } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { environment } from 'src/environments/environment';
+import { CardImageService } from '../../../card-image.service';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 
 /**
+ * Representative game card rendered in the landing page card showcase.
+ */
+export interface ShowcaseCard {
+  id: number;
+  type: string;
+  name: string;
+}
+
+/**
  * Public landing page for anonymous visitors (authenticated visitors are redirected to /home by the root guard).
- * Hero with tagline and CTAs, game pitch, world teaser, lore teasers and a closing CTA.
+ * Hero with mission headline and CTAs, game pitch with interactive 5-type card showcase,
+ * world teaser, lore teasers and a closing CTA.
  */
 @Component({
   selector: 'oc-page-landing',
@@ -18,10 +29,22 @@ import { ContentBoxComponent } from '../../../components/content-box/content-box
 })
 export class LandingPage implements OnDestroy {
   private meta = inject(Meta);
+  private cardImage = inject(CardImageService);
 
   private readonly description =
     'Outer Colonies ist ein browserbasiertes Online-Sammelkartenspiel im Sonnensystem des 23. Jahrhunderts. ' +
     'Baue deine Kolonie am Rand des Lichts.';
+
+  /** Verified representative cards covering all five Outer Colonies card types. */
+  readonly showcaseCards: readonly ShowcaseCard[] = [
+    { id: 348, type: 'Rumpf', name: 'Kanonenboot' },
+    { id: 522, type: 'Ausrüstung', name: 'Railgun' },
+    { id: 145, type: 'Infrastruktur', name: 'Fusionsreaktor' },
+    { id: 112, type: 'Himmelskörper', name: 'Titan' },
+    { id: 346, type: 'Taktik', name: 'Space Marines' }
+  ];
+
+  private readonly failedCardImages = new Set<number>();
 
   constructor() {
     this.meta.updateTag({ name: 'description', content: this.description });
@@ -41,17 +64,53 @@ export class LandingPage implements OnDestroy {
     this.meta.removeTag('property="og:image"');
   }
 
-  /** Hero background: gradient overlay on top of the hero artwork (star field as long as the artwork is pending). */
+  /** Hero background: dark-teal gradient veil over the hero artwork and matching teal star-field fallback. */
   get heroBackground(): string {
     return (
-      'linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(5, 24, 24, 0.55) 55%, rgba(0, 0, 0, 0.45) 100%), ' +
+      'linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(5, 24, 24, 0.62) 55%, rgba(0, 0, 0, 0.5) 100%), ' +
       `url("${this.heroArtworkUrl}"), ` +
-      `url("${environment.url.assets}/background/stars4.jpg")`
+      `url("${environment.url.assets}/background/stars1.jpg")`
     );
   }
 
   private get heroArtworkUrl(): string {
     return `${environment.url.assets}/website/hero.jpg`;
+  }
+
+  /**
+   * Builds the card image URL for a representative showcase card.
+   * @param cardId The card ID
+   * @returns The card image asset URL
+   */
+  cardImageUrl(cardId: number): string {
+    return this.cardImage.cardIdToUrl(cardId);
+  }
+
+  /**
+   * Opens a representative showcase card in the accessible full-size image modal.
+   * @param card The selected representative card
+   */
+  openCardModal(card: ShowcaseCard): void {
+    this.cardImage.openImgInModal(card.id, {
+      title: `${card.type}: ${card.name}`,
+      alt: `Spielkarte ${card.name} (${card.type})`
+    });
+  }
+
+  /**
+   * Records a failed card thumbnail load so the tile renders its labeled fallback without collapsing.
+   * @param cardId The card ID whose image failed to load
+   */
+  onCardImageError(cardId: number): void {
+    this.failedCardImages.add(cardId);
+  }
+
+  /**
+   * Returns whether a showcase card thumbnail failed to load.
+   * @param cardId The card ID to check
+   */
+  hasCardImageError(cardId: number): boolean {
+    return this.failedCardImages.has(cardId);
   }
 
   /**

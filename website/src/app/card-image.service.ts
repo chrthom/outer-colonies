@@ -1,7 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
+import { ImageModalComponent, ImageModalData } from 'src/app/components/image-modal/image-modal.component';
 import { environment } from 'src/environments/environment';
+
+/**
+ * Optional metadata passed to {@link CardImageService.openImgInModal} for
+ * accessible dialog labeling, image alt text and modal title display.
+ */
+export interface CardImageModalMeta {
+  title?: string;
+  alt?: string;
+}
 
 /**
  * Service for building card-related asset URLs and opening card images in a modal.
@@ -44,11 +53,16 @@ export class CardImageService {
   /**
    * Open the image of a card in a modal dialog.
    * @param cardId The card ID whose image is shown
+   * @param meta Optional accessible title and alt text for the dialog
    */
-  openImgInModal(cardId: number): void {
+  openImgInModal(cardId: number, meta?: CardImageModalMeta): void {
+    const src = this.cardIdToUrl(cardId);
+    const data: string | ImageModalData = meta ? { src, title: meta.title, alt: meta.alt } : src;
     this.dialog.open(ImageModalComponent, {
-      data: this.cardIdToUrl(cardId),
-      maxHeight: '95vh'
+      data,
+      maxHeight: '95vh',
+      restoreFocus: true,
+      ...(meta ? { ariaLabel: meta.title ?? meta.alt ?? 'Kartenansicht' } : {})
     });
   }
 }
