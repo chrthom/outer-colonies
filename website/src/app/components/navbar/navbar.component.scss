@@ -50,17 +50,46 @@
   position: absolute;
   z-index: 1;
   top: 0;
+  bottom: 0;
   right: 20px;
-  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile,
+.logout {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 60px;
   padding: 5px 15px;
 }
-h2.right {
-  right: 100px;
-  padding-top: 13px;
+.profile {
+  gap: 12px;
+  color: var(--color-primary-light);
+  text-decoration: none;
+
+  &:hover,
+  &.active {
+    color: var(--color-accent-light);
+  }
+}
+.user-name {
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1.2;
   max-width: clamp(120px, (100vw - 1000px) / 2, 300px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &:empty {
+    display: none;
+  }
+}
+.logout {
+  justify-content: center;
 }
 .logo {
   position: absolute;

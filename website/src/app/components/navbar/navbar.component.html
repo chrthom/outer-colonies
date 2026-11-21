@@ -41,19 +41,27 @@
     >
       <img src="../../../assets/icons/trade.png" alt="" />
     </a>
-    <a
-      class="item center"
-      matTooltip="Verwalte dein Profil"
-      aria-label="Verwalte dein Profil"
-      [class.active]="active === 'profile'"
-      routerLink="/profile"
-    >
-      <img src="../../../assets/icons/profile.png" alt="" />
-    </a>
-    <h2 class="user-name right" [title]="username">{{ username }}</h2>
-    <button type="button" class="item right" matTooltip="Abmelden" aria-label="Abmelden" (click)="logout()">
-      <img src="../../../assets/icons/logout.png" alt="" />
-    </button>
+    <div class="right">
+      <a
+        class="item profile"
+        matTooltip="Verwalte dein Profil"
+        [attr.aria-label]="username ? username + ' – Profil verwalten' : 'Verwalte dein Profil'"
+        [class.active]="active === 'profile'"
+        routerLink="/profile"
+      >
+        <span class="user-name">{{ username }}</span>
+        <img src="../../../assets/icons/profile.png" alt="" />
+      </a>
+      <button
+        type="button"
+        class="item logout"
+        matTooltip="Abmelden"
+        aria-label="Abmelden"
+        (click)="logout()"
+      >
+        <img src="../../../assets/icons/logout.png" alt="" />
+      </button>
+    </div>
   } @else {
     <div class="zone" id="navbar-anon-zone">
       <div class="actions" id="navbar-anon-actions">

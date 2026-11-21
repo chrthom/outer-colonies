@@ -27,6 +27,12 @@
       padding: 0;
     }
 
+    .right {
+      position: static;
+      flex-shrink: 0;
+      gap: 0;
+    }
+
     .user-name {
       position: absolute;
       width: 1px;
@@ -37,12 +43,13 @@
       white-space: nowrap;
     }
 
-    button.right {
-      position: static;
-      flex-shrink: 0;
+    .profile,
+    .logout {
       min-width: 44px;
       height: 44px;
       padding: 0;
+      gap: 0;
+      justify-content: center;
     }
   }
 }

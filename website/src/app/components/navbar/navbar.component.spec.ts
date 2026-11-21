@@ -24,7 +24,8 @@ describe('NavbarComponent', () => {
         RouterTestingModule.withRoutes([
           { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
-          { path: 'rules', component: TestPageComponent }
+          { path: 'rules', component: TestPageComponent },
+          { path: 'profile', component: TestPageComponent }
         ]),
         MatTooltipModule
       ],
@@ -65,8 +66,21 @@ describe('NavbarComponent', () => {
   it('should render the icon navbar for logged-in users', () => {
     const element = fixture.nativeElement;
     const iconElements = element.querySelectorAll('.item.center');
-    expect(iconElements.length).toBe(5);
-    expect(element.querySelector('.user-name')?.textContent).toBe('testuser');
+    expect(iconElements.length).toBe(4);
+    expect(
+      Array.from<Element>(iconElements).every(link => link.getAttribute('href') !== '/profile')
+    ).toBeTrue();
+
+    const rightZone = element.querySelector('.right');
+    expect(rightZone).toBeTruthy();
+
+    const profileLink = rightZone.querySelector('a.item.profile');
+    expect(profileLink).toBeTruthy();
+    expect(profileLink.getAttribute('href')).toBe('/profile');
+    expect(profileLink.getAttribute('aria-label')).toBe('testuser – Profil verwalten');
+    expect(profileLink.querySelector('.user-name')?.textContent).toBe('testuser');
+    expect(profileLink.querySelector('img')?.getAttribute('src')).toContain('assets/icons/profile.png');
+
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
     expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
@@ -76,11 +90,42 @@ describe('NavbarComponent', () => {
     expect(
       Array.from<Element>(iconElements).every(link => link.tagName === 'A' && link.hasAttribute('aria-label'))
     ).toBeTrue();
-    const logout = element.querySelector('button[aria-label="Abmelden"]');
+    const logout = rightZone.querySelector('button.logout[aria-label="Abmelden"]');
     expect(logout.type).toBe('button');
     logout.click();
     expect(authSpy.logout).toHaveBeenCalled();
     expect(element.querySelector('img:not([alt=""])')).toBeNull();
+  });
+
+  it('navigates to /profile when clicking either the username or profile icon and marks it active', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const profileLink = element.querySelector('.right a.item.profile') as HTMLAnchorElement;
+    const usernameEl = profileLink.querySelector('.user-name') as HTMLElement;
+    const profileIcon = profileLink.querySelector('img') as HTMLImageElement;
+
+    usernameEl.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/profile');
+    expect(profileLink.classList.contains('active')).toBeTrue();
+
+    await router.navigateByUrl('/rules');
+    fixture.detectChanges();
+    expect(profileLink.classList.contains('active')).toBeFalse();
+
+    profileIcon.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/profile');
+    expect(profileLink.classList.contains('active')).toBeTrue();
+  });
+
+  it('uses fallback aria-label on the profile link when username is unavailable', () => {
+    Object.defineProperty(authSpy, 'displayname', { get: () => undefined });
+    fixture.detectChanges();
+
+    const profileLink = fixture.nativeElement.querySelector('.right a.item.profile');
+    expect(profileLink.getAttribute('aria-label')).toBe('Verwalte dein Profil');
   });
 
   it('should render only the logo and auth actions without navigation links for anonymous users', () => {
