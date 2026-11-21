@@ -24,12 +24,21 @@ export class CardImageService {
   private readonly assetsUrl = environment.url.assets;
 
   /**
-   * Get the image URL of a card.
+   * Get the thumbnail image URL of a card.
    * @param cardId The card ID
-   * @returns The URL of the card image
+   * @returns The URL of the card thumbnail image
    */
   cardIdToUrl(cardId: number): string {
     return `${this.assetsUrl}/cards/${cardId}.png`;
+  }
+
+  /**
+   * Get the full-resolution image URL of a card.
+   * @param cardId The card ID
+   * @returns The URL of the full-resolution card image
+   */
+  cardIdToFullUrl(cardId: number): string {
+    return `${this.assetsUrl}/cards_full/${cardId}.png`;
   }
 
   /**
@@ -56,7 +65,7 @@ export class CardImageService {
    * @param meta Optional accessible title and alt text for the dialog
    */
   openImgInModal(cardId: number, meta?: CardImageModalMeta): void {
-    const src = this.cardIdToUrl(cardId);
+    const src = this.cardIdToFullUrl(cardId);
     const data: string | ImageModalData = meta ? { src, title: meta.title, alt: meta.alt } : src;
     this.dialog.open(ImageModalComponent, {
       data,
