@@ -19,7 +19,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: color-mix(in srgb, var(--color-primary) 9%, rgb(0 8 10 / 34%));
+  background: var(--oc-box-bg, color-mix(in srgb, var(--color-primary) 9%, rgb(0 8 10 / 34%)));
+  filter: var(--oc-box-glow, none);
   clip-path: polygon(
     var(--c) 0,
     calc(100% - var(--c)) 0,
@@ -35,7 +36,10 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: color-mix(in srgb, var(--color-primary-light), var(--color-primary) 62%);
+    background: var(
+      --oc-box-stroke,
+      color-mix(in srgb, var(--color-primary-light), var(--color-primary) 62%)
+    );
     clip-path: polygon(
       evenodd,
       0 0,
@@ -96,7 +100,7 @@
     position: absolute;
     left: 0;
     bottom: -1px;
-    width: min(48px, 35%);
+    width: var(--oc-box-beam-width, min(48px, 35%));
     height: 2px;
     background: var(--color-primary-light);
   }
@@ -104,7 +108,7 @@
   > h2 {
     display: block;
     margin: 0;
-    font-size: clamp(22px, 2.2vw, 26px);
+    font-size: var(--oc-box-title-size, clamp(22px, 2.2vw, 26px));
     font-weight: 400;
     line-height: 1.25;
     letter-spacing: 0.04em;
@@ -139,7 +143,7 @@
     padding-bottom: 8px;
 
     > h2 {
-      font-size: 20px;
+      font-size: var(--oc-box-title-size-mobile, 20px);
     }
   }
 }

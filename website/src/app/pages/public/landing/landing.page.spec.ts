@@ -49,13 +49,17 @@ describe('LandingPage', () => {
     expect(betaBadge ? getComputedStyle(betaBadge).cursor : '').toBe('default');
   });
 
-  it('should render the game pitch with feature bullets and rules link', () => {
+  it('should render the game pitch with lead statement, feature bullets and emphasized rules CTA', () => {
     const element: HTMLElement = fixture.nativeElement;
     expect(element.textContent).toContain('Online-Sammelkartenspiel');
+    expect(element.querySelector('oc-content-box[title="Das Spiel"] .overview-lead')?.textContent).toContain(
+      'Keine Warp-Antriebe'
+    );
     const bullets = element.querySelectorAll('.landing-text ul li');
     expect(bullets.length).toBe(5);
     const rules = element.querySelector('oc-content-box[title="Das Spiel"] a[routerLink="/rules"]');
     expect(rules?.getAttribute('href')).toBe('/rules');
+    expect(rules?.classList.contains('rules-cta')).toBeTrue();
     expect(rules?.textContent).toContain('Spielregeln lesen');
   });
 

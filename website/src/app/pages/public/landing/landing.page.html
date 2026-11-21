@@ -13,13 +13,35 @@
   <oc-content-box title="Das Spiel" class="landing-section landing-section--wide">
     <div class="landing-text landing-text--split">
       <div class="landing-overview">
-        <p>
+        <p class="overview-lead">
           Keine Warp-Antriebe, keine fremden Zivilisationen, keine Wundermaschinen – nur Physik, Wasser,
-          Metalle und Lichtgeschwindigkeit. Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen,
-          Waffen und Infrastruktur zusammen, fliegst Missionen und Überfälle und führst Gefechte über bis zu
-          vier Reichweiten-Phasen.
+          Metalle und Lichtgeschwindigkeit.
         </p>
-        <a routerLink="/rules" class="more-link">Spielregeln lesen</a>
+        <p class="overview-copy">
+          Du übernimmst eine junge Kolonie: stellst dein Deck aus Rümpfen, Waffen und Infrastruktur zusammen,
+          fliegst Missionen und Überfälle und führst Gefechte über bis zu vier Reichweiten-Phasen.
+        </p>
+        <div class="overview-actions">
+          <a routerLink="/rules" class="rules-cta">
+            <span class="rules-cta-pip" aria-hidden="true"></span>
+            <span class="rules-cta-label">Spielregeln lesen</span>
+            <svg
+              class="rules-cta-arrow"
+              viewBox="0 0 20 20"
+              width="18"
+              height="18"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 10h11M11 5l5 5-5 5"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="square"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
       <ul class="landing-features">
         <li>
