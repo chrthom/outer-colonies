@@ -1,0 +1,128 @@
+// Use a same-origin copy of utils/card_mask.png because CSS mask-image enforces CORS and assets.* omits CORS headers.
+.oc-card-mask {
+  -webkit-mask: url("../assets/card_mask.png") center / 100% 100% no-repeat;
+  mask: url("../assets/card_mask.png") center / 100% 100% no-repeat alpha;
+}
+
+.console-button {
+  --c: 7px;
+  --i: calc(var(--c) + 0.62px);
+  position: relative;
+  isolation: isolate;
+  min-height: 44px;
+  padding: 8px 20px;
+  background: transparent;
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: background-color 140ms ease;
+  }
+
+  &::before {
+    z-index: -2;
+    background: transparent;
+    clip-path: polygon(
+      var(--c) 0,
+      calc(100% - var(--c)) 0,
+      100% var(--c),
+      100% calc(100% - var(--c)),
+      calc(100% - var(--c)) 100%,
+      var(--c) 100%,
+      0 calc(100% - var(--c)),
+      0 var(--c)
+    );
+  }
+
+  &--primary {
+    color: var(--color-light);
+
+    &::before {
+      background: var(--color-primary-dark);
+    }
+
+    &.is-climax::before {
+      background: var(--color-accent);
+    }
+
+    &:hover:not(:disabled)::before,
+    &:focus-visible:not(:disabled)::before {
+      background: var(--color-accent);
+    }
+  }
+
+  &--secondary,
+  &--close {
+    color: var(--color-primary-light);
+
+    &::before {
+      background: color-mix(in srgb, var(--color-dark) 80%, var(--color-primary));
+    }
+
+    // Draw the chamfered border without clipping the button box itself so right/bottom edges are never cropped.
+    &::after {
+      z-index: -1;
+      background: color-mix(in srgb, var(--color-primary-light), transparent 35%);
+      clip-path: polygon(
+        evenodd,
+        0 0,
+        100% 0,
+        100% 100%,
+        0 100%,
+        0 0,
+        var(--i) 1.5px,
+        1.5px var(--i),
+        1.5px calc(100% - var(--i)),
+        var(--i) calc(100% - 1.5px),
+        calc(100% - var(--i)) calc(100% - 1.5px),
+        calc(100% - 1.5px) calc(100% - var(--i)),
+        calc(100% - 1.5px) var(--i),
+        calc(100% - var(--i)) 1.5px,
+        var(--i) 1.5px
+      );
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      color: var(--color-accent-light);
+
+      &::before {
+        background: color-mix(in srgb, var(--color-accent) 32%, var(--color-dark));
+      }
+
+      &::after {
+        background: var(--color-accent-light);
+      }
+    }
+  }
+
+  &--ghost {
+    padding-inline: 12px;
+    color: var(--color-primary-light);
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      color: var(--color-accent-light);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-light);
+    outline-offset: 2px;
+  }
+}
