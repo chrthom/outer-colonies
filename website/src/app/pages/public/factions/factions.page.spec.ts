@@ -45,9 +45,13 @@ describe('FactionsPage', () => {
     expect(houses).toEqual(['Tharsis', 'Elysium', 'Hellas', 'Arcadia', 'Isidis']);
   });
 
-  it('should render a link back to the landing page', () => {
-    const back = fixture.nativeElement.querySelector('.lore-back-nav a[routerLink="/"]');
-    expect(back?.textContent).toContain('Zurück zur Startseite');
+  it('should render links back to the landing page at top and bottom', () => {
+    const links = Array.from<Element>(
+      fixture.nativeElement.querySelectorAll('.lore-back-nav a[routerLink="/"]')
+    );
+    expect(links.length).toBe(2);
+    expect(links.every(link => link.textContent?.includes('Zurück zur Startseite'))).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.lore-back-nav--bottom a[routerLink="/"]')).toBeTruthy();
   });
 
   it('should reuse the four canon quotes with Layla Chen on Venus', () => {
