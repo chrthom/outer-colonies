@@ -46,6 +46,12 @@ export class LandingPage implements OnDestroy {
 
   private readonly failedCardImages = new Set<number>();
 
+  private readonly teaserImages: Record<string, string> = {
+    maechte: 'martian_fleet.jpg',
+    geschichte: 'kallisto_aftermath.jpg',
+    editionen: 'free_traders.jpg'
+  };
+
   constructor() {
     this.meta.updateTag({ name: 'description', content: this.description });
     this.meta.updateTag({ property: 'og:title', content: 'Outer Colonies – Das Online-Sammelkartenspiel' });
@@ -74,7 +80,7 @@ export class LandingPage implements OnDestroy {
   }
 
   private get heroArtworkUrl(): string {
-    return `${environment.url.assets}/website/hero.jpg`;
+    return `${environment.url.assets}/stock_photos/rand_des_lichts.jpg`;
   }
 
   /**
@@ -114,11 +120,12 @@ export class LandingPage implements OnDestroy {
   }
 
   /**
-   * URL of a lore teaser artwork; the final assets are human work and uploaded to the assets server.
+   * URL of a lore teaser artwork hosted on the assets server.
    * @param name Teaser identifier, e.g. 'maechte', 'geschichte' or 'editionen'
    */
   teaserUrl(name: string): string {
-    return `${environment.url.assets}/website/teaser-${name}.jpg`;
+    const file = this.teaserImages[name] ?? `teaser-${name}.jpg`;
+    return `${environment.url.assets}/stock_photos/${file}`;
   }
 
   /**

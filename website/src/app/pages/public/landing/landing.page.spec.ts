@@ -146,7 +146,9 @@ describe('LandingPage', () => {
     expect(meta.getTag('property="og:description"')?.content).toContain(
       'Baue deine Kolonie am Rand des Lichts.'
     );
-    expect(meta.getTag('property="og:image"')?.content).toBe(`${environment.url.assets}/website/hero.jpg`);
+    expect(meta.getTag('property="og:image"')?.content).toBe(
+      `${environment.url.assets}/stock_photos/rand_des_lichts.jpg`
+    );
   });
 
   it('should remove the meta tags again on destroy', () => {
@@ -161,12 +163,20 @@ describe('LandingPage', () => {
   it('should compose the hero background from gradient, artwork and teal star field fallback', () => {
     const background = component.heroBackground;
     expect(background).toContain('linear-gradient(to top');
-    expect(background).toContain(`${environment.url.assets}/website/hero.jpg`);
+    expect(background).toContain(`${environment.url.assets}/stock_photos/rand_des_lichts.jpg`);
     expect(background).toContain(`${environment.url.assets}/background/stars1.jpg`);
   });
 
+  it('should map lore teaser names to their stock photo URLs', () => {
+    expect(component.teaserUrl('maechte')).toBe(`${environment.url.assets}/stock_photos/martian_fleet.jpg`);
+    expect(component.teaserUrl('geschichte')).toBe(
+      `${environment.url.assets}/stock_photos/kallisto_aftermath.jpg`
+    );
+    expect(component.teaserUrl('editionen')).toBe(`${environment.url.assets}/stock_photos/free_traders.jpg`);
+  });
+
   it('should fall back to a star background when a teaser artwork is missing', () => {
-    const image = { src: `${environment.url.assets}/website/teaser-maechte.jpg` };
+    const image = { src: `${environment.url.assets}/stock_photos/martian_fleet.jpg` };
     component.showPlaceholder({ target: image } as unknown as Event, 'stars1');
     expect(image.src).toBe(`${environment.url.assets}/background/stars1.jpg`);
     // A failing placeholder must not trigger an endless error loop:
