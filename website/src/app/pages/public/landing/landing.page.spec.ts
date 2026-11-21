@@ -102,14 +102,14 @@ describe('LandingPage', () => {
     expect(firstCard?.querySelector('.showcase-card-fallback')?.textContent).toContain('Blockadebrecher');
   });
 
-  it('should link the world teaser and the three lore teasers to the lore pages', () => {
+  it('should link the three lore teasers to the lore pages without a duplicate world link', () => {
     const element: HTMLElement = fixture.nativeElement;
-    expect(element.querySelector('a[routerLink="/world"]')?.textContent).toContain('Mehr über die Welt');
+    expect(element.querySelector('oc-content-box[title="Die Welt"] a[routerLink="/world"]')).toBeNull();
     expect(element.querySelector('.teaser-card a[routerLink="/factions"]')?.textContent).toBe(
       'Mehr über die Mächte'
     );
-    expect(element.querySelector('.teaser-card a[routerLink="/history"]')?.textContent).toBe(
-      'Mehr zur Geschichte'
+    expect(element.querySelector('.teaser-card a[routerLink="/world"]')?.textContent).toBe(
+      'Mehr zur Welt & Geschichte'
     );
     expect(element.querySelector('.teaser-card a[routerLink="/editions"]')?.textContent).toBe(
       'Mehr zu den Editionen'

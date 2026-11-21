@@ -24,13 +24,12 @@ describe('NavbarComponent', () => {
         RouterTestingModule.withRoutes([
           { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
-          { path: 'factions', component: TestPageComponent },
-          { path: 'rules', component: TestPageComponent },
           {
-            path: 'history',
+            path: 'factions',
             component: TestPageComponent,
             canActivate: [() => TestBed.inject(Router).parseUrl('/world')]
           },
+          { path: 'rules', component: TestPageComponent },
           { path: 'editions', component: TestPageComponent, canActivate: [() => false] }
         ]),
         MatTooltipModule
@@ -179,10 +178,10 @@ describe('NavbarComponent', () => {
     toggle.click();
     fixture.detectChanges();
     (
-      fixture.nativeElement.querySelector('#navbar-anon-links a[href="/history"]') as HTMLAnchorElement
+      fixture.nativeElement.querySelector('#navbar-anon-links a[href="/factions"]') as HTMLAnchorElement
     ).focus();
 
-    await router.navigateByUrl('/history');
+    await router.navigateByUrl('/factions');
     fixture.detectChanges();
     expect(router.url).toBe('/world');
     expect(onMenuNavigation).toHaveBeenCalledTimes(1);
@@ -247,7 +246,6 @@ describe('NavbarComponent', () => {
       '/',
       '/world',
       '/factions',
-      '/history',
       '/editions',
       '/rules'
     ]);
@@ -255,7 +253,6 @@ describe('NavbarComponent', () => {
       'Startseite',
       'Die Welt',
       'Die Mächte',
-      'Die Geschichte',
       'Die Editionen',
       'Spielregeln'
     ]);

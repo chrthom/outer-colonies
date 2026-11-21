@@ -115,7 +115,6 @@ describe('AppComponent', () => {
     expect(footer).toBeTruthy();
     expect(footer.textContent).not.toContain('Die Welt');
     expect(footer.textContent).not.toContain('Die Mächte');
-    expect(footer.textContent).not.toContain('Die Geschichte');
     expect(footer.textContent).not.toContain('Die Editionen');
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');
@@ -128,7 +127,6 @@ describe('AppComponent', () => {
     const footer = fixture.nativeElement.querySelector('#footer');
     expect(footer.textContent).toContain('Die Welt');
     expect(footer.textContent).toContain('Die Mächte');
-    expect(footer.textContent).toContain('Die Geschichte');
     expect(footer.textContent).toContain('Die Editionen');
     expect(footer.textContent).toContain('Impressum');
     expect(footer.textContent).toContain('Datenschutz');

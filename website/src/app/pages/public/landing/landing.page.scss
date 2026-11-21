@@ -95,6 +95,10 @@ oc-content-box.landing-section {
     letter-spacing: 0.008em;
     margin: 0 0 16px;
     text-wrap: pretty;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .more-link {

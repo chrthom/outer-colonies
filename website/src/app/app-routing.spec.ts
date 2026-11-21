@@ -80,7 +80,6 @@ describe('app routes (public landing and lore pages)', () => {
     const loreRoutes: [string, string, string][] = [
       ['world', 'oc-page-world', 'Outer Colonies – Die Welt'],
       ['factions', 'oc-page-factions', 'Outer Colonies – Die Mächte'],
-      ['history', 'oc-page-history', 'Outer Colonies – Die Geschichte'],
       ['editions', 'oc-page-editions', 'Outer Colonies – Die Editionen']
     ];
     for (const [path, selector, pageTitle] of loreRoutes) {
