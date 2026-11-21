@@ -5,7 +5,8 @@
     [class.is-reduced-motion]="reducedMotion"
     role="dialog"
     aria-modal="true"
-    [attr.aria-label]="phaseTitle"
+    aria-label="Spielstart – Transferbahn"
+    aria-describedby="departure-status-desc"
     tabindex="-1"
   >
     <canvas #transitCanvas class="departure-canvas" aria-hidden="true"></canvas>
@@ -45,7 +46,7 @@
           <circle [attr.cx]="vesselPoint.x" [attr.cy]="vesselPoint.y" r="3.5" class="transfer-vessel" />
         </svg>
 
-        <p class="departure-status">
+        <p id="departure-status-desc" class="departure-status">
           Schubzündung eingeleitet – Verbindung zur Gegnersuche wird hergestellt.
         </p>
 

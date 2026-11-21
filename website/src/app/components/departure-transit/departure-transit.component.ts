@@ -16,6 +16,7 @@ import {
   inject
 } from '@angular/core';
 import { ContentBoxComponent } from '../content-box/content-box.component';
+import { createSeededRandom } from 'src/app/starfield-background';
 
 /** Total duration of the planetary transfer burn sequence in normal motion (ms). */
 export const DEPARTURE_DURATION_MS = 1840;
@@ -37,17 +38,6 @@ interface TransitStar {
   size: number;
   alpha: number;
   rgb: string;
-}
-
-/** Seeded PRNG so the transit starfield stays deterministic across launches and tests. */
-function createSeededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /**
@@ -88,6 +78,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private startTimestamp = 0;
   private completed = false;
+  private aborted = false;
   private destroyed = false;
   private width = 0;
   private height = 0;
@@ -119,7 +110,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   get vesselPoint(): { x: number; y: number } {
     const t = this.reducedMotion ? 0.72 : Math.min(1, Math.max(0, this.progress / 0.82));
     const u = 1 - t;
-    // Quadratic Bezier from (44, 66) through control (142, 10) to (236, 26)
+    // Control points must match SVG path `M 44 66 Q 142 10 236 26` in the template.
     const x = u * u * 44 + 2 * u * t * 142 + t * t * 236;
     const y = u * u * 66 + 2 * u * t * 10 + t * t * 26;
     return { x, y };
@@ -157,7 +148,10 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
       return;
     }
     if (event.key === 'Escape') {
-      event.preventDefault();
+      // Once complete has emitted, allow the browser's native Escape stop-loading behavior too.
+      if (!this.completed) {
+        event.preventDefault();
+      }
       this.abort();
       return;
     }
@@ -167,11 +161,12 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
     }
   }
 
-  /** Aborts the departure before hop-off and notifies the parent page. */
+  /** Aborts or dismisses the departure overlay and notifies the parent page. */
   abort(): void {
-    if (!this.active || this.completed) {
+    if (!this.active || this.aborted) {
       return;
     }
+    this.aborted = true;
     this.teardownSequence();
     this.cancelled.emit();
   }
@@ -179,6 +174,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   private startSequence(): void {
     this.teardownSequence();
     this.completed = false;
+    this.aborted = false;
     this.progress = 0;
 
     if (!isPlatformBrowser(this.platformId)) {
@@ -192,7 +188,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
 
     // Defer canvas setup and focus one microtask so ViewChild elements exist in the DOM.
     Promise.resolve().then(() => {
-      if (!this.active || this.destroyed) {
+      if (!this.active || this.destroyed || this.aborted) {
         return;
       }
       this.overlayContainer?.nativeElement.focus({ preventScroll: true });
@@ -216,7 +212,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   }
 
   private finishSequence(): void {
-    if (!this.active || this.completed) {
+    if (!this.active || this.completed || this.aborted) {
       return;
     }
     this.completed = true;
@@ -240,7 +236,7 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
   }
 
   private readonly tick = (timestamp: number): void => {
-    if (!this.active || this.completed) {
+    if (!this.active || this.completed || this.aborted) {
       this.rafId = null;
       return;
     }
@@ -296,8 +292,9 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
     if (!canvas || typeof window === 'undefined') {
       return;
     }
-    const width = Math.max(1, window.innerWidth);
-    const height = Math.max(1, window.innerHeight);
+    const rect = this.overlayContainer?.nativeElement.getBoundingClientRect();
+    const width = Math.max(1, Math.round(rect?.width || window.innerWidth));
+    const height = Math.max(1, Math.round(rect?.height || window.innerHeight));
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     this.width = width;
@@ -331,7 +328,6 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
     const thrust = this.reducedMotion ? 0 : progress * progress * (2.2 - 1.2 * progress);
     const reticleAlpha = this.reducedMotion ? 0.22 : 0.16 + Math.sin(progress * Math.PI) * 0.18;
 
-    // Faint forward flight-vector reference rings.
     ctx.strokeStyle = `rgba(136, 204, 204, ${reticleAlpha.toFixed(3)})`;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 10]);
@@ -347,7 +343,6 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Cardinal flight-vector azimuth ticks on the outer reticle ring.
     ctx.strokeStyle = `rgba(224, 184, 184, ${(reticleAlpha * 1.25).toFixed(3)})`;
     for (let q = 0; q < 4; q++) {
       const a = (q * Math.PI) / 2;
@@ -359,7 +354,6 @@ export class DepartureTransitComponent implements OnChanges, OnDestroy {
       ctx.stroke();
     }
 
-    // Starfield radial inertial drift along the forward flight vector.
     for (const star of this.stars) {
       const travel = thrust * (0.28 + star.depth * 0.92);
       const rNorm = (star.baseRadius + travel) % 1.04;

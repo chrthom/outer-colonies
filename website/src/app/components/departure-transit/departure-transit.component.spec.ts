@@ -55,6 +55,9 @@ describe('DepartureTransitComponent', () => {
     expect(overlay).toBeTruthy();
     expect(overlay?.getAttribute('role')).toBe('dialog');
     expect(overlay?.getAttribute('aria-modal')).toBe('true');
+    expect(overlay?.getAttribute('aria-label')).toBe('Spielstart – Transferbahn');
+    expect(overlay?.getAttribute('aria-describedby')).toBe('departure-status-desc');
+    expect(fixture.nativeElement.querySelector('#departure-status-desc')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.departure-canvas')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.departure-trajectory')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('button')).toBeNull();
@@ -127,9 +130,33 @@ describe('DepartureTransitComponent', () => {
     activate();
     tick();
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    const escBefore = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    document.dispatchEvent(escBefore);
+    expect(escBefore.defaultPrevented).toBeTrue();
     expect(cancelSpy).toHaveBeenCalledTimes(1);
     expect(completeSpy).not.toHaveBeenCalled();
+  }));
+
+  it('emits cancelled without preventing default on Escape after completion if page stays open', fakeAsync(() => {
+    setReducedMotion(true);
+    const completeSpy = jasmine.createSpy('complete');
+    const cancelSpy = jasmine.createSpy('cancelled');
+    component.complete.subscribe(completeSpy);
+    component.cancelled.subscribe(cancelSpy);
+
+    activate();
+    tick();
+    tick(DEPARTURE_REDUCED_MOTION_MS);
+    expect(completeSpy).toHaveBeenCalledTimes(1);
+
+    const escAfter = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    document.dispatchEvent(escAfter);
+    expect(escAfter.defaultPrevented).toBeFalse();
+    expect(cancelSpy).toHaveBeenCalledTimes(1);
+
+    // Repeated Escape presses do not re-emit cancelled while awaiting parent teardown.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
+    expect(cancelSpy).toHaveBeenCalledTimes(1);
   }));
 
   it('focuses the dialog overlay and keeps Tab from escaping while active', fakeAsync(() => {

@@ -384,4 +384,38 @@ describe('HomePage', () => {
 
     fixture.destroy();
   }));
+
+  it('allows dismissing a stalled post-completion curtain via Escape and restores focus', fakeAsync(() => {
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false
+    } as MediaQueryList);
+
+    fixture.detectChanges();
+    const launchBtn: HTMLAnchorElement = fixture.nativeElement.querySelector('.launch-match-button');
+    const focusSpy = spyOn(launchBtn, 'focus').and.callThrough();
+    launchBtn.click();
+    fixture.detectChanges();
+    tick(300);
+
+    expect(gameNavigatorSpy).toHaveBeenCalledTimes(1);
+    expect(component.departureActive).toBeTrue();
+
+    const escEvent = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    document.dispatchEvent(escEvent);
+    fixture.detectChanges();
+
+    expect(escEvent.defaultPrevented).toBeFalse();
+    expect(component.departureActive).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.departure-overlay')).toBeNull();
+    expect(focusSpy).toHaveBeenCalled();
+
+    fixture.destroy();
+  }));
 });

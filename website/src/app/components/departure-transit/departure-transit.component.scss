@@ -182,6 +182,12 @@
   }
 }
 
+.departure-overlay.is-reduced-motion,
+.departure-overlay.is-reduced-motion .departure-brackets,
+.departure-overlay.is-reduced-motion .departure-console {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .departure-overlay,
   .departure-brackets,
