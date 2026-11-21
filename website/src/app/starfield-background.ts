@@ -21,8 +21,8 @@ interface Star {
   hasHalo: boolean;
 }
 
-/** Seeded Mulberry32 PRNG so the starfield stays deterministic across resizes and tests. */
-function createSeededRandom(seed: number): () => number {
+/** Seeded Mulberry32 PRNG so starfields stay deterministic across resizes, launches, and tests. */
+export function createSeededRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
     state = (state + 0x6d2b79f5) | 0;

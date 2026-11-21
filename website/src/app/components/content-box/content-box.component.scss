@@ -102,7 +102,7 @@
     bottom: -1px;
     width: var(--oc-box-beam-width, min(48px, 35%));
     height: 2px;
-    background: var(--color-primary-light);
+    background: var(--oc-box-beam-color, var(--color-primary-light));
   }
 
   > h2 {

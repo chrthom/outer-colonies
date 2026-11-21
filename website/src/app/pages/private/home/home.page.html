@@ -5,7 +5,16 @@
         Starte die Suche nach einem anderen Outer Colonies Spieler f&uuml;r ein schneller Match nach
         Standardregeln.
       </p>
-      <a mat-raised-button color="primary" [href]="gameLink"> Suche n&auml;chstes Spiel </a>
+      <a
+        mat-raised-button
+        color="primary"
+        class="launch-match-button"
+        [class.is-launching]="departureActive"
+        [href]="gameLink"
+        (click)="onLaunchMatch($event)"
+      >
+        Suche n&auml;chstes Spiel
+      </a>
       @if (onlineCount !== undefined) {
       <p id="online-count">{{ onlineCount }} Spieler online</p>
       }
@@ -60,3 +69,9 @@
     </oc-content-box>
   </div>
 </div>
+
+<oc-departure-transit
+  [active]="departureActive"
+  (complete)="onDepartureComplete()"
+  (cancelled)="onDepartureCancelled()"
+></oc-departure-transit>
