@@ -31,6 +31,17 @@
   .game-intro {
     margin-bottom: 20px;
   }
+
+  .launch-match-button {
+    transition: background-color 160ms ease;
+
+    &:hover,
+    &:focus-visible,
+    &.is-launching {
+      --mat-button-protected-container-color: var(--color-accent);
+      --mat-button-protected-label-text-color: var(--color-light);
+    }
+  }
 }
 
 #note-box {
