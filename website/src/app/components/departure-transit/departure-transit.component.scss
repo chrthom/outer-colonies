@@ -1,0 +1,191 @@
+.departure-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 40px);
+  background: color-mix(in srgb, var(--color-dark) 86%, rgb(0 12 16));
+  backdrop-filter: blur(2px);
+  animation: departure-veil-in 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.departure-canvas,
+.departure-void-curtain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.departure-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.departure-void-curtain {
+  z-index: 3;
+  background: var(--color-dark);
+}
+
+.departure-brackets {
+  position: absolute;
+  inset: clamp(14px, 3vw, 28px);
+  pointer-events: none;
+  animation: departure-brackets-lock 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.bracket {
+  position: absolute;
+  width: clamp(18px, 3vw, 30px);
+  height: clamp(18px, 3vw, 30px);
+  border-color: var(--color-accent-light);
+  border-style: solid;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-accent), transparent 25%));
+}
+
+.bracket--tl {
+  top: 0;
+  left: 0;
+  border-width: 1.5px 0 0 1.5px;
+}
+
+.bracket--tr {
+  top: 0;
+  right: 0;
+  border-width: 1.5px 1.5px 0 0;
+}
+
+.bracket--bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1.5px 1.5px;
+}
+
+.bracket--br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+.departure-console {
+  --oc-box-bg: color-mix(in srgb, var(--color-accent) 12%, rgb(0 4 6 / 88%));
+  --oc-box-stroke: color-mix(in srgb, var(--color-accent-light), var(--color-accent) 45%);
+  --oc-box-glow: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent), transparent 55%));
+  --oc-box-beam-color: var(--color-accent-light);
+  --oc-box-beam-width: 64px;
+  position: relative;
+  z-index: 2;
+  width: min(100%, 480px);
+  animation: departure-console-in 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.departure-console-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.departure-trajectory {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  margin: 2px auto;
+}
+
+.orbit-ring {
+  stroke: color-mix(in srgb, var(--color-primary-light), transparent 55%);
+  stroke-width: 1;
+}
+
+.orbit-ring--target {
+  stroke: color-mix(in srgb, var(--color-accent-light), transparent 45%);
+}
+
+.transfer-guide {
+  stroke: color-mix(in srgb, var(--color-primary-light), transparent 65%);
+  stroke-width: 1;
+}
+
+.transfer-arc {
+  stroke: var(--color-accent-light);
+  stroke-width: 1.75;
+  stroke-dasharray: 240;
+}
+
+.orbit-node--origin {
+  fill: var(--color-primary-light);
+}
+
+.orbit-node--target {
+  fill: var(--color-accent-light);
+}
+
+.transfer-vessel {
+  fill: var(--color-warn);
+}
+
+.departure-status {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-primary-light);
+  text-wrap: pretty;
+}
+
+.departure-progress {
+  width: 100%;
+  height: 2px;
+  background: color-mix(in srgb, var(--color-primary-light), transparent 80%);
+  overflow: hidden;
+}
+
+.departure-progress-beam {
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--color-accent-light);
+}
+
+@keyframes departure-veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes departure-brackets-lock {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes departure-console-in {
+  from {
+    opacity: 0;
+    transform: scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .departure-overlay,
+  .departure-brackets,
+  .departure-console {
+    animation: none;
+  }
+}

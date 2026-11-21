@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HomePage } from './home.page';
+import { GAME_NAVIGATOR, HomePage } from './home.page';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import AuthService from 'src/app/auth.service';
 import { DailyGetResponse } from '@shared/interfaces/rest_api';
@@ -10,13 +10,19 @@ describe('HomePage', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
   let httpMock: HttpTestingController;
+  let gameNavigatorSpy: jasmine.Spy;
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn'], { token: 'test-token' });
+    gameNavigatorSpy = jasmine.createSpy('gameNavigator');
 
     await TestBed.configureTestingModule({
       imports: [HomePage, HttpClientTestingModule],
-      providers: [DailyApiService, { provide: AuthService, useValue: authServiceSpy }]
+      providers: [
+        DailyApiService,
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: GAME_NAVIGATOR, useValue: gameNavigatorSpy }
+      ]
     }).compileComponents();
 
     httpMock = TestBed.inject(HttpTestingController);
@@ -269,5 +275,83 @@ describe('HomePage', () => {
     } finally {
       environment.stage = 'production';
     }
+  }));
+
+  it('starts the full-page departure transit on click and navigates to gameLink on completion', fakeAsync(() => {
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false
+    } as MediaQueryList);
+
+    fixture.detectChanges();
+    const launchBtn: HTMLAnchorElement = fixture.nativeElement.querySelector('.launch-match-button');
+    const clickEvent = new MouseEvent('click', { button: 0, bubbles: true, cancelable: true });
+    launchBtn.dispatchEvent(clickEvent);
+    fixture.detectChanges();
+
+    expect(clickEvent.defaultPrevented).toBeTrue();
+    expect(component.departureActive).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.departure-overlay')).toBeTruthy();
+    expect(gameNavigatorSpy).not.toHaveBeenCalled();
+
+    tick(300);
+    expect(gameNavigatorSpy).toHaveBeenCalledOnceWith(`${environment.url.game}/?token=test-token`);
+
+    fixture.destroy();
+  }));
+
+  it('preserves modifier-key clicks on the launch link without intercepting navigation', () => {
+    fixture.detectChanges();
+    const launchBtn: HTMLAnchorElement = fixture.nativeElement.querySelector('.launch-match-button');
+    const ctrlClick = new MouseEvent('click', {
+      button: 0,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true
+    });
+    launchBtn.dispatchEvent(ctrlClick);
+    fixture.detectChanges();
+
+    expect(ctrlClick.defaultPrevented).toBeFalse();
+    expect(component.departureActive).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.departure-overlay')).toBeNull();
+
+    fixture.destroy();
+  });
+
+  it('aborts departure without navigating and restores focus when cancelled', fakeAsync(() => {
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false
+    } as MediaQueryList);
+
+    fixture.detectChanges();
+    const launchBtn: HTMLAnchorElement = fixture.nativeElement.querySelector('.launch-match-button');
+    const focusSpy = spyOn(launchBtn, 'focus').and.callThrough();
+    launchBtn.click();
+    fixture.detectChanges();
+    tick();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+
+    expect(component.departureActive).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.departure-overlay')).toBeNull();
+    expect(gameNavigatorSpy).not.toHaveBeenCalled();
+    expect(focusSpy).toHaveBeenCalled();
+
+    fixture.destroy();
   }));
 });

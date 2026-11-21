@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, InjectionToken, OnDestroy, OnInit, inject } from '@angular/core';
 import { DailyApiService } from 'src/app/api/daily-api.service';
 import { OnlineApiService } from 'src/app/api/online-api.service';
 import AuthService from 'src/app/auth.service';
@@ -6,8 +6,15 @@ import { environment } from 'src/environments/environment';
 import { DailyGetResponse } from '@shared/interfaces/rest_api';
 import { DAILY_DEFINITIONS } from '@shared/config/dailies';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
+import { DepartureTransitComponent } from '../../../components/departure-transit/departure-transit.component';
 import { MatAnchor } from '@angular/material/button';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
+
+/** Navigates the browser to the external Phaser game client URL. */
+export const GAME_NAVIGATOR = new InjectionToken<(url: string) => void>('Game client navigator', {
+  providedIn: 'root',
+  factory: () => (url: string) => window.location.assign(url)
+});
 
 /** Interval in which the number of online users is refreshed. */
 const ONLINE_POLL_INTERVAL_MS = 60000;
@@ -16,17 +23,21 @@ const ONLINE_POLL_INTERVAL_MS = 60000;
   selector: 'oc-page-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [ContentBoxComponent, MatAnchor, MatTabGroup, MatTab]
+  imports: [ContentBoxComponent, DepartureTransitComponent, MatAnchor, MatTabGroup, MatTab]
 })
 export class HomePage implements OnInit, OnDestroy {
   authService = inject(AuthService);
   private dailyApiService = inject(DailyApiService);
   private onlineApiService = inject(OnlineApiService);
+  private navigateToGame = inject(GAME_NAVIGATOR);
 
   dailies: Daily[] = this.generateDailiesArray();
   selectedDaily = 1;
   /** Number of online users, undefined until the first successful poll. */
   onlineCount?: number;
+  /** Whether the full-viewport planetary departure sequence is currently running. */
+  departureActive = false;
+  private launchTrigger: HTMLElement | null = null;
   private autoAdvanceInterval: ReturnType<typeof setInterval> | undefined;
   private onlinePollInterval: ReturnType<typeof setInterval> | undefined;
 
@@ -104,6 +115,38 @@ export class HomePage implements OnInit, OnDestroy {
    */
   get gameLink(): string {
     return `${this.gameUrl}/?token=${encodeURIComponent(this.authService.token)}`;
+  }
+
+  /**
+   * Starts the full-viewport planetary departure sequence on a normal link activation
+   * while preserving modifier-key / middle-click tab opening.
+   */
+  onLaunchMatch(event: MouseEvent): void {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    event.preventDefault();
+    this.launchTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.departureActive = true;
+  }
+
+  /** Navigates to the game client once the departure sequence finishes or is skipped. */
+  onDepartureComplete(): void {
+    this.navigateToGame(this.gameLink);
+  }
+
+  /** Cancels the departure sequence before hop-off and restores focus to the launch link. */
+  onDepartureCancelled(): void {
+    this.departureActive = false;
+    this.launchTrigger?.focus({ preventScroll: true });
+    this.launchTrigger = null;
   }
 
   /** Advances the selection to the next daily, cycling against the current dailies array. */

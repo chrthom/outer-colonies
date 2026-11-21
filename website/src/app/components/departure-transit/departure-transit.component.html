@@ -1,0 +1,62 @@
+@if (active) {
+  <div
+    #overlayContainer
+    class="departure-overlay"
+    [class.is-reduced-motion]="reducedMotion"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="phaseTitle"
+    tabindex="-1"
+  >
+    <canvas #transitCanvas class="departure-canvas" aria-hidden="true"></canvas>
+
+    <div class="departure-brackets" aria-hidden="true">
+      <span class="bracket bracket--tl"></span>
+      <span class="bracket bracket--tr"></span>
+      <span class="bracket bracket--bl"></span>
+      <span class="bracket bracket--br"></span>
+    </div>
+
+    <oc-content-box [title]="phaseTitle" class="departure-console">
+      <div class="departure-console-body">
+        <svg
+          class="departure-trajectory"
+          viewBox="0 0 280 88"
+          width="280"
+          height="88"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d="M 18 76 A 92 92 0 0 1 118 42" class="orbit-ring" stroke-dasharray="3 4" />
+          <path
+            d="M 152 14 A 120 120 0 0 1 264 52"
+            class="orbit-ring orbit-ring--target"
+            stroke-dasharray="3 4"
+          />
+          <path d="M 44 66 Q 142 10 236 26" class="transfer-guide" stroke-dasharray="2 5" />
+          <path
+            d="M 44 66 Q 142 10 236 26"
+            class="transfer-arc"
+            [style.stroke-dashoffset]="transferArcOffset"
+          />
+          <polygon points="44,61 49,66 44,71 39,66" class="orbit-node orbit-node--origin" />
+          <polygon points="236,21 241,26 236,31 231,26" class="orbit-node orbit-node--target" />
+          <circle [attr.cx]="vesselPoint.x" [attr.cy]="vesselPoint.y" r="3.5" class="transfer-vessel" />
+        </svg>
+
+        <p class="departure-status">
+          Schubzündung eingeleitet – Verbindung zur Gegnersuche wird hergestellt.
+        </p>
+
+        <div class="departure-progress" aria-hidden="true">
+          <div
+            class="departure-progress-beam"
+            [style.transform]="'scaleX(' + (reducedMotion ? 1 : progress) + ')'"
+          ></div>
+        </div>
+      </div>
+    </oc-content-box>
+
+    <div class="departure-void-curtain" aria-hidden="true" [style.opacity]="voidCurtainOpacity"></div>
+  </div>
+}
