@@ -22,23 +22,28 @@
 
   .title {
     position: absolute;
+    display: block;
     top: 160px;
     left: 50%;
     width: 100%;
     transform: translateX(-50%);
+    font-family: "Latin Modern Mono Caps", monospace;
+    font-weight: bold;
     white-space: nowrap;
   }
 
   .corners {
     position: absolute;
+    display: block;
     width: 160px;
     height: 160px;
     top: 0;
     left: 0;
     pointer-events: none;
 
-    div {
+    > span {
       position: absolute;
+      display: block;
       width: 60px;
       height: 60px;
       background-image: url("../../../assets/zone_corner_blue.png");
@@ -73,8 +78,8 @@
 .item--interactive {
   cursor: pointer;
 
-  &:hover:not(:disabled) > .corners > div,
-  &:focus-visible > .corners > div {
+  &:hover:not(:disabled) > .corners > span,
+  &:focus-visible > .corners > span {
     background-image: url("../../../assets/zone_corner_red.png");
   }
 

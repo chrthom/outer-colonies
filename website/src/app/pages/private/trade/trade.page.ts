@@ -126,7 +126,13 @@ export class TradePage implements OnInit {
    * When `boosterNo` is supplied, opens the physical card-by-card booster unboxing stage.
    */
   open(itemId: number, boosterNo?: number) {
-    if (this.openingItemId !== undefined) return;
+    if (
+      this.openingItemId !== undefined ||
+      this.openedBooster !== undefined ||
+      this.openedBoxContent !== undefined
+    ) {
+      return;
+    }
     this.actionFailed = false;
     this.openingItemId = itemId;
     this.itemApiService.open(itemId).subscribe({
@@ -152,9 +158,8 @@ export class TradePage implements OnInit {
     this.openedBoxContent = undefined;
     this.reload();
   }
-  /** Closes the booster unboxing stage and refreshes the inventory. */
+  /** Closes the booster unboxing stage. */
   boosterClosed() {
     this.openedBooster = undefined;
-    this.reload();
   }
 }

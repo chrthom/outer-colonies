@@ -303,11 +303,19 @@ describe('BoosterOpeningComponent', () => {
     });
   }));
 
-  it('closes on Escape only when no card inspection dialog is open', () => {
+  it('closes on Escape only after all cards are revealed and no card inspection dialog is open', () => {
     setReducedMotion(false);
     fixture.detectChanges();
     const doneSpy = jasmine.createSpy('done');
     component.done.subscribe(doneSpy);
+
+    // Escape and close() are blocked while cards are still unrevealed
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    component.close();
+    expect(doneSpy).not.toHaveBeenCalled();
+
+    component.revealAll();
+    fixture.detectChanges();
 
     dialogMock.openDialogs = [{}];
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
@@ -316,6 +324,72 @@ describe('BoosterOpeningComponent', () => {
     dialogMock.openDialogs = [];
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(doneSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('activates seal seam and top card via click/keyboard, suppresses aborted-drag clicks, and preserves focus', fakeAsync(() => {
+    setReducedMotion(false);
+    fixture.detectChanges();
+    tick();
+
+    const seamBtn = fixture.nativeElement.querySelector('.pack-tear-seam') as HTMLButtonElement;
+    expect(seamBtn).toBeTruthy();
+
+    // Aborted pointer drag followed by browser pointer click (detail=1) does not unseal
+    component.onSealPointerDown(createPointerEvent('pointerdown', 100, 100));
+    component.onSealPointerMove(createPointerEvent('pointermove', 120, 100));
+    component.onSealPointerUp(createPointerEvent('pointerup', 120, 100));
+    seamBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    expect(component.phase).toBe('sealed');
+
+    // Keyboard / assistive click (detail=0) unseals and moves focus off the detached seam button
+    seamBtn.focus();
+    seamBtn.click();
+    fixture.detectChanges();
+    tick();
+    expect(component.phase).toBe('unsealing');
+    const primaryBtn = fixture.nativeElement.querySelector('.console-button--primary') as HTMLButtonElement;
+    expect(document.activeElement).toBe(primaryBtn);
+
+    tick(BOOSTER_UNSEAL_MS);
+    fixture.detectChanges();
+    expect(component.phase).toBe('ready');
+
+    // Draw cards 1..9 quickly, then activate the 10th card via .pack-top-card click while focused
+    for (let i = 0; i < 9; i++) {
+      component.handlePrimaryAction();
+      tick(BOOSTER_EXTRACT_MS + BOOSTER_FLIP_MS);
+    }
+    fixture.detectChanges();
+
+    const topCardBtn = fixture.nativeElement.querySelector('.pack-top-card') as HTMLButtonElement;
+    expect(topCardBtn).toBeTruthy();
+    topCardBtn.focus();
+    topCardBtn.click();
+    fixture.detectChanges();
+    tick();
+    expect(component.phase).toBe('extracting');
+    expect(document.activeElement).toBe(primaryBtn);
+
+    tick(BOOSTER_CLIMAX_EXTRACT_MS + BOOSTER_CLIMAX_FLIP_MS);
+    expect(component.phase).toBe('revealed');
+    expect(component.revealedCount).toBe(10);
+  }));
+
+  it('ignores global keyboard shortcuts when modifier keys are held and avoids block tags inside buttons', () => {
+    setReducedMotion(false);
+    fixture.detectChanges();
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', ctrlKey: true }));
+    expect(component.phase).toBe('sealed');
+
+    component.revealAll();
+    fixture.detectChanges();
+    const buttons = Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button'));
+    expect(buttons.length).toBeGreaterThan(0);
+    for (const btn of buttons) {
+      expect(btn.querySelector('div, h1, h2, h3, h4, h5, h6')).toBeNull();
+    }
   });
 
   it('reveals immediately without spatial travel when prefers-reduced-motion is active', fakeAsync(() => {

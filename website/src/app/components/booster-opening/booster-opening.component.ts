@@ -1,3 +1,4 @@
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectorRef,
@@ -62,7 +63,8 @@ const DRAG_DEADZONE_PX = 6;
 @Component({
   selector: 'oc-booster-opening',
   templateUrl: './booster-opening.component.html',
-  styleUrls: ['./booster-opening.component.scss']
+  styleUrls: ['./booster-opening.component.scss'],
+  imports: [CdkTrapFocus]
 })
 export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
@@ -81,6 +83,7 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('primaryActionButton') private primaryActionButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('closeButton') private closeButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('packShell') private packShell?: ElementRef<HTMLElement>;
 
   readonly assetURL = environment.url.assets;
   readonly cardBackUrl = `${environment.url.assets}/cards/${constants.cardBackSideID}.png`;
@@ -107,10 +110,12 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
   private tearStartX = 0;
   private tearStartY = 0;
   private tearDidMove = false;
+  private suppressSealClick = false;
 
   private activePullPointerId: number | null = null;
   private pullStartY = 0;
   private pullDidMove = false;
+  private suppressPullClick = false;
 
   /** Display name of the booster edition. */
   get editionName(): string {
@@ -269,9 +274,11 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
       (changes['boosterNo'] && !changes['boosterNo'].firstChange)
     ) {
       this.boosterImageError = false;
+      this.cardBackImageError = false;
       this.failedCardImages.clear();
       this.resetSequence();
       this.preloadAssets();
+      this.focusPrimaryActionSoon();
     }
   }
 
@@ -286,21 +293,23 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
   /** Handles keyboard shortcuts while the booster overlay is open. */
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    // Let an open full-resolution card inspection modal handle keyboard input first.
+    if (this.dialog.openDialogs.length > 0) return;
+
     if (event.key === 'Escape') {
-      // Let an open full-resolution card inspection modal handle Escape first.
-      if (this.dialog.openDialogs.length > 0) return;
+      if (!this.canClose) return;
       event.preventDefault();
       this.close();
       return;
     }
 
-    if (this.dialog.openDialogs.length > 0) return;
-
     const target = event.target as HTMLElement | null;
-    const isInteractiveTarget =
-      target?.tagName === 'BUTTON' || target?.tagName === 'A' || target?.getAttribute('role') === 'button';
+    const isInteractiveTarget = Boolean(
+      target?.closest('button, a, input, select, textarea, [role="button"]')
+    );
 
-    if (event.key === 'ArrowRight' && this.phase !== 'summary') {
+    if (event.key === 'ArrowRight' && !event.shiftKey && this.phase !== 'summary') {
       event.preventDefault();
       this.handlePrimaryAction();
       return;
@@ -377,10 +386,14 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
   /** Tears open the sealed booster sleeve and exposes the face-down card stack. */
   unsealPack(): void {
     if (this.phase !== 'sealed') return;
+    const shouldRestoreFocus = this.isFocusInsidePackShell();
     this.clearActiveTimer();
     this.tearProgress = 1;
     this.isDraggingTear = false;
     this.phase = 'unsealing';
+    if (shouldRestoreFocus) {
+      this.focusPrimaryActionSoon();
+    }
 
     const duration = this.reducedMotion ? BOOSTER_REDUCED_STEP_MS : BOOSTER_UNSEAL_MS;
     this.activeTimer = setTimeout(() => {
@@ -427,16 +440,28 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  /** Closes the booster opening overlay and returns to the trade page. */
+  /** Closes the booster opening overlay and returns to the trade page once all cards are revealed. */
   close(): void {
+    if (!this.canClose) return;
     this.clearActiveTimer();
     this.done.emit();
+  }
+
+  /** Handles keyboard or assistive-technology click activation on the sealed seam. */
+  onSealClick(event?: MouseEvent): void {
+    if (this.suppressSealClick && event?.detail !== 0) {
+      this.suppressSealClick = false;
+      return;
+    }
+    this.suppressSealClick = false;
+    this.unsealPack();
   }
 
   /** Starts tracking a horizontal/diagonal pointer tear across the sealed pack top. */
   onSealPointerDown(event: PointerEvent): void {
     if (this.phase !== 'sealed') return;
     if (event.button !== 0 && event.pointerType === 'mouse') return;
+    this.suppressSealClick = false;
     this.activeTearPointerId = event.pointerId;
     this.tearStartX = event.clientX;
     this.tearStartY = event.clientY;
@@ -464,6 +489,7 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     this.isDraggingTear = false;
     if (this.phase !== 'sealed') return;
 
+    this.suppressSealClick = true;
     if (!this.tearDidMove || this.tearProgress >= TEAR_COMMIT_THRESHOLD) {
       this.unsealPack();
     } else {
@@ -476,9 +502,20 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     if (event.pointerId !== this.activeTearPointerId) return;
     this.activeTearPointerId = null;
     this.isDraggingTear = false;
+    this.suppressSealClick = false;
     if (this.phase === 'sealed') {
       this.tearProgress = 0;
     }
+  }
+
+  /** Handles keyboard or assistive-technology click activation on the top face-down card. */
+  onPullClick(event?: MouseEvent): void {
+    if (this.suppressPullClick && event?.detail !== 0) {
+      this.suppressPullClick = false;
+      return;
+    }
+    this.suppressPullClick = false;
+    this.triggerTopCardDraw();
   }
 
   /** Starts tracking an upward pull gesture on the next face-down card inside the pouch. */
@@ -486,6 +523,7 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     if (this.isPackEmpty) return;
     if (this.phase !== 'ready' && this.phase !== 'revealed') return;
     if (event.button !== 0 && event.pointerType === 'mouse') return;
+    this.suppressPullClick = false;
     this.activePullPointerId = event.pointerId;
     this.pullStartY = event.clientY;
     this.pullDidMove = false;
@@ -511,13 +549,10 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
 
     const shouldCommit = !this.pullDidMove || this.pullProgress >= PULL_COMMIT_THRESHOLD;
     this.pullProgress = 0;
+    this.suppressPullClick = true;
 
     if (!shouldCommit || this.isPackEmpty) return;
-    if (this.phase === 'ready') {
-      this.beginCardDraw(this.currentIndex);
-    } else if (this.phase === 'revealed' && this.currentIndex < this.totalCards - 1) {
-      this.beginCardDraw(this.currentIndex + 1);
-    }
+    this.triggerTopCardDraw();
   }
 
   /** Resets pull-out drag state if cancelled by the browser. */
@@ -525,6 +560,7 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     if (event.pointerId !== this.activePullPointerId) return;
     this.activePullPointerId = null;
     this.isDraggingPull = false;
+    this.suppressPullClick = false;
     this.pullProgress = 0;
   }
 
@@ -551,7 +587,24 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
     this.pullProgress = 0;
     this.isDraggingTear = false;
     this.isDraggingPull = false;
+    this.activeTearPointerId = null;
+    this.activePullPointerId = null;
+    this.suppressSealClick = false;
+    this.suppressPullClick = false;
     this.phase = this.cards.length > 0 ? 'sealed' : 'summary';
+  }
+
+  private triggerTopCardDraw(): void {
+    if (this.isPackEmpty) return;
+    if (this.phase === 'ready') {
+      this.beginCardDraw(this.currentIndex);
+    } else if (this.phase === 'revealed' && this.currentIndex < this.totalCards - 1) {
+      this.beginCardDraw(this.currentIndex + 1);
+    } else if (this.phase === 'extracting' || this.phase === 'flipping') {
+      this.completeActiveDraw();
+    } else if (this.phase === 'unsealing') {
+      this.finishUnsealingImmediately();
+    }
   }
 
   private finishUnsealingImmediately(): void {
@@ -563,16 +616,23 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
 
   private beginCardDraw(index: number): void {
     if (index < 0 || index >= this.totalCards) return;
+    const shouldRestoreFocus = index >= this.totalCards - 1 && this.isFocusInsidePackShell();
     this.clearActiveTimer();
     this.currentIndex = index;
     this.pullProgress = 0;
 
     if (this.reducedMotion) {
       this.completeActiveDraw();
+      if (shouldRestoreFocus) {
+        this.focusPrimaryActionSoon();
+      }
       return;
     }
 
     this.phase = 'extracting';
+    if (shouldRestoreFocus) {
+      this.focusPrimaryActionSoon();
+    }
     const isClimax = this.slotTier(index) === 'climax';
     const extractMs = isClimax ? BOOSTER_CLIMAX_EXTRACT_MS : BOOSTER_EXTRACT_MS;
     const flipMs = isClimax ? BOOSTER_CLIMAX_FLIP_MS : BOOSTER_FLIP_MS;
@@ -619,6 +679,12 @@ export class BoosterOpeningComponent implements OnInit, OnChanges, OnDestroy {
       const img = new Image();
       img.src = url;
     }
+  }
+
+  private isFocusInsidePackShell(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const active = document.activeElement;
+    return active instanceof HTMLElement && Boolean(this.packShell?.nativeElement.contains(active));
   }
 
   private focusPrimaryActionSoon(): void {

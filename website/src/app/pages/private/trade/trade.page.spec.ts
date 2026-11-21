@@ -178,13 +178,29 @@ describe('TradePage', () => {
     expect(fixture.nativeElement.querySelector('oc-booster-opening')).toBeTruthy();
   });
 
-  it('should clear opened booster and reload on boosterClosed', () => {
+  it('should clear opened booster on boosterClosed', () => {
     component.openedBooster = {
       boosterNo: 1,
       content: { itemId: 1, sol: [], boosters: [], cards: [101, 102] }
     };
+    const reloadSpy = spyOn(component, 'reload');
     component.boosterClosed();
     expect(component.openedBooster).toBeUndefined();
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it('should ignore open calls while an unboxing or box overlay is already open', () => {
+    component.openedBooster = {
+      boosterNo: 1,
+      content: { itemId: 1, sol: [], boosters: [], cards: [101] }
+    };
+    component.open(2, 2);
+    expect(itemApiSpy.open).not.toHaveBeenCalled();
+
+    component.openedBooster = undefined;
+    component.openedBoxContent = { itemId: 1, sol: [100], boosters: [], cards: [] };
+    component.open(2, 2);
+    expect(itemApiSpy.open).not.toHaveBeenCalled();
   });
 
   it('should ignore duplicate open calls while an open request is in flight and reset on error', () => {

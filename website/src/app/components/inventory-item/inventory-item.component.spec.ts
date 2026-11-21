@@ -34,6 +34,7 @@ describe('InventoryItemComponent', () => {
     const button: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.item');
     expect(button).toBeTruthy();
     expect(button?.getAttribute('aria-label')).toBe('Booster-Pack Outer Colonies öffnen');
+    expect(button?.querySelector('div, h1, h2, h3, h4, h5, h6')).toBeNull();
 
     button?.click();
     expect(activateSpy).toHaveBeenCalledTimes(1);

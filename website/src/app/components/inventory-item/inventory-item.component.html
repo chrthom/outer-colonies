@@ -8,24 +8,24 @@
     [attr.aria-busy]="loading"
     (click)="onActivate()"
   >
-    <div class="corners" aria-hidden="true">
-      <div class="top_left"></div>
-      <div class="top_right"></div>
-      <div class="bottom_left"></div>
-      <div class="bottom_right"></div>
-    </div>
+    <span class="corners" aria-hidden="true">
+      <span class="top_left"></span>
+      <span class="top_right"></span>
+      <span class="bottom_left"></span>
+      <span class="bottom_right"></span>
+    </span>
     <img class="image" [src]="img" alt="" />
-    <h4 class="title">{{ loading ? "Öffne…" : text }}</h4>
+    <span class="title">{{ loading ? "Öffne…" : text }}</span>
   </button>
 } @else {
   <div class="item">
-    <div class="corners" aria-hidden="true">
-      <div class="top_left"></div>
-      <div class="top_right"></div>
-      <div class="bottom_left"></div>
-      <div class="bottom_right"></div>
-    </div>
+    <span class="corners" aria-hidden="true">
+      <span class="top_left"></span>
+      <span class="top_right"></span>
+      <span class="bottom_left"></span>
+      <span class="bottom_right"></span>
+    </span>
     <img class="image" [src]="img" alt="" />
-    <h4 class="title">{{ text }}</h4>
+    <span class="title">{{ text }}</span>
   </div>
 }

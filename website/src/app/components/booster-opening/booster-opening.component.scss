@@ -1,14 +1,26 @@
-// Use a same-origin copy of utils/card_mask.png because CSS mask-image enforces CORS and assets.* omits CORS headers.
-@mixin card-image-mask {
-  -webkit-mask-image: url("../../../assets/card_mask.png");
-  mask-image: url("../../../assets/card_mask.png");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  mask-mode: alpha;
+@mixin reduced-motion-card-3d {
+  .card-3d {
+    transform: none;
+
+    &.is-flipped {
+      transform: none;
+    }
+
+    &:not(.is-flipped) .card-face--front {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.is-flipped .card-face--back {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.is-flipped .card-face--front {
+      transform: none;
+      opacity: 1;
+    }
+  }
 }
 
 .booster-overlay {
@@ -17,7 +29,8 @@
   --stage-fill: color-mix(in srgb, var(--color-primary) 10%, rgb(0 8 10 / 88%));
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  // Stay below Angular CDK overlays (z-index: 1000) so full-size card modals always stack above the stage.
+  z-index: 900;
   display: grid;
   place-items: center;
   padding: clamp(10px, 2vh, 22px);
@@ -198,8 +211,6 @@
   gap: clamp(18px, 4vw, 48px);
   margin-top: clamp(14px, 2.2vh, 22px);
 }
-
-/* --- Left bay: physical booster sleeve --- */
 
 .pack-bay {
   display: flex;
@@ -533,8 +544,6 @@
   text-align: center;
 }
 
-/* --- Right bay: active card spotlight --- */
-
 .spotlight-bay {
   display: flex;
   flex-direction: column;
@@ -542,8 +551,7 @@
   justify-content: center;
 }
 
-.spotlight-stage,
-.spotlight-dock {
+.spotlight-stage {
   width: min(100%, clamp(190px, 25vw, 252px));
 }
 
@@ -672,8 +680,9 @@
   }
 }
 
-.card-face-image {
-  @include card-image-mask;
+.card-face-image,
+.strip-thumb,
+.summary-card-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -681,7 +690,6 @@
 }
 
 .card-reveal-scanline {
-  @include card-image-mask;
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -806,8 +814,6 @@
   color: var(--color-primary-light);
 }
 
-/* --- Bottom drawn cards strip --- */
-
 .drawn-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(40px, 50px));
@@ -859,20 +865,10 @@
   }
 }
 
-.strip-thumb {
-  @include card-image-mask;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .strip-fallback {
   font-size: 11px;
   color: var(--color-light);
 }
-
-/* --- Summary spread --- */
 
 .summary-spread {
   margin-top: 16px;
@@ -919,17 +915,10 @@
 }
 
 .summary-card-frame {
+  display: block;
   width: 100%;
   aspect-ratio: 411 / 561;
   overflow: hidden;
-}
-
-.summary-card-image {
-  @include card-image-mask;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .summary-card-meta {
@@ -953,8 +942,6 @@
   white-space: nowrap;
 }
 
-/* --- Footer actions --- */
-
 .booster-footer {
   display: flex;
   flex-wrap: wrap;
@@ -962,129 +949,6 @@
   align-items: center;
   gap: 12px 16px;
   margin-top: clamp(10px, 1.8vh, 18px);
-}
-
-.console-button {
-  --c: 7px;
-  --i: calc(var(--c) + 0.62px);
-  position: relative;
-  isolation: isolate;
-  min-height: 44px;
-  padding: 8px 20px;
-  background: transparent;
-  font-family: "Latin Modern Mono Caps", monospace;
-  font-size: 14px;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition:
-    color 140ms ease,
-    opacity 140ms ease;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    transition: background-color 140ms ease;
-  }
-
-  &::before {
-    z-index: -2;
-    background: transparent;
-    clip-path: polygon(
-      var(--c) 0,
-      calc(100% - var(--c)) 0,
-      100% var(--c),
-      100% calc(100% - var(--c)),
-      calc(100% - var(--c)) 100%,
-      var(--c) 100%,
-      0 calc(100% - var(--c)),
-      0 var(--c)
-    );
-  }
-
-  &--primary {
-    color: var(--color-light);
-
-    &::before {
-      background: var(--color-primary-dark);
-    }
-
-    &.is-climax::before {
-      background: var(--color-accent);
-    }
-
-    &:hover:not(:disabled)::before,
-    &:focus-visible:not(:disabled)::before {
-      background: var(--color-accent);
-    }
-  }
-
-  &--secondary,
-  &--close {
-    color: var(--color-primary-light);
-
-    &::before {
-      background: color-mix(in srgb, var(--color-dark) 80%, var(--color-primary));
-    }
-
-    // Draw the chamfered border without clipping the button box itself so right/bottom edges are never cropped.
-    &::after {
-      z-index: -1;
-      background: color-mix(in srgb, var(--color-primary-light), transparent 35%);
-      clip-path: polygon(
-        evenodd,
-        0 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 0,
-        var(--i) 1.5px,
-        1.5px var(--i),
-        1.5px calc(100% - var(--i)),
-        var(--i) calc(100% - 1.5px),
-        calc(100% - var(--i)) calc(100% - 1.5px),
-        calc(100% - 1.5px) calc(100% - var(--i)),
-        calc(100% - 1.5px) var(--i),
-        calc(100% - var(--i)) 1.5px,
-        var(--i) 1.5px
-      );
-    }
-
-    &:hover:not(:disabled),
-    &:focus-visible:not(:disabled) {
-      color: var(--color-accent-light);
-
-      &::before {
-        background: color-mix(in srgb, var(--color-accent) 32%, var(--color-dark));
-      }
-
-      &::after {
-        background: var(--color-accent-light);
-      }
-    }
-  }
-
-  &--ghost {
-    padding-inline: 12px;
-    color: var(--color-primary-light);
-
-    &:hover:not(:disabled),
-    &:focus-visible:not(:disabled) {
-      color: var(--color-accent-light);
-    }
-  }
-
-  &:disabled {
-    opacity: 0.42;
-    cursor: not-allowed;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-accent-light);
-    outline-offset: 2px;
-  }
 }
 
 @keyframes booster-veil-in {
@@ -1139,8 +1003,7 @@
     width: clamp(128px, 38vw, 168px);
   }
 
-  .spotlight-stage,
-  .spotlight-dock {
+  .spotlight-stage {
     width: min(100%, 240px);
   }
 
@@ -1165,51 +1028,9 @@
     transition-duration: 0.01ms;
   }
 
-  .card-3d {
-    transform: none;
-
-    &.is-flipped {
-      transform: none;
-    }
-
-    &:not(.is-flipped) .card-face--front {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    &.is-flipped .card-face--back {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    &.is-flipped .card-face--front {
-      transform: none;
-      opacity: 1;
-    }
-  }
+  @include reduced-motion-card-3d;
 }
 
 .booster-overlay.is-reduced-motion {
-  .card-3d {
-    transform: none;
-
-    &.is-flipped {
-      transform: none;
-    }
-
-    &:not(.is-flipped) .card-face--front {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    &.is-flipped .card-face--back {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    &.is-flipped .card-face--front {
-      transform: none;
-      opacity: 1;
-    }
-  }
+  @include reduced-motion-card-3d;
 }
