@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatAnchor } from '@angular/material/button';
 import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 
@@ -11,7 +13,7 @@ import { ContentBoxComponent } from '../../../components/content-box/content-box
   selector: 'oc-page-editions',
   templateUrl: './editions.page.html',
   styleUrls: ['./editions.page.scss'],
-  imports: [ContentBoxComponent]
+  imports: [RouterLink, MatAnchor, ContentBoxComponent]
 })
 export class EditionsPage {
   private readonly failedBoosterImages = new Set<number>();

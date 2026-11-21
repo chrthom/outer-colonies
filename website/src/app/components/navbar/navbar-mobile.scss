@@ -12,44 +12,6 @@
     padding-left: 0;
     gap: 8px;
   }
-  .menu {
-    --g: color-mix(in srgb, var(--color-primary), transparent 70%);
-    display: inline-flex;
-    align-items: center;
-    min-height: 62px;
-    padding: 0 14px;
-    background: radial-gradient(closest-side, var(--g), transparent);
-    color: var(--color-primary-light);
-    font:
-      14px "Latin Modern Mono Caps",
-      monospace;
-    cursor: pointer;
-    white-space: nowrap;
-    &:hover,
-    &[aria-expanded="true"] {
-      color: var(--color-accent-light);
-      --g: color-mix(in srgb, var(--color-accent), transparent 50%);
-    }
-  }
-  .links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    flex-direction: column;
-    gap: 0;
-    background: var(--color-dark);
-    border: 1px solid var(--color-primary-dark);
-    padding: 8px 16px;
-    &.open {
-      display: flex;
-    }
-    a {
-      min-height: 44px;
-      padding: 12px 16px;
-      font-size: 16px;
-    }
-  }
   .actions {
     gap: 4px;
     padding: 0 8px 0 0;
@@ -87,9 +49,6 @@
 @media (max-width: 480px) {
   .zone {
     gap: 4px;
-  }
-  .menu {
-    padding: 0 8px;
   }
   .actions a {
     min-width: 0;

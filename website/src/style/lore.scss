@@ -16,6 +16,15 @@
   }
 }
 
+.lore-back-nav {
+  margin-bottom: 18px;
+
+  a {
+    font-family: "Latin Modern Mono Caps", monospace;
+    letter-spacing: 0.03em;
+  }
+}
+
 .lore-page {
   width: min(860px, 100%);
   margin: 40px auto;

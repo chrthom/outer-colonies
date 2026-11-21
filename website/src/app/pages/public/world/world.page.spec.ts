@@ -77,6 +77,11 @@ describe('WorldPage', () => {
     expect(kallisto.textContent).toContain('publik und ungesühnt');
   });
 
+  it('should render a link back to the landing page', () => {
+    const back = fixture.nativeElement.querySelector('.lore-back-nav a[routerLink="/"]');
+    expect(back?.textContent).toContain('Zurück zur Startseite');
+  });
+
   it('should close with a registration CTA', () => {
     const closing = fixture.nativeElement.querySelector('.history-closing');
     expect(closing.textContent).toContain('Die Chronik deiner Kolonie beginnt jetzt');

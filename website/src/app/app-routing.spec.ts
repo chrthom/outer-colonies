@@ -186,7 +186,7 @@ describe('rules session restoration in the app shell', () => {
     router.navigateByUrl('/rules?section=missions');
     tick();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeTruthy();
 
     http
       .expectOne(`${environment.url.api}/api/auth/login`)
@@ -195,7 +195,7 @@ describe('rules session restoration in the app shell', () => {
     expect(router.url).toBe('/rules?section=missions');
     expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('a[aria-label="Spielregeln"][href="/rules"]')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeNull();
   }));
 });
 

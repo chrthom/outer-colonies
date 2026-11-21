@@ -4,8 +4,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import AuthService from './auth.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { By } from '@angular/platform-browser';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -110,29 +108,28 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('oc-navbar')).toBeTruthy();
   });
 
-  it('keeps legal links and omits header lore links on the landing page', () => {
-    const footer = fixture.nativeElement.querySelector('#footer');
-    expect(footer).toBeTruthy();
-    expect(footer.textContent).not.toContain('Die Welt');
-    expect(footer.textContent).not.toContain('Die Mächte');
-    expect(footer.textContent).not.toContain('Die Editionen');
-    expect(footer.textContent).toContain('Impressum');
-    expect(footer.textContent).toContain('Datenschutz');
-    expect(footer.querySelector('#version')).toBeTruthy();
-  });
+  it('links all public content subpages and legal links in the footer across public and private pages', async () => {
+    const assertFooterLinks = () => {
+      const footer = fixture.nativeElement.querySelector('#footer');
+      expect(footer).toBeTruthy();
+      expect(footer.textContent).toContain('Die Welt');
+      expect(footer.textContent).toContain('Die Mächte');
+      expect(footer.textContent).toContain('Die Editionen');
+      expect(footer.textContent).toContain('Spielregeln');
+      expect(footer.textContent).toContain('Impressum');
+      expect(footer.textContent).toContain('Datenschutz');
+      expect(footer.querySelector('#version')).toBeTruthy();
+    };
 
-  it('keeps the full lore navigation on other public and private pages', async () => {
+    assertFooterLinks();
+
     await TestBed.inject(Router).navigateByUrl('/world?from=landing');
     fixture.detectChanges();
-    const footer = fixture.nativeElement.querySelector('#footer');
-    expect(footer.textContent).toContain('Die Welt');
-    expect(footer.textContent).toContain('Die Mächte');
-    expect(footer.textContent).toContain('Die Editionen');
-    expect(footer.textContent).toContain('Impressum');
-    expect(footer.textContent).toContain('Datenschutz');
+    assertFooterLinks();
+
     Object.assign(authSpy, { isLoggedIn: true });
     fixture.detectChanges();
-    expect(footer.textContent).toContain('Die Editionen');
+    assertFooterLinks();
   });
 
   it('provides landmarks and a skip link to the focusable main content', () => {
@@ -153,14 +150,6 @@ describe('AppComponent', () => {
     skip.click();
     expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
     expect(document.activeElement).toBe(main);
-  });
-
-  it('moves focus to the main content after mobile menu navigation', () => {
-    const main: HTMLElement = fixture.nativeElement.querySelector('#main-content');
-    const scrollSpy = spyOn(main, 'scrollIntoView');
-    fixture.debugElement.query(By.directive(NavbarComponent)).componentInstance.menuNavigation.emit();
-    expect(document.activeElement).toBe(main);
-    expect(scrollSpy).toHaveBeenCalledWith({ block: 'start' });
   });
 
   it('opens legal dialogs through semantic footer buttons', async () => {

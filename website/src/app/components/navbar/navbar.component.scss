@@ -66,35 +66,6 @@ h2.right {
   justify-content: flex-end;
   padding-left: 128px;
 }
-.links {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
-  gap: clamp(4px, 0.8vw, 16px);
-  a {
-    --g: color-mix(in srgb, var(--color-primary), transparent 70%);
-    display: inline-flex;
-    align-items: center;
-    min-height: 62px;
-    padding: 0 clamp(10px, 1.3vw, 24px);
-    color: var(--color-primary-light);
-    font:
-      clamp(14px, 1.1vw, 16px) "Latin Modern Mono Caps",
-      monospace;
-    text-decoration: none;
-    white-space: nowrap;
-    background: radial-gradient(closest-side, var(--g), transparent);
-    &:hover,
-    &.active {
-      color: var(--color-accent-light);
-      --g: color-mix(in srgb, var(--color-accent), transparent 50%);
-    }
-  }
-}
-.menu {
-  display: none;
-}
 .actions {
   display: flex;
   flex-shrink: 0;

@@ -6,7 +6,7 @@
   >Zum Inhalt springen</a
 >
 <header>
-  <oc-navbar (menuNavigation)="focusMainContent(mainContent)"></oc-navbar>
+  <oc-navbar></oc-navbar>
 </header>
 
 <div id="root-content">
@@ -16,11 +16,10 @@
   <footer id="footer">
     <div id="footer-links">
       <ul>
-        @if (!isLandingPage) {
-          <li><a routerLink="/world">Die Welt</a></li>
-          <li><a routerLink="/factions">Die Mächte</a></li>
-          <li><a routerLink="/editions">Die Editionen</a></li>
-        }
+        <li><a routerLink="/world">Die Welt</a></li>
+        <li><a routerLink="/factions">Die Mächte</a></li>
+        <li><a routerLink="/editions">Die Editionen</a></li>
+        <li><a routerLink="/rules">Spielregeln</a></li>
         <li>
           <button type="button" [attr.aria-busy]="legalLoading.imprint" (click)="openImprint()">
             Impressum

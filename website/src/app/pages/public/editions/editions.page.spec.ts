@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { environment } from 'src/environments/environment';
 import { EditionsPage } from './editions.page';
 
@@ -8,7 +9,7 @@ describe('EditionsPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditionsPage]
+      imports: [EditionsPage, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditionsPage);
@@ -79,6 +80,11 @@ describe('EditionsPage', () => {
     expect(text).toContain('einem Plasmabeschleuniger, der niemandem gehört.');
     expect(text).toContain('Wir haben beschlossen, das sein zu lassen. Meistens.');
     expect(text).not.toContain('Beleuchteter Weltausschnitt');
+  });
+
+  it('should render a link back to the landing page', () => {
+    const back = fixture.nativeElement.querySelector('.lore-back-nav a[routerLink="/"]');
+    expect(back?.textContent).toContain('Zurück zur Startseite');
   });
 
   it('should not contain any edition 5 elements', () => {

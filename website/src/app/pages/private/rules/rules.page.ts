@@ -3,14 +3,14 @@ import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 import { MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IconService } from '../../../icon.service';
 
 @Component({
   selector: 'oc-page-rules',
   templateUrl: './rules.page.html',
   styleUrls: ['./rules.page.scss'],
-  imports: [ContentBoxComponent, MatSelectionList, MatListOption, MatButtonModule]
+  imports: [ContentBoxComponent, MatSelectionList, MatListOption, MatButtonModule, RouterLink]
 })
 export class RulesPage implements OnInit {
   @ViewChild('activeChapter') activeChapterList!: MatSelectionList;

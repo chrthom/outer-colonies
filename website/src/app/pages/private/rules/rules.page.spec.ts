@@ -25,6 +25,11 @@ describe('RulesPage', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should render a link back to the landing page', () => {
+    const back = fixture.nativeElement.querySelector('.lore-back-nav a[routerLink="/"]');
+    expect(back?.textContent).toContain('Zurück zur Startseite');
+  });
+
   it('should have default active chapter', () => {
     const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
     expect(selectedValue).toBe('setup');

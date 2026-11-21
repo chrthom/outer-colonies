@@ -2,7 +2,7 @@ import { Component, InjectionToken, Type, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import AuthService from './auth.service';
 import { version, releaseName } from '@shared/config/version';
 
@@ -29,7 +29,6 @@ export const LEGAL_PAGE_LOADERS = new InjectionToken<Record<LegalPage, () => Pro
 export class AppComponent {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
-  private router = inject(Router);
   private legalPageLoaders = inject(LEGAL_PAGE_LOADERS);
 
   readonly legalLoadErrors: Record<LegalPage, boolean> = { imprint: false, privacy: false };
@@ -45,11 +44,6 @@ export class AppComponent {
   focusMainContent(mainContent: HTMLElement): void {
     mainContent.scrollIntoView({ block: 'start' });
     mainContent.focus({ preventScroll: true });
-  }
-
-  /** Whether the public landing page already provides the full set of lore previews. */
-  get isLandingPage(): boolean {
-    return !this.authService.isLoggedIn && this.router.url.split(/[?#]/, 1)[0] === '/';
   }
 
   get env() {

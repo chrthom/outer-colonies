@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { FactionsPage } from './factions.page';
 
 describe('FactionsPage', () => {
@@ -7,7 +8,7 @@ describe('FactionsPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FactionsPage]
+      imports: [FactionsPage, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FactionsPage);
@@ -42,6 +43,11 @@ describe('FactionsPage', () => {
     expect(table).toBeTruthy();
     const houses = Array.from<Element>(table.querySelectorAll('th')).map(th => th.textContent);
     expect(houses).toEqual(['Tharsis', 'Elysium', 'Hellas', 'Arcadia', 'Isidis']);
+  });
+
+  it('should render a link back to the landing page', () => {
+    const back = fixture.nativeElement.querySelector('.lore-back-nav a[routerLink="/"]');
+    expect(back?.textContent).toContain('Zurück zur Startseite');
   });
 
   it('should reuse the four canon quotes with Layla Chen on Venus', () => {
