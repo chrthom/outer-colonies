@@ -89,7 +89,7 @@ North Star: "The Flight Console"
 Rules:
 - The Teal-to-Red Rule. Idle is teal and interaction is red.
 - The Pale-for-Small-Text Rule. Signal Teal Bright and Alert Red do not carry small text on black at WCAG AA.
-- The Veil Rule. The star photograph is always under the 60% black veil.
+- The Veil Rule. The deep-void starfield is always under the 60% black veil.
 - The Two-Face Rule. Titles, labels and navigation are Mono Caps, and everything that is read as a sentence is Sans.
 - The No-Third-Font Rule. Only the two Latin Modern faces plus the icon font.
 - The Glow-Not-Shadow Rule. Emphasis is a halo or a line of light, never a cast shadow.

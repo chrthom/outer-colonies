@@ -1,10 +1,23 @@
-import { Component, InjectionToken, Type, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  InjectionToken,
+  NgZone,
+  OnDestroy,
+  PLATFORM_ID,
+  Type,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import AuthService from './auth.service';
 import { version, releaseName } from '@shared/config/version';
+import { StarfieldBackgroundController } from './starfield-background';
 
 type LegalPage = 'imprint' | 'privacy';
 
@@ -26,10 +39,17 @@ export const LEGAL_PAGE_LOADERS = new InjectionToken<Record<LegalPage, () => Pro
   styleUrls: ['./app.component.scss', './background.scss'],
   imports: [NavbarComponent, RouterLink, RouterOutlet]
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit, OnDestroy {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
   private legalPageLoaders = inject(LEGAL_PAGE_LOADERS);
+  private ngZone = inject(NgZone);
+  private platformId = inject(PLATFORM_ID);
+
+  @ViewChild('backgroundStars') private backgroundStars?: ElementRef<HTMLDivElement>;
+  @ViewChild('starfieldCanvas') private starfieldCanvas?: ElementRef<HTMLCanvasElement>;
+
+  private starfield: StarfieldBackgroundController | null = null;
 
   readonly legalLoadErrors: Record<LegalPage, boolean> = { imprint: false, privacy: false };
   readonly legalLoading: Record<LegalPage, boolean> = { imprint: false, privacy: false };
@@ -38,6 +58,28 @@ export class AppComponent {
     // Restore a cookie session on startup so the navbar shows the real login state even on public pages,
     // where no route guard triggers the session check.
     this.authService.check().subscribe();
+  }
+
+  /** Starts the procedural starfield outside Angular's change-detection zone. */
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    const host = this.backgroundStars?.nativeElement;
+    const canvas = this.starfieldCanvas?.nativeElement;
+    if (!host || !canvas) {
+      return;
+    }
+    this.ngZone.runOutsideAngular(() => {
+      this.starfield = new StarfieldBackgroundController(canvas, host);
+      this.starfield.start();
+    });
+  }
+
+  /** Stops the procedural starfield animation loop and observers on teardown. */
+  ngOnDestroy(): void {
+    this.starfield?.destroy();
+    this.starfield = null;
   }
 
   /** Moves focus and the viewport to the start of the page content. */

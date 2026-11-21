@@ -66,11 +66,13 @@ describe('AppComponent', () => {
     expect(authSpy.check).toHaveBeenCalledTimes(1);
   });
 
-  it('uses the same veiled star field and dark fallback for both login states', () => {
+  it('uses the same veiled procedural starfield and dark fallback for both login states', () => {
     const stars: HTMLElement = fixture.nativeElement.querySelector('#background-stars');
+    const canvas: HTMLCanvasElement = fixture.nativeElement.querySelector('#background-canvas');
     const veil: HTMLElement = fixture.nativeElement.querySelector('#background-layer');
     const checkBackground = () => {
-      expect(getComputedStyle(stars).backgroundImage).toContain('/background/stars1.jpg');
+      expect(canvas).toBeTruthy();
+      expect(getComputedStyle(stars).backgroundImage).toBe('none');
       expect(getComputedStyle(stars).backgroundColor).toBe('rgb(0, 0, 0)');
       expect(getComputedStyle(veil).opacity).toBe('0.6');
     };

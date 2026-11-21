@@ -118,7 +118,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 - **Alert Red Bright** (#ff3535, palette A400, `--color-warn`): Warnings, errors, the Beta badge and anything that must read as text on black.
 
 ### Neutral
-- **Void Black** (#000000, `--color-dark`): The footer, overlays, the navbar start and the veil over the star photograph (60% opacity).
+- **Void Black** (#000000, `--color-dark`): The footer, overlays, the navbar start and the veil over the procedural starfield (60% opacity).
 - **Hologram White** (#ffffff, `--color-light`): Body text on the dark background, and card titles.
 - **Surface Dark** (#303030, `--color-surface`): The Material M2 dark-theme surface, used by default Material controls (form fields, default buttons). `--color-panel-tint` and `--color-panel-backdrop` name the translucent teal and black panel tints.
 
@@ -127,7 +127,7 @@ A near-monochrome teal-on-black palette with one warm counter-signal. The palett
 
 **The Pale-for-Small-Text Rule.** Signal Teal Bright and Alert Red do not carry small text on black at WCAG AA. Body-size text on the dark background is white, Signal Teal Pale, Alert Red Pale or Alert Red Bright. Saturated teal and red are for lines, fills, large labels and icons.
 
-**The Veil Rule.** The star photograph is always under the 60% black veil. Never place content straight on the unveiled sky.
+**The Veil Rule.** The deep-void starfield is always under the 60% black veil. Never place content straight on the unveiled sky.
 
 ## Typography
 
