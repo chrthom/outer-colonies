@@ -13,29 +13,21 @@
   align-items: center;
   min-height: clamp(320px, 46vh, 480px);
   padding: clamp(36px, 5vw, 48px) 20px;
-  border: 1px solid color-mix(in srgb, var(--color-primary), transparent 45%);
+  border: 1px solid color-mix(in srgb, var(--color-primary), transparent 62%);
   background: var(--color-dark) center / cover;
   text-align: center;
 
-  &::before,
-  &::after {
+  &::before {
+    --s: 16px;
     content: "";
     position: absolute;
-    width: 28px;
-    height: 28px;
-    border: 0 solid var(--color-primary);
-  }
-
-  &::before {
-    top: -1px;
-    left: -1px;
-    border-width: 3px 0 0 3px;
-  }
-
-  &::after {
-    bottom: -1px;
-    right: -1px;
-    border-width: 0 3px 3px 0;
+    inset: -1px;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 1.5px solid var(--color-primary-light);
+    mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s))
+      calc(100% - var(--s));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-primary), transparent 30%));
   }
 }
 

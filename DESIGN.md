@@ -65,7 +65,7 @@ components:
   content-box:
     backgroundColor: "{colors.signal-teal-bright}"
     textColor: "{colors.hologram-white}"
-    padding: "81px 42px 42px 43px"
+    padding: "26px 32px 30px"
   table-header:
     backgroundColor: "{colors.signal-teal-bright}"
     textColor: "{colors.hologram-white}"
@@ -103,7 +103,7 @@ Don't:
 - Don't put card or rules content in anything that obscures exact reading of card text; legibility beats effect.
 Do:
 - Do shift teal elements to red on hover, focus and selection (Alert Red #991111 fills, Alert Red Pale text), and keep red out of idle surfaces.
-- Do frame images and text blocks in a content box or with chamfered, beam-like lines; follow the zone-corner and frame art for any new shape.
+- Do choose from the Flight-Console surface family (chamfered `panel`, fine card-corner `brackets` or `open` ruled sections) rather than wrapping every section in an identical outlined box.
 - Do set titles, labels and navigation in Latin Modern Mono Caps and prose in Latin Modern Sans at 18px, line-height 1.7, capped at 75ch.
 - Do use Signal Teal Pale (#88cccc) or white for small text on black, and keep WCAG AA contrast.
 - Do keep the 40% black veil under all content and keep the page flat (halo and translucent tint, no shadows).
