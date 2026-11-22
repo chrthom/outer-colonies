@@ -92,17 +92,22 @@
 }
 
 @media (max-width: 430px) {
-  .logo {
-    padding: 0 6px;
+  .logo,
+  .logged-in .logo {
+    padding: 0 5px;
   }
 
   .logo-emblem {
-    height: 26px;
+    height: 24px;
   }
 
   .logged-in {
     .center {
-      padding: 4px 2px;
+      padding: 4px 1px;
+    }
+
+    .right {
+      padding-right: 0;
     }
 
     .center img,
@@ -113,13 +118,13 @@
     }
 
     .item-label {
-      font-size: 10px;
-      letter-spacing: 0.02em;
+      font-size: 11px;
+      letter-spacing: 0.01em;
     }
 
     .profile {
       min-width: 44px;
-      padding: 4px;
+      padding: 4px 2px;
     }
 
     .logout {

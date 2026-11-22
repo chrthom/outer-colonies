@@ -57,8 +57,12 @@
   &:hover,
   &:focus-visible {
     color: var(--color-accent-light);
-    border-bottom-color: var(--color-accent-bright);
+    border-bottom-color: var(--color-warn);
     background-color: color-mix(in srgb, var(--color-accent), transparent 88%);
+  }
+
+  &:focus-visible {
+    outline-offset: -2px;
   }
 }
 
@@ -110,11 +114,16 @@
   }
 
   &:hover,
+  &:focus-visible,
   &.active {
     color: var(--color-accent-light);
-    border-bottom-color: var(--color-accent-bright);
+    border-bottom-color: var(--color-warn);
     background-color: color-mix(in srgb, var(--color-accent), transparent 88%);
     --f: sepia(55%) saturate(380%) hue-rotate(312deg) brightness(95%);
+  }
+
+  &:focus-visible {
+    outline-offset: -2px;
   }
 }
 
@@ -252,10 +261,10 @@
     &:hover,
     &:focus-visible {
       background-color: color-mix(in srgb, var(--color-accent), transparent 82%);
-      border-color: var(--color-accent-bright);
+      border-color: var(--color-warn);
       color: var(--color-accent-light);
       --mat-button-outlined-label-text-color: var(--color-accent-light);
-      --mat-button-outlined-outline-color: var(--color-accent-bright);
+      --mat-button-outlined-outline-color: var(--color-warn);
     }
   }
 }

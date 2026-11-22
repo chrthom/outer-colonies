@@ -95,10 +95,17 @@ describe('NavbarComponent', () => {
 
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
-    expect(logo.classList.contains('compact')).toBeFalse();
     expect(logo.getAttribute('aria-label')).toBe('Outer Colonies – Startseite');
     expect(
-      Array.from<Element>(iconElements).every(link => link.tagName === 'A' && link.hasAttribute('aria-label'))
+      Array.from<Element>(iconElements).every(link => {
+        const visibleLabel = link.querySelector('.item-label')?.textContent?.trim() ?? '';
+        const accessibleName = link.getAttribute('aria-label') ?? '';
+        return (
+          link.tagName === 'A' &&
+          visibleLabel.length > 0 &&
+          accessibleName.toLowerCase().includes(visibleLabel.toLowerCase())
+        );
+      })
     ).toBeTrue();
     const logout = rightZone.querySelector('button.logout[aria-label="Abmelden"]');
     expect(logout.type).toBe('button');
@@ -180,8 +187,8 @@ describe('NavbarComponent', () => {
     expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
     expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Einloggen']);
     expect(element.querySelector('.item.center')).toBeFalsy();
-    // Both logged-in and anonymous views share the exact same logo sizing and overhanging layout:
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
+    expect(element.querySelector('#navbar-logo svg.logo-emblem')).toBeTruthy();
+    expect(element.querySelector('#navbar-logo .logo-wordmark')?.textContent?.trim()).toBe('Outer Colonies');
   });
 
   it('should render the decorative energy stream canvas and react to mouse hover without throwing', () => {
