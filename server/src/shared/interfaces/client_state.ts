@@ -79,8 +79,11 @@ export interface ClientHandCard {
 
 export interface ClientEvent {
   type: EventType;
+  /** True if the moved card belongs to the player receiving this state. */
   playerEvent: boolean;
+  /** UUID of the moved card stack (board card or hand card) before the movement. */
   oldUUID?: string;
+  /** UUID of the newly created hand card stack (only set for retract events). */
   newUUID?: string;
   target?: string;
 }
@@ -94,6 +97,8 @@ export interface ClientGameResult {
 export interface ClientState {
   battle: ClientBattle;
   cardStacks: ClientCardStack[];
+  /** Card movements (retract/discard) caused by the action which produced this state. */
+  events: ClientEvent[];
   gameResult?: ClientGameResult;
   highlightCardUUID?: string;
   highlightCardId?: number;
@@ -114,6 +119,7 @@ export const emptyClientState: ClientState = {
     range: rules.maxRange + 1
   },
   cardStacks: [],
+  events: [],
   opponent: {
     actionPool: [],
     deckSize: 0,

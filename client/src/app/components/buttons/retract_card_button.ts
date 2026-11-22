@@ -67,6 +67,7 @@ export default class RetractCardButton {
     return this;
   }
   destroy() {
+    this.tweenAnimation?.stop();
     this.image.destroy();
   }
   private tween(show: boolean, x: number, y: number) {

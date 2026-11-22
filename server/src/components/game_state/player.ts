@@ -1,6 +1,13 @@
 import Card from '../cards/card';
 import CardStack, { RootCardStack } from '../cards/card_stack';
-import { CardType, Zone, TurnPhase, BattleType, InterventionType } from '../../shared/config/enums';
+import {
+  CardType,
+  Zone,
+  TurnPhase,
+  BattleType,
+  EventType,
+  InterventionType
+} from '../../shared/config/enums';
 import { shuffle, spliceCardStackByUUID } from '../utils/helpers';
 import ColonyCard from '../cards/types/colony_card';
 import ActionPool from '../cards/action_pool';
@@ -55,14 +62,19 @@ export default class Player {
     this.discardPile.push(...cards);
   }
   discardHandCards(...uuids: string[]) {
-    uuids
-      .map(uuid => spliceCardStackByUUID(this.hand, uuid)?.cards)
-      .forEach(c => (c ? this.discardPile.push(...c) : {}));
+    uuids.forEach(uuid => {
+      const handCard = spliceCardStackByUUID(this.hand, uuid);
+      if (handCard) {
+        this.discardPile.push(...handCard.cards);
+        this.match.addCardMovementEvent(EventType.Discard, handCard);
+      }
+    });
   }
   discardCardStacks(...uuids: string[]) {
-    uuids
-      .map(uuid => spliceCardStackByUUID(this.cardStacks, uuid)?.cards)
-      .forEach(c => (c ? this.discardPile.push(...c) : {}));
+    uuids.forEach(uuid => {
+      const cardStack = this.cardStacks.find(cs => cs.uuid == uuid);
+      cardStack?.discard();
+    });
   }
   get colonyCardStack(): CardStack {
     const colonyCard = this.cardStacks.find(c => c.card.type == CardType.Colony);
@@ -87,8 +99,14 @@ export default class Player {
     this.takeCards([card]);
     return card;
   }
-  takeCards(cards: Card[]) {
-    this.hand.push(...cards.map(c => new RootCardStack(c, Zone.Hand, this)));
+  /**
+   * Takes the given cards into the player's hand as new hand card stacks.
+   * @returns the newly created hand card stacks (with fresh UUIDs)
+   */
+  takeCards(cards: Card[]): CardStack[] {
+    const newHandCardStacks = cards.map(c => new RootCardStack(c, Zone.Hand, this));
+    this.hand.push(...newHandCardStacks);
+    return newHandCardStacks;
   }
   pickCardFromDeck(): Card | undefined {
     const card = this.pickCardsFromDeck(1);
