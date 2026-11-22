@@ -129,12 +129,6 @@ export const routes: Routes = [
     title: 'Outer Colonies – Passwort vergessen'
   },
   {
-    path: 'history',
-    canActivate: [publicGuardFn],
-    loadComponent: () => import('./pages/public/history/history.page').then(m => m.HistoryPage),
-    title: 'Outer Colonies – Die Geschichte'
-  },
-  {
     path: 'home',
     canActivate: [privateGuardFn],
     loadComponent: () => import('./pages/private/home/home.page').then(m => m.HomePage),

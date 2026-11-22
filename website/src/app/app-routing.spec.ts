@@ -80,7 +80,6 @@ describe('app routes (public landing and lore pages)', () => {
     const loreRoutes: [string, string, string][] = [
       ['world', 'oc-page-world', 'Outer Colonies – Die Welt'],
       ['factions', 'oc-page-factions', 'Outer Colonies – Die Mächte'],
-      ['history', 'oc-page-history', 'Outer Colonies – Die Geschichte'],
       ['editions', 'oc-page-editions', 'Outer Colonies – Die Editionen']
     ];
     for (const [path, selector, pageTitle] of loreRoutes) {
@@ -187,7 +186,7 @@ describe('rules session restoration in the app shell', () => {
     router.navigateByUrl('/rules?section=missions');
     tick();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeTruthy();
 
     http
       .expectOne(`${environment.url.api}/api/auth/login`)
@@ -196,7 +195,7 @@ describe('rules session restoration in the app shell', () => {
     expect(router.url).toBe('/rules?section=missions');
     expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('a[aria-label="Spielregeln"][href="/rules"]')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('#navbar-anon-links')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeNull();
   }));
 });
 

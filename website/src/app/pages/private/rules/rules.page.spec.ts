@@ -34,6 +34,24 @@ describe('RulesPage', () => {
     fixture.detectChanges();
   });
 
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should render links back to the landing page at top and bottom', () => {
+    const links = Array.from<Element>(
+      fixture.nativeElement.querySelectorAll('.lore-back-nav a[routerLink="/"]')
+    );
+    expect(links.length).toBe(2);
+    expect(links.every(link => link.textContent?.includes('Zurück zur Startseite'))).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.lore-back-nav--bottom a[routerLink="/"]')).toBeTruthy();
+  });
+
+  it('should have default active chapter', () => {
+    const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
+    expect(selectedValue).toBe('setup');
+  });
+
   it('labels the keyboard-operable chapter list and keeps both navigation button sets', () => {
     const list: HTMLElement = fixture.nativeElement.querySelector('mat-selection-list');
     expect(list.getAttribute('aria-label')).toBe('Kapitel der Spielregeln');
@@ -65,15 +83,6 @@ describe('RulesPage', () => {
     component.nextChapter();
 
     expect(list.scrollTop).toBe(224);
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should have default active chapter', () => {
-    const selectedValue = component.activeChapterList.selectedOptions.selected[0]?.value;
-    expect(selectedValue).toBe('setup');
   });
 
   it('should register every sidebar chapter in the chapters array', () => {

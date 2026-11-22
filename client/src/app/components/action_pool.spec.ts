@@ -1,7 +1,7 @@
 import ActionPool from './action_pool';
 import { layoutConfig } from '../config/layout';
 import { designConfig } from '../config/design';
-import { asGameScene, makeGameObjectStub, makeSceneStub, SceneStub } from '../testing/phaser_stubs';
+import { asGameScene, makeSceneStub, SceneStub } from '../testing/phaser_stubs';
 
 describe('ActionPool', () => {
   let scene: SceneStub;
@@ -11,20 +11,6 @@ describe('ActionPool', () => {
     scene = makeSceneStub();
     scene.getPlayerState.and.returnValue({ actionPool: ['attack', 'defend'] });
     actionPool = new ActionPool(asGameScene(scene), true);
-  });
-
-  it('should destroy existing images when destroyed', () => {
-    // Stub game objects stand in for real Phaser images, hence the cast
-    const mockImage1 = makeGameObjectStub();
-    const mockImage2 = makeGameObjectStub();
-
-    actionPool.images = [mockImage1, mockImage2] as unknown as Phaser.GameObjects.Image[];
-
-    actionPool.destroy();
-
-    expect(mockImage1.destroy).toHaveBeenCalled();
-    expect(mockImage2.destroy).toHaveBeenCalled();
-    expect(actionPool.images).toEqual([]);
   });
 
   it('should update action pool with player actions', () => {
@@ -89,20 +75,50 @@ describe('ActionPool', () => {
     expect(actionPool.images).toEqual([]);
   });
 
-  it('should destroy old images before creating new ones', () => {
+  it('should reuse images and update their textures in place', () => {
+    actionPool.update();
+    const firstImages = [...actionPool.images];
+    expect(firstImages.length).toBe(2);
+
+    scene.getPlayerState.and.returnValue({ actionPool: ['move', 'defend'] });
+    actionPool.update();
+
+    expect(actionPool.images.length).toBe(2);
+    expect(actionPool.images[0]).toBe(firstImages[0]);
+    expect(actionPool.images[1]).toBe(firstImages[1]);
+    expect(firstImages[0].setTexture).toHaveBeenCalledWith('icon_move');
+    expect(firstImages[1].setTexture).toHaveBeenCalledWith('icon_defend');
+
+    // No images were destroyed or recreated for the update
+    firstImages.forEach(img => expect(img.destroy).not.toHaveBeenCalled());
+    expect(scene.add.image).toHaveBeenCalledTimes(2); // only from the first update
+  });
+
+  it('should destroy only surplus images when the action pool shrinks', () => {
     actionPool.update();
     const firstImages = [...actionPool.images];
 
-    scene.getPlayerState.and.returnValue({ actionPool: ['move'] });
+    scene.getPlayerState.and.returnValue({ actionPool: ['attack'] });
     actionPool.update();
 
-    firstImages.forEach(img => expect(img.destroy).toHaveBeenCalled());
-
     expect(actionPool.images.length).toBe(1);
-    expect(scene.add.image).toHaveBeenCalledWith(
-      layoutConfig.game.ui.actionPool.player.x,
-      layoutConfig.game.ui.actionPool.player.y,
-      'icon_move'
-    );
+    expect(actionPool.images[0]).toBe(firstImages[0]);
+    expect(firstImages[0].setTexture).toHaveBeenCalledWith('icon_attack');
+    expect(firstImages[1].destroy).toHaveBeenCalled();
+    expect(firstImages[0].destroy).not.toHaveBeenCalled();
+  });
+
+  it('should recreate images after the pool was emptied and grows again', () => {
+    actionPool.update();
+    expect(actionPool.images.length).toBe(2);
+
+    scene.getPlayerState.and.returnValue({ actionPool: [] });
+    actionPool.update();
+    expect(actionPool.images).toEqual([]);
+
+    scene.getPlayerState.and.returnValue({ actionPool: ['attack', 'defend'] });
+    actionPool.update();
+    expect(actionPool.images.length).toBe(2);
+    expect(scene.add.image).toHaveBeenCalledTimes(4); // 2 from each non-empty update
   });
 });

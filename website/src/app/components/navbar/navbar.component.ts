@@ -1,19 +1,20 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, inject, Output, ViewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { isPlatformBrowser } from '@angular/common';
 import {
-  NavigationCancel,
-  NavigationCancellationCode,
-  NavigationEnd,
-  NavigationError,
-  NavigationSkipped,
-  NavigationStart,
-  Router,
-  RouterLink
-} from '@angular/router';
+  AfterViewInit,
+  Component,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  PLATFORM_ID,
+  ViewChild,
+  inject
+} from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import AuthService from 'src/app/auth.service';
+import { environment } from 'src/environments/environment';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatAnchor } from '@angular/material/button';
+import { PlasmaConduitController } from './plasma-conduit';
 
 @Component({
   selector: 'oc-navbar',
@@ -21,74 +22,101 @@ import { MatAnchor } from '@angular/material/button';
   styleUrls: ['./navbar.component.scss', './navbar-mobile.scss'],
   imports: [RouterLink, MatTooltip, MatAnchor]
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit, OnDestroy {
   router = inject(Router);
   private authService = inject(AuthService);
-  private document = inject(DOCUMENT);
-  @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
-  @ViewChild('menuLinks') private menuLinks?: ElementRef<HTMLElement>;
-  @Output() menuNavigation = new EventEmitter<void>();
+  private ngZone = inject(NgZone);
+  private platformId = inject(PLATFORM_ID);
 
-  menuOpen = false;
-  private menuNavigationId?: number;
-  private menuNavigationRedirect = false;
+  @ViewChild('barElement') private barElement?: ElementRef<HTMLDivElement>;
+  @ViewChild('energyCanvas') private energyCanvas?: ElementRef<HTMLCanvasElement>;
 
-  constructor() {
-    this.router.events.pipe(takeUntilDestroyed()).subscribe(event => {
-      if (event instanceof NavigationStart) {
-        if (this.menuOpen && this.menuHasFocus()) {
-          this.menuNavigationId = event.id;
-          this.menuToggle?.nativeElement.focus();
-        } else if (
-          this.menuNavigationRedirect &&
-          this.document.activeElement === this.menuToggle?.nativeElement
-        ) {
-          this.menuNavigationId = event.id;
-        }
-        this.menuNavigationRedirect = false;
-        this.menuOpen = false;
-      } else if (event instanceof NavigationSkipped) {
-        if (this.menuOpen && this.menuHasFocus()) {
-          this.menuToggle?.nativeElement.focus();
-        }
-        this.menuOpen = false;
-        this.menuNavigationRedirect = false;
-      } else if (
-        event instanceof NavigationEnd ||
-        event instanceof NavigationCancel ||
-        event instanceof NavigationError
-      ) {
-        if (event.id === this.menuNavigationId && event instanceof NavigationEnd) {
-          if (this.document.activeElement === this.menuToggle?.nativeElement) {
-            this.menuNavigation.emit();
-          }
-          this.menuNavigationId = undefined;
-        } else if (event.id === this.menuNavigationId) {
-          this.menuNavigationRedirect =
-            event instanceof NavigationCancel && event.code === NavigationCancellationCode.Redirect;
-          this.menuNavigationId = undefined;
-        }
+  private conduit: PlasmaConduitController | null = null;
+  private pointerInside = false;
+
+  private readonly handleMouseMove = (event: MouseEvent): void => {
+    this.pointerInside = true;
+    this.conduit?.setPointer(event.clientX, event.clientY);
+  };
+
+  private readonly handleMouseLeave = (): void => {
+    this.pointerInside = false;
+    this.conduit?.clearTarget();
+  };
+
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+    let isFocusVisible = false;
+    try {
+      isFocusVisible = target.matches(':focus-visible');
+    } catch {
+      if (environment.stage !== 'production') {
+        console.warn(
+          'NavbarComponent: :focus-visible selector unsupported, skipping conduit focus deflection'
+        );
       }
+      isFocusVisible = false;
+    }
+    if (!isFocusVisible) {
+      return;
+    }
+    const barRect = this.barElement?.nativeElement.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    if (!barRect || barRect.width <= 0) {
+      return;
+    }
+    const localX = targetRect.left + targetRect.width * 0.5 - barRect.left;
+    const localY = targetRect.top + targetRect.height * 0.5 - barRect.top;
+    this.conduit?.setLocalTarget(localX, localY);
+  };
+
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const bar = this.barElement?.nativeElement;
+    const related = event.relatedTarget;
+    if (this.pointerInside || (bar && related instanceof Node && bar.contains(related))) {
+      return;
+    }
+    this.conduit?.clearTarget();
+  };
+
+  /** Initializes the header plasma conduit stream outside Angular's change-detection zone. */
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    const bar = this.barElement?.nativeElement;
+    const canvas = this.energyCanvas?.nativeElement;
+    if (!bar || !canvas) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() => {
+      this.conduit = new PlasmaConduitController(canvas, bar);
+      this.conduit.start();
+      bar.addEventListener('mousemove', this.handleMouseMove, { passive: true });
+      bar.addEventListener('mouseleave', this.handleMouseLeave, { passive: true });
+      bar.addEventListener('focusin', this.handleFocusIn);
+      bar.addEventListener('focusout', this.handleFocusOut);
     });
   }
 
-  private menuHasFocus(): boolean {
-    return (
-      !!this.menuToggle?.nativeElement.getClientRects().length &&
-      !!this.menuLinks?.nativeElement.contains(this.document.activeElement)
-    );
-  }
-
-  /** Closes the mobile menu and returns keyboard focus to its toggle. */
-  @HostListener('document:keydown.escape')
-  closeMenuOnEscape(): void {
-    if (this.menuOpen) {
-      this.menuOpen = false;
-      this.menuToggle?.nativeElement.focus();
+  /** Releases the animation loop, observers, and DOM listeners on teardown. */
+  ngOnDestroy(): void {
+    const bar = this.barElement?.nativeElement;
+    if (bar) {
+      bar.removeEventListener('mousemove', this.handleMouseMove);
+      bar.removeEventListener('mouseleave', this.handleMouseLeave);
+      bar.removeEventListener('focusin', this.handleFocusIn);
+      bar.removeEventListener('focusout', this.handleFocusOut);
     }
+    this.conduit?.destroy();
+    this.conduit = null;
   }
 
-  /** Whether a user is logged in (icon navbar) or the public links should be shown. */
+  /** Whether a user is logged in (icon navbar) or the public auth actions should be shown. */
   get isLoggedIn(): boolean {
     return this.authService.isLoggedIn;
   }

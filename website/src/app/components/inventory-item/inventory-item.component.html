@@ -1,10 +1,31 @@
-<div class="item">
-  <div class="corners">
-    <div class="top_left"></div>
-    <div class="top_right"></div>
-    <div class="bottom_left"></div>
-    <div class="bottom_right"></div>
+@if (interactive) {
+  <button
+    type="button"
+    class="item item--interactive"
+    [class.is-loading]="loading"
+    [disabled]="loading"
+    [attr.aria-label]="actionLabel || text"
+    [attr.aria-busy]="loading"
+    (click)="onActivate()"
+  >
+    <span class="corners" aria-hidden="true">
+      <span class="top_left"></span>
+      <span class="top_right"></span>
+      <span class="bottom_left"></span>
+      <span class="bottom_right"></span>
+    </span>
+    <img class="image" [src]="img" alt="" />
+    <span class="title">{{ loading ? "Öffne…" : text }}</span>
+  </button>
+} @else {
+  <div class="item">
+    <span class="corners" aria-hidden="true">
+      <span class="top_left"></span>
+      <span class="top_right"></span>
+      <span class="bottom_left"></span>
+      <span class="bottom_right"></span>
+    </span>
+    <img class="image" [src]="img" alt="" />
+    <span class="title">{{ text }}</span>
   </div>
-  <img class="image" [src]="img" />
-  <h4 class="title">{{ text }}</h4>
-</div>
+}
