@@ -237,10 +237,13 @@ describe('RulesPage', () => {
     expect(text()).toContain('Missionen und Überfälle starten');
     expect(text()).toContain('Gefechte');
     expect(text()).toContain('Spielende und Kapitulation');
+    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(6);
+    expect(fixture.debugElement.queryAll(By.css('.screenshot-legend')).length).toBe(6);
     component.setMode('kartenspiel');
     fixture.detectChanges();
     expect(text()).not.toContain('So steuerst du das Spiel');
     expect(text()).not.toContain('Kapitulation bestätigen');
+    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(0);
     // Mode-independent online features remain visible in both modes
     expect(text()).toContain('Timer und Bedenkzeit');
     expect(text()).toContain('Sol');

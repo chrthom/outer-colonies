@@ -30,10 +30,41 @@
           content: "Online-Spiel: ";
           font-weight: bold;
         }
+        .screenshot-figure {
+          margin: 0 0 24px 0;
+        }
         .screenshot {
           display: block;
-          max-width: 60%;
-          margin: 0 auto 20px auto;
+          max-width: 75%;
+          margin: 0 auto 14px auto;
+        }
+        .screenshot-legend {
+          max-width: 75%;
+          margin: 0 auto;
+          padding-left: 0;
+          list-style: none;
+          counter-reset: screenshot-item;
+          li {
+            counter-increment: screenshot-item;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 6px;
+          }
+          li::before {
+            content: counter(screenshot-item);
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: var(--color-warn);
+            color: #ffffff;
+            font-size: 0.85em;
+            font-weight: bold;
+          }
         }
       }
       h2 {
@@ -154,6 +185,13 @@
       .size-30,
       .size-40 {
         max-width: 70%;
+      }
+
+      .online-hint {
+        .screenshot,
+        .screenshot-legend {
+          max-width: 100%;
+        }
       }
     }
   }

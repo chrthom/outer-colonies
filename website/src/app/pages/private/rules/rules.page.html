@@ -315,10 +315,11 @@
                 wie ein Klick auf die Weiter-Schaltfläche.
               </p>
               <p>
-                Die Hinweisbox über dem Spielfeld zeigt dir jederzeit an, welche Aktion gerade von dir
-                erwartet wird – etwa Karten auszuspielen, Schiffe für eine Mission zu wählen oder Angriffe
-                durchzuführen. Schaltflächen heben ihre Beschriftung farblich ab, sobald du mit dem Zeiger
-                darüberfährst.
+                Die Hinweisbox unter der Weiter-Schaltfläche erscheint, sobald du mit dem Zeiger über die
+                Weiter-Schaltfläche fährst (sowie kurz bei Phasenwechseln), und zeigt dir an, welche Aktion
+                gerade von dir erwartet wird – etwa Karten auszuspielen, Schiffe für eine Mission zu wählen
+                oder Angriffe durchzuführen. Schaltflächen heben ihre Beschriftung farblich ab, sobald du mit
+                dem Zeiger darüberfährst.
               </p>
               <p>
                 Am rechten Spielfeldrand siehst du für beide Spieler:innen jeweils eine Spalte kleiner Symbole
@@ -337,11 +338,35 @@
                   <b>Abgeblendete Karte</b>: Die Karte steht in der aktuellen Situation nicht zur Verfügung.
                 </li>
               </ul>
-              <img
-                [src]="screenshotUrl('online_prompt')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot der Hinweisbox mit Hervorhebungen"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_prompt')"
+                  class="screenshot"
+                  alt="Steuerungselemente am rechten Spielfeldrand mit Hinweisbox und Kartenhervorhebungen"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Bedenkzeit-Anzeige</b> – verbleibende Zeit neben dem Namen der handelnden Spieler:in
+                      (färbt sich unter 60 Sekunden rot)
+                    </li>
+                    <li>
+                      <b>Weiter-Schaltfläche</b> – schaltet in die nächste Phase weiter bzw. bestätigt deine
+                      Auswahl (alternativ per <b>Leertaste</b>)
+                    </li>
+                    <li>
+                      <b>Hinweisbox</b> – erscheint beim Überfahren der Weiter-Schaltfläche und nennt die
+                      aktuell erwartete Aktion
+                    </li>
+                    <li>
+                      <b>Aktionspool</b> – noch verfügbare Aktionen und erlaubte Kartentypen deiner
+                      Aufbauphase
+                    </li>
+                    <li><b>Weißer Schimmer</b> – Karte ist auswählbar, spielbar oder ein gültiges Ziel</li>
+                    <li><b>Roter Schimmer</b> – Karte ist aktuell von dir ausgewählt</li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>Deine Handkarten</h4>
               <p>
                 Deine Handkarten liegen unten am Bildschirmrand. Fährst du mit dem Zeiger über deine Hand,
@@ -357,22 +382,60 @@
                 Bei manchen Karten erscheint beim Ausspielen eine Auswahl, z.B. wenn du eine Karte aus
                 mehreren Möglichkeiten aussuchen sollst: Wähle dort die geforderte Anzahl Karten aus –
                 angezeigt werden je drei Karten pro Seite, mit den Pfeilen blätterst du umher – und bestätige
-                mit <b>OK</b>.
+                mit <b>OK</b>. Über <b>X</b>, die <b>Escape</b>-Taste oder einen <b>Rechtsklick</b> brichst du
+                die Auswahl ab.
               </p>
-              <img
-                [src]="screenshotUrl('online_picker')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot der Kartenauswahl"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_picker')"
+                  class="screenshot"
+                  alt="Kartenauswahl mit Seitenpfeilen, Abbrechen- und OK-Schaltfläche"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Statusanzeige</b> – zeigt, wie viele Karten gewählt werden müssen und auf welcher
+                      Seite du bist
+                    </li>
+                    <li>
+                      <b>Abbrechen (X)</b> – schließt die Auswahl ohne die Karte auszuspielen (alternativ per
+                      <b>Escape</b> oder <b>Rechtsklick</b>)
+                    </li>
+                    <li>
+                      <b>Kartenoptionen</b> – bis zu drei Karten pro Seite; gewählte Karten leuchten rot
+                    </li>
+                    <li><b>Blättern-Pfeile</b> – wechseln zwischen den Seiten der Auswahl</li>
+                    <li>
+                      <b>OK-Schaltfläche</b> – erscheint, sobald die geforderte Anzahl Karten gewählt ist
+                    </li>
+                  </ol>
+                </figcaption>
+              </figure>
               <p>
                 Hast du am Ende deines Spielzugs mehr als 7 Handkarten, legt ein Klick auf eine Handkarte
                 diese auf deinen Ablagestapel.
               </p>
-              <img
-                [src]="screenshotUrl('online_hand')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot der aufgefächerten Handkarten"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_hand')"
+                  class="screenshot"
+                  alt="Aufgefächerte Handkarten mit abgehobener Karte unter dem Mauszeiger"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Abgehobene Handkarte</b> – Karte unter dem Mauszeiger hebt sich aus dem Fächer hervor
+                    </li>
+                    <li>
+                      <b>Spielbare Handkarte</b> – weißer Schimmer zeigt an, dass du sie ausspielen kannst
+                    </li>
+                    <li>
+                      <b>Nicht spielbare Handkarte</b> – Karten ohne Schimmer stehen aktuell nicht zur
+                      Verfügung
+                    </li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>Kartenstapel inspizieren</h4>
               <p>
                 Fährst du mit dem Zeiger über einen Kartenstapel, fächert sich dieser auf und du siehst alle
@@ -387,16 +450,31 @@
                 erneut mit der rechten Maustaste klickst. Spielt deine Gegenspieler:in eine Taktikkarte, wird
                 dir diese automatisch groß angezeigt; ein Linksklick blendet die Ansicht aus.
               </p>
-              <img
-                [src]="screenshotUrl('online_stack')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot eines aufgefächerten Kartenstapels"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_stack')"
+                  class="screenshot"
+                  alt="Aufgefächerter Kartenstapel mit Zusammenfassungsbox und Zurücknehmen-Schaltflächen"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Aufgefächerter Kartenstapel</b> – beim Überfahren werden alle Karten des Stapels
+                      einzeln sichtbar
+                    </li>
+                    <li><b>Zusammenfassungsbox</b> – zeigt die gesammelten Eigenschaftspunkte des Stapels</li>
+                    <li>
+                      <b>Zurücknehmen-Schaltfläche</b> – legt die jeweilige Karte in deiner Aufbauphase zurück
+                      auf die Hand (dauerhaft rot bei fehlender Energie)
+                    </li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>Missionen und Überfälle starten</h4>
               <p>
                 In deiner Aufbauphase erscheinen die Schaltflächen <b>Mission</b> und <b>Überfall</b>, sobald
                 du mindestens ein einsatzbereites Schiff besitzt. Ein Klick startet die Planung – die aktive
-                Schaltfläche ist farblich hervorgehoben und deine Handkarten sind während der Planung
+                Schaltfläche ist türkis hervorgehoben und deine Handkarten sind während der Planung
                 abgeblendet –, ein weiterer Klick bricht die Planung ab.
               </p>
               <p>
@@ -416,11 +494,30 @@
                 jeweiligen Karte. Karten, die nicht mehr genügend Energie haben, sind dauerhaft rot markiert
                 und müssen zurückgenommen werden.
               </p>
-              <img
-                [src]="screenshotUrl('online_buttons')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot der Schaltflächen für Mission und Überfall"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_buttons')"
+                  class="screenshot"
+                  alt="Schaltflächen für Mission und Überfall bei aktiver Missionsplanung"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Schaltfläche Mission</b> – startet oder beendet die Missionsplanung (türkis
+                      hervorgehoben, solange aktiv)
+                    </li>
+                    <li><b>Schaltfläche Überfall</b> – startet oder beendet die Überfallsplanung</li>
+                    <li>
+                      <b>Ausgewähltes Schiff</b> – roter Schimmer markiert eingeteilte Schiffe (erneuter Klick
+                      entfernt sie wieder)
+                    </li>
+                    <li>
+                      <b>Abgeblendete Handkarten</b> – während der Missions- oder Überfallsplanung nicht
+                      spielbar
+                    </li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>Gefechte</h4>
               <p>
                 In der Gefechtsphase wählst du zuerst eine kampfbereite Waffe deines Schiffes als Angreifer
@@ -444,11 +541,27 @@
                 ausspielen, indem du die Handkarte und danach ihr Ziel anklickst, oder die Intervention mit
                 der Weiter-Schaltfläche überspringen.
               </p>
-              <img
-                [src]="screenshotUrl('online_combat')"
-                class="screenshot"
-                alt="Platzhalter: Screenshot der Angriffsauswahl im Gefecht"
-              />
+              <figure class="screenshot-figure">
+                <img
+                  [src]="screenshotUrl('online_combat')"
+                  class="screenshot"
+                  alt="Angriffsauswahl im Gefecht mit ausgewählter Waffe, Zielschiff und Reichweitenanzeige"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Ausgewählte Waffe</b> – roter Schimmer markiert deinen gewählten Angreifer (weitere
+                      kampfbereite Waffen leuchten weiß)
+                    </li>
+                    <li>
+                      <b>Gültiges Ziel</b> – weißer Schimmer markiert gegnerische Schiffe, die du per Klick
+                      angreifen kannst
+                    </li>
+                    <li><b>Reichweitenanzeige</b> – zeigt die aktuelle Gefechtsreichweite</li>
+                    <li><b>Abgeblendete Stapel</b> – Karten, die nicht am Gefecht teilnehmen</li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>Spielende und Kapitulation</h4>
               <p>
                 Über die Schaltfläche <b>Aufgeben</b> kannst du jederzeit kapitulieren: Der erste Klick zeigt
