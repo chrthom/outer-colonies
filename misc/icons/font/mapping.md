@@ -85,7 +85,7 @@ npm run build
 Afterwards, copy the generated font files to the website and update the glyph comments in both stylesheets:
 
 ```bash
-cp font/outer-colonies-icons.{ttf,woff,woff2} ../../website/src/assets/fonts/
+cp font/outer-colonies-icons.{ttf,woff,woff2} ../../website/src/style/fonts/
 ```
 
 - `font/outer-colonies-icons.css` (comment mapping in this directory)
