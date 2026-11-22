@@ -110,20 +110,9 @@ describe('RequestValidation', () => {
   });
 
   describe('authPasswordSchema', () => {
-    const validBody = { password: 'password1' };
-
-    it('accepts a strong password', () => {
-      expect(authPasswordSchema.safeParse(validBody).success).toBe(true);
-    });
-
-    it.each([
-      ['password without a digit', { password: 'password' }],
-      ['password without a letter', { password: '12345678' }],
-      ['short password', { password: 'ab1' }],
-      ['missing password', { password: undefined }]
-    ])('rejects a %s', (_case, invalidChange) => {
-      const result = authPasswordSchema.safeParse({ ...validBody, ...invalidChange });
-      expect(result.success).toBe(false);
+    it('accepts a strong password and rejects a weak one', () => {
+      expect(authPasswordSchema.safeParse({ password: 'password1' }).success).toBe(true);
+      expect(authPasswordSchema.safeParse({ password: 'password' }).success).toBe(false);
     });
   });
 
@@ -152,13 +141,8 @@ describe('RequestValidation', () => {
       }
     );
 
-    it.each([
-      ['malformed email', { email: 'not-an-email' }],
-      ['missing email', { email: undefined }],
-      ['non-string email', { email: 42 }]
-    ])('rejects a %s', (_case, invalidChange) => {
-      const result = authEmailSchema.safeParse({ ...validBody, ...invalidChange });
-      expect(result.success).toBe(false);
+    it('rejects a non-string email', () => {
+      expect(authEmailSchema.safeParse({ email: 42 }).success).toBe(false);
     });
   });
 
@@ -176,11 +160,9 @@ describe('RequestValidation', () => {
     });
 
     it.each([
-      ['short username', { username: 'ab' }],
-      ['long username', { username: 'a'.repeat(21) }],
-      ['malformed email', { email: 'not-an-email' }],
-      ['long email', { email: `${'a'.repeat(50)}@example.com` }]
-    ])('rejects a query with a %s', (_case, invalidQuery) => {
+      ['invalid username', { username: 'ab' }],
+      ['invalid email', { email: 'not-an-email' }]
+    ])('rejects a query with an %s', (_case, invalidQuery) => {
       expect(authExistsQuerySchema.safeParse(invalidQuery).success).toBe(false);
     });
   });

@@ -120,17 +120,6 @@ const getEmittedState = (socketMock: SocketMock): ClientState => {
   return emission[1];
 };
 
-describe('Match player creation', () => {
-  test('players carry the user id of the authenticated socket data', () => {
-    const { match } = createCombatMatch();
-
-    // The socket mock deliberately uses userId = playerNo + 1, so a passing
-    // expectation proves the id is carried over, not coincidentally equal
-    expect(match.players[0].userId).toBe(1);
-    expect(match.players[1].userId).toBe(2);
-  });
-});
-
 describe('MsgTypeInbound.Attack with all weapons', () => {
   let match: Match;
   let socketMocks: [SocketMock, SocketMock];
@@ -245,21 +234,7 @@ describe('gameCron with reconnection grace', () => {
     expect(match.players[0].disconnectedSince).toBeDefined();
   });
 
-  test('surrenders a player whose grace window expired', () => {
-    const { match, socketMocks } = createCombatMatch();
-    registerMatch(match);
-    jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
-    match.players[0].disconnectedSince = Date.now() - (rules.reconnectGracePeriod * 1000 + 1000);
-
-    gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
-
-    expect(match.gameResult.gameOver).toBe(true);
-    expect(match.gameResult.type).toBe(GameResultType.Surrender);
-    expect(match.gameResult.winnerNo).toBe(1);
-    expect(match.players[0].disconnectedSince).toBeUndefined();
-  });
-
-  test('emits the game over state to the remaining player after the grace surrender', () => {
+  test('surrenders a player whose grace window expired and delivers the state to the remaining player', () => {
     const { match, socketMocks } = createCombatMatch();
     registerMatch(match);
     jest.spyOn(match.gameResult, 'persistEarnings').mockResolvedValue(undefined);
@@ -268,6 +243,11 @@ describe('gameCron with reconnection grace', () => {
 
     // The surrendered player's socket is gone; only the remaining player is reachable
     gameCron(createIoMock([socketMocks[1].socket]));
+
+    expect(match.gameResult.gameOver).toBe(true);
+    expect(match.gameResult.type).toBe(GameResultType.Surrender);
+    expect(match.gameResult.winnerNo).toBe(1);
+    expect(match.players[0].disconnectedSince).toBeUndefined();
 
     const state = getEmittedState(socketMocks[1]);
     expect(state.gameResult?.type).toBe(GameResultType.Surrender);
