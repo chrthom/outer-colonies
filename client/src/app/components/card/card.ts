@@ -27,12 +27,23 @@ export default class Card extends CardImage {
     this.cardStackUUID = cardStackUUID;
     this.retractCardButton = data.retractable ? new RetractCardButton(this.scene, this) : undefined;
   }
+  /** Updates the card data in place and syncs the retract button, without recreating game objects. */
+  update(data: ClientCard, x: number, y: number) {
+    this.data = data;
+    if (!data.retractable) {
+      this.destroyRetractButton();
+    } else {
+      if (!this.retractCardButton) this.retractCardButton = new RetractCardButton(this.scene, this);
+      this.retractCardButton.refresh(x, y);
+    }
+  }
   override destroy(): this {
     this.destroyRetractButton();
     return super.destroy();
   }
   destroyRetractButton() {
     this.retractCardButton?.destroy();
+    this.retractCardButton = undefined;
   }
   animateAttack() {
     this.highlightSelected();
@@ -40,6 +51,8 @@ export default class Card extends CardImage {
   }
   override tween(config: CardTweenConfig) {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
+    // Cards are reused across updates, so kill tweens from a previous update or hover.
+    this.killTweens();
     super.tween(config);
   }
 }

@@ -32,6 +32,54 @@ export default class RetractCardButton {
     } else this.setTintNormal();
   }
   show(x: number, y: number, onPointerOver: () => void, onPointerOut: () => void): this {
+    this.bindInputHandlers(onPointerOver, onPointerOut);
+    this.tween(true, x, y);
+    return this;
+  }
+  hide(): this {
+    // A critical button stays visible when hidden, so its handlers must stay bound.
+    if (!this.isCritical) this.unbindInputHandlers();
+    this.tween(false, this.card.x.value2d, this.card.y.value2d);
+    return this;
+  }
+  /** Syncs the button with the card's current state, moving it in sync with the card's move tween. */
+  refresh(x: number, y: number): this {
+    this.tweenAnimation?.stop();
+    this.tweenAnimation = this.scene.tweens.add({
+      targets: this.image,
+      duration: animationConfig.duration.move,
+      ease: 'Cubic.easeInOut',
+      x: x + layoutConfig.game.cards.retractCardButton.xOffset,
+      y: y + layoutConfig.game.cards.retractCardButton.yOffset
+    });
+    if (this.isCritical) {
+      this.setTintCritical();
+      this.bindInputHandlers(
+        () => {},
+        () => {}
+      );
+      this.image.setAlpha(designConfig.alpha.normal);
+    } else {
+      this.unbindInputHandlers();
+      this.setTintNormal();
+      this.image.setAlpha(0);
+    }
+    return this;
+  }
+  destroy() {
+    this.image.destroy();
+  }
+  private tween(show: boolean, x: number, y: number) {
+    this.tweenAnimation?.stop();
+    this.tweenAnimation = this.scene.tweens.add({
+      targets: this.image,
+      duration: animationConfig.duration.displayIndicator,
+      alpha: show || this.isCritical ? designConfig.alpha.normal : 0,
+      x: x + layoutConfig.game.cards.retractCardButton.xOffset,
+      y: y + layoutConfig.game.cards.retractCardButton.yOffset
+    });
+  }
+  private bindInputHandlers(onPointerOver: () => void, onPointerOut: () => void) {
     this.image
       .off('pointerover')
       .off('pointerout')
@@ -49,25 +97,10 @@ export default class RetractCardButton {
         if (p.leftButtonDown())
           this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
       });
-    this.tween(true, x, y);
-    return this;
   }
-  hide(): this {
-    this.tween(false, this.card.x.value2d, this.card.y.value2d);
-    return this;
-  }
-  destroy() {
-    this.image.destroy();
-  }
-  private tween(show: boolean, x: number, y: number) {
-    this.tweenAnimation?.stop();
-    this.tweenAnimation = this.scene.tweens.add({
-      targets: this.image,
-      duration: animationConfig.duration.displayIndicator,
-      alpha: show || this.isCritical ? designConfig.alpha.normal : 0,
-      x: x + layoutConfig.game.cards.retractCardButton.xOffset,
-      y: y + layoutConfig.game.cards.retractCardButton.yOffset
-    });
+  // Phaser hit-testing ignores alpha, so an invisible button must not keep live handlers.
+  private unbindInputHandlers() {
+    this.image.off('pointerover').off('pointerout').off('pointerdown');
   }
   private setTintNormal() {
     this.image.setTint(

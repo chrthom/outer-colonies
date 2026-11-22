@@ -10,22 +10,27 @@ export default class ActionPool {
     this.scene = scene;
     this.ownedByPlayer = ownedByPlayer;
   }
-  destroy() {
-    this.images.forEach(s => s.destroy());
-    this.images = [];
-  }
   update() {
-    this.destroy();
     const placementConfig = this.ownedByPlayer
       ? layoutConfig.game.ui.actionPool.player
       : layoutConfig.game.ui.actionPool.opponent;
     const color = this.ownedByPlayer ? designConfig.tint.player : designConfig.tint.opponent;
-    this.images = this.scene.getPlayerState(this.ownedByPlayer).actionPool.map((action, index) =>
-      this.scene.add
-        .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
-        .setOrigin(0.5)
-        .setTint(color, designConfig.tint.neutral, color, color)
-        .setAlpha(designConfig.alpha.normal)
-    );
+    const actions = this.scene.getPlayerState(this.ownedByPlayer).actionPool;
+    actions.forEach((action, index) => {
+      if (index < this.images.length) {
+        this.images[index].setTexture(`icon_${action}`);
+      } else {
+        this.images.push(
+          this.scene.add
+            .image(placementConfig.x, placementConfig.y + index * placementConfig.yDistance, `icon_${action}`)
+            .setOrigin(0.5)
+            .setTint(color, designConfig.tint.neutral, color, color)
+            .setAlpha(designConfig.alpha.normal)
+        );
+      }
+    });
+    while (this.images.length > actions.length) {
+      this.images.pop()?.destroy();
+    }
   }
 }
