@@ -27,6 +27,14 @@
             "assets": ["src/missing", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": [],
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": false
+              },
+              "fonts": true
+            },
             "browser": "src/main.ts"
           },
           "configurations": {
