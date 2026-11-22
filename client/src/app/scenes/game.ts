@@ -197,6 +197,9 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5)
       .setDepth(layoutConfig.depth.gameOver);
     if (this.obj) this.obj.exitButton.update();
+    // No further state arrives while disconnected, so destroy a pending option
+    // picker that would otherwise linger over the connection lost message.
+    this.obj?.optionPicker?.destroy();
   }
 
   /**
@@ -211,6 +214,7 @@ export default class Game extends Phaser.Scene {
     this.state = state;
     this.preloader.destroy();
     this.resetSelection();
+    this.destroyStaleOptionPicker(state);
     const attackAnimating = this.animateAttack();
     let newHandCards: ClientHandCard[] = [];
     this.stateUpdateSequencer.run([
@@ -292,6 +296,16 @@ export default class Game extends Phaser.Scene {
     this.interceptShipIds = [];
     this.plannedBattle = ClientPlannedBattleHelper.empty;
     this.plannedBattle.type = battleType ?? this.plannedBattle.type;
+  }
+
+  /**
+   * Destroys a pending option picker if the incoming state invalidated its pending
+   * action, e.g. because the countdown expired or the hand card is no longer playable.
+   * @param state incoming client state
+   */
+  private destroyStaleOptionPicker(state: ClientState) {
+    const optionPicker = this.obj?.optionPicker;
+    if (optionPicker && !optionPicker.isValidFor(state)) optionPicker.destroy();
   }
 
   private animateAttack(): boolean {

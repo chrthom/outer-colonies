@@ -27,6 +27,16 @@ export default class Card extends CardImage {
     this.cardStackUUID = cardStackUUID;
     this.retractCardButton = data.retractable ? new RetractCardButton(this.scene, this) : undefined;
   }
+  /** Updates the card data in place and syncs the retract button, without recreating game objects. */
+  update(data: ClientCard, x: number, y: number) {
+    this.data = data;
+    if (!data.retractable) {
+      this.destroyRetractButton();
+    } else {
+      if (!this.retractCardButton) this.retractCardButton = new RetractCardButton(this.scene, this);
+      this.retractCardButton.refresh(x, y);
+    }
+  }
   override destroy(): this {
     this.destroyRetractButton();
     return super.destroy();

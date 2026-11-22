@@ -20,6 +20,7 @@ export default class CardStack {
   private scene: Game;
   private initialized = false;
   private discarded = false;
+  private hovered = false;
 
   constructor(scene: Game, data: ClientCardStack) {
     this.scene = scene;
@@ -41,47 +42,42 @@ export default class CardStack {
    */
   discard(toDeckFor?: (card: Card) => boolean) {
     this.discarded = true;
+    this.hovered = false;
     this.destroyIndicators();
     this.cards.forEach(c => c.discard(toDeckFor?.(c)));
   }
   update(data: ClientCardStack) {
-    this.destroyIndicators();
-    const [removedCardUUIDs, newCardUUIDs] = this.arrayDiff(
-      this.cards.map(c => c.data.uuid),
-      data.cards.map(c => c.uuid)
+    const newUuids = new Set(data.cards.map(nc => nc.uuid));
+    const existingCardsByUuid = new Map<string, Card>(
+      this.cards.map(c => [c.data.uuid, c] as [string, Card])
     );
-    this.filterCardsByUUIDList(removedCardUUIDs).forEach(c => {
-      const toDeck = this.scene.getCardMovementEvent(c.data.uuid)?.type == EventType.Retract;
+    let cardRemoved = false;
+    existingCardsByUuid.forEach((card, uuid) => {
+      if (newUuids.has(uuid)) return;
+      cardRemoved = true;
+      const toDeck = this.scene.getCardMovementEvent(uuid)?.type == EventType.Retract;
       if (toDeck) this.scene.retractCardsExist = true;
-      c.discard(toDeck);
-    }, this);
-    const replacedCards = this.filterCardsByUUIDList(data.cards.map(c => c.uuid));
-    this.data.cards = data.cards;
-    this.createCards();
+      card.destroyRetractButton();
+      card.discard(toDeck);
+    });
+    // Destroying a removed card's button or disabling its plane does not emit pointerout
+    if (cardRemoved) this.hovered = false;
     this.data = data;
-    this.summaryBox = new CardStackSummary(this.scene, this);
-    // Preserve surviving cards' current transform so expanded stacks un-expand smoothly
-    replacedCards.forEach(oldCard => {
-      this.cards
-        .find(c => c.data.uuid == oldCard.data.uuid)
-        ?.setX(oldCard.x)
-        .setY(oldCard.y)
-        .setZ(oldCard.z)
-        .setAngle(oldCard.angle)
-        .setXRotation(oldCard.xRotation);
+    const x = this.targetX.value2d;
+    this.cards = data.cards.map(nc => {
+      const existingCard = existingCardsByUuid.get(nc.uuid);
+      if (existingCard) {
+        existingCard.update(nc, x, this.targetY(nc.index).value2d);
+        return existingCard;
+      }
+      return this.createNewCard(nc);
     });
-    this.filterCardsByUUIDList(newCardUUIDs).forEach(c => {
-      // Attaching keeps the card stack UUID, so the played hand card matches exactly by UUID
-      const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.uuid == c.data.uuid);
-      const x = handCard ? handCard.x : c.placementConfig.deck.x;
-      const y = handCard ? handCard.y : c.placementConfig.deck.y;
-      const angle = handCard
-        ? handCard.image.angle
-        : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
-      c.setX(x).setY(y).setAngle(angle).setDepth(this.depth);
-    });
+    this.cards.forEach(c => c.bringPlanesToTop());
+    if (this.summaryBox) this.summaryBox.update();
+    else this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
-    this.scene.time.delayedCall(animationConfig.duration.min, () => replacedCards.forEach(c => c.destroy()));
+    // Reused planes never get a new pointerover from Phaser's input poll, so re-apply the hover state.
+    if (this.hovered) this.pointerover();
   }
   animateAttack(cardUUID: string) {
     this.cards.find(c => c.data.uuid == cardUUID)?.animateAttack();
@@ -173,20 +169,9 @@ export default class CardStack {
       !this.scene.activeCards.hand
     );
   }
-  private filterCardsByUUIDList(list: string[]) {
-    const l = list.slice();
-    return this.cards.filter(c => {
-      const i = l.indexOf(c.data.uuid);
-      if (i >= 0) {
-        l.splice(i, 1);
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
   private pointerover() {
     if (this.discarded) return;
+    this.hovered = true;
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
@@ -202,28 +187,16 @@ export default class CardStack {
   }
   private pointerout() {
     if (this.discarded) return;
+    this.hovered = false;
     this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
     this.summaryBox.toDefaultAlpha();
   }
   private createCards(origin?: CardImage) {
     this.cards = this.data.cards.map(c => {
-      const x = this.targetX;
-      const y = this.targetY(c.index);
-      const newCard = new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, c)
-        .setDepth(this.depth)
-        .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
-      return newCard;
-    });
-    this.cards.forEach(c => {
-      c.enableMaximizeOnRightclick();
-      c.image
-        .on('pointerdown', (p: Phaser.Input.Pointer) => {
-          if (p.leftButtonDown()) this.onClickAction(c.data);
-        })
-        .on('pointerover', () => this.pointerover())
-        .on('pointerout', () => this.pointerout())
-        .on('gameout', () => this.pointerout());
+      const card = this.createCard(c);
+      this.enableInteraction(card);
+      return card;
     });
     if (origin) {
       this.cards[0]
@@ -233,6 +206,34 @@ export default class CardStack {
         .setAngle(origin.angle)
         .setXRotation(origin.xRotation);
     }
+  }
+  private createCard(cardData: ClientCard): Card {
+    const x = this.targetX;
+    const y = this.targetY(cardData.index);
+    return new Card(this.scene, x, y, !this.ownedByPlayer, this.uuid, cardData)
+      .setDepth(this.depth)
+      .setAngle((this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d));
+  }
+  private createNewCard(cardData: ClientCard): Card {
+    const card = this.createCard(cardData);
+    this.enableInteraction(card);
+    const handCard = this.scene.getPlayerUI(this.ownedByPlayer).hand.find(h => h.uuid == cardData.uuid);
+    const x = handCard ? handCard.x : card.placementConfig.deck.x;
+    const y = handCard ? handCard.y : card.placementConfig.deck.y;
+    const angle = handCard
+      ? handCard.image.angle
+      : (this.ownedByPlayer ? 0 : 180) + this.randomAngle(x.value2d + y.value2d);
+    return card.setX(x).setY(y).setAngle(angle);
+  }
+  private enableInteraction(card: Card) {
+    card.enableMaximizeOnRightclick();
+    card.image
+      .on('pointerdown', (p: Phaser.Input.Pointer) => {
+        if (p.leftButtonDown()) this.onClickAction(card.data);
+      })
+      .on('pointerover', () => this.pointerover())
+      .on('pointerout', () => this.pointerout())
+      .on('gameout', () => this.pointerout());
   }
   private targetXExpanded(index: number): CardXPosition {
     const offset = layoutConfig.game.cards.expanded.xOffset * (index > this.maxIndex / 2 ? -1 : 1);
@@ -279,8 +280,9 @@ export default class CardStack {
               if (this.scene.activeCards.hand) {
                 const handcard = this.scene.player.hand.find(h => h.uuid == this.scene.activeCards.hand);
                 if (handcard?.data?.options) {
-                  this.scene.obj.optionPicker = new OptionPicker(
+                  new OptionPicker(
                     this.scene,
+                    this.scene.activeCards.hand,
                     this.uuid,
                     handcard?.data?.options,
                     handcard?.data?.optionsToSelect
@@ -342,18 +344,5 @@ export default class CardStack {
       }
       this.scene.updateView();
     }
-  }
-  private arrayDiff<T>(array1: T[], array2: T[]): [T[], T[]] {
-    const a1 = array1.slice();
-    const a2 = array2.slice();
-    a1.slice().forEach(v1 => {
-      const i1 = a1.indexOf(v1);
-      const i2 = a2.indexOf(v1);
-      if (i1 >= 0 && i2 >= 0) {
-        a1.splice(i1, 1);
-        a2.splice(i2, 1);
-      }
-    });
-    return [a1, a2];
   }
 }

@@ -78,6 +78,7 @@ export default class CardImage {
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
+    this.imagePile.destroy();
     return this;
   }
   discard(toDeck?: boolean): this {
@@ -173,6 +174,13 @@ export default class CardImage {
   }
   get depth(): number {
     return this.image.depth;
+  }
+  /** Brings the planes to the top of the display list in creation order to restore the card's render order within its stack. */
+  bringPlanesToTop(): this {
+    [this.imagePile, this.imageHighlight, this.imageMask, this.image].forEach(p =>
+      this.scene.children.bringToTop(p)
+    );
+    return this;
   }
   setXRotation(x: number): this {
     this.forAllImages(i => (i.modelRotation.x = x));
