@@ -39,10 +39,4 @@ export function getDailiesResponse(daily: DBDaily): DailyGetResponse {
   return typedPayload;
 }
 
-/** Thin wrapper that fetches and projects in one call; retained for tests. */
-export async function getDailies(userId: number): Promise<DailyGetResponse> {
-  const daily = await DBDailiesDAO.getByUserId(userId);
-  return getDailiesResponse(daily);
-}
-
 export default dailyRouter;

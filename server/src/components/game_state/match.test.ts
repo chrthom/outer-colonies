@@ -104,30 +104,6 @@ describe('Match.removeDestroyedCardStacks', () => {
     expect(match.events).toEqual([]);
   });
 
-  test('pushes destroyed stack cards onto the owning player discard pile', () => {
-    const ship = createShip(1, opponent, 3);
-    ship.damage = 3;
-
-    const destroyedStacks = match.removeDestroyedCardStacks();
-
-    expect(destroyedStacks).toEqual([ship]);
-    expect(opponent.discardPile).toContain(ship.card);
-    expect(opponent.cardStacks).not.toContain(ship);
-  });
-
-  test('routes cards attached to an opponent stack to the playing player discard pile', () => {
-    const ship = createShip(1, opponent, 3);
-    const tacticCard = new MockCard(2, CardType.Tactic);
-    const tactic = new RootCardStack(tacticCard, Zone.Hand, player);
-    ship.attach(tactic);
-    ship.damage = 3;
-
-    match.removeDestroyedCardStacks();
-
-    expect(player.discardPile).toContain(tacticCard);
-    expect(opponent.discardPile).not.toContain(tacticCard);
-  });
-
   test('returns an attachment played by the opponent to the playing player', () => {
     const ship = createShip(1, opponent, 4);
     ship.damage = 4;

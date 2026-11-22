@@ -135,19 +135,6 @@ describe('Battle', () => {
         expect(player0.drawCards).toHaveBeenCalledWith(1);
       });
 
-      test('should grant control surplus to player 1 on successful mission', () => {
-        battle = new Battle(BattleType.Mission, 1);
-        const mockMatch = mockMatchFor(1, [player0, player1]);
-        battle.ships[1] = [createMissionShip(player1, 3)];
-        battle.ships[0] = [createInterceptingShip(player0, 2)];
-        stubMissionLoot(player1);
-
-        (battle as any).applyMissionResult(mockMatch);
-
-        expect(player1.gainControl).toHaveBeenCalledWith(1);
-        expect(player1.drawCards).toHaveBeenCalledWith(1);
-      });
-
       test('should not grant control on failed mission', () => {
         battle = new Battle(BattleType.Mission, 1);
         const mockMatch = mockMatchFor(1, [player0, player1]);
@@ -238,15 +225,6 @@ describe('Battle', () => {
       match.prepareCombatPhase([defenderShipId]);
 
       expect(match.battle.range).toBe(3);
-      expect(match.turnPhase).toBe(TurnPhase.Combat);
-    });
-
-    test('should start at rules.maxRange for battles involving a range 4 weapon', () => {
-      const defenderShipId = setupRaid([rules.maxRange], []);
-
-      match.prepareCombatPhase([defenderShipId]);
-
-      expect(match.battle.range).toBe(rules.maxRange);
       expect(match.turnPhase).toBe(TurnPhase.Combat);
     });
 

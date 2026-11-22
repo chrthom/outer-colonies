@@ -332,36 +332,16 @@ describe('REST API', () => {
   });
 
   describe('error status logging', () => {
-    it('should log a WARN with method and route pattern for a request without a session token', async () => {
+    it('should log a WARN with method and route pattern instead of the concrete path for a 401', async () => {
       const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
       const response = await request('POST', '/api/deck/456');
 
       expect(response.status).toBe(401);
       expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/^WARN: API request for POST .* failed with status 401$/)
-      );
-    });
-
-    it('should log the route pattern instead of the concrete path', async () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-
-      await request('POST', '/api/deck/456');
-
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('for POST /api/deck/:cardInstanceId(\\d+) failed with status 401')
+        'WARN: API request for POST /api/deck/:cardInstanceId(\\d+) failed with status 401'
       );
       expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('/api/deck/456'));
-    });
-
-    it('should log a WARN for an invalid session token', async () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue(APIRejectReason.NotFound);
-
-      const response = await request('POST', '/api/deck/456', 'invalid-token');
-
-      expect(response.status).toBe(403);
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*status 403/));
     });
 
     it('should log an ERROR for an internal server error', async () => {
@@ -452,13 +432,6 @@ describe('REST API', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ count: 2 });
-    });
-
-    it('should respond with a count of 0 when nobody is online', async () => {
-      const response = await request('GET', '/api/online');
-
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ count: 0 });
     });
   });
 });

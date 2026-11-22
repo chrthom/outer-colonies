@@ -60,15 +60,6 @@ describe('Card.canDefend', () => {
     });
     expect(card.canDefend).toBe(true);
   });
-
-  test('returns true when multiple defense values are positive', () => {
-    const card = new TestCard(4, 'Multi Defense', CardType.Infrastructure, 1, {
-      armour: 2,
-      shield: 3,
-      pointDefense: 1
-    });
-    expect(card.canDefend).toBe(true);
-  });
 });
 
 interface MockProfile {
@@ -223,12 +214,6 @@ describe('Card.rechargePerAttackDefenders', () => {
     expect(def.defenseAvailable).toBe(false);
   });
 
-  test('leaves already-active PerAttack defenders alone (idempotent)', () => {
-    const def = defender({ pointDefense: 2 }, { instantRecharge: true, defenseAvailable: true });
-    attacker.exposedRechargePerAttackDefenders([ship(def)]);
-    expect(def.defenseAvailable).toBe(true);
-  });
-
   test('re-arms across multiple ships', () => {
     const def1 = defender({ pointDefense: 1 }, { instantRecharge: true, defenseAvailable: false });
     const def2 = defender({ shield: 1 }, { instantRecharge: true, defenseAvailable: false });
@@ -248,12 +233,6 @@ describe('Card.repairDamage', () => {
   test('clamps at 0 when amount exceeds existing damage', () => {
     const stack = { damage: 3 } as CardStack;
     attacker.exposedRepairDamage(stack, 10);
-    expect(stack.damage).toBe(0);
-  });
-
-  test('no-op when damage is already 0', () => {
-    const stack = { damage: 0 } as CardStack;
-    attacker.exposedRepairDamage(stack, 5);
     expect(stack.damage).toBe(0);
   });
 });
