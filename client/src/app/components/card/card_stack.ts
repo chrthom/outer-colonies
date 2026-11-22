@@ -260,8 +260,9 @@ export default class CardStack {
               if (this.scene.activeCards.hand) {
                 const handcard = this.scene.player.hand.find(h => h.uuid == this.scene.activeCards.hand);
                 if (handcard?.data?.options) {
-                  this.scene.obj.optionPicker = new OptionPicker(
+                  new OptionPicker(
                     this.scene,
+                    this.scene.activeCards.hand,
                     this.uuid,
                     handcard?.data?.options,
                     handcard?.data?.optionsToSelect

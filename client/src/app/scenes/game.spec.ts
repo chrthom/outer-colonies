@@ -186,6 +186,15 @@ describe('Game scene - showConnectionLostMessage', () => {
 
     expect(game.obj.exitButton.update).toHaveBeenCalled();
   });
+
+  it('destroys a pending option picker, as no further state arrives while disconnected', () => {
+    const optionPicker = { destroy: jasmine.createSpy('destroy') };
+    (game as any).obj = { ...makeObjStub(), optionPicker };
+
+    game.showConnectionLostMessage();
+
+    expect(optionPicker.destroy).toHaveBeenCalled();
+  });
 });
 
 describe('Game scene - socket listener lifecycle', () => {
@@ -313,6 +322,51 @@ describe('Game scene - showGameOverIndicator', () => {
     });
 
     expect(game.connectionLost).toBeFalse();
+  });
+});
+
+describe('Game scene - updateState', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game();
+    (game as any).preloader = { destroy: jasmine.createSpy('preloader.destroy') };
+    (game as any).time = { delayedCall: jasmine.createSpy('time.delayedCall') };
+  });
+
+  function makeOptionPickerStub(isValidFor: boolean) {
+    return {
+      destroy: jasmine.createSpy('destroy'),
+      isValidFor: jasmine.createSpy('isValidFor').and.returnValue(isValidFor)
+    };
+  }
+
+  it('destroys a pending option picker that the incoming state invalidated', () => {
+    const optionPicker = makeOptionPickerStub(false);
+    (game as any).obj = { optionPicker };
+    const state: ClientState = { ...emptyClientState };
+
+    game.updateState(state);
+
+    expect(optionPicker.isValidFor).toHaveBeenCalledWith(state);
+    expect(optionPicker.destroy).toHaveBeenCalled();
+  });
+
+  it('keeps a pending option picker whose action is still valid', () => {
+    const optionPicker = makeOptionPickerStub(true);
+    (game as any).obj = { optionPicker };
+
+    game.updateState({ ...emptyClientState });
+
+    expect(optionPicker.isValidFor).toHaveBeenCalled();
+    expect(optionPicker.destroy).not.toHaveBeenCalled();
+    expect((game as any).obj.optionPicker).toBe(optionPicker);
+  });
+
+  it('ignores incoming states while no option picker is pending', () => {
+    (game as any).obj = {};
+
+    expect(() => game.updateState({ ...emptyClientState })).not.toThrow();
   });
 });
 
