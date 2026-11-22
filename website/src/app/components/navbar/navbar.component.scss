@@ -1,21 +1,30 @@
 .space {
   height: 25px;
 }
+
 .bar {
+  box-sizing: border-box;
   position: relative;
-  background: linear-gradient(90deg, var(--color-dark) 50%, var(--color-primary-dark) 130%);
-  border-block: 3px ridge var(--color-primary-dark);
   height: 62px;
-  margin-bottom: 30px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  background: color-mix(in srgb, var(--color-dark), var(--color-primary-dark) 12%);
+  border-block: 1px solid color-mix(in srgb, var(--color-primary), transparent 35%);
   transition: border-color 280ms ease-out;
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     border-block-color: color-mix(in srgb, var(--color-accent), var(--color-primary-dark) 45%);
   }
+
+  &.logged-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+  }
 }
+
 .energy-stream {
   position: absolute;
   inset: 0;
@@ -25,61 +34,148 @@
   pointer-events: none;
   z-index: 0;
 }
+
+.logo {
+  position: relative;
+  z-index: 2;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: 44px;
+  height: 100%;
+  padding: 0 16px;
+  color: var(--color-primary-light);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 180ms ease-out,
+    border-color 180ms ease-out,
+    background-color 180ms ease-out;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-accent-light);
+    border-bottom-color: var(--color-accent-bright);
+    background-color: color-mix(in srgb, var(--color-accent), transparent 88%);
+  }
+}
+
+.logo-emblem {
+  display: block;
+  height: 34px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.logo-wordmark {
+  font:
+    16px/1 "Latin Modern Mono Caps",
+    monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logged-in-nav {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
 .item {
   position: relative;
   z-index: 1;
   cursor: pointer;
-  --g: color-mix(in srgb, var(--color-primary), transparent 70%);
-  --f: invert(12%) sepia(41%) saturate(340%) hue-rotate(125deg) brightness(84%) contrast(88%);
-  background: radial-gradient(closest-side, var(--g), transparent);
+  color: var(--color-primary-light);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  --f: sepia(45%) saturate(260%) hue-rotate(132deg) brightness(92%);
+  transition:
+    color 180ms ease-out,
+    border-color 180ms ease-out,
+    background-color 180ms ease-out;
+
   img {
     display: block;
-    width: 50px;
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
     filter: var(--f);
+    transition: filter 180ms ease-out;
   }
+
   &:hover,
   &.active {
-    --g: color-mix(in srgb, var(--color-accent), transparent 50%);
-    --f: invert(15%) sepia(10%) saturate(579%) hue-rotate(314deg) brightness(87%) contrast(104%);
+    color: var(--color-accent-light);
+    border-bottom-color: var(--color-accent-bright);
+    background-color: color-mix(in srgb, var(--color-accent), transparent 88%);
+    --f: sepia(55%) saturate(380%) hue-rotate(312deg) brightness(95%);
   }
 }
+
 .center {
-  padding: 10px 36px;
-}
-.right {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  right: 20px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 72px;
+  padding: 4px 20px;
 }
+
+.item-label {
+  font:
+    12px/1.1 "Latin Modern Mono Caps",
+    monospace;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.mobile-only-label {
+  display: none;
+}
+
+.right {
+  position: relative;
+  z-index: 1;
+  justify-self: end;
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding-right: 12px;
+}
+
 .profile,
 .logout {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  height: 60px;
-  padding: 5px 15px;
-}
-.profile {
-  gap: 12px;
-  color: var(--color-primary-light);
-  text-decoration: none;
+  height: 100%;
+  padding: 0 12px;
 
-  &:hover,
-  &.active {
-    color: var(--color-accent-light);
+  img {
+    width: 28px;
+    height: 28px;
   }
 }
+
+.profile {
+  gap: 10px;
+}
+
 .user-name {
   font-family: "Latin Modern Mono Caps", monospace;
-  font-size: 1.5em;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: normal;
   line-height: 1.2;
-  max-width: clamp(120px, (100vw - 1000px) / 2, 300px);
+  max-width: clamp(100px, (100vw - 1000px) / 2, 240px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,50 +184,78 @@
     display: none;
   }
 }
+
 .logout {
   justify-content: center;
+  min-width: 44px;
+  background: transparent;
+  font: inherit;
 }
-.logo {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  background: radial-gradient(closest-side, #000c 75%, transparent);
-  padding: 4px 12px;
-  z-index: 2;
-  img {
-    display: block;
-    height: auto;
-    width: var(--logo-width, 104px);
-  }
-}
+
 .zone {
   position: relative;
   z-index: 1;
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-left: 128px;
 }
+
 .actions {
   display: flex;
   flex-shrink: 0;
   gap: 12px;
-  padding: 0 15px;
+  padding: 0 16px;
+
+  a {
+    min-height: 44px;
+    padding: 0 16px;
+    font-family: "Latin Modern Mono Caps", monospace;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    border-radius: 0;
+    box-shadow: none;
+    --mat-button-protected-container-shape: 0px;
+    --mat-button-outlined-container-shape: 0px;
+    --mat-button-protected-label-text-font: "Latin Modern Mono Caps", monospace;
+    --mat-button-outlined-label-text-font: "Latin Modern Mono Caps", monospace;
+    --mat-button-protected-container-elevation-shadow: none;
+    --mat-button-protected-hover-container-elevation-shadow: none;
+    --mat-button-protected-focus-container-elevation-shadow: none;
+    transition:
+      background-color 180ms ease-out,
+      border-color 180ms ease-out,
+      color 180ms ease-out;
+  }
+
+  a[mat-raised-button] {
+    border: 1px solid var(--color-primary);
+    background-color: var(--color-primary-dark);
+    color: var(--color-light);
+    --mat-button-protected-container-color: var(--color-primary-dark);
+    --mat-button-protected-label-text-color: var(--color-light);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-accent);
+      border-color: var(--color-accent-light);
+      --mat-button-protected-container-color: var(--color-accent);
+    }
+  }
 
   a[mat-stroked-button] {
-    background-color: color-mix(in srgb, var(--color-dark), transparent 35%);
-  }
-}
-@media (min-width: 1561px) {
-  .logo {
-    --logo-width: 300px;
-    top: 0;
-    padding: 15px 25px;
-    transform: translateY(-30%);
-  }
-  .zone {
-    padding-left: 350px;
+    border: 1px solid var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-dark), transparent 20%);
+    color: var(--color-primary-light);
+    --mat-button-outlined-label-text-color: var(--color-primary-light);
+    --mat-button-outlined-outline-color: var(--color-primary);
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(in srgb, var(--color-accent), transparent 82%);
+      border-color: var(--color-accent-bright);
+      color: var(--color-accent-light);
+      --mat-button-outlined-label-text-color: var(--color-accent-light);
+      --mat-button-outlined-outline-color: var(--color-accent-bright);
+    }
   }
 }

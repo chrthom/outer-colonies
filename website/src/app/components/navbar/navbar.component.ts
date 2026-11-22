@@ -121,7 +121,7 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
     return this.authService.isLoggedIn;
   }
   get active(): string {
-    return this.router.url.split(/[?#]/, 1)[0].replace('/', '');
+    return this.router.url.split(/[?#]/, 1)[0].replace(/^\/+/, '').split('/')[0];
   }
   get username(): string | undefined {
     return this.authService.displayname;

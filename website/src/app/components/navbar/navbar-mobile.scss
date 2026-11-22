@@ -1,36 +1,26 @@
-@media (max-width: 1200px) {
-  .bar {
+@media (max-width: 1024px) {
+  .bar.logged-in {
+    display: flex;
     justify-content: space-between;
   }
-  .logo {
-    position: static;
-    transform: none;
-    flex-shrink: 0;
-  }
-  .zone {
+
+  .logged-in-nav {
+    flex: 1 1 auto;
     min-width: 0;
-    padding-left: 0;
-    gap: 8px;
+    justify-content: space-evenly;
   }
-  .actions {
-    gap: 4px;
-    padding: 0 8px 0 0;
-  }
+
   .logged-in {
     .center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       flex: 1 1 0;
       min-width: 44px;
-      min-height: 44px;
-      padding: 0;
+      padding: 4px 6px;
     }
 
     .right {
-      position: static;
       flex-shrink: 0;
       gap: 0;
+      padding-right: 4px;
     }
 
     .user-name {
@@ -43,34 +33,110 @@
       white-space: nowrap;
     }
 
-    .profile,
+    .profile {
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      min-width: 48px;
+      padding: 4px 8px;
+    }
+
+    .mobile-only-label {
+      display: block;
+    }
+
+    .profile img,
+    .logout img {
+      width: 24px;
+      height: 24px;
+    }
+
     .logout {
       min-width: 44px;
-      height: 44px;
-      padding: 0;
-      gap: 0;
+      padding: 0 8px;
       justify-content: center;
     }
   }
 }
-@media (max-width: 480px) {
-  .zone {
-    gap: 4px;
-  }
-  .actions a {
-    min-width: 0;
-    padding-inline: 6px;
-    font-size: 12px;
-    letter-spacing: normal;
+
+@media (max-width: 720px) {
+  .logged-in {
+    .logo {
+      padding: 0 10px;
+    }
+
+    .logo-wordmark {
+      display: none;
+    }
   }
 }
-@media (max-width: 400px) {
-  .logo {
-    --logo-width: 48px;
-    padding-inline: 4px;
+
+@media (max-width: 560px) {
+  .bar:not(.logged-in) .logo-wordmark {
+    display: none;
   }
-  .logged-in .item img {
-    width: 32px;
-    margin: auto;
+
+  .logo-emblem {
+    height: 28px;
+  }
+
+  .actions {
+    gap: 6px;
+    padding: 0 10px;
+
+    a {
+      padding: 0 10px;
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 430px) {
+  .logo {
+    padding: 0 6px;
+  }
+
+  .logo-emblem {
+    height: 26px;
+  }
+
+  .logged-in {
+    .center {
+      padding: 4px 2px;
+    }
+
+    .center img,
+    .profile img,
+    .logout img {
+      width: 22px;
+      height: 22px;
+    }
+
+    .item-label {
+      font-size: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .profile {
+      min-width: 44px;
+      padding: 4px;
+    }
+
+    .logout {
+      min-width: 44px;
+      padding: 0 4px;
+    }
+  }
+
+  .actions {
+    gap: 4px;
+    padding: 0 8px;
+
+    a {
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 12px;
+      letter-spacing: normal;
+    }
   }
 }

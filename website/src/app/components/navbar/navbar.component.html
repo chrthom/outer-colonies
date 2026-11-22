@@ -1,56 +1,141 @@
 <div class="space"></div>
 <div #barElement class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
   <canvas #energyCanvas class="energy-stream" aria-hidden="true"></canvas>
-  <a class="logo" id="navbar-logo" routerLink="/" aria-label="Outer Colonies – Startseite">
-    <img src="../../../assets/logo.png" alt="" width="300" height="188" />
+  <a
+    class="logo"
+    id="navbar-logo"
+    routerLink="/"
+    aria-label="Outer Colonies – Startseite"
+    [attr.aria-current]="active === '' ? 'page' : null"
+  >
+    <svg
+      class="logo-emblem"
+      viewBox="0 0 60 38"
+      width="60"
+      height="38"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <!-- Neptune (lower left) -->
+      <circle
+        cx="12"
+        cy="26"
+        r="6"
+        fill="currentColor"
+        fill-opacity="0.2"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+      <path d="M7.2 24.4a7.6 7.6 0 0 0 9.6 0" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1" />
+
+      <!-- Uranus (center) with steep orbital ring -->
+      <ellipse
+        cx="26"
+        cy="19"
+        rx="2.1"
+        ry="8.8"
+        transform="rotate(-14 26 19)"
+        stroke="#ffffff"
+        stroke-opacity="0.75"
+        stroke-width="1.1"
+      />
+      <circle cx="26" cy="19" r="5" fill="#000000" />
+      <circle
+        cx="26"
+        cy="19"
+        r="5"
+        fill="currentColor"
+        fill-opacity="0.24"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+
+      <!-- Saturn (upper right) with back ring, body mask, and front ring arc -->
+      <path
+        d="M30.2 15.8c-0.7-2.2 4.3-5.8 11.4-8.1 7.1-2.3 13.5-2.3 14.2-0.1"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <circle cx="43" cy="12" r="6.4" fill="#000000" />
+      <circle
+        cx="43"
+        cy="12"
+        r="6.4"
+        fill="currentColor"
+        fill-opacity="0.26"
+        stroke="#ffffff"
+        stroke-width="1.4"
+      />
+      <path
+        d="M55.8 7.6c0.7 2.2-4.3 5.8-11.4 8.1-7.1 2.3-13.5 2.3-14.2 0.1"
+        stroke="#ffffff"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    </svg>
+    <span class="logo-wordmark" aria-hidden="true">Outer Colonies</span>
   </a>
   @if (isLoggedIn) {
-    <a
-      class="item center"
-      matTooltip="Spielsuche & Aktuelles"
-      aria-label="Spielsuche & Aktuelles"
-      [class.active]="active === 'home'"
-      routerLink="/home"
-    >
-      <img src="../../../assets/icons/home.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Spielregeln"
-      aria-label="Spielregeln"
-      [class.active]="active === 'rules'"
-      routerLink="/rules"
-    >
-      <img src="../../../assets/icons/rules.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Deck-Manager"
-      aria-label="Deck-Manager"
-      [class.active]="active === 'deck'"
-      routerLink="/deck"
-    >
-      <img src="../../../assets/icons/deck.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Inventar und Markt"
-      aria-label="Inventar und Markt"
-      [class.active]="active === 'trade'"
-      routerLink="/trade"
-    >
-      <img src="../../../assets/icons/trade.png" alt="" />
-    </a>
+    <nav class="logged-in-nav" aria-label="Hauptnavigation">
+      <a
+        class="item center"
+        matTooltip="Spielsuche & Aktuelles"
+        aria-label="Spielsuche & Aktuelles"
+        [class.active]="active === 'home'"
+        [attr.aria-current]="active === 'home' ? 'page' : null"
+        routerLink="/home"
+      >
+        <img src="../../../assets/icons/home.png" alt="" />
+        <span class="item-label" aria-hidden="true">Lobby</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Spielregeln"
+        aria-label="Spielregeln"
+        [class.active]="active === 'rules'"
+        [attr.aria-current]="active === 'rules' ? 'page' : null"
+        routerLink="/rules"
+      >
+        <img src="../../../assets/icons/rules.png" alt="" />
+        <span class="item-label" aria-hidden="true">Regeln</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Deck-Manager"
+        aria-label="Deck-Manager"
+        [class.active]="active === 'deck'"
+        [attr.aria-current]="active === 'deck' ? 'page' : null"
+        routerLink="/deck"
+      >
+        <img src="../../../assets/icons/deck.png" alt="" />
+        <span class="item-label" aria-hidden="true">Decks</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Inventar und Markt"
+        aria-label="Inventar und Markt"
+        [class.active]="active === 'trade'"
+        [attr.aria-current]="active === 'trade' ? 'page' : null"
+        routerLink="/trade"
+      >
+        <img src="../../../assets/icons/trade.png" alt="" />
+        <span class="item-label" aria-hidden="true">Markt</span>
+      </a>
+    </nav>
     <div class="right">
       <a
         class="item profile"
         matTooltip="Verwalte dein Profil"
         [attr.aria-label]="username ? username + ' – Profil verwalten' : 'Verwalte dein Profil'"
         [class.active]="active === 'profile'"
+        [attr.aria-current]="active === 'profile' ? 'page' : null"
         routerLink="/profile"
       >
         <span class="user-name">{{ username }}</span>
         <img src="../../../assets/icons/profile.png" alt="" />
+        <span class="item-label mobile-only-label" aria-hidden="true">Profil</span>
       </a>
       <button
         type="button"

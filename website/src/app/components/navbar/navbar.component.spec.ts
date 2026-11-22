@@ -24,7 +24,11 @@ describe('NavbarComponent', () => {
         RouterTestingModule.withRoutes([
           { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
+          { path: 'home', component: TestPageComponent },
           { path: 'rules', component: TestPageComponent },
+          { path: 'rules/:section', component: TestPageComponent },
+          { path: 'deck', component: TestPageComponent },
+          { path: 'trade', component: TestPageComponent },
           { path: 'profile', component: TestPageComponent }
         ]),
         MatTooltipModule
@@ -63,13 +67,21 @@ describe('NavbarComponent', () => {
     expect(component.active).toBeDefined();
   });
 
-  it('should render the icon navbar for logged-in users', () => {
+  it('should render the icon navbar with visible labels for logged-in users', () => {
     const element = fixture.nativeElement;
     const iconElements = element.querySelectorAll('.item.center');
     expect(iconElements.length).toBe(4);
     expect(
       Array.from<Element>(iconElements).every(link => link.getAttribute('href') !== '/profile')
     ).toBeTrue();
+    expect(
+      Array.from<Element>(iconElements).map(link => link.querySelector('.item-label')?.textContent?.trim())
+    ).toEqual(['Lobby', 'Regeln', 'Decks', 'Markt']);
+
+    const logo = element.querySelector('#navbar-logo') as HTMLAnchorElement;
+    expect(logo.querySelector('svg.logo-emblem')?.getAttribute('aria-hidden')).toBe('true');
+    expect(logo.querySelector('.logo-wordmark')?.textContent?.trim()).toBe('Outer Colonies');
+    expect(logo.querySelector('.logo-wordmark')?.getAttribute('aria-hidden')).toBe('true');
 
     const rightZone = element.querySelector('.right');
     expect(rightZone).toBeTruthy();
@@ -83,10 +95,8 @@ describe('NavbarComponent', () => {
 
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
-    expect(element.querySelector('#navbar-logo').getAttribute('aria-label')).toBe(
-      'Outer Colonies – Startseite'
-    );
+    expect(logo.classList.contains('compact')).toBeFalse();
+    expect(logo.getAttribute('aria-label')).toBe('Outer Colonies – Startseite');
     expect(
       Array.from<Element>(iconElements).every(link => link.tagName === 'A' && link.hasAttribute('aria-label'))
     ).toBeTrue();
@@ -95,6 +105,34 @@ describe('NavbarComponent', () => {
     logout.click();
     expect(authSpy.logout).toHaveBeenCalled();
     expect(element.querySelector('img:not([alt=""])')).toBeNull();
+  });
+
+  it('sets aria-current="page" on the active logo or logged-in route and handles nested segments', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const logo = element.querySelector('#navbar-logo') as HTMLAnchorElement;
+    const rulesLink = element.querySelector('a.item.center[href="/rules"]') as HTMLAnchorElement;
+    const deckLink = element.querySelector('a.item.center[href="/deck"]') as HTMLAnchorElement;
+    const profileLink = element.querySelector('a.item.profile') as HTMLAnchorElement;
+
+    expect(logo.getAttribute('aria-current')).toBe('page');
+    expect(rulesLink.getAttribute('aria-current')).toBeNull();
+
+    await router.navigateByUrl('/rules/combat?tab=1#top');
+    fixture.detectChanges();
+    expect(component.active).toBe('rules');
+    expect(logo.getAttribute('aria-current')).toBeNull();
+    expect(rulesLink.getAttribute('aria-current')).toBe('page');
+    expect(rulesLink.classList.contains('active')).toBeTrue();
+
+    await router.navigateByUrl('/deck');
+    fixture.detectChanges();
+    expect(rulesLink.getAttribute('aria-current')).toBeNull();
+    expect(deckLink.getAttribute('aria-current')).toBe('page');
+
+    await router.navigateByUrl('/profile');
+    fixture.detectChanges();
+    expect(deckLink.getAttribute('aria-current')).toBeNull();
+    expect(profileLink.getAttribute('aria-current')).toBe('page');
   });
 
   it('navigates to /profile when clicking either the username or profile icon and marks it active', async () => {
