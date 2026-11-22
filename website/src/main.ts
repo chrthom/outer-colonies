@@ -6,6 +6,9 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { AppComponent } from './app/app.component';
 import { provideZoneChangeDetection } from '@angular/core';
 import { appRouterProviders } from './app/app.routes';
+import { initFontLoading } from './app/font-loading';
+
+void initFontLoading();
 
 bootstrapApplication(AppComponent, {
   providers: [
