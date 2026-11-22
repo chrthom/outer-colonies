@@ -6,7 +6,7 @@
     url("/assets/fonts/latin-modern-sans.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 @font-face {
   font-family: "Latin Modern Sans";
@@ -16,7 +16,7 @@
     url("/assets/fonts/latin-modern-sans-bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 @font-face {
   font-family: "Latin Modern Sans";
@@ -26,7 +26,7 @@
     url("/assets/fonts/latin-modern-sans-oblique.ttf") format("truetype");
   font-weight: normal;
   font-style: italic;
-  font-display: block;
+  font-display: swap;
 }
 @font-face {
   font-family: "Latin Modern Sans";
@@ -36,7 +36,7 @@
     url("/assets/fonts/latin-modern-sans-bold-oblique.ttf") format("truetype");
   font-weight: bold;
   font-style: italic;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
@@ -47,5 +47,5 @@
     url("/assets/fonts/latin-modern-mono-caps.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }

@@ -1,9 +1,16 @@
 import { environment } from 'src/environments/environment';
 
-const CRITICAL_FONTS = [
-  { family: 'Latin Modern Sans', spec: '1em "Latin Modern Sans"' },
-  { family: 'Latin Modern Mono Caps', spec: '1em "Latin Modern Mono Caps"' }
-] as const;
+interface CriticalFont {
+  family: string;
+  weights: readonly string[];
+  spec: string;
+}
+
+const CRITICAL_FONTS: readonly CriticalFont[] = [
+  { family: 'Latin Modern Sans', weights: ['normal', '400'], spec: '400 1em "Latin Modern Sans"' },
+  { family: 'Latin Modern Sans', weights: ['bold', '700'], spec: '700 1em "Latin Modern Sans"' },
+  { family: 'Latin Modern Mono Caps', weights: ['normal', '400'], spec: '400 1em "Latin Modern Mono Caps"' }
+];
 const FONT_LOADING_CLASS = 'oc-fonts-loading';
 const DEFAULT_FONT_TIMEOUT_MS = 1200;
 
@@ -26,18 +33,13 @@ function normalizeFamily(family: string): string {
 function areCriticalFontsLoaded(fonts: Pick<FontFaceSet, 'forEach'>): boolean {
   const faces: FontFaceLike[] = [];
   fonts.forEach(face => faces.push(face));
-  if (faces.length === 0) {
-    // No @font-face declarations present (e.g. test harness without global styles); never hide content.
-    return true;
-  }
 
-  return CRITICAL_FONTS.every(({ family }) => {
+  return CRITICAL_FONTS.every(({ family, weights }) => {
     const matching = faces.filter(
       face =>
-        normalizeFamily(face.family) === family &&
-        (face.weight === 'normal' || face.weight === '400') &&
-        face.style === 'normal'
+        normalizeFamily(face.family) === family && weights.includes(face.weight) && face.style === 'normal'
     );
+    // Treat missing @font-face entries (e.g. test harness without global styles) as settled so content stays visible.
     return matching.length === 0 || matching.every(face => face.status === 'loaded');
   });
 }

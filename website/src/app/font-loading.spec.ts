@@ -43,12 +43,23 @@ describe('initFontLoading', () => {
     expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
   });
 
-  it('skips hiding content when both critical fonts are already loaded', async () => {
+  it('skips hiding content when no font faces are registered', async () => {
+    const loadSpy = jasmine.createSpy('load');
+    const { doc, root } = createDoc(createFonts([], loadSpy));
+
+    await initFontLoading(doc);
+
+    expect(loadSpy).not.toHaveBeenCalled();
+    expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
+  });
+
+  it('skips hiding content when all critical fonts are already loaded', async () => {
     const loadSpy = jasmine.createSpy('load');
     const { doc, root } = createDoc(
       createFonts(
         [
           { family: '"Latin Modern Sans"', weight: '400', style: 'normal', status: 'loaded' },
+          { family: '"Latin Modern Sans"', weight: '700', style: 'normal', status: 'loaded' },
           { family: 'Latin Modern Mono Caps', weight: 'normal', style: 'normal', status: 'loaded' }
         ],
         loadSpy
@@ -61,19 +72,23 @@ describe('initFontLoading', () => {
     expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
   });
 
-  it('hides content while critical fonts load and reveals once both settle', fakeAsync(() => {
-    let resolveSans!: () => void;
+  it('hides content while critical fonts load and reveals once all settle', fakeAsync(() => {
+    let resolveSansRegular!: () => void;
+    let resolveSansBold!: () => void;
     let resolveMono!: () => void;
     const { doc, root } = createDoc(
       createFonts(
         [
-          { family: 'Latin Modern Sans', weight: 'normal', style: 'normal', status: 'loading' },
+          { family: 'Latin Modern Sans', weight: 'normal', style: 'normal', status: 'loaded' },
+          { family: 'Latin Modern Sans', weight: 'bold', style: 'normal', status: 'loading' },
           { family: 'Latin Modern Mono Caps', weight: 'normal', style: 'normal', status: 'unloaded' }
         ],
         (spec: string) =>
           new Promise<FontFace[]>(resolve => {
-            if (spec.includes('Sans')) {
-              resolveSans = () => resolve([]);
+            if (spec.includes('700')) {
+              resolveSansBold = () => resolve([]);
+            } else if (spec.includes('Sans')) {
+              resolveSansRegular = () => resolve([]);
             } else {
               resolveMono = () => resolve([]);
             }
@@ -89,12 +104,13 @@ describe('initFontLoading', () => {
     expect(root.classList.contains('oc-fonts-loading')).toBeTrue();
     tick();
 
-    resolveSans();
+    resolveSansRegular();
+    resolveMono();
     tick();
     expect(root.classList.contains('oc-fonts-loading')).toBeTrue();
     expect(done).toBeFalse();
 
-    resolveMono();
+    resolveSansBold();
     tick();
     expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
     expect(done).toBeTrue();
@@ -107,6 +123,7 @@ describe('initFontLoading', () => {
       createFonts(
         [
           { family: 'Latin Modern Sans', weight: 'normal', style: 'normal', status: 'loading' },
+          { family: 'Latin Modern Sans', weight: 'bold', style: 'normal', status: 'loading' },
           { family: 'Latin Modern Mono Caps', weight: 'normal', style: 'normal', status: 'loading' }
         ],
         (spec: string) => (spec.includes('Sans') ? Promise.resolve([]) : Promise.reject(new Error('404')))
@@ -121,13 +138,14 @@ describe('initFontLoading', () => {
     expect(warnSpy).toHaveBeenCalledOnceWith('Critical webfont failed to load, degrading to fallback font');
   }));
 
-  it('reveals content when font loading exceeds the safety timeout', fakeAsync(() => {
+  it('reveals content silently in production when font loading exceeds the safety timeout', fakeAsync(() => {
     environment.stage = 'production';
     const warnSpy = spyOn(console, 'warn');
     const { doc, root } = createDoc(
       createFonts(
         [
           { family: 'Latin Modern Sans', weight: 'normal', style: 'normal', status: 'loading' },
+          { family: 'Latin Modern Sans', weight: 'bold', style: 'normal', status: 'loading' },
           { family: 'Latin Modern Mono Caps', weight: 'normal', style: 'normal', status: 'loading' }
         ],
         () => new Promise<FontFace[]>(() => {})
@@ -147,6 +165,30 @@ describe('initFontLoading', () => {
     expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
     expect(done).toBeTrue();
     expect(warnSpy).not.toHaveBeenCalled();
+  }));
+
+  it('warns in non-production when font loading exceeds the safety timeout', fakeAsync(() => {
+    environment.stage = 'development';
+    const warnSpy = spyOn(console, 'warn');
+    const { doc, root } = createDoc(
+      createFonts(
+        [
+          { family: 'Latin Modern Sans', weight: 'normal', style: 'normal', status: 'loading' },
+          { family: 'Latin Modern Sans', weight: 'bold', style: 'normal', status: 'loading' },
+          { family: 'Latin Modern Mono Caps', weight: 'normal', style: 'normal', status: 'loading' }
+        ],
+        () => new Promise<FontFace[]>(() => {})
+      )
+    );
+
+    void initFontLoading(doc, 1200);
+    expect(root.classList.contains('oc-fonts-loading')).toBeTrue();
+
+    tick(1200);
+    expect(root.classList.contains('oc-fonts-loading')).toBeFalse();
+    expect(warnSpy).toHaveBeenCalledOnceWith(
+      'Critical webfont loading timed out, revealing page with fallback fonts'
+    );
   }));
 
   it('degrades to immediate visibility when inspecting fonts throws', async () => {
