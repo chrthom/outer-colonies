@@ -134,10 +134,8 @@ describe('toClientState', () => {
   });
 
   describe('events', () => {
-    /**
-     * Creates an orbital ship stack (with one non-retractable equipment card) for player 0 and
-     * retracts it, producing one retract and one discard movement event.
-     */
+    // Creates an orbital ship stack (with one non-retractable equipment card) for player 0 and
+    // retracts it, producing one retract and one discard movement event.
     const retractShipWithEquipment = (): { ship: CardStack; equipment: CardStack } => {
       const player = match.players[0];
       const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, player);
@@ -149,10 +147,8 @@ describe('toClientState', () => {
       return { ship, equipment };
     };
 
-    /**
-     * Attaches a tactic card played by player 0 to player 1's orbital ship and discards it,
-     * producing one discard movement event whose card is routed to the playing player.
-     */
+    // Attaches a tactic card played by player 0 to player 1's orbital ship and discards it,
+    // producing one discard movement event whose card is routed to the playing player.
     const discardAttachmentOnOpponentStack = (): CardStack => {
       const caster = match.players[0];
       const opponent = match.players[1];

@@ -531,4 +531,59 @@ describe('Game scene - state update pipeline', () => {
     clock.fireOldest();
     expect(updateHandCards).toHaveBeenCalledTimes(1);
   });
+
+  it('retains movement events from a superseded state until the UI steps reconcile them', () => {
+    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
+    let seenDuringStacks: EventType | undefined;
+    let seenDuringHand: EventType | undefined;
+    updateCardStacks.and.callFake(() => {
+      seenDuringStacks = game.getCardMovementEvent('ship-1')?.type;
+    });
+    updateHandCards.and.callFake(() => {
+      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
+    });
+
+    game.updateState(
+      makeState({
+        events: [
+          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
+          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
+        ]
+      })
+    );
+    // Second state with an empty event list supersedes the first before any step runs
+    game.updateState(makeState({ events: [] }));
+    clock.fireAll();
+
+    expect(seenDuringStacks).toBe(EventType.Retract);
+    expect(seenDuringHand).toBe(EventType.Discard);
+    expect(game.getCardMovementEvent('ship-1')).toBeUndefined();
+    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
+  });
+
+  it('retains hand discard events when a second state supersedes a chain waiting on a retract delay', () => {
+    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
+    let seenDuringHand: EventType | undefined;
+    updateCardStacks.and.callFake(() => {
+      game.retractCardsExist = game.getCardMovementEvent('ship-1')?.type == EventType.Retract;
+    });
+    updateHandCards.and.callFake(() => {
+      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
+    });
+
+    game.updateState(
+      makeState({
+        events: [
+          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
+          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
+        ]
+      })
+    );
+    clock.fireOldest(); // Chain 1 runs step 1 and schedules step 2 behind the retract delay
+    game.updateState(makeState({ events: [] })); // Supersedes chain 1 before step 2 runs
+    clock.fireAll();
+
+    expect(seenDuringHand).toBe(EventType.Discard);
+    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
+  });
 });

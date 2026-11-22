@@ -1,5 +1,5 @@
 import Match from './match';
-import CardStack from '../cards/card_stack';
+import CardStack, { RootCardStack } from '../cards/card_stack';
 import Card from '../cards/card';
 import { CardType, EventType, Zone } from '../../shared/config/enums';
 import { Socket } from 'socket.io';
@@ -68,6 +68,32 @@ describe('Player', () => {
 
       expect(player.discardPile).toEqual([]);
       expect(match.events).toEqual([]);
+    });
+  });
+
+  describe('discardCardStacks', () => {
+    test('discards the stack, invokes onLeaveGame and routes opponent attachments to their owner', () => {
+      const match = createMatch();
+      const player = match.players[0];
+      const opponent = match.players[1];
+      const shipCard = new MockCard(10, 'Ship', CardType.Hull, 1);
+      const tacticCard = new MockCard(11, 'Tactic', CardType.Tactic, 1);
+      const leaveSpy = jest.spyOn(shipCard, 'onLeaveGame');
+      const ship = new RootCardStack(shipCard, Zone.Orbital, player);
+      const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent);
+      ship.attach(tactic);
+      player.cardStacks.push(ship);
+
+      player.discardCardStacks(ship.uuid, 'unknown-uuid');
+
+      expect(player.cardStacks).not.toContain(ship);
+      expect(leaveSpy).toHaveBeenCalledWith(player);
+      expect(player.discardPile).toEqual([shipCard]);
+      expect(opponent.discardPile).toEqual([tacticCard]);
+      expect(match.events).toEqual([
+        { type: EventType.Discard, playerNo: 1, oldUUID: tactic.uuid },
+        { type: EventType.Discard, playerNo: 0, oldUUID: ship.uuid }
+      ]);
     });
   });
 });

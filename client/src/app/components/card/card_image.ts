@@ -81,13 +81,19 @@ export default class CardImage {
     this.imagePile.destroy();
     return this;
   }
-  discard(toDeck?: boolean): this {
+  /**
+   * Animates this card to a deck (retract) or discard pile and destroys its planes on completion.
+   * @param toDeck true if the card moves to the deck (retracted), false/undefined for the discard pile
+   * @param targetOwnedByPlayer whether the destination deck/discard pile belongs to the local player;
+   * defaults to `this.ownedByPlayer`, and can be overridden for attachments on opponent stacks
+   */
+  discard(toDeck?: boolean, targetOwnedByPlayer: boolean = this.ownedByPlayer): this {
     if (this.discarding) return this;
     this.image.disableInteractive(true);
-    const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
+    const discardPileIds = this.scene.getPlayerState(targetOwnedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
-    const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
+    const targetPlayerConfig = targetOwnedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: CardPosition = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.highlightReset();
     this.tween({
@@ -96,10 +102,10 @@ export default class CardImage {
       y: targetCoordinates.y,
       z: perspectiveConfig.distance.board,
       xRotation: layoutConfig.game.cards.perspective.board,
-      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+      angle: this.shortestAngle(targetOwnedByPlayer ? 0 : 180),
       onComplete: () => {
         if (!toDeck) {
-          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+          this.scene.getPlayerUI(targetOwnedByPlayer).discardPile.update(discardPileIds);
         }
         this.destroy();
       }

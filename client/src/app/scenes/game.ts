@@ -79,6 +79,7 @@ export default class Game extends Phaser.Scene {
   private stateUpdateSequencer = new StateUpdateSequencer((delayMs, callback) =>
     this.time.delayedCall(delayMs, callback)
   );
+  private pendingCardMovementEvents = new Map<string, ClientEvent>();
 
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
@@ -104,6 +105,7 @@ export default class Game extends Phaser.Scene {
     // reference to allow a fresh game over overlay in the new game.
     this.gameOverIndicator = undefined;
     this.connectionLost = false;
+    this.pendingCardMovementEvents.clear();
     this.background = new Background(this);
   }
 
@@ -211,6 +213,9 @@ export default class Game extends Phaser.Scene {
    * animating only the remaining delta.
    */
   updateState(state: ClientState) {
+    for (const event of state.events) {
+      if (event.oldUUID) this.pendingCardMovementEvents.set(event.oldUUID, event);
+    }
     this.state = state;
     this.preloader.destroy();
     this.resetSelection();
@@ -230,6 +235,7 @@ export default class Game extends Phaser.Scene {
         delay: () => (this.retractCardsExist ? animationConfig.duration.move : 0),
         action: () => {
           this.updateHandCards(newHandCards);
+          this.pendingCardMovementEvents.clear();
           this.updateView();
           this.highlightAttackIntervention();
         }
@@ -274,12 +280,13 @@ export default class Game extends Phaser.Scene {
   }
 
   /**
-   * Returns the card movement event (retract or discard) which the server attached to the current
-   * state for the card with the given UUID, or undefined if that card did not move.
+   * Returns the card movement event (retract or discard) reported by the server for the card
+   * with the given UUID, including events buffered from states whose animation chain was
+   * superseded before reconciling the UI.
    * @param cardUUID UUID of the card (stack) to look up
    */
   getCardMovementEvent(cardUUID: string): ClientEvent | undefined {
-    return this.state.events.find(e => e.oldUUID == cardUUID);
+    return this.pendingCardMovementEvents.get(cardUUID) ?? this.state.events.find(e => e.oldUUID == cardUUID);
   }
 
   discardMaximizedTacticCard() {
@@ -342,12 +349,7 @@ export default class Game extends Phaser.Scene {
       if (newData) {
         cs.update(newData);
       } else {
-        // Vanished card stack: the server's movement events determine each card's destination
-        cs.discard(card => {
-          const toDeck = this.getCardMovementEvent(card.data.uuid)?.type == EventType.Retract;
-          if (toDeck) this.retractCardsExist = true; // Delay hand animations until the retract animation finished
-          return toDeck;
-        });
+        cs.discard();
       }
     }, this);
     this.state.cardStacks
@@ -377,9 +379,10 @@ export default class Game extends Phaser.Scene {
     this.forBothPlayers((state, ui) =>
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
+        const event = this.getCardMovementEvent(h.uuid);
         if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
         else if (newData) h.update(newData);
-        else if (this.getCardMovementEvent(h.uuid)?.type == EventType.Discard) h.discard();
+        else if (event?.type == EventType.Discard) h.discard(false, event.playerEvent);
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
       }, this)
     );

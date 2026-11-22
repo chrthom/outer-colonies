@@ -265,10 +265,7 @@ function toClientGameResult(match: Match, playerNo: number): ClientGameResult | 
     : undefined;
 }
 
-/**
- * Projects the card movement events accumulated on the match into receiver-relative client
- * events: the playerEvent flag marks movements of cards owned by the receiving player.
- */
+// Projects match movement events into receiver-relative client events (playerEvent = card owned by receiver)
 function toClientEvents(match: Match, playerNo: number): ClientEvent[] {
   return match.events.map(e => {
     return {

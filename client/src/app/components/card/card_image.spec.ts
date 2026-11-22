@@ -97,6 +97,40 @@ describe('CardImage', () => {
       expect(discardPositionTween.stop).not.toHaveBeenCalled();
       expect(scene.tweens.add).toHaveBeenCalledTimes(2);
     });
+
+    it('routes an opponent-hosted attachment to the local player discard pile when targetOwnedByPlayer is true', () => {
+      const playerDiscardUpdate = jasmine.createSpy('playerDiscard.update');
+      const opponentDiscardUpdate = jasmine.createSpy('opponentDiscard.update');
+      const scene = makeSceneStub();
+      scene.state!.player.discardPileIds = [442];
+      scene.state!.opponent.discardPileIds = [99];
+      scene.getPlayerUI.and.callFake((isPlayer: boolean) => ({
+        hand: [],
+        discardPile: { update: isPlayer ? playerDiscardUpdate : opponentDiscardUpdate }
+      }));
+      scene.add.plane.and.callFake(makePlaneStub);
+      scene.tweens.add.and.callFake(() => makeTweenStub());
+      const card = new CardImage(asGameScene(scene), new CardXPosition(100), new CardYPosition(200), 442, {
+        isOpponentCard: true
+      });
+
+      card.discard(false, true);
+
+      const [rotationConfig, positionConfig] = scene.tweens.add.calls
+        .allArgs()
+        .map(args => args[0]) as Array<{
+        x?: number;
+        y?: number;
+        z?: number;
+        onComplete?: () => void;
+      }>;
+      expect(positionConfig.x).toBe(layoutConfig.game.cards.placement.player.discardPile.x.value3d);
+      expect(positionConfig.y).toBe(layoutConfig.game.cards.placement.player.discardPile.y.value3d);
+      expect(rotationConfig.z).toBeCloseTo(0, 5);
+      positionConfig.onComplete!();
+      expect(playerDiscardUpdate).toHaveBeenCalledWith([442]);
+      expect(opponentDiscardUpdate).not.toHaveBeenCalled();
+    });
   });
 
   describe('destroy', () => {

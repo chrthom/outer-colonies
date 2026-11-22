@@ -197,8 +197,10 @@ export default abstract class CardStack {
   }
   discard() {
     this.removeCardStack();
-    this.owner.discardCards(...this.cards);
-    this.cardStacks.forEach(cs => this.match.addCardMovementEvent(EventType.Discard, cs));
+    this.cardStacks.forEach(cs => {
+      cs.owner.discardCards(cs.card);
+      this.match.addCardMovementEvent(EventType.Discard, cs);
+    });
   }
   retract() {
     this.removeCardStack();

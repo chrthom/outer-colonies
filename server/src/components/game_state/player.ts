@@ -72,11 +72,8 @@ export default class Player {
   }
   discardCardStacks(...uuids: string[]) {
     uuids.forEach(uuid => {
-      const cardStack = spliceCardStackByUUID(this.cardStacks, uuid);
-      if (cardStack) {
-        this.discardPile.push(...cardStack.cards);
-        cardStack.cardStacks.forEach(cs => this.match.addCardMovementEvent(EventType.Discard, cs));
-      }
+      const cardStack = this.cardStacks.find(cs => cs.uuid == uuid);
+      cardStack?.discard();
     });
   }
   get colonyCardStack(): CardStack {

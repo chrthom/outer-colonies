@@ -36,15 +36,15 @@ export default class CardStack {
     this.tween();
   }
   /**
-   * Animates all cards of this stack away from the board.
-   * @param toDeckFor Optional per-card callback: returns true if the card was retracted (animated
-   * to the deck, from where it is redrawn into the hand) and false if it was discarded
+   * Animates all cards of this vanished stack away from the board according to their
+   * server-reported movement events (to the deck on retract, or to the owning player's
+   * discard pile otherwise).
    */
-  discard(toDeckFor?: (card: Card) => boolean) {
+  discard() {
     this.discarded = true;
     this.hovered = false;
     this.destroyIndicators();
-    this.cards.forEach(c => c.discard(toDeckFor?.(c)));
+    this.cards.forEach(c => this.discardCard(c));
   }
   update(data: ClientCardStack) {
     const newUuids = new Set(data.cards.map(nc => nc.uuid));
@@ -55,10 +55,7 @@ export default class CardStack {
     existingCardsByUuid.forEach((card, uuid) => {
       if (newUuids.has(uuid)) return;
       cardRemoved = true;
-      const toDeck = this.scene.getCardMovementEvent(uuid)?.type == EventType.Retract;
-      if (toDeck) this.scene.retractCardsExist = true;
-      card.destroyRetractButton();
-      card.discard(toDeck);
+      this.discardCard(card);
     });
     // Destroying a removed card's button or disabling its plane does not emit pointerout
     if (cardRemoved) this.hovered = false;
@@ -265,6 +262,13 @@ export default class CardStack {
   private destroyIndicators() {
     this.summaryBox?.destroy();
     this.cards.forEach(c => c.destroyRetractButton());
+  }
+  private discardCard(card: Card) {
+    const event = this.scene.getCardMovementEvent(card.data.uuid);
+    const toDeck = event?.type == EventType.Retract;
+    if (toDeck) this.scene.retractCardsExist = true;
+    card.destroyRetractButton();
+    card.discard(toDeck, event?.playerEvent ?? card.ownedByPlayer);
   }
   private onClickAction(cardData: ClientCard) {
     const state = this.scene.state;

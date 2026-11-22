@@ -251,10 +251,37 @@ describe('CardStack.discard', () => {
     ship.discard();
 
     expect(player.cardStacks).not.toContain(ship);
-    expect(player.discardCards).toHaveBeenCalledWith(...ship.cards);
+    expect(player.discardCards).toHaveBeenCalledTimes(2);
+    expect(player.discardCards).toHaveBeenCalledWith(equipment.card);
+    expect(player.discardCards).toHaveBeenCalledWith(ship.card);
     expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(2);
     expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, ship);
     expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, equipment);
+  });
+
+  test('routes each card of a discarded stack to its own owner when an opponent attachment is present', () => {
+    const caster = new MockPlayer();
+    const shipOwner = new MockPlayer();
+    const ship = new RootCardStack(
+      new MockCard(25, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      shipOwner as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(26, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    ship.attach(tactic);
+    shipOwner.cardStacks.push(ship);
+
+    ship.discard();
+
+    expect(shipOwner.cardStacks).not.toContain(ship);
+    expect(caster.discardCards).toHaveBeenCalledWith(tactic.card);
+    expect(shipOwner.discardCards).toHaveBeenCalledWith(ship.card);
+    expect(shipOwner.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, tactic);
+    expect(shipOwner.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, ship);
   });
 
   test('discards an attachment on an opponent stack to the owning player', () => {
