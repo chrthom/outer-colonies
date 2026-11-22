@@ -217,7 +217,6 @@ export default class CardImage {
   }
   tween(config: CardTweenConfig) {
     if (this.discarding) return;
-    this.rotationTween?.stop();
     this.positionTween?.stop();
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
@@ -228,14 +227,17 @@ export default class CardImage {
     if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
     if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
-    const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
-      targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
-      duration: config.duration,
-      ease: 'Quad.easeInOut'
-    };
-    if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
-    if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    this.rotationTween = this.scene.tweens.add(rTweenConfig);
+    if (config.xRotation != undefined || config.angle != undefined) {
+      this.rotationTween?.stop();
+      const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
+        targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
+        duration: config.duration,
+        ease: 'Quad.easeInOut'
+      };
+      if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
+      if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
+      this.rotationTween = this.scene.tweens.add(rTweenConfig);
+    }
     this.positionTween = this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {

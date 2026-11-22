@@ -265,7 +265,6 @@ function toClientGameResult(match: Match, playerNo: number): ClientGameResult | 
     : undefined;
 }
 
-// Projects match movement events into receiver-relative client events (playerEvent = card owned by receiver)
 function toClientEvents(match: Match, playerNo: number): ClientEvent[] {
   return match.events.map(e => {
     return {

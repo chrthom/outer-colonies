@@ -51,35 +51,6 @@ describe('Match', () => {
     });
   });
 
-  describe('removeDestroyedCardStacks', () => {
-    test('records a discard movement event for every card of destroyed stacks', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, player);
-      const equipment = new AttachmentCardStack(new MockCard(2, CardType.Equipment), ship);
-      ship.attach(equipment);
-      player.cardStacks.push(ship);
-      ship.damage = 1; // Card hp defaults to 0, so the ship is destroyed
-
-      const destroyedCardStacks = match.removeDestroyedCardStacks();
-
-      expect(destroyedCardStacks).toContain(ship);
-      expect(player.discardPile).toEqual([...ship.cards]);
-      expect(match.events).toEqual([
-        { type: EventType.Discard, playerNo: 0, oldUUID: equipment.uuid },
-        { type: EventType.Discard, playerNo: 0, oldUUID: ship.uuid }
-      ]);
-    });
-
-    test('records no events when no card stacks are destroyed', () => {
-      const match = createMatch();
-
-      match.removeDestroyedCardStacks();
-
-      expect(match.events).toEqual([]);
-    });
-  });
-
   describe('resetTempStates', () => {
     test('clears the accumulated movement events', () => {
       const match = createMatch();
@@ -108,6 +79,29 @@ describe('Match.removeDestroyedCardStacks', () => {
     match = createMatch();
     player = match.players[0];
     opponent = match.players[1];
+  });
+
+  test('records a discard movement event for every card of destroyed stacks', () => {
+    const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, player);
+    const equipment = new AttachmentCardStack(new MockCard(2, CardType.Equipment), ship);
+    ship.attach(equipment);
+    player.cardStacks.push(ship);
+    ship.damage = 1; // Card hp defaults to 0, so the ship is destroyed
+
+    const destroyedCardStacks = match.removeDestroyedCardStacks();
+
+    expect(destroyedCardStacks).toContain(ship);
+    expect(player.discardPile).toEqual([...ship.cards]);
+    expect(match.events).toEqual([
+      { type: EventType.Discard, playerNo: 0, oldUUID: equipment.uuid },
+      { type: EventType.Discard, playerNo: 0, oldUUID: ship.uuid }
+    ]);
+  });
+
+  test('records no events when no card stacks are destroyed', () => {
+    match.removeDestroyedCardStacks();
+
+    expect(match.events).toEqual([]);
   });
 
   test('pushes destroyed stack cards onto the owning player discard pile', () => {

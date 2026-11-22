@@ -89,26 +89,6 @@ describe('CardStack.owner', () => {
   });
 });
 
-describe('CardStack.retract', () => {
-  test('routes retractable cards to the stack owner hand and opponent attachments to their pile', () => {
-    const owner = new MockPlayer();
-    const opponent = new MockPlayer();
-    const shipCard = new MockCard(1, 'Ship', CardType.Hull, 1);
-    const ship = new RootCardStack(shipCard, Zone.Orbital, owner as any);
-    owner.cardStacks.push(ship);
-    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
-    jest.spyOn(tacticCard, 'canBeRetracted').mockReturnValue(false);
-    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
-    ship.attach(tactic);
-
-    ship.retract();
-
-    expect(owner.takeCards).toHaveBeenCalledWith([shipCard]);
-    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
-    expect(owner.discardCards).not.toHaveBeenCalled();
-  });
-});
-
 describe('CardStack.rootCardStack', () => {
   test('returns itself when there is no parent', () => {
     const stack = newStack(6, 'Root');
@@ -308,6 +288,24 @@ describe('CardStack.discard', () => {
 });
 
 describe('CardStack.retract', () => {
+  test('routes retractable cards to the stack owner hand and opponent attachments to their pile', () => {
+    const owner = new MockPlayer();
+    const opponent = new MockPlayer();
+    const shipCard = new MockCard(1, 'Ship', CardType.Hull, 1);
+    const ship = new RootCardStack(shipCard, Zone.Orbital, owner as any);
+    owner.cardStacks.push(ship);
+    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
+    jest.spyOn(tacticCard, 'canBeRetracted').mockReturnValue(false);
+    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
+    ship.attach(tactic);
+
+    ship.retract();
+
+    expect(owner.takeCards).toHaveBeenCalledWith([shipCard]);
+    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
+    expect(owner.discardCards).not.toHaveBeenCalled();
+  });
+
   test('takes retractable cards into the hand and records retract events with the new hand card UUIDs', () => {
     const player = new MockPlayer();
     const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);

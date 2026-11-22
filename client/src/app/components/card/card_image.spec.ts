@@ -41,19 +41,48 @@ describe('CardImage', () => {
       card.tween({
         duration: animationConfig.duration.move,
         x: new CardXPosition(300),
-        y: new CardYPosition(400)
+        y: new CardYPosition(400),
+        xRotation: layoutConfig.game.cards.perspective.board,
+        angle: 0
       });
       const [firstRotationTween, firstPositionTween] = tweens;
 
       card.tween({
         duration: animationConfig.duration.move,
         x: new CardXPosition(500),
-        y: new CardYPosition(600)
+        y: new CardYPosition(600),
+        xRotation: layoutConfig.game.cards.perspective.neutral,
+        angle: 10
       });
 
       expect(firstRotationTween.stop).toHaveBeenCalledTimes(1);
       expect(firstPositionTween.stop).toHaveBeenCalledTimes(1);
       expect(tweens.length).toBe(4);
+    });
+
+    it('keeps an active rotation tween running when a position-only tween starts', () => {
+      const { card, tweens } = makeCardImage();
+
+      // Simulate HandCard.update() starting both draw position and rotation tweens
+      card.tween({
+        duration: animationConfig.duration.draw,
+        x: new CardXPosition(300),
+        y: new CardYPosition(400),
+        xRotation: layoutConfig.game.cards.perspective.neutral,
+        angle: -5
+      });
+      const [drawRotationTween, drawPositionTween] = tweens;
+
+      // Simulate hover expand calling tween() with position only
+      card.tween({
+        duration: animationConfig.duration.handExpand,
+        x: new CardXPosition(300),
+        y: new CardYPosition(335)
+      });
+
+      expect(drawRotationTween.stop).not.toHaveBeenCalled();
+      expect(drawPositionTween.stop).toHaveBeenCalledTimes(1);
+      expect(tweens.length).toBe(3);
     });
   });
 
@@ -66,7 +95,9 @@ describe('CardImage', () => {
       card.tween({
         duration: animationConfig.duration.move,
         x: new CardXPosition(300),
-        y: new CardYPosition(400)
+        y: new CardYPosition(400),
+        xRotation: layoutConfig.game.cards.perspective.neutral,
+        angle: 4
       });
       const [expandRotationTween, expandPositionTween] = tweens;
 
@@ -140,7 +171,9 @@ describe('CardImage', () => {
       card.tween({
         duration: animationConfig.duration.move,
         x: new CardXPosition(300),
-        y: new CardYPosition(400)
+        y: new CardYPosition(400),
+        xRotation: layoutConfig.game.cards.perspective.board,
+        angle: 0
       });
       const [rotationTween, positionTween] = tweens;
 
