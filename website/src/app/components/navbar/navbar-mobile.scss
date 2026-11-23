@@ -1,9 +1,13 @@
-@media (max-width: 1200px) {
-  .center {
+@media (max-width: 1280px) {
+  .center,
+  .logout {
     flex-direction: column;
     gap: 3px;
-    min-width: 72px;
     padding: 4px 16px;
+  }
+
+  .center {
+    min-width: 72px;
   }
 
   .item img,
@@ -74,7 +78,8 @@
       white-space: nowrap;
     }
 
-    .profile {
+    .profile,
+    .logout {
       flex-direction: column;
       justify-content: center;
       gap: 3px;
@@ -90,12 +95,6 @@
     .logout img {
       width: 24px;
       height: 24px;
-    }
-
-    .logout {
-      min-width: 44px;
-      padding: 0 8px;
-      justify-content: center;
     }
   }
 
@@ -174,18 +173,14 @@
     }
 
     .item-label {
-      font-size: 11px;
+      font-size: 10.5px;
       letter-spacing: 0.01em;
     }
 
-    .profile {
-      min-width: 44px;
-      padding: 4px 2px;
-    }
-
+    .profile,
     .logout {
       min-width: 44px;
-      padding: 0 4px;
+      padding: 4px 2px;
     }
   }
 

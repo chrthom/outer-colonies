@@ -80,9 +80,9 @@
 .logo-wordmark {
   font-family: "Latin Modern Mono Caps", monospace;
   font-size: var(--navbar-brand-font-size);
+  font-weight: normal;
   line-height: 1.1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
@@ -136,17 +136,17 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   box-sizing: border-box;
   height: 100%;
   min-width: 84px;
-  padding: 0 clamp(14px, 1.3vw, 24px);
+  padding: 0 clamp(10px, 1.2vw, 22px);
 }
 
 .item-label {
-  font:
-    16px/1.1 "Latin Modern Mono Caps",
-    monospace;
+  font-family: "Latin Modern Mono Caps", monospace;
+  font-size: clamp(18px, 1.38vw, 20px);
+  line-height: 1.1;
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -188,6 +188,7 @@
   font-size: var(--navbar-brand-font-size);
   font-weight: normal;
   line-height: 1.1;
+  letter-spacing: 0.04em;
   max-width: clamp(100px, (100vw - 1100px) / 2, 240px);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -200,6 +201,7 @@
 
 .logout {
   justify-content: center;
+  gap: 8px;
   min-width: 48px;
   background: transparent;
   font: inherit;

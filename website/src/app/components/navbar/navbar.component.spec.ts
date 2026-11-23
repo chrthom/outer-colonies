@@ -93,6 +93,16 @@ describe('NavbarComponent', () => {
     expect(profileLink.querySelector('.user-name')?.textContent).toBe('testuser');
     expect(profileLink.querySelector('img')?.getAttribute('src')).toContain('assets/icons/profile.png');
 
+    const wordmark = logo.querySelector('.logo-wordmark') as HTMLElement;
+    const username = profileLink.querySelector('.user-name') as HTMLElement;
+    const wordmarkStyle = getComputedStyle(wordmark);
+    const usernameStyle = getComputedStyle(username);
+    expect(wordmarkStyle.fontFamily).toBe(usernameStyle.fontFamily);
+    expect(wordmarkStyle.fontSize).toBe(usernameStyle.fontSize);
+    expect(wordmarkStyle.fontWeight).toBe(usernameStyle.fontWeight);
+    expect(wordmarkStyle.letterSpacing).toBe(usernameStyle.letterSpacing);
+    expect(wordmarkStyle.textTransform).toBe(usernameStyle.textTransform);
+
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
     expect(logo.getAttribute('aria-label')).toBe('Outer Colonies – Startseite');
@@ -109,6 +119,8 @@ describe('NavbarComponent', () => {
     ).toBeTrue();
     const logout = rightZone.querySelector('button.logout[aria-label="Abmelden"]');
     expect(logout.type).toBe('button');
+    expect(logout.querySelector('.item-label')?.textContent?.trim()).toBe('Abmelden');
+    expect(logout.querySelector('.item-label')?.getAttribute('aria-hidden')).toBe('true');
     logout.click();
     expect(authSpy.logout).toHaveBeenCalled();
     expect(element.querySelector('img:not([alt=""])')).toBeNull();
