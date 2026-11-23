@@ -1,6 +1,6 @@
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { BattleType, EventType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
 import { ClientAttack, ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
@@ -19,6 +19,7 @@ export default class CardStack {
   summaryBox!: CardStackSummary;
   private scene: Game;
   private initialized = false;
+  private discarded = false;
   private hovered = false;
 
   constructor(scene: Game, data: ClientCardStack) {
@@ -34,25 +35,30 @@ export default class CardStack {
     this.summaryBox = new CardStackSummary(this.scene, this);
     this.tween();
   }
-  discard(toDeck?: boolean) {
+  /**
+   * Animates all cards of this vanished stack away from the board according to their
+   * server-reported movement events (to the deck on retract, or to the owning player's
+   * discard pile otherwise).
+   */
+  discard() {
+    this.discarded = true;
+    this.hovered = false;
     this.destroyIndicators();
-    this.cards.forEach(c => c.discard(toDeck));
+    this.cards.forEach(c => this.discardCard(c));
   }
   update(data: ClientCardStack) {
     const newUuids = new Set(data.cards.map(nc => nc.uuid));
     const existingCardsByUuid = new Map<string, Card>(
       this.cards.map(c => [c.data.uuid, c] as [string, Card])
     );
+    let cardRemoved = false;
     existingCardsByUuid.forEach((card, uuid) => {
       if (newUuids.has(uuid)) return;
-      let toDeck = false;
-      if (this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice(-1).pop() != card.cardId) {
-        toDeck = true;
-        this.scene.retractCardsExist = true;
-      }
-      card.destroyRetractButton();
-      card.discard(toDeck);
+      cardRemoved = true;
+      this.discardCard(card);
     });
+    // Destroying a removed card's button or disabling its plane does not emit pointerout
+    if (cardRemoved) this.hovered = false;
     this.data = data;
     const x = this.targetX.value2d;
     this.cards = data.cards.map(nc => {
@@ -129,6 +135,7 @@ export default class CardStack {
     return this.zoneLayout.y.plus(modIndex * yDistance).plus(expand ? moveToCenter : 0);
   }
   tween(expand?: boolean) {
+    if (this.discarded) return;
     this.cards.forEach(c => {
       c.setDepth(expand ? layoutConfig.depth.cardStackExpanded : this.depth);
       const x = expand ? this.targetXExpanded(c.data.index) : this.targetX;
@@ -160,6 +167,7 @@ export default class CardStack {
     );
   }
   private pointerover() {
+    if (this.discarded) return;
     this.hovered = true;
     if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
       this.cards.forEach(c =>
@@ -175,6 +183,7 @@ export default class CardStack {
     this.summaryBox.highlight();
   }
   private pointerout() {
+    if (this.discarded) return;
     this.hovered = false;
     this.tween();
     this.cards.forEach(c => c.retractCardButton?.hide());
@@ -253,6 +262,13 @@ export default class CardStack {
   private destroyIndicators() {
     this.summaryBox?.destroy();
     this.cards.forEach(c => c.destroyRetractButton());
+  }
+  private discardCard(card: Card) {
+    const event = this.scene.getCardMovementEvent(card.data.uuid);
+    const toDeck = event?.type == EventType.Retract;
+    if (toDeck) this.scene.retractCardsExist = true;
+    card.destroyRetractButton();
+    card.discard(toDeck, event?.playerEvent ?? card.ownedByPlayer);
   }
   private onClickAction(cardData: ClientCard) {
     const state = this.scene.state;

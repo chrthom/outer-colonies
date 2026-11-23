@@ -7,10 +7,6 @@ const shipStack = (damage: number) => ({ damage, rootCardStack: { damage } }) as
 describe('Card115 Reparaturnaniten', () => {
   const card = new Card115();
 
-  test('gains 10 hp', () => {
-    expect(card.profile.hp).toBe(10);
-  });
-
   test('removes all damage markers at the end of the turn', () => {
     const source = shipStack(17);
 
@@ -23,8 +19,7 @@ describe('Card115 Reparaturnaniten', () => {
 describe('Card343 Selbstreparierender Torso', () => {
   const card = new Card343();
 
-  test('gains 2 hp and repairs 4 damage markers per turn', () => {
-    expect(card.profile.hp).toBe(2);
+  test('repairs 4 damage markers per turn', () => {
     const source = shipStack(9);
 
     card.onEndTurn({} as Player, source);

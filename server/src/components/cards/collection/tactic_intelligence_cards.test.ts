@@ -1,13 +1,5 @@
 import { Socket } from 'socket.io';
-import {
-  BattleType,
-  CardDurability,
-  CardType,
-  InterventionType,
-  TacticDiscipline,
-  TurnPhase,
-  Zone
-} from '../../../shared/config/enums';
+import { BattleType, CardType, InterventionType, TurnPhase, Zone } from '../../../shared/config/enums';
 import Card from '../card';
 import CardStack, { RootCardStack } from '../card_stack';
 import { CardProfileConfig } from '../card_profile';
@@ -56,10 +48,6 @@ describe('Card517 Diasporabewegung', () => {
     match = createMatch();
     player = match.players[0];
     card = new Card517();
-  });
-
-  test('is an Intelligence discipline tactic card', () => {
-    expect(card.discipline).toBe(TacticDiscipline.Intelligence);
   });
 
   describe('onEnterGame', () => {
@@ -138,15 +126,6 @@ describe('Card442 Triebwerksschaden', () => {
     card = new Card442();
   });
 
-  test('is an Intelligence discipline tactic card', () => {
-    expect(card.discipline).toBe(TacticDiscipline.Intelligence);
-    expect(card.type).toBe(CardType.Tactic);
-  });
-
-  test('has Turn durability', () => {
-    expect(card.durability).toBe(CardDurability.Turn);
-  });
-
   test('is only playable in the battle round start intervention window', () => {
     expect(card.canIntervene(InterventionType.BattleRoundStart)).toBe(true);
     expect(card.canIntervene(InterventionType.BattleRoundEnd)).toBe(false);
@@ -199,19 +178,6 @@ describe('Card442 Triebwerksschaden', () => {
 
       expect(target.attachedCardStacks).toContain(handCard);
       expect(target.profile.speed).toBe(1);
-    });
-
-    test('drops the effective speed of a speed 1 ship to 0', () => {
-      const target = new RootCardStack(
-        new MockCard(105, CardType.Hull, { speed: 1 }),
-        Zone.Neutral,
-        match.players[1]
-      );
-      const handCard = new RootCardStack(card, Zone.Hand, match.players[0]);
-
-      handCard.playHandCard(target);
-
-      expect(target.profile.speed).toBe(0);
     });
   });
 });

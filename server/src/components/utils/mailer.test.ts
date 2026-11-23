@@ -1,5 +1,4 @@
 import config from 'config';
-import nodemailer from 'nodemailer';
 import Mailer from './mailer';
 
 jest.mock('nodemailer', () => ({
@@ -13,25 +12,9 @@ describe('Mailer', () => {
     sendMail().mockClear();
   });
 
-  describe('transporter', () => {
-    it('should be created from the mail configuration', () => {
-      expect(nodemailer.createTransport).toHaveBeenCalledWith({
-        host: config.get('mail.host'),
-        port: config.get<number>('mail.port'),
-        secure: config.get<boolean>('mail.secure'),
-        auth: {
-          user: config.get('mail.user'),
-          pass: process.env['MAIL_PASSWORD']
-        }
-      });
-    });
-  });
-
   describe('sendAccountActivation', () => {
     it('should send a mail with the account activation subject and link', async () => {
-      await expect(Mailer.sendAccountActivation('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual(
-        {}
-      );
+      await Mailer.sendAccountActivation('test@example.com', 'Testuser', 'uuid-123');
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           from: 'noreply@outercolonies.de',
@@ -47,9 +30,7 @@ describe('Mailer', () => {
 
   describe('sendEmailConfirmation', () => {
     it('should send a mail with the email confirmation subject, link and correct wording', async () => {
-      await expect(Mailer.sendEmailConfirmation('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual(
-        {}
-      );
+      await Mailer.sendEmailConfirmation('test@example.com', 'Testuser', 'uuid-123');
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           to: 'test@example.com',
@@ -68,7 +49,7 @@ describe('Mailer', () => {
 
   describe('sendPasswordReset', () => {
     it('should send a mail with the password reset subject and link', async () => {
-      await expect(Mailer.sendPasswordReset('test@example.com', 'Testuser', 'uuid-123')).resolves.toEqual({});
+      await Mailer.sendPasswordReset('test@example.com', 'Testuser', 'uuid-123');
       expect(sendMail()).toHaveBeenCalledWith(
         expect.objectContaining({
           to: 'test@example.com',

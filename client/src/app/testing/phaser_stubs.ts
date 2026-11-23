@@ -16,8 +16,10 @@ import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 /** Game object methods that return the game object itself, so their stubs must be chainable. */
 const chainableMethods = [
   'clear',
+  'disableInteractive',
   'fillRect',
   'fillStyle',
+  'off',
   'on',
   'setAlign',
   'setAlpha',

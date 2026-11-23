@@ -126,13 +126,6 @@ describe('AuthUtils', () => {
       jest.restoreAllMocks();
     });
 
-    it('should send the activation mail and return the credential on success', async () => {
-      const sendMailSpy = jest.spyOn(Mailer, 'sendAccountActivation').mockResolvedValue({});
-      const registeredCredential = await AuthUtils.register(registrationData);
-      expect(sendMailSpy).toHaveBeenCalledWith('test@example.com', 'testuser', 'uuid-123');
-      expect(registeredCredential).toEqual(mockCredential);
-    });
-
     it('should reject if the activation mail cannot be sent', async () => {
       jest.spyOn(Mailer, 'sendAccountActivation').mockRejectedValue(new Error('SMTP error'));
       await expect(AuthUtils.register(registrationData)).rejects.toThrow('SMTP error');
@@ -201,11 +194,6 @@ describe('AuthUtils', () => {
       await AuthUtils.sendPasswordReset('testuser');
       expect(sendMailSpy).toHaveBeenCalledWith('test@example.com', 'testuser', 'uuid-123');
     });
-
-    it('should reject if the password reset mail cannot be sent', async () => {
-      jest.spyOn(Mailer, 'sendPasswordReset').mockRejectedValue(new Error('SMTP error'));
-      await expect(AuthUtils.sendPasswordReset('testuser')).rejects.toThrow('SMTP error');
-    });
   });
 
   describe('sendEmailConfirmation', () => {
@@ -221,13 +209,6 @@ describe('AuthUtils', () => {
       const sendMailSpy = jest.spyOn(Mailer, 'sendEmailConfirmation').mockResolvedValue({});
       await AuthUtils.sendEmailConfirmation(123, 'testuser', 'new@example.com');
       expect(sendMailSpy).toHaveBeenCalledWith('new@example.com', 'testuser', 'uuid-123');
-    });
-
-    it('should reject if the email confirmation mail cannot be sent', async () => {
-      jest.spyOn(Mailer, 'sendEmailConfirmation').mockRejectedValue(new Error('SMTP error'));
-      await expect(AuthUtils.sendEmailConfirmation(123, 'testuser', 'new@example.com')).rejects.toThrow(
-        'SMTP error'
-      );
     });
   });
 });

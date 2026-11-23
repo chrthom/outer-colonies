@@ -1,8 +1,15 @@
 import { Socket } from 'socket.io';
-import { CardType, InterventionType, TacticDiscipline, TurnPhase, Zone } from '../../shared/config/enums';
+import {
+  CardType,
+  EventType,
+  InterventionType,
+  TacticDiscipline,
+  TurnPhase,
+  Zone
+} from '../../shared/config/enums';
 import { constants } from '../../shared/config/constants';
 import Card from '../cards/card';
-import CardStack, { RootCardStack } from '../cards/card_stack';
+import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import { CardProfileConfig } from '../cards/card_profile';
 import TacticCard from '../cards/types/tactic_card';
 import Match from '../game_state/match';
@@ -123,6 +130,52 @@ describe('toClientState', () => {
       expect(revealedHandCard?.validTargets).toEqual([]);
       expect(revealedHandCard?.optionsToSelect).toBe(0);
       expect(revealedHandCard?.options).toEqual([]);
+    });
+  });
+
+  describe('events', () => {
+    // Creates an orbital ship stack (with one non-retractable equipment card) for player 0 and
+    // retracts it, producing one retract and one discard movement event.
+    const retractShipWithEquipment = (): { ship: CardStack; equipment: CardStack } => {
+      const player = match.players[0];
+      const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, player);
+      const equipment = new AttachmentCardStack(new MockCard(2, CardType.Equipment), ship);
+      ship.attach(equipment);
+      jest.spyOn(equipment.card, 'canBeRetracted').mockReturnValue(false);
+      player.cardStacks.push(ship);
+      ship.retract();
+      return { ship, equipment };
+    };
+
+    test('attaches the movement events with playerEvent = true for the owning player', () => {
+      const { ship, equipment } = retractShipWithEquipment();
+
+      const state = toClientState(match, 0);
+
+      expect(state.events).toEqual([
+        { type: EventType.Discard, playerEvent: true, oldUUID: equipment.uuid },
+        { type: EventType.Retract, playerEvent: true, oldUUID: ship.uuid, newUUID: expect.any(String) }
+      ]);
+      expect(state.player.hand.map(h => h.uuid)).toContain(state.events[1].newUUID);
+      expect(state.player.discardPileIds).toEqual([equipment.card.id]);
+    });
+
+    test('attaches the same movement events with playerEvent = false for the opponent', () => {
+      const { ship, equipment } = retractShipWithEquipment();
+
+      const state = toClientState(match, 1);
+
+      expect(state.events).toEqual([
+        { type: EventType.Discard, playerEvent: false, oldUUID: equipment.uuid },
+        { type: EventType.Retract, playerEvent: false, oldUUID: ship.uuid, newUUID: expect.any(String) }
+      ]);
+      expect(state.opponent.discardPileIds).toEqual([equipment.card.id]);
+    });
+
+    test('contains an empty event list when no cards were moved', () => {
+      const state = toClientState(match, 0);
+
+      expect(state.events).toEqual([]);
     });
   });
 

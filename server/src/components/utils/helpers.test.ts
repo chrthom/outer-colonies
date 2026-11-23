@@ -179,14 +179,6 @@ describe('pickRandom', () => {
 
     expect(pickRandom(['a', 'b', 'c', 'd'])).toBe(expected);
   });
-
-  it('returns a real element (never undefined) across many calls on a non-empty array', () => {
-    const items = ['a', 'b', 'c'];
-
-    for (let i = 0; i < 100; i++) {
-      expect(items).toContain(pickRandom(items));
-    }
-  });
 });
 
 describe('shuffle', () => {

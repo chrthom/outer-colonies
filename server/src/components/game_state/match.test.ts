@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
 import Card from '../cards/card';
-import CardStack, { RootCardStack } from '../cards/card_stack';
+import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import { CardProfileConfig } from '../cards/card_profile';
-import { BattleType, CardDurability, CardType, Zone } from '../../shared/config/enums';
+import { BattleType, CardDurability, CardType, EventType, Zone } from '../../shared/config/enums';
 import Battle from './battle';
 import Match from './match';
 import Player from './player';
@@ -26,11 +26,43 @@ const createSocket = (playerNo: number): Socket =>
     join: jest.fn(),
     data: {
       user: { userId: playerNo + 1, username: `Player ${playerNo}` },
-      activeDeck: []
+      activeDeck: [1, 2, 3, 4].map(i => new MockCard(i, CardType.Hull))
     }
   }) as unknown as Socket;
 
 const createMatch = (): Match => new Match('test-room', createSocket(0), createSocket(1));
+
+describe('Match', () => {
+  describe('addCardMovementEvent', () => {
+    test('records type, owning player and old UUID of the moved card stack', () => {
+      const match = createMatch();
+      const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, match.players[0]);
+
+      match.addCardMovementEvent(EventType.Retract, ship, 'new-hand-card-uuid');
+
+      expect(match.events).toEqual([
+        {
+          type: EventType.Retract,
+          playerNo: 0,
+          oldUUID: ship.uuid,
+          newUUID: 'new-hand-card-uuid'
+        }
+      ]);
+    });
+  });
+
+  describe('resetTempStates', () => {
+    test('clears the accumulated movement events', () => {
+      const match = createMatch();
+      const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, match.players[0]);
+      match.addCardMovementEvent(EventType.Discard, ship);
+
+      match.resetTempStates();
+
+      expect(match.events).toEqual([]);
+    });
+  });
+});
 
 const createShip = (id: number, owner: Player, hp: number): CardStack => {
   const ship = new RootCardStack(new MockCard(id, CardType.Hull, { hp }), Zone.Orbital, owner);
@@ -49,28 +81,27 @@ describe('Match.removeDestroyedCardStacks', () => {
     opponent = match.players[1];
   });
 
-  test('pushes destroyed stack cards onto the owning player discard pile', () => {
-    const ship = createShip(1, opponent, 3);
-    ship.damage = 3;
+  test('records a discard movement event for every card of destroyed stacks', () => {
+    const ship = new RootCardStack(new MockCard(1, CardType.Hull), Zone.Orbital, player);
+    const equipment = new AttachmentCardStack(new MockCard(2, CardType.Equipment), ship);
+    ship.attach(equipment);
+    player.cardStacks.push(ship);
+    ship.damage = 1; // Card hp defaults to 0, so the ship is destroyed
 
-    const destroyedStacks = match.removeDestroyedCardStacks();
+    const destroyedCardStacks = match.removeDestroyedCardStacks();
 
-    expect(destroyedStacks).toEqual([ship]);
-    expect(opponent.discardPile).toContain(ship.card);
-    expect(opponent.cardStacks).not.toContain(ship);
+    expect(destroyedCardStacks).toContain(ship);
+    expect(player.discardPile).toEqual([...ship.cards]);
+    expect(match.events).toEqual([
+      { type: EventType.Discard, playerNo: 0, oldUUID: equipment.uuid },
+      { type: EventType.Discard, playerNo: 0, oldUUID: ship.uuid }
+    ]);
   });
 
-  test('routes cards attached to an opponent stack to the playing player discard pile', () => {
-    const ship = createShip(1, opponent, 3);
-    const tacticCard = new MockCard(2, CardType.Tactic);
-    const tactic = new RootCardStack(tacticCard, Zone.Hand, player);
-    ship.attach(tactic);
-    ship.damage = 3;
-
+  test('records no events when no card stacks are destroyed', () => {
     match.removeDestroyedCardStacks();
 
-    expect(player.discardPile).toContain(tacticCard);
-    expect(opponent.discardPile).not.toContain(tacticCard);
+    expect(match.events).toEqual([]);
   });
 
   test('returns an attachment played by the opponent to the playing player', () => {
