@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { RulesPage } from './rules.page';
 import { environment } from 'src/environments/environment';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { IconService } from 'src/app/icon.service';
 
@@ -13,21 +13,18 @@ describe('RulesPage', () => {
   let component: RulesPage;
   let fixture: ComponentFixture<RulesPage>;
   let routeStub: { queryParams: Observable<QueryParams> };
-  let routerSpy: jasmine.SpyObj<Router>;
+  let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
     localStorage.clear();
     routeStub = { queryParams: of<QueryParams>({}) };
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [RulesPage],
-      providers: [
-        IconService,
-        { provide: ActivatedRoute, useValue: routeStub },
-        { provide: Router, useValue: routerSpy }
-      ]
+      providers: [provideRouter([]), IconService, { provide: ActivatedRoute, useValue: routeStub }]
     }).compileComponents();
+
+    navigateSpy = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
 
     fixture = TestBed.createComponent(RulesPage);
     component = fixture.componentInstance;
@@ -60,10 +57,9 @@ describe('RulesPage', () => {
   });
 
   it('updates the chapter deep link without discarding other query parameters', () => {
-    routerSpy.navigate.and.resolveTo(true);
     component.nextChapter();
     expect(component.activeChapterList.selectedOptions.selected[0]?.value).toBe('symbols');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(
+    expect(navigateSpy).toHaveBeenCalledWith(
       [],
       jasmine.objectContaining({
         queryParams: { section: 'symbols' },
@@ -156,46 +152,51 @@ describe('RulesPage', () => {
 
   it('should default to online mode', () => {
     expect(component.onlineMode).toBeTrue();
-    const toggleButton = fixture.debugElement.query(By.css('#mode-toggle button')).nativeElement;
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true');
-    expect(fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent).toContain(
-      'Online-Spiel'
-    );
+    const toggleButtons = fixture.debugElement.queryAll(By.css('#mode-toggle mat-button-toggle'));
+    expect(toggleButtons.length).toBe(2);
+    expect(toggleButtons[0].nativeElement.textContent).toContain('Online-Spiel');
+    expect(toggleButtons[1].nativeElement.textContent).toContain('Kartenspiel');
+    expect(toggleButtons[0].query(By.css('button')).nativeElement.getAttribute('aria-checked')).toBe('true');
+    expect(toggleButtons[1].query(By.css('button')).nativeElement.getAttribute('aria-checked')).toBe('false');
   });
 
-  it('should keep the static toggle label regardless of the mode', () => {
+  it('should keep both mode labels visible regardless of the active mode', () => {
     component.setMode('kartenspiel');
     fixture.detectChanges();
-    const toggleText = fixture.debugElement.query(By.css('#mode-toggle')).nativeElement.textContent;
-    expect(toggleText).toContain('Online-Spiel');
-    expect(toggleText).not.toContain('Kartenspiel');
+    const toggleButtons = fixture.debugElement.queryAll(By.css('#mode-toggle mat-button-toggle'));
+    expect(toggleButtons[0].nativeElement.textContent).toContain('Online-Spiel');
+    expect(toggleButtons[1].nativeElement.textContent).toContain('Kartenspiel');
+    expect(toggleButtons[0].query(By.css('button')).nativeElement.getAttribute('aria-checked')).toBe('false');
+    expect(toggleButtons[1].query(By.css('button')).nativeElement.getAttribute('aria-checked')).toBe('true');
   });
 
   it('should persist the mode choice and mirror it to the mode query param', () => {
     component.setMode('kartenspiel');
     expect(component.onlineMode).toBeFalse();
     expect(localStorage.getItem('oc-rules-mode')).toBe('kartenspiel');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(
+    expect(navigateSpy).toHaveBeenCalledWith(
       [],
       jasmine.objectContaining({ queryParams: { mode: 'kartenspiel' } })
     );
     fixture.detectChanges();
-    const toggleButton = fixture.debugElement.query(By.css('#mode-toggle button')).nativeElement;
-    expect(toggleButton.getAttribute('aria-checked')).toBe('false');
+    const kartenspielButton = fixture.debugElement
+      .queryAll(By.css('#mode-toggle mat-button-toggle'))[1]
+      .query(By.css('button')).nativeElement;
+    expect(kartenspielButton.getAttribute('aria-checked')).toBe('true');
   });
 
-  it('should apply the mode from the slide toggle change event', () => {
-    component.onModeChange({ checked: false } as MatSlideToggleChange);
+  it('should apply the mode from the segmented toggle change event', () => {
+    component.onModeChange({ value: 'kartenspiel' } as MatButtonToggleChange);
     expect(component.onlineMode).toBeFalse();
     expect(localStorage.getItem('oc-rules-mode')).toBe('kartenspiel');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(
+    expect(navigateSpy).toHaveBeenCalledWith(
       [],
       jasmine.objectContaining({ queryParams: { mode: 'kartenspiel' } })
     );
-    component.onModeChange({ checked: true } as MatSlideToggleChange);
+    component.onModeChange({ value: 'online' } as MatButtonToggleChange);
     expect(component.onlineMode).toBeTrue();
     expect(localStorage.getItem('oc-rules-mode')).toBe('online');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(
+    expect(navigateSpy).toHaveBeenCalledWith(
       [],
       jasmine.objectContaining({ queryParams: { mode: 'online' } })
     );
@@ -224,36 +225,59 @@ describe('RulesPage', () => {
     expect(newFixture.componentInstance.onlineMode).toBeFalse();
   });
 
-  it('should show the client controls in the online-game chapter only in online mode', () => {
-    selectChapter('online-game');
-    const text = () => fixture.debugElement.nativeElement.textContent;
-    expect(text()).toContain('Aufbau des Spielfelds');
-    expect(text()).toContain('So steuerst du das Spiel');
-    expect(text()).toContain('Deine Handkarten');
-    expect(text()).toContain('Kartenstapel inspizieren');
-    expect(text()).toContain('Missionen und Überfälle starten');
-    expect(text()).toContain('Gefechte');
-    expect(text()).toContain('Spielende und Kapitulation');
-    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(7);
-    expect(fixture.debugElement.queryAll(By.css('.screenshot-legend')).length).toBe(7);
-    component.setMode('kartenspiel');
-    fixture.detectChanges();
-    expect(text()).not.toContain('Aufbau des Spielfelds');
-    expect(text()).not.toContain('So steuerst du das Spiel');
-    expect(text()).not.toContain('Kapitulation bestätigen');
-    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(0);
-    // Mode-independent online features remain visible in both modes
-    expect(text()).toContain('Timer und Bedenkzeit');
-    expect(text()).toContain('Sol');
+  it('should redirect legacy online-game deep links to setup', async () => {
+    routeStub.queryParams = of({ section: 'online-game' });
+    const newFixture = TestBed.createComponent(RulesPage);
+    newFixture.detectChanges();
+    await new Promise(resolve => setTimeout(resolve));
+    expect(newFixture.componentInstance.activeChapterList.selectedOptions.selected[0]?.value).toBe('setup');
   });
 
-  it('should show inline hints in physical-rule chapters only in online mode', () => {
+  it('should swap the setup board diagram between online overview and tabletop setup', () => {
     selectChapter('setup');
     const text = () => fixture.debugElement.nativeElement.textContent;
+    const imgs = () =>
+      Array.from<HTMLImageElement>(fixture.nativeElement.querySelectorAll('img')).map(img => img.src);
+
     expect(text()).toContain('Deck-Manager der Website');
+    expect(text()).toContain('Aufbau des Spielfelds');
+    expect(imgs().some(src => src.endsWith('/rules/online_overview.png'))).toBeTrue();
+    expect(imgs().some(src => src.endsWith('/rules/setup.png'))).toBeFalse();
+
     component.setMode('kartenspiel');
     fixture.detectChanges();
     expect(text()).not.toContain('Deck-Manager der Website');
+    expect(text()).not.toContain('Aufbau des Spielfelds');
+    expect(imgs().some(src => src.endsWith('/rules/online_overview.png'))).toBeFalse();
+    expect(imgs().some(src => src.endsWith('/rules/setup.png'))).toBeTrue();
+  });
+
+  it('should show contextual online screenshots and hints only in online mode across chapters', () => {
+    const checkChapter = (chapter: string, expectedScreenshots: string[], expectedText: string) => {
+      component.setMode('online');
+      selectChapter(chapter);
+      const imgs = Array.from<HTMLImageElement>(fixture.nativeElement.querySelectorAll('img')).map(
+        img => img.src
+      );
+      expectedScreenshots.forEach(name =>
+        expect(imgs.some(src => src.endsWith(`/rules/${name}.png`))).toBeTrue()
+      );
+      expect(fixture.debugElement.nativeElement.textContent).toContain(expectedText);
+
+      component.setMode('kartenspiel');
+      fixture.detectChanges();
+      expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(0);
+      expect(fixture.debugElement.queryAll(By.css('.online-hint')).length).toBe(0);
+    };
+
+    checkChapter('victory', [], 'Kapitulation bestätigen');
+    checkChapter(
+      'turn-overview',
+      ['online_hand', 'online_picker', 'online_stack', 'online_prompt'],
+      'Bedenkzeit'
+    );
+    checkChapter('missions', ['online_buttons'], 'Schaltfläche Mission');
+    checkChapter('battle-overview', ['online_combat'], 'Reichweitenanzeige');
   });
 
   function selectChapter(chapter: string): void {

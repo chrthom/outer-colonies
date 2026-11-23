@@ -3,7 +3,11 @@ import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 import { MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggle, MatSlideToggleChange } from '@angular/material/slide-toggle';
+import {
+  MatButtonToggleGroup,
+  MatButtonToggle,
+  MatButtonToggleChange
+} from '@angular/material/button-toggle';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IconService } from '../../../icon.service';
 
@@ -17,7 +21,15 @@ const MODE_STORAGE_KEY = 'oc-rules-mode';
   selector: 'oc-page-rules',
   templateUrl: './rules.page.html',
   styleUrls: ['./rules.page.scss'],
-  imports: [ContentBoxComponent, MatSelectionList, MatListOption, MatButtonModule, MatSlideToggle, RouterLink]
+  imports: [
+    ContentBoxComponent,
+    MatSelectionList,
+    MatListOption,
+    MatButtonModule,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    RouterLink
+  ]
 })
 export class RulesPage implements OnInit {
   @ViewChild('activeChapter') activeChapterList!: MatSelectionList;
@@ -30,7 +42,6 @@ export class RulesPage implements OnInit {
     'symbols',
     'victory',
     'glossar',
-    'online-game',
     'cards',
     'hull-cards',
     'equipment-cards',
@@ -52,7 +63,8 @@ export class RulesPage implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      const section = params['section'];
+      const rawSection = params['section'];
+      const section = rawSection === 'online-game' ? 'setup' : rawSection;
       if (section && this.chapters.includes(section)) {
         setTimeout(() => this.selectChapter(section));
       }
@@ -61,11 +73,11 @@ export class RulesPage implements OnInit {
   }
 
   /**
-   * Handles a mode change through the slide toggle: applies the new mode, persists the choice and
+   * Handles a mode change through the segmented toggle: applies the new mode, persists the choice and
    * mirrors it to the `?mode=` query param so links including the mode are shareable.
    */
-  onModeChange(event: MatSlideToggleChange): void {
-    this.setMode(event.checked ? 'online' : 'kartenspiel');
+  onModeChange(event: MatButtonToggleChange): void {
+    this.setMode(event.value as RulesMode);
   }
 
   /** Applies a rules mode, persists it in localStorage and mirrors it to the `?mode=` query param. */

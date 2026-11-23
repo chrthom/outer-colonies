@@ -46,14 +46,16 @@
           counter-reset: screenshot-item;
           li {
             counter-increment: screenshot-item;
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
+            position: relative;
+            padding-left: 32px;
+            min-height: 22px;
             margin-bottom: 6px;
           }
           li::before {
             content: counter(screenshot-item);
-            flex-shrink: 0;
+            position: absolute;
+            left: 0;
+            top: 1px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
