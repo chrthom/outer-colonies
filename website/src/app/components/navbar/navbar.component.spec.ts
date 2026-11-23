@@ -80,8 +80,13 @@ describe('NavbarComponent', () => {
 
     const logo = element.querySelector('#navbar-logo') as HTMLAnchorElement;
     expect(logo.querySelector('svg.logo-emblem')?.getAttribute('aria-hidden')).toBe('true');
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-neptune')).toBeTruthy();
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-uranus')).toBeTruthy();
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-saturn')).toBeTruthy();
     expect(logo.querySelector('.logo-wordmark')?.textContent?.trim()).toBe('Outer Colonies');
     expect(logo.querySelector('.logo-wordmark')?.getAttribute('aria-hidden')).toBe('true');
+    expect(logo.querySelector('.logo-word-outer')?.textContent?.trim()).toBe('Outer');
+    expect(logo.querySelector('.logo-word-colonies')?.textContent?.trim()).toBe('Colonies');
 
     const rightZone = element.querySelector('.right');
     expect(rightZone).toBeTruthy();
@@ -94,6 +99,8 @@ describe('NavbarComponent', () => {
     expect(profileLink.querySelector('img')?.getAttribute('src')).toContain('assets/icons/profile.png');
 
     const wordmark = logo.querySelector('.logo-wordmark') as HTMLElement;
+    const outerWord = logo.querySelector('.logo-word-outer') as HTMLElement;
+    const coloniesWord = logo.querySelector('.logo-word-colonies') as HTMLElement;
     const username = profileLink.querySelector('.user-name') as HTMLElement;
     const navLabel = iconElements[0].querySelector('.item-label') as HTMLElement;
     const logoutLabel = rightZone.querySelector('button.logout .item-label') as HTMLElement;
@@ -102,12 +109,14 @@ describe('NavbarComponent', () => {
     const navLabelStyle = getComputedStyle(navLabel);
     const logoutLabelStyle = getComputedStyle(logoutLabel);
     expect(wordmarkStyle.fontFamily).toBe(usernameStyle.fontFamily);
-    expect(wordmarkStyle.fontSize).toBe(usernameStyle.fontSize);
-    expect(wordmarkStyle.fontWeight).toBe(usernameStyle.fontWeight);
-    expect(wordmarkStyle.letterSpacing).toBe(usernameStyle.letterSpacing);
-    expect(wordmarkStyle.textTransform).toBe(usernameStyle.textTransform);
+    expect(Number.parseFloat(wordmarkStyle.fontWeight)).toBeGreaterThanOrEqual(700);
+    expect(wordmarkStyle.textTransform).toBe('uppercase');
+    expect(getComputedStyle(outerWord).color).not.toBe(getComputedStyle(coloniesWord).color);
     expect(navLabelStyle.fontSize).toBe(logoutLabelStyle.fontSize);
     if (window.innerWidth > 1280) {
+      expect(Number.parseFloat(wordmarkStyle.fontSize)).toBeGreaterThan(
+        Number.parseFloat(usernameStyle.fontSize)
+      );
       expect(navLabelStyle.fontSize).toBe(usernameStyle.fontSize);
       expect(logoutLabelStyle.fontSize).toBe(usernameStyle.fontSize);
     }

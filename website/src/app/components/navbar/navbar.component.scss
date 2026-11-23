@@ -49,8 +49,8 @@
   box-sizing: border-box;
   min-height: 44px;
   height: 100%;
-  padding: 0 18px;
-  color: var(--color-primary-light);
+  padding: 0 clamp(14px, 1.3vw, 20px);
+  color: var(--color-light);
   text-decoration: none;
   border-bottom: 2px solid transparent;
   transition:
@@ -63,6 +63,15 @@
     color: var(--color-accent-light);
     border-bottom-color: var(--color-warn);
     background-color: color-mix(in srgb, var(--color-accent), transparent 88%);
+
+    .logo-emblem {
+      filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-warn), transparent 28%));
+    }
+
+    .logo-word-outer,
+    .logo-word-colonies {
+      color: var(--color-accent-light);
+    }
   }
 
   &:focus-visible {
@@ -72,18 +81,31 @@
 
 .logo-emblem {
   display: block;
-  height: 52px;
+  height: 54px;
   width: auto;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-primary), transparent 40%));
+  transition: filter 180ms ease-out;
 }
 
 .logo-wordmark {
   font-family: "Latin Modern Mono Caps", monospace;
-  font-size: var(--navbar-text-size);
-  font-weight: normal;
-  line-height: 1.1;
-  letter-spacing: 0.04em;
+  font-size: clamp(19px, 1.6vw, 24px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   white-space: nowrap;
+}
+
+.logo-word-outer {
+  color: var(--color-light);
+  transition: color 180ms ease-out;
+}
+
+.logo-word-colonies {
+  color: color-mix(in srgb, var(--color-primary-light) 65%, var(--color-light));
+  transition: color 180ms ease-out;
 }
 
 .logged-in-nav {

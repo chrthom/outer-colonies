@@ -33,11 +33,17 @@
   }
 
   .logo {
+    gap: 10px;
     padding: 0 14px;
   }
 
   .logo-emblem {
-    height: 40px;
+    height: 42px;
+  }
+
+  .logo-wordmark {
+    font-size: clamp(16px, 2vw, 20px);
+    letter-spacing: 0.05em;
   }
 
   .logged-in-nav {
