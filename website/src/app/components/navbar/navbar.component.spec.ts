@@ -95,13 +95,22 @@ describe('NavbarComponent', () => {
 
     const wordmark = logo.querySelector('.logo-wordmark') as HTMLElement;
     const username = profileLink.querySelector('.user-name') as HTMLElement;
+    const navLabel = iconElements[0].querySelector('.item-label') as HTMLElement;
+    const logoutLabel = rightZone.querySelector('button.logout .item-label') as HTMLElement;
     const wordmarkStyle = getComputedStyle(wordmark);
     const usernameStyle = getComputedStyle(username);
+    const navLabelStyle = getComputedStyle(navLabel);
+    const logoutLabelStyle = getComputedStyle(logoutLabel);
     expect(wordmarkStyle.fontFamily).toBe(usernameStyle.fontFamily);
     expect(wordmarkStyle.fontSize).toBe(usernameStyle.fontSize);
     expect(wordmarkStyle.fontWeight).toBe(usernameStyle.fontWeight);
     expect(wordmarkStyle.letterSpacing).toBe(usernameStyle.letterSpacing);
     expect(wordmarkStyle.textTransform).toBe(usernameStyle.textTransform);
+    expect(navLabelStyle.fontSize).toBe(logoutLabelStyle.fontSize);
+    if (window.innerWidth > 1280) {
+      expect(navLabelStyle.fontSize).toBe(usernameStyle.fontSize);
+      expect(logoutLabelStyle.fontSize).toBe(usernameStyle.fontSize);
+    }
 
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
@@ -210,6 +219,10 @@ describe('NavbarComponent', () => {
 
     expect(canvas).toBeTruthy();
     expect(canvas.getAttribute('aria-hidden')).toBe('true');
+    expect(bar.clientWidth).toBeGreaterThan(0);
+    expect(bar.clientHeight).toBeGreaterThan(0);
+    expect(canvas.getBoundingClientRect().width).toBe(bar.clientWidth);
+    expect(canvas.getBoundingClientRect().height).toBe(bar.clientHeight);
 
     expect(() => {
       bar.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 30, bubbles: true }));

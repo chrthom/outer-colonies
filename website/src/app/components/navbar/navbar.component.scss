@@ -1,5 +1,5 @@
 :host {
-  --navbar-brand-font-size: clamp(19px, 1.5vw, 24px);
+  --navbar-text-size: clamp(18px, 1.4vw, 20px);
 }
 
 .space {
@@ -79,7 +79,7 @@
 
 .logo-wordmark {
   font-family: "Latin Modern Mono Caps", monospace;
-  font-size: var(--navbar-brand-font-size);
+  font-size: var(--navbar-text-size);
   font-weight: normal;
   line-height: 1.1;
   letter-spacing: 0.04em;
@@ -145,7 +145,7 @@
 
 .item-label {
   font-family: "Latin Modern Mono Caps", monospace;
-  font-size: clamp(18px, 1.38vw, 20px);
+  font-size: var(--navbar-text-size);
   line-height: 1.1;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -185,11 +185,11 @@
 
 .user-name {
   font-family: "Latin Modern Mono Caps", monospace;
-  font-size: var(--navbar-brand-font-size);
+  font-size: var(--navbar-text-size);
   font-weight: normal;
   line-height: 1.1;
   letter-spacing: 0.04em;
-  max-width: clamp(100px, (100vw - 1100px) / 2, 240px);
+  max-width: clamp(96px, (100vw - 1140px) / 2, 220px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -225,7 +225,7 @@
     min-height: 48px;
     padding: 0 20px;
     font-family: "Latin Modern Mono Caps", monospace;
-    font-size: 16px;
+    font-size: var(--navbar-text-size);
     letter-spacing: 0.04em;
     border-radius: 0;
     box-shadow: none;
