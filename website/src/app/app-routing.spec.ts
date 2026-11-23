@@ -194,7 +194,9 @@ describe('rules session restoration in the app shell', () => {
     fixture.detectChanges();
     expect(router.url).toBe('/rules?section=missions');
     expect(fixture.nativeElement.querySelector('oc-page-rules')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('a[aria-label="Spielregeln"][href="/rules"]')).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('a[aria-label="Regeln – Spielregeln"][href="/rules"]')
+    ).toBeTruthy();
     expect(fixture.nativeElement.querySelector('#navbar-anon-actions')).toBeNull();
   }));
 });
