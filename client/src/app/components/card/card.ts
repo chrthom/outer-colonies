@@ -51,8 +51,6 @@ export default class Card extends CardImage {
   }
   override tween(config: CardTweenConfig) {
     config.xRotation ??= layoutConfig.game.cards.perspective.board;
-    // Cards are reused across updates, so kill tweens from a previous update or hover.
-    this.killTweens();
     super.tween(config);
   }
 }

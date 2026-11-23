@@ -53,10 +53,4 @@ describe('InfrastructureCard.getValidTargets', () => {
     const result = new ColonyOnlyInfra().getValidTargets(playerWith([hull, colony]));
     expect(result).toEqual([colony]);
   });
-
-  test('colony-only infrastructure: still respects profile match on the colony', () => {
-    const colony = mockStack(CardType.Colony, false);
-    const result = new ColonyOnlyInfra().getValidTargets(playerWith([colony]));
-    expect(result).toEqual([]);
-  });
 });

@@ -30,6 +30,9 @@ export default class CardImage {
   private imageHighlight: Phaser.GameObjects.Plane;
   private imageMask: Phaser.GameObjects.Plane;
   private imagePile: Phaser.GameObjects.Plane;
+  private positionTween?: Phaser.Tweens.Tween;
+  private rotationTween?: Phaser.Tweens.Tween;
+  private discarding = false;
   constructor(
     scene: Game,
     x: PerspectivePosition,
@@ -70,17 +73,27 @@ export default class CardImage {
       .setXRotation(config?.perspective ?? layoutConfig.game.cards.perspective.neutral);
   }
   destroy(): this {
+    this.rotationTween?.stop();
+    this.positionTween?.stop();
     this.image.destroy();
     this.imageHighlight.destroy();
     this.imageMask.destroy();
     this.imagePile.destroy();
     return this;
   }
-  discard(toDeck?: boolean): this {
-    const discardPileIds = this.scene.getPlayerState(this.ownedByPlayer).discardPileIds.slice();
+  /**
+   * Animates this card to a deck (retract) or discard pile and destroys its planes on completion.
+   * @param toDeck true if the card moves to the deck (retracted), false/undefined for the discard pile
+   * @param targetOwnedByPlayer whether the destination deck/discard pile belongs to the local player;
+   * defaults to `this.ownedByPlayer`, and can be overridden for attachments on opponent stacks
+   */
+  discard(toDeck?: boolean, targetOwnedByPlayer: boolean = this.ownedByPlayer): this {
+    if (this.discarding) return this;
+    this.image.disableInteractive(true);
+    const discardPileIds = this.scene.getPlayerState(targetOwnedByPlayer).discardPileIds.slice();
     this.setDepth(layoutConfig.depth.discardCard);
     const placementConfig = layoutConfig.game.cards.placement;
-    const targetPlayerConfig = this.ownedByPlayer ? placementConfig.player : placementConfig.opponent;
+    const targetPlayerConfig = targetOwnedByPlayer ? placementConfig.player : placementConfig.opponent;
     const targetCoordinates: CardPosition = toDeck ? targetPlayerConfig.deck : targetPlayerConfig.discardPile;
     this.highlightReset();
     this.tween({
@@ -89,14 +102,16 @@ export default class CardImage {
       y: targetCoordinates.y,
       z: perspectiveConfig.distance.board,
       xRotation: layoutConfig.game.cards.perspective.board,
-      angle: this.shortestAngle(this.ownedByPlayer ? 0 : 180),
+      angle: this.shortestAngle(targetOwnedByPlayer ? 0 : 180),
       onComplete: () => {
         if (!toDeck) {
-          this.scene.getPlayerUI(this.ownedByPlayer).discardPile.update(discardPileIds);
+          this.scene.getPlayerUI(targetOwnedByPlayer).discardPile.update(discardPileIds);
         }
         this.destroy();
       }
     });
+    // Mark after starting the discard tween so no subsequent hover/un-expand tween can overwrite it
+    this.discarding = true;
     return this;
   }
   highlightDisabled(): this {
@@ -173,17 +188,6 @@ export default class CardImage {
     );
     return this;
   }
-  /** Stops all tweens running on this card's planes, e.g. before re-tweening a reused card. */
-  protected killTweens(): void {
-    this.scene.tweens.killTweensOf([
-      this.image.modelPosition,
-      this.imageHighlight.modelPosition,
-      this.imageMask.modelPosition,
-      this.image.modelRotation,
-      this.imageHighlight.modelRotation,
-      this.imageMask.modelRotation
-    ]);
-  }
   setXRotation(x: number): this {
     this.forAllImages(i => (i.modelRotation.x = x));
     return this;
@@ -212,6 +216,8 @@ export default class CardImage {
     return this;
   }
   tween(config: CardTweenConfig) {
+    if (this.discarding) return;
+    this.positionTween?.stop();
     const pTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
       targets: [this.image.modelPosition, this.imageHighlight.modelPosition, this.imageMask.modelPosition],
       duration: config.duration,
@@ -221,15 +227,18 @@ export default class CardImage {
     if (config.y != undefined) pTweenConfig['y'] = config.y.value3d;
     if (config.z != undefined) pTweenConfig['z'] = config.z;
     if (config.onComplete) pTweenConfig.onComplete = config.onComplete;
-    const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
-      targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
-      duration: config.duration,
-      ease: 'Quad.easeInOut'
-    };
-    if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
-    if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
-    this.scene.tweens.add(rTweenConfig);
-    this.scene.tweens.add(pTweenConfig);
+    if (config.xRotation != undefined || config.angle != undefined) {
+      this.rotationTween?.stop();
+      const rTweenConfig: Phaser.Types.Tweens.TweenBuilderConfig = {
+        targets: [this.image.modelRotation, this.imageHighlight.modelRotation, this.imageMask.modelRotation],
+        duration: config.duration,
+        ease: 'Quad.easeInOut'
+      };
+      if (config.xRotation != undefined) rTweenConfig['x'] = config.xRotation;
+      if (config.angle != undefined) rTweenConfig['z'] = Phaser.Math.DegToRad(config.angle);
+      this.rotationTween = this.scene.tweens.add(rTweenConfig);
+    }
+    this.positionTween = this.scene.tweens.add(pTweenConfig);
   }
   shortestAngle(targetAngle: number): number {
     const deg = Phaser.Math.RadToDeg(this.image.modelRotation.z);

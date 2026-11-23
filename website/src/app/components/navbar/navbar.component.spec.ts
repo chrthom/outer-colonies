@@ -24,7 +24,11 @@ describe('NavbarComponent', () => {
         RouterTestingModule.withRoutes([
           { path: '', component: TestPageComponent },
           { path: 'world', component: TestPageComponent },
+          { path: 'home', component: TestPageComponent },
           { path: 'rules', component: TestPageComponent },
+          { path: 'rules/:section', component: TestPageComponent },
+          { path: 'deck', component: TestPageComponent },
+          { path: 'trade', component: TestPageComponent },
           { path: 'profile', component: TestPageComponent }
         ]),
         MatTooltipModule
@@ -63,13 +67,26 @@ describe('NavbarComponent', () => {
     expect(component.active).toBeDefined();
   });
 
-  it('should render the icon navbar for logged-in users', () => {
+  it('should render the icon navbar with visible labels for logged-in users', () => {
     const element = fixture.nativeElement;
     const iconElements = element.querySelectorAll('.item.center');
     expect(iconElements.length).toBe(4);
     expect(
       Array.from<Element>(iconElements).every(link => link.getAttribute('href') !== '/profile')
     ).toBeTrue();
+    expect(
+      Array.from<Element>(iconElements).map(link => link.querySelector('.item-label')?.textContent?.trim())
+    ).toEqual(['Lobby', 'Regeln', 'Decks', 'Markt']);
+
+    const logo = element.querySelector('#navbar-logo') as HTMLAnchorElement;
+    expect(logo.querySelector('svg.logo-emblem')?.getAttribute('aria-hidden')).toBe('true');
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-neptune')).toBeTruthy();
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-uranus')).toBeTruthy();
+    expect(logo.querySelector('svg.logo-emblem defs radialGradient#oc-nav-saturn')).toBeTruthy();
+    expect(logo.querySelector('.logo-wordmark')?.textContent?.trim()).toBe('Outer Colonies');
+    expect(logo.querySelector('.logo-wordmark')?.getAttribute('aria-hidden')).toBe('true');
+    expect(logo.querySelector('.logo-word-outer')?.textContent?.trim()).toBe('Outer');
+    expect(logo.querySelector('.logo-word-colonies')?.textContent?.trim()).toBe('Colonies');
 
     const rightZone = element.querySelector('.right');
     expect(rightZone).toBeTruthy();
@@ -81,20 +98,78 @@ describe('NavbarComponent', () => {
     expect(profileLink.querySelector('.user-name')?.textContent).toBe('testuser');
     expect(profileLink.querySelector('img')?.getAttribute('src')).toContain('assets/icons/profile.png');
 
+    const wordmark = logo.querySelector('.logo-wordmark') as HTMLElement;
+    const outerWord = logo.querySelector('.logo-word-outer') as HTMLElement;
+    const coloniesWord = logo.querySelector('.logo-word-colonies') as HTMLElement;
+    const username = profileLink.querySelector('.user-name') as HTMLElement;
+    const navLabel = iconElements[0].querySelector('.item-label') as HTMLElement;
+    const logoutLabel = rightZone.querySelector('button.logout .item-label') as HTMLElement;
+    const wordmarkStyle = getComputedStyle(wordmark);
+    const usernameStyle = getComputedStyle(username);
+    const navLabelStyle = getComputedStyle(navLabel);
+    const logoutLabelStyle = getComputedStyle(logoutLabel);
+    expect(wordmarkStyle.fontFamily).toBe(usernameStyle.fontFamily);
+    expect(Number.parseFloat(wordmarkStyle.fontWeight)).toBeGreaterThanOrEqual(700);
+    expect(wordmarkStyle.textTransform).toBe('uppercase');
+    expect(getComputedStyle(outerWord).color).not.toBe(getComputedStyle(coloniesWord).color);
+    expect(navLabelStyle.fontSize).toBe(logoutLabelStyle.fontSize);
+    if (window.innerWidth > 1280) {
+      expect(Number.parseFloat(wordmarkStyle.fontSize)).toBeGreaterThan(
+        Number.parseFloat(usernameStyle.fontSize)
+      );
+      expect(navLabelStyle.fontSize).toBe(usernameStyle.fontSize);
+      expect(logoutLabelStyle.fontSize).toBe(usernameStyle.fontSize);
+    }
+
     expect(element.querySelector('#navbar-anon-actions')).toBeFalsy();
     expect(element.querySelector('#navbar-main').classList.contains('logged-in')).toBeTrue();
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
-    expect(element.querySelector('#navbar-logo').getAttribute('aria-label')).toBe(
-      'Outer Colonies – Startseite'
-    );
+    expect(logo.getAttribute('aria-label')).toBe('Outer Colonies – Startseite');
     expect(
-      Array.from<Element>(iconElements).every(link => link.tagName === 'A' && link.hasAttribute('aria-label'))
+      Array.from<Element>(iconElements).every(link => {
+        const visibleLabel = link.querySelector('.item-label')?.textContent?.trim() ?? '';
+        const accessibleName = link.getAttribute('aria-label') ?? '';
+        return (
+          link.tagName === 'A' &&
+          visibleLabel.length > 0 &&
+          accessibleName.toLowerCase().includes(visibleLabel.toLowerCase())
+        );
+      })
     ).toBeTrue();
     const logout = rightZone.querySelector('button.logout[aria-label="Abmelden"]');
     expect(logout.type).toBe('button');
+    expect(logout.querySelector('.item-label')?.textContent?.trim()).toBe('Abmelden');
+    expect(logout.querySelector('.item-label')?.getAttribute('aria-hidden')).toBe('true');
     logout.click();
     expect(authSpy.logout).toHaveBeenCalled();
     expect(element.querySelector('img:not([alt=""])')).toBeNull();
+  });
+
+  it('sets aria-current="page" on the active logo or logged-in route and handles nested segments', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const logo = element.querySelector('#navbar-logo') as HTMLAnchorElement;
+    const rulesLink = element.querySelector('a.item.center[href="/rules"]') as HTMLAnchorElement;
+    const deckLink = element.querySelector('a.item.center[href="/deck"]') as HTMLAnchorElement;
+    const profileLink = element.querySelector('a.item.profile') as HTMLAnchorElement;
+
+    expect(logo.getAttribute('aria-current')).toBe('page');
+    expect(rulesLink.getAttribute('aria-current')).toBeNull();
+
+    await router.navigateByUrl('/rules/combat?tab=1#top');
+    fixture.detectChanges();
+    expect(component.active).toBe('rules');
+    expect(logo.getAttribute('aria-current')).toBeNull();
+    expect(rulesLink.getAttribute('aria-current')).toBe('page');
+    expect(rulesLink.classList.contains('active')).toBeTrue();
+
+    await router.navigateByUrl('/deck');
+    fixture.detectChanges();
+    expect(rulesLink.getAttribute('aria-current')).toBeNull();
+    expect(deckLink.getAttribute('aria-current')).toBe('page');
+
+    await router.navigateByUrl('/profile');
+    fixture.detectChanges();
+    expect(deckLink.getAttribute('aria-current')).toBeNull();
+    expect(profileLink.getAttribute('aria-current')).toBe('page');
   });
 
   it('navigates to /profile when clicking either the username or profile icon and marks it active', async () => {
@@ -142,8 +217,8 @@ describe('NavbarComponent', () => {
     expect(actions.map(a => a.getAttribute('href'))).toEqual(['/register', '/login']);
     expect(actions.map(a => a.textContent?.trim())).toEqual(['Registrieren', 'Einloggen']);
     expect(element.querySelector('.item.center')).toBeFalsy();
-    // Both logged-in and anonymous views share the exact same logo sizing and overhanging layout:
-    expect(element.querySelector('#navbar-logo')?.classList.contains('compact')).toBeFalse();
+    expect(element.querySelector('#navbar-logo svg.logo-emblem')).toBeTruthy();
+    expect(element.querySelector('#navbar-logo .logo-wordmark')?.textContent?.trim()).toBe('Outer Colonies');
   });
 
   it('should render the decorative energy stream canvas and react to mouse hover without throwing', () => {
@@ -153,6 +228,10 @@ describe('NavbarComponent', () => {
 
     expect(canvas).toBeTruthy();
     expect(canvas.getAttribute('aria-hidden')).toBe('true');
+    expect(bar.clientWidth).toBeGreaterThan(0);
+    expect(bar.clientHeight).toBeGreaterThan(0);
+    expect(canvas.getBoundingClientRect().width).toBe(bar.clientWidth);
+    expect(canvas.getBoundingClientRect().height).toBe(bar.clientHeight);
 
     expect(() => {
       bar.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 30, bubbles: true }));

@@ -1,56 +1,160 @@
 <div class="space"></div>
 <div #barElement class="bar" id="navbar-main" [class.logged-in]="isLoggedIn">
   <canvas #energyCanvas class="energy-stream" aria-hidden="true"></canvas>
-  <a class="logo" id="navbar-logo" routerLink="/" aria-label="Outer Colonies – Startseite">
-    <img src="../../../assets/logo.png" alt="" width="300" height="188" />
+  <a
+    class="logo"
+    id="navbar-logo"
+    routerLink="/"
+    aria-label="Outer Colonies – Startseite"
+    [attr.aria-current]="active === '' ? 'page' : null"
+  >
+    <svg
+      class="logo-emblem"
+      viewBox="0 0 62 38"
+      width="62"
+      height="38"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <radialGradient id="oc-nav-neptune" cx="35%" cy="32%" r="68%">
+          <stop offset="0%" stop-color="#96c8ff" />
+          <stop offset="42%" stop-color="#2c6ef0" />
+          <stop offset="82%" stop-color="#133487" />
+          <stop offset="100%" stop-color="#08163b" />
+        </radialGradient>
+        <radialGradient id="oc-nav-uranus" cx="35%" cy="32%" r="68%">
+          <stop offset="0%" stop-color="#d2ffff" />
+          <stop offset="44%" stop-color="#1cbaba" />
+          <stop offset="84%" stop-color="#095c61" />
+          <stop offset="100%" stop-color="#04292e" />
+        </radialGradient>
+        <radialGradient id="oc-nav-saturn" cx="35%" cy="30%" r="68%">
+          <stop offset="0%" stop-color="#fff4d2" />
+          <stop offset="44%" stop-color="#dfb169" />
+          <stop offset="84%" stop-color="#8c5e28" />
+          <stop offset="100%" stop-color="#38210b" />
+        </radialGradient>
+        <linearGradient
+          id="oc-nav-saturn-ring-front"
+          x1="30"
+          y1="16"
+          x2="58"
+          y2="8"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stop-color="#d6e2e2" />
+          <stop offset="50%" stop-color="#fff7e2" />
+          <stop offset="100%" stop-color="#e8d098" />
+        </linearGradient>
+      </defs>
+
+      <!-- Saturn (upper right, furthest plane) with back ring, body mask, atmospheric band, and front ring arc -->
+      <path
+        d="M30.5 16.39A14.2 3.4 -18 0 1 57.5 7.61"
+        stroke="#d8cdb4"
+        stroke-opacity="0.78"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <circle cx="44" cy="12" r="6.6" fill="#04080a" />
+      <circle cx="44" cy="12" r="6.6" fill="url(#oc-nav-saturn)" stroke="#f6dfa9" stroke-width="1.35" />
+      <path d="M38 13.6a8.8 8.8 0 0 0 12 -3.9" stroke="#fff3d1" stroke-opacity="0.52" stroke-width="1.05" />
+      <path
+        d="M57.5 7.61A14.2 3.4 -18 0 1 30.5 16.39"
+        stroke="url(#oc-nav-saturn-ring-front)"
+        stroke-width="1.85"
+        stroke-linecap="round"
+      />
+
+      <!-- Uranus (center, middle plane) with back ring, body mask, and front ring arc -->
+      <path
+        d="M24.18 9.69A2.4 9.6 -14 0 1 28.82 28.31"
+        stroke="#78e8e8"
+        stroke-opacity="0.72"
+        stroke-width="1.35"
+        stroke-linecap="round"
+      />
+      <circle cx="26.5" cy="19" r="5.2" fill="#030a0c" />
+      <circle cx="26.5" cy="19" r="5.2" fill="url(#oc-nav-uranus)" stroke="#88f0f0" stroke-width="1.35" />
+      <path
+        d="M28.82 28.31A2.4 9.6 -14 0 1 24.18 9.69"
+        stroke="#d6ffff"
+        stroke-opacity="0.95"
+        stroke-width="1.45"
+        stroke-linecap="round"
+      />
+
+      <!-- Neptune (lower left, foreground plane) -->
+      <circle cx="12" cy="26" r="6.4" fill="url(#oc-nav-neptune)" stroke="#7cb6ff" stroke-width="1.4" />
+      <path d="M6.8 24.4a8.2 8.2 0 0 0 10.4 0" stroke="#b8daff" stroke-opacity="0.7" stroke-width="1.05" />
+      <path d="M8.1 28.4a6.4 6.4 0 0 0 7.8 0" stroke="#629eff" stroke-opacity="0.5" stroke-width="0.9" />
+    </svg>
+    <span class="logo-wordmark" aria-hidden="true"
+      ><span class="logo-word-outer">Outer</span>{{ " "
+      }}<span class="logo-word-colonies">Colonies</span></span
+    >
   </a>
   @if (isLoggedIn) {
-    <a
-      class="item center"
-      matTooltip="Spielsuche & Aktuelles"
-      aria-label="Spielsuche & Aktuelles"
-      [class.active]="active === 'home'"
-      routerLink="/home"
-    >
-      <img src="../../../assets/icons/home.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Spielregeln"
-      aria-label="Spielregeln"
-      [class.active]="active === 'rules'"
-      routerLink="/rules"
-    >
-      <img src="../../../assets/icons/rules.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Deck-Manager"
-      aria-label="Deck-Manager"
-      [class.active]="active === 'deck'"
-      routerLink="/deck"
-    >
-      <img src="../../../assets/icons/deck.png" alt="" />
-    </a>
-    <a
-      class="item center"
-      matTooltip="Inventar und Markt"
-      aria-label="Inventar und Markt"
-      [class.active]="active === 'trade'"
-      routerLink="/trade"
-    >
-      <img src="../../../assets/icons/trade.png" alt="" />
-    </a>
+    <nav class="logged-in-nav" aria-label="Hauptnavigation">
+      <a
+        class="item center"
+        matTooltip="Spielsuche & Aktuelles"
+        aria-label="Lobby – Spielsuche & Aktuelles"
+        [class.active]="active === 'home'"
+        [attr.aria-current]="active === 'home' ? 'page' : null"
+        routerLink="/home"
+      >
+        <img src="../../../assets/icons/home.png" alt="" />
+        <span class="item-label" aria-hidden="true">Lobby</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Spielregeln"
+        aria-label="Regeln – Spielregeln"
+        [class.active]="active === 'rules'"
+        [attr.aria-current]="active === 'rules' ? 'page' : null"
+        routerLink="/rules"
+      >
+        <img src="../../../assets/icons/rules.png" alt="" />
+        <span class="item-label" aria-hidden="true">Regeln</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Deck-Manager"
+        aria-label="Decks – Deck-Manager"
+        [class.active]="active === 'deck'"
+        [attr.aria-current]="active === 'deck' ? 'page' : null"
+        routerLink="/deck"
+      >
+        <img src="../../../assets/icons/deck.png" alt="" />
+        <span class="item-label" aria-hidden="true">Decks</span>
+      </a>
+      <a
+        class="item center"
+        matTooltip="Inventar und Markt"
+        aria-label="Markt – Inventar und Markt"
+        [class.active]="active === 'trade'"
+        [attr.aria-current]="active === 'trade' ? 'page' : null"
+        routerLink="/trade"
+      >
+        <img src="../../../assets/icons/trade.png" alt="" />
+        <span class="item-label" aria-hidden="true">Markt</span>
+      </a>
+    </nav>
     <div class="right">
       <a
         class="item profile"
         matTooltip="Verwalte dein Profil"
         [attr.aria-label]="username ? username + ' – Profil verwalten' : 'Verwalte dein Profil'"
         [class.active]="active === 'profile'"
+        [attr.aria-current]="active === 'profile' ? 'page' : null"
         routerLink="/profile"
       >
         <span class="user-name">{{ username }}</span>
         <img src="../../../assets/icons/profile.png" alt="" />
+        <span class="item-label mobile-only-label" aria-hidden="true">Profil</span>
       </a>
       <button
         type="button"
@@ -60,6 +164,7 @@
         (click)="logout()"
       >
         <img src="../../../assets/icons/logout.png" alt="" />
+        <span class="item-label" aria-hidden="true">Abmelden</span>
       </button>
     </div>
   } @else {

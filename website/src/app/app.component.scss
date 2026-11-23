@@ -18,12 +18,14 @@ header {
 }
 
 #root-content {
+  box-sizing: border-box;
   position: relative;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
+  padding-top: 30px;
   width: min(1400px, 90%);
-  min-height: calc(100vh - 123px);
+  min-height: calc(100vh - 99px);
   background-image: url("../assets/background_squares_transparent.png");
 }
 
@@ -32,7 +34,7 @@ router-outlet {
 }
 
 #main-content {
-  scroll-margin-top: 95px;
+  scroll-margin-top: 108px;
 }
 
 #footer {
@@ -100,6 +102,16 @@ router-outlet {
 
 ul li {
   color: var(--color-primary-light);
+}
+
+@media (max-width: 1024px) {
+  #root-content {
+    min-height: calc(100vh - 87px);
+  }
+
+  #main-content {
+    scroll-margin-top: 95px;
+  }
 }
 
 @media (max-width: 600px) {

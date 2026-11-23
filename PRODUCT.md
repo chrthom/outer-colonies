@@ -40,7 +40,7 @@ Outer Colonies is a hard-science setting: the Solar System in 2250, with no warp
 
 ## Brand Commitments
 
-- Name: Outer Colonies. Logo at `website/src/assets/logo.png`.
+- Name: Outer Colonies. Inline 3-planet SVG emblem and wordmark in `oc-navbar` (legacy raster logo at `website/src/assets/logo.png`).
 - Existing tone on public pages: sober, narrative, German, in-world ("Baue deine Kolonie am Rand des Lichts.").
 - A teal accent is already used for quotes; the existing theme primary lives in the Angular Material theme (`website/src/style/`).
 
