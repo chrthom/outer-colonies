@@ -1,7 +1,39 @@
+@media (max-width: 1200px) {
+  .center {
+    flex-direction: column;
+    gap: 3px;
+    min-width: 72px;
+    padding: 4px 16px;
+  }
+
+  .item img,
+  .profile img,
+  .logout img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .item-label {
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 1024px) {
-  .bar.logged-in {
-    display: flex;
-    justify-content: space-between;
+  .bar {
+    height: 62px;
+
+    &.logged-in {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  .logo {
+    padding: 0 14px;
+  }
+
+  .logo-emblem {
+    height: 40px;
   }
 
   .logged-in-nav {
@@ -15,6 +47,15 @@
       flex: 1 1 0;
       min-width: 44px;
       padding: 4px 6px;
+    }
+
+    .item img {
+      width: 26px;
+      height: 26px;
+    }
+
+    .item-label {
+      font-size: 12px;
     }
 
     .right {
@@ -57,9 +98,24 @@
       justify-content: center;
     }
   }
+
+  .actions {
+    gap: 10px;
+    padding: 0 14px;
+
+    a {
+      min-height: 44px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+  }
 }
 
 @media (max-width: 720px) {
+  .logo-emblem {
+    height: 36px;
+  }
+
   .logged-in {
     .logo {
       padding: 0 10px;
@@ -77,7 +133,7 @@
   }
 
   .logo-emblem {
-    height: 28px;
+    height: 34px;
   }
 
   .actions {
@@ -98,7 +154,7 @@
   }
 
   .logo-emblem {
-    height: 24px;
+    height: 30px;
   }
 
   .logged-in {
