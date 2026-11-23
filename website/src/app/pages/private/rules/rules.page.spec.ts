@@ -227,16 +227,18 @@ describe('RulesPage', () => {
   it('should show the client controls in the online-game chapter only in online mode', () => {
     selectChapter('online-game');
     const text = () => fixture.debugElement.nativeElement.textContent;
+    expect(text()).toContain('Aufbau des Spielfelds');
     expect(text()).toContain('So steuerst du das Spiel');
     expect(text()).toContain('Deine Handkarten');
     expect(text()).toContain('Kartenstapel inspizieren');
     expect(text()).toContain('Missionen und Überfälle starten');
     expect(text()).toContain('Gefechte');
     expect(text()).toContain('Spielende und Kapitulation');
-    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(6);
-    expect(fixture.debugElement.queryAll(By.css('.screenshot-legend')).length).toBe(6);
+    expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(7);
+    expect(fixture.debugElement.queryAll(By.css('.screenshot-legend')).length).toBe(7);
     component.setMode('kartenspiel');
     fixture.detectChanges();
+    expect(text()).not.toContain('Aufbau des Spielfelds');
     expect(text()).not.toContain('So steuerst du das Spiel');
     expect(text()).not.toContain('Kapitulation bestätigen');
     expect(fixture.debugElement.queryAll(By.css('.screenshot-figure')).length).toBe(0);

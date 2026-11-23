@@ -83,7 +83,8 @@
               <p>
                 Im Online-Spiel stellst du dein Deck über den Deck-Manager der Website zusammen; auch die
                 Spielersuche und der Spielstart laufen dort. Die Anzahl deiner verbleibenden Karten wird an
-                deinem Deckstapel angezeigt.
+                deinem Deckstapel angezeigt. Eine Übersicht des Online-Spielfelds findest du im Kapitel
+                <i>Online-Spiel</i>.
               </p>
             </div>
             }
@@ -306,6 +307,46 @@
             </p>
             @if (onlineMode) {
             <div class="online-hint">
+              <h4>Aufbau des Spielfelds</h4>
+              <p>
+                Das Online-Spielfeld spiegelt den klassischen Tischaufbau wider: Unten liegt deine eigene
+                Spielfeldhälfte mit Kolonie-, Orbitalzone, Deck, Ablagestapel und deinen Handkarten; oben
+                gegenüber siehst du spiegelbildlich das Spielfeld deiner Gegenspieler:in. In der Mitte
+                befinden sich die neutrale Zone sowie aktive Missionen, Überfälle und Gefechte. Am rechten
+                Rand liegen sämtliche Schaltflächen, die Bedenkzeit-Anzeige und der Aktionspool.
+              </p>
+              <figure class="screenshot-figure">
+                <img
+                  [src]="imgUrl('online_overview')"
+                  class="screenshot"
+                  alt="Übersicht des gesamten Online-Spielfelds mit Zonen, Stapeln, Handkarten und Steuerungsleiste"
+                />
+                <figcaption>
+                  <ol class="screenshot-legend">
+                    <li>
+                      <b>Gegnerische Spielfeldhälfte</b> – spiegelbildlich oben: Kolonie-, Orbitalzone, Hand,
+                      Deck und Ablagestapel deiner Gegenspieler:in
+                    </li>
+                    <li>
+                      <b>Neutrale Zone &amp; Gefechte</b> – in der Spielfeldmitte liegen neutrale Karten sowie
+                      aktive Missionen und Überfälle
+                    </li>
+                    <li><b>Orbitale Zone</b> – hier liegen deine Schiffe im Einsatz</li>
+                    <li>
+                      <b>Koloniezone</b> – ganz unten links: deine Kolonie, Infrastruktur und Himmelskörper
+                    </li>
+                    <li>
+                      <b>Deck &amp; Ablagestapel</b> – unten rechts neben dem Spielfeld mit Anzeige der
+                      verbleibenden Kartenanzahl
+                    </li>
+                    <li><b>Deine Handkarten</b> – ganz unten rechts am Bildschirmrand</li>
+                    <li>
+                      <b>Steuerungsleiste</b> – Bedenkzeit, Weiter-, Aufgeben- sowie ggf.
+                      Mission-/Überfall-Schaltflächen und dein Aktionspool
+                    </li>
+                  </ol>
+                </figcaption>
+              </figure>
               <h4>So steuerst du das Spiel</h4>
               <p>
                 Du steuerst das Online-Spiel hauptsächlich mit der Maus: Ein <b>Linksklick</b> wählt eine
