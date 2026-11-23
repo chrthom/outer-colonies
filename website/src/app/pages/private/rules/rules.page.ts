@@ -93,14 +93,6 @@ export class RulesPage implements OnInit {
     return mode == 'online' || mode == 'kartenspiel' ? mode : null;
   }
 
-  /**
-   * URL of an annotated client screenshot shipped with the website (placeholder until the real
-   * screenshot is captured from the running client).
-   */
-  screenshotUrl(imgName: string): string {
-    return `assets/rules/${imgName}.png`;
-  }
-
   imgUrl(imgName: string): string {
     return `${this.assetUrl}/rules/${imgName}.png`;
   }

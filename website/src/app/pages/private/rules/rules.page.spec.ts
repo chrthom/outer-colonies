@@ -93,10 +93,6 @@ describe('RulesPage', () => {
     optionValues.forEach(value => expect(component.chapters).toContain(value));
   });
 
-  it('should generate correct local screenshot URL', () => {
-    expect(component.screenshotUrl('online_hand')).toBe('assets/rules/online_hand.png');
-  });
-
   it('should generate correct image URL', () => {
     const imgName = 'test';
     const expectedUrl = `${environment.url.assets}/rules/${imgName}.png`;
