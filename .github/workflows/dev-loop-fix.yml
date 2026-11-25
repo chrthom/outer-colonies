@@ -108,8 +108,8 @@ jobs:
       MAX_TOKENS: '4000000'
       TIME_LIMIT_SEC: '3600'
       TIME_LIMIT_MIN: '60'
-      OPENCODE_VERSION: '2.0.26'
-      MAX_DENIED_STREAK: '6'
+      VIBE_VERSION: '3.1.5'
+      VIBE_MODEL: 'zai-glm-5-3'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -824,25 +824,27 @@ jobs:
           echo "--- rendered prompt ---"
           cat out/fixer.rendered.md
 
-      - name: Install opencode
+      - name: Install vibe
         if: steps.gate.outputs.skip != 'true'
         run: |
-          # The v2 installer (npm package @opencode/cli) installs to
-          # ~/.opencode/bin; the v1 installer at https://opencode.ai/install
-          # ships 1.x and cannot reach 2.x releases.
-          curl -fsSL https://opencode.ai/v2/install | bash -s -- --version "$OPENCODE_VERSION"
-          export PATH="$HOME/.opencode/bin:$PATH"
-          command -v opencode
-          # The invocation below is verified against this exact version; the
-          # v1 -> v2 CLI surface moved substantially (auth/provider/config
-          # flags, managed-service architecture, event schema).
-          opencode --version | grep -F "$OPENCODE_VERSION" || {
-            echo "::error::Installed opencode version does not match the expected $OPENCODE_VERSION - verify the invocation against the new CLI surface before rerunning"
+          export UV_SYSTEM_CERTS=true
+          if ! command -v uv >/dev/null 2>&1; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            export PATH="$HOME/.local/bin:$PATH"
+          fi
+          uv tool install --force --python cpython-3.14+gil "mistral-vibe==$VIBE_VERSION" 2>/dev/null \
+            || { uv python install cpython-3.14 && uv tool install --force --python cpython-3.14+gil "mistral-vibe==$VIBE_VERSION"; }
+          vibe_bin_dir="$(uv --color never tool dir --bin)"
+          echo "$vibe_bin_dir" >> "$GITHUB_PATH"
+          export PATH="$vibe_bin_dir:$PATH"
+          command -v vibe
+          vibe --version | grep -F "$VIBE_VERSION" || {
+            echo "::error::Installed vibe version does not match the expected $VIBE_VERSION - verify the invocation against the new CLI surface before rerunning"
             exit 1
           }
 
-      - name: Run opencode fixer
-        id: opencode
+      - name: Run vibe fixer
+        id: vibe
         if: steps.gate.outputs.skip != 'true'
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -850,132 +852,65 @@ jobs:
           DEV_LOOP_PR: ${{ steps.gate.outputs.pr_number }}
           DEV_LOOP_BRANCH: ${{ steps.gate.outputs.branch }}
           DEV_LOOP_REVIEW_ID: ${{ steps.gate.outputs.review_id }}
-          # Job-local config dir: MISTRAL_API_KEY must be the only credential
-          # source (stored auth would otherwise silently mask a rotated secret).
-          OPENCODE_CONFIG_DIR: ${{ runner.temp }}/opencode-config
-          OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          # Websearch provider (misc/dev-loop.md): opencode v2 routes websearch and
-          # webfetch through a search provider; without a key every call errors (which
-          # also flips the run's exit code - see the rc=1 contract fallback). Pinned in
-          # the config below because headless --auto cannot answer the provider prompt.
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-          # The managed service binds a loopback port; never route it via a
-          # proxy. Env keys are case-insensitive, so this covers both the
-          # NO_PROXY and no_proxy spellings that tools check.
-          NO_PROXY: 127.0.0.1,localhost
+          # Job-local Vibe home: MISTRAL_API_KEY must be the only credential
+          # source (stored auth or keyring entries would otherwise silently mask
+          # a rotated secret).
+          VIBE_HOME: ${{ runner.temp }}/vibe-home
+          VIBE_TEST_DISABLE_KEYRING: '1'
         run: |
-          export PATH="$HOME/.opencode/bin:$PATH"
-          mkdir -p "$OPENCODE_CONFIG_DIR"
-          # Pin the websearch provider; skip when no key is configured so the tool
-          # is simply unavailable instead of erroring on a missing provider.
-          if [ -n "$TAVILY_API_KEY" ]; then
-            printf '{"websearch": {"provider": "tavily"}}\n' > "$OPENCODE_CONFIG_DIR/opencode.jsonc"
-            echo "opencode.jsonc: websearch provider pinned to tavily"
-          else
-            echo "TAVILY_API_KEY not set; websearch/webfetch stay disabled"
+          mkdir -p "$VIBE_HOME"
+          # Disable CI update checks and telemetry; register zai-glm-5-3 with
+          # Mistral's model-card pricing so --model always resolves even if the
+          # remote model catalog is unreachable and export.json reports cost_usd.
+          cat > "$VIBE_HOME/config.toml" <<'EOF'
+          enable_update_checks = false
+          enable_telemetry = false
+          EOF
+          if [ "$VIBE_MODEL" = "zai-glm-5-3" ]; then
+            cat >> "$VIBE_HOME/config.toml" <<'EOF'
+
+          [[models]]
+          name = "zai-glm-5-3"
+          provider = "mistral"
+          alias = "zai-glm-5-3"
+          display_name = "Z.ai GLM 5.3"
+          input_price = 1.4
+          output_price = 4.4
+          cached_input_price = 0.14
+          max_context_length = 1048576
+          supports_images = false
+          EOF
           fi
 
-          # Watchdog: consume the JSON event stream, tee it to a file, and kill
-          # opencode when the run degenerates:
-          #  - MAX_DENIED_STREAK consecutive failed/denied tool calls (state
-          #    "failed", or "completed" with a non-zero shell exit)
-          #  - MAX_TURNS steps (step_start events)
-          #  - MAX_TOKENS cumulative cost-weighted tokens: input + output +
-          #    cache.write + 0.1 * cache.read (cached tokens are billed at 10%,
-          #    so the cap means "N uncached-equivalent tokens")
-          run_watchdog() {
-            streak=0
-            steps=0
-            tokens=0
-            jq -c '
-              select(.type == "tool_use" or .type == "step_start" or .type == "step_finish")
-              | if .type == "tool_use" then {
-                    k: "tool",
-                    status: (.part.state.status // ""),
-                    exit: (.part.state.metadata.metadata.exit // 0)
-                  }
-                elif .type == "step_start" then { k: "step" }
-                else {
-                    k: "tokens",
-                    t: (
-                      (.part.tokens.input // 0)
-                      + (.part.tokens.output // 0)
-                      + (.part.tokens.cache.write // 0)
-                      + (0.1 * (.part.tokens.cache.read // 0))
-                    )
-                  }
-                end' 2>/dev/null \
-            | while IFS= read -r entry; do
-                k="$(printf '%s' "$entry" | jq -r '.k')"
-                case "$k" in
-                  step)
-                    steps=$((steps + 1))
-                    if [ "$steps" -ge "$MAX_TURNS" ]; then
-                      echo "watchdog: step limit $MAX_TURNS reached - killing opencode"
-                      pkill -TERM -f 'opencode run' || true
-                      exit 99
-                    fi
-                    ;;
-                  tokens)
-                    tt="$(printf '%s' "$entry" | jq -r '.t')"
-                    tokens=$(jq -n --argjson a "$tokens" --argjson b "$tt" '$a + $b | floor')
-                    if [ "$tokens" -ge "$MAX_TOKENS" ]; then
-                      echo "watchdog: token limit $MAX_TOKENS reached - killing opencode"
-                      pkill -TERM -f 'opencode run' || true
-                      exit 99
-                    fi
-                    ;;
-                  tool)
-                    status="$(printf '%s' "$entry" | jq -r '.status')"
-                    exit_code="$(printf '%s' "$entry" | jq -r '.exit')"
-                    if [ "$status" = "failed" ] || { [ "$status" = "completed" ] && [ "$exit_code" != "0" ] && [ -n "$exit_code" ] && [ "$exit_code" != "null" ]; }; then
-                      streak=$((streak + 1))
-                      echo "watchdog: failed tool call streak = $streak"
-                      if [ "$streak" -ge "$MAX_DENIED_STREAK" ]; then
-                        echo "watchdog: $streak consecutive failed tool calls - killing opencode"
-                        pkill -TERM -f 'opencode run' || true
-                        exit 99
-                      fi
-                    elif [ "$status" = "completed" ]; then
-                      streak=0
-                    fi
-                    ;;
-                esac
-              done
-          }
-
-          set -o pipefail
           set +e
-          timeout --signal=TERM --kill-after=60 "$TIME_LIMIT_SEC" \
-            opencode run --standalone --format json --auto --model mistral/zai-glm-5-3 \
-              "$(cat out/fixer.rendered.md)" \
-            2> out/opencode.stderr \
-            | tee out/stream.ndjson \
-            | run_watchdog
+          timeout --signal=TERM --kill-after=60 "$((TIME_LIMIT_SEC + 120))" \
+            vibe --prompt-file "out/fixer.rendered.md" \
+              --auto-approve \
+              --trust \
+              --model "$VIBE_MODEL" \
+              --max-turns "$MAX_TURNS" \
+              --max-tokens "$MAX_TOKENS" \
+              --time-limit "$TIME_LIMIT_SEC" \
+              --output streaming \
+              --output-dir out \
+              > out/stream.ndjson 2> out/vibe.stderr
           rc=$?
           set -e
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          echo "--- opencode stderr ---"
-          cat out/opencode.stderr || true
-          if [ "$rc" = "99" ]; then
-            echo "stopped_by_watchdog=true" >> "$GITHUB_OUTPUT"
-          fi
+          echo "--- vibe stderr ---"
+          cat out/vibe.stderr || true
           exit 0
 
-      - name: Upload opencode output artifact
+      - name: Upload vibe output artifact
         if: always() && steps.gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v5
         with:
           # The PR number in the name associates the artifact with its dev-loop
           # issue (via the linked PR) for the cost report workflow
           # (misc/dev-loop.md): artifact names are the only artifact metadata
-          # that can be filtered without a download. Runs whose artifacts
-          # predate this naming scheme are not attributable and are skipped.
-          name: opencode-fixer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            out/stream.ndjson
-            out/opencode.stderr
-            out/fixer.rendered.md
+          # that can be filtered without a download.
+          name: vibe-fixer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: out/
           if-no-files-found: warn
 
       - name: Post-step state machine
@@ -1017,10 +952,10 @@ jobs:
               || echo "::warning::Could not post the escalation comment (gh pr comment failed); the needs-human label marks the PR."
           }
 
-          rc="${{ steps.opencode.outputs.rc }}"
+          rc="${{ steps.vibe.outputs.rc }}"
 
           if [ -z "$rc" ]; then
-            # opencode never ran: a pre-run step (npm ci, install, version check, render) failed.
+            # vibe never ran: a pre-run step (npm ci, install, version check, render) failed.
             if [ "$RUN_ATTEMPT" = "1" ]; then
               echo "A step failed before the agent ran; leaving a red run for re-run failed jobs."
               exit 1
@@ -1029,110 +964,96 @@ jobs:
             exit 0
           fi
 
-          # Cost = sum of the per-step cost fields in the event stream
-          # (opencode reports cost/tokens on every step_finish event).
-          # Round to cents: every consumer prints $cost verbatim, and the raw
-          # sum has float artifacts (e.g. $0.16212848000000002).
-          cost="$(jq -s '[.[].part.cost // 0] | add // 0 | (.*100 | round) / 100' out/stream.ndjson 2>/dev/null || echo 0)"
-          stderr_tail="$(tail -1 out/opencode.stderr 2>/dev/null || true)"
+          # Usage/cost/steps come from out/export.json (plus any subagents).
+          # Round cost to cents: every consumer prints $cost verbatim, and raw
+          # sums have float artifacts.
+          cost="$(jq -r '[(.cost_usd // 0), (.subagents[]?.cost_usd // 0)] | add // 0 | (.*100 | round) / 100' out/export.json 2>/dev/null || echo 0)"
+          tokens="$(jq -r '[(.usage.total_tokens // 0), (.subagents[]?.usage.total_tokens // 0)] | add // 0' out/export.json 2>/dev/null || echo 0)"
+          steps="$(jq -r '[(.steps // 0), (.subagents[]?.steps // 0)] | add // 0' out/export.json 2>/dev/null || echo 0)"
+          outcome="$(jq -r '.outcome // empty' out/export.json 2>/dev/null || true)"
+          error_msg="$(jq -r '.error.message // empty' out/export.json 2>/dev/null || true)"
+          stderr_tail="$(tail -1 out/vibe.stderr 2>/dev/null || true)"
 
           # Push-evidence attribution shared by both auto-retry paths (the
-          # rc=1 infra retry and the unparseable-outcome retry): 1 only when
+          # rc=2 infra retry and the unparseable-outcome retry): 1 only when
           # this attempt's own stream shows a successful git push (a
-          # completed, exit-0 tool call whose command contains at least one
-          # push segment - chain-aware anchor: "git push" at the command
+          # completed, successful shell effect whose command contains at least
+          # one push segment - chain-aware anchor: "git push" at the command
           # start or right after a command separator - ;, &, |, a subshell
           # (, a newline (multi-line commands) - with no --dry-run / -n on
           # the push segment). A missing or unreadable stream is no
           # evidence: unattributed, so the retry's notice+chain branch.
           push_evidence() {
-            jq -e 'select(.type == "tool_use")
-                       | select((.part.state.input.command? // "") | ([match("(^|[;&|(\n] *)git push[^;&|]*"; "g") | .string] | (length > 0) and (any(test("--dry-run") or test("(^| )-n( |$)")) | not)))
-                       | select(.part.state.status == "completed")
-                       | select((.part.state.metadata.metadata.exit? // 1) == 0)' \
+            jq -Re 'fromjson?
+                       | select(.type == "effect" and .detail.kind == "shell")
+                       | select((.detail.input.command? // "") | ([match("(^|[;&|(\n] *)git push[^;&|]*"; "g") | .string] | (length > 0) and (any(test("--dry-run") or test("(^| )-n( |$)")) | not)))
+                       | select(.state.status == "completed")
+                       | select((.state.display.success? // false) == true)' \
               out/stream.ndjson >/dev/null 2>&1
           }
 
-          if [ "$rc" = "99" ]; then
-            # The watchdog killed opencode (failure streak / step / token cap):
-            # the run misbehaved or blew the budget. Never retry, escalate.
-            escalate "fixer killed by the watchdog (rc=99; failure streak / step cap ${MAX_TURNS} / token cap ${MAX_TOKENS}; cost: \$$cost) - see the opencode output artifact"
+          if [ "$rc" = "124" ]; then
+            # outer timeout(1) backstop hit: never auto-retry, escalate.
+            escalate "fixer stopped on the ${TIME_LIMIT_MIN} min deadline (rc=124, cost: \$$cost); see the vibe output artifact"
             exit 0
           fi
 
-          if [ "$rc" = "124" ]; then
-            # deadline hit (timeout(1)): never auto-retry, escalate.
-            escalate "fixer stopped on the ${TIME_LIMIT_MIN} min deadline (rc=124, cost: \$$cost); see the opencode output artifact"
+          if [ "$rc" = "3" ]; then
+            # Vibe programmatic limit/deadline/termination/length/refusal: never auto-retry, escalate.
+            case "$outcome" in
+              deadline|terminated)
+                escalate "fixer stopped on the ${TIME_LIMIT_MIN} min deadline (${outcome}; rc=3, cost: \$$cost); see the vibe output artifact"
+                ;;
+              *)
+                escalate "fixer budget stop (${outcome:-unknown}; rc=3, steps: ${steps}/${MAX_TURNS}, tokens: ${tokens}/${MAX_TOKENS}, cost: \$$cost); see the vibe output artifact"
+                ;;
+            esac
             exit 0
           fi
 
           if [ "$rc" = "1" ]; then
-            # opencode exits 1 for config/infra failures AND for sessions that
-            # recorded (recovered) tool errors - v2.0.26 observed on the #98/#99
-            # loop: a failed websearch/webfetch (no provider key configured)
-            # marks the session errored even when the agent completed its work
-            # with a valid outcome line. The outcome is the ground truth: fall
-            # through to normal handling when it parses, and escalate only
-            # when it does not.
-            contract_line="$(jq -r 'select(.type == "text") | .part.text' out/stream.ndjson 2>/dev/null \
-              | awk 'NF { line = $0 } END { if (line) print line }' \
-              | grep -E '^(FIXED:|WALL:)' || true)"
-            if [ -z "$contract_line" ]; then
-              # rc=1 with no outcome line is not homogeneous: a provider/stream
-              # infra failure is transient (observed on the #122 loop: a
-              # provider.invalid-output event, empty stderr, the agent productively
-              # mid-run), while a usage/config error (Error: ... in stderr) or a
-              # tool-failure session is deterministic or functional - a retry
-              # fails the same way or re-spends a full budget on a task problem.
-              # Retry only on the infra signature: a top-level provider.* error
-              # event in the stream and no deterministic Error: line in stderr.
-              # rc=1 + recovered-tool-errors + no outcome line (agent stalled
-              # before finishing) has no provider event, so it escalates -
-              # the watchdog already absorbed the hard tool-failure loop.
-              if jq -e 'select(.type == "error") | select(.error.type | startswith("provider."))' \
-                out/stream.ndjson >/dev/null 2>&1 \
-                && ! grep -q '^Error:' out/opencode.stderr 2>/dev/null; then
-                moved_by_fix=0
-                # Same guard as the FIXED path: a transient gh failure must
-                # not kill the post-step right before the retry dispatch, and
-                # an empty read must not count as a movement. An unknown head
-                # leaves moved_by_fix=0 (unattributed), so the retry's
-                # stale-review branch stays fail-visible.
-                head_sha_now="$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid 2>/dev/null || true)"
-                if [ -z "$head_sha_now" ]; then
-                  echo "::warning::Head-SHA poll failed before the retry dispatch; passing moved_by_fix=0 (unattributed) so a real movement fails visible in the retry."
-                elif [ "$head_sha_now" != "$HEAD_SHA_BEFORE" ] && push_evidence; then
-                  moved_by_fix=1
-                fi
-                retry_review_id="${REVIEW_ID:-none}"
-                if [ "$RETRY_COUNT" -ge 1 ]; then
-                  # This is already the retried run: the one auto-retry is
-                  # spent, so the failure recurs and escalates.
-                  escalate "opencode failed with a provider infra error (exit 1, no outcome line, retry exhausted; cost: \$$cost); see the opencode output artifact"
-                  exit 0
-                fi
-                if gh workflow run dev-loop-fix.yml --ref main -f pr_number="$PR_NUMBER" -f review_id="$retry_review_id" -f retry=1 -f moved_by_fix="$moved_by_fix"; then
-                  echo "opencode exit 1 with a provider infra signature (cost: \$$cost); re-dispatching the fixer once (retry=1, moved_by_fix=$moved_by_fix). Transcript artifact preserved for diagnosis."
-                  exit 0
-                fi
-                # The dispatch itself failed, so the retry never left.
-                escalate "opencode failed with a provider infra error (exit 1, no outcome line, retry unavailable - the re-dispatch failed; cost: \$$cost); see the opencode output artifact"
-                exit 0
-              fi
-              escalate "opencode failed (exit 1, no outcome line; cost: \$$cost, $stderr_tail); retry via workflow_dispatch if the stderr indicates a transient failure; see the opencode output artifact"
-              exit 0
-            fi
-            echo "opencode exited 1 but the final message carries $contract_line; treating the session as completed (tool errors were recovered)."
-            rc=0
-          fi
-
-          if [ "$rc" != "0" ]; then
-            escalate "unexpected opencode exit code $rc (cost: \$$cost, $stderr_tail); see the opencode output artifact"
+            # usage_error / config_error: deterministic misconfiguration, never auto-retry.
+            escalate "vibe failed (rc=1, outcome=${outcome:-unknown}, cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
             exit 0
           fi
 
-          # exit 0: parse the outcome contract from the final assistant text.
-          final_msg="$(jq -r 'select(.type == "text") | .part.text' out/stream.ndjson 2>/dev/null || true)"
+          if [ "$rc" = "2" ]; then
+            # infrastructure_failure: transient API/runtime failure, single auto-retry via workflow_dispatch.
+            moved_by_fix=0
+            # Same guard as the FIXED path: a transient gh failure must
+            # not kill the post-step right before the retry dispatch, and
+            # an empty read must not count as a movement. An unknown head
+            # leaves moved_by_fix=0 (unattributed), so the retry's
+            # stale-review branch stays fail-visible.
+            head_sha_now="$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid 2>/dev/null || true)"
+            if [ -z "$head_sha_now" ]; then
+              echo "::warning::Head-SHA poll failed before the retry dispatch; passing moved_by_fix=0 (unattributed) so a real movement fails visible in the retry."
+            elif [ "$head_sha_now" != "$HEAD_SHA_BEFORE" ] && push_evidence; then
+              moved_by_fix=1
+            fi
+            retry_review_id="${REVIEW_ID:-none}"
+            if [ "$RETRY_COUNT" -ge 1 ]; then
+              # This is already the retried run: the one auto-retry is
+              # spent, so the failure recurs and escalates.
+              escalate "vibe failed with an infrastructure failure (rc=2, retry exhausted; cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+              exit 0
+            fi
+            if gh workflow run dev-loop-fix.yml --ref main -f pr_number="$PR_NUMBER" -f review_id="$retry_review_id" -f retry=1 -f moved_by_fix="$moved_by_fix"; then
+              echo "vibe failed with infrastructure_failure (rc=2, cost: \$$cost); re-dispatching the fixer once (retry=1, moved_by_fix=$moved_by_fix). Vibe output artifact preserved for diagnosis."
+              exit 0
+            fi
+            # The dispatch itself failed, so the retry never left.
+            escalate "vibe failed with an infrastructure failure (rc=2, retry unavailable - the re-dispatch failed; cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+            exit 0
+          fi
+
+          if [ "$rc" != "0" ]; then
+            escalate "unexpected vibe exit code $rc (outcome=${outcome:-unknown}, cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+            exit 0
+          fi
+
+          # exit 0: parse the outcome contract from the final assistant message.
+          final_msg="$(jq -Rrs '[split("\n")[] | fromjson? | select(.type == "message" and .role == "assistant" and ((.outcome.type? // "") != "discarded" or (.outcome.cause? // "") == "interrupt")) | ([.content[]? | select(.type == "text") | .text] | join("\n\n")) | select(test("\\S"))] | last // ""' out/stream.ndjson 2>/dev/null || true)"
           outcome_line="$(printf '%s\n' "$final_msg" | awk 'NF { line = $0 } END { if (line) print line }')"
 
           case "$outcome_line" in
@@ -1178,7 +1099,7 @@ jobs:
               ;;
             *)
               # A clean exit (rc=0) with no contract line is usually a truncated
-              # run (agent stopped mid-fix, opencode gave up silently) -
+              # run (agent stopped mid-fix without a contract line) -
               # transient, unlike a deterministic parse failure. Retry once via
               # workflow_dispatch, passing the same review id so the gate does
               # not have to re-resolve it; the counter in the input prevents a
@@ -1231,10 +1152,10 @@ jobs:
               retry_review_id="${REVIEW_ID:-none}"
               if [ "$RETRY_COUNT" -lt 1 ] \
                 && gh workflow run dev-loop-fix.yml --ref main -f pr_number="$PR_NUMBER" -f review_id="$retry_review_id" -f retry=1 -f moved_by_fix="$moved_by_fix"; then
-                echo "Unparseable fixer outcome (cost: \$$cost); re-dispatching the fixer once (retry=1, moved_by_fix=$moved_by_fix). Transcript artifact preserved for diagnosis."
+                echo "Unparseable fixer outcome (cost: \$$cost); re-dispatching the fixer once (retry=1, moved_by_fix=$moved_by_fix). Vibe output artifact preserved for diagnosis."
                 exit 0
               fi
-              escalate "unparseable outcome (exit 0, final message does not match the contract; retry exhausted); transcript artifact preserved for diagnosis"
+              escalate "unparseable outcome (exit 0, final message does not match the contract; retry exhausted); see the vibe output artifact"
               exit 0
               ;;
           esac

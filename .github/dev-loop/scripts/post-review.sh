@@ -1,4 +1,4 @@
-# Dev-loop reviewer post-step: the deterministic state machine after the opencode
+# Dev-loop reviewer post-step: the deterministic state machine after the vibe
 # reviewer run (verdict parsing, review posting, stale-thread auto-resolve, fixer
 # dispatch). Lives in this checked-in script - NOT inline in dev-loop-review.yml -
 # because GitHub caps a `run:` block scalar at 21,000 chars, and this script sits
@@ -8,9 +8,9 @@
 # workflow). Grow this file, never the YAML scalar.
 # Invoked as `run: bash .github/dev-loop/scripts/post-review.sh`; the workflow's
 # `env:` block is the only bridge for GitHub expression contexts - everything the
-# script needs (incl. OPENCODE_RC, from steps.opencode.outputs.rc) arrives as an
-# environment variable. Assumes cwd = repo root with out/stream.ndjson and
-# out/opencode.stderr from the reviewer run.
+# script needs (incl. VIBE_RC, from steps.vibe.outputs.rc) arrives as an
+# environment variable. Assumes cwd = repo root with out/export.json,
+# out/stream.ndjson and out/vibe.stderr from the reviewer run.
 set -u
 escalate() {
   # The escalation path must itself fail open: an unguarded gh failure here
@@ -46,9 +46,9 @@ drop_clean_label() {
   fi
 }
 
-# OPENCODE_RC mirrors steps.opencode.outputs.rc from the workflow (an inline
+# VIBE_RC mirrors steps.vibe.outputs.rc from the workflow (an inline
 # ${{ }} expression cannot survive in a checked-in script file).
-rc="${OPENCODE_RC}"
+rc="${VIBE_RC}"
 
 if [ -z "$rc" ]; then
   # A pre-run step (install/render) failed before the agent ran.
@@ -60,43 +60,61 @@ if [ -z "$rc" ]; then
   exit 0
 fi
 
-# Per-step cost sum, rounded to cents (matches the watchdog cap; raw sums have float artifacts).
-cost="$(jq -s '[.[].part.cost // 0] | add // 0 | (.*100 | round) / 100' out/stream.ndjson 2>/dev/null || echo 0)"
-stderr_tail="$(tail -1 out/opencode.stderr 2>/dev/null || true)"
+# Usage/cost/steps come from out/export.json (plus any subagents); round cost to cents.
+cost="$(jq -r '[(.cost_usd // 0), (.subagents[]?.cost_usd // 0)] | add // 0 | (.*100 | round) / 100' out/export.json 2>/dev/null || echo 0)"
+tokens="$(jq -r '[(.usage.total_tokens // 0), (.subagents[]?.usage.total_tokens // 0)] | add // 0' out/export.json 2>/dev/null || echo 0)"
+steps="$(jq -r '[(.steps // 0), (.subagents[]?.steps // 0)] | add // 0' out/export.json 2>/dev/null || echo 0)"
+outcome="$(jq -r '.outcome // empty' out/export.json 2>/dev/null || true)"
+error_msg="$(jq -r '.error.message // empty' out/export.json 2>/dev/null || true)"
+stderr_tail="$(tail -1 out/vibe.stderr 2>/dev/null || true)"
 
-if [ "$rc" = "99" ]; then
-  # Watchdog kill - never retry, escalate.
-  escalate "reviewer killed by the watchdog (rc=99; failure streak / step cap ${MAX_TURNS} / token cap ${MAX_TOKENS}; cost: \$$cost) - see the opencode output artifact"
+if [ "$rc" = "124" ]; then
+  # Outer timeout(1) backstop hit - never retry, escalate.
+  escalate "reviewer stopped on the ${TIME_LIMIT_MIN} min deadline (rc=124, cost: \$$cost); see the vibe output artifact"
   exit 0
 fi
 
-if [ "$rc" = "124" ]; then
-  # Deadline hit - never retry, escalate.
-  escalate "reviewer stopped on the ${TIME_LIMIT_MIN} min deadline (rc=124, cost: \$$cost); see the opencode output artifact"
+if [ "$rc" = "3" ]; then
+  # Vibe programmatic limit/deadline/termination/length/refusal - never retry, escalate.
+  case "$outcome" in
+    deadline|terminated)
+      escalate "reviewer stopped on the ${TIME_LIMIT_MIN} min deadline (${outcome}; rc=3, cost: \$$cost); see the vibe output artifact"
+      ;;
+    *)
+      escalate "reviewer budget stop (${outcome:-unknown}; rc=3, steps: ${steps}/${MAX_TURNS}, tokens: ${tokens}/${MAX_TOKENS}, cost: \$$cost); see the vibe output artifact"
+      ;;
+  esac
   exit 0
 fi
 
 if [ "$rc" = "1" ]; then
-  # Exit 1 covers config/infra failures AND recovered tool errors; the VERDICT line is ground truth.
-  # The agents sometimes wrap the contract line in markdown emphasis (observed on PR #57:
-  # '**VERDICT: CHANGES_NEEDED**'); tolerate decoration instead of escalating a valid verdict.
-  contract_line="$(jq -r 'select(.type == "text") | .part.text' out/stream.ndjson 2>/dev/null \
-    | grep -E '^[[:space:]`*_]*VERDICT: (CLEAN|CHANGES_NEEDED|NEEDS_HUMAN)|^[[:space:]`*_]*WALL:' | tail -1 || true)"
-  if [ -z "$contract_line" ]; then
-    escalate "opencode failed (exit 1, no VERDICT line; cost: \$$cost, $stderr_tail); retry via workflow_dispatch if the stderr indicates a transient failure; see the opencode output artifact"
+  # usage_error / config_error: deterministic misconfiguration, never auto-retry.
+  escalate "vibe failed (rc=1, outcome=${outcome:-unknown}, cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+  exit 0
+fi
+
+if [ "$rc" = "2" ]; then
+  # infrastructure_failure: transient API/runtime failure, single auto-retry via workflow_dispatch.
+  if [ "$RETRY_COUNT" -lt 1 ] \
+    && gh workflow run dev-loop-review.yml --ref main -f pr_number="$PR_NUMBER" -f retry=1; then
+    echo "vibe failed with infrastructure_failure (rc=2, cost: \$$cost); re-dispatching the reviewer once (retry=1). Vibe output artifact preserved for diagnosis."
     exit 0
   fi
-  echo "opencode exited 1 but the final message carries $contract_line; treating the session as completed (tool errors were recovered)."
-  rc=0
+  if [ "$RETRY_COUNT" -ge 1 ]; then
+    escalate "vibe failed with an infrastructure failure (rc=2, retry exhausted; cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+  else
+    escalate "vibe failed with an infrastructure failure (rc=2, retry unavailable - the re-dispatch failed; cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
+  fi
+  exit 0
 fi
 
 if [ "$rc" != "0" ]; then
-  escalate "unexpected opencode exit code $rc (cost: \$$cost, $stderr_tail); see the opencode output artifact"
+  escalate "unexpected vibe exit code $rc (outcome=${outcome:-unknown}, cost: \$$cost, ${error_msg:-$stderr_tail}); see the vibe output artifact"
   exit 0
 fi
 
 # rc=0: the verdict lives in the final assistant message; this step posts the review with the PAT (last VERDICT line wins).
-final_msg="$(jq -r 'select(.type == "text") | .part.text' out/stream.ndjson 2>/dev/null || true)"
+final_msg="$(jq -Rrs '[split("\n")[] | fromjson? | select(.type == "message" and .role == "assistant" and ((.outcome.type? // "") != "discarded" or (.outcome.cause? // "") == "interrupt")) | ([.content[]? | select(.type == "text") | .text] | join("\n\n")) | select(test("\\S"))] | last // ""' out/stream.ndjson 2>/dev/null || true)"
 outcome_line="$(printf '%s\n' "$final_msg" | awk 'NF { line = $0 } END { if (line) print line }')"
 
 outcome_line="$(printf '%s\n' "$outcome_line" | sed -E 's/^[[:space:]`*_]+//; s/[[:space:]`*_]+$//')"

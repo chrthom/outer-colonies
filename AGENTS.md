@@ -13,8 +13,7 @@ Scan `README.md` to get further information on project background and structure.
 Maintain consistency across the three subprojects
 
 ## Working with Git
-- Use conventional commits (see `commit` skill for details)
-- Skills available: `commit`, `github`, `check-pr`, `start-issue`, `release-oc`
+- Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, etc.)
 
 ## Repository Working Rules
 

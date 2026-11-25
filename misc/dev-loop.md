@@ -3,9 +3,15 @@
 Successor design to PR #80 (`.openclaude/` skill/agents/guard): GitHub Actions replaces the
 orchestrator (no cron tick, no `state.json`, no command-text guard); the agentic work
 (implement / review / fix, including merge-conflict resolution) stays with a real coding-agent
-harness — Mistral models via OpenCode — executed headless on the workflow runner, with its
+harness — Mistral Vibe CLI in programmatic mode — executed headless on the workflow runner, with its
 full local toolset (edit files, `npm run format`, `npm test`, `npm run lint` from the repo root
 - they loop over the `server`, `client` and `website` subprojects, each with its own lockfile).
+
+> **Harness migration (before December 1, 2026)**: Starting December 1, 2026, Mistral debits
+> usage from third-party harnesses against the smaller monthly API allowance rather than the
+> Vibe allowance. The role workflows migrated from OpenCode to the Vibe CLI in programmatic mode
+> (`vibe --prompt-file … --auto-approve`) so headless `MISTRAL_API_KEY` plan-key runs continue
+> drawing on the Vibe allowance.
 
 GitHub is the source of truth (issues, PRs, reviews, labels). The loop is fully event-driven:
 every dispatch follows a GitHub event; the chain is usually the GitHub event the previous
@@ -21,10 +27,11 @@ GitHub event
 role workflow (reviewer / fixer / implementer)
   pre-step: gate + dedupe (dev-loop label, draft, needs-human, head SHA, iteration cap)
   job:      checkout → Node 22 → npm ci → render prompt (budget injected) →
-            timeout --signal=TERM --kill-after=60 <time-limit> opencode run --standalone
-            --format json --auto --model mistral/zai-glm-5-3 "$(cat out/<role>.rendered.md)"
-            (with a failure-streak / step / token watchdog on the stream)
-  post-step: deterministic state machine from out/stream.ndjson + out/opencode.stderr
+            timeout --signal=TERM --kill-after=60 <time-limit+120> \
+              vibe --prompt-file out/<role>.rendered.md --auto-approve --trust \
+              --model "$VIBE_MODEL" --max-turns "$MAX_TURNS" --max-tokens "$MAX_TOKENS" \
+              --time-limit "$TIME_LIMIT_SEC" --output streaming --output-dir out
+  post-step: deterministic state machine from out/export.json + out/stream.ndjson + out/vibe.stderr
              (labels, escalation, failure classification)
 ```
 
@@ -227,9 +234,9 @@ verifies the claim against reality (head SHA moved) before relying on it.
   since the last escalation comment (per escalation epoch). At `MAX_ITERATIONS` (8), it
   deterministically labels `needs-human`, posts the escalation, dispatches nothing. Agents
   cannot see or negotiate the cap.
-- **Per-run budgets**: step cap / token cap on every role run, enforced by the stream
-  watchdog (plus the job `timeout-minutes` and `timeout(1)` as the wall-clock caps); a budget
-  stop escalates instead of chaining.
+- **Per-run budgets**: turn cap (`--max-turns`), token cap (`--max-tokens`), and deadline
+  (`--time-limit`) enforced natively by Vibe on every role run (plus `timeout(1)` and the job
+  `timeout-minutes` as outer wall-clock backstops); a budget stop escalates instead of chaining.
 - **Fixer completes only on `FIXED`**: `WALL:` or a limit-stop breaks the cycle; a successful
   fix re-enters the loop purely via its own `synchronize` event.
 - **One review per head SHA**: pre-step skips if a marker review with `commit_id == headRefOid`
@@ -330,8 +337,8 @@ Stays a pure gate: format-auto-fix, lint, typecheck, tests — unchanged. Additi
 - **Post-step script is a checked-in file**: the reviewer's post-step state machine lives
   in `.github/dev-loop/scripts/post-review.sh`, invoked as
   `run: bash .github/dev-loop/scripts/post-review.sh` - the workflow's `env:` block is its
-  only bridge for GitHub expression contexts (`OPENCODE_RC` carries
-  `steps.opencode.outputs.rc`; everything else arrives as a plain env var). Reason: GitHub
+  only bridge for GitHub expression contexts (`VIBE_RC` carries
+  `steps.vibe.outputs.rc`; everything else arrives as a plain env var). Reason: GitHub
   caps a `run:` block scalar at **21,000 chars**, and the inline version of the script sat
   within ~3.3k of that cap - crossing it makes GitHub reject the whole workflow file, a
   silent full-loop stall, because the loop's escalation machinery lives in that very
@@ -355,8 +362,10 @@ allocated, and the gate re-checks the live issue state, so the `workflow_dispatc
 (a manual retry) can never post for a not-planned/duplicate close either.
 
 - **Run-to-issue association**: the three role workflows record their target in the artifact
-  name — `opencode-implementer-output-issue-<N>-<run_id>-<run_attempt>` for the implementer,
-  `opencode-(reviewer|fixer)-output-pr-<M>-…` for the PR roles — the only artifact metadata
+  name — `vibe-implementer-output-issue-<N>-<run_id>-<run_attempt>` for the implementer,
+  `vibe-(reviewer|fixer)-output-pr-<M>-…` for the PR roles (legacy `opencode-*` artifacts
+  from pre-migration runs of the same issue are also matched so cross-migration issues report
+  their true total) — the only artifact metadata
   that can be filtered without a download (run metadata carries neither the issue nor the
   dispatch inputs). The report resolves the issue's PRs two ways — cross-referenced PRs whose
   live body still carries a closing keyword reference (`Closes|Fixes|Resolves #<N>` or the
@@ -371,11 +380,13 @@ allocated, and the gate re-checks the live issue state, so the `workflow_dispatc
   them is not implemented). Runs whose
   artifacts predate the naming scheme are not attributable; the report then finds nothing and
   posts no comment, so the first reported issue is the first one fully served after the scheme.
-- **Aggregation**: per run, cost is the sum of `part.cost` and tokens the cost-weighted sum
-  (input + output + cache.write + 0.1 × cache.read, the cap semantics) over the
-  `step_finish` events in the run's `stream.ndjson` artifact — the same jq the role
-  post-steps use, per-run cost rounded to cents; the comment breaks the totals down per
-  role and links every run.
+- **Aggregation**: per run, Vibe artifacts read `cost_usd`, `usage.total_tokens` (cumulative
+  prompt + completion tokens), and `steps` from `out/export.json` (plus any spawned
+  `subagents` — counting that run only, matching the per-run summing semantics). Legacy
+  `opencode-*` artifacts fall back to `stream.ndjson` (sum of `part.cost`, cost-weighted
+  tokens `input + output + cache.write + 0.1 × cache.read`, and `step_finish` count).
+  Per-run cost is rounded to cents; the comment breaks the totals down per role and links
+  every run.
 - **Retention**: artifacts expire with the default retention (90 days); an issue closed
   after some of its artifacts expired reports over what remains and notes the unavailable
   count (the totals undercount those runs); if every matched artifact is unavailable, the
@@ -420,44 +431,44 @@ concurrency:
                                         # runs use the -resume sub-group (see event map)
   cancel-in-progress: false
 steps:
-  - uses: actions/checkout@v4
-  - uses: actions/setup-node@v4         # node 22, npm cache (mirrors ci.yml)
+  - uses: actions/checkout@v5
+  - uses: actions/setup-node@v5         # node 22, npm cache (mirrors ci.yml)
   - run: npm ci
-  - run: curl -fsSL https://opencode.ai/install | bash
+  - run: uv tool install --force --python cpython-3.14+gil "mistral-vibe==$VIBE_VERSION"
   - run: render .github/dev-loop/prompts/<role>.md with the budget values, then:
-        timeout --signal=TERM --kill-after=60 <time-limit> \
-          opencode run --standalone --format json --auto --model mistral/zai-glm-5-3 \
-          "$(cat out/<role>.rendered.md)" \
-          2> out/opencode.stderr | tee out/stream.ndjson | <watchdog>
+        timeout --signal=TERM --kill-after=60 "$((TIME_LIMIT_SEC + 120))" \
+          vibe --prompt-file "out/<role>.rendered.md" --auto-approve --trust \
+          --model "$VIBE_MODEL" --max-turns "$MAX_TURNS" --max-tokens "$MAX_TOKENS" \
+          --time-limit "$TIME_LIMIT_SEC" --output streaming --output-dir out \
+          > out/stream.ndjson 2> out/vibe.stderr
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GH_TOKEN: ${{ secrets.DEV_LOOP_TOKEN }}
           DEV_LOOP_ARGS: <pr/issue number, branch, review id>
-          OPENCODE_CONFIG_DIR: <job-local dir>   # env var must be the only credential source
-          OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          NO_PROXY: 127.0.0.1,localhost         # managed service binds a loopback port
-            (verified against opencode v2.0.26: `run` is the non-interactive mode,
-            `--standalone` avoids the shared managed-service port state on the runner,
-            `--format json` emits the live JSON event stream the watchdog and the
-            post-step consume — event types step_start / step_finish / text /
-            tool_use, with per-step `cost` and `tokens` (incl. cache read/write) on
-            step_finish, so no export file is needed for outcome/cost. The installed
-            opencode version must be pinned and verified: the CLI surface moved
-            substantially between majors (v1.19 vs v2.0 — auth flags, provider
-            config env vars, service architecture))
-  - uses: actions/upload-artifact@v4     # out/export.json + out/stream.ndjson + stderr:
-                                         # outcome, stop reason, cost, final message
+          VIBE_HOME: <job-local dir>    # MISTRAL_API_KEY must be the only credential source
+          VIBE_TEST_DISABLE_KEYRING: '1'
+            (verified against mistral-vibe 3.1.5: `--prompt-file` + `--auto-approve`
+            runs headless without approval prompts; `--trust` grants temporary project
+            trust so repo-root `AGENTS.md` is loaded under an isolated `VIBE_HOME`;
+            `--output streaming` writes live JSON history entries to `out/stream.ndjson`
+            while `--output-dir out` writes `out/export.json` and copies the session
+            journal to `out/session/`. Job-local `$VIBE_HOME/config.toml` disables CI
+            update checks/telemetry and registers `zai-glm-5-3` with Mistral's model-card
+            pricing so `--model` always resolves and `export.json` reports `cost_usd`.
+            `VIBE_VERSION` is pinned and verified via `vibe --version`.)
+  - uses: actions/upload-artifact@v5     # out/ -> export.json, session/, stream.ndjson,
+                                         # vibe.stderr, <role>.rendered.md
   - run: <post-step: state machine per table above, using the PAT>
 ```
 
 The reviewer posts its review **from the post-step** (reads the agent's verdict out of
-`out/stream.ndjson` — the last assistant message — plus `out/export.json` for outcome and
-cost, composes the marker-prefixed JSON, `gh api` posts it), so the agent never needs
-review-writing API access.
+`out/stream.ndjson` — the last non-discarded assistant message — plus `out/export.json` for
+outcome and cost, composes the marker-prefixed JSON, `gh api` posts it), so the agent never
+needs review-writing API access.
 
 ## Secrets & settings
 
-- `MISTRAL_API_KEY` — Actions secret (masked in logs on public repo).
+- `MISTRAL_API_KEY` — Actions secret (Mistral plan key, masked in logs on public repo).
 - `DEV_LOOP_TOKEN` — fine-grained PAT, this repo only, `contents:write` + `pull-requests:write`
   (+ `issues:write` for the implementer's issue comments).
 - `needs-human` label as in PR #80; `dev-loop` label as the opt-in gate.
@@ -466,28 +477,29 @@ review-writing API access.
 
 ## Budgets and parameters
 
-Calibrate from the `out/stream.ndjson` artifacts after the first real runs; these are the starting caps
-(steps/tokens enforced by the stream watchdog — a cap hit kills `opencode run` and the
-post-step classifies rc 99; time enforced by `timeout(1)`, rc 124 — not a hang):
+Every role job pins `VIBE_VERSION` (`3.1.5`) and `VIBE_MODEL` (`zai-glm-5-3`). Turn, token and
+time limits are enforced natively by Vibe programmatic mode (`--max-turns`, `--max-tokens`,
+`--time-limit`, stopping with exit code `3` and outcome `turn_limit` / `token_limit` /
+`deadline` — never `--max-price`, which is omitted until plan-key pricing semantics are
+validated); `timeout(1)` (`TIME_LIMIT_SEC + 120`) and the job `timeout-minutes` remain as
+outer wall-clock backstops:
 
-| Role                              | steps (watchdog) | tokens (watchdog, cost-weighted) | time limit (`timeout(1)`) | job `timeout-minutes` | Rationale                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------------------------- | ---------------- | -------------------------------- | ------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| implementer                       | 800              | 6M                               | 5400                      | 105                   | the heaviest role: reads issue + AGENTS.md, full src, writes code + tests, runs build/test/lint. First live run used 71 steps / 3.03M tokens / $4.63 on a modest issue; with opencode prompt caching observed at 93-99% hit rate, steps are cheap (~10% input cost), so the step cap is a generous runaway guard (~7x the vibe-era 120-turn budget) and the 90-min deadline is the real constraint |
-| reviewer                          | 400              | 4M                               | 3600                      | 75                    | read-only but adversarial: reads diff + linked issue + prior reviews, runs build/test/lint once; calibrate from its first artifacts                                                                                                                                                                                                                                                                |
-| fixer (incl. conflict resolution) | 400              | 4M                               | 3600                      | 75                    | scoped to one review's findings and/or one conflict; usually well under. Conflict resolution is bounded work; a conflict-heavy run that cannot finish stops with `WALL:` like anything else                                                                                                                                                                                                        |
+| Role                              | `MAX_TURNS` (`--max-turns`) | `MAX_TOKENS` (`--max-tokens`, prompt + completion) | `TIME_LIMIT_SEC` (`--time-limit`) | job `timeout-minutes` | Rationale                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------- | --------------------------- | -------------------------------------------------- | --------------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| implementer                       | 800                         | 6M                                                 | 5400                              | 105                   | the heaviest role: reads issue + AGENTS.md, full src, writes code + tests, runs build/test/lint. Turn cap is a generous runaway guard and the 90-min deadline is the real constraint                                                                                                                                                                                    |
+| reviewer                          | 400                         | 4M                                                 | 3600                              | 75                    | read-only but adversarial: reads diff + linked issue + prior reviews, runs build/test/lint once; calibrate from `export.json` artifacts                                                                                                                                                                                                                                  |
+| fixer (incl. conflict resolution) | 400                         | 4M                                                 | 3600                              | 75                    | scoped to one review's findings and/or one conflict; usually well under. Conflict resolution is bounded work; a conflict-heavy run that cannot finish stops with `WALL:` like anything else                                                                                                                                                                             |
 
-The token cap is cost-weighted: input + output + cache.write + 0.1 × cache.read —
-cached tokens count at their 10% billing rate, so the cap means "N uncached-equivalent
-tokens" and preserves the vibe-era cost semantics: a heavily cached, cheap, healthy run
-cannot blow it. The post-step reports the same sum, so artifacts calibrate against what
-the cap enforced. Token spend remains the direct measure of work; a token-cap
-hit is a truthful "this run consumed excessive tokens". A step-cap hit means the agent
-looped: the cap is deliberately far above any honest run. Hard ceiling independent of
-opencode: the GitHub job timeout (`timeout-minutes`) set 15 min above each time limit, so a
-wedged process cannot burn the 6-hour job limit. A time-limit hit is rc 124 with a complete
-event-stream transcript up to the kill. Expected real-world spend per happy-path PR
-(implement + 1–2 reviews + 1 fix + occasional conflict resolution): with caching, a fraction
-of the $5–15 uncached estimate; dry-run sessions measured ~$1.29 for 5.9M tokens.
+**Token semantics change**: Vibe's `--max-tokens` counts raw cumulative **prompt + completion
+tokens** (`usage.total_tokens` across the root session and any subagents), whereas the earlier
+watchdog used cost-weighted tokens (`input + output + cache.write + 0.1 × cache.read`). With
+prompt caching, raw `total_tokens` is larger per step than the old uncached-equivalent figure,
+so `MAX_TOKENS` (`6M` / `4M`) should be calibrated against `out/export.json` after the first
+live runs. Token spend remains the direct measure of work; a `token_limit` stop is a truthful
+"this run consumed excessive tokens". A `turn_limit` stop means the agent looped: the cap is
+deliberately far above any honest run. Hard ceiling independent of Vibe: the GitHub job
+timeout (`timeout-minutes`) set 15 min above each `--time-limit`, so a wedged process cannot
+burn the 6-hour job limit.
 
 **Budget awareness in the prompt**: each role prompt is rendered with its caps (the workflow
 pre-step injects `MAX_TURNS`, `TIME_LIMIT_MIN` (the job's wall-clock budget) into the prompt file via a template
@@ -496,7 +508,7 @@ tells the agent its turn budget and instructs it to plan accordingly: front-load
 issue/PR and `AGENTS.md`, implement, then reserve the last ~20% of the budget for running
 `npm run format`/`npm test`/`npm run lint` and fixing what they surface. If the agent believes
 it cannot finish within the budget, it must stop early with `WALL: <reason>` rather than
-run until the harness kills it — a deliberate stop yields a useful escalation, a budget hit
+run until the harness stops it — a deliberate stop yields a useful escalation, a budget hit
 does not. Caveat: agents cannot observe their live usage, so this is planning guidance, not
 a hard guarantee; the harness cap remains the enforcement and the two complement each other.
 
@@ -504,38 +516,31 @@ a hard guarantee; the harness cap remains the enforcement and the two complement
 
 Principle: a failed role run never chains, never retries itself, and always leaves a visible
 GitHub trace. No silent stuck states. "Never retries itself" is scoped to the deterministic
-failure rows below (rc 99, rc 124 — never auto-retried; rc 1 stays escalated outside its
-provider-infra signature); the two exceptions, each presumed transient and auto-retried once
-via `workflow_dispatch` before escalating, are the unparseable-outcome row (exit 0 without a
-contract line) and the provider-infra row (exit 1 without an outcome line plus a `provider.*`
-stream event and a clean stderr). Every failure path ends in exactly one of:
+failure rows below (`rc 1`, `rc 3`, `rc 124` — never auto-retried); the two exceptions, each
+presumed transient and auto-retried once via `workflow_dispatch` (`retry=1`) before
+escalating, are `rc 0` with an unparseable outcome and `rc 2` (`infrastructure_failure`).
+Every failure path ends in exactly one of:
 (a) a `needs-human` label + marker escalation comment (`@$REPO_OWNER`, reason, pointers),
 (b) a benign no-op, or (c) an Actions-visible failed run that the dispatch backstop can re-tick.
 
-The opencode exit code and the event stream (`out/stream.ndjson` + `out/opencode.stderr`)
-are the discriminators. Opencode v2.0.26 exit codes (measured): 0 finished, 1 config or
-infrastructure failure **or a session that recorded (recovered) tool errors** — v2.0.26
-exits 1 whenever any tool call errored, even when the agent recovered and completed its
-work with a valid contract line (observed on the #98/#99 loop: failed `websearch`/`webfetch`
-calls, no search-provider key configured, flip an otherwise successful run to rc 1; the
-role jobs now pass `TAVILY_API_KEY` and pin `"websearch": {"provider": "tavily"}` in the
-job-local `opencode.jsonc` when the secret is set, so websearch/webfetch work headless). The
-post-steps therefore treat rc 1 as finished **iff** the final message parses the role's
-outcome contract (`PR_URL:`/`NO_PR:`/`WALL:`, `VERDICT:`, `FIXED:`/`WALL:`), and escalate
-only when it does not. Remaining exit codes: 124 deadline (`timeout(1)`), 130 killed by
-signal, 99 watchdog kill (convention of this workflow, not opencode's):
+The Vibe exit code and `out/export.json` (plus `out/stream.ndjson` and `out/vibe.stderr`)
+are the discriminators. Vibe programmatic mode exit codes:
+- `0` (`finished`): agent completed its turn; parse the outcome contract from the final assistant message in `out/stream.ndjson`.
+- `1` (`usage_error`, `config_error`): run could not start as asked (bad flag, unknown model, invalid API key); deterministic, never auto-retry.
+- `2` (`infrastructure_failure`): model API (after retries) or runtime failed; transient, single auto-retry via `workflow_dispatch` (`retry=1`).
+- `3` (`turn_limit`, `token_limit`, `price_limit`, `deadline`, `terminated`, `length`, `refusal`): agent stopped without finishing; escalate naming the `outcome`, never auto-retry.
+- `124`: outer `timeout(1)` backstop killed the process; escalate, never auto-retry.
 
-| What failed                                                              | Detection                                                                                                                                                                                                            | Handling (post-step, in code)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| model API outage / runner infra                                          | exit 1, no outcome line, a top-level `provider.*` error event in the stream and no `Error:` signature in stderr (observed on the #122 loop: `provider.invalid-output`, empty stderr, the agent productively mid-run) | fixer: one-shot auto-retry via `workflow_dispatch` (retry=1, moved_by_fix from push evidence), on the retried run escalate with reason + run link - the provider event plus the clean stderr is the transient signature; reviewer/implementer: escalate only, manual retry stays available via the `workflow_dispatch` retry input. Other rc=1 shapes (connection errors that only surface in stderr, usage/config `Error:` lines) stay escalated everywhere: without the stream event the transient/deterministic split is not observable                 |
-| budget hit (steps/tokens)                                                | watchdog kills opencode after the cap, rc 99                                                                                                                                                                         | escalate: label `needs-human`, comment the caps + cost summed from `step_finish` events, link the artifact. Never auto-retry: a budget hit means the task, not the run, is the problem. Step cap = agent looped; token cap = run consumed excessive tokens                                                                                                                                                                                                                                                                                                 |
-| deadline                                                                 | rc 124 from `timeout(1)`                                                                                                                                                                                             | escalate with cost from the stream; never auto-retry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| wall-clock timeout (belt above the time limit)                           | job killed by `timeout-minutes` (no opencode exit code)                                                                                                                                                              | red run; the re-run backstop covers it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| usage/config error (bad flag, missing API key)                           | exit 1 (`Error: ...` in stderr)                                                                                                                                                                                      | escalate; deterministic, a retry fails the same way                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| tool-failure loop (agent retries failing commands)                       | watchdog kills opencode after N consecutive failed tool calls (`state.status == "failed"`, or non-zero shell exit in `state.metadata.metadata.exit`)                                                                 | escalate: the agent could not use its tools; a full budget spent on failing calls is pure waste (this happened on the first live run)                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| agent finished but outcome unparseable                                   | exit 0, final `text` event doesn't match the contract                                                                                                                                                                | one-shot auto-retry via `workflow_dispatch` (retry=1; the fixer's retry also passes `moved_by_fix`, the first attempt's head-before/after observation plus push evidence from its event stream, so the retry's stale-review skip stays attribution-aware for human reviews - a marker review plain-skips on any moved head, and the mover's `synchronize` re-review re-derives its findings); on the retried run escalate with reason "unparseable outcome (retry exhausted)" + link to the transcript artifact; the transcript is preserved for diagnosis |
-| agent reported `WALL:` / `NO_PR:`                                        | exit 0, parseable                                                                                                                                                                                                    | the designed escalation: implementer comments its questions on the issue + labels it; fixer escalates on the PR                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| workflow step failed _outside_ opencode (npm ci, install, push rejected) | step exit code                                                                                                                                                                                                       | normal Actions red run: visible on the run, GitHub can "re-run failed jobs"; if the same step fails twice (run attempt > 1), escalate instead of leaving it red silently                                                                                                                                                                                                                                                                                                                                                                                   |
+| What failed                                                             | Detection                                                                               | Handling (post-step, in code)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| model API outage / runtime failure                                      | `rc 2` (`infrastructure_failure` in `export.json`)                                      | one-shot auto-retry via `workflow_dispatch` (`retry=1`; the fixer's retry also passes `moved_by_fix` from push evidence in `out/stream.ndjson`), on the retried run escalate with reason + cost + run link                                                                                                                                                                                                                                                                                                                                                           |
+| budget / length / refusal stop                                          | `rc 3` (`turn_limit`, `token_limit`, `price_limit`, `length`, `refusal` in `export.json`) | escalate: label `needs-human` (or park issue), comment naming the `outcome` token, step/token counts and `cost_usd` from `export.json`, link the vibe output artifact. Never auto-retry                                                                                                                                                                                                                                                                                                                                                                            |
+| deadline                                                                | `rc 3` (`deadline` / `terminated` in `export.json`) or `rc 124` from outer `timeout(1)` | escalate naming the outcome/rc and cost from `export.json`; never auto-retry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| wall-clock timeout (belt above the time limit)                          | job killed by `timeout-minutes` (no Vibe exit code)                                     | red run; the re-run backstop covers it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| usage/config error (bad flag, unknown model, missing/invalid API key)   | `rc 1` (`usage_error` / `config_error` in `export.json`, error in `vibe.stderr`)        | escalate; deterministic, never auto-retry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| agent finished but outcome unparseable                                  | `rc 0`, final non-discarded assistant message in `out/stream.ndjson` doesn't match contract | one-shot auto-retry via `workflow_dispatch` (`retry=1`; the fixer's retry also passes `moved_by_fix`, the first attempt's head-before/after observation plus push evidence from `out/stream.ndjson`, so the retry's stale-review skip stays attribution-aware for human reviews - a marker review plain-skips on any moved head, and the mover's `synchronize` re-review re-derives its findings); on the retried run escalate with reason "unparseable outcome (exit 0, final message does not match the contract; retry exhausted)" + link to the vibe output artifact |
+| agent reported `WALL:` / `NO_PR:`                                       | `rc 0`, parseable                                                                       | the designed escalation: implementer comments its questions on the issue + labels it; fixer escalates on the PR                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| workflow step failed _outside_ Vibe (npm ci, install, push rejected)    | step exit code (`rc` empty)                                                             | normal Actions red run: visible on the run, GitHub can "re-run failed jobs"; if the same step fails twice (run attempt > 1), escalate instead of leaving it red silently                                                                                                                                                                                                                                                                                                                                                                                           |
 
 Per-role specifics:
 

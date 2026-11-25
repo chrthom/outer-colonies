@@ -215,12 +215,14 @@ jobs:
         run: |
           set -u
           prs="$(cat "$WORK_DIR/prs.json")"
-          # All opencode artifacts, matched by name: the role workflows record
-          # their association target in the artifact name (issue-<N> for the
-          # implementer, pr-<M> for reviewer/fixer runs of a linked PR) - the
-          # only artifact metadata that can be filtered without a download.
-          # Runs whose artifacts predate the naming scheme are not
-          # attributable and are skipped (misc/dev-loop.md).
+          # All vibe and legacy opencode artifacts, matched by name: the role
+          # workflows record their association target in the artifact name
+          # (issue-<N> for the implementer, pr-<M> for reviewer/fixer runs of a
+          # linked PR) - the only artifact metadata that can be filtered without
+          # a download. Legacy opencode-* artifacts from pre-migration runs of
+          # the same issue remain included so cross-migration issues report
+          # their true total (misc/dev-loop.md). Runs whose artifacts predate
+          # the naming scheme are not attributable and are skipped.
           if ! GH_TOKEN="$GITHUB_TOKEN" gh api "repos/${GH_REPO}/actions/artifacts" --paginate < /dev/null > "$WORK_DIR/artifacts.raw.json" 2>"$WORK_DIR/artifacts.err"; then
             # The report cannot be built without the artifact list, so the
             # step fails red like the gate/Post transient failures - the
@@ -233,13 +235,13 @@ jobs:
           # With no linked PRs the reviewer/fixer branch is dropped from the
           # pattern entirely: an empty pr alternation would degenerate into
           # matching crashed-run artifacts whose pr number was never echoed
-          # (opencode-reviewer-output-pr--<run_id>-<attempt>).
+          # (vibe-reviewer-output-pr--<run_id>-<attempt>).
           if ! jq -r --argjson prs "$prs" --arg issue "$ISSUE_NUMBER" '
             ($prs | length) as $npr
             | .[] | select(.name | test(
-                ("^opencode-implementer-output-issue-" + $issue + "-[0-9]+-[0-9]+$")
+                ("^(vibe|opencode)-implementer-output-issue-" + $issue + "-[0-9]+-[0-9]+$")
                 + (if $npr > 0
-                   then "|^opencode-(reviewer|fixer)-output-pr-("
+                   then "|^(vibe|opencode)-(reviewer|fixer)-output-pr-("
                         + ($prs | map(tostring) | join("|"))
                         + ")-[0-9]+-[0-9]+$"
                    else "" end)
@@ -259,8 +261,8 @@ jobs:
             if [ -z "$art_id" ]; then
               continue
             fi
-            role="$(printf '%s' "$art_name" | sed -E 's/^opencode-([a-z]+)-output-.*/\1/')"
-            run_id="$(printf '%s' "$art_name" | sed -E 's/^opencode-[a-z]+-output-(issue-[0-9]+|pr-[0-9]+)-([0-9]+)-[0-9]+$/\2/')"
+            role="$(printf '%s' "$art_name" | sed -E 's/^(vibe|opencode)-([a-z]+)-output-.*/\2/')"
+            run_id="$(printf '%s' "$art_name" | sed -E 's/^(vibe|opencode)-[a-z]+-output-(issue-[0-9]+|pr-[0-9]+)-([0-9]+)-[0-9]+$/\3/')"
             if [ "$art_expired" = "true" ]; then
               echo "Artifact $art_name has expired; its run cannot be counted."
               unavailable=$((unavailable + 1))
@@ -275,30 +277,46 @@ jobs:
               unavailable=$((unavailable + 1))
               continue
             fi
-            if [ ! -f "$dl/stream.ndjson" ]; then
-              echo "::warning::Artifact $art_name carries no stream.ndjson; skipping the run."
-              unavailable=$((unavailable + 1))
-              continue
-            fi
-            # Same aggregation as the role post-steps: cost = sum of the
-            # per-step cost fields, tokens = the cost-weighted sum the
-            # MAX_TOKENS watchdog cap enforces. Round the per-run cost to
-            # cents so the reported per-run numbers have no float artifacts.
-            # A hard-killed run can leave a truncated final line in
-            # stream.ndjson, which fails jq -s: a parse failure means the
-            # run's data is unusable, so - like a missing stream.ndjson
-            # above - the run is counted as unavailable instead of being
-            # silently zeroed into the totals.
-            cost="$(jq -s '[.[].part.cost // 0] | add // 0 | (.*100 | round) / 100' "$dl/stream.ndjson" 2>"$dl/parse.err" || true)"
-            tokens="$(jq -s '[.[].part.tokens // empty
-              | (.input // 0) + (.output // 0) + (.cache.write // 0) + (0.1 * (.cache.read // 0))] | add // 0' "$dl/stream.ndjson" 2>>"$dl/parse.err" || true)"
-            if [ -z "$cost" ] || [ -z "$tokens" ]; then
-              echo "::warning::Artifact $art_name carries an unparseable stream.ndjson; skipping the run."
-              cat "$dl/parse.err" || true
-              unavailable=$((unavailable + 1))
-              continue
-            fi
-            printf '{"role":"%s","run_id":"%s","cost":%s,"tokens":%s}\n' "$role" "$run_id" "$cost" "$tokens" >> "$WORK_DIR/runs.jsonl"
+            case "$art_name" in
+              vibe-*)
+                if [ ! -f "$dl/export.json" ]; then
+                  echo "::warning::Artifact $art_name carries no export.json; skipping the run."
+                  unavailable=$((unavailable + 1))
+                  continue
+                fi
+                # Vibe programmatic export.json counts this run only (plus any
+                # subagents spawned during the run). Round per-run cost to cents.
+                cost="$(jq -r '[(.cost_usd // 0), (.subagents[]?.cost_usd // 0)] | add // 0 | (.*100 | round) / 100' "$dl/export.json" 2>"$dl/parse.err" || true)"
+                tokens="$(jq -r '[(.usage.total_tokens // 0), (.subagents[]?.usage.total_tokens // 0)] | add // 0' "$dl/export.json" 2>>"$dl/parse.err" || true)"
+                steps="$(jq -r '[(.steps // 0), (.subagents[]?.steps // 0)] | add // 0' "$dl/export.json" 2>>"$dl/parse.err" || true)"
+                if [ -z "$cost" ] || [ -z "$tokens" ] || [ -z "$steps" ]; then
+                  echo "::warning::Artifact $art_name carries an unparseable export.json; skipping the run."
+                  cat "$dl/parse.err" || true
+                  unavailable=$((unavailable + 1))
+                  continue
+                fi
+                ;;
+              opencode-*)
+                if [ ! -f "$dl/stream.ndjson" ]; then
+                  echo "::warning::Artifact $art_name carries no stream.ndjson; skipping the run."
+                  unavailable=$((unavailable + 1))
+                  continue
+                fi
+                # Legacy OpenCode path: cost = sum of per-step cost fields,
+                # tokens = cost-weighted sum, steps = step_finish count.
+                cost="$(jq -s '[.[].part.cost // 0] | add // 0 | (.*100 | round) / 100' "$dl/stream.ndjson" 2>"$dl/parse.err" || true)"
+                tokens="$(jq -s '[.[].part.tokens // empty
+                  | (.input // 0) + (.output // 0) + (.cache.write // 0) + (0.1 * (.cache.read // 0))] | add // 0' "$dl/stream.ndjson" 2>>"$dl/parse.err" || true)"
+                steps="$(jq -s '[.[] | select(.type == "step_finish")] | length' "$dl/stream.ndjson" 2>>"$dl/parse.err" || true)"
+                if [ -z "$cost" ] || [ -z "$tokens" ] || [ -z "$steps" ]; then
+                  echo "::warning::Artifact $art_name carries an unparseable stream.ndjson; skipping the run."
+                  cat "$dl/parse.err" || true
+                  unavailable=$((unavailable + 1))
+                  continue
+                fi
+                ;;
+            esac
+            printf '{"role":"%s","run_id":"%s","cost":%s,"tokens":%s,"steps":%s}\n' "$role" "$run_id" "$cost" "$tokens" "$steps" >> "$WORK_DIR/runs.jsonl"
           done < "$WORK_DIR/matched.tsv"
           runs_found=false
           if [ -s "$WORK_DIR/runs.jsonl" ]; then
@@ -336,16 +354,19 @@ jobs:
             runs: length,
             cost: (map(.cost) | add // 0),
             tokens: (map(.tokens) | add // 0),
+            steps: (map(.steps // 0) | add // 0),
             roles: (group_by(.role) | map({
               role: .[0].role,
               runs: length,
               cost: (map(.cost) | add // 0),
-              tokens: (map(.tokens) | add // 0)
+              tokens: (map(.tokens) | add // 0),
+              steps: (map(.steps // 0) | add // 0)
             }))
           }' "$WORK_DIR/runs.jsonl" > "$WORK_DIR/agg.json"
           total_runs="$(jq -r '.runs' "$WORK_DIR/agg.json")"
           total_cost="$(jq -r '.cost' "$WORK_DIR/agg.json")"
           total_tokens="$(jq -r '.tokens' "$WORK_DIR/agg.json")"
+          total_steps="$(jq -r '.steps' "$WORK_DIR/agg.json")"
           # 'across 1 runs' would read wrong; singularize the count word.
           runs_word="runs"
           if [ "$total_runs" = "1" ]; then
@@ -381,8 +402,9 @@ jobs:
             fi
             role_cost="$(printf '%s' "$agg" | jq -r '.cost')"
             role_tokens="$(printf '%s' "$agg" | jq -r '.tokens')"
+            role_steps="$(printf '%s' "$agg" | jq -r '.steps')"
             role_runs="$(printf '%s' "$agg" | jq -r '.runs')"
-            printf '| %s | %s | %s | %s |\n' "$role" "$role_runs" "$(fmt_cost "$role_cost")" "$(fmt_tokens "$role_tokens")" >> "$WORK_DIR/role_rows.md"
+            printf '| %s | %s | %s | %s | %s |\n' "$role" "$role_runs" "$role_steps" "$(fmt_cost "$role_cost")" "$(fmt_tokens "$role_tokens")" >> "$WORK_DIR/role_rows.md"
             if [ -n "$summary_roles" ]; then
               summary_roles="${summary_roles}, "
             fi
@@ -398,7 +420,8 @@ jobs:
             role="$(printf '%s' "$line" | jq -r '.role')"
             cost="$(printf '%s' "$line" | jq -r '.cost')"
             tokens="$(printf '%s' "$line" | jq -r '.tokens')"
-            printf '| [#%s](%s/%s) | %s | %s | %s |\n' "$run_id" "$RUNS_URL" "$run_id" "$role" "$(fmt_cost "$cost")" "$(fmt_tokens "$tokens")" >> "$WORK_DIR/run_rows.md"
+            steps="$(printf '%s' "$line" | jq -r '.steps // 0')"
+            printf '| [#%s](%s/%s) | %s | %s | %s | %s |\n' "$run_id" "$RUNS_URL" "$run_id" "$role" "$steps" "$(fmt_cost "$cost")" "$(fmt_tokens "$tokens")" >> "$WORK_DIR/run_rows.md"
           done < "$WORK_DIR/runs.jsonl"
 
           note=""
@@ -410,21 +433,21 @@ jobs:
           <!-- dev-loop-cost-report -->
           **Dev-loop cost report for issue #${ISSUE_NUMBER}**
 
-          **Dev-loop total: $(fmt_cost "$total_cost") across ${total_runs} ${runs_word}** (${summary_roles}) - cost-weighted tokens: $(fmt_tokens "$total_tokens").
+          **Dev-loop total: $(fmt_cost "$total_cost") across ${total_runs} ${runs_word}** (${summary_roles}) - tokens: $(fmt_tokens "$total_tokens").
 
-          | Role | Runs | Cost | Cost-weighted tokens |
-          | --- | --- | --- | --- |
+          | Role | Runs | Steps | Cost | Tokens |
+          | --- | --- | --- | --- | --- |
           $(cat "$WORK_DIR/role_rows.md")
-          | **Total** | **${total_runs}** | **$(fmt_cost "$total_cost")** | **$(fmt_tokens "$total_tokens")** |
+          | **Total** | **${total_runs}** | **${total_steps}** | **$(fmt_cost "$total_cost")** | **$(fmt_tokens "$total_tokens")** |
 
           <details><summary>Per run</summary>
 
-          | Run | Role | Cost | Cost-weighted tokens |
-          | --- | --- | --- | --- |
+          | Run | Role | Steps | Cost | Tokens |
+          | --- | --- | --- | --- | --- |
           $(cat "$WORK_DIR/run_rows.md")
           </details>
 
-          Cost is the sum of the per-step costs in each run's \`stream.ndjson\` artifact (per-run rounded to cents); tokens are cost-weighted (input + output + cache.write + 0.1 × cache.read), the same semantics as the loop's token caps.${note}
+          Cost, steps and tokens come from each Vibe run's \`export.json\` (per-run cost rounded to cents; cumulative prompt + completion \`usage.total_tokens\` and \`steps\`, plus any subagents). Legacy OpenCode artifacts (\`opencode-*\`) from pre-migration runs of the same issue are included using \`stream.ndjson\` (cost-weighted tokens: input + output + cache.write + 0.1 × cache.read).${note}
           EOF
           # All-artifacts-unavailable case (collect's runs_found=false with
           # unavailable>0): no run data remains, so the zero-total body
