@@ -1,0 +1,15 @@
+@let promptOpen = mode === "game" && (promptVisible$ | async);
+@if (!promptOpen) {
+  @let vm = (vm$ | async) ?? currentViewModel;
+  <div class="exit-button-group">
+    <button type="button" class="oc-unstyled-btn exit-button" (click)="onPrimaryClick()">
+      <span class="label">{{ vm.label }}</span>
+      <span class="icon" [style.--oc-icon-url]="'url(' + iconUrl + ')'" aria-hidden="true"></span>
+    </button>
+    @if (mode === "game" && vm.canSurrender && confirming) {
+      <button type="button" class="oc-unstyled-btn confirm-button" (click)="onConfirmSurrender()">
+        Kapitulation bestätigen
+      </button>
+    }
+  </div>
+}

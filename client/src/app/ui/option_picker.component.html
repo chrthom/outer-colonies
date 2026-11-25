@@ -1,0 +1,74 @@
+@if (vm$ | async; as vm) {
+  <div
+    #dialogPanel
+    class="option-picker-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="option-picker-title"
+    tabindex="-1"
+    (contextmenu)="$event.preventDefault(); cancel()"
+  >
+    <div class="option-picker-header">
+      <h2 id="option-picker-title" class="selection-status">{{ vm.selectedOptionsText }}</h2>
+      <button
+        type="button"
+        class="oc-unstyled-btn cancel-btn"
+        aria-label="Auswahl abbrechen"
+        (click)="cancel()"
+      >
+        X
+      </button>
+    </div>
+
+    <div class="option-picker-body">
+      <button
+        type="button"
+        class="oc-unstyled-btn page-btn prev"
+        [style.visibility]="vm.hasPreviousPage ? 'visible' : 'hidden'"
+        [disabled]="!vm.hasPreviousPage"
+        aria-label="Vorherige Seite"
+        (click)="movePage(-1)"
+      >
+        <span aria-hidden="true">&#9664;</span>
+      </button>
+
+      <div class="options-grid">
+        @for (option of vm.visibleOptions; track option.absoluteIndex) {
+          <button
+            type="button"
+            class="oc-unstyled-btn option-card"
+            [class.selected]="option.selected"
+            [attr.aria-pressed]="option.selected"
+            [attr.aria-label]="'Optionskarte ' + option.cardId"
+            (click)="toggleSelection(option.absoluteIndex)"
+          >
+            <img [src]="vm.cardUrls.get(option.cardId)" [alt]="'Karte ' + option.cardId" />
+          </button>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="oc-unstyled-btn page-btn next"
+        [style.visibility]="vm.hasNextPage ? 'visible' : 'hidden'"
+        [disabled]="!vm.hasNextPage"
+        aria-label="Nächste Seite"
+        (click)="movePage(1)"
+      >
+        <span aria-hidden="true">&#9654;</span>
+      </button>
+    </div>
+
+    <div class="option-picker-footer">
+      <button
+        type="button"
+        class="oc-unstyled-btn confirm-btn"
+        [class.hidden]="!vm.allOptionsSelected"
+        [disabled]="!vm.allOptionsSelected"
+        (click)="confirm()"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+}

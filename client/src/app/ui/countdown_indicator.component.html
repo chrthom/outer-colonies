@@ -1,0 +1,10 @@
+@if (vm$ | async; as vm) {
+  <div
+    class="countdown-indicator"
+    [class.player]="ownedByPlayer"
+    [class.opponent]="!ownedByPlayer"
+    [class.warning]="vm.warning"
+  >
+    {{ vm.text }}
+  </div>
+}

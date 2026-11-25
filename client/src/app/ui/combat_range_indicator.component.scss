@@ -1,0 +1,13 @@
+.combat-range-indicator {
+  position: absolute;
+  left: 77.29%;
+  top: 44.44%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  img {
+    display: block;
+    width: clamp(28px, 2.5cqw, 64px);
+    height: auto;
+  }
+}

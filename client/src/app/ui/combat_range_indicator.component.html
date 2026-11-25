@@ -1,0 +1,5 @@
+@if (range$ | async; as vm) {
+  <div class="combat-range-indicator">
+    <img [src]="vm.imageUrl" [alt]="'Kampfreichweite ' + vm.range" />
+  </div>
+}

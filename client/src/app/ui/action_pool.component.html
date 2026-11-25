@@ -1,0 +1,18 @@
+@let actions = (actions$ | async) ?? [];
+@if (actions.length > 0) {
+  <div
+    class="action-pool"
+    [class.player]="ownedByPlayer"
+    [class.opponent]="!ownedByPlayer"
+    [attr.aria-label]="ownedByPlayer ? 'Aktionspool Spieler' : 'Aktionspool Gegner'"
+  >
+    @for (action of actions; track action.key) {
+      <span
+        class="action-icon"
+        [style.--oc-icon-url]="'url(' + action.iconUrl + ')'"
+        [title]="action.name"
+        aria-hidden="true"
+      ></span>
+    }
+  </div>
+}

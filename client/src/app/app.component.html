@@ -1,1 +1,14 @@
 <div id="game"></div>
+<div class="ui-viewport-overlay">
+  <div class="ui-stage-overlay">
+    @if (matchmakingActive$ | async) {
+      <app-matchmaking-overlay />
+    }
+    @if (gameActive$ | async) {
+      <app-game-hud />
+    }
+  </div>
+  @if (gameActive$ | async) {
+    <app-option-picker />
+  }
+</div>

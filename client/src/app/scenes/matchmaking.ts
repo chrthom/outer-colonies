@@ -1,19 +1,19 @@
 import Phaser from 'phaser';
 import { Subscription } from 'rxjs';
 import Background from '../components/background';
-import ExitButton from '../components/buttons/exit_button';
-import OnlineIndicator from '../components/indicators/online_indicator';
-import VersionIndicator from '../components/indicators/version_indicator';
-import LoadingStatus from '../components/loading_status';
+import { AssetPreloaderService } from '../services/asset_preloader_service';
 import { MatchmakingService } from '../services/matchmaking_service';
 import { SERVICE_REGISTRY_KEYS } from '../services/service_registry';
-import { loadPreloadableResources, loadRequiredResources } from './resource-loader';
 
+/**
+ * Thin Phaser scene rendering the space background while Angular renders the
+ * matchmaking overlay and `MatchmakingService` manages lobby sockets.
+ */
 export default class Matchmaking extends Phaser.Scene {
-  status!: LoadingStatus;
-  onlineIndicator!: OnlineIndicator;
   matchmaking!: MatchmakingService;
+  assetPreloader!: AssetPreloaderService;
   private subscriptions?: Subscription;
+  private isShutDown = false;
 
   constructor() {
     super({
@@ -21,24 +21,16 @@ export default class Matchmaking extends Phaser.Scene {
     });
   }
 
-  preload() {
-    loadRequiredResources(this.load);
-  }
-
   create() {
+    this.isShutDown = false;
     this.matchmaking = this.registry.get(SERVICE_REGISTRY_KEYS.matchmaking);
-    this.status = new LoadingStatus(this);
-    new VersionIndicator(this);
-    this.onlineIndicator = new OnlineIndicator(this);
-    new ExitButton(this);
-    new Background(this);
-    loadPreloadableResources(this.load);
+    this.assetPreloader = this.registry.get(SERVICE_REGISTRY_KEYS.assetPreloader);
     this.bindMatchmakingService();
+    void this.initBackground();
   }
 
   /**
-   * Binds the scene UI elements to `MatchmakingService` streams and cleans up
-   * subscriptions on scene shutdown.
+   * Binds scene navigation to `MatchmakingService` and cleans up on shutdown.
    */
   private bindMatchmakingService(): void {
     this.subscriptions?.unsubscribe();
@@ -48,25 +40,22 @@ export default class Matchmaking extends Phaser.Scene {
         this.scene.start('Game', { gameParams });
       })
     );
-    this.matchmaking.start();
-    sub.add(
-      this.matchmaking.statusText$.subscribe(text => {
-        this.status.setText(text);
-      })
-    );
-    sub.add(
-      this.matchmaking.onlineCount$.subscribe(count => {
-        if (count !== undefined) {
-          this.onlineIndicator.setCount(count);
-        }
-      })
-    );
     this.subscriptions = sub;
+    this.matchmaking.start();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.isShutDown = true;
       this.subscriptions?.unsubscribe();
       this.subscriptions = undefined;
       this.matchmaking.stop();
     });
+  }
+
+  private async initBackground(): Promise<void> {
+    await this.assetPreloader.preloadRequired();
+    if (this.isShutDown) return;
+    this.assetPreloader.registerPhaserTextures(this.textures);
+    new Background(this);
+    void this.assetPreloader.preloadCommon();
   }
 }

@@ -1,0 +1,5 @@
+@if (vm$ | async; as vm) {
+  <div class="zoom-card" [style.left.%]="vm.leftPercent" [style.top.%]="vm.topPercent" aria-hidden="true">
+    <img [src]="vm.imageUrl" alt="" />
+  </div>
+}

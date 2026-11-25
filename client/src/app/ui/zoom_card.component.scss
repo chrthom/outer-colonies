@@ -1,0 +1,25 @@
+.zoom-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: clamp(180px, 16.5cqw, 400px);
+  z-index: 60;
+  pointer-events: none;
+  animation: oc-zoom-fade 150ms ease-out forwards;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.6cqw;
+    box-shadow: 0 12px 36px rgb(0 0 0 / 75%);
+  }
+}
+
+@keyframes oc-zoom-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

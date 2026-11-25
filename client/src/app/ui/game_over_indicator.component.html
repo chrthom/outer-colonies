@@ -1,0 +1,19 @@
+@if (vm$ | async; as vm) {
+  <div
+    class="game-over-indicator"
+    [class.won]="vm.won"
+    [class.lost]="!vm.won"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="banner-wrap">
+      <img class="banner-image" [src]="vm.imageUrl" alt="" />
+      <div class="banner-shine" aria-hidden="true"></div>
+    </div>
+    <h1 class="title">{{ vm.title }}</h1>
+    <p class="subtitle">{{ vm.subtitle }}</p>
+    @if (vm.sol > 0) {
+      <p class="sol-gain" [class.winner]="vm.won" [class.loser]="!vm.won">{{ vm.sol }} Sol erhalten</p>
+    }
+  </div>
+}

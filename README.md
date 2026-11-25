@@ -118,39 +118,23 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Communication**: Uses REST API to communicate with the server
 - **Public account forms**: Authentication and account-token pages use responsive centered layouts, autocomplete hints, accessible request feedback and page headings. Registration exposes username/password rules and a separate keyboard-operable privacy dialog trigger; login and registration prevent duplicate in-flight requests.
 
-#### Client (Phaser 3)
-- **Purpose**: Actual card game implementation with game logic and rendering
+#### Client (Angular + Phaser 3)
+- **Purpose**: Actual card game implementation with Angular HUD/overlays and Phaser 3 card board rendering
 - **Key Components**:
-  - `app.component.ts`: Main game component; boots Phaser and registers root Angular services into `Phaser.Game.registry` via `callbacks.preBoot`
+  - `app.component.ts`: Main game component; boots Phaser, registers root Angular services into `Phaser.Game.registry` via `callbacks.preBoot`, and renders the non-blocking Angular stage overlay above the canvas
   - `socket_service.ts`: App-level Angular service owning the single Socket.IO connection, listener cleanup, reconnection disabling during matches, typed inbound RxJS streams, and typed outbound `emit*` methods
-  - `services/`: Renderer-agnostic Angular services holding client game logic and state
+  - `services/`: Renderer-agnostic Angular services holding client game logic, asset preloading, and state
+    - `asset_preloader_service.ts`: Browser-native image preloader preserving `assetBaseURL()` and serving both Angular DOM overlays and Phaser board textures
     - `matchmaking_service.ts`: Session token parsing, matchmaking status text, online count, and match start notifications
     - `game_session_service.ts`: Active match `ClientState`, countdown, disconnect handling, buffered card movement events, and cancel-and-replace state update sequencing
-    - `game_interaction_service.ts`: Card selection, battle planning, interception selection, option picker state, auto-ready scheduling, intent dispatch, and derived UI view-models
+    - `game_interaction_service.ts`: Card selection, battle planning, interception selection, option picker state, zoom preview state, prompt visibility, auto-ready scheduling, intent dispatch, and derived UI view-models
+    - `navigation_service.ts`: Wrapper for external website navigation
     - `scheduler_service.ts`: Injectable browser-timer scheduler used by `StateUpdateSequencer` and `GameInteractionService`
     - `service_registry.ts`: Registry keys bridging root Angular services into Phaser scenes
-  - `scenes/`: Thin Phaser view adapters
-    - `game.ts`: Main game scene
-    - `matchmaking.ts`: Matchmaking scene
-    - `resource-loader.ts`: Resource loader scene
-  - `components/`: Game-specific components
-    - `action_pool.ts`: Action pool component
-    - `background.ts`: Background component
-    - `buttons/`: Button components
-    - `card/`: Card components
-    - `indicators/`: Indicator components
-    - `loading_status.ts`: Loading status component
-    - `option_picker.ts`: Option picker component
-    - `perspective.ts`: Perspective component
-    - `preloader.ts`: Preloader component
-  - `config/`: Game configuration
-    - `animation.ts`: Animation configuration
-    - `background.ts`: Background configuration
-    - `design.ts`: Design configuration
-    - `layout_game.ts`: Game layout configuration
-    - `layout_load.ts`: Load layout configuration
-    - `layout.ts`: General layout configuration
-    - `perspective.ts`: Perspective configuration
+  - `ui/`: Angular HTML/CSS components for matchmaking (`matchmaking_overlay`, `loading_status`, `online_indicator`, `version_indicator`), in-game HUD (`game_hud`, `preloader`, `action_pool`, `countdown_indicator`, `combat_range_indicator`, `battle_action_buttons`, `continue_button`, `exit_button`, `prompt`), and overlays/modals (`zoom_card`, `option_picker`, `game_over_indicator`, `connection_lost`)
+  - `scenes/`: Thin Phaser board adapters (`game.ts`, `matchmaking.ts`) rendering the space background, zone markers, interactive card board, and battle FX
+  - `components/`: Phaser board components (`background.ts`, `perspective.ts`, `buttons/retract_card_button.ts`, `card/`, `indicators/attack_damage_indicator.ts`, `indicators/value_indicator.ts`)
+  - `config/`: Game configuration (`animation.ts`, `background.ts`, `design.ts`, `layout_game.ts`, `layout_load.ts`, `layout.ts`, `perspective.ts`; design tokens mirrored in `styles/_design_tokens.scss`)
   - `testing/`: Shared test utilities
     - `phaser_stubs.ts`: Chainable Phaser game object, scene and system stubs for the client specs
   - `utils/`: Utility classes
@@ -324,11 +308,11 @@ The `misc` directory contains the pipeline that turns the designed cards into da
 #### Card Images
 
 - Card PNGs are renamed by `misc/cards/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/cards/card_bulk_resize.sh` to 411×561 px (ImageMagick).
-- The client loads card images per match from `<assetBaseURL>/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
+- The client loads card images per match from `<assetBaseURL>/cards/<id>.png` (`client/src/app/services/asset_preloader_service.ts`), including ID 0 for the colony.
 
 #### Client Runtime Assets
 
-The client loads all runtime assets directly from the configured asset host (`environment.urls.assets`) on deployed stages, falling back to the development-only `<apiURL>/assets/` proxy locally (see `resource-loader.ts`):
+The client loads all runtime assets directly from the configured asset host (`environment.urls.assets`) on deployed stages, falling back to the development-only `<apiURL>/assets/` proxy locally (see `asset_preloader_service.ts`):
 
 - `background/`: starfields, sun, orbs, rings and vessel sprites
 - `attribute/`: stat icons (`damage`, `hp`, `control`, `speed`, `energy`, `armour`, `shield`, `point_defense`) and socket glyphs (`theta`, `xi`, `phi`, `omega`, `delta`, `psi`)

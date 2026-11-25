@@ -1,3 +1,23 @@
 #game {
+  width: 100%;
+  height: 100%;
   margin: auto;
+}
+
+.ui-viewport-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ui-stage-overlay {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  container-type: size;
+  pointer-events: none;
 }

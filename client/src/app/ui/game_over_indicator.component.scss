@@ -1,0 +1,100 @@
+.game-over-indicator {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.banner-wrap {
+  position: relative;
+  width: clamp(320px, 44cqw, 1050px);
+  overflow: hidden;
+  opacity: 0;
+  animation: oc-game-over-fade 1500ms ease-out forwards;
+}
+
+.banner-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.banner-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 25%, rgb(255 255 255 / 35%) 48%, transparent 70%);
+  transform: translateX(-120%);
+  animation: oc-game-over-shine 1600ms ease-in-out 1500ms forwards;
+}
+
+.title,
+.subtitle,
+.sol-gain {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  white-space: nowrap;
+  text-shadow:
+    0 2px 12px rgb(0 0 0 / 90%),
+    0 0 24px rgb(0 0 0 / 70%);
+}
+
+.title {
+  top: calc(50% - 7.4cqh);
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-giant);
+  color: var(--oc-color-neutral);
+  opacity: 0;
+  animation: oc-game-over-fade 1500ms ease-out 800ms forwards;
+}
+
+.subtitle {
+  top: calc(50% - 1.5cqh);
+  font-family: var(--oc-font-text);
+  font-size: var(--oc-font-size-large);
+  color: var(--oc-color-neutral);
+  opacity: 0;
+  animation: oc-game-over-fade 1500ms ease-out 1600ms forwards;
+}
+
+.sol-gain {
+  font-family: var(--oc-font-text);
+  font-size: var(--oc-font-size-normal);
+  color: var(--oc-color-player);
+  opacity: 0;
+  animation: oc-game-over-fade 400ms ease-out 3100ms forwards;
+
+  &.winner {
+    top: calc(50% + 18.5cqh);
+  }
+
+  &.loser {
+    top: calc(50% + 14.8cqh);
+  }
+}
+
+@keyframes oc-game-over-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes oc-game-over-shine {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}

@@ -1,0 +1,26 @@
+:root {
+  --oc-alpha-normal: 0.8;
+  --oc-alpha-faded: 0.3;
+  --oc-alpha-transparent: 0.1;
+
+  --oc-color-dark: #000000;
+  --oc-color-faded: #666666;
+  --oc-color-neutral: #ffffff;
+  --oc-color-hover: #eeeeaa;
+  --oc-color-warn: #991111;
+  --oc-color-point-defense: #999911;
+  --oc-color-shield: #119999;
+  --oc-color-armour: #999999;
+  --oc-color-damage: #991111;
+  --oc-color-player: #119999;
+  --oc-color-opponent: #991111;
+
+  --oc-font-caption: "latin-modern-mono-caps", monospace;
+  --oc-font-text: "latin-modern-sans", sans-serif;
+
+  // Scaled against the 2400x1350 stage container with readable floors for smaller screens
+  --oc-font-size-small: clamp(11px, 0.8333cqw, 22px);
+  --oc-font-size-normal: clamp(13px, 1.1667cqw, 30px);
+  --oc-font-size-large: clamp(16px, 1.5cqw, 38px);
+  --oc-font-size-giant: clamp(44px, 6.25cqw, 150px);
+}

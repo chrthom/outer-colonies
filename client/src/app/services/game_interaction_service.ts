@@ -4,7 +4,7 @@ import { BattleType, InterventionType, TurnPhase } from '@shared/config/enums';
 import { rules } from '@shared/config/rules';
 import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
 import { ClientCardStack, ClientHandCard, ClientState } from '@shared/interfaces/client_state';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, map, merge } from 'rxjs';
 import { animationConfig } from '../config/animation';
 import { SocketService } from '../socket_service';
 import { GameSessionService } from './game_session_service';
@@ -73,6 +73,13 @@ export interface OptionPickerViewModel {
   visibleOptions: Array<{ absoluteIndex: number; cardId: number; selected: boolean }>;
 }
 
+/** Active hovered/right-click card preview state in stage-percentage coordinates. */
+export interface ZoomCardState {
+  cardId: number;
+  xPercent: number;
+  yPercent: number;
+}
+
 /** Automatic Ready message a pending player emits when unable to act. */
 interface AutoReadyAction {
   delay: number;
@@ -92,23 +99,40 @@ export class GameInteractionService implements OnDestroy {
   plannedBattle: ClientPlannedBattle = ClientPlannedBattleHelper.empty;
   interceptShipIds: string[] = [];
 
+  private readonly gameSession = inject(GameSessionService);
+  private readonly socketService = inject(SocketService);
+  private readonly scheduler = inject(SchedulerService);
+
   private readonly viewChangedSubject = new Subject<void>();
+  private readonly returnToMatchmakingSubject = new Subject<void>();
+  private readonly zoomCardSubject = new BehaviorSubject<ZoomCardState | undefined>(undefined);
+  private readonly promptVisibleSubject = new BehaviorSubject<boolean>(false);
   private readonly pendingOptionPickerSubject = new BehaviorSubject<PendingOptionPickerState | undefined>(
     undefined
   );
 
   /** Emits whenever local interaction state changes and the view should refresh. */
   readonly viewChanged$: Observable<void> = this.viewChangedSubject.asObservable();
+  /** Emits whenever any HUD-relevant state, interaction, or connection change settles. */
+  readonly hudRefresh$: Observable<void> = merge(
+    this.gameSession.syncViewStep$,
+    this.viewChangedSubject,
+    this.gameSession.connectionLost$
+  ).pipe(map(() => undefined));
+  /** Emits when the user chooses to return to matchmaking after game over. */
+  readonly returnToMatchmaking$: Observable<void> = this.returnToMatchmakingSubject.asObservable();
+  /** Emits the active zoomed card preview state, or `undefined` when hidden. */
+  readonly zoomCard$: Observable<ZoomCardState | undefined> = this.zoomCardSubject.asObservable();
+  /** Whether the phase/waiting prompt box should currently be shown. */
+  readonly promptVisible$: Observable<boolean> = this.promptVisibleSubject.asObservable();
   /** Emits the current pending option picker state, or `undefined` when closed. */
   readonly pendingOptionPicker$: Observable<PendingOptionPickerState | undefined> =
     this.pendingOptionPickerSubject.asObservable();
 
-  private readonly gameSession = inject(GameSessionService);
-  private readonly socketService = inject(SocketService);
-  private readonly scheduler = inject(SchedulerService);
-
   private autoReadyCancel?: () => void;
   private autoReadyState?: ClientState;
+  private promptAutoCancel?: () => void;
+  private promptHovered = false;
   private readonly subscriptions = new Subscription();
 
   constructor() {
@@ -116,6 +140,7 @@ export class GameInteractionService implements OnDestroy {
       this.gameSession.stateReceived$.subscribe(state => {
         this.resetSelection();
         this.cancelPendingAutoReady();
+        this.hideZoomCard();
         const picker = this.pendingOptionPickerSubject.value;
         if (picker && !this.isOptionPickerValidFor(state, picker)) {
           this.pendingOptionPickerSubject.next(undefined);
@@ -125,12 +150,17 @@ export class GameInteractionService implements OnDestroy {
     this.subscriptions.add(
       this.gameSession.syncViewStep$.subscribe(() => {
         this.syncAutoReady();
+        this.syncPromptVisibility();
       })
     );
     this.subscriptions.add(
       this.gameSession.connectionLost$.subscribe(lost => {
         if (lost) {
           this.cancelPendingAutoReady();
+          this.hideZoomCard();
+          this.promptHovered = false;
+          this.cancelPromptAutoHide();
+          this.promptVisibleSubject.next(false);
           if (this.pendingOptionPickerSubject.value) {
             this.pendingOptionPickerSubject.next(undefined);
           }
@@ -140,6 +170,10 @@ export class GameInteractionService implements OnDestroy {
     this.subscriptions.add(
       this.gameSession.sessionStopped$.subscribe(() => {
         this.cancelPendingAutoReady();
+        this.hideZoomCard();
+        this.promptHovered = false;
+        this.cancelPromptAutoHide();
+        this.promptVisibleSubject.next(false);
         if (this.pendingOptionPickerSubject.value) {
           this.pendingOptionPickerSubject.next(undefined);
         }
@@ -160,6 +194,10 @@ export class GameInteractionService implements OnDestroy {
   reset(battleType?: BattleType): void {
     this.resetSelection(battleType);
     this.cancelPendingAutoReady();
+    this.hideZoomCard();
+    this.promptHovered = false;
+    this.cancelPromptAutoHide();
+    this.promptVisibleSubject.next(false);
     if (this.pendingOptionPickerSubject.value) {
       this.pendingOptionPickerSubject.next(undefined);
     }
@@ -300,6 +338,7 @@ export class GameInteractionService implements OnDestroy {
     const state = this.gameSession.state;
     if (state.gameResult) {
       this.cancelAutoReadyTimer();
+      this.returnToMatchmakingSubject.next();
       return 'matchmaking';
     }
     if (!state.playerPendingAction) return 'none';
@@ -498,6 +537,51 @@ export class GameInteractionService implements OnDestroy {
         autoReady.emit();
       });
     }
+  }
+
+  /**
+   * Toggles the zoomed card preview overlay for a board/hand card.
+   */
+  toggleZoomCard(cardId: number, xPercent: number, yPercent: number): void {
+    if (this.zoomCardSubject.value) {
+      this.hideZoomCard();
+    } else {
+      this.zoomCardSubject.next({ cardId, xPercent, yPercent });
+    }
+  }
+
+  /**
+   * Updates the pointer anchor of an active zoomed card preview.
+   */
+  updateZoomCardPosition(xPercent: number, yPercent: number): void {
+    const current = this.zoomCardSubject.value;
+    if (!current) return;
+    this.zoomCardSubject.next({ ...current, xPercent, yPercent });
+  }
+
+  /**
+   * Hides the zoomed card preview overlay if visible.
+   */
+  hideZoomCard(): void {
+    if (this.zoomCardSubject.value) {
+      this.zoomCardSubject.next(undefined);
+    }
+  }
+
+  /**
+   * Shows or hides the prompt box when hovering/focusing the continue button.
+   */
+  setContinueHover(hovered: boolean): void {
+    const vm = this.getPromptState();
+    if (vm.isGameOver) {
+      this.promptHovered = false;
+      this.cancelPromptAutoHide();
+      this.promptVisibleSubject.next(false);
+      return;
+    }
+    this.promptHovered = hovered;
+    this.cancelPromptAutoHide();
+    this.promptVisibleSubject.next(hovered);
   }
 
   /**
@@ -790,7 +874,36 @@ export class GameInteractionService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.cancelPendingAutoReady();
+    this.cancelPromptAutoHide();
     this.subscriptions.unsubscribe();
+  }
+
+  private syncPromptVisibility(): void {
+    const vm = this.getPromptState();
+    this.cancelPromptAutoHide();
+    if (vm.isGameOver) {
+      this.promptHovered = false;
+      this.promptVisibleSubject.next(false);
+      return;
+    }
+    if (vm.visible) {
+      this.promptVisibleSubject.next(true);
+      if (vm.autoHide) {
+        this.promptAutoCancel = this.scheduler.schedule(animationConfig.duration.promptShow, () => {
+          this.promptAutoCancel = undefined;
+          if (!this.promptHovered) {
+            this.promptVisibleSubject.next(false);
+          }
+        });
+      }
+    } else {
+      this.promptVisibleSubject.next(this.promptHovered);
+    }
+  }
+
+  private cancelPromptAutoHide(): void {
+    this.promptAutoCancel?.();
+    this.promptAutoCancel = undefined;
   }
 
   private cancelPendingAutoReady(): void {

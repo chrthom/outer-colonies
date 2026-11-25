@@ -1,3 +1,5 @@
+@use "./styles/design_tokens";
+
 html,
 body {
   width: 100%;
@@ -5,8 +7,11 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: black;
+  background-color: var(--oc-color-dark);
+  color: var(--oc-color-neutral);
+  font-family: var(--oc-font-text);
 }
+
 @font-face {
   font-family: "latin-modern-sans";
   src:
@@ -14,10 +19,36 @@ body {
     url("https://assets.outercolonies.de/fonts/latin-modern-sans.woff") format("woff"),
     url("https://assets.outercolonies.de/fonts/latin-modern-sans.ttf") format("truetype");
 }
+
 @font-face {
   font-family: "latin-modern-mono-caps";
   src:
     url("https://assets.outercolonies.de/fonts/latin-modern-mono-caps.woff2") format("woff2"),
     url("https://assets.outercolonies.de/fonts/latin-modern-mono-caps.woff") format("woff"),
     url("https://assets.outercolonies.de/fonts/latin-modern-mono-caps.ttf") format("truetype");
+}
+
+button.oc-unstyled-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--oc-color-hover);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

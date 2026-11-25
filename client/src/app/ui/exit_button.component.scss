@@ -1,0 +1,48 @@
+.exit-button-group {
+  position: absolute;
+  right: 3.125%;
+  top: 51.85%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45cqw;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.exit-button,
+.confirm-button {
+  pointer-events: auto;
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-normal);
+  color: var(--oc-color-neutral);
+  min-height: 36px;
+  transition: color 120ms ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--oc-color-warn);
+  }
+}
+
+.exit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7cqw;
+
+  .icon {
+    width: clamp(20px, 1.67cqw, 40px);
+    height: clamp(20px, 1.67cqw, 40px);
+    background-color: currentColor;
+    mask-image: var(--oc-icon-url);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    flex-shrink: 0;
+  }
+}
+
+.confirm-button {
+  margin-right: clamp(24px, 2.35cqw, 52px);
+}

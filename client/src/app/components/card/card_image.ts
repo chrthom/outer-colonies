@@ -203,16 +203,22 @@ export default class CardImage {
     return Phaser.Math.RadToDeg(this.image.modelRotation.z);
   }
   enableMaximizeOnRightclick(): this {
+    const toPercent = (pointer: Phaser.Input.Pointer) => ({
+      xPercent: (pointer.x / layoutConfig.scene.width) * 100,
+      yPercent: (pointer.y / layoutConfig.scene.height) * 100
+    });
     this.image
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.rightButtonDown()) {
-          const maxCard = this.scene.obj.zoomCard;
-          if (maxCard.image.visible) this.scene.obj.zoomCard.hide();
-          else this.scene.obj.zoomCard.show(this.cardId);
+          const { xPercent, yPercent } = toPercent(p);
+          this.scene.interaction.toggleZoomCard(this.cardId, xPercent, yPercent);
         }
       })
-      .on('pointerout', () => this.scene.obj.zoomCard.hide())
-      .on('pointermove', () => this.scene.obj.zoomCard.updatePosition());
+      .on('pointerout', () => this.scene.interaction.hideZoomCard())
+      .on('pointermove', (p: Phaser.Input.Pointer) => {
+        const { xPercent, yPercent } = toPercent(p);
+        this.scene.interaction.updateZoomCardPosition(xPercent, yPercent);
+      });
     return this;
   }
   tween(config: CardTweenConfig) {

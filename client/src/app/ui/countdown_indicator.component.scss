@@ -1,0 +1,23 @@
+.countdown-indicator {
+  position: absolute;
+  right: 3.125%;
+  transform: translateY(-50%);
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-normal);
+  color: var(--oc-color-neutral);
+  text-align: right;
+  white-space: pre;
+  pointer-events: none;
+
+  &.player {
+    top: 38.89%;
+  }
+
+  &.opponent {
+    top: 35.19%;
+  }
+
+  &.warning {
+    color: var(--oc-color-warn);
+  }
+}

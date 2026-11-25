@@ -4,5 +4,6 @@
 export const SERVICE_REGISTRY_KEYS = {
   matchmaking: 'matchmakingService',
   gameSession: 'gameSessionService',
-  gameInteraction: 'gameInteractionService'
+  gameInteraction: 'gameInteractionService',
+  assetPreloader: 'assetPreloaderService'
 } as const;
