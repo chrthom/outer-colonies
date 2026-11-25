@@ -44,6 +44,12 @@ export default class Matchmaking extends Phaser.Scene {
     this.subscriptions?.unsubscribe();
     const sub = new Subscription();
     sub.add(
+      this.matchmaking.matchStart$.subscribe(gameParams => {
+        this.scene.start('Game', { gameParams });
+      })
+    );
+    this.matchmaking.start();
+    sub.add(
       this.matchmaking.statusText$.subscribe(text => {
         this.status.setText(text);
       })
@@ -55,13 +61,7 @@ export default class Matchmaking extends Phaser.Scene {
         }
       })
     );
-    sub.add(
-      this.matchmaking.matchStart$.subscribe(gameParams => {
-        this.scene.start('Game', { gameParams });
-      })
-    );
     this.subscriptions = sub;
-    this.matchmaking.start();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.subscriptions?.unsubscribe();

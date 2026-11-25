@@ -52,7 +52,7 @@ describe('Matchmaking scene - service view adapter', () => {
 
   it('starts the MatchmakingService when bound', () => {
     expect(serviceStub.start).toHaveBeenCalledTimes(1);
-    expect((matchmakingScene as unknown as MatchmakingService) !== undefined).toBeTrue();
+    expect(matchmakingScene.matchmaking).toBe(serviceStub as unknown as MatchmakingService);
   });
 
   it('updates LoadingStatus text when statusText$ emits', () => {

@@ -42,10 +42,6 @@ export default class HandCard extends CardImage {
       angle: this.shortestAngle(this.targetAngle)
     });
   }
-  highlightPlayability() {
-    this.highlightReset();
-    if (this.data.playable) this.highlightSelectable();
-  }
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)

@@ -1,7 +1,6 @@
 import { EnvironmentInjector, createEnvironmentInjector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import ClientGameParams from '@shared/interfaces/client_game_params';
-import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
 import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { Subject } from 'rxjs';
 import Game from '../scenes/game';
@@ -242,7 +241,6 @@ export interface SceneStub {
   add: AddStub;
   getPlayerState: jasmine.Spy;
   getPlayerUI: jasmine.Spy;
-  retractCardsExist: boolean;
   /**
    * Scene state; defaults to a deep copy of `emptyClientState` so no spec can
    * corrupt the shared constant. Pass `undefined` to mimic a scene without
@@ -251,10 +249,6 @@ export interface SceneStub {
   state?: ClientState;
   time: TimeStub;
   tweens: TweensStub;
-  /** The battle the player is planning; defaults to `ClientPlannedBattleHelper.empty` like the `Game` scene. */
-  plannedBattle?: ClientPlannedBattle;
-  /** The ships the player selected for interception; defaults to `[]` like the `Game` scene. */
-  interceptShipIds: string[];
   /** Fixed UI elements; defaults to a fresh `makeObjStub()`. */
   obj?: ObjStub;
   /** Game parameters; only set on a game scene, so their absence mimics a matchmaking scene. */
@@ -314,11 +308,8 @@ export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
     add: makeAddStub(),
     getPlayerState: jasmine.createSpy('getPlayerState'),
     getPlayerUI: jasmine.createSpy('getPlayerUI'),
-    retractCardsExist: false,
     time,
     tweens: makeTweensStub(),
-    plannedBattle: ClientPlannedBattleHelper.empty,
-    interceptShipIds: [],
     obj: makeObjStub(),
     socket,
     session,

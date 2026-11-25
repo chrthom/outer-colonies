@@ -2,7 +2,6 @@ import CardStack from './card_stack';
 import Card from './card';
 import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import { EventType, Zone } from '@shared/config/enums';
-import { constants } from '@shared/config/constants';
 import { designConfig } from '../../config/design';
 import { layoutConfig } from '../../config/layout';
 import { animationConfig } from '../../config/animation';
@@ -80,9 +79,6 @@ function makeScene(): any {
     interaction: {
       retractCard: jasmine.createSpy('interaction.retractCard'),
       clickCardStack: jasmine.createSpy('interaction.clickCardStack'),
-      canPerformAllAttackOnBase: jasmine
-        .createSpy('interaction.canPerformAllAttackOnBase')
-        .and.returnValue(false),
       isStackExpandableOnHover: jasmine
         .createSpy('interaction.isStackExpandableOnHover')
         .and.returnValue(true)
@@ -136,41 +132,6 @@ describe('CardStack', () => {
     it('reflects the value in data', () => {
       expect(makeCardStack({ ownedByPlayer: true }).ownedByPlayer).toBeTrue();
       expect(makeCardStack({ ownedByPlayer: false }).ownedByPlayer).toBeFalse();
-    });
-  });
-
-  describe('isOpponentColony', () => {
-    const card = (id: number) => ({
-      uuid: `u-${id}`,
-      id,
-      index: 0,
-      battleReady: false,
-      retractable: false,
-      insufficientEnergy: false
-    });
-
-    it('is true only for an opponent stack whose last card is the colony card', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [card(1), card(constants.colonyID)] });
-      expect(cs.isOpponentColony).toBeTrue();
-    });
-
-    it('is false when the stack is owned by the player', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: true, cards: [card(constants.colonyID)] });
-      expect(cs.isOpponentColony).toBeFalse();
-    });
-
-    it('is false when the opponent stack ends with a non-colony card', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [card(constants.colonyID), card(42)] });
-      expect(cs.isOpponentColony).toBeFalse();
-    });
-
-    it('is false when the stack has no cards', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [] });
-      expect(cs.isOpponentColony).toBeFalse();
     });
   });
 

@@ -39,6 +39,7 @@ export class GameSessionService implements OnDestroy {
   private readonly isAttackAnimatingSubject = new BehaviorSubject<boolean>(false);
 
   private readonly stateReceivedSubject = new Subject<ClientState>();
+  private readonly sessionStoppedSubject = new Subject<void>();
   private readonly attackAnimationSubject = new Subject<ClientAttack>();
   private readonly syncBoardStepSubject = new Subject<ClientState>();
   private readonly syncHandStepSubject = new Subject<ClientState>();
@@ -56,6 +57,8 @@ export class GameSessionService implements OnDestroy {
 
   /** Emits synchronously when a new state arrives, before sequenced animation steps start. */
   readonly stateReceived$: Observable<ClientState> = this.stateReceivedSubject.asObservable();
+  /** Emits whenever the active match session is stopped or left. */
+  readonly sessionStopped$: Observable<void> = this.sessionStoppedSubject.asObservable();
   /** Emits when an incoming state carries a recent attack to animate. */
   readonly attackAnimation$: Observable<ClientAttack> = this.attackAnimationSubject.asObservable();
   /** Sequencer step 1: reconcile board card stacks. */
@@ -157,6 +160,7 @@ export class GameSessionService implements OnDestroy {
     this.cancelAttackTimer?.();
     this.cancelAttackTimer = undefined;
     this.isAttackAnimatingSubject.next(false);
+    this.sessionStoppedSubject.next();
   }
 
   /**

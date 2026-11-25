@@ -53,6 +53,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.matchmakingService.stop();
     this.gameSessionService.stopSession();
+    this.gameInteractionService.reset();
     this.socketService.disconnect();
     this.phaserGame?.destroy(true);
     this.phaserGame = undefined;
