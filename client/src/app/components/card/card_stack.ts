@@ -6,7 +6,6 @@ import Card from './card';
 import { animationConfig } from '../../config/animation';
 import AttackDamageIndicator from '../indicators/attack_damage_indicator';
 import CardImage from './card_image';
-import { constants } from '@shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
@@ -100,9 +99,6 @@ export default class CardStack {
   get ownedByPlayer() {
     return this.data.ownedByPlayer;
   }
-  get isOpponentColony(): boolean {
-    return !this.ownedByPlayer && this.data.cards.slice(-1).pop()?.id == constants.colonyID;
-  }
   get targetX(): CardXPosition {
     let zoneWidth =
       this.data.zone == Zone.Neutral
@@ -156,9 +152,6 @@ export default class CardStack {
   }
   get maxIndex(): number {
     return Math.max(...this.data.cards.map(c => c.index));
-  }
-  get canPerformAllAttackOnBase(): boolean {
-    return this.scene.interaction.canPerformAllAttackOnBase(this.data);
   }
   private pointerover() {
     if (this.discarded) return;

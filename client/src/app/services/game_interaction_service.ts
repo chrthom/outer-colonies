@@ -137,6 +137,14 @@ export class GameInteractionService implements OnDestroy {
         }
       })
     );
+    this.subscriptions.add(
+      this.gameSession.sessionStopped$.subscribe(() => {
+        this.cancelPendingAutoReady();
+        if (this.pendingOptionPickerSubject.value) {
+          this.pendingOptionPickerSubject.next(undefined);
+        }
+      })
+    );
   }
 
   /** Currently active option picker state, if any. */

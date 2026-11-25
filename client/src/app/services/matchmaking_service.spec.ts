@@ -108,6 +108,20 @@ describe('MatchmakingService', () => {
   });
 
   describe('lifecycle cleanup', () => {
+    it('clears onlineCount on stop() so returning to matchmaking does not replay a stale count', () => {
+      service.start('?token=tok-1');
+      socketService.onlineCount$.next(14);
+      expect(service.onlineCount).toBe(14);
+
+      service.stop();
+      expect(service.onlineCount).toBeUndefined();
+
+      const replayed: Array<number | undefined> = [];
+      const sub = service.onlineCount$.subscribe(count => replayed.push(count));
+      expect(replayed).toEqual([undefined]);
+      sub.unsubscribe();
+    });
+
     it('unsubscribes from socket streams on stop() without disconnecting the socket', () => {
       const received: ClientGameParams[] = [];
       const sub = service.matchStart$.subscribe(params => received.push(params));

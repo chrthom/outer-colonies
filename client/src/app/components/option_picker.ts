@@ -37,9 +37,6 @@ export default class OptionPicker {
     this.scene = scene;
     this.handCardUUID = handCardUUID;
     this.targetUUID = targetUUID;
-    if (!this.scene.interaction.pendingOptionPicker) {
-      this.scene.interaction.openOptionPicker(handCardUUID, targetUUID, options, optionsToSelect);
-    }
 
     this.backgroundOverlay = this.scene.add
       .rectangle(
@@ -157,6 +154,9 @@ export default class OptionPicker {
     this.escapeKey = this.scene.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, true);
     this.escapeKey?.on('down', () => this.cancel());
     this.scene.obj.optionPicker = this;
+    if (!this.scene.interaction.pendingOptionPicker) {
+      this.scene.interaction.openOptionPicker(handCardUUID, targetUUID, options, optionsToSelect);
+    }
     this.sync();
   }
 

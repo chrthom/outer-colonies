@@ -115,6 +115,7 @@ export class MatchmakingService implements OnDestroy {
   stop(): void {
     this.subscriptions?.unsubscribe();
     this.subscriptions = undefined;
+    this.onlineCountSubject.next(undefined);
   }
 
   /**

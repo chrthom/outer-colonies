@@ -302,6 +302,114 @@ describe('GameInteractionService', () => {
       session.handleDisconnect();
       expect(service.pendingOptionPicker).toBeUndefined();
     });
+
+    it('closes a pending option picker when the session stops', () => {
+      setupOptionCardState();
+      service.clickHandCard('hand-opt');
+      service.clickCardStack('target-1');
+      expect(service.pendingOptionPicker).toBeDefined();
+
+      session.stopSession();
+      expect(service.pendingOptionPicker).toBeUndefined();
+    });
+
+    describe('isOptionPickerValidFor', () => {
+      function openPickerState(over: Partial<ClientState> = {}): ClientState {
+        const hand = makeHandCard('hand-opt', {
+          validTargets: ['target-1'],
+          options: [101, 102, 103],
+          optionsToSelect: 2
+        });
+        const target = makeStack('target-1', { ownedByPlayer: false });
+        return makeState({
+          playerPendingAction: true,
+          playerIsActive: true,
+          turnPhase: TurnPhase.Build,
+          player: { ...emptyClientState.player, hand: [hand] },
+          cardStacks: [target],
+          ...over
+        });
+      }
+
+      beforeEach(() => {
+        session.applyState(openPickerState());
+        service.clickHandCard('hand-opt');
+        service.clickCardStack('target-1');
+      });
+
+      it('accepts a state in which the pending action is still possible', () => {
+        expect(service.isOptionPickerValidFor(openPickerState())).toBeTrue();
+      });
+
+      it('rejects a state without a pending player action', () => {
+        expect(service.isOptionPickerValidFor(openPickerState({ playerPendingAction: false }))).toBeFalse();
+      });
+
+      it('rejects a state in which the player is no longer active', () => {
+        expect(service.isOptionPickerValidFor(openPickerState({ playerIsActive: false }))).toBeFalse();
+      });
+
+      it('rejects a state outside the build phase', () => {
+        expect(service.isOptionPickerValidFor(openPickerState({ turnPhase: TurnPhase.Combat }))).toBeFalse();
+      });
+
+      it('rejects a state with an intervention', () => {
+        expect(
+          service.isOptionPickerValidFor(
+            openPickerState({
+              intervention: { type: InterventionType.TacticCard, rootType: InterventionType.TacticCard }
+            })
+          )
+        ).toBeFalse();
+      });
+
+      it('rejects a state with a game result', () => {
+        expect(
+          service.isOptionPickerValidFor(
+            openPickerState({ gameResult: { won: false, type: GameResultType.Surrender, sol: 0 } })
+          )
+        ).toBeFalse();
+      });
+
+      it('rejects a state in which the hand card is no longer in hand', () => {
+        expect(
+          service.isOptionPickerValidFor(
+            openPickerState({ player: { ...emptyClientState.player, hand: [] } })
+          )
+        ).toBeFalse();
+      });
+
+      it('rejects a state in which the hand card is no longer playable', () => {
+        const hand = [
+          makeHandCard('hand-opt', {
+            playable: false,
+            validTargets: ['target-1'],
+            options: [101, 102, 103],
+            optionsToSelect: 2
+          })
+        ];
+        expect(
+          service.isOptionPickerValidFor(openPickerState({ player: { ...emptyClientState.player, hand } }))
+        ).toBeFalse();
+      });
+
+      it('rejects a state in which the target stack no longer exists', () => {
+        expect(service.isOptionPickerValidFor(openPickerState({ cardStacks: [] }))).toBeFalse();
+      });
+
+      it('rejects a state in which the target is no longer a valid target of the hand card', () => {
+        const hand = [
+          makeHandCard('hand-opt', {
+            validTargets: ['other-target'],
+            options: [101, 102, 103],
+            optionsToSelect: 2
+          })
+        ];
+        expect(
+          service.isOptionPickerValidFor(openPickerState({ player: { ...emptyClientState.player, hand } }))
+        ).toBeFalse();
+      });
+    });
   });
 
   describe('battle planning & interception', () => {
@@ -402,6 +510,45 @@ describe('GameInteractionService', () => {
         'opp-colony'
       );
     });
+
+    it('restricts canPerformAllAttackOnBase to an opponent colony at range 1 with no active selection', () => {
+      const oppColony = makeStack('opp-colony', {
+        ownedByPlayer: false,
+        cards: [makeCard('col-card', { id: constants.colonyID })]
+      });
+      const playerColony = makeStack('player-colony', {
+        ownedByPlayer: true,
+        cards: [makeCard('p-col-card', { id: constants.colonyID })]
+      });
+      const oppShip = makeStack('opp-ship', {
+        ownedByPlayer: false,
+        cards: [makeCard('col-card', { id: constants.colonyID }), makeCard('ship-card', { id: 42 })]
+      });
+      const emptyStack = makeStack('empty', { ownedByPlayer: false, cards: [] });
+
+      session.applyState(
+        makeState({
+          playerPendingAction: true,
+          turnPhase: TurnPhase.Combat,
+          battle: { type: BattleType.Raid, playerShipIds: [], opponentShipIds: ['opp-colony'], range: 2 },
+          cardStacks: [oppColony, playerColony, oppShip, emptyStack]
+        })
+      );
+      expect(service.canPerformAllAttackOnBase(oppColony)).toBeFalse();
+
+      session.applyState(
+        makeState({
+          playerPendingAction: true,
+          turnPhase: TurnPhase.Combat,
+          battle: { type: BattleType.Raid, playerShipIds: [], opponentShipIds: ['opp-colony'], range: 1 },
+          cardStacks: [oppColony, playerColony, oppShip, emptyStack]
+        })
+      );
+      expect(service.canPerformAllAttackOnBase(oppColony)).toBeTrue();
+      expect(service.canPerformAllAttackOnBase(playerColony)).toBeFalse();
+      expect(service.canPerformAllAttackOnBase(oppShip)).toBeFalse();
+      expect(service.canPerformAllAttackOnBase(emptyStack)).toBeFalse();
+    });
   });
 
   describe('auto-ready scheduling', () => {
@@ -459,6 +606,19 @@ describe('GameInteractionService', () => {
       scheduler.fireAll();
 
       expect(socketService.emitReady).toHaveBeenCalledWith(TurnPhase.Build, []);
+    });
+
+    it('cancels a queued auto-ready timer when stopSession() is called', () => {
+      session.applyState(combatState());
+      scheduler.fireNext(); // Board step
+      scheduler.fireNext(); // Hand + view step -> queues auto-ready
+      expect(scheduler.activeDelays()).toContain(animationConfig.duration.attack);
+
+      session.stopSession();
+      expect(scheduler.activeDelays()).toEqual([]);
+
+      scheduler.fireAll();
+      expect(socketService.emitReady).not.toHaveBeenCalled();
     });
   });
 
