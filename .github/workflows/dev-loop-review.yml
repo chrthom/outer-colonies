@@ -48,8 +48,8 @@ jobs:
       MAX_TOKENS: '4000000'
       TIME_LIMIT_SEC: '3600'
       TIME_LIMIT_MIN: '60'
-      OPENCODE_VERSION: '2.0.26'
-      MAX_DENIED_STREAK: '6'
+      VIBE_VERSION: '3.1.5'
+      VIBE_MODEL: 'zai-glm-5-3'
       MAX_ITERATIONS: '8'
     steps:
       - name: Checkout repository
@@ -392,25 +392,27 @@ jobs:
           echo "--- rendered prompt ---"
           cat out/reviewer.rendered.md
 
-      - name: Install opencode
+      - name: Install vibe
         if: steps.gate.outputs.skip != 'true'
         run: |
-          # The v2 installer (npm package @opencode/cli) installs to
-          # ~/.opencode/bin; the v1 installer at https://opencode.ai/install
-          # ships 1.x and cannot reach 2.x releases.
-          curl -fsSL https://opencode.ai/v2/install | bash -s -- --version "$OPENCODE_VERSION"
-          export PATH="$HOME/.opencode/bin:$PATH"
-          command -v opencode
-          # The invocation below is verified against this exact version; the
-          # v1 -> v2 CLI surface moved substantially (auth/provider/config
-          # flags, managed-service architecture, event schema).
-          opencode --version | grep -F "$OPENCODE_VERSION" || {
-            echo "::error::Installed opencode version does not match the expected $OPENCODE_VERSION - verify the invocation against the new CLI surface before rerunning"
+          export UV_SYSTEM_CERTS=true
+          if ! command -v uv >/dev/null 2>&1; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            export PATH="$HOME/.local/bin:$PATH"
+          fi
+          uv tool install --force --python cpython-3.14+gil "mistral-vibe==$VIBE_VERSION" 2>/dev/null \
+            || { uv python install cpython-3.14 && uv tool install --force --python cpython-3.14+gil "mistral-vibe==$VIBE_VERSION"; }
+          vibe_bin_dir="$(uv --color never tool dir --bin)"
+          echo "$vibe_bin_dir" >> "$GITHUB_PATH"
+          export PATH="$vibe_bin_dir:$PATH"
+          command -v vibe
+          vibe --version | grep -F "$VIBE_VERSION" || {
+            echo "::error::Installed vibe version does not match the expected $VIBE_VERSION - verify the invocation against the new CLI surface before rerunning"
             exit 1
           }
 
-      - name: Run opencode reviewer
-        id: opencode
+      - name: Run vibe reviewer
+        id: vibe
         if: steps.gate.outputs.skip != 'true'
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -422,132 +424,65 @@ jobs:
           GH_TOKEN: ${{ secrets.DEV_LOOP_TOKEN_READONLY || secrets.DEV_LOOP_TOKEN }}
           DEV_LOOP_PR: ${{ steps.gate.outputs.pr_number }}
           DEV_LOOP_HEAD_SHA: ${{ steps.gate.outputs.head_sha }}
-          # Job-local config dir: MISTRAL_API_KEY must be the only credential
-          # source (stored auth would otherwise silently mask a rotated secret).
-          OPENCODE_CONFIG_DIR: ${{ runner.temp }}/opencode-config
-          OPENCODE_DISABLE_AUTOUPDATE: 'true'
-          # Websearch provider (misc/dev-loop.md): opencode v2 routes websearch and
-          # webfetch through a search provider; without a key every call errors (which
-          # also flips the run's exit code - see the rc=1 contract fallback). Pinned in
-          # the config below because headless --auto cannot answer the provider prompt.
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-          # The managed service binds a loopback port; never route it via a
-          # proxy. Env keys are case-insensitive, so this covers both the
-          # NO_PROXY and no_proxy spellings that tools check.
-          NO_PROXY: 127.0.0.1,localhost
+          # Job-local Vibe home: MISTRAL_API_KEY must be the only credential
+          # source (stored auth or keyring entries would otherwise silently mask
+          # a rotated secret).
+          VIBE_HOME: ${{ runner.temp }}/vibe-home
+          VIBE_TEST_DISABLE_KEYRING: '1'
         run: |
-          export PATH="$HOME/.opencode/bin:$PATH"
-          mkdir -p "$OPENCODE_CONFIG_DIR"
-          # Pin the websearch provider; skip when no key is configured so the tool
-          # is simply unavailable instead of erroring on a missing provider.
-          if [ -n "$TAVILY_API_KEY" ]; then
-            printf '{"websearch": {"provider": "tavily"}}\n' > "$OPENCODE_CONFIG_DIR/opencode.jsonc"
-            echo "opencode.jsonc: websearch provider pinned to tavily"
-          else
-            echo "TAVILY_API_KEY not set; websearch/webfetch stay disabled"
+          mkdir -p "$VIBE_HOME"
+          # Disable CI update checks and telemetry; register zai-glm-5-3 with
+          # Mistral's model-card pricing so --model always resolves even if the
+          # remote model catalog is unreachable and export.json reports cost_usd.
+          cat > "$VIBE_HOME/config.toml" <<'EOF'
+          enable_update_checks = false
+          enable_telemetry = false
+          EOF
+          if [ "$VIBE_MODEL" = "zai-glm-5-3" ]; then
+            cat >> "$VIBE_HOME/config.toml" <<'EOF'
+
+          [[models]]
+          name = "zai-glm-5-3"
+          provider = "mistral"
+          alias = "zai-glm-5-3"
+          display_name = "Z.ai GLM 5.3"
+          input_price = 1.4
+          output_price = 4.4
+          cached_input_price = 0.14
+          max_context_length = 1048576
+          supports_images = false
+          EOF
           fi
 
-          # Watchdog: consume the JSON event stream, tee it to a file, and kill
-          # opencode when the run degenerates:
-          #  - MAX_DENIED_STREAK consecutive failed/denied tool calls (state
-          #    "failed", or "completed" with a non-zero shell exit)
-          #  - MAX_TURNS steps (step_start events)
-          #  - MAX_TOKENS cumulative cost-weighted tokens: input + output +
-          #    cache.write + 0.1 * cache.read (cached tokens are billed at 10%,
-          #    so the cap means "N uncached-equivalent tokens")
-          run_watchdog() {
-            streak=0
-            steps=0
-            tokens=0
-            jq -c '
-              select(.type == "tool_use" or .type == "step_start" or .type == "step_finish")
-              | if .type == "tool_use" then {
-                    k: "tool",
-                    status: (.part.state.status // ""),
-                    exit: (.part.state.metadata.metadata.exit // 0)
-                  }
-                elif .type == "step_start" then { k: "step" }
-                else {
-                    k: "tokens",
-                    t: (
-                      (.part.tokens.input // 0)
-                      + (.part.tokens.output // 0)
-                      + (.part.tokens.cache.write // 0)
-                      + (0.1 * (.part.tokens.cache.read // 0))
-                    )
-                  }
-                end' 2>/dev/null \
-            | while IFS= read -r entry; do
-                k="$(printf '%s' "$entry" | jq -r '.k')"
-                case "$k" in
-                  step)
-                    steps=$((steps + 1))
-                    if [ "$steps" -ge "$MAX_TURNS" ]; then
-                      echo "watchdog: step limit $MAX_TURNS reached - killing opencode"
-                      pkill -TERM -f 'opencode run' || true
-                      exit 99
-                    fi
-                    ;;
-                  tokens)
-                    tt="$(printf '%s' "$entry" | jq -r '.t')"
-                    tokens=$(jq -n --argjson a "$tokens" --argjson b "$tt" '$a + $b | floor')
-                    if [ "$tokens" -ge "$MAX_TOKENS" ]; then
-                      echo "watchdog: token limit $MAX_TOKENS reached - killing opencode"
-                      pkill -TERM -f 'opencode run' || true
-                      exit 99
-                    fi
-                    ;;
-                  tool)
-                    status="$(printf '%s' "$entry" | jq -r '.status')"
-                    exit_code="$(printf '%s' "$entry" | jq -r '.exit')"
-                    if [ "$status" = "failed" ] || { [ "$status" = "completed" ] && [ "$exit_code" != "0" ] && [ -n "$exit_code" ] && [ "$exit_code" != "null" ]; }; then
-                      streak=$((streak + 1))
-                      echo "watchdog: failed tool call streak = $streak"
-                      if [ "$streak" -ge "$MAX_DENIED_STREAK" ]; then
-                        echo "watchdog: $streak consecutive failed tool calls - killing opencode"
-                        pkill -TERM -f 'opencode run' || true
-                        exit 99
-                      fi
-                    elif [ "$status" = "completed" ]; then
-                      streak=0
-                    fi
-                    ;;
-                esac
-              done
-          }
-
-          set -o pipefail
           set +e
-          timeout --signal=TERM --kill-after=60 "$TIME_LIMIT_SEC" \
-            opencode run --standalone --format json --auto --model mistral/zai-glm-5-3 \
-              "$(cat out/reviewer.rendered.md)" \
-            2> out/opencode.stderr \
-            | tee out/stream.ndjson \
-            | run_watchdog
+          timeout --signal=TERM --kill-after=60 "$((TIME_LIMIT_SEC + 120))" \
+            vibe --prompt-file "out/reviewer.rendered.md" \
+              --auto-approve \
+              --trust \
+              --model "$VIBE_MODEL" \
+              --max-turns "$MAX_TURNS" \
+              --max-tokens "$MAX_TOKENS" \
+              --time-limit "$TIME_LIMIT_SEC" \
+              --output streaming \
+              --output-dir out \
+              > out/stream.ndjson 2> out/vibe.stderr
           rc=$?
           set -e
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          echo "--- opencode stderr ---"
-          cat out/opencode.stderr || true
-          if [ "$rc" = "99" ]; then
-            echo "stopped_by_watchdog=true" >> "$GITHUB_OUTPUT"
-          fi
+          echo "--- vibe stderr ---"
+          cat out/vibe.stderr || true
           exit 0
 
-      - name: Upload opencode output artifact
+      - name: Upload vibe output artifact
         if: always() && steps.gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v5
         with:
           # The PR number in the name associates the artifact with its dev-loop
           # issue (via the linked PR) for the cost report workflow
           # (misc/dev-loop.md): artifact names are the only artifact metadata
-          # that can be filtered without a download. Runs whose artifacts
-          # predate this naming scheme are not attributable and are skipped.
-          name: opencode-reviewer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            out/stream.ndjson
-            out/opencode.stderr
-            out/reviewer.rendered.md
+          # that can be filtered without a download.
+          name: vibe-reviewer-output-pr-${{ steps.gate.outputs.pr_number }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: out/
           if-no-files-found: warn
 
       - name: Post-step state machine
@@ -558,7 +493,7 @@ jobs:
           REVIEWED_SHA: ${{ steps.gate.outputs.head_sha }}
           # The reviewer run's exit code - the one expression context the
           # checked-in script below cannot reach on its own.
-          OPENCODE_RC: ${{ steps.opencode.outputs.rc }}
+          VIBE_RC: ${{ steps.vibe.outputs.rc }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
           RETRY_COUNT: ${{ inputs.retry || '0' }}
           REPOSITORY: ${{ github.repository }}

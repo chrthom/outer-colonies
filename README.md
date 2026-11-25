@@ -156,7 +156,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
 - **Key Components**:
   - `app.ts`: Main server application (startup database probe, cron registration, graceful shutdown on `SIGTERM`/`SIGINT` and uncaught exceptions)
   - `components/rest_api/`: REST API for the website, split into one `express.Router` module per resource
-    - `index.ts`: Router registration and central error-handling middleware
+    - `index.ts`: Router registration, development-only `/assets/*` proxy and central error-handling middleware
     - `auth_router.ts`, `deck_router.ts`, `profile_router.ts`, `daily_router.ts`, `item_router.ts`, `shop_router.ts`, `online_router.ts`: Endpoints per resource
     - `session_middleware.ts`: `requireSession` middleware resolving the `session-token` header for authenticated endpoints
     - `api_error.ts`: Typed `ApiError`, the async route wrapper and the central error handler
@@ -323,11 +323,11 @@ The `misc` directory contains the pipeline that turns the designed cards into da
 #### Card Images
 
 - Card PNGs are renamed by `misc/cards/card_bulk_rename.sh` to `cards/<id>.png` (edition digit + card ID) and resized by `misc/cards/card_bulk_resize.sh` to 411×561 px (ImageMagick).
-- The client loads card images per match from `<apiURL>/assets/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
+- The client loads card images per match from `<assetBaseURL>/cards/<id>.png` (`client/src/app/scenes/resource-loader.ts`), including ID 0 for the colony.
 
 #### Client Runtime Assets
 
-The client loads all runtime assets from the assets web space under `<apiURL>/assets/` (see `resource-loader.ts`):
+The client loads all runtime assets directly from the configured asset host (`environment.urls.assets`) on deployed stages, falling back to the development-only `<apiURL>/assets/` proxy locally (see `resource-loader.ts`):
 
 - `background/`: starfields, sun, orbs, rings and vessel sprites
 - `attribute/`: stat icons (`damage`, `hp`, `control`, `speed`, `energy`, `armour`, `shield`, `point_defense`) and socket glyphs (`theta`, `xi`, `phi`, `omega`, `delta`, `psi`)
@@ -509,7 +509,7 @@ The repository working rules — repository language, branches and merges, issue
 
 ### AI Agent Development Loop
 
-The repository contains an event-driven agent workflow on GitHub Actions for unattended issue implementation, PR review and review fixes. The three roles — **implementer**, **reviewer** and **fixer** — run a headless coding agent (Mistral GLM via OpenCode) on the workflow runner:
+The repository contains an event-driven agent workflow on GitHub Actions for unattended issue implementation, PR review and review fixes. The three roles — **implementer**, **reviewer** and **fixer** — run a headless coding agent (Mistral GLM via Mistral Vibe CLI in programmatic mode) on the workflow runner:
 
 - **Trigger**: `dev-loop` label on an issue (implementer opens a ready PR), review comments on agent PRs (reviewer), or failing checks (fixer)
 - **Escalation**: the loop stops and labels the issue/PR `needs-human` when an agent cannot proceed (budgets for time, steps and tokens are capped)

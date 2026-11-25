@@ -4,7 +4,6 @@ import LoadingStatus from '../components/loading_status';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
 import VersionIndicator from '../components/indicators/version_indicator';
 import OnlineIndicator from '../components/indicators/online_indicator';
-import { environment } from '../../environments/environment';
 import Phaser from 'phaser';
 import ExitButton from '../components/buttons/exit_button';
 import BotButton from '../components/buttons/bot_button';
@@ -25,7 +24,7 @@ export default class Matchmaking extends Phaser.Scene {
   }
 
   preload() {
-    loadRequiredResources(environment.urls.api, this.load);
+    loadRequiredResources(this.load);
   }
 
   create() {
@@ -41,7 +40,7 @@ export default class Matchmaking extends Phaser.Scene {
     this.socket = SocketService.connect();
     this.registerSocketListeners();
     new Background(this);
-    loadPreloadableResources(environment.urls.api, this.load);
+    loadPreloadableResources(this.load);
   }
 
   /**

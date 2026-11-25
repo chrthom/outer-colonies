@@ -1,6 +1,7 @@
 import express from 'express';
 import http, { IncomingMessage, RequestOptions } from 'node:http';
 import { Readable } from 'node:stream';
+import config from 'config';
 import restAPI from './rest_api';
 import Auth from './utils/auth';
 import Mailer from './utils/mailer';
@@ -62,7 +63,8 @@ describe('REST API', () => {
     method: string,
     path: string,
     sessionToken?: string,
-    body?: object | string
+    body?: object | string,
+    targetBaseUrl = baseUrl
   ): Promise<TestResponse> {
     const options: RequestOptions = { method, agent: false };
     const payload = body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body);
@@ -71,12 +73,16 @@ describe('REST API', () => {
       options.headers = { ...(options.headers ?? {}), 'session-token': sessionToken };
     }
     return new Promise((resolve, reject) => {
-      const req = http.request(`${baseUrl}${path}`, options, (res: IncomingMessage) => {
+      const req = http.request(`${targetBaseUrl}${path}`, options, (res: IncomingMessage) => {
         let data = '';
         res.on('data', chunk => (data += chunk));
         res.on('end', () => {
           try {
-            resolve({ status: res.statusCode ?? 0, body: data ? JSON.parse(data) : undefined });
+            const isJson = res.headers['content-type']?.includes('application/json');
+            resolve({
+              status: res.statusCode ?? 0,
+              body: data ? (isJson ? JSON.parse(data) : data) : undefined
+            });
           } catch (err) {
             reject(err);
           }
@@ -381,39 +387,72 @@ describe('REST API', () => {
   });
 
   describe('assets proxy', () => {
-    it('should respond with 502 when the upstream asset stream fails mid-stream', async () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const upstream = new Readable({
-        read() {
-          this.destroy(new Error('boom'));
-        }
-      });
-      jest
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(<any>{ ok: true, status: 200, body: Readable.toWeb(upstream) });
+    it('should respond with 404 on non-development stages', async () => {
+      const response = await request('GET', '/assets/anything');
 
-      const response = await request('GET', '/assets/test.png');
-
-      expect(response.status).toBe(502);
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
+      expect(response.status).toBe(404);
     });
 
-    it('should respond with 502 when the upstream responds with an error status', async () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-      const upstream = new Readable({
-        read() {
-          this.push('upstream error page');
-          this.push(null);
-        }
+    describe('on development stage', () => {
+      let devServer: http.Server;
+      let devBaseUrl: string;
+
+      beforeAll(done => {
+        const originalGet = config.get.bind(config);
+        jest
+          .spyOn(config, 'get')
+          .mockImplementation((setting: string) =>
+            setting === 'stage' ? 'development' : originalGet(setting)
+          );
+        const devApp = express();
+        devApp.use(express.json());
+        restAPI(devApp);
+        jest.restoreAllMocks();
+        devServer = http.createServer(devApp).listen(0, () => {
+          const address = devServer.address() as { port: number };
+          devBaseUrl = `http://127.0.0.1:${address.port}`;
+          done();
+        });
       });
-      jest
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(<any>{ ok: false, status: 404, body: Readable.toWeb(upstream) });
 
-      const response = await request('GET', '/assets/missing.png');
+      afterAll(done => {
+        devServer.close(done);
+      });
 
-      expect(response.status).toBe(502);
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
+      it('should respond with 502 when the upstream asset stream fails mid-stream', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+        const upstream = new Readable({
+          read() {
+            this.destroy(new Error('boom'));
+          }
+        });
+        jest
+          .spyOn(globalThis, 'fetch')
+          .mockResolvedValue(<any>{ ok: true, status: 200, body: Readable.toWeb(upstream) });
+
+        const response = await request('GET', '/assets/test.png', undefined, undefined, devBaseUrl);
+
+        expect(response.status).toBe(502);
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*boom/));
+      });
+
+      it('should respond with 502 when the upstream responds with an error status', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+        const upstream = new Readable({
+          read() {
+            this.push('upstream error page');
+            this.push(null);
+          }
+        });
+        jest
+          .spyOn(globalThis, 'fetch')
+          .mockResolvedValue(<any>{ ok: false, status: 404, body: Readable.toWeb(upstream) });
+
+        const response = await request('GET', '/assets/missing.png', undefined, undefined, devBaseUrl);
+
+        expect(response.status).toBe(502);
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/^WARN: .*upstream status 404/));
+      });
     });
   });
 
