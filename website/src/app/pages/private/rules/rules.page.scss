@@ -17,6 +17,58 @@
     }
     #rules-content {
       padding-left: 40px;
+      #mode-toggle {
+        margin-bottom: 15px;
+        padding-top: 10px;
+      }
+      .online-hint {
+        border-left: 3px solid var(--color-accent);
+        background-color: color-mix(in srgb, var(--color-accent), transparent 92%);
+        padding: 8px 14px;
+        margin-bottom: 30px;
+        & > p:first-child::before {
+          content: "Online-Spiel: ";
+          font-weight: bold;
+        }
+        .screenshot-figure {
+          margin: 0 0 24px 0;
+        }
+        .screenshot {
+          display: block;
+          max-width: 75%;
+          margin: 0 auto 14px auto;
+        }
+        .screenshot-legend {
+          max-width: 75%;
+          margin: 0 auto;
+          padding-left: 0;
+          list-style: none;
+          counter-reset: screenshot-item;
+          li {
+            counter-increment: screenshot-item;
+            position: relative;
+            padding-left: 32px;
+            min-height: 22px;
+            margin-bottom: 6px;
+          }
+          li::before {
+            content: counter(screenshot-item);
+            position: absolute;
+            left: 0;
+            top: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: var(--color-warn);
+            color: #ffffff;
+            font-size: 0.85em;
+            font-weight: bold;
+          }
+        }
+      }
       h2 {
         display: block;
         margin-bottom: 15px;
@@ -135,6 +187,13 @@
       .size-30,
       .size-40 {
         max-width: 70%;
+      }
+
+      .online-hint {
+        .screenshot,
+        .screenshot-legend {
+          max-width: 100%;
+        }
       }
     }
   }
