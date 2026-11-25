@@ -7,7 +7,7 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
-import Bot, { processBotActions } from './bot/bot';
+import Bot from './bot/bot';
 import { pickRandom } from './utils/helpers';
 import { logger } from './utils/logger';
 import Player from './game_state/player';
@@ -133,6 +133,6 @@ function initBotGame(io: Server, socket: Socket): void {
   match.bot = new Bot(match, 1);
   registerMatch(match);
   io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
-  processBotActions(io, match);
+  match.bot.onMatchStart(io);
   logger.info(`Player ${(<SocketData>socket.data).user.username} started a bot game`);
 }

@@ -207,10 +207,9 @@ export default class Player {
   }
 
   /**
-   * Retract cards with insufficient energy, e.g. when the player ends the build
-   * phase or when the countdown expires. Also used by the singleplayer bot.
+   * Retract cards with insufficient energy
    */
-  retractInsufficientEnergyCards() {
+  private retractInsufficientEnergyCards() {
     const cardStacksToRetract = this.cardStacks
       .filter(cs => cs.hasInsufficientEnergy)
       .sort((a, b) => a.profile.energy - b.profile.energy);

@@ -1,100 +1,110 @@
-import Card, { CardRarity } from '../cards/card';
-import CardStack, { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
-import Match from '../game_state/match';
-import Player from '../game_state/player';
-import Battle from '../game_state/battle';
-import { BattleType, CardType, Zone } from '../../shared/config/enums';
-import { Socket } from 'socket.io';
+import { BattleType, Zone } from '../../shared/config/enums';
+import {
+  ClientCard,
+  ClientCardStack,
+  ClientHandCard,
+  ClientState,
+  emptyClientState
+} from '../../shared/interfaces/client_state';
 import {
   fleetStrength,
   planBattle,
   selectAttack,
+  selectCardOptions,
   selectHandCard,
   selectInterceptingShips,
+  selectRetractableCard,
   selectTarget
 } from './strategy';
 
-class MockCard extends Card {
-  constructor(id: number, name: string, type: CardType, rarity: CardRarity) {
-    super(id, name, type, rarity);
-  }
-  getValidTargets(): CardStack[] {
-    return [];
-  }
-  onEnterGame(): void {}
-  onLeaveGame(): void {}
-  onStartTurn(): void {}
-  onEndTurn(): void {}
-}
+// Real public card IDs from CardCollection:
+// 0: Colony (Colony, rarity 0, hp 50)
+// 160: Leichter Frachter (Hull, rarity 1, hp 5, speed 4)
+// 220: Blockadebrecher (Hull, rarity 2, hp 4, speed 5)
+// 436: Panzerschiff (Hull, rarity 2, hp 7, speed 2)
+// 185: Kraftwerk (Infrastructure, rarity 1, energy +3)
+// 179: Pulskanone (Equipment, rarity 1, damage 2)
+// 125: Kinetikwaffenbatterie (Equipment, rarity 3, damage 4)
+// 173: Ausweichmanöver (Tactic, rarity 1)
+// 331: Schadenskontrolle (Tactic, rarity 2)
+// 214: Bombenanschlag (Tactic, rarity 3)
 
-class MockHullCard extends MockCard {
-  constructor(id: number, hp: number, speed: number) {
-    super(id, `Hull ${id}`, CardType.Hull, 1);
-    this.profile.hp = hp;
-    this.profile.speed = speed;
-  }
-  override isFlightReady(): boolean {
-    return true;
-  }
-}
+const makeClientCard = (id: number, overrides: Partial<ClientCard> = {}): ClientCard => ({
+  uuid: `card-${id}-${Math.random().toString(36).slice(2, 7)}`,
+  id,
+  index: 0,
+  battleReady: false,
+  retractable: false,
+  insufficientEnergy: false,
+  ...overrides
+});
 
-class MockWeaponCard extends MockCard {
-  readonly attackProfile;
-  constructor(id: number, damage: number) {
-    super(id, `Weapon ${id}`, CardType.Equipment, 1);
-    this.attackProfile = { range: 2, damage, pointDefense: 0, shield: 0, armour: 0 };
-  }
-  override get canAttack(): boolean {
-    return true;
-  }
-  override isInRange(): boolean {
-    return true;
-  }
-}
+const makeStack = (
+  uuid: string,
+  cardIds: number[],
+  ownedByPlayer: boolean,
+  zone: Zone = Zone.Orbital,
+  overrides: Partial<ClientCardStack> = {}
+): ClientCardStack => ({
+  uuid,
+  cards: cardIds.map((id, index) => makeClientCard(id, { index })),
+  zone,
+  index: 0,
+  zoneCardsNum: 1,
+  ownedByPlayer,
+  missionReady: ownedByPlayer && zone == Zone.Orbital && cardIds.some(id => id != 0),
+  interceptionReady: false,
+  attributes: [],
+  ...overrides
+});
 
-/** Hand card stack with a controllable playability, independent of match state. */
-class PlayableCardStack extends RootCardStack {
-  constructor(
-    card: Card,
-    player: Player,
-    private readonly playable: boolean,
-    private readonly targets: CardStack[] = []
-  ) {
-    super(card, Zone.Hand, player);
-  }
-  override get hasValidTargets(): boolean {
-    return this.playable;
-  }
-  override get validTargets(): CardStack[] {
-    return this.targets;
-  }
-}
+const makeShip = (
+  uuid: string,
+  hullId: number,
+  ownedByPlayer: boolean,
+  zone: Zone = Zone.Orbital,
+  damage: number = 0,
+  hp: number = 5,
+  extraCardIds: number[] = [],
+  overrides: Partial<ClientCardStack> = {}
+): ClientCardStack =>
+  makeStack(uuid, [...extraCardIds, hullId], ownedByPlayer, zone, {
+    attributes: [
+      ...(damage > 0 ? [{ icon: 'damage', value: damage, warning: true }] : []),
+      { icon: 'hp', value: hp, warning: damage >= hp }
+    ],
+    ...overrides
+  });
 
-const createSocket = (playerNo: number): Socket =>
-  ({
-    id: `socket-${playerNo}`,
-    join: jest.fn(),
-    data: {
-      user: { username: `Player ${playerNo}` },
-      activeDeck: []
-    }
-  }) as unknown as Socket;
+const makeHandCard = (
+  uuid: string,
+  cardId: number,
+  playable: boolean = true,
+  validTargets: string[] = ['target-1'],
+  overrides: Partial<ClientHandCard> = {}
+): ClientHandCard => ({
+  uuid,
+  cardId,
+  index: 0,
+  playable,
+  validTargets,
+  ownedByPlayer: true,
+  optionsToSelect: 0,
+  ...overrides
+});
 
-const createMatch = (): Match => new Match('test-room', createSocket(0), createSocket(1));
-
-const createShip = (player: Player, card: MockHullCard, zone: Zone = Zone.Orbital): RootCardStack =>
-  new RootCardStack(card, zone, player);
+const makeState = (overrides: Partial<ClientState> = {}): ClientState => ({
+  ...emptyClientState,
+  ...overrides
+});
 
 describe('Bot strategy', () => {
   describe('fleetStrength', () => {
     test('sums remaining hp and weapon damage of the fleet', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ship = createShip(player, new MockHullCard(1, 10, 2));
-      ship.damage = 3;
-      ship.attach(new AttachmentCardStack(new MockWeaponCard(100, 4), ship));
+      // Leichter Frachter (hp 5, damage 2 -> 3) + Kinetikwaffenbatterie (damage 4) = 7
+      const ship = makeShip('ship-1', 160, true, Zone.Orbital, 2, 5, [125]);
 
-      expect(fleetStrength([ship])).toBe(7 + 4);
+      expect(fleetStrength([ship])).toBe(7);
     });
 
     test('is zero for an empty fleet', () => {
@@ -104,400 +114,363 @@ describe('Bot strategy', () => {
 
   describe('selectHandCard', () => {
     test('picks the playable card with the highest rarity', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const hand = [1, 3, 2].map(
-        rarity =>
-          new PlayableCardStack(
-            new MockCard(rarity, `Card ${rarity}`, CardType.Hull, rarity as CardRarity),
-            player,
-            true
-          )
-      );
+      const hand = [
+        makeHandCard('h1', 173, true), // rarity 1
+        makeHandCard('h2', 214, true), // rarity 3
+        makeHandCard('h3', 331, true) // rarity 2
+      ];
 
       expect(selectHandCard(hand)).toBe(hand[1]);
     });
 
     test('breaks rarity ties by draw order', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const hand = [2, 2].map(
-        rarity =>
-          new PlayableCardStack(
-            new MockCard(rarity, `Card ${rarity}`, CardType.Hull, rarity as CardRarity),
-            player,
-            true
-          )
-      );
+      const hand = [
+        makeHandCard('h1', 220, true), // rarity 2
+        makeHandCard('h2', 436, true) // rarity 2
+      ];
 
       expect(selectHandCard(hand)).toBe(hand[0]);
     });
 
-    test('only considers cards with valid targets', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const unplayable = new PlayableCardStack(
-        new MockCard(1, 'Unplayable', CardType.Hull, 5),
-        player,
-        false
-      );
-      const playable = new PlayableCardStack(new MockCard(2, 'Playable', CardType.Hull, 1), player, true);
-      const hand = [unplayable, playable];
+    test('only considers playable cards with valid targets', () => {
+      const unplayable = makeHandCard('h1', 214, false, ['t1']);
+      const noTargets = makeHandCard('h2', 214, true, []);
+      const playable = makeHandCard('h3', 173, true, ['t1']);
 
-      expect(selectHandCard(hand)).toBe(playable);
+      expect(selectHandCard([unplayable, noTargets, playable])).toBe(playable);
+    });
+
+    test('skips cards requiring options when insufficient options are available', () => {
+      const needsOptions = makeHandCard('h1', 214, true, ['t1'], { optionsToSelect: 1, options: [] });
+      const playable = makeHandCard('h2', 173, true, ['t1']);
+
+      expect(selectHandCard([needsOptions, playable])).toBe(playable);
     });
 
     test('returns undefined without playable cards', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const hand = [new PlayableCardStack(new MockCard(1, 'Unplayable', CardType.Hull, 1), player, false)];
+      expect(selectHandCard([makeHandCard('h1', 173, false, [])])).toBeUndefined();
+    });
+  });
 
-      expect(selectHandCard(hand)).toBeUndefined();
+  describe('selectCardOptions', () => {
+    test('returns undefined when no options are needed and slices required options otherwise', () => {
+      expect(selectCardOptions(makeHandCard('h1', 173))).toBeUndefined();
+      expect(
+        selectCardOptions(
+          makeHandCard('h2', 214, true, ['t1'], { optionsToSelect: 2, options: [10, 20, 30] })
+        )
+      ).toEqual([10, 20]);
     });
   });
 
   describe('selectTarget', () => {
     test('picks one of the valid targets', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const targets = [
-        createShip(player, new MockHullCard(1, 5, 1)),
-        createShip(player, new MockHullCard(2, 5, 1))
-      ];
-      const handCard = new PlayableCardStack(
-        new MockCard(3, 'Tactic', CardType.Tactic, 1),
-        player,
-        true,
-        targets
-      );
+      const s1 = makeShip('s1', 160, true);
+      const s2 = makeShip('s2', 160, true);
+      const state = makeState({ cardStacks: [s1, s2] });
+      const handCard = makeHandCard('h1', 173, true, ['s1', 's2']);
 
-      expect(targets).toContain(selectTarget(handCard));
+      expect([s1, s2]).toContain(selectTarget(handCard, state));
     });
 
     test('prefers an enemy ship in the orbital zone over an own ship', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const opponent = match.players[1];
-      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
-      const enemyShip = createShip(opponent, new MockHullCard(2, 5, 1));
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        ownShip,
-        enemyShip
-      ]);
+      const ownShip = makeShip('own', 160, true, Zone.Orbital);
+      const enemyShip = makeShip('enemy', 160, false, Zone.Orbital);
+      const state = makeState({ cardStacks: [ownShip, enemyShip] });
+      const handCard = makeHandCard('h1', 173, true, ['own', 'enemy']);
 
-      expect(selectTarget(handCard)).toBe(enemyShip);
+      expect(selectTarget(handCard, state)).toBe(enemyShip);
     });
 
     test('prefers an enemy card in the colony zone over an own ship in the orbital zone', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const opponent = match.players[1];
-      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
-      const enemyInfrastructure = new RootCardStack(
-        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
-        Zone.Colony,
-        opponent
-      );
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        ownShip,
-        enemyInfrastructure
-      ]);
+      const ownShip = makeShip('own', 160, true, Zone.Orbital);
+      const enemyInfra = makeStack('enemy-infra', [185], false, Zone.Colony);
+      const state = makeState({ cardStacks: [ownShip, enemyInfra] });
+      const handCard = makeHandCard('h1', 173, true, ['own', 'enemy-infra']);
 
-      expect(selectTarget(handCard)).toBe(enemyInfrastructure);
+      expect(selectTarget(handCard, state)).toBe(enemyInfra);
     });
 
     test('prefers an enemy ship in the neutral zone over the enemy colony', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const opponent = match.players[1];
-      const enemyShip = createShip(opponent, new MockHullCard(2, 5, 1), Zone.Neutral);
-      const enemyColony = new RootCardStack(
-        new MockCard(5, 'Enemy Colony', CardType.Colony, 1),
-        Zone.Colony,
-        opponent
-      );
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        enemyShip,
-        enemyColony
-      ]);
+      const enemyShip = makeShip('enemy-ship', 160, false, Zone.Neutral);
+      const enemyColony = makeStack('enemy-colony', [0], false, Zone.Colony);
+      const state = makeState({ cardStacks: [enemyShip, enemyColony] });
+      const handCard = makeHandCard('h1', 173, true, ['enemy-ship', 'enemy-colony']);
 
-      expect(selectTarget(handCard)).toBe(enemyShip);
+      expect(selectTarget(handCard, state)).toBe(enemyShip);
     });
 
     test('prefers an own ship in the orbital zone over an own card in the colony zone', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ownShip = createShip(player, new MockHullCard(1, 5, 1));
-      const ownInfrastructure = new RootCardStack(
-        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
-        Zone.Colony,
-        player
-      );
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        ownShip,
-        ownInfrastructure
-      ]);
+      const ownShip = makeShip('own-ship', 160, true, Zone.Orbital);
+      const ownInfra = makeStack('own-infra', [185], true, Zone.Colony);
+      const state = makeState({ cardStacks: [ownShip, ownInfra] });
+      const handCard = makeHandCard('h1', 173, true, ['own-ship', 'own-infra']);
 
-      expect(selectTarget(handCard)).toBe(ownShip);
+      expect(selectTarget(handCard, state)).toBe(ownShip);
     });
 
     test('prefers an own card in the colony zone over the own colony', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ownInfrastructure = new RootCardStack(
-        new MockCard(4, 'Infrastructure', CardType.Infrastructure, 1),
-        Zone.Colony,
-        player
-      );
-      const ownColony = new RootCardStack(
-        new MockCard(5, 'Own Colony', CardType.Colony, 1),
-        Zone.Colony,
-        player
-      );
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        ownInfrastructure,
-        ownColony
-      ]);
+      const ownInfra = makeStack('own-infra', [185], true, Zone.Colony);
+      const ownColony = makeStack('own-colony', [0], true, Zone.Colony);
+      const state = makeState({ cardStacks: [ownInfra, ownColony] });
+      const handCard = makeHandCard('h1', 173, true, ['own-infra', 'own-colony']);
 
-      expect(selectTarget(handCard)).toBe(ownInfrastructure);
+      expect(selectTarget(handCard, state)).toBe(ownInfra);
     });
 
     test('targets the own colony when it is the only valid target', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ownColony = new RootCardStack(
-        new MockCard(5, 'Own Colony', CardType.Colony, 1),
-        Zone.Colony,
-        player
-      );
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, true, [
-        ownColony
-      ]);
+      const ownColony = makeStack('own-colony', [0], true, Zone.Colony);
+      const state = makeState({ cardStacks: [ownColony] });
+      const handCard = makeHandCard('h1', 173, true, ['own-colony']);
 
-      expect(selectTarget(handCard)).toBe(ownColony);
+      expect(selectTarget(handCard, state)).toBe(ownColony);
     });
 
     test('returns undefined without valid targets', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const handCard = new PlayableCardStack(new MockCard(3, 'Tactic', CardType.Tactic, 1), player, false);
+      const state = makeState();
+      const handCard = makeHandCard('h1', 173, false, []);
 
-      expect(selectTarget(handCard)).toBeUndefined();
+      expect(selectTarget(handCard, state)).toBeUndefined();
+    });
+  });
+
+  describe('selectRetractableCard', () => {
+    test('returns a retractable insufficient-energy sub-card', () => {
+      const stack = makeStack('ship-1', [160, 179], true, Zone.Colony, {
+        cards: [
+          makeClientCard(160, { uuid: 'hull-uuid', index: 0, retractable: true, insufficientEnergy: false }),
+          makeClientCard(179, { uuid: 'weapon-uuid', index: 1, retractable: true, insufficientEnergy: true })
+        ]
+      });
+      const state = makeState({ cardStacks: [stack] });
+
+      expect(selectRetractableCard(state)).toEqual({ rootUUID: 'ship-1', subUUID: 'weapon-uuid' });
+    });
+
+    test('ignores non-retractable insufficient-energy cards', () => {
+      const stack = makeStack('infra-1', [185], true, Zone.Colony, {
+        cards: [makeClientCard(185, { uuid: 'infra-uuid', retractable: false, insufficientEnergy: true })]
+      });
+      const state = makeState({ cardStacks: [stack] });
+
+      expect(selectRetractableCard(state)).toBeUndefined();
     });
   });
 
   describe('planBattle', () => {
     test('declares a mission with all ships when the fleet matches the enemy total', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ships = [
-        createShip(player, new MockHullCard(1, 5, 2)),
-        createShip(player, new MockHullCard(2, 5, 2))
+      // Own: 2x Leichter Frachter (hp 5, speed 4) = 10
+      // Enemy: 1x Panzerschiff (hp 7, speed 2) + Pulskanone (dmg 2) = 9
+      const ownShips = [
+        makeShip('s1', 160, true, Zone.Orbital, 0, 5),
+        makeShip('s2', 160, true, Zone.Orbital, 0, 5)
       ];
-      player.cardStacks.push(...ships);
-      const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 7, 2)));
+      const enemyShip = makeShip('e1', 436, false, Zone.Orbital, 0, 7, [179]);
+      const state = makeState({ cardStacks: [...ownShips, enemyShip] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.Mission);
-      expect(plannedBattle.shipIds).toEqual(ships.map(cs => cs.uuid));
+      expect(plannedBattle.shipIds).toEqual(['s1', 's2']);
     });
 
     test('declares a mission with only the fastest ships', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const fastShip = createShip(player, new MockHullCard(1, 6, 4));
-      player.cardStacks.push(fastShip, createShip(player, new MockHullCard(2, 6, 2)));
-      const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 9, 2)));
+      // Own: Blockadebrecher (hp 4, speed 5) + Kinetikwaffenbatterie (dmg 4) = 8; Panzerschiff (hp 7, speed 2) = 7 -> total 15
+      // Enemy: Panzerschiff (hp 7, speed 2) + Kinetikwaffenbatterie (dmg 4) = 11 (too slow to intercept speed 5)
+      const fastShip = makeShip('fast', 220, true, Zone.Orbital, 0, 4, [125]);
+      const slowShip = makeShip('slow', 436, true, Zone.Orbital, 0, 7);
+      const enemyShip = makeShip('enemy', 436, false, Zone.Orbital, 0, 7, [125]);
+      const state = makeState({ cardStacks: [fastShip, slowShip, enemyShip] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.Mission);
-      expect(plannedBattle.shipIds).toEqual([fastShip.uuid]);
+      expect(plannedBattle.shipIds).toEqual(['fast']);
     });
 
     test('ignores enemy ships in the neutral zone as interceptors', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const fastShip = createShip(player, new MockHullCard(1, 10, 4));
-      player.cardStacks.push(fastShip, createShip(player, new MockHullCard(2, 4, 2)));
-      const opponent = match.players[1];
-      opponent.cardStacks.push(
-        createShip(opponent, new MockHullCard(3, 10, 4)),
-        createShip(opponent, new MockHullCard(4, 4, 5), Zone.Neutral)
-      );
+      // Own: Blockadebrecher (4, speed 5) + 2x Panzerschiff/Kinetikwaffenbatterie (22, speed 2) + Leichter Frachter (5, speed 4) = 31
+      // Enemy orbital: 2x Panzerschiff/Kinetikwaffenbatterie (22, speed 2 -> 31 < 22 * 1.5 = 33, no raid; too slow to intercept)
+      // Enemy neutral: Blockadebrecher/Kinetikwaffenbatterie (8, speed 5 -> total enemy 30 <= 31; stronger than fastShip 4 if counted)
+      const fastShip = makeShip('fast', 220, true, Zone.Orbital, 0, 4);
+      const slowShips = [
+        makeShip('slow-1', 436, true, Zone.Orbital, 0, 7, [125]),
+        makeShip('slow-2', 436, true, Zone.Orbital, 0, 7, [125]),
+        makeShip('slow-3', 160, true, Zone.Orbital, 0, 5)
+      ];
+      const enemyOrbital = [
+        makeShip('e-orb-1', 436, false, Zone.Orbital, 0, 7, [125]),
+        makeShip('e-orb-2', 436, false, Zone.Orbital, 0, 7, [125])
+      ];
+      const enemyNeutral = makeShip('e-neu', 220, false, Zone.Neutral, 0, 4, [125]);
+      const state = makeState({ cardStacks: [fastShip, ...slowShips, ...enemyOrbital, enemyNeutral] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.Mission);
-      expect(plannedBattle.shipIds).toEqual([fastShip.uuid]);
+      expect(plannedBattle.shipIds).toEqual(['fast']);
     });
 
     test('passes when the fastest ships are weaker than the intercepting enemy ships', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      player.cardStacks.push(
-        createShip(player, new MockHullCard(1, 6, 4)),
-        createShip(player, new MockHullCard(2, 6, 2))
-      );
-      const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(3, 9, 5)));
+      const fastShip = makeShip('fast', 220, true, Zone.Orbital, 0, 4); // strength 4, speed 5
+      const slowShip = makeShip('slow', 436, true, Zone.Orbital, 0, 7); // strength 7, speed 2 -> total 11
+      const enemyFast = makeShip('e-fast', 220, false, Zone.Orbital, 0, 4, [125]); // strength 8, speed 5
+      const state = makeState({ cardStacks: [fastShip, slowShip, enemyFast] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.None);
       expect(plannedBattle.shipIds).toEqual([]);
     });
 
     test('declares a raid when the opponent has no orbital ships', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const ships = [createShip(player, new MockHullCard(1, 6, 2))];
-      player.cardStacks.push(...ships);
+      const ownShip = makeShip('s1', 160, true, Zone.Orbital, 0, 5);
+      const state = makeState({ cardStacks: [ownShip] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.Raid);
-      expect(plannedBattle.shipIds).toEqual(ships.map(cs => cs.uuid));
+      expect(plannedBattle.shipIds).toEqual(['s1']);
     });
 
     test('declares a raid when the fleet clearly overwhelms the orbital defense', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      player.cardStacks.push(createShip(player, new MockHullCard(1, 20, 2)));
-      const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(2, 8, 2)));
+      const ownShips = [
+        makeShip('s1', 436, true, Zone.Orbital, 0, 7, [125]), // 11
+        makeShip('s2', 436, true, Zone.Orbital, 0, 7) // 7 -> 18 >= 5 * 1.5
+      ];
+      const enemyShip = makeShip('e1', 160, false, Zone.Orbital, 0, 5);
+      const state = makeState({ cardStacks: [...ownShips, enemyShip] });
 
-      expect(planBattle(player).type).toBe(BattleType.Raid);
+      expect(planBattle(state).type).toBe(BattleType.Raid);
     });
 
     test('passes when the own fleet is weaker than the enemy total', () => {
-      const match = createMatch();
-      const player = match.players[0];
-      player.cardStacks.push(createShip(player, new MockHullCard(1, 9, 2)));
-      const opponent = match.players[1];
-      opponent.cardStacks.push(createShip(opponent, new MockHullCard(2, 10, 2)));
+      const ownShip = makeShip('s1', 160, true, Zone.Orbital, 0, 5);
+      const enemyShip = makeShip('e1', 436, false, Zone.Orbital, 0, 7);
+      const state = makeState({ cardStacks: [ownShip, enemyShip] });
 
-      const plannedBattle = planBattle(player);
+      const plannedBattle = planBattle(state);
 
       expect(plannedBattle.type).toBe(BattleType.None);
       expect(plannedBattle.shipIds).toEqual([]);
     });
 
     test('passes without mission-ready ships', () => {
-      const match = createMatch();
-      const player = match.players[0];
+      const colonyShip = makeShip('s1', 160, true, Zone.Colony, 0, 5, [], { missionReady: false });
+      const state = makeState({ cardStacks: [colonyShip] });
 
-      expect(planBattle(player).type).toBe(BattleType.None);
+      expect(planBattle(state).type).toBe(BattleType.None);
     });
   });
 
   describe('selectInterceptingShips', () => {
     test('intercepts a mission with all interception ready ships when at least as strong', () => {
-      const match = createMatch();
-      const attacker = match.players[0];
-      const defender = match.players[1];
-      match.activePlayerNo = 0;
-      match.battle = new Battle(BattleType.Mission, 0);
-      match.battle.ships[0] = [createShip(attacker, new MockHullCard(1, 10, 2), Zone.Neutral)];
-      const interceptor = createShip(defender, new MockHullCard(2, 10, 3));
-      defender.cardStacks.push(interceptor);
+      const attacker = makeShip('att', 160, false, Zone.Neutral, 0, 5);
+      const interceptor = makeShip('def', 436, true, Zone.Orbital, 0, 7, [], { interceptionReady: true });
+      const state = makeState({
+        cardStacks: [attacker, interceptor],
+        battle: {
+          type: BattleType.Mission,
+          playerShipIds: [],
+          opponentShipIds: ['att'],
+          range: 4
+        }
+      });
 
-      expect(selectInterceptingShips(defender)).toEqual([interceptor.uuid]);
+      expect(selectInterceptingShips(state)).toEqual(['def']);
     });
 
     test('stays home when the own defense is weaker than the attacker', () => {
-      const match = createMatch();
-      const attacker = match.players[0];
-      const defender = match.players[1];
-      match.activePlayerNo = 0;
-      match.battle = new Battle(BattleType.Mission, 0);
-      match.battle.ships[0] = [createShip(attacker, new MockHullCard(1, 20, 2), Zone.Neutral)];
-      defender.cardStacks.push(createShip(defender, new MockHullCard(2, 5, 3)));
+      const attacker = makeShip('att', 436, false, Zone.Neutral, 0, 7, [125]); // 11
+      const interceptor = makeShip('def', 160, true, Zone.Orbital, 0, 5, [], { interceptionReady: true }); // 5
+      const state = makeState({
+        cardStacks: [attacker, interceptor],
+        battle: {
+          type: BattleType.Mission,
+          playerShipIds: [],
+          opponentShipIds: ['att'],
+          range: 4
+        }
+      });
 
-      expect(selectInterceptingShips(defender)).toEqual([]);
+      expect(selectInterceptingShips(state)).toEqual([]);
     });
 
     test('keeps all mission-ready ships in orbit against a raid', () => {
-      const match = createMatch();
-      const attacker = match.players[0];
-      const defender = match.players[1];
-      match.activePlayerNo = 0;
-      match.battle = new Battle(BattleType.Raid, 0);
-      match.battle.ships[0] = [createShip(attacker, new MockHullCard(1, 20, 2), Zone.Neutral)];
-      const defenders = [
-        createShip(defender, new MockHullCard(2, 5, 3)),
-        createShip(defender, new MockHullCard(3, 5, 2))
-      ];
-      defender.cardStacks.push(...defenders);
+      const attacker = makeShip('att', 436, false, Zone.Neutral, 0, 7);
+      const def1 = makeShip('d1', 160, true, Zone.Orbital, 0, 5);
+      const def2 = makeShip('d2', 436, true, Zone.Orbital, 0, 7);
+      const state = makeState({
+        cardStacks: [attacker, def1, def2],
+        battle: {
+          type: BattleType.Raid,
+          playerShipIds: [],
+          opponentShipIds: ['att'],
+          range: 4
+        }
+      });
 
-      expect(selectInterceptingShips(defender)).toEqual(defenders.map(cs => cs.uuid));
+      expect(selectInterceptingShips(state)).toEqual(['d1', 'd2']);
     });
   });
 
   describe('selectAttack', () => {
-    const setupCombat = () => {
-      const match = createMatch();
-      const player = match.players[0];
-      const opponent = match.players[1];
-      match.pendingActionPlayerNo = 0;
-      match.battle = new Battle(BattleType.Mission, 0);
-      const ship = createShip(player, new MockHullCard(1, 10, 2), Zone.Neutral);
-      const weapon = new AttachmentCardStack(new MockWeaponCard(100, 4), ship);
-      ship.attach(weapon);
-      weapon.attackAvailable = true;
-      match.battle.ships[0] = [ship];
-      const enemyShips = [
-        createShip(opponent, new MockHullCard(2, 10, 2), Zone.Neutral),
-        createShip(opponent, new MockHullCard(3, 10, 2), Zone.Neutral)
-      ];
-      match.battle.ships[1] = enemyShips;
-      return { match, player, weapon, enemyShips };
+    const setupCombat = (damage1: number = 0, damage2: number = 0, battleReady: boolean = true) => {
+      const ownShip = makeStack('own-ship', [179, 160], true, Zone.Neutral, {
+        cards: [
+          makeClientCard(179, { uuid: 'weapon-1', index: 0, battleReady }),
+          makeClientCard(160, { uuid: 'hull-1', index: 1 })
+        ]
+      });
+      const enemy1 = makeShip('enemy-1', 160, false, Zone.Neutral, damage1, 5);
+      const enemy2 = makeShip('enemy-2', 160, false, Zone.Neutral, damage2, 5);
+      return makeState({
+        cardStacks: [ownShip, enemy1, enemy2],
+        battle: {
+          type: BattleType.Mission,
+          playerShipIds: ['own-ship'],
+          opponentShipIds: ['enemy-1', 'enemy-2'],
+          range: 1
+        }
+      });
     };
 
-    test('attacks with the first available weapon on a valid target', () => {
-      const { player, weapon, enemyShips } = setupCombat();
+    test('attacks with the first available battle-ready weapon on a valid target', () => {
+      const state = setupCombat();
 
-      const attack = selectAttack(player);
+      const attack = selectAttack(state);
 
-      expect(attack?.srcWeapon).toBe(weapon);
-      expect(enemyShips).toContain(attack?.target);
+      expect(attack?.shipUUID).toBe('own-ship');
+      expect(attack?.weaponUUID).toBe('weapon-1');
+      expect(['enemy-1', 'enemy-2']).toContain(attack?.targetUUID);
     });
 
     test('focuses all weapons on the same target until it is destroyed', () => {
-      const { player, enemyShips } = setupCombat();
-      const firstAttack = selectAttack(player)!;
+      const state = setupCombat();
+      const firstAttack = selectAttack(state)!;
 
-      const secondAttack = selectAttack(player, firstAttack.target.uuid)!;
-      expect(secondAttack.target).toBe(firstAttack.target);
+      const secondAttack = selectAttack(state, firstAttack.targetUUID)!;
+      expect(secondAttack.targetUUID).toBe(firstAttack.targetUUID);
 
-      // Focus target is destroyed: like in the real game flow it stays in
-      // battle.ships (destroyed hulls are only pruned from the player's card
-      // stacks at the end of each battle round), so the aliveness filter must
-      // release the focus and a new target among the survivors is picked
-      firstAttack.target.damage = firstAttack.target.profile.hp;
-      const survivors = enemyShips.filter(cs => cs.uuid != firstAttack.target.uuid);
-      const thirdAttack = selectAttack(player, firstAttack.target.uuid)!;
-      expect(survivors).toContain(thirdAttack.target);
+      // Focus target is destroyed (damage == hp): must switch to a surviving target
+      const destroyedState = setupCombat(
+        firstAttack.targetUUID == 'enemy-1' ? 5 : 0,
+        firstAttack.targetUUID == 'enemy-2' ? 5 : 0
+      );
+      const thirdAttack = selectAttack(destroyedState, firstAttack.targetUUID)!;
+      expect(thirdAttack.targetUUID).not.toBe(firstAttack.targetUUID);
     });
 
     test('does not pick a destroyed ship as a new target', () => {
-      const { match, player, enemyShips } = setupCombat();
-      enemyShips.forEach(cs => (cs.damage = cs.profile.hp));
+      const state = setupCombat(5, 5);
 
-      expect(selectAttack(player)).toBeUndefined();
-      // The destroyed hulls are still in the battle's ship pool, so the
-      // undefined result must come from the aliveness filter
-      expect(match.battle.ships[1].length).toBe(enemyShips.length);
+      expect(selectAttack(state)).toBeUndefined();
     });
 
     test('returns undefined when no weapon can attack', () => {
-      const { player, weapon } = setupCombat();
-      weapon.attackAvailable = false;
+      const state = setupCombat(0, 0, false);
 
-      expect(selectAttack(player)).toBeUndefined();
+      expect(selectAttack(state)).toBeUndefined();
     });
   });
 });

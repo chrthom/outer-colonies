@@ -41,6 +41,7 @@ export default class GameResult {
     this.loserSol = this.halveSolInBotGame(this.computeEarnings(loser, winner, false), botGame);
     if (!winner.isBot) void this.persistEarnings(winner, loser, true, this.winnerSol);
     if (!loser.isBot) void this.persistEarnings(loser, winner, false, this.loserSol);
+    this.match.bot?.onMatchEnd();
   }
   private halveSolInBotGame(sol: number, botGame: boolean): number {
     return botGame ? Math.floor(sol / 2) : sol;

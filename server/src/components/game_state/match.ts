@@ -24,6 +24,7 @@ import Intervention, {
 import SocketData from './socket_data';
 import toClientState from '../converters/client_state_converter';
 import Card from '../cards/card';
+import { ClientState } from '../../shared/interfaces/client_state';
 
 type Players = [player1: Player, player2: Player];
 
@@ -44,7 +45,9 @@ export class BotPlayerSetup {
  */
 export interface MatchBot {
   readonly playerNo: number;
-  act(io: Server): void;
+  onMatchStart(io: Server): void;
+  onState(io: Server, state: ClientState): void;
+  onMatchEnd(): void;
 }
 
 /**
@@ -313,17 +316,18 @@ export default class Match {
     this.prepareStartPhase();
   }
   /**
-   * Emits the current state to every connected human player and resets
-   * temporary match states afterwards. Bot players have no socket and are
-   * skipped; nobody is owed the delivery of a bot's game result.
+   * Emits the current state to every connected human player, resets temporary
+   * match states afterwards and forwards the bot player's projected state to
+   * the attached bot. Bot players have no socket and are owed no game result
+   * delivery (without marking resultDelivered on game over, a finished bot
+   * match would stay registered for the whole delivery period in gameCron).
    */
   emitState(io: Server) {
+    let botState: ClientState | undefined;
     this.forAllPlayers((playerNo: number) => {
       const player = this.players[playerNo];
       if (player.isBot) {
-        // The bot has no socket, so its game result needs no delivery: without
-        // this, a finished bot match would stay registered for the whole
-        // result delivery period (see gameCron)
+        botState = toClientState(this, playerNo);
         if (this.gameResult.gameOver) player.resultDelivered = true;
         return;
       }
@@ -339,5 +343,6 @@ export default class Match {
       else if (player.disconnectedSince == undefined) logger.warn('Could not find socket to emit state');
     });
     this.resetTempStates();
+    if (botState) this.bot?.onState(io, botState);
   }
 }

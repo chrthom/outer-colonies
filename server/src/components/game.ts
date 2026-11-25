@@ -9,7 +9,6 @@ import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
 import Player from './game_state/player';
 import SocketData from './game_state/socket_data';
 import { allActiveMatches, unregisterMatch } from './match_registry';
-import { processBotActions } from './bot/bot';
 
 export function gameSocketListeners(io: Server, socket: Socket) {
   socket.on(MsgTypeInbound.Ready, (turnPhase: string, data?: unknown) =>
@@ -52,7 +51,7 @@ export function gameSocketListeners(io: Server, socket: Socket) {
  * @param turnPhase turn phase the player readied for
  * @param data phase-specific payload: planned battle (Build, active player) or intercepting ship ids
  */
-function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: unknown) {
+export function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: unknown) {
   // A finished match no longer processes ready events; the initial ready
   // of a rejoin only fetches the current (final) match state
   if (turnPhase == match.turnPhase && !match.gameResult.gameOver) {
@@ -115,7 +114,7 @@ function onDisconnect(io: Server, socket: Socket, match: Match, player: Player) 
  * @param targetUUID uuid of the target card stack
  * @param optionalParameters optional card parameters (e.g. picked card options)
  */
-function onHandCard(
+export function onHandCard(
   io: Server,
   match: Match,
   player: Player,
@@ -152,7 +151,7 @@ function onHandCard(
  * @param rootCardStackUUID uuid of the card stack to retract from
  * @param subCardStackUUID uuid of the card stack to retract
  */
-function onRetract(
+export function onRetract(
   io: Server,
   match: Match,
   player: Player,
@@ -183,7 +182,7 @@ function onRetract(
  * @param player acting player
  * @param handCardUUID uuid of the hand card to discard
  */
-function onDiscard(io: Server, match: Match, player: Player, handCardUUID: string) {
+export function onDiscard(io: Server, match: Match, player: Player, handCardUUID: string) {
   if (match.gameResult.gameOver) return;
   const handCard = getCardStackByUUID(player.hand, handCardUUID);
   if (!handCard) {
@@ -207,7 +206,7 @@ function onDiscard(io: Server, match: Match, player: Player, handCardUUID: strin
  * @param weaponUUID uuid of the attacking weapon, or the attack-all placeholder
  * @param targetId uuid of the attacked card stack
  */
-function onAttack(
+export function onAttack(
   io: Server,
   match: Match,
   player: Player,
@@ -327,14 +326,13 @@ function getPlayer(socket: Socket): Player | undefined {
 }
 
 /**
- * Emits the current match state, projected per player, to both players, resets the match's
- * temporary states and triggers pending bot actions afterwards.
+ * Emits the current match state, projected per player, to connected players and resets the
+ * match's temporary states afterwards.
  * @param io server instance used to look up the players' sockets
  * @param match match whose state is emitted
  */
 function emitState(io: Server, match: Match) {
   match.emitState(io);
-  processBotActions(io, match);
 }
 
 /**

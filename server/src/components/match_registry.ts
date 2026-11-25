@@ -30,8 +30,9 @@ export function registerMatch(match: Match): void {
   matchesByRoom.set(match.room, match);
 }
 
-/** Removes a finished match from the registry. */
+/** Removes a finished match from the registry and stops any pending bot timer. */
 export function unregisterMatch(match: Match): void {
+  match.bot?.onMatchEnd();
   matchesByRoom.delete(match.room);
 }
 
