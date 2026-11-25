@@ -27,7 +27,6 @@ import Background from '../components/background';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
 import CardImage from '../components/card/card_image';
 import ExitButton from '../components/buttons/exit_button';
-import { environment } from '../../environments/environment';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
 import { layoutConfig } from '../config/layout';
 import { rules } from '@shared/config/rules';
@@ -111,8 +110,8 @@ export default class Game extends Phaser.Scene {
 
   preload() {
     this.preloader = new Preloader(this);
-    loadPreloadableResources(environment.urls.api, this.load);
-    loadCardResources(environment.urls.api, this.load, this.gameParams.preloadCardIds);
+    loadPreloadableResources(this.load);
+    loadCardResources(this.load, this.gameParams.preloadCardIds);
   }
 
   create() {

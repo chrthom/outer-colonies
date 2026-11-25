@@ -1,14 +1,23 @@
 import { backgroundConfig } from '../config/background';
+import { environment } from '../../environments/environment';
 
-export function loadRequiredResources(apiURL: string, load: Phaser.Loader.LoaderPlugin) {
-  load.baseURL = `${apiURL}/assets/`;
+/**
+ * Base URL for static asset loading, without trailing slash.
+ */
+export function assetBaseURL(): string {
+  // Local development has no own asset host and keeps using the dev-only proxy of the API server
+  return environment.urls.assets || `${environment.urls.api}/assets`;
+}
+
+export function loadRequiredResources(load: Phaser.Loader.LoaderPlugin) {
+  load.baseURL = `${assetBaseURL()}/`;
   load.image('background', `background/stars${Math.floor(Math.random() * 7)}.jpg`);
   load.image('icon_exit', 'icons/exit.png');
   load.image('background_sun', 'background/sun.png');
 }
 
-export function loadPreloadableResources(apiURL: string, load: Phaser.Loader.LoaderPlugin) {
-  load.baseURL = `${apiURL}/assets/`;
+export function loadPreloadableResources(load: Phaser.Loader.LoaderPlugin) {
+  load.baseURL = `${assetBaseURL()}/`;
   backgroundConfig.orbs
     .map(o => o.name)
     .forEach(name => load.image(`background_orb_${name}`, `background/orb_${name}.png`));
@@ -88,7 +97,7 @@ export function loadPreloadableResources(apiURL: string, load: Phaser.Loader.Loa
   ].forEach(name => load.image(`button_${name}`, `utils/button_${name}.png`));
 }
 
-export function loadCardResources(apiURL: string, load: Phaser.Loader.LoaderPlugin, cardIds: number[]) {
-  load.baseURL = `${apiURL}/assets/`;
+export function loadCardResources(load: Phaser.Loader.LoaderPlugin, cardIds: number[]) {
+  load.baseURL = `${assetBaseURL()}/`;
   [0, 1].concat(cardIds).forEach(id => load.image(`card_${id}`, `cards/${id}.png`));
 }
