@@ -402,10 +402,12 @@ case "$verdict" in
     else
       echo "::warning::Verdict CLEAN, but adding the clean label failed; the review stands - the label can be added manually."
     fi
+    bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In review" || true
     exit 0
     ;;
   CHANGES_NEEDED)
     drop_clean_label
+    bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In progress" || true
     case "$review_post_id" in
       ''|*[!0-9]*)
         # A non-numeric id must never reach the fixer (PR #106: the 422 error JSON crashed the fixer gate).
@@ -424,6 +426,7 @@ case "$verdict" in
   NEEDS_HUMAN)
     # Same label drop as CHANGES_NEEDED: the head did not pass a CLEAN review.
     drop_clean_label
+    bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In progress" || true
     escalate "review verdict NEEDS_HUMAN - at least one finding requires a human decision; see the review just posted"
     exit 0
     ;;

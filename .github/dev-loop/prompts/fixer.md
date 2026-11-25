@@ -103,7 +103,7 @@ fixed for this run. Change approach or stop with `WALL: <reason>`.
 ## Hard rules
 
 Never rebase, never force-push, merge commits only, never merge the PR itself, never push to
-`main`, never change labels.
+`main`, never change labels, never change issue statuses.
 
 ## Outcome contract
 

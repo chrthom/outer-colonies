@@ -35,24 +35,40 @@ role workflow (reviewer / fixer / implementer)
              (labels, escalation, failure classification)
 ```
 
-Agents never change PR state (draft/ready/labels) themselves: every state transition is a
-workflow post-step, auditable in the run log, enforceable in code. There is **no draft/ready
-state machine**: the loop does not flip PRs between draft and ready. Draft status is a human
-parking brake — draft PRs are simply never touched by the loop.
+Agents never change PR state (draft/ready/labels) or issue planning statuses themselves: every state
+transition is a workflow step or post-step, auditable in the run log, enforceable in code. There
+is **no draft/ready state machine**: the loop does not flip PRs between draft and ready. Draft
+status is a human parking brake — draft PRs are simply never touched by the loop.
 
-## Opt-in: the `dev-loop` label
+## Opt-in & lifecycle gate: `dev-loop` label + `Todo` status
 
 The loop is opt-in, not opt-out. No workflow touches an issue or PR unless it carries the
-`dev-loop` label. The label is the first gate line in every workflow, evaluated before all
-other checks; if the label is absent, the run skips without side effects. Adding the label to
-an existing issue or PR starts the loop (`labeled` trigger); removing it stops the loop from
-picking the item up on future events.
+`dev-loop` label. On issues, the implementer additionally requires the native GitHub issue status
+to be **`Todo`** (`id = 3`): `Backlog` (`id = 2`) issues are never started even when they already
+carry `dev-loop`. Adding `dev-loop` to a `Todo` issue (`labeled` trigger) or moving a `dev-loop`
+issue to `Todo` (`status_changed` trigger) starts the implementer; removing `dev-loop` stops the
+loop from picking the item up on future events.
+
+```
+Backlog (ignored) ──[human sets Todo + dev-loop]──▶ Todo (implementer starts)
+                                                     │
+                                                     ▼ (implementer gate)
+                                                In progress ◀──────────────┐
+                                                     │                     │
+                                                     │ (reviewer CLEAN)    │ (reviewer start / red CI /
+                                                     ▼                     │  CHANGES_NEEDED / NEEDS_HUMAN)
+                                                 In review ────────────────┘
+                                                     │
+                                                     │ (human merges PR)
+                                                     ▼
+                                                   Done (GitHub auto-close)
+```
 
 ## Event map (final, agreed)
 
 | Trigger                                                                                                         | Fires                                                | Guard / notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `issues: [opened, reopened, labeled]`                                                                           | implementer                                          | requires `dev-loop` label; skip if a `vibe/issue-<N>-*` branch exists; `labeled: dev-loop` starts the loop on an existing issue. `needs-human` on an issue is informational only (parking = removing `dev-loop`, resume = re-adding it); there is no `unlabeled` trigger and no `needs-human` gate                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `issues: [opened, reopened, labeled, status_changed]`                                                           | implementer                                          | requires `dev-loop` label AND `Todo` status (`id = 3`; `Backlog` and all other statuses skip; `workflow_dispatch` also accepts `In progress` `id = 4` so `retry=1` and manual retries work after the first run moves the issue); skip if a `vibe/issue-<N>-*` branch exists; once gated, the implementer pre-step moves the issue to `In progress` (`id = 4`). `labeled: dev-loop` (on `Todo`) or `status_changed` to `Todo` (with `dev-loop`) starts the loop on an existing issue. `needs-human` on an issue is informational only (parking = removing `dev-loop`, resume = moving status back to `Todo` + re-adding `dev-loop` in either order); there is no `unlabeled` trigger and no `needs-human` gate |
 | `pull_request: [opened, ready_for_review, synchronize, labeled, unlabeled]`                                     | reviewer                                             | skip if draft, or no `dev-loop` label, or `needs-human`; marker-dedupe on head SHA; **CI gate**: poll the head's check runs (bounded, fail open) — green + tip unchanged → review; red + tip unchanged → dispatch the fixer (no-findings CI-failure run) and skip; tip moved (e.g. `chore: auto-format` pushed by ci.yml) → skip, the push's `synchronize` re-offers on the new head. **Merge-only skip**: a `synchronize` push verified from the git objects to introduce no branch-authored content — the head is already contained in `main` (fast-forward), or is a single two-parent merge commit of the pre-push head (`github.event.before`) with a `main`-contained second parent whose tree is byte-identical to the automatic merge (`git merge-tree --write-tree`, so hand-resolved merges keep their full review) — skips the agent review after the same CI watch: green + tip unchanged → skip (no marker review is posted; a later event re-runs the detection instead of deduping); red → the fixer dispatch above as usual; a consumable findings review standing on the pre-merge head keeps the full review (its fixer would otherwise skip on the moved head, and its safety assumption — the mover's `synchronize` re-reviews — is what the skip suppresses), and a marker review must exist on the pre-merge head (the branch side is verified; an unreviewed fresh head that absorbs a scan-dispatched merge keeps its full review instead of skipping its only review — fail closed to the full review on an unreadable poll). `opened`/`labeled` cover the implementer's ready PR (created non-draft, label added right after) and human opt-in on an existing PR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `pull_request_review: [submitted]`                                                                              | fixer                                                | event payload gate, partitioned by review author AND shape (reviews are world-postable on a public repo, so the author is checked on both branches; the expected login is derived from `github.repository_owner`, not hardcoded - the repo owner is the human by definition): **owner-authored marker review** (`<!-- dev-loop-review -->` line 1) with `Verdict: CHANGES_NEEDED` → fixer, CLEAN/NEEDS_HUMAN → nothing; **owner-authored `COMMENT` review** (state matched case-insensitively: the webhook payload delivers lowercase, only the REST API returns uppercase) with a non-empty body → fixer treats body + inline comments as the human's findings (the owner cannot APPROVE/REQUEST_CHANGES on their own PRs - the loop opens PRs under the owner's PAT - so a comment review is the human's findings channel; informational reviews get replies and no push; owner APPROVE/CHANGES_REQUESTED bodies, possible on human-authored PRs opted into the loop, dispatch nothing); **empty-body submissions** (the fixer's own reply reviews and an owner's comment-only reviews alike - the job-level `if` cannot distinguish fresh threads from replies, so both are filtered) → nothing, pre-filtered by a job-level `if` before runner allocation (also prevents the fixer's own replies from cancelling a pending re-review, the PR #106 race; a human findings review must carry body text - see Human input channels); third-party reviews → nothing (injection surface: a forged marker shape by a non-owner starts nothing). The shape contract is load-bearing: every automated review must carry either the marker or an empty body - the fixer prompt forbids body-carrying review submissions by the fixer itself |
 | (reviewer's CI gate, red dispatch) `pull_request: [synchronize]` with red/failed checks on a `CONFLICTING` head | fixer (no-findings run: conflicts and/or failing CI) | conflict origin 1: the PR's own push made it conflicting - a conflicted head cannot produce green checks, so the reviewer's CI gate dispatches the fixer (one per head SHA). The fixer has **no** `synchronize` trigger of its own: it would race the reviewer for the shared `dev-loop-pr-<N>` concurrency slot on every fix push and cancel the pending re-review (observed on PR #106)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -63,14 +79,17 @@ picking the item up on future events.
 
 Job-level event filters (all three role workflows): every role job carries an `if:` that
 skips events which can never start that role _before a runner is allocated_ — `labeled` for
-any label other than `dev-loop`, `unlabeled` for any label other than `needs-human`, and on
-the fixer an empty-body `pull_request_review` (reply-only submission — the human findings
-channel requires a body; the gate would skip it anyway — the fixer has no `synchronize`
-trigger at all, per the event map's conflict-origin-1 row). This keeps the loop's own state transitions (escalations adding/removing `needs-human`)
-from spawning gated no-op runs; the in-job gate remains as defense in depth and still enforces
-label/draft/fork/SHA rules against the live API state. On issues, `needs-human` is informational
-only: the implementer's escalation removes `dev-loop` (parking) and re-adding `dev-loop` resumes
-— there is no `unlabeled` trigger and no `needs-human` gate on the issue path.
+any label other than `dev-loop`, `status_changed` for any status other than `Todo` (`id = 3`),
+`opened`/`reopened`/`labeled` on issues whose status is not `Todo` (`id = 3`), `unlabeled` for any
+label other than `needs-human`, and on the fixer an empty-body `pull_request_review` (reply-only
+submission — the human findings channel requires a body; the gate would skip it anyway — the fixer
+has no `synchronize` trigger at all, per the event map's conflict-origin-1 row). This keeps the
+loop's own state transitions (moving issues to `In progress`/`In review`, escalations adding/removing
+`needs-human`) from spawning gated no-op runs; the in-job gate remains as defense in depth and
+still enforces label/status/draft/fork/SHA rules against the live API state. On issues,
+`needs-human` is informational only: the implementer's escalation removes `dev-loop` (parking) and
+moving the issue back to `Todo` + re-adding `dev-loop` resumes — there is no `unlabeled` trigger
+and no `needs-human` gate on the issue path.
 
 Human input channels (the owner acts under the same PAT login as the loop, so channels are
 partitioned by review shape, not identity alone):
@@ -157,9 +176,9 @@ Non-events by design:
 
 | Post-step   | Condition                                                                       | Action                                                                                                                                                                   |
 | ----------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| reviewer    | `Verdict: CLEAN`                                                                | add the `clean` label to the PR (best-effort, created on demand; the loop's merge-ready signal - removed again by the next non-CLEAN verdict) |
-| reviewer    | `Verdict: CHANGES_NEEDED`                                                       | dispatch the fixer with the posted review's id (a direct chain: no GitHub event carries the review id; one of the chained dispatches enumerated in Non-events by design); drop the `clean` label if present |
-| reviewer    | `Verdict: NEEDS_HUMAN`                                                          | label `needs-human` + marker escalation comment `@$REPO_OWNER` (the `github.repository_owner`-derived mention every escalation template uses); drop the `clean` label if present |
+| reviewer    | `Verdict: CLEAN`                                                                | add the `clean` label to the PR and move linked open same-repo issue(s) to **`In review`** (`id = 8`, best-effort; the loop's merge-ready signal for human verification/merge) |
+| reviewer    | `Verdict: CHANGES_NEEDED`                                                       | dispatch the fixer with the posted review's id (a direct chain: no GitHub event carries the review id; one of the chained dispatches enumerated in Non-events by design); drop the `clean` label if present and ensure linked open issue(s) are **`In progress`** (`id = 4`) |
+| reviewer    | `Verdict: NEEDS_HUMAN`                                                          | label `needs-human` + marker escalation comment `@$REPO_OWNER` (the `github.repository_owner`-derived mention every escalation template uses); drop the `clean` label if present and ensure linked open issue(s) are **`In progress`** (`id = 4`) |
 | reviewer    | head SHA moved since review start                                               | re-dispatch reviewer (stale review is not acted on)                                                                                                                      |
 | reviewer    | head-SHA freshness poll errors                                                  | post the review on the reviewed SHA + `::warning` (fail open; the stale-head protection is best-effort)                                                                  |
 | fixer gate  | advisory poll errors (head SHA, mergeability, CI state; pre-agent)              | `::warning` + proceed (fail open — the fixer re-checks live; a skip would strand the reviewer's red-CI dispatch)                                                          |
@@ -171,11 +190,16 @@ Non-events by design:
 | implementer | outcome `finished`                                                              | open a **ready** PR (`Closes #<N>`) with the `dev-loop` label; `ready_for_review` fires the first review                                                                 |
 | implementer | outcome `NO_PR`                                                                 | comment questions on the issue + label `needs-human`                                                                                                                     |
 
-Clean-label lifecycle caveat: the label is verdict-driven only - added on a CLEAN verdict,
-dropped by the next non-CLEAN verdict. A push to the PR head after a CLEAN verdict (a human
-edit or a conflict-resolution merge commit) therefore leaves the label on a head that has not
-passed review until the next verdict lands; the push's `synchronize` trigger re-offers a review
-for the new head, and that verdict reconciles the label (CLEAN re-adds it, non-CLEAN drops it).
+Clean-label & `In review` lifecycle caveat: both signals are driven by review/CI activity —
+`clean` + `In review` are set on a `CLEAN` verdict, and `In progress` is restored whenever a new
+full AI review starts (including countering GitHub's preview PR-link auto-transition to `In review`
+on newly opened PRs), when the CI gate dispatches the fixer for red CI, or when the iteration cap
+escalates (with `merge_only` green-CI skips preserving an existing `In review` status). If a push
+lands after `CLEAN`, `clean` stays on the PR until the next verdict lands, while the reviewer gate
+immediately moves linked open issue(s) back to `In progress` until the new head finishes review.
+All issue status reads/writes use `DEV_LOOP_TOKEN` via the REST/GraphQL APIs (`gh issue view`/`edit`
+do not yet expose planning statuses) and fail open with a `::warning::` so preview API hiccups
+never block the loop; closed issues are never patched (setting an open status reopens an issue).
 
 The reviewer is never called twice for the same work: dispatches on the same PR serialize in
 the shared `dev-loop-pr-<N>` concurrency group, the head-SHA marker dedupe makes at most one
@@ -413,10 +437,12 @@ allocated, and the gate re-checks the live issue state, so the `workflow_dispatc
 .github/dev-loop/prompts/implementer.md    role prompts (ported from PR #80's agent definitions,
 .github/dev-loop/prompts/reviewer.md       minus gh-guard boilerplate; final line is a parseable
 .github/dev-loop/prompts/fixer.md          outcome: PR_URL|NO_PR:, VERDICT:, FIXED:|WALL:)
-.github/dev-loop/scripts/post-review.sh   reviewer post-step state machine (checked-in file, not
-                                           an inline run: scalar - GitHub caps run: at 21,000 chars
-                                           and the inline version sat within ~3.3k of it; the env:
-                                           block bridges expression contexts)
+.github/dev-loop/scripts/post-review.sh          reviewer post-step state machine (checked-in file, not
+                                                  an inline run: scalar - GitHub caps run: at 21,000 chars
+                                                  and the inline version sat within ~3.3k of it; the env:
+                                                  block bridges expression contexts)
+.github/dev-loop/scripts/sync-pr-issue-status.sh  best-effort PR-to-issue planning status sync
+                                                  (In progress / In review via GraphQL + REST PATCH)
 misc/dev-loop.md                           this plan / runbook
 ```
 
@@ -545,9 +571,10 @@ are the discriminators. Vibe programmatic mode exit codes:
 Per-role specifics:
 
 - **implementer fails** → nothing exists yet on GitHub except the issue. Post-step comments on
-  the issue ("dev-loop implementer failed: <reason>, run: <link>") and labels it `needs-human`.
-  The issue is never lost; re-adding the `dev-loop` label re-triggers the implementer with a
-  fresh budget (the escalation removed it to park the issue).
+  the issue ("dev-loop implementer failed: <reason>, run: <link>"), removes `dev-loop` to park it,
+  and labels it `needs-human` (the issue stays in `In progress`). The issue is never lost; moving its
+  status back to `Todo` and re-adding the `dev-loop` label (or running `workflow_dispatch`)
+  re-triggers the implementer with a fresh budget.
 - **reviewer fails** → the PR sits ready-for-review with no review. Post-step comments
   on the PR with the failure reason. Human can re-run the job or push a trivial change to
   re-trigger `synchronize`. A ready PR without a review stays unmergeable by review policy,
@@ -583,8 +610,10 @@ which is also the recovery path if a webhook event was ever missed.
 
 ## Acceptance criteria
 
-- A `dev-loop`-labeled open issue becomes a ready PR without human interaction; CI passes.
-- No workflow touches an issue or PR without the `dev-loop` label.
+- A `dev-loop`-labeled open issue in status `Todo` becomes a ready PR without human interaction;
+  CI passes. `Backlog` issues are never started automatically.
+- No workflow touches an issue or PR without the `dev-loop` label; the implementer moves started
+  issues to `In progress`, and the reviewer moves linked open issues to `In review` on `CLEAN`.
 - Review runs exactly once per head SHA; pushes to draft PRs never trigger it; a `needs-human`
   label parks the item; drafts are the human parking brake and the loop never flips them.
 - A push to a ready PR (fix commits or CI auto-format) triggers re-review via `synchronize`;
@@ -596,6 +625,6 @@ which is also the recovery path if a webhook event was ever missed.
   or the synchronize/push conflict-only path), and the push is re-reviewed.
 - On PRs, `needs-human` parks the item; removing it resumes it with a fresh budget. On issues,
   `needs-human` is informational only: the implementer's escalation parks the issue by removing
-  `dev-loop`, and re-adding `dev-loop` resumes it with a fresh budget.
+  `dev-loop`, and moving it back to `Todo` + re-adding `dev-loop` resumes it with a fresh budget.
 - Every role run is bounded by the step/token caps and the job timeout; the transcript
   artifact preserves what happened within those bounds.

@@ -4,8 +4,9 @@ on:
   issues:
     # No unlabeled trigger: needs-human is ignored on issues, so removing it is
     # not a resume event for the implementer - the manual backstop
-    # (workflow_dispatch) covers a retry after a needs-human escalation.
-    types: [opened, reopened, labeled]
+    # (workflow_dispatch) covers a retry after a needs-human escalation, or
+    # moving the issue back to Todo + re-adding dev-loop.
+    types: [opened, reopened, labeled, status_changed]
   workflow_dispatch:
     inputs:
       issue_number:
@@ -32,10 +33,14 @@ jobs:
   implement:
     name: Implementer
     # Job-level event filter (misc/dev-loop.md): a labeled event for any
-    # label other than dev-loop can never start the implementer - skip before
+    # label other than dev-loop, a status_changed event to any status other
+    # than Todo (id=3), or an opened/reopened/labeled event on an issue whose
+    # status is not Todo (id=3) can never start the implementer - skip before
     # a runner is allocated. The gate below remains as defense in depth.
     if: >-
-      !(github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name != 'dev-loop')
+      !(github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name != 'dev-loop') &&
+      !(github.event_name == 'issues' && github.event.action == 'status_changed' && github.event.status.id != 3) &&
+      !(github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'labeled') && github.event.issue.status.id != 3)
     runs-on: ubuntu-latest
     # 15 min above --time-limit (5400 s = 90 min), per misc/dev-loop.md budgets table
     timeout-minutes: 105
@@ -58,8 +63,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.DEV_LOOP_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+          EVENT_NAME: ${{ github.event_name }}
           EVENT_ACTION: ${{ github.event.action }}
           LABELED_NAME: ${{ github.event.label.name }}
+          EVENT_STATUS_ID: ${{ github.event.status.id }}
         run: |
           set -eu
           if [ -z "$ISSUE_NUMBER" ]; then
@@ -68,9 +75,15 @@ jobs:
             exit 0
           fi
           # Opt-in gate, first line, before all other checks: no dev-loop label,
-          # no loop. `labeled: dev-loop` starts the loop on an existing issue.
+          # no loop. `labeled: dev-loop` or `status_changed` to Todo starts the
+          # loop on an existing issue.
           if [ "$EVENT_ACTION" = "labeled" ] && [ "$LABELED_NAME" != "dev-loop" ]; then
             echo "Labeled '$LABELED_NAME', not dev-loop; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$EVENT_ACTION" = "status_changed" ] && [ "$EVENT_STATUS_ID" != "3" ]; then
+            echo "Status changed to id='$EVENT_STATUS_ID', not Todo (3); skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -78,20 +91,74 @@ jobs:
             --description "dev-loop: human decision required" 2>/dev/null || true
           gh label create dev-loop --color 46A1AA \
             --description "Development and reviewing is performed by an agentic AI dev-loop" 2>/dev/null || true
-          if ! gh issue view "$ISSUE_NUMBER" --json labels \
-            | jq -e 'any(.labels[]; .name == "dev-loop")' >/dev/null; then
+          # Poll live issue state via REST API (gh issue view --json does not
+          # expose planning status). Retry boundedly and fail visible on
+          # persistent errors so a transient API blip does not silently masquerade
+          # as a missing label or wrong status.
+          issue_json=""
+          for attempt in 1 2 3 4 5; do
+            issue_json="$(gh api "repos/${GH_REPO}/issues/${ISSUE_NUMBER}" 2>/dev/null || true)"
+            if [ -n "$issue_json" ] && jq -e '.number' <<<"$issue_json" >/dev/null 2>&1; then
+              break
+            fi
+            issue_json=""
+            [ "$attempt" = 5 ] || sleep 10
+          done
+          if [ -z "$issue_json" ]; then
+            echo "::warning::Issue poll failed after 5 attempts; cannot evaluate the gate on issue #$ISSUE_NUMBER. Skipping - re-run via workflow_dispatch to retry (fail visible, no red run)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if printf '%s' "$issue_json" | jq -e '.pull_request != null' >/dev/null; then
+            echo "#$ISSUE_NUMBER is a pull request, not an issue; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          issue_state="$(printf '%s' "$issue_json" | jq -r '.state // empty')"
+          if [ "$issue_state" != "open" ]; then
+            echo "Issue #$ISSUE_NUMBER is '$issue_state', not open; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! printf '%s' "$issue_json" | jq -e 'any(.labels[]; .name == "dev-loop")' >/dev/null; then
             echo "Issue #$ISSUE_NUMBER lacks the dev-loop label; the loop is opt-in. Skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Lifecycle gate (misc/dev-loop.md): only start issues on Todo (id=3)
+          # so Backlog / In progress / In review issues stay untouched.
+          # workflow_dispatch (including internal retry=1) also accepts
+          # In progress (id=4) because the initial run moves the issue there.
+          status_id="$(printf '%s' "$issue_json" | jq -r '.status.id // 0')"
+          status_name="$(printf '%s' "$issue_json" | jq -r '.status.name // "none"')"
+          if [ "$EVENT_NAME" != "workflow_dispatch" ] && [ "$status_id" != "3" ]; then
+            echo "Issue #$ISSUE_NUMBER status is '$status_name' (id=$status_id), not Todo (3); skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$status_id" != "3" ] && [ "$status_id" != "4" ]; then
+            echo "Issue #$ISSUE_NUMBER status is '$status_name' (id=$status_id), not Todo (3) or In progress (4); skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           # needs-human on an issue is informational only: parking is done by
           # removing the dev-loop label (the escalation post-step does exactly
-          # that), and the resume path is re-adding dev-loop. The gate therefore
-          # does not skip on needs-human.
+          # that), and the resume path is re-adding dev-loop (with status Todo).
+          # The gate therefore does not skip on needs-human.
           if [ -n "$(git ls-remote origin "refs/heads/vibe/issue-$ISSUE_NUMBER-*")" ]; then
             echo "Branch vibe/issue-$ISSUE_NUMBER-* already exists; skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+          # Move the issue to In progress (id=4) right before handing off to
+          # the agent so the board reflects active work and queued duplicate
+          # events (e.g. opened + status_changed) see In progress and skip.
+          if [ "$status_id" != "4" ]; then
+            if gh api -X PATCH "repos/${GH_REPO}/issues/${ISSUE_NUMBER}" -f status="In progress" >/dev/null 2>&1; then
+              echo "Moved issue #$ISSUE_NUMBER status to In progress."
+            else
+              echo "::warning::Could not move issue #$ISSUE_NUMBER status to In progress (best-effort); proceeding."
+            fi
           fi
           echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
 
@@ -224,7 +291,7 @@ jobs:
           escalate() {
             # Park the issue: remove dev-loop (the opt-in gate then skips future
             # events) and add needs-human as the informational marker. Resume =
-            # re-adding dev-loop (labeled: dev-loop re-triggers the implementer).
+            # move status back to Todo and re-add dev-loop (or workflow_dispatch).
             # The escalation path must itself fail open: an unguarded gh failure
             # here would red-run the post-step after the agent already finished
             # (losing the outcome) and silently drop the signal. Guard both so
@@ -251,7 +318,7 @@ jobs:
               echo "A step failed before the agent ran; leaving a red run for re-run failed jobs."
               exit 1
             fi
-            escalate "a workflow step failed before the agent ran (twice); retry via workflow_dispatch (Actions -> Dev Loop Implement -> Run workflow) or re-add the dev-loop label"
+            escalate "a workflow step failed before the agent ran (twice); retry via workflow_dispatch (Actions -> Dev Loop Implement -> Run workflow) or move status to Todo and re-add the dev-loop label"
             exit 0
           fi
 

@@ -47,7 +47,8 @@ fixed for this run. Change approach or stop with `WALL: <reason>`.
 
 ## Hard rules
 
-Never open a draft PR, never merge, never force-push, never push to `main`.
+Never open a draft PR, never merge, never force-push, never push to `main`, never change issue
+statuses.
 
 ## Outcome contract
 

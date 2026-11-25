@@ -34,6 +34,7 @@ Maintain consistency across the three subprojects
 - When creating an issue, label it as follows: add `needs-human` whenever the issue cannot be completely implemented by the AI agent in this environment; additionally add `dev-loop` only if any part of it can be automatically implemented by the AI agent there (a fully automatable issue carries only `dev-loop`)
 - Unless stated otherwise, issues assigned to the productive milestone (bugfixes) and to the current in-development milestone always carry the `dev-loop` label; issues on any other milestone do not carry it by default
 - The `clean` label on a PR marks that its current head passed a dev-loop review with verdict CLEAN; it is managed by the dev loop (added on a CLEAN verdict, removed on the next non-CLEAN verdict)
+- Issue lifecycle statuses (`Backlog`, `Todo`, `In progress`, `In review`, `Done`) are integrated with the dev loop: only `dev-loop` issues in **`Todo`** are started by the implementer (which moves them to **`In progress`**), and the reviewer moves linked open issues to **`In review`** on verdict `CLEAN` (and keeps them **`In progress`** while reviewing/fixing or on non-`CLEAN` verdicts)
 
 ### Milestones, Versions & Releases
 - Each milestone matches exactly one major/minor tag and release and contains all issues for developing that release; hotfix patch tags and releases are additionally assigned to the productive milestone
