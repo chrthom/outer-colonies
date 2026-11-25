@@ -3,14 +3,33 @@ import { environment } from 'src/environments/environment';
 import { ContentBoxComponent } from '../../../components/content-box/content-box.component';
 import { MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import {
+  MatButtonToggleGroup,
+  MatButtonToggle,
+  MatButtonToggleChange
+} from '@angular/material/button-toggle';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IconService } from '../../../icon.service';
+
+/** Mode of the rules: online client controls included or physical card game only. */
+export type RulesMode = 'online' | 'kartenspiel';
+
+const DEFAULT_MODE: RulesMode = 'online';
+const MODE_STORAGE_KEY = 'oc-rules-mode';
 
 @Component({
   selector: 'oc-page-rules',
   templateUrl: './rules.page.html',
   styleUrls: ['./rules.page.scss'],
-  imports: [ContentBoxComponent, MatSelectionList, MatListOption, MatButtonModule, RouterLink]
+  imports: [
+    ContentBoxComponent,
+    MatSelectionList,
+    MatListOption,
+    MatButtonModule,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    RouterLink
+  ]
 })
 export class RulesPage implements OnInit {
   @ViewChild('activeChapter') activeChapterList!: MatSelectionList;
@@ -23,7 +42,6 @@ export class RulesPage implements OnInit {
     'symbols',
     'victory',
     'glossar',
-    'online-game',
     'cards',
     'hull-cards',
     'equipment-cards',
@@ -40,13 +58,51 @@ export class RulesPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
+  /** Whether online usage instructions and client controls are shown (Online-Spiel mode). */
+  onlineMode = true;
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      const section = params['section'];
+      const rawSection = params['section'];
+      const section = rawSection === 'online-game' ? 'setup' : rawSection;
       if (section && this.chapters.includes(section)) {
         setTimeout(() => this.selectChapter(section));
       }
+      this.onlineMode = (this.modeFromParams(params) ?? this.storedMode ?? DEFAULT_MODE) == 'online';
     });
+  }
+
+  /**
+   * Handles a mode change through the segmented toggle: applies the new mode, persists the choice and
+   * mirrors it to the `?mode=` query param so links including the mode are shareable.
+   */
+  onModeChange(event: MatButtonToggleChange): void {
+    this.setMode(event.value as RulesMode);
+  }
+
+  /** Applies a rules mode, persists it in localStorage and mirrors it to the `?mode=` query param. */
+  setMode(mode: RulesMode): void {
+    this.onlineMode = mode == 'online';
+    try {
+      localStorage.setItem(MODE_STORAGE_KEY, mode);
+    } catch {
+      // Storage may be unavailable (strict privacy modes); the mode still applies for this session.
+    }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: mode },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  private modeFromParams(params: Record<string, string>): RulesMode | null {
+    const mode = params['mode'];
+    return mode == 'online' || mode == 'kartenspiel' ? mode : null;
+  }
+
+  private get storedMode(): RulesMode | null {
+    const mode = localStorage.getItem(MODE_STORAGE_KEY);
+    return mode == 'online' || mode == 'kartenspiel' ? mode : null;
   }
 
   imgUrl(imgName: string): string {

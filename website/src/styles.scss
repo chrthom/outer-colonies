@@ -65,6 +65,15 @@ body {
   font-family: "Latin Modern Sans", sans-serif;
   font-variant-numeric: tabular-nums;
 }
+oc-root > header,
+#root-content {
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.oc-fonts-loading oc-root > header,
+html.oc-fonts-loading #root-content {
+  opacity: 0;
+  pointer-events: none;
+}
 mat-card-title,
 mat-card-subtitle {
   color: var(--color-light) !important;

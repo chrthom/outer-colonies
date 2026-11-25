@@ -120,28 +120,20 @@ describe('Matchmaking login', () => {
     jest.restoreAllMocks();
   });
 
-  test('lets a player without a running match join the matchmaking search', async () => {
-    const socketMock = createSocketMock(1);
-    mockLogin(1);
-
-    await getLoginHandler(createIoMock([socketMock]), socketMock)('token-1');
-
-    expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
-    expect(socketMock.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, 0);
-  });
-
-  test('counts the user as online and broadcasts the new count on login', async () => {
+  test('lets a player without a running match join the search and counts them as online', async () => {
     const socketMock = createSocketMock(1);
     const io = createIoMock([socketMock]);
     mockLogin(1);
 
     await getLoginHandler(io, socketMock)('token-1');
 
+    expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
+    expect(socketMock.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Search, 0);
     expect(io.emit).toHaveBeenCalledWith(MsgTypeOutbound.OnlineCount, 1);
     expect(onlineUserCount()).toBe(1);
   });
 
-  test('does not count the user as online when the session token is invalid', async () => {
+  test('does not count the user as online or join the search when the session token is invalid', async () => {
     const socketMock = createSocketMock(1);
     const io = createIoMock([socketMock]);
     jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue('not_found');
@@ -150,6 +142,8 @@ describe('Matchmaking login', () => {
 
     expect(io.emit).not.toHaveBeenCalled();
     expect(onlineUserCount()).toBe(0);
+    expect(socketMock.join).not.toHaveBeenCalled();
+    expect(socketMock.emit).not.toHaveBeenCalled();
   });
 
   test('does not count a socket which disconnected during the login', async () => {
@@ -160,16 +154,6 @@ describe('Matchmaking login', () => {
     await getLoginHandler(createIoMock([socketMock]), socketMock)('token-1');
 
     expect(onlineUserCount()).toBe(0);
-  });
-
-  test('does not join the search when the session token is invalid', async () => {
-    const socketMock = createSocketMock(1);
-    jest.spyOn(DBCredentialsDAO, 'getBySessionToken').mockRejectedValue('not_found');
-
-    await getLoginHandler(createIoMock([socketMock]), socketMock)('invalid-token');
-
-    expect(socketMock.join).not.toHaveBeenCalled();
-    expect(socketMock.emit).not.toHaveBeenCalled();
   });
 
   test('lets a player rejoin their running match instead of searching again', async () => {

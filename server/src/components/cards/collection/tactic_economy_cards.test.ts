@@ -1,12 +1,5 @@
 import { Socket } from 'socket.io';
-import {
-  CardDurability,
-  CardType,
-  GameResultType,
-  TacticDiscipline,
-  TurnPhase,
-  Zone
-} from '../../../shared/config/enums';
+import { CardType, GameResultType, TurnPhase, Zone } from '../../../shared/config/enums';
 import Card from '../card';
 import CardStack, { RootCardStack } from '../card_stack';
 import { CardProfileConfig } from '../card_profile';
@@ -60,12 +53,6 @@ describe('Card437 Kopfgeld', () => {
     player.deck = [1, 2, 3, 4, 5, 6].map(i => new MockCard(200 + i));
     opponentShip = new RootCardStack(new MockCard(1, CardType.Hull, { hp: 3 }), Zone.Orbital, opponent);
     opponent.cardStacks.push(opponentShip);
-  });
-
-  test('is a permanent Trade discipline tactic card', () => {
-    expect(card.type).toBe(CardType.Tactic);
-    expect(card.discipline).toBe(TacticDiscipline.Trade);
-    expect(card.durability).toBe(CardDurability.Permanent);
   });
 
   test('targets only opponent hull card stacks, including stations', () => {

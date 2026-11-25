@@ -7,6 +7,7 @@ import { layoutConfig } from 'src/app/config/layout';
 export default class DiscardPile extends CardImage {
   cardIds: number[] = [];
   indicator?: ValueIndicator;
+  private maximizeOnRightclickEnabled = false;
   constructor(scene: Game, ownedByPlayer: boolean) {
     super(
       scene,
@@ -22,20 +23,31 @@ export default class DiscardPile extends CardImage {
   }
   update(cardIds?: number[]) {
     if (cardIds) this.cardIds = cardIds;
-    if (this.indicator) this.indicator.destroy();
-    if (this.topCard != constants.cardBackSideID) {
-      this.setCardId(this.topCard).setVisible(true).enableMaximizeOnRightclick();
-      this.indicator = new ValueIndicator(
-        this.scene,
-        this.cardIds.length,
-        false,
-        this.placementConfig.discardPile.x.value2d,
-        this.placementConfig.discardPile.y.value2d,
-        this.ownedByPlayer
-      );
+    const topCard = this.topCard;
+    if (topCard != constants.cardBackSideID) {
+      if (this.cardId != topCard) this.setCardId(topCard);
+      if (!this.maximizeOnRightclickEnabled) {
+        this.enableMaximizeOnRightclick();
+        this.maximizeOnRightclickEnabled = true;
+      }
+      this.setVisible(true);
+      if (this.indicator) {
+        this.indicator.update(this.cardIds.length, false);
+      } else {
+        this.indicator = new ValueIndicator(
+          this.scene,
+          this.cardIds.length,
+          false,
+          this.placementConfig.discardPile.x.value2d,
+          this.placementConfig.discardPile.y.value2d,
+          this.ownedByPlayer
+        );
+      }
       this.setPileSize(this.cardIds.length);
     } else {
       this.setVisible(false);
+      this.indicator?.destroy();
+      this.indicator = undefined;
     }
   }
   override destroy(): this {

@@ -371,9 +371,17 @@ The client loads all runtime assets from the assets web space under `<apiURL>/as
 3. **Configuration**:
    - Copy the configuration files from `server/config/` and adjust as needed.
    - Ensure the database connection settings are correctly configured.
-   - Set the environment variables for the database and mail service:
-     - `DB_PASSWORD`: Database password
+   - Set the environment variables for the database and mail service. They are read from the process environment only (no `.env` file is loaded), so export them in the shell before starting the server:
+     - `DB_PASSWORD`: Database password (required, the server cannot connect to the database without it)
      - `MAIL_PASSWORD`: Mail service password (optional for development)
+
+     ```bash
+     export DB_PASSWORD='your-database-password'
+     export MAIL_PASSWORD='your-mail-password'   # optional
+     cd server && npm run s
+     ```
+
+     The database user, host, port and name are taken from `server/config/` (see `database` in `default.json`). Override them in a local `server/config/local.json` if your database runs elsewhere.
 
 ### Development Workflow
 

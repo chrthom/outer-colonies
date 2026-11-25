@@ -1,6 +1,6 @@
 import CardStack, { AttachmentCardStack, RootCardStack } from './card_stack';
 import Card from './card';
-import { CardDurability, CardType, Zone } from '../../shared/config/enums';
+import { CardDurability, CardType, EventType, Zone } from '../../shared/config/enums';
 
 class MockCard extends Card {
   getValidTargets(): CardStack[] {
@@ -15,11 +15,15 @@ class MockCard extends Card {
 class MockPlayer {
   socketId = 'test-player';
   no = 1;
-  match = { battle: { recentAttack: null as unknown, range: 1 } };
+  match = {
+    battle: { recentAttack: null as unknown, range: 1 },
+    addCardMovementEvent: jest.fn()
+  };
   cardStacks: CardStack[] = [];
   hand: CardStack[] = [];
+  discardPile: Card[] = [];
   discardCards = jest.fn();
-  takeCards = jest.fn();
+  takeCards = jest.fn((cards: Card[]) => cards.map(c => new RootCardStack(c, Zone.Hand, this as any)));
 }
 
 const newStack = (id: number, name: string, type: CardType = CardType.Hull) =>
@@ -82,26 +86,6 @@ describe('CardStack.owner', () => {
 
     expect(tactic.player).toBe(opponent);
     expect(tactic.owner).toBe(caster);
-  });
-});
-
-describe('CardStack.retract', () => {
-  test('routes retractable cards to the stack owner hand and opponent attachments to their pile', () => {
-    const owner = new MockPlayer();
-    const opponent = new MockPlayer();
-    const shipCard = new MockCard(1, 'Ship', CardType.Hull, 1);
-    const ship = new RootCardStack(shipCard, Zone.Orbital, owner as any);
-    owner.cardStacks.push(ship);
-    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
-    jest.spyOn(tacticCard, 'canBeRetracted').mockReturnValue(false);
-    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
-    ship.attach(tactic);
-
-    ship.retract();
-
-    expect(owner.takeCards).toHaveBeenCalledWith([shipCard]);
-    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
-    expect(owner.discardCards).not.toHaveBeenCalled();
   });
 });
 
@@ -237,6 +221,49 @@ describe('CardStack.playHandCard', () => {
 });
 
 describe('CardStack.discard', () => {
+  test('discards all cards and records a discard movement event for every card of the stack', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    const equipment = new AttachmentCardStack(new MockCard(2, 'Equipment', CardType.Equipment, 1), ship);
+    ship.attach(equipment);
+    player.cardStacks.push(ship);
+
+    ship.discard();
+
+    expect(player.cardStacks).not.toContain(ship);
+    expect(player.discardCards).toHaveBeenCalledTimes(2);
+    expect(player.discardCards).toHaveBeenCalledWith(equipment.card);
+    expect(player.discardCards).toHaveBeenCalledWith(ship.card);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(2);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, ship);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, equipment);
+  });
+
+  test('routes each card of a discarded stack to its own owner when an opponent attachment is present', () => {
+    const caster = new MockPlayer();
+    const shipOwner = new MockPlayer();
+    const ship = new RootCardStack(
+      new MockCard(25, 'Ship', CardType.Hull, 1),
+      Zone.Orbital,
+      shipOwner as any
+    );
+    const tactic = new RootCardStack(
+      new MockCard(26, 'Tactic', CardType.Tactic, 1),
+      Zone.Hand,
+      caster as any
+    );
+    ship.attach(tactic);
+    shipOwner.cardStacks.push(ship);
+
+    ship.discard();
+
+    expect(shipOwner.cardStacks).not.toContain(ship);
+    expect(caster.discardCards).toHaveBeenCalledWith(tactic.card);
+    expect(shipOwner.discardCards).toHaveBeenCalledWith(ship.card);
+    expect(shipOwner.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, tactic);
+    expect(shipOwner.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, ship);
+  });
+
   test('discards an attachment on an opponent stack to the owning player', () => {
     const caster = new MockPlayer();
     const opponent = new MockPlayer();
@@ -257,5 +284,100 @@ describe('CardStack.discard', () => {
     expect(opponentShip.attachedCardStacks).not.toContain(tactic);
     expect(caster.discardCards).toHaveBeenCalledWith(tactic.card);
     expect(opponent.discardCards).not.toHaveBeenCalled();
+  });
+});
+
+describe('CardStack.retract', () => {
+  test('routes retractable cards to the stack owner hand and opponent attachments to their pile', () => {
+    const owner = new MockPlayer();
+    const opponent = new MockPlayer();
+    const shipCard = new MockCard(1, 'Ship', CardType.Hull, 1);
+    const ship = new RootCardStack(shipCard, Zone.Orbital, owner as any);
+    owner.cardStacks.push(ship);
+    const tacticCard = new MockCard(2, 'Kopfgeld', CardType.Tactic, 1);
+    jest.spyOn(tacticCard, 'canBeRetracted').mockReturnValue(false);
+    const tactic = new RootCardStack(tacticCard, Zone.Hand, opponent as any);
+    ship.attach(tactic);
+
+    ship.retract();
+
+    expect(owner.takeCards).toHaveBeenCalledWith([shipCard]);
+    expect(opponent.discardCards).toHaveBeenCalledWith(tacticCard);
+    expect(owner.discardCards).not.toHaveBeenCalled();
+  });
+
+  test('takes retractable cards into the hand and records retract events with the new hand card UUIDs', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    player.cardStacks.push(ship);
+
+    ship.retract();
+
+    expect(player.cardStacks).not.toContain(ship);
+    expect(player.takeCards).toHaveBeenCalledWith([ship.card]);
+    const newHandCardStacks = player.takeCards.mock.results[0].value as CardStack[];
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(1);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      ship,
+      newHandCardStacks[0].uuid
+    );
+  });
+
+  test('records discard events for non-retractable cards of a partially retracted stack', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    const equipment = new AttachmentCardStack(new MockCard(2, 'Equipment', CardType.Equipment, 1), ship);
+    ship.attach(equipment);
+    jest.spyOn(equipment.card, 'canBeRetracted').mockReturnValue(false);
+    player.cardStacks.push(ship);
+
+    ship.retract();
+
+    expect(player.takeCards).toHaveBeenCalledWith([ship.card]);
+    expect(player.discardCards).toHaveBeenCalledWith(equipment.card);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(2);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      ship,
+      expect.any(String)
+    );
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(EventType.Discard, equipment);
+  });
+
+  test('pairs each of two identical retractable cards with its own new hand card stack UUID', () => {
+    const player = new MockPlayer();
+    const ship = new RootCardStack(new MockCard(1, 'Ship', CardType.Hull, 1), Zone.Orbital, player as any);
+    // Two copies of the same card ID share one Card instance (static CardCollection registry)
+    const equipmentCard = new MockCard(2, 'Equipment', CardType.Equipment, 1);
+    const equipment1 = new AttachmentCardStack(equipmentCard, ship);
+    const equipment2 = new AttachmentCardStack(equipmentCard, ship);
+    ship.attach(equipment1);
+    ship.attach(equipment2);
+    player.cardStacks.push(ship);
+
+    ship.retract();
+
+    const newHandCardStacks = player.takeCards.mock.results[0].value as CardStack[];
+    expect(player.takeCards).toHaveBeenCalledWith([equipmentCard, equipmentCard, ship.card]);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledTimes(3);
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      equipment1,
+      newHandCardStacks[0].uuid
+    );
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      equipment2,
+      newHandCardStacks[1].uuid
+    );
+    expect(player.match.addCardMovementEvent).toHaveBeenCalledWith(
+      EventType.Retract,
+      ship,
+      newHandCardStacks[2].uuid
+    );
+    // Every new hand card stack is referenced by exactly one retract event
+    const newUUIDs = player.match.addCardMovementEvent.mock.calls.map(call => call[2] as string);
+    expect(new Set(newUUIDs).size).toBe(3);
   });
 });

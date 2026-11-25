@@ -39,6 +39,14 @@ export default class ValueIndicator {
     this.shape.destroy();
     this.text.destroy();
   }
+  /** Updates value and critical state in place, without recreating the objects. */
+  update(value: number, critical: boolean) {
+    this.text.setText(value.toString());
+    this.shape.setFillStyle(
+      critical ? designConfig.tint.opponent : designConfig.tint.player,
+      designConfig.alpha.normal
+    );
+  }
   private x(cardX: number) {
     return (
       cardX +

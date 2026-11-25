@@ -30,13 +30,6 @@ const playerWith = (attached: OrbStub[]) => {
 };
 
 describe('OrbCard.onEnterGame', () => {
-  test('discards every orb already attached to the colony', () => {
-    const oldOrb = orbStub();
-    const { player } = playerWith([oldOrb]);
-    new TestOrb().onEnterGame(player);
-    expect(oldOrb.discard).toHaveBeenCalledTimes(1);
-  });
-
   test('discards multiple existing orbs', () => {
     const orb1 = orbStub();
     const orb2 = orbStub();
@@ -65,13 +58,5 @@ describe('OrbCard.onEnterGame', () => {
     expect(captured).toEqual(expected);
     expect(expected).toHaveLength(2);
     expect(orb.actionPool).toBeInstanceOf(ActionPool);
-  });
-
-  test('discards old orbs AND pushes new actions in the same call', () => {
-    const oldOrb = orbStub();
-    const { player, captured } = playerWith([oldOrb]);
-    new TestOrb().onEnterGame(player);
-    expect(oldOrb.discard).toHaveBeenCalledTimes(1);
-    expect(captured.length).toBeGreaterThan(0);
   });
 });

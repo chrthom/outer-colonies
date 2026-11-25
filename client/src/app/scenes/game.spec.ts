@@ -1,6 +1,6 @@
 import Game from './game';
 import SocketService from '../socket_service';
-import { GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { EventType, GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
 import {
   ClientGameResult,
   ClientHandCard,
@@ -186,6 +186,15 @@ describe('Game scene - showConnectionLostMessage', () => {
 
     expect(game.obj.exitButton.update).toHaveBeenCalled();
   });
+
+  it('destroys a pending option picker, as no further state arrives while disconnected', () => {
+    const optionPicker = { destroy: jasmine.createSpy('destroy') };
+    (game as any).obj = { ...makeObjStub(), optionPicker };
+
+    game.showConnectionLostMessage();
+
+    expect(optionPicker.destroy).toHaveBeenCalled();
+  });
 });
 
 describe('Game scene - socket listener lifecycle', () => {
@@ -240,6 +249,40 @@ describe('Game scene - socket listener lifecycle', () => {
 
     expect(game.connectionLost).toBeTrue();
     expect(game.state.gameResult).toBeUndefined();
+  });
+});
+
+describe('Game scene - getCardMovementEvent', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game();
+    game.state = {
+      ...emptyClientState,
+      events: [
+        { type: EventType.Retract, playerEvent: true, oldUUID: 'card-1', newUUID: 'hand-1' },
+        { type: EventType.Discard, playerEvent: false, oldUUID: 'card-2' }
+      ]
+    };
+  });
+
+  it('returns the movement event for a card that was moved by the server', () => {
+    const event = game.getCardMovementEvent('card-1');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Retract);
+    expect(event?.newUUID).toBe('hand-1');
+  });
+
+  it('returns the discard event for a discarded card regardless of the owning player', () => {
+    const event = game.getCardMovementEvent('card-2');
+
+    expect(event).toBeDefined();
+    expect(event?.type).toBe(EventType.Discard);
+  });
+
+  it('returns undefined for cards without a movement event', () => {
+    expect(game.getCardMovementEvent('card-3')).toBeUndefined();
   });
 });
 
@@ -316,6 +359,51 @@ describe('Game scene - showGameOverIndicator', () => {
   });
 });
 
+describe('Game scene - updateState', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game();
+    (game as any).preloader = { destroy: jasmine.createSpy('preloader.destroy') };
+    (game as any).time = { delayedCall: jasmine.createSpy('time.delayedCall') };
+  });
+
+  function makeOptionPickerStub(isValidFor: boolean) {
+    return {
+      destroy: jasmine.createSpy('destroy'),
+      isValidFor: jasmine.createSpy('isValidFor').and.returnValue(isValidFor)
+    };
+  }
+
+  it('destroys a pending option picker that the incoming state invalidated', () => {
+    const optionPicker = makeOptionPickerStub(false);
+    (game as any).obj = { optionPicker };
+    const state: ClientState = { ...emptyClientState };
+
+    game.updateState(state);
+
+    expect(optionPicker.isValidFor).toHaveBeenCalledWith(state);
+    expect(optionPicker.destroy).toHaveBeenCalled();
+  });
+
+  it('keeps a pending option picker whose action is still valid', () => {
+    const optionPicker = makeOptionPickerStub(true);
+    (game as any).obj = { optionPicker };
+
+    game.updateState({ ...emptyClientState });
+
+    expect(optionPicker.isValidFor).toHaveBeenCalled();
+    expect(optionPicker.destroy).not.toHaveBeenCalled();
+    expect((game as any).obj.optionPicker).toBe(optionPicker);
+  });
+
+  it('ignores incoming states while no option picker is pending', () => {
+    (game as any).obj = {};
+
+    expect(() => game.updateState({ ...emptyClientState })).not.toThrow();
+  });
+});
+
 describe('Game scene - state update pipeline', () => {
   it('runs the full update chain for a single state', () => {
     const {
@@ -338,9 +426,9 @@ describe('Game scene - state update pipeline', () => {
     clock.fireAll();
 
     expect(updateCardStacks).toHaveBeenCalledTimes(1);
-    expect(updateCardStacks).toHaveBeenCalledWith([handCard('p1', 10)]);
+    expect(updateCardStacks).toHaveBeenCalledWith();
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)], TurnPhase.Init);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)]);
     expect(updateView).toHaveBeenCalledTimes(1);
     expect(highlightAttackIntervention).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([7]);
@@ -368,10 +456,10 @@ describe('Game scene - state update pipeline', () => {
     expect(game.state).toBe(state2);
     // Each chain ran its card stacks step exactly once
     expect(updateCardStacks).toHaveBeenCalledTimes(2);
-    // The hand update ran only for the newest state, with the turn phase
-    // captured when the superseded state was still current
+    // The hand update ran only for the newest state, with the new hand
+    // cards captured from that state
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)], TurnPhase.Build);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
     // The discard piles were updated from the newest state only
     expect(playerDiscardPile).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([3]);
@@ -393,7 +481,7 @@ describe('Game scene - state update pipeline', () => {
 
     expect(updateCardStacks).toHaveBeenCalledTimes(1);
     expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)], TurnPhase.Init);
+    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
     expect(playerDiscardPile).toHaveBeenCalledTimes(1);
     expect(playerDiscardPile).toHaveBeenCalledWith([2]);
   });
@@ -442,5 +530,60 @@ describe('Game scene - state update pipeline', () => {
     expect(updateHandCards).not.toHaveBeenCalled();
     clock.fireOldest();
     expect(updateHandCards).toHaveBeenCalledTimes(1);
+  });
+
+  it('retains movement events from a superseded state until the UI steps reconcile them', () => {
+    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
+    let seenDuringStacks: EventType | undefined;
+    let seenDuringHand: EventType | undefined;
+    updateCardStacks.and.callFake(() => {
+      seenDuringStacks = game.getCardMovementEvent('ship-1')?.type;
+    });
+    updateHandCards.and.callFake(() => {
+      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
+    });
+
+    game.updateState(
+      makeState({
+        events: [
+          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
+          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
+        ]
+      })
+    );
+    // Second state with an empty event list supersedes the first before any step runs
+    game.updateState(makeState({ events: [] }));
+    clock.fireAll();
+
+    expect(seenDuringStacks).toBe(EventType.Retract);
+    expect(seenDuringHand).toBe(EventType.Discard);
+    expect(game.getCardMovementEvent('ship-1')).toBeUndefined();
+    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
+  });
+
+  it('retains hand discard events when a second state supersedes a chain waiting on a retract delay', () => {
+    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
+    let seenDuringHand: EventType | undefined;
+    updateCardStacks.and.callFake(() => {
+      game.retractCardsExist = game.getCardMovementEvent('ship-1')?.type == EventType.Retract;
+    });
+    updateHandCards.and.callFake(() => {
+      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
+    });
+
+    game.updateState(
+      makeState({
+        events: [
+          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
+          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
+        ]
+      })
+    );
+    clock.fireOldest(); // Chain 1 runs step 1 and schedules step 2 behind the retract delay
+    game.updateState(makeState({ events: [] })); // Supersedes chain 1 before step 2 runs
+    clock.fireAll();
+
+    expect(seenDuringHand).toBe(EventType.Discard);
+    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
   });
 });
