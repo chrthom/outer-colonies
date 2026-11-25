@@ -1,6 +1,6 @@
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { BattleType, EventType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { EventType, Zone } from '@shared/config/enums';
 import { ClientAttack, ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
 import Card from './card';
 import { animationConfig } from '../../config/animation';
@@ -10,7 +10,6 @@ import { constants } from '@shared/config/constants';
 import { CardPosition, CardXPosition, CardYPosition } from '../perspective';
 import { perspectiveConfig } from 'src/app/config/perspective';
 import CardStackSummary from './card_stack_summary';
-import OptionPicker from '../option_picker';
 
 export default class CardStack {
   cards!: Array<Card>;
@@ -159,17 +158,12 @@ export default class CardStack {
     return Math.max(...this.data.cards.map(c => c.index));
   }
   get canPerformAllAttackOnBase(): boolean {
-    return (
-      this.isOpponentColony &&
-      this.scene.state.battle.range == 1 &&
-      !this.scene.activeCards.stackUUID &&
-      !this.scene.activeCards.hand
-    );
+    return this.scene.interaction.canPerformAllAttackOnBase(this.data);
   }
   private pointerover() {
     if (this.discarded) return;
     this.hovered = true;
-    if (!this.scene.activeCards.hand && !this.scene.activeCards.stackUUID && !this.scene.isAttackAnimating) {
+    if (this.scene.interaction.isStackExpandableOnHover()) {
       this.cards.forEach(c =>
         c.retractCardButton?.show(
           this.targetXExpanded(c.data.index).value2d,
@@ -266,87 +260,11 @@ export default class CardStack {
   private discardCard(card: Card) {
     const event = this.scene.getCardMovementEvent(card.data.uuid);
     const toDeck = event?.type == EventType.Retract;
-    if (toDeck) this.scene.retractCardsExist = true;
+    if (toDeck) this.scene.session.markRetractCardsExist();
     card.destroyRetractButton();
     card.discard(toDeck, event?.playerEvent ?? card.ownedByPlayer);
   }
   private onClickAction(cardData: ClientCard) {
-    const state = this.scene.state;
-    if (state.playerPendingAction) {
-      if (state.intervention) {
-        if (this.scene.activeCards.hand) {
-          this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
-        }
-      } else {
-        switch (state.turnPhase) {
-          case TurnPhase.Build:
-            if (state.playerIsActive) {
-              if (this.scene.activeCards.hand) {
-                const handcard = this.scene.player.hand.find(h => h.uuid == this.scene.activeCards.hand);
-                if (handcard?.data?.options) {
-                  new OptionPicker(
-                    this.scene,
-                    this.scene.activeCards.hand,
-                    this.uuid,
-                    handcard?.data?.options,
-                    handcard?.data?.optionsToSelect
-                  );
-                } else {
-                  this.scene.socket.emit(MsgTypeInbound.Handcard, this.scene.activeCards.hand, this.uuid);
-                }
-              } else if (this.scene.plannedBattle.type != BattleType.None && this.data.missionReady) {
-                if (this.scene.plannedBattle.shipIds.includes(this.uuid)) {
-                  this.scene.plannedBattle.shipIds = this.scene.plannedBattle.shipIds.filter(
-                    id => id != this.uuid
-                  );
-                } else {
-                  this.scene.plannedBattle.shipIds.push(this.uuid);
-                }
-              }
-            } else {
-              if (this.data.missionReady) {
-                if (this.scene.interceptShipIds.includes(this.uuid)) {
-                  this.scene.interceptShipIds = this.scene.interceptShipIds.filter(id => id != this.uuid);
-                } else if (this.data.interceptionReady) {
-                  this.scene.interceptShipIds.push(this.uuid);
-                }
-              }
-            }
-            break;
-          case TurnPhase.Combat:
-            if (
-              this.scene.activeCards.stackUUID == this.uuid &&
-              this.scene.activeCards.cardUUID == cardData.uuid
-            ) {
-              this.scene.activeCards.stackUUID = undefined;
-              this.scene.activeCards.cardUUID = undefined;
-              this.scene.activeCards.hand = undefined;
-            } else if (cardData.battleReady) {
-              this.scene.activeCards.stackUUID = this.uuid;
-              this.scene.activeCards.cardUUID = cardData.uuid;
-              this.scene.activeCards.hand = undefined;
-            } else if (this.canPerformAllAttackOnBase) {
-              this.scene.socket.emit(
-                MsgTypeInbound.Attack,
-                constants.attackAllID,
-                constants.attackAllID,
-                this.uuid
-              );
-            } else if (
-              this.scene.activeCards.stackUUID &&
-              this.scene.state.battle.opponentShipIds.includes(this.uuid)
-            ) {
-              this.scene.socket.emit(
-                MsgTypeInbound.Attack,
-                this.scene.activeCards.stackUUID,
-                this.scene.activeCards.cardUUID,
-                this.uuid
-              );
-            }
-            break;
-        }
-      }
-      this.scene.updateView();
-    }
+    this.scene.interaction.clickCardStack(this.uuid, cardData.uuid);
   }
 }

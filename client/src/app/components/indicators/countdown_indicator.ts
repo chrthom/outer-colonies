@@ -20,7 +20,7 @@ export default class CountdownIndicator {
       .setOrigin(1, 0.5);
   }
   update(countdown?: number) {
-    const playerData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
+    const playerData = this.scene.session.getPlayerState(this.ownedByPlayer);
     const countdownPrefix = countdown ? `${this.formatCountdown(countdown)}  ` : '';
     this.text.setText(`${countdownPrefix}${playerData.name}`);
     this.text.setColor(countdown && countdown < 60 ? designConfig.color.warn : designConfig.color.neutral);

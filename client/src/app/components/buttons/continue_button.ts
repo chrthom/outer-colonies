@@ -1,11 +1,8 @@
-import { animationConfig } from 'src/app/config/animation';
-import { BattleType, MsgTypeInbound, TurnPhase } from '@shared/config/enums';
-import { ClientGameResult, ClientState } from '@shared/interfaces/client_state';
+import Phaser from 'phaser';
+import { designConfig } from 'src/app/config/design';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import Prompt from './prompt';
-import Phaser from 'phaser';
-import { designConfig } from 'src/app/config/design';
 
 interface ButtonImages {
   active_build: Phaser.GameObjects.Image;
@@ -19,22 +16,15 @@ interface ButtonImages {
   lost: Phaser.GameObjects.Image;
 }
 
-/** Automatic Ready message a pending player emits when he cannot act himself. */
-interface AutoReadyAction {
-  delay: number;
-  emit: () => void;
-}
-
 export default class ContinueButton {
   private scene!: Game;
   private buttonImages!: ButtonImages;
   private text: Phaser.GameObjects.Text;
   private prompt!: Prompt;
-  private autoReadyTimer?: Phaser.Time.TimerEvent;
-  private autoReadyState?: ClientState;
   private onClickAction: () => void = () => {
     /* Do nothing */
   };
+
   constructor(scene: Game) {
     this.scene = scene;
     this.prompt = new Prompt(scene);
@@ -84,103 +74,27 @@ export default class ContinueButton {
       .on('down', () => this.onClickAction());
     this.waitState();
   }
+
   update() {
     this.prompt.update();
-    this.updateAutoReady();
-    if (this.scene.state.gameResult) {
-      this.showGameOver(this.scene.state.gameResult);
-    } else if (!this.scene.state.playerPendingAction) {
-      this.waitState();
-    } else if (this.scene.state.intervention) {
-      this.showIntervention(this.scene.state.playerIsActive);
-    } else {
-      switch (this.scene.state.turnPhase) {
-        case TurnPhase.Build:
-          if (!this.scene.state.playerIsActive) {
-            this.showIncept();
-          } else if (this.scene.state.player.hasToRetractCards) {
-            this.waitState();
-          } else {
-            this.showNextPhase();
+    this.scene.interaction.syncAutoReady();
+    const vm = this.scene.interaction.getContinueButtonState();
+    if (vm.isGameOver && this.scene.session.state.gameResult) {
+      this.scene.showGameOverIndicator(this.scene.session.state.gameResult);
+    }
+    this.show(
+      vm.text,
+      vm.buttonKey,
+      vm.enabled
+        ? () => {
+            if (this.scene.interaction.continueAction() === 'matchmaking') {
+              this.scene.scene.start('Matchmaking');
+            }
           }
-          break;
-        case TurnPhase.Combat:
-          this.showNextCombatPhase();
-          break;
-        case TurnPhase.End:
-          this.showEndPhase();
-          break;
-        default:
-          this.waitState();
-      }
-    }
+        : undefined
+    );
   }
-  /**
-   * Queues the automatic Ready for a pending player who can neither intercept
-   * (build) nor attack (combat), at most once per state (one pending action);
-   * a queued emission is canceled at the next update() call when no longer
-   * needed.
-   */
-  private updateAutoReady() {
-    const autoReady = this.pendingAutoReady;
-    if (!autoReady) {
-      this.cancelPendingAutoReady();
-    } else if (this.autoReadyState != this.scene.state) {
-      this.cancelPendingAutoReady();
-      this.autoReadyState = this.scene.state;
-      this.autoReadyTimer = this.scene.time.delayedCall(autoReady.delay, () => {
-        this.autoReadyTimer = undefined;
-        autoReady.emit();
-      });
-    }
-  }
-  /** Cancels a queued automatic Ready message, if one exists. */
-  private cancelPendingAutoReady() {
-    this.cancelAutoReadyTimer();
-    this.autoReadyState = undefined;
-  }
-  /**
-   * Removes a queued automatic Ready timer while keeping the state marker, so
-   * that repeated update() calls for the same state do not queue a second
-   * Ready for the same pending action.
-   */
-  private cancelAutoReadyTimer() {
-    if (this.autoReadyTimer) {
-      this.scene.time.removeEvent(this.autoReadyTimer);
-      this.autoReadyTimer = undefined;
-    }
-  }
-  /**
-   * Ready message to automatically send for the current state, or undefined if
-   * the player is not pending for an action he cannot perform himself.
-   */
-  private get pendingAutoReady(): AutoReadyAction | undefined {
-    if (
-      this.scene.state.gameResult ||
-      !this.scene.state.playerPendingAction ||
-      this.scene.state.intervention
-    ) {
-      return undefined;
-    }
-    switch (this.scene.state.turnPhase) {
-      case TurnPhase.Build:
-        return !this.scene.state.playerIsActive && !this.canIntercept
-          ? {
-              delay: animationConfig.duration.move,
-              emit: () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, [])
-            }
-          : undefined;
-      case TurnPhase.Combat:
-        return !this.canAttack
-          ? {
-              delay: animationConfig.duration.attack,
-              emit: () => this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat)
-            }
-          : undefined;
-      default:
-        return undefined;
-    }
-  }
+
   private createButtonImage(name: string) {
     return this.scene.add
       .image(layoutConfig.game.ui.continueButton.x, layoutConfig.game.ui.continueButton.y, `button_${name}`)
@@ -190,73 +104,24 @@ export default class ContinueButton {
       })
       .setVisible(false);
   }
-  private showNextPhase() {
-    const text =
-      this.scene.plannedBattle.shipIds.length == 0
-        ? 'Zug beenden'
-        : `${this.scene.plannedBattle.type == BattleType.Mission ? 'Mission' : 'Überfall'} durchführen`;
-    this.show(text, 'active_build', () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.plannedBattle)
-    );
-  }
-  private showIncept() {
-    let text: string;
-    if (this.scene.state.battle.type == BattleType.Raid) text = 'Verteidigung beginnen';
-    else if (this.scene.interceptShipIds.length > 0) text = 'Abfangen';
-    else text = 'Überspringen';
-    this.show(text, 'inactive_select', () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Build, this.scene.interceptShipIds)
-    );
-  }
-  private showNextCombatPhase() {
-    const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_combat`;
-    this.show('Kampfphase beenden', button, () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, TurnPhase.Combat)
-    );
-  }
-  private showEndPhase() {
-    this.show('Karten ablegen', 'active_select');
-  }
-  private showIntervention(isActivePlayer: boolean) {
-    this.show('Überspringen', `${isActivePlayer ? '' : 'in'}active_select`, () =>
-      this.scene.socket.emit(MsgTypeInbound.Ready, this.scene.state.turnPhase)
-    );
-  }
-  private showGameOver(gameResult: ClientGameResult) {
-    this.scene.showGameOverIndicator(gameResult);
-    // The Game scene removes all of its socket listeners on scene shutdown
-    this.show('Neuen Gegner suchen', gameResult.won ? 'won' : 'lost', () => {
-      this.scene.scene.start('Matchmaking');
-    });
-  }
+
   private show(text: string, button: string, onClickAction?: () => void) {
-    this.onClickAction = onClickAction
-      ? () => {
-          // Manual click makes a queued auto-ready obsolete; keep the state
-          // marker so the same state does not queue a second Ready.
-          this.cancelAutoReadyTimer();
-          onClickAction();
-        }
-      : () => {
-          /* Do nothing */
-        };
+    this.onClickAction =
+      onClickAction ??
+      (() => {
+        /* Do nothing */
+      });
     this.showButton(button);
     this.text.setText(text);
   }
+
   private showButton(name: string) {
     Object.values(this.buttonImages).forEach(i => i.setVisible(false));
     this.buttonImages[name as keyof ButtonImages].setVisible(true);
   }
+
   private waitState() {
-    const button = `${this.scene.state.playerIsActive ? '' : 'in'}active_wait`;
+    const button = `${this.scene.session.state.playerIsActive ? '' : 'in'}active_wait`;
     this.show('', button);
-  }
-  private get canIntercept() {
-    return this.scene.state.cardStacks.filter(cs => cs.ownedByPlayer).some(cs => cs.interceptionReady);
-  }
-  private get canAttack() {
-    return this.scene.state.cardStacks
-      .filter(cs => this.scene.state.battle.playerShipIds.includes(cs.uuid), this)
-      .some(cs => cs.cards.some(c => c.battleReady));
   }
 }

@@ -107,4 +107,20 @@ describe('StateUpdateSequencer', () => {
     scheduler.fireOldest(); // Callback of the newest run
     expect(calls).toEqual(['new']);
   });
+
+  it('cancels pending steps and invokes the timer cancel callback on cancel()', () => {
+    const cancelSpy = jasmine.createSpy('cancel');
+    const cancellingSequencer = new StateUpdateSequencer((delay, callback) => {
+      scheduler.schedule(delay, callback);
+      return cancelSpy;
+    });
+    const calls: string[] = [];
+    cancellingSequencer.run([{ delay: () => 100, action: () => calls.push('step') }]);
+
+    cancellingSequencer.cancel();
+    scheduler.fireOldest();
+
+    expect(cancelSpy).toHaveBeenCalledTimes(1);
+    expect(calls).toEqual([]);
+  });
 });

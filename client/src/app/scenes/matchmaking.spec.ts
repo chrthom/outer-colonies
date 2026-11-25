@@ -1,96 +1,94 @@
-import Matchmaking from './matchmaking';
-import { MsgTypeOutbound } from '@shared/config/enums';
 import ClientGameParams from '@shared/interfaces/client_game_params';
 import Phaser from 'phaser';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { MatchmakingService } from '../services/matchmaking_service';
+import Matchmaking from './matchmaking';
 
-/** Fake socket that records the listeners registered and removed by the scene. */
-interface SocketListenerStub {
-  on: jasmine.Spy;
-  off: jasmine.Spy;
-  emit: jasmine.Spy;
-  io: { on: jasmine.Spy; off: jasmine.Spy };
+interface MatchmakingServiceStub {
+  statusText$: BehaviorSubject<string>;
+  onlineCount$: BehaviorSubject<number | undefined>;
+  matchStart$: Subject<ClientGameParams>;
+  start: jasmine.Spy;
+  stop: jasmine.Spy;
 }
 
-/** Handle for overriding private internals of a Matchmaking instance in tests. */
 interface MatchmakingOverrides {
-  socket: SocketListenerStub;
+  matchmaking: MatchmakingServiceStub;
   events: { once: jasmine.Spy };
-  registerSocketListeners: () => void;
+  bindMatchmakingService: () => void;
   scene: { start: jasmine.Spy };
+  status: { setText: jasmine.Spy };
   onlineIndicator: { setCount: jasmine.Spy };
 }
 
-describe('Matchmaking scene - socket listener lifecycle', () => {
-  let matchmaking: Matchmaking;
-  let socket: SocketListenerStub;
+describe('Matchmaking scene - service view adapter', () => {
+  let matchmakingScene: Matchmaking;
+  let serviceStub: MatchmakingServiceStub;
   let shutdownEvent: string;
   let shutdownHandler: () => void;
 
   beforeEach(() => {
-    matchmaking = new Matchmaking();
-    socket = jasmine.createSpyObj('Socket', ['on', 'off', 'emit']);
-    socket.io = jasmine.createSpyObj('Manager', ['on', 'off']);
-    const handle = matchmaking as unknown as MatchmakingOverrides;
-    handle.socket = socket;
+    matchmakingScene = new Matchmaking();
+    serviceStub = {
+      statusText$: new BehaviorSubject<string>('Verbinde mit Server...'),
+      onlineCount$: new BehaviorSubject<number | undefined>(undefined),
+      matchStart$: new Subject<ClientGameParams>(),
+      start: jasmine.createSpy('matchmaking.start'),
+      stop: jasmine.createSpy('matchmaking.stop')
+    };
+    const handle = matchmakingScene as unknown as MatchmakingOverrides;
+    handle.matchmaking = serviceStub;
+    handle.status = { setText: jasmine.createSpy('status.setText') };
+    handle.onlineIndicator = { setCount: jasmine.createSpy('onlineIndicator.setCount') };
+    handle.scene = { start: jasmine.createSpy('scene.start') };
     handle.events = {
       once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
         shutdownEvent = event;
         shutdownHandler = handler;
       })
     };
-    handle.registerSocketListeners();
+    handle.bindMatchmakingService();
   });
 
-  it('registers all matchmaking listeners in create()', () => {
-    expect(socket.on.calls.allArgs().map(args => args[0])).toEqual([
-      MsgTypeOutbound.Connect,
-      'disconnect',
-      'connect_error',
-      MsgTypeOutbound.Matchmaking,
-      MsgTypeOutbound.OnlineCount
-    ]);
-    expect(socket.io.on.calls.allArgs().map(args => args[0])).toEqual(['reconnect_failed']);
+  it('starts the MatchmakingService when bound', () => {
+    expect(serviceStub.start).toHaveBeenCalledTimes(1);
+    expect((matchmakingScene as unknown as MatchmakingService) !== undefined).toBeTrue();
   });
 
-  it('binds the listener cleanup to the scene shutdown event', () => {
+  it('updates LoadingStatus text when statusText$ emits', () => {
+    const handle = matchmakingScene as unknown as MatchmakingOverrides;
+    serviceStub.statusText$.next('Suche Mitspieler...');
+
+    expect(handle.status.setText).toHaveBeenCalledWith('Suche Mitspieler...');
+  });
+
+  it('forwards numeric online counts to the online indicator and ignores undefined', () => {
+    const handle = matchmakingScene as unknown as MatchmakingOverrides;
+    expect(handle.onlineIndicator.setCount).not.toHaveBeenCalled();
+
+    serviceStub.onlineCount$.next(7);
+
+    expect(handle.onlineIndicator.setCount).toHaveBeenCalledWith(7);
+  });
+
+  it('starts the Game scene with gameParams when matchStart$ emits', () => {
+    const handle = matchmakingScene as unknown as MatchmakingOverrides;
+    const gameParams: ClientGameParams = { preloadCardIds: [1, 2, 3] };
+
+    serviceStub.matchStart$.next(gameParams);
+
+    expect(handle.scene.start).toHaveBeenCalledWith('Game', { gameParams });
+  });
+
+  it('binds cleanup to SHUTDOWN and stops subscriptions and service on shutdown', () => {
     expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
-  });
 
-  it('removes all matchmaking listeners on scene shutdown', () => {
     shutdownHandler();
 
-    expect(socket.off.calls.allArgs().map(args => args[0])).toEqual([
-      MsgTypeOutbound.Connect,
-      MsgTypeOutbound.OnlineCount,
-      MsgTypeOutbound.Matchmaking,
-      'disconnect',
-      'connect_error'
-    ]);
-    expect(socket.io.off.calls.allArgs().map(args => args[0])).toEqual(['reconnect_failed']);
-  });
-
-  it('starts the game scene without passing the socket through the scene data', () => {
-    const gameParams: ClientGameParams = { preloadCardIds: [1, 2, 3] };
-    const start = jasmine.createSpy('scene.start');
-    (matchmaking as unknown as MatchmakingOverrides).scene = { start };
-
-    const matchmakingHandler = socket.on.calls
-      .allArgs()
-      .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
-    matchmakingHandler('start', gameParams);
-
-    expect(start).toHaveBeenCalledWith('Game', { gameParams });
-  });
-
-  it('forwards the pushed online count to the online indicator', () => {
-    const setCount = jasmine.createSpy('onlineIndicator.setCount');
-    (matchmaking as unknown as MatchmakingOverrides).onlineIndicator = { setCount };
-
-    const onlineCountHandler = socket.on.calls
-      .allArgs()
-      .find(args => args[0] == MsgTypeOutbound.OnlineCount)![1];
-    onlineCountHandler(7);
-
-    expect(setCount).toHaveBeenCalledWith(7);
+    expect(serviceStub.stop).toHaveBeenCalledTimes(1);
+    const handle = matchmakingScene as unknown as MatchmakingOverrides;
+    handle.status.setText.calls.reset();
+    serviceStub.statusText$.next('Should not propagate');
+    expect(handle.status.setText).not.toHaveBeenCalled();
   });
 });

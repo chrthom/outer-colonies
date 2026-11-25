@@ -2,7 +2,6 @@ import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { ClientHandCard } from '@shared/interfaces/client_state';
-import { BattleType, MsgTypeInbound, TurnPhase } from '@shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { constants } from '@shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
@@ -95,19 +94,8 @@ export default class HandCard extends CardImage {
   private onClickAction() {
     if (this.scene.maximizedTacticCard == this) {
       this.scene.discardMaximizedTacticCard();
-    } else if (this.ownedByPlayer && this.scene.state.playerPendingAction) {
-      if (
-        this.data.playable &&
-        (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)
-      ) {
-        const reset = this.scene.activeCards.hand == this.uuid;
-        this.scene.activeCards.stackUUID = undefined;
-        this.scene.activeCards.hand = undefined;
-        if (!reset) this.scene.activeCards.hand = this.uuid;
-        this.scene.updateView();
-      } else if (this.scene.state.turnPhase == TurnPhase.End) {
-        this.scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
-      }
+    } else {
+      this.scene.interaction.clickHandCard(this.uuid);
     }
   }
   private enableExpandOnPointerover() {

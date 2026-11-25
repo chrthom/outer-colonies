@@ -1,45 +1,39 @@
-import { Socket } from 'socket.io-client';
-import ContinueButton from '../components/buttons/continue_button';
-import RaidButton from '../components/buttons/raid_button';
-import MissionButton from '../components/buttons/mission_button';
+import Phaser from 'phaser';
+import { Subscription } from 'rxjs';
+import { EventType } from '@shared/config/enums';
+import ClientGameParams from '@shared/interfaces/client_game_params';
 import {
+  ClientAttack,
   ClientEvent,
   ClientGameResult,
   ClientHandCard,
   ClientPlayer,
-  ClientState,
-  emptyClientState
+  ClientState
 } from '@shared/interfaces/client_state';
-import { BattleType, EventType, MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
-import GameOverIndicator from '../components/indicators/game_over_indicator';
-import HandCard from '../components/card/hand_card';
+import ActionPool from '../components/action_pool';
+import Background from '../components/background';
+import ContinueButton from '../components/buttons/continue_button';
+import ExitButton from '../components/buttons/exit_button';
+import MissionButton from '../components/buttons/mission_button';
+import RaidButton from '../components/buttons/raid_button';
+import CardImage from '../components/card/card_image';
 import CardStack from '../components/card/card_stack';
 import DeckCard from '../components/card/deck_card';
-import ZoomCard from '../components/card/zoom_card';
-import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
-import ClientGameParams from '@shared/interfaces/client_game_params';
 import DiscardPile from '../components/card/discard_pile';
-import ActionPool from '../components/action_pool';
-import Preloader from '../components/preloader';
-import { animationConfig } from '../config/animation';
-import { designConfig } from '../config/design';
-import Background from '../components/background';
+import HandCard from '../components/card/hand_card';
+import ZoomCard from '../components/card/zoom_card';
 import CombatRangeIndicator from '../components/indicators/combat_range_indicator';
-import CardImage from '../components/card/card_image';
-import ExitButton from '../components/buttons/exit_button';
 import CountdownIndicator from '../components/indicators/countdown_indicator';
+import GameOverIndicator from '../components/indicators/game_over_indicator';
+import OptionPicker from '../components/option_picker';
+import Preloader from '../components/preloader';
+import { designConfig } from '../config/design';
 import { layoutConfig } from '../config/layout';
 import { rules } from '@shared/config/rules';
+import { GameInteractionService, PendingOptionPickerState } from '../services/game_interaction_service';
+import { GameSessionService } from '../services/game_session_service';
+import { SERVICE_REGISTRY_KEYS } from '../services/service_registry';
 import { loadCardResources, loadPreloadableResources } from './resource-loader';
-import OptionPicker from '../components/option_picker';
-import SocketService from '../socket_service';
-import StateUpdateSequencer from '../utils/state_update_sequencer';
-
-interface ActiveCards {
-  hand?: string;
-  stackUUID?: string;
-  cardUUID?: string;
-}
 
 interface FixedUIElements {
   continueButton: ContinueButton;
@@ -64,26 +58,18 @@ interface PlayerUIElements {
 }
 
 export default class Game extends Phaser.Scene {
-  socket!: Socket;
+  session!: GameSessionService;
+  interaction!: GameInteractionService;
   gameParams!: ClientGameParams;
   preloader!: Preloader;
-
-  state: ClientState = emptyClientState;
-  activeCards: ActiveCards = {};
-  plannedBattle: ClientPlannedBattle = ClientPlannedBattleHelper.empty;
-  interceptShipIds: Array<string> = [];
-  retractCardsExist = false;
-  isAttackAnimating = false;
-
-  private stateUpdateSequencer = new StateUpdateSequencer((delayMs, callback) =>
-    this.time.delayedCall(delayMs, callback)
-  );
-  private pendingCardMovementEvents = new Map<string, ClientEvent>();
 
   cardStacks: Array<CardStack> = [];
   maximizedTacticCard?: CardImage;
   private gameOverIndicator?: GameOverIndicator;
-  connectionLost = false;
+  private connectionLostShown = false;
+  private pendingNewHandCards: ClientHandCard[] = [];
+  private subscriptions?: Subscription;
+
   background!: Background;
   obj!: FixedUIElements;
   player!: PlayerUIElements;
@@ -95,16 +81,29 @@ export default class Game extends Phaser.Scene {
     });
   }
 
+  /** Authoritative client game state owned by `GameSessionService`. */
+  get state(): ClientState {
+    return this.session.state;
+  }
+
+  /** Whether a mid-game connection loss was reported by `GameSessionService`. */
+  get connectionLost(): boolean {
+    return this.session.connectionLost;
+  }
+
   init(data: InitData) {
-    this.socket = SocketService.getSocket();
+    this.session = this.registry.get(SERVICE_REGISTRY_KEYS.gameSession);
+    this.interaction = this.registry.get(SERVICE_REGISTRY_KEYS.gameInteraction);
     this.gameParams = data.gameParams;
-    // A socket.io reconnect cannot rejoin the match; rejoining happens via a fresh page load
-    this.socket.io.reconnection(false);
-    // Phaser reuses the scene instance for the next match, so reset the
-    // reference to allow a fresh game over overlay in the new game.
+    // Phaser reuses the scene instance for the next match, so reset view state
+    // to allow fresh overlays in the new game.
     this.gameOverIndicator = undefined;
-    this.connectionLost = false;
-    this.pendingCardMovementEvents.clear();
+    this.connectionLostShown = false;
+    this.pendingNewHandCards = [];
+    this.cardStacks = [];
+    this.maximizedTacticCard = undefined;
+    this.session.initMatch(data.gameParams);
+    this.interaction.reset();
     this.background = new Background(this);
   }
 
@@ -115,7 +114,6 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.registerSocketListeners();
     this.background.initInterface();
     this.opponent = {
       actionPool: new ActionPool(this, false),
@@ -139,38 +137,13 @@ export default class Game extends Phaser.Scene {
       raidButton: new RaidButton(this),
       missionButton: new MissionButton(this)
     };
-    this.socket.emit(MsgTypeInbound.Ready, TurnPhase.Init);
-  }
-
-  /**
-   * Registers the socket listeners of the game scene.
-   *
-   * All listeners are bound to the scene lifecycle and removed again on scene
-   * shutdown, so that no listeners of a finished match leak into the next
-   * matchmaking session.
-   */
-  private registerSocketListeners(): void {
-    this.socket.on(MsgTypeOutbound.State, (state: ClientState) => {
-      this.updateState(state);
-    });
-    this.socket.on(MsgTypeOutbound.Countdown, (countdown: number, isPlayerActive: boolean) => {
-      (isPlayerActive ? this.player : this.opponent).countdownIndicator.update(countdown);
-      (isPlayerActive ? this.opponent : this.player).countdownIndicator.update();
-    });
-    this.socket.on('disconnect', () => {
-      this.showConnectionLostMessage();
-    });
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.socket.off(MsgTypeOutbound.State);
-      this.socket.off(MsgTypeOutbound.Countdown);
-      this.socket.off('disconnect');
-    });
+    this.bindServices();
+    this.session.startSession();
   }
 
   /**
    * Shows the game over overlay for the given result exactly once per game.
-   * Any later call (e.g. from additional states or user interactions after the game result)
-   * is ignored, so exactly one overlay exists regardless of how many updates arrive.
+   * Any later call is ignored, so exactly one overlay exists regardless of how many updates arrive.
    */
   showGameOverIndicator(gameResult: ClientGameResult) {
     if (!this.gameOverIndicator) {
@@ -183,8 +156,8 @@ export default class Game extends Phaser.Scene {
    * reconnection grace window, so the player can rejoin by reloading the page.
    */
   showConnectionLostMessage() {
-    if (this.connectionLost || this.state.gameResult) return;
-    this.connectionLost = true;
+    if (this.connectionLostShown || this.session.state.gameResult) return;
+    this.connectionLostShown = true;
     this.add
       .text(
         layoutConfig.scene.width / 2,
@@ -201,57 +174,6 @@ export default class Game extends Phaser.Scene {
     // No further state arrives while disconnected, so destroy a pending option
     // picker that would otherwise linger over the connection lost message.
     this.obj?.optionPicker?.destroy();
-  }
-
-  /**
-   * Applies a new game state to the UI via a cancel-and-replace sequencer:
-   * `this.state` is stored immediately as the single source of truth, while
-   * the animation steps are enqueued. If a newer state arrives while an
-   * older chain is still running, the queued steps of the older chain are
-   * cancelled and the new chain reconciles directly to the newest state,
-   * animating only the remaining delta.
-   */
-  updateState(state: ClientState) {
-    for (const event of state.events) {
-      if (event.oldUUID) this.pendingCardMovementEvents.set(event.oldUUID, event);
-    }
-    this.state = state;
-    this.preloader.destroy();
-    this.resetSelection();
-    this.destroyStaleOptionPicker(state);
-    const attackAnimating = this.animateAttack();
-    let newHandCards: ClientHandCard[] = [];
-    this.stateUpdateSequencer.run([
-      {
-        delay: () => (attackAnimating ? animationConfig.duration.attack : 0),
-        action: () => {
-          newHandCards = this.newHandCards;
-          this.retractCardsExist = false; // If true, then the hand animations are delayed
-          this.updateCardStacks();
-        }
-      },
-      {
-        delay: () => (this.retractCardsExist ? animationConfig.duration.move : 0),
-        action: () => {
-          this.updateHandCards(newHandCards);
-          this.pendingCardMovementEvents.clear();
-          this.updateView();
-          this.highlightAttackIntervention();
-        }
-      },
-      {
-        delay: () => animationConfig.duration.move,
-        action: () => {
-          this.player.discardPile.update(this.state.player.discardPileIds);
-          this.opponent.discardPile.update(this.state.opponent.discardPileIds);
-        }
-      }
-    ]);
-  }
-
-  resetView(battleType?: BattleType) {
-    this.resetSelection(battleType);
-    this.updateView();
   }
 
   updateView() {
@@ -275,64 +197,123 @@ export default class Game extends Phaser.Scene {
   }
 
   getPlayerState(isPlayer: boolean): ClientPlayer {
-    return isPlayer ? this.state.player : this.state.opponent;
+    return this.session.getPlayerState(isPlayer);
   }
 
   /**
    * Returns the card movement event (retract or discard) reported by the server for the card
-   * with the given UUID, including events buffered from states whose animation chain was
-   * superseded before reconciling the UI.
-   * @param cardUUID UUID of the card (stack) to look up
+   * with the given UUID.
    */
   getCardMovementEvent(cardUUID: string): ClientEvent | undefined {
-    return this.pendingCardMovementEvents.get(cardUUID) ?? this.state.events.find(e => e.oldUUID == cardUUID);
+    return this.session.getCardMovementEvent(cardUUID);
   }
 
   discardMaximizedTacticCard() {
-    if (!this.state.intervention) {
+    if (!this.session.state.intervention) {
       this.maximizedTacticCard?.discard();
       this.maximizedTacticCard = undefined;
     }
   }
 
-  private resetSelection(battleType?: BattleType) {
-    this.activeCards.hand = undefined;
-    this.activeCards.stackUUID = undefined;
-    this.activeCards.cardUUID = undefined;
-    this.interceptShipIds = [];
-    this.plannedBattle = ClientPlannedBattleHelper.empty;
-    this.plannedBattle.type = battleType ?? this.plannedBattle.type;
+  private bindServices(): void {
+    this.subscriptions?.unsubscribe();
+    const sub = new Subscription();
+
+    sub.add(
+      this.session.stateReceived$.subscribe(() => {
+        this.preloader?.destroy();
+      })
+    );
+    sub.add(
+      this.session.attackAnimation$.subscribe(attack => {
+        this.animateAttack(attack);
+      })
+    );
+    sub.add(
+      this.session.syncBoardStep$.subscribe(() => {
+        this.pendingNewHandCards = this.newHandCards;
+        this.updateCardStacks();
+      })
+    );
+    sub.add(
+      this.session.syncHandStep$.subscribe(() => {
+        this.updateHandCards(this.pendingNewHandCards);
+        this.pendingNewHandCards = [];
+      })
+    );
+    sub.add(
+      this.session.syncViewStep$.subscribe(() => {
+        this.updateView();
+        this.highlightAttackIntervention();
+      })
+    );
+    sub.add(
+      this.session.syncDiscardPilesStep$.subscribe(({ player, opponent }) => {
+        this.player.discardPile.update(player);
+        this.opponent.discardPile.update(opponent);
+      })
+    );
+    sub.add(
+      this.session.countdown$.subscribe(({ player, opponent }) => {
+        this.player.countdownIndicator.update(player);
+        this.opponent.countdownIndicator.update(opponent);
+      })
+    );
+    sub.add(
+      this.session.connectionLost$.subscribe(lost => {
+        if (lost) {
+          this.showConnectionLostMessage();
+        }
+      })
+    );
+    sub.add(
+      this.interaction.viewChanged$.subscribe(() => {
+        this.updateView();
+      })
+    );
+    sub.add(
+      this.interaction.pendingOptionPicker$.subscribe(picker => {
+        this.syncOptionPicker(picker);
+      })
+    );
+
+    this.subscriptions = sub;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.subscriptions?.unsubscribe();
+      this.subscriptions = undefined;
+      this.session.stopSession();
+      this.interaction.reset();
+    });
   }
 
-  /**
-   * Destroys a pending option picker if the incoming state invalidated its pending
-   * action, e.g. because the countdown expired or the hand card is no longer playable.
-   * @param state incoming client state
-   */
-  private destroyStaleOptionPicker(state: ClientState) {
-    const optionPicker = this.obj?.optionPicker;
-    if (optionPicker && !optionPicker.isValidFor(state)) optionPicker.destroy();
-  }
-
-  private animateAttack(): boolean {
-    const attack = this.state.battle.recentAttack;
-    if (attack) {
-      this.isAttackAnimating = true;
-      this.cardStacks.filter(cs => cs.cards.length > 1).forEach(cs => cs.tween());
-      const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceRootUUID);
-      if (!attacker?.data.ownedByPlayer) {
-        attacker?.animateAttack(attack.sourceSubUUID);
-      }
-      this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
-      this.time.delayedCall(animationConfig.duration.attack, () => {
-        this.isAttackAnimating = false;
-      });
+  private syncOptionPicker(picker: PendingOptionPickerState | undefined): void {
+    if (!picker) {
+      this.obj?.optionPicker?.destroy();
+      return;
     }
-    return !!attack;
+    if (
+      !this.obj?.optionPicker ||
+      this.obj.optionPicker.handCardUUID !== picker.handCardUUID ||
+      this.obj.optionPicker.targetUUID !== picker.targetUUID
+    ) {
+      this.obj?.optionPicker?.destroy();
+      new OptionPicker(this, picker.handCardUUID, picker.targetUUID, picker.options, picker.optionsToSelect);
+    } else {
+      this.obj.optionPicker.sync();
+    }
+  }
+
+  private animateAttack(attack: ClientAttack): void {
+    this.cardStacks.filter(cs => cs.cards.length > 1).forEach(cs => cs.tween());
+    const attacker = this.cardStacks.find(cs => cs.uuid == attack.sourceRootUUID);
+    if (!attacker?.data.ownedByPlayer) {
+      attacker?.animateAttack(attack.sourceSubUUID);
+    }
+    this.cardStacks.find(cs => cs.uuid == attack.targetUUID)?.animateDamage(attack);
   }
 
   private highlightAttackIntervention() {
-    const intervention = this.state.intervention?.attack;
+    const intervention = this.session.state.intervention?.attack;
     if (intervention) {
       this.cardStacks
         .find(cs => cs.uuid == intervention.sourceRootUUID)
@@ -344,14 +325,14 @@ export default class Game extends Phaser.Scene {
 
   private updateCardStacks() {
     this.cardStacks.forEach(cs => {
-      const newData = this.state.cardStacks.find(csd => csd.uuid == cs.uuid);
+      const newData = this.session.state.cardStacks.find(csd => csd.uuid == cs.uuid);
       if (newData) {
         cs.update(newData);
       } else {
         cs.discard();
       }
     }, this);
-    this.state.cardStacks
+    this.session.state.cardStacks
       .filter(cs => !this.cardStacks.some(csd => csd.uuid == cs.uuid), this)
       .map(cs => {
         let origin: CardImage | undefined;
@@ -368,7 +349,7 @@ export default class Game extends Phaser.Scene {
       }, this)
       .forEach(cs => this.cardStacks.push(cs), this);
     this.cardStacks = this.cardStacks.filter(
-      cs => this.state.cardStacks.find(csd => csd.uuid == cs.uuid),
+      cs => this.session.state.cardStacks.find(csd => csd.uuid == cs.uuid),
       this
     );
   }
@@ -379,7 +360,7 @@ export default class Game extends Phaser.Scene {
       ui.hand.map(h => {
         const newData = state.hand.find(hcd => hcd.uuid == h.uuid);
         const event = this.getCardMovementEvent(h.uuid);
-        if (h.uuid == this.state.highlightCardUUID) h.maximizeTacticCard();
+        if (h.uuid == this.session.state.highlightCardUUID) h.maximizeTacticCard();
         else if (newData) h.update(newData);
         else if (event?.type == EventType.Discard) h.discard(false, event.playerEvent);
         else h.destroy(); // Card was attached to a card stack in updateCardStacks()
@@ -410,53 +391,35 @@ export default class Game extends Phaser.Scene {
       uiElements.hand.forEach(c => c.highlightReset());
     });
     this.cardStacks.forEach(c => c.highlightReset());
-    if (this.state.playerPendingAction) {
-      this.player.hand.forEach(c => {
-        if (this.plannedBattle.type != BattleType.None) c.highlightDisabled();
-        else if (this.activeCards.hand == c.uuid) c.highlightSelected();
-        else if (this.state.turnPhase != TurnPhase.End) c.highlightPlayability();
-        else c.highlightSelectable();
+
+    this.player.hand.forEach(c => {
+      switch (this.interaction.getHandCardHighlight(c.data)) {
+        case 'disabled':
+          c.highlightDisabled();
+          break;
+        case 'selected':
+          c.highlightSelected();
+          break;
+        case 'selectable':
+          c.highlightSelectable();
+          break;
+        default:
+          c.highlightReset();
+      }
+    });
+
+    this.cardStacks.forEach(cs => {
+      const { stackHighlight, cardHighlights } = this.interaction.getCardStackHighlight(cs.data);
+      if (stackHighlight == 'disabled') {
+        cs.highlightDisabled();
+      }
+      cardHighlights.forEach((highlight, cardUUID) => {
+        const card = cs.cards.find(c => c.data.uuid == cardUUID);
+        if (highlight == 'selected') card?.highlightSelected();
+        else if (highlight == 'selectable') card?.highlightSelectable();
       });
-      this.cardStacks.forEach(cs => {
-        if (this.activeCards.hand) {
-          const activeCard = this.player.hand.find(c => c.uuid == this.activeCards.hand);
-          if (activeCard && activeCard.data.validTargets.includes(cs.uuid)) cs.highlightSelectable();
-        } else {
-          const allShips = this.state.battle.playerShipIds.concat(this.state.battle.opponentShipIds);
-          switch (this.state.turnPhase) {
-            case TurnPhase.Build:
-              if (this.plannedBattle.type != BattleType.None) {
-                if (this.plannedBattle.shipIds.includes(cs.uuid)) {
-                  cs.highlightSelected();
-                } else if (cs.data.missionReady) {
-                  cs.highlightSelectable();
-                }
-              } else if (this.state.battle.type != BattleType.None && !this.state.playerIsActive) {
-                if (this.interceptShipIds.includes(cs.uuid)) {
-                  cs.highlightSelected();
-                } else if (cs.data.interceptionReady) {
-                  cs.highlightSelectable();
-                }
-              }
-              break;
-            case TurnPhase.Combat:
-              if (!allShips.includes(cs.uuid)) {
-                cs.highlightDisabled();
-              }
-              if (this.activeCards.stackUUID == cs.uuid && this.activeCards.cardUUID != undefined) {
-                cs.cards.find(c => c.data.uuid == this.activeCards.cardUUID)?.highlightSelected();
-              } else if (this.state.battle.playerShipIds.includes(cs.uuid)) {
-                cs.cards.filter(c => c.data.battleReady).forEach(c => c.highlightSelectable());
-              }
-              if (this.activeCards.stackUUID && this.state.battle.opponentShipIds.includes(cs.uuid)) {
-                cs.highlightSelectable();
-              } else if (cs.canPerformAllAttackOnBase) {
-                cs.highlightSelected();
-              }
-              break;
-          }
-        }
-      });
-    }
+      if (stackHighlight == 'selectable') cs.highlightSelectable();
+      else if (stackHighlight == 'selected') cs.highlightSelected();
+    });
   }
 }

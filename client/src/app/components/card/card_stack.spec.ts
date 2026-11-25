@@ -1,7 +1,7 @@
 import CardStack from './card_stack';
 import Card from './card';
 import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
-import { EventType, MsgTypeInbound, Zone } from '@shared/config/enums';
+import { EventType, Zone } from '@shared/config/enums';
 import { constants } from '@shared/config/constants';
 import { designConfig } from '../../config/design';
 import { layoutConfig } from '../../config/layout';
@@ -72,9 +72,21 @@ function makeScene(): any {
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     getCardMovementEvent: jasmine.createSpy('getCardMovementEvent'),
     retractCardsExist: false,
-    activeCards: {},
-    isAttackAnimating: false,
-    socket: { emit: jasmine.createSpy('emit') },
+    session: {
+      markRetractCardsExist: jasmine.createSpy('session.markRetractCardsExist').and.callFake(() => {
+        scene.retractCardsExist = true;
+      })
+    },
+    interaction: {
+      retractCard: jasmine.createSpy('interaction.retractCard'),
+      clickCardStack: jasmine.createSpy('interaction.clickCardStack'),
+      canPerformAllAttackOnBase: jasmine
+        .createSpy('interaction.canPerformAllAttackOnBase')
+        .and.returnValue(false),
+      isStackExpandableOnHover: jasmine
+        .createSpy('interaction.isStackExpandableOnHover')
+        .and.returnValue(true)
+    },
     time: { delayedCall: jasmine.createSpy('delayedCall') },
     add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
     tweens: jasmine.createSpyObj('tweens', ['add']),
@@ -515,7 +527,7 @@ describe('CardStack', () => {
       expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal); // visible
       expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function)); // interactive
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('binds input handlers when refresh turns a non-critical button critical', () => {
@@ -540,7 +552,7 @@ describe('CardStack', () => {
       expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal);
       expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function));
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('unbinds the input handlers when refresh turns a critical button non-critical', () => {
@@ -597,7 +609,7 @@ describe('CardStack', () => {
 
       expect(button.image.off).not.toHaveBeenCalled();
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('destroys the retract button when the card is no longer retractable', () => {
