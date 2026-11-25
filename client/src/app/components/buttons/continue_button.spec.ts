@@ -1,6 +1,6 @@
 import ContinueButton from './continue_button';
 import { animationConfig } from '../../config/animation';
-import { BattleType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
+import { BattleType, TurnPhase, Zone } from '@shared/config/enums';
 import { ClientCardStack, ClientState, emptyClientState } from '@shared/interfaces/client_state';
 import { asGameScene, makeSceneStub, SceneStub, TimeStub } from '../../testing/phaser_stubs';
 
@@ -109,7 +109,7 @@ describe('ContinueButton auto-ready', () => {
 
     expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
     expect(queuedAutoReadys(scene, animationConfig.duration.move).length).toBe(0);
-    expect(scene.socket.emit).not.toHaveBeenCalled();
+    expect(scene.socket.emitReady).not.toHaveBeenCalled();
   });
 
   describe('combat phase without battle-ready cards', () => {
@@ -131,15 +131,15 @@ describe('ContinueButton auto-ready', () => {
       button.update();
       fireAutoReadys(scene, animationConfig.duration.attack);
 
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Combat);
-      expect(scene.socket.emit.calls.count()).toBe(1);
+      expect(scene.socket.emitReady).toHaveBeenCalledWith(TurnPhase.Combat);
+      expect(scene.socket.emitReady.calls.count()).toBe(1);
 
       // Repeated update() calls with the same state must not re-queue the emission
       button.update();
       button.update();
       fireAutoReadys(scene, animationConfig.duration.attack);
 
-      expect(scene.socket.emit.calls.count()).toBe(1);
+      expect(scene.socket.emitReady.calls.count()).toBe(1);
     });
 
     it('queues a new auto-ready for a new state, so the player advances once per pending action', () => {
@@ -155,7 +155,7 @@ describe('ContinueButton auto-ready', () => {
       button.update();
       fireAutoReadys(scene, animationConfig.duration.attack);
 
-      expect(scene.socket.emit.calls.count()).toBe(2);
+      expect(scene.socket.emitReady.calls.count()).toBe(2);
     });
 
     it('cancels a queued auto-ready once the player can attack again', () => {
@@ -192,7 +192,7 @@ describe('ContinueButton auto-ready', () => {
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
       expect(scene.time.removeEvent).toHaveBeenCalled();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitReady).not.toHaveBeenCalled();
     });
 
     it('does not queue an auto-ready while the player can attack', () => {
@@ -226,7 +226,7 @@ describe('ContinueButton auto-ready', () => {
       button.update();
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitReady).not.toHaveBeenCalled();
     });
 
     it('cancels the queued auto-ready when the player acts himself', () => {
@@ -239,8 +239,8 @@ describe('ContinueButton auto-ready', () => {
       (button as unknown as { onClickAction: () => void }).onClickAction();
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Combat);
-      expect(scene.socket.emit.calls.count()).toBe(1);
+      expect(scene.socket.emitReady).toHaveBeenCalledWith(TurnPhase.Combat);
+      expect(scene.socket.emitReady.calls.count()).toBe(1);
     });
 
     it('does not re-queue an auto-ready after a manual click for the same state', () => {
@@ -249,7 +249,7 @@ describe('ContinueButton auto-ready', () => {
 
       button.update();
       (button as unknown as { onClickAction: () => void }).onClickAction();
-      expect(scene.socket.emit.calls.count()).toBe(1);
+      expect(scene.socket.emitReady.calls.count()).toBe(1);
 
       // User interactions while waiting for the server trigger further update() calls
       button.update();
@@ -257,14 +257,14 @@ describe('ContinueButton auto-ready', () => {
 
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(0);
       fireAutoReadys(scene, animationConfig.duration.attack);
-      expect(scene.socket.emit.calls.count()).toBe(1); // No second Ready for the same pending action
+      expect(scene.socket.emitReady.calls.count()).toBe(1); // No second Ready for the same pending action
 
       // A new state (e.g. after a rejected Ready) still queues a new auto-ready
       scene.state = combatState();
       button.update();
       expect(queuedAutoReadys(scene, animationConfig.duration.attack).length).toBe(1);
       fireAutoReadys(scene, animationConfig.duration.attack);
-      expect(scene.socket.emit.calls.count()).toBe(2);
+      expect(scene.socket.emitReady.calls.count()).toBe(2);
     });
   });
 
@@ -281,8 +281,8 @@ describe('ContinueButton auto-ready', () => {
       expect(queued.length).toBe(1);
       queued[0].callback();
 
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Ready, TurnPhase.Build, []);
-      expect(scene.socket.emit.calls.count()).toBe(1);
+      expect(scene.socket.emitReady).toHaveBeenCalledWith(TurnPhase.Build, []);
+      expect(scene.socket.emitReady.calls.count()).toBe(1);
     });
 
     it('queues no auto-ready while the player can intercept', () => {
@@ -295,7 +295,7 @@ describe('ContinueButton auto-ready', () => {
       button.update();
 
       expect(queuedAutoReadys(scene, animationConfig.duration.move).length).toBe(0);
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitReady).not.toHaveBeenCalled();
     });
 
     it('queues no auto-ready for the active player', () => {
@@ -306,7 +306,7 @@ describe('ContinueButton auto-ready', () => {
       button.update();
 
       expect(queuedAutoReadys(scene, animationConfig.duration.move).length).toBe(0);
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitReady).not.toHaveBeenCalled();
     });
   });
 });

@@ -30,7 +30,7 @@ export abstract class BattleActionButton extends BaseButton {
   }
 
   private updateColor() {
-    const isActive = this.gameScene.plannedBattle.type == this.battleType;
+    const isActive = this.gameScene.interaction.plannedBattle.type == this.battleType;
 
     const tintColor = isActive ? designConfig.tint.player : designConfig.tint.neutral;
     this.image.setTint(tintColor, tintColor, tintColor, tintColor);
@@ -51,8 +51,6 @@ export abstract class BattleActionButton extends BaseButton {
   }
 
   protected onClickAction() {
-    this.gameScene.resetView(
-      this.gameScene.plannedBattle.type == this.battleType ? BattleType.None : this.battleType
-    );
+    this.gameScene.interaction.togglePlannedBattle(this.battleType);
   }
 }

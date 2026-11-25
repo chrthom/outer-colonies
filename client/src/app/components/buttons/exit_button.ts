@@ -3,9 +3,7 @@ import { environment } from '../../../environments/environment';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { designConfig } from 'src/app/config/design';
-import { MsgTypeInbound } from '@shared/config/enums';
 import { BaseButton } from './base_button';
-import SocketService from '../../socket_service';
 
 export default class ExitButton extends BaseButton {
   private isMatchmaking!: boolean;
@@ -53,23 +51,26 @@ export default class ExitButton extends BaseButton {
 
   update() {
     this.confirmText.setVisible(false);
-    if (this.isMatchmaking) this.updateText('Spielersuche abbrechen');
-    else if (this.scene instanceof Game && !this.scene.state.gameResult && !this.scene.connectionLost)
-      this.updateText('Aufgeben');
-    else this.updateText('Spiel beenden');
+    if (this.isMatchmaking) {
+      this.updateText('Spielersuche abbrechen');
+    } else if (this.scene instanceof Game) {
+      this.updateText(this.scene.interaction.getExitButtonState().label);
+    }
   }
 
   protected onClickAction(confirmed?: boolean) {
-    if (
-      this.isMatchmaking ||
-      (this.scene instanceof Game && (this.scene.state.gameResult || this.scene.connectionLost))
-    ) {
-      SocketService.disconnect();
+    if (this.isMatchmaking) {
+      (this.scene as Matchmaking).matchmaking?.cancel();
       window.location.href = environment.urls.website;
-    } else if (confirmed) {
-      this.scene.socket.emit(MsgTypeInbound.Surrender);
-    } else {
-      this.confirmText.setVisible(!this.confirmText.visible);
+    } else if (this.scene instanceof Game) {
+      if (!this.scene.interaction.getExitButtonState().canSurrender) {
+        this.scene.session.leaveMatch();
+        window.location.href = environment.urls.website;
+      } else if (confirmed) {
+        this.scene.interaction.surrender();
+      } else {
+        this.confirmText.setVisible(!this.confirmText.visible);
+      }
     }
   }
 }

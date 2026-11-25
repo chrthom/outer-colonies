@@ -1,160 +1,119 @@
-import Game from './game';
-import SocketService from '../socket_service';
-import { EventType, GameResultType, MsgTypeOutbound, TurnPhase } from '@shared/config/enums';
+import { EnvironmentInjector, createEnvironmentInjector } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { EventType, GameResultType, TurnPhase } from '@shared/config/enums';
 import {
   ClientGameResult,
   ClientHandCard,
   ClientState,
   emptyClientState
 } from '@shared/interfaces/client_state';
-import { animationConfig } from '../config/animation';
-import { Socket } from 'socket.io-client';
 import Phaser from 'phaser';
-import { makeAddStub, makeObjStub, makeTimeStub, makeTweensStub, ObjStub } from '../testing/phaser_stubs';
+import { GameInteractionService } from '../services/game_interaction_service';
+import { GameSessionService } from '../services/game_session_service';
+import { SchedulerService } from '../services/scheduler_service';
+import { SERVICE_REGISTRY_KEYS } from '../services/service_registry';
+import { SocketService } from '../socket_service';
+import {
+  makeAddStub,
+  makeObjStub,
+  makeSocketStub,
+  makeTimeStub,
+  makeTweensStub,
+  ObjStub,
+  SocketStub
+} from '../testing/phaser_stubs';
+import Game from './game';
 
-/** Fake socket that records the game listeners registered and removed by the scene. */
-interface SocketListenerStub {
-  on: jasmine.Spy;
-  off: jasmine.Spy;
-}
+class FakeScheduler implements SchedulerService {
+  readonly entries: Array<{ delay: number; callback: () => void; cancelled: boolean }> = [];
 
-/** Handle for overriding socket lifecycle internals of a Game instance in tests. */
-interface GameSocketOverrides {
-  socket: SocketListenerStub;
-  events: { once: jasmine.Spy };
-  registerSocketListeners: () => void;
-}
-
-/** Handle for overriding the private socket factory of the SocketService. */
-interface SocketServiceOverrides {
-  createSocket: () => Socket;
-}
-
-/**
- * Test handle for overriding the private update helpers and Phaser internals
- * of a Game instance with spies and stubs.
- */
-interface GameTestOverrides {
-  time: { delayedCall: FakeClock['delayedCall'] };
-  preloader: { destroy: () => void };
-  updateCardStacks: jasmine.Spy;
-  updateHandCards: jasmine.Spy;
-  updateView: jasmine.Spy;
-  highlightAttackIntervention: jasmine.Spy;
-  player: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
-  opponent: { hand: ClientHandCard[]; discardPile: { update: jasmine.Spy } };
-}
-
-/**
- * Test double for Phaser's clock: records delayed calls so tests can fire
- * them manually, which makes the state update pipeline testable without
- * Phaser timers.
- */
-class FakeClock {
-  readonly entries: Array<{ delay: number; callback: () => void }> = [];
-
-  delayedCall = (delay: number, callback: () => void) => {
-    this.entries.push({ delay, callback });
+  schedule = (delay: number, callback: () => void): (() => void) => {
+    const entry = { delay, callback, cancelled: false };
+    this.entries.push(entry);
+    return () => {
+      entry.cancelled = true;
+    };
   };
 
-  /** Fires and removes the oldest scheduled delayed call (mimics an elapsed timer). */
-  fireOldest() {
-    const entry = this.entries.shift();
-    if (!entry) throw new Error('No delayed call scheduled');
-    entry.callback();
-  }
-
-  /** Fires all scheduled delayed calls, including those scheduled while firing. */
-  fireAll() {
-    while (this.entries.length) this.fireOldest();
+  fireAll(): void {
+    while (this.entries.some(e => !e.cancelled)) {
+      const entry = this.entries.shift()!;
+      if (!entry.cancelled) {
+        entry.callback();
+      }
+    }
   }
 }
 
-function handCard(uuid: string, cardId = 1): ClientHandCard {
-  return {
-    uuid,
-    cardId,
-    index: 0,
-    playable: true,
-    validTargets: [],
-    ownedByPlayer: true,
-    optionsToSelect: 0
-  };
+interface GameTestHandles {
+  game: Game;
+  socket: SocketStub;
+  scheduler: FakeScheduler;
+  session: GameSessionService;
+  interaction: GameInteractionService;
+  shutdownEvent?: string;
+  shutdownHandler?: () => void;
 }
 
-function makeState(over: Partial<ClientState> = {}): ClientState {
-  return { ...emptyClientState, ...over };
-}
-
-/** Creates a Game instance with a fake clock and spied update helpers. */
-function setupGame() {
+function makeGameWithServices(): GameTestHandles {
   const game = new Game();
-  const clock = new FakeClock();
-  const overrides = game as unknown as GameTestOverrides;
-  overrides.time = { delayedCall: clock.delayedCall };
-  overrides.preloader = { destroy: () => {} };
-  const updateCardStacks = jasmine.createSpy('updateCardStacks');
-  const updateHandCards = jasmine.createSpy('updateHandCards');
-  const updateView = jasmine.createSpy('updateView');
-  const highlightAttackIntervention = jasmine.createSpy('highlightAttackIntervention');
-  overrides.updateCardStacks = updateCardStacks;
-  overrides.updateHandCards = updateHandCards;
-  overrides.updateView = updateView;
-  overrides.highlightAttackIntervention = highlightAttackIntervention;
-  const playerDiscardPile = jasmine.createSpy('playerDiscardPile.update');
-  const opponentDiscardPile = jasmine.createSpy('opponentDiscardPile.update');
-  overrides.player = { hand: [], discardPile: { update: playerDiscardPile } };
-  overrides.opponent = { hand: [], discardPile: { update: opponentDiscardPile } };
-  return {
-    game,
-    clock,
-    updateCardStacks,
-    updateHandCards,
-    updateView,
-    highlightAttackIntervention,
-    playerDiscardPile,
-    opponentDiscardPile
+  const socket = makeSocketStub();
+  const scheduler = new FakeScheduler();
+  const injector = createEnvironmentInjector(
+    [
+      { provide: SocketService, useValue: socket },
+      { provide: SchedulerService, useValue: scheduler },
+      GameSessionService,
+      GameInteractionService
+    ],
+    TestBed.inject(EnvironmentInjector)
+  );
+  const session = injector.get(GameSessionService);
+  const interaction = injector.get(GameInteractionService);
+
+  game.session = session;
+  game.interaction = interaction;
+  game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
+  game.time = makeTimeStub() as unknown as Phaser.Time.Clock;
+  game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
+
+  const registryMap = new Map<string, unknown>([
+    [SERVICE_REGISTRY_KEYS.gameSession, session],
+    [SERVICE_REGISTRY_KEYS.gameInteraction, interaction]
+  ]);
+  (game as unknown as { registry: { get: (key: string) => unknown } }).registry = {
+    get: (key: string) => registryMap.get(key)
   };
+
+  const handles: GameTestHandles = { game, socket, scheduler, session, interaction };
+  (game as unknown as { events: { once: jasmine.Spy } }).events = {
+    once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
+      handles.shutdownEvent = event;
+      handles.shutdownHandler = handler;
+    })
+  };
+  return handles;
 }
 
-/** The GameOverIndicator constructor renders one image and three text labels. */
 function expectSingleIndicator(game: Game) {
   expect(game.add.image as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
   expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(3);
 }
 
-/** Creates a Game instance with shared-harness render, clock and tween stubs. */
-function makeGame(): Game {
-  const game = new Game();
-  game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
-  // Game.init() constructs the Background, which schedules via scene.time
-  game.time = makeTimeStub() as unknown as Phaser.Time.Clock;
-  game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
-  game.state = emptyClientState;
-  return game;
-}
-
 describe('Game scene - showConnectionLostMessage', () => {
+  let handles: GameTestHandles;
   let game: Game;
 
   beforeEach(() => {
-    game = makeGame();
+    handles = makeGameWithServices();
+    game = handles.game;
   });
 
-  it('renders a hint text and marks the connection as lost', () => {
+  it('renders a hint text when connection is lost without synthesizing a gameResult', () => {
     game.showConnectionLostMessage();
 
-    expect(game.connectionLost).toBeTrue();
     expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
-    // The server keeps the match alive for a grace window, so no surrender
-    // result is synthesised on the client
     expect(game.state.gameResult).toBeUndefined();
-  });
-
-  it('does not mutate the shared emptyClientState constant', () => {
-    game.showConnectionLostMessage();
-
-    expect(game.state).toBe(emptyClientState);
     expect(emptyClientState.gameResult).toBeUndefined();
   });
 
@@ -163,11 +122,10 @@ describe('Game scene - showConnectionLostMessage', () => {
       ...emptyClientState,
       gameResult: { won: true, type: GameResultType.Domination, sol: 42 }
     };
-    game.state = existing;
+    handles.session.applyState(existing);
 
     game.showConnectionLostMessage();
 
-    expect(game.connectionLost).toBeFalse();
     expect(game.state).toBe(existing);
     expect(game.add.text as unknown as jasmine.Spy).not.toHaveBeenCalled();
   });
@@ -197,104 +155,120 @@ describe('Game scene - showConnectionLostMessage', () => {
   });
 });
 
-describe('Game scene - socket listener lifecycle', () => {
+describe('Game scene - service binding & lifecycle', () => {
+  let handles: GameTestHandles;
   let game: Game;
-  let socket: SocketListenerStub;
-  let shutdownEvent: string;
-  let shutdownHandler: () => void;
 
   beforeEach(() => {
-    game = new Game();
-    socket = jasmine.createSpyObj('Socket', ['on', 'off']);
-    const handle = game as unknown as GameSocketOverrides;
-    handle.socket = socket;
-    handle.events = {
-      once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
-        shutdownEvent = event;
-        shutdownHandler = handler;
-      })
+    handles = makeGameWithServices();
+    game = handles.game;
+    (game as any).preloader = { destroy: jasmine.createSpy('preloader.destroy') };
+    (game as any).background = { update: jasmine.createSpy('background.update') };
+    (game as any).player = {
+      hand: [],
+      actionPool: { update: jasmine.createSpy('player.actionPool') },
+      countdownIndicator: { update: jasmine.createSpy('player.countdown') },
+      deck: {
+        update: jasmine.createSpy('player.deck'),
+        highlightReset: jasmine.createSpy('player.deck.reset')
+      },
+      discardPile: {
+        update: jasmine.createSpy('player.discardPile'),
+        highlightReset: jasmine.createSpy('player.discardPile.reset')
+      }
     };
-    handle.registerSocketListeners();
+    (game as any).opponent = {
+      hand: [],
+      actionPool: { update: jasmine.createSpy('opponent.actionPool') },
+      countdownIndicator: { update: jasmine.createSpy('opponent.countdown') },
+      deck: {
+        update: jasmine.createSpy('opponent.deck'),
+        highlightReset: jasmine.createSpy('opponent.deck.reset')
+      },
+      discardPile: {
+        update: jasmine.createSpy('opponent.discardPile'),
+        highlightReset: jasmine.createSpy('opponent.discardPile.reset')
+      }
+    };
+    (game as any).obj = {
+      ...makeObjStub(),
+      continueButton: { update: jasmine.createSpy('continueButton.update') },
+      combatRangeIndicator: { update: jasmine.createSpy('combatRangeIndicator.update') },
+      zoomCard: { hide: jasmine.createSpy('zoomCard.hide') },
+      raidButton: { updateVisibility: jasmine.createSpy('raidButton.updateVisibility') },
+      missionButton: { updateVisibility: jasmine.createSpy('missionButton.updateVisibility') }
+    };
+    (game as any).bindServices();
+    handles.session.startSession();
   });
 
-  it('registers all game listeners in create()', () => {
-    expect(socket.on.calls.allArgs().map(args => args[0])).toEqual([
-      MsgTypeOutbound.State,
-      MsgTypeOutbound.Countdown,
-      'disconnect'
-    ]);
+  it('emits Ready(Init) on session start and binds SHUTDOWN cleanup', () => {
+    expect(handles.socket.emitReady).toHaveBeenCalledWith(TurnPhase.Init);
+    expect(handles.shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
   });
 
-  it('binds the listener cleanup to the scene shutdown event', () => {
-    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
-  });
-
-  it('removes all game listeners on scene shutdown', () => {
-    shutdownHandler();
-
-    expect(socket.off.calls.allArgs().map(args => args[0])).toEqual([
-      MsgTypeOutbound.State,
-      MsgTypeOutbound.Countdown,
-      'disconnect'
-    ]);
-  });
-
-  it('shows the connection lost message when the socket disconnects', () => {
-    game.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
-    game.tweens = makeTweensStub() as unknown as Phaser.Tweens.TweenManager;
-    game.state = emptyClientState;
-
-    const disconnectHandler = socket.on.calls.allArgs().find(args => args[0] == 'disconnect')![1];
-    disconnectHandler();
+  it('renders connection lost message when socket disconnects via session service', () => {
+    handles.socket.disconnect$.next();
 
     expect(game.connectionLost).toBeTrue();
-    expect(game.state.gameResult).toBeUndefined();
+    expect(game.add.text as unknown as jasmine.Spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('updates countdown indicators from session countdown$', () => {
+    handles.socket.countdown$.next({ countdown: 55, isPlayerActive: true });
+
+    expect(game.player.countdownIndicator.update as unknown as jasmine.Spy).toHaveBeenCalledWith(55);
+    expect(game.opponent.countdownIndicator.update as unknown as jasmine.Spy).toHaveBeenCalledWith(undefined);
+  });
+
+  it('destroys preloader and reconciles discard piles through the session pipeline', () => {
+    const state: ClientState = {
+      ...emptyClientState,
+      turnPhase: TurnPhase.Build,
+      player: { ...emptyClientState.player, discardPileIds: [7], hand: [] as ClientHandCard[] },
+      opponent: { ...emptyClientState.opponent, discardPileIds: [8] }
+    };
+
+    handles.socket.state$.next(state);
+    handles.scheduler.fireAll();
+
+    expect(game.preloader.destroy as unknown as jasmine.Spy).toHaveBeenCalled();
+    expect(game.player.discardPile.update as unknown as jasmine.Spy).toHaveBeenCalledWith([7]);
+    expect(game.opponent.discardPile.update as unknown as jasmine.Spy).toHaveBeenCalledWith([8]);
+  });
+
+  it('stops session and unsubscribes scene listeners on SHUTDOWN', () => {
+    handles.shutdownHandler!();
+
+    handles.socket.disconnect$.next();
+    expect(game.connectionLost).toBeFalse();
   });
 });
 
 describe('Game scene - getCardMovementEvent', () => {
-  let game: Game;
-
-  beforeEach(() => {
-    game = new Game();
-    game.state = {
+  it('delegates to GameSessionService.getCardMovementEvent', () => {
+    const handles = makeGameWithServices();
+    handles.session.applyState({
       ...emptyClientState,
       events: [
         { type: EventType.Retract, playerEvent: true, oldUUID: 'card-1', newUUID: 'hand-1' },
         { type: EventType.Discard, playerEvent: false, oldUUID: 'card-2' }
       ]
-    };
-  });
+    });
 
-  it('returns the movement event for a card that was moved by the server', () => {
-    const event = game.getCardMovementEvent('card-1');
-
-    expect(event).toBeDefined();
-    expect(event?.type).toBe(EventType.Retract);
-    expect(event?.newUUID).toBe('hand-1');
-  });
-
-  it('returns the discard event for a discarded card regardless of the owning player', () => {
-    const event = game.getCardMovementEvent('card-2');
-
-    expect(event).toBeDefined();
-    expect(event?.type).toBe(EventType.Discard);
-  });
-
-  it('returns undefined for cards without a movement event', () => {
-    expect(game.getCardMovementEvent('card-3')).toBeUndefined();
+    expect(handles.game.getCardMovementEvent('card-1')?.type).toBe(EventType.Retract);
+    expect(handles.game.getCardMovementEvent('card-2')?.type).toBe(EventType.Discard);
+    expect(handles.game.getCardMovementEvent('card-3')).toBeUndefined();
   });
 });
 
 describe('Game scene - showGameOverIndicator', () => {
+  let handles: GameTestHandles;
   let game: Game;
 
   beforeEach(() => {
-    game = makeGame();
-  });
-
-  afterEach(() => {
-    SocketService.disconnect();
+    handles = makeGameWithServices();
+    game = handles.game;
   });
 
   it('creates the overlay exactly once regardless of how often it is called', () => {
@@ -309,281 +283,31 @@ describe('Game scene - showGameOverIndicator', () => {
 
   it('does not create a second overlay when a game result follows a connection loss', () => {
     game.showConnectionLostMessage();
-    game.state = {
+    handles.session.applyState({
       ...emptyClientState,
       gameResult: { won: false, type: GameResultType.Surrender, sol: 0 }
-    };
-    // The connection lost hint is a separate text and not part of the overlay
+    });
     (game.add.text as unknown as jasmine.Spy).calls.reset();
 
-    // Simulates the ContinueButton.update() path after further updateView() calls
     game.showGameOverIndicator(game.state.gameResult!);
     game.showGameOverIndicator(game.state.gameResult!);
 
     expectSingleIndicator(game);
   });
 
-  it('shows a fresh overlay in the next match after init() resets the reference', () => {
+  it('shows a fresh overlay and resets connectionLost in the next match after init()', () => {
     game.showGameOverIndicator({ won: false, type: GameResultType.Surrender, sol: 0 });
+    handles.session.handleDisconnect();
+    expect(game.connectionLost).toBeTrue();
 
-    // The Game scene fetches its socket from the app-level SocketService, so
-    // open a fake connection instead of passing a socket via the init data.
-    const socket = jasmine.createSpyObj('Socket', ['disconnect']);
-    socket.io = { reconnection: () => undefined };
-    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
-    SocketService.connect();
-    game.init({
-      gameParams: { preloadCardIds: [] }
-    });
+    game.init({ gameParams: { preloadCardIds: [] } });
     (game.add.image as unknown as jasmine.Spy).calls.reset();
     (game.add.text as unknown as jasmine.Spy).calls.reset();
 
-    game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
-
-    expectSingleIndicator(game);
-  });
-
-  it('resets the connection lost flag when the next match starts', () => {
-    game.showConnectionLostMessage();
-    expect(game.connectionLost).toBeTrue();
-
-    const socket = jasmine.createSpyObj('Socket', ['disconnect']);
-    socket.io = { reconnection: () => undefined };
-    spyOn(SocketService as unknown as SocketServiceOverrides, 'createSocket').and.returnValue(socket);
-    SocketService.connect();
-    game.init({
-      gameParams: { preloadCardIds: [] }
-    });
-
     expect(game.connectionLost).toBeFalse();
-  });
-});
+    expect(handles.socket.disableReconnection).toHaveBeenCalled();
 
-describe('Game scene - updateState', () => {
-  let game: Game;
-
-  beforeEach(() => {
-    game = new Game();
-    (game as any).preloader = { destroy: jasmine.createSpy('preloader.destroy') };
-    (game as any).time = { delayedCall: jasmine.createSpy('time.delayedCall') };
-  });
-
-  function makeOptionPickerStub(isValidFor: boolean) {
-    return {
-      destroy: jasmine.createSpy('destroy'),
-      isValidFor: jasmine.createSpy('isValidFor').and.returnValue(isValidFor)
-    };
-  }
-
-  it('destroys a pending option picker that the incoming state invalidated', () => {
-    const optionPicker = makeOptionPickerStub(false);
-    (game as any).obj = { optionPicker };
-    const state: ClientState = { ...emptyClientState };
-
-    game.updateState(state);
-
-    expect(optionPicker.isValidFor).toHaveBeenCalledWith(state);
-    expect(optionPicker.destroy).toHaveBeenCalled();
-  });
-
-  it('keeps a pending option picker whose action is still valid', () => {
-    const optionPicker = makeOptionPickerStub(true);
-    (game as any).obj = { optionPicker };
-
-    game.updateState({ ...emptyClientState });
-
-    expect(optionPicker.isValidFor).toHaveBeenCalled();
-    expect(optionPicker.destroy).not.toHaveBeenCalled();
-    expect((game as any).obj.optionPicker).toBe(optionPicker);
-  });
-
-  it('ignores incoming states while no option picker is pending', () => {
-    (game as any).obj = {};
-
-    expect(() => game.updateState({ ...emptyClientState })).not.toThrow();
-  });
-});
-
-describe('Game scene - state update pipeline', () => {
-  it('runs the full update chain for a single state', () => {
-    const {
-      game,
-      clock,
-      updateCardStacks,
-      updateHandCards,
-      updateView,
-      highlightAttackIntervention,
-      playerDiscardPile,
-      opponentDiscardPile
-    } = setupGame();
-    const state = makeState({
-      turnPhase: TurnPhase.Build,
-      player: { ...emptyClientState.player, discardPileIds: [7], hand: [handCard('p1', 10)] },
-      opponent: { ...emptyClientState.opponent, discardPileIds: [8] }
-    });
-
-    game.updateState(state);
-    clock.fireAll();
-
-    expect(updateCardStacks).toHaveBeenCalledTimes(1);
-    expect(updateCardStacks).toHaveBeenCalledWith();
-    expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p1', 10)]);
-    expect(updateView).toHaveBeenCalledTimes(1);
-    expect(highlightAttackIntervention).toHaveBeenCalledTimes(1);
-    expect(playerDiscardPile).toHaveBeenCalledWith([7]);
-    expect(opponentDiscardPile).toHaveBeenCalledWith([8]);
-  });
-
-  it('renders the newest state when a second state arrives mid-chain', () => {
-    const { game, clock, updateCardStacks, updateHandCards, playerDiscardPile, opponentDiscardPile } =
-      setupGame();
-    const state1 = makeState({
-      turnPhase: TurnPhase.Build,
-      player: { ...emptyClientState.player, hand: [handCard('p1', 10)] }
-    });
-    game.updateState(state1);
-    clock.fireOldest(); // Chain 1 applied its card stacks step
-    const state2 = makeState({
-      turnPhase: TurnPhase.Combat,
-      player: { ...emptyClientState.player, discardPileIds: [3], hand: [handCard('p2', 20)] },
-      opponent: { ...emptyClientState.opponent, discardPileIds: [4] }
-    });
-
-    game.updateState(state2); // Supersedes the pending steps of chain 1
-    clock.fireAll();
-
-    expect(game.state).toBe(state2);
-    // Each chain ran its card stacks step exactly once
-    expect(updateCardStacks).toHaveBeenCalledTimes(2);
-    // The hand update ran only for the newest state, with the new hand
-    // cards captured from that state
-    expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
-    // The discard piles were updated from the newest state only
-    expect(playerDiscardPile).toHaveBeenCalledTimes(1);
-    expect(playerDiscardPile).toHaveBeenCalledWith([3]);
-    expect(opponentDiscardPile).toHaveBeenCalledWith([4]);
-  });
-
-  it('skips every step of a chain that was superseded before it started', () => {
-    const { game, clock, updateCardStacks, updateHandCards, playerDiscardPile } = setupGame();
-    const state1 = makeState({
-      player: { ...emptyClientState.player, discardPileIds: [1], hand: [handCard('p1', 10)] }
-    });
-    game.updateState(state1);
-    const state2 = makeState({
-      player: { ...emptyClientState.player, discardPileIds: [2], hand: [handCard('p2', 20)] }
-    });
-
-    game.updateState(state2); // Supersedes chain 1 before any of its steps ran
-    clock.fireAll();
-
-    expect(updateCardStacks).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledTimes(1);
-    expect(updateHandCards).toHaveBeenCalledWith([handCard('p2', 20)]);
-    expect(playerDiscardPile).toHaveBeenCalledTimes(1);
-    expect(playerDiscardPile).toHaveBeenCalledWith([2]);
-  });
-
-  it('waits for the attack animation before updating the card stacks', () => {
-    const { game, clock, updateCardStacks } = setupGame();
-    const state = makeState({
-      battle: {
-        ...emptyClientState.battle,
-        recentAttack: {
-          sourceRootUUID: 'src-root',
-          sourceSubUUID: 'src-sub',
-          targetUUID: 'target',
-          pointDefense: 0,
-          shield: 0,
-          armour: 0,
-          damage: 1
-        }
-      }
-    });
-
-    game.updateState(state);
-
-    expect(game.isAttackAnimating).toBeTrue();
-    // The attack animation reset and the chain's first step are both
-    // scheduled with the attack duration
-    expect(clock.entries.map(e => e.delay)).toEqual([
-      animationConfig.duration.attack,
-      animationConfig.duration.attack
-    ]);
-    clock.fireOldest(); // Resets isAttackAnimating
-    expect(game.isAttackAnimating).toBeFalse();
-    expect(updateCardStacks).not.toHaveBeenCalled();
-    clock.fireOldest(); // Chain step 1
-    expect(updateCardStacks).toHaveBeenCalledTimes(1);
-  });
-
-  it('delays the hand update when a retract animation was detected', () => {
-    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
-    updateCardStacks.and.callFake(() => (game.retractCardsExist = true));
-
-    game.updateState(makeState());
-    clock.fireOldest(); // Step 1 detects a retract via updateCardStacks
-
-    expect(clock.entries[0].delay).toBe(animationConfig.duration.move);
-    expect(updateHandCards).not.toHaveBeenCalled();
-    clock.fireOldest();
-    expect(updateHandCards).toHaveBeenCalledTimes(1);
-  });
-
-  it('retains movement events from a superseded state until the UI steps reconcile them', () => {
-    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
-    let seenDuringStacks: EventType | undefined;
-    let seenDuringHand: EventType | undefined;
-    updateCardStacks.and.callFake(() => {
-      seenDuringStacks = game.getCardMovementEvent('ship-1')?.type;
-    });
-    updateHandCards.and.callFake(() => {
-      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
-    });
-
-    game.updateState(
-      makeState({
-        events: [
-          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
-          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
-        ]
-      })
-    );
-    // Second state with an empty event list supersedes the first before any step runs
-    game.updateState(makeState({ events: [] }));
-    clock.fireAll();
-
-    expect(seenDuringStacks).toBe(EventType.Retract);
-    expect(seenDuringHand).toBe(EventType.Discard);
-    expect(game.getCardMovementEvent('ship-1')).toBeUndefined();
-    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
-  });
-
-  it('retains hand discard events when a second state supersedes a chain waiting on a retract delay', () => {
-    const { game, clock, updateCardStacks, updateHandCards } = setupGame();
-    let seenDuringHand: EventType | undefined;
-    updateCardStacks.and.callFake(() => {
-      game.retractCardsExist = game.getCardMovementEvent('ship-1')?.type == EventType.Retract;
-    });
-    updateHandCards.and.callFake(() => {
-      seenDuringHand = game.getCardMovementEvent('hand-1')?.type;
-    });
-
-    game.updateState(
-      makeState({
-        events: [
-          { type: EventType.Retract, playerEvent: true, oldUUID: 'ship-1', newUUID: 'hand-2' },
-          { type: EventType.Discard, playerEvent: true, oldUUID: 'hand-1' }
-        ]
-      })
-    );
-    clock.fireOldest(); // Chain 1 runs step 1 and schedules step 2 behind the retract delay
-    game.updateState(makeState({ events: [] })); // Supersedes chain 1 before step 2 runs
-    clock.fireAll();
-
-    expect(seenDuringHand).toBe(EventType.Discard);
-    expect(game.getCardMovementEvent('hand-1')).toBeUndefined();
+    game.showGameOverIndicator({ won: true, type: GameResultType.Domination, sol: 5 });
+    expectSingleIndicator(game);
   });
 });

@@ -26,8 +26,9 @@ export interface StateUpdateStep {
  */
 export default class StateUpdateSequencer {
   private version = 0;
+  private cancelPending?: () => void;
 
-  constructor(private schedule: (delayMs: number, callback: () => void) => void) {}
+  constructor(private schedule: (delayMs: number, callback: () => void) => (() => void) | void) {}
 
   /**
    * Runs the given steps sequentially: each step waits for `delay()` ms after
@@ -37,16 +38,28 @@ export default class StateUpdateSequencer {
    * @param steps Steps to execute in order; may be empty.
    */
   run(steps: StateUpdateStep[]) {
-    const version = ++this.version;
+    this.cancel();
+    const version = this.version;
     const runNext = (index: number) => {
       const step = steps[index];
       if (!step || version != this.version) return; // Run was superseded by a newer one
-      this.schedule(step.delay(), () => {
+      const cancel = this.schedule(step.delay(), () => {
+        this.cancelPending = undefined;
         if (version != this.version) return; // Run was superseded while waiting
         step.action();
         runNext(index + 1);
       });
+      this.cancelPending = typeof cancel === 'function' ? cancel : undefined;
     };
     runNext(0);
+  }
+
+  /**
+   * Cancels any pending step of the current run without starting a new one.
+   */
+  cancel() {
+    ++this.version;
+    this.cancelPending?.();
+    this.cancelPending = undefined;
   }
 }
