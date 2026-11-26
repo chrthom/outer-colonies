@@ -164,7 +164,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `components/game.ts`: Game logic and WebSocket handlers
   - `components/matchmaking.ts`: Matchmaking logic
   - `components/bot/`: Singleplayer bot (plays against a human in a regular match)
-    - `bot.ts`: Bot actor reacting to state changes with immediate actions
+    - `bot.ts`: Bot actor reacting to emitted client states with paced actions through the game handlers
     - `strategy.ts`: Rule-based decision heuristics (card play, battles, target selection)
     - `decks.ts`: Bot deck definitions (independent copy of the starter decks)
   - `components/online_users.ts`: Tracking of unique logged-in users (a user with several sockets counts once) and push of the online count
@@ -257,7 +257,7 @@ The server provides the following WebSocket events for the game client:
 - **Matchmaking**:
   - `MsgTypeInbound.Login`: Login to matchmaking
   - `MsgTypeInbound.StartBotGame`: Start a singleplayer game against the bot
-  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.Start` with the game params when a match begins)
+  - `MsgTypeOutbound.Matchmaking`: Matchmaking status updates (`MatchmakingStatus.Search` while waiting, `MatchmakingStatus.BotRejected` when a bot game request is rejected, `MatchmakingStatus.Start` with the game params when a match begins)
   - `MsgTypeOutbound.OnlineCount`: Number of unique logged-in users, pushed to all clients on every login and disconnect which changes it (and to a newly logged-in socket)
 
 - **Game**:

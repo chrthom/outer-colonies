@@ -467,6 +467,15 @@ describe('Bot strategy', () => {
       expect(selectAttack(state)).toBeUndefined();
     });
 
+    test('treats a target with hp warning as destroyed even without a damage attribute', () => {
+      const state = setupCombat();
+      state.cardStacks[1].attributes = [{ icon: 'hp', value: 50, warning: true }];
+
+      const attack = selectAttack(state, state.cardStacks[1].uuid);
+
+      expect(attack?.targetUUID).toBe(state.cardStacks[2].uuid);
+    });
+
     test('returns undefined when no weapon can attack', () => {
       const state = setupCombat(0, 0, false);
 

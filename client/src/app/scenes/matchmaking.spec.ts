@@ -1,5 +1,5 @@
 import Matchmaking from './matchmaking';
-import { MsgTypeOutbound } from '@shared/config/enums';
+import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '@shared/config/enums';
 import ClientGameParams from '@shared/interfaces/client_game_params';
 import Phaser from 'phaser';
 
@@ -18,6 +18,7 @@ interface MatchmakingOverrides {
   registerSocketListeners: () => void;
   scene: { start: jasmine.Spy };
   onlineIndicator: { setCount: jasmine.Spy };
+  status: { setText: jasmine.Spy };
 }
 
 describe('Matchmaking scene - socket listener lifecycle', () => {
@@ -92,5 +93,27 @@ describe('Matchmaking scene - socket listener lifecycle', () => {
     onlineCountHandler(7);
 
     expect(setCount).toHaveBeenCalledWith(7);
+  });
+
+  it('emits StartBotGame and updates status when starting a bot game', () => {
+    const setText = jasmine.createSpy('status.setText');
+    (matchmaking as unknown as MatchmakingOverrides).status = { setText };
+
+    matchmaking.startBotGame();
+
+    expect(setText).toHaveBeenCalledWith('Starte Bot-Spiel...');
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeInbound.StartBotGame);
+  });
+
+  it('updates status when a bot game request is rejected', () => {
+    const setText = jasmine.createSpy('status.setText');
+    (matchmaking as unknown as MatchmakingOverrides).status = { setText };
+
+    const matchmakingHandler = socket.on.calls
+      .allArgs()
+      .find(args => args[0] == MsgTypeOutbound.Matchmaking)![1];
+    matchmakingHandler(MatchmakingStatus.BotRejected);
+
+    expect(setText).toHaveBeenCalledWith('Bot-Spiel konnte nicht gestartet werden. Suche Mitspieler...');
   });
 });

@@ -2,8 +2,9 @@ import Match, { BotPlayerSetup } from '../game_state/match';
 import Player from '../game_state/player';
 import Bot, { BotScheduler, defaultBotReactionDelays } from './bot';
 import CardCollection from '../cards/collection/card_collection';
+import { AttachmentCardStack, RootCardStack } from '../cards/card_stack';
 import { Server, Socket } from 'socket.io';
-import { EventType, MsgTypeOutbound, TurnPhase } from '../../shared/config/enums';
+import { BattleType, EventType, MsgTypeOutbound, TurnPhase, Zone } from '../../shared/config/enums';
 import { ClientState, emptyClientState } from '../../shared/interfaces/client_state';
 import { rules } from '../../shared/config/rules';
 import * as gameHandlers from '../game';
@@ -196,6 +197,42 @@ describe('Bot', () => {
     expect(scheduler.flushAll()).toBe(0);
   });
 
+  test('does not stall when the bot has insufficient energy during the opponent turn', () => {
+    const { match, io, scheduler } = createBotMatch();
+    match.bot!.onMatchStart(io);
+    jest.spyOn(match, 'setSecondPlayer').mockImplementation(() => {
+      // Human (player 0) takes the first turn
+      match.activePlayerNo = 1;
+    });
+    gameHandlers.onReady(io, match, match.players[0], TurnPhase.Init);
+    // Clear any initial Start-phase intervention before entering Human Build
+    scheduler.flushAll(10);
+    if (match.turnPhase == TurnPhase.Start) {
+      gameHandlers.onReady(io, match, match.players[0], TurnPhase.Start);
+    }
+
+    // Bot has an energy consumer (154 Industriekomplex, -2 energy) without producer -> insufficientEnergy
+    const bot = match.players[1];
+    const consumer = new RootCardStack(CardCollection.cards[154], Zone.Colony, bot);
+    bot.cardStacks.push(consumer);
+    expect(consumer.hasInsufficientEnergy).toBe(true);
+
+    // Human declares a Raid with an armed ship -> Bot must skip OpponentRaidStart and confirm defense without looping
+    const human = match.players[0];
+    const ship = new RootCardStack(CardCollection.cards[160], Zone.Orbital, human);
+    ship.attach(new AttachmentCardStack(CardCollection.cards[179], ship));
+    human.cardStacks.push(ship);
+    gameHandlers.onReady(io, match, human, TurnPhase.Build, {
+      type: BattleType.Raid,
+      shipIds: [ship.uuid]
+    });
+
+    const steps = scheduler.flushAll(20);
+    expect(steps).toBeGreaterThan(0);
+    expect(steps).toBeLessThan(10);
+    expect(match.turnPhase).toBe(TurnPhase.Combat);
+  });
+
   test.each([0, 1, 2])('a full game against the bot (deck %i) finishes without stalling', deckIndex => {
     const { match, io, scheduler } = createBotMatch(deckIndex);
 
@@ -207,7 +244,16 @@ describe('Bot', () => {
       scheduler.flushAll(200);
       if (match.gameResult.gameOver) break;
       if (match.pendingActionPlayerNo == 0) autoPlayHuman(io, match, match.players[0]);
-      if (++iterations > 5000) throw new Error('Bot game stalled: exceeded 5000 iterations');
+      if (++iterations > 5000) {
+        const insufficient = match.players[1].cardStacks.flatMap(cs =>
+          cs.cardStacks
+            .filter(sub => sub.hasInsufficientEnergy)
+            .map(sub => `${sub.card.id}:${sub.card.name}:retract=${sub.canBeRetracted}`)
+        );
+        throw new Error(
+          `Bot game stalled: phase=${match.turnPhase} active=${match.activePlayerNo} pending=${match.pendingActionPlayerNo} intervention=${match.intervention?.type} botHand=${match.players[1].hand.length}/${match.players[1].handCardLimit} humanHand=${match.players[0].hand.length}/${match.players[0].handCardLimit} insufficient=[${insufficient.join(',')}] pendingTimers=${scheduler.pending.filter(e => !e.cancelled).length}`
+        );
+      }
     }
 
     expect(match.gameResult.gameOver).toBe(true);

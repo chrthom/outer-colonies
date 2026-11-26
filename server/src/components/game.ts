@@ -337,16 +337,18 @@ function emitState(io: Server, match: Match) {
 
 /**
  * Verifies that the player may ready the given turn phase: the hand card limit must be kept
- * in the End phase and no card stack may have insufficient energy.
+ * in the End phase and no card stack may have insufficient energy when leaving the active
+ * Build phase without an open intervention.
  * @param player player readying the phase
  * @param turnPhase turn phase to ready
  * @returns true if the player meets all ready conditions
  */
 export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+  if (player.match.intervention) return true;
   if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
     return false;
   }
-  if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
+  if (player.hasInsufficientEnergyCard) {
     return false;
   }
   return true;

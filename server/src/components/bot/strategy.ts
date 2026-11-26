@@ -30,6 +30,11 @@ function stackAttribute(stack: ClientCardStack, icon: string): number {
   return stack.attributes.find(a => a.icon == icon)?.value ?? 0;
 }
 
+function isStackAlive(stack: ClientCardStack): boolean {
+  if (stack.attributes.find(a => a.icon == 'hp')?.warning) return false;
+  return stackAttribute(stack, 'damage') < stackHp(stack);
+}
+
 function stackHp(stack: ClientCardStack): number {
   const attr = stack.attributes.find(a => a.icon == 'hp')?.value;
   if (attr !== undefined) return attr;
@@ -201,7 +206,7 @@ export function selectAttack(state: ClientState, focusTargetUUID?: string): BotA
     if (ship && weapon) {
       const opponentShips = state.battle.opponentShipIds
         .map(id => state.cardStacks.find(cs => cs.uuid == id))
-        .filter((cs): cs is ClientCardStack => !!cs && stackAttribute(cs, 'damage') < stackHp(cs));
+        .filter((cs): cs is ClientCardStack => !!cs && isStackAlive(cs));
       const focusTarget = focusTargetUUID ? opponentShips.find(cs => cs.uuid == focusTargetUUID) : undefined;
       const target = focusTarget ?? (opponentShips.length > 0 ? pickRandom(opponentShips) : undefined);
       return target ? { shipUUID: ship.uuid, weaponUUID: weapon.uuid, targetUUID: target.uuid } : undefined;

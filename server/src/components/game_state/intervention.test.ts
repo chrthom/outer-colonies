@@ -304,4 +304,46 @@ describe('Intervention', () => {
       expect(tacticCard.root).toBe(tacticCard);
     });
   });
+
+  describe('BattleRoundEnd at range 0', () => {
+    test('clears the intervention when moving to End phase for discarding', () => {
+      const match = createMatch();
+      match.activePlayerNo = 0;
+      match.pendingActionPlayerNo = 1;
+      match.turnPhase = TurnPhase.Combat;
+      match.battle.type = BattleType.Mission;
+      match.battle.range = 1;
+      for (let i = 0; i <= rules.maxHandCards; i++) {
+        addHandCard(match.players[0], new MockCard(i));
+      }
+
+      const roundEnd = new InterventionBattleRoundEnd(match);
+      match.intervention = roundEnd;
+      roundEnd.skip();
+
+      expect(match.turnPhase).toBe(TurnPhase.End);
+      expect(match.activePlayerNo).toBe(0);
+      expect(match.pendingActionPlayerNo).toBe(0);
+      expect(match.intervention).toBeUndefined();
+    });
+
+    test('does not overwrite an OpponentTurnStart intervention when the battle ends', () => {
+      const match = createMatch();
+      match.activePlayerNo = 0;
+      match.pendingActionPlayerNo = 1;
+      match.turnPhase = TurnPhase.Combat;
+      match.battle.type = BattleType.Mission;
+      match.battle.range = 1;
+      addHandCard(match.players[0], new Card231());
+
+      const roundEnd = new InterventionBattleRoundEnd(match);
+      match.intervention = roundEnd;
+      roundEnd.skip();
+
+      expect(match.turnPhase).toBe(TurnPhase.Start);
+      expect(match.activePlayerNo).toBe(1);
+      expect(match.pendingActionPlayerNo).toBe(0);
+      expect(match.intervention?.type).toBe(InterventionType.OpponentTurnStart);
+    });
+  });
 });
