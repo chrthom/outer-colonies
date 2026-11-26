@@ -67,6 +67,7 @@ jobs:
           EVENT_ACTION: ${{ github.event.action }}
           LABELED_NAME: ${{ github.event.label.name }}
           EVENT_STATUS_ID: ${{ github.event.status.id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           set -eu
           if [ -z "$ISSUE_NUMBER" ]; then
@@ -127,16 +128,17 @@ jobs:
           fi
           # Lifecycle gate (misc/dev-loop.md): only start issues on Todo (id=3)
           # so Backlog / In progress / In review issues stay untouched.
-          # workflow_dispatch (including internal retry=1) also accepts
-          # In progress (id=4) because the initial run moves the issue there.
+          # workflow_dispatch (including internal retry=1) and Actions re-runs
+          # (RUN_ATTEMPT > 1) also accept In progress (id=4) because the
+          # initial run moves the issue there before pre-agent setup steps.
           status_id="$(printf '%s' "$issue_json" | jq -r '.status.id // 0')"
           status_name="$(printf '%s' "$issue_json" | jq -r '.status.name // "none"')"
-          if [ "$EVENT_NAME" != "workflow_dispatch" ] && [ "$status_id" != "3" ]; then
+          if [ "$EVENT_NAME" != "workflow_dispatch" ] && [ "${RUN_ATTEMPT:-1}" = "1" ] && [ "$status_id" != "3" ]; then
             echo "Issue #$ISSUE_NUMBER status is '$status_name' (id=$status_id), not Todo (3); skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$status_id" != "3" ] && [ "$status_id" != "4" ]; then
+          if { [ "$EVENT_NAME" = "workflow_dispatch" ] || [ "${RUN_ATTEMPT:-1}" != "1" ]; } && [ "$status_id" != "3" ] && [ "$status_id" != "4" ]; then
             echo "Issue #$ISSUE_NUMBER status is '$status_name' (id=$status_id), not Todo (3) or In progress (4); skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0

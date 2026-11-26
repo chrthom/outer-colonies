@@ -179,6 +179,7 @@ jobs:
           Run: ${RUN_URL}
           EOF
             gh pr comment "$PR_NUMBER" --body-file /tmp/dev-loop-escalation.md >/dev/null
+            bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In progress" || true
           }
           # Conflict origin 2: a push to main can leave open ready dev-loop PRs
           # CONFLICTING. One scan per merge to main (misc/dev-loop.md): find all
@@ -775,6 +776,7 @@ jobs:
           Run: ${RUN_URL}
           EOF
                 gh pr comment "$PR_NUMBER" --body-file /tmp/dev-loop-escalation.md >/dev/null
+                bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In progress" || true
               fi
               echo "skip=true" >> "$GITHUB_OUTPUT"
               exit 0
@@ -794,6 +796,11 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # Ensure linked open issues are In progress when the agent fixer runs
+          # (covers direct entries like human COMMENT findings reviews or
+          # non-scripted conflict fixes on a previously CLEAN / In review PR;
+          # clean scripted merges exited early above so In review is preserved).
+          bash .github/dev-loop/scripts/sync-pr-issue-status.sh "In progress" || true
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
           echo "review_id=$review_id" >> "$GITHUB_OUTPUT"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
