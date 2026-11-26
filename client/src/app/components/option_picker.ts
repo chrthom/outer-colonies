@@ -21,6 +21,7 @@ export default class OptionPicker {
   private previousPageButton: Phaser.GameObjects.Triangle;
   private escapeKey?: Phaser.Input.Keyboard.Key;
   private destroyed = false;
+  private synced = false;
   private readonly uiConfig = layoutConfig.game.ui.optionPicker;
 
   /**
@@ -155,9 +156,12 @@ export default class OptionPicker {
     this.escapeKey?.on('down', () => this.cancel());
     this.scene.obj.optionPicker = this;
     if (!this.scene.interaction.pendingOptionPicker) {
+      // Calling openOptionPicker synchronously triggers Game.syncOptionPicker() -> sync() when bound.
       this.scene.interaction.openOptionPicker(handCardUUID, targetUUID, options, optionsToSelect);
     }
-    this.sync();
+    if (!this.synced) {
+      this.sync();
+    }
   }
 
   /**
@@ -167,6 +171,7 @@ export default class OptionPicker {
   sync(): void {
     const vm = this.scene.interaction.getOptionPickerViewModel();
     if (!vm) return;
+    this.synced = true;
     this.renderCards(vm);
     this.text.setText(vm.selectedOptionsText);
     this.confirmButton.setVisible(vm.allOptionsSelected);
