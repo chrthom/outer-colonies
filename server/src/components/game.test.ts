@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { gameCron, gameSocketListeners } from './game';
+import { gameCron, gameSocketListeners, verifyReadyConditions } from './game';
 import { allActiveMatches, registerMatch, unregisterMatch } from './match_registry';
 import Battle from './game_state/battle';
 import Match from './game_state/match';
@@ -291,5 +291,50 @@ describe('gameCron with reconnection grace', () => {
     gameCron(createIoMock(socketMocks.map(sm => sm.socket)));
 
     expect(allActiveMatches()).not.toContain(match);
+  });
+});
+
+describe('verifyReadyConditions', () => {
+  test('blocks active Build ready when a card stack has insufficient energy and no intervention is open', () => {
+    const { match } = createCombatMatch();
+    match.turnPhase = TurnPhase.Build;
+    const activePlayer = match.players[0];
+    jest.spyOn(activePlayer.cardStacks[0], 'hasInsufficientEnergy', 'get').mockReturnValue(true);
+
+    expect(verifyReadyConditions(activePlayer, TurnPhase.Build)).toBe(false);
+  });
+
+  test('allows inactive Build ready and open interventions despite insufficient energy', () => {
+    const { match } = createCombatMatch();
+    match.turnPhase = TurnPhase.Build;
+    const inactivePlayer = match.players[1];
+    jest.spyOn(inactivePlayer.cardStacks[0], 'hasInsufficientEnergy', 'get').mockReturnValue(true);
+    expect(verifyReadyConditions(inactivePlayer, TurnPhase.Build)).toBe(true);
+
+    const activePlayer = match.players[0];
+    jest.spyOn(activePlayer.cardStacks[0], 'hasInsufficientEnergy', 'get').mockReturnValue(true);
+    match.intervention = new InterventionAttack(
+      match,
+      activePlayer.cardStacks[0],
+      inactivePlayer.cardStacks[0]
+    );
+    expect(verifyReadyConditions(activePlayer, TurnPhase.Build)).toBe(true);
+  });
+
+  test('blocks End ready only when over hand card limit without an open intervention', () => {
+    const { match } = createCombatMatch();
+    match.turnPhase = TurnPhase.End;
+    const activePlayer = match.players[0];
+    for (let i = 0; i <= rules.maxHandCards; i++) {
+      activePlayer.hand.push(new RootCardStack(new MockHullCard(50 + i), Zone.Hand, activePlayer));
+    }
+    expect(verifyReadyConditions(activePlayer, TurnPhase.End)).toBe(false);
+
+    match.intervention = new InterventionAttack(
+      match,
+      activePlayer.cardStacks[0],
+      match.players[1].cardStacks[0]
+    );
+    expect(verifyReadyConditions(activePlayer, TurnPhase.End)).toBe(true);
   });
 });

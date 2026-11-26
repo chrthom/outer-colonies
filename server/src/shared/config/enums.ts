@@ -71,6 +71,7 @@ export enum MsgTypeInbound {
   Login = 'login',
   Ready = 'ready',
   Retract = 'retract',
+  StartBotGame = 'start_bot_game',
   Surrender = 'surrender'
 }
 
@@ -119,7 +120,8 @@ export enum Zone {
 
 export enum MatchmakingStatus {
   Search = 'search',
-  Start = 'start'
+  Start = 'start',
+  BotRejected = 'bot_rejected'
 }
 
 export enum MagicLinkType {

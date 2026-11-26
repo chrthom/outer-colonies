@@ -16,11 +16,12 @@ import { InterventionTacticCard } from './intervention';
 import { rules } from '../../shared/config/rules';
 
 export default class Player {
-  socketId: string;
-  userId: number;
+  socketId?: string;
+  userId?: number;
   name: string;
   match: Match;
   no: number;
+  isBot: boolean;
   ready: boolean = false;
   deck: Card[];
   discardPile: Card[] = [];
@@ -31,12 +32,21 @@ export default class Player {
   disconnectedSince?: number;
   /** Whether the player's socket received the final state of the match; a finished match stays registered until every player's result was delivered (see gameCron in components/game.ts) */
   resultDelivered?: boolean;
-  constructor(socketId: string, userId: number, name: string, match: Match, playerNo: number, deck: Card[]) {
+  constructor(
+    socketId: string | undefined,
+    userId: number | undefined,
+    name: string,
+    match: Match,
+    playerNo: number,
+    deck: Card[],
+    isBot: boolean = false
+  ) {
     this.socketId = socketId;
     this.userId = userId;
     this.name = name;
     this.match = match;
     this.no = playerNo;
+    this.isBot = isBot;
     this.deck = deck;
     this.cardStacks = [new RootCardStack(new ColonyCard(), Zone.Colony, this)];
     this.resetRemainingActions();

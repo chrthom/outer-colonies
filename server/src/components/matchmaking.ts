@@ -1,5 +1,5 @@
 import SocketData from './game_state/socket_data';
-import Match from './game_state/match';
+import Match, { BotPlayerSetup } from './game_state/match';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
 import { v4 as uuidv4 } from 'uuid';
 import { Server, Socket } from 'socket.io';
@@ -7,6 +7,8 @@ import ClientGameParams from '../shared/interfaces/client_game_params';
 import DBCredentialsDAO from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import CardCollection from './cards/collection/card_collection';
+import Bot from './bot/bot';
+import { pickRandom } from './utils/helpers';
 import { logger } from './utils/logger';
 import Player from './game_state/player';
 import { findRejoinableMatch, registerMatch } from './match_registry';
@@ -17,6 +19,7 @@ import { markOnline } from './online_users';
 // be mixed up (they share the socket.io namespace otherwise).
 export const matchmakingRoom = 'matchmaking-lobby';
 const gameRoomPrefix = 'match';
+const botName = 'Bot';
 
 export function matchMakingSocketListeners(io: Server, socket: Socket): void {
   socket.on(MsgTypeInbound.Login, async (sessionToken: string) => {
@@ -46,6 +49,24 @@ export function matchMakingSocketListeners(io: Server, socket: Socket): void {
     } catch (err) {
       logger.error(`Login failed: ${err}`);
     }
+  });
+  socket.on(MsgTypeInbound.StartBotGame, () => {
+    const socketData = <SocketData>socket.data;
+    if (!socketData?.activeDeck || socketData.activeDeck.length == 0) {
+      logger.warn(
+        socketData?.user
+          ? `${socketData.user.username} tried to start a bot game without an active deck`
+          : `Socket ${socket.id} tried to start a bot game before logging in`
+      );
+      socket.emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.BotRejected);
+      return;
+    }
+    if (socketData.match) {
+      logger.warn(`${socketData.user.username} tried to start a bot game while already in a match`);
+      return;
+    }
+    socket.leave(matchmakingRoom); // The matchmaking cron must no longer pair this player
+    initBotGame(io, socket);
   });
 }
 
@@ -82,7 +103,7 @@ function rejoinMatch(io: Server, socket: Socket, match: Match, player: Player): 
   // Detach the socket of the previous connection: a lingering old socket must
   // neither act on the match under the player's identity nor re-mark the
   // rejoined player as disconnected via its late Disconnect event
-  const previousSocket = io.sockets.sockets.get(player.socketId);
+  const previousSocket = player.socketId ? io.sockets.sockets.get(player.socketId) : undefined;
   if (previousSocket && previousSocket.id != socket.id) {
     const previousSocketData = <SocketData>previousSocket.data;
     previousSocketData.match = undefined;
@@ -101,4 +122,17 @@ function gameParamsFor(match: Match): ClientGameParams {
   return {
     preloadCardIds: [...new Set(match.players.flatMap(p => p.deck).map(c => c.id))]
   };
+}
+
+function initBotGame(io: Server, socket: Socket): void {
+  const match = new Match(
+    `${gameRoomPrefix}-${uuidv4()}`,
+    socket,
+    new BotPlayerSetup(botName, pickRandom(CardCollection.botDecks).slice())
+  );
+  match.bot = new Bot(match, 1);
+  registerMatch(match);
+  io.sockets.to(match.room).emit(MsgTypeOutbound.Matchmaking, MatchmakingStatus.Start, gameParamsFor(match));
+  match.bot.onMatchStart(io);
+  logger.info(`Player ${(<SocketData>socket.data).user.username} started a bot game`);
 }

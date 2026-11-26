@@ -1,4 +1,4 @@
-import { CardDurability, InterventionType } from '../../shared/config/enums';
+import { CardDurability, InterventionType, TurnPhase } from '../../shared/config/enums';
 import CardStack from '../cards/card_stack';
 import Match from './match';
 
@@ -85,9 +85,12 @@ export class InterventionBattleRoundEnd extends Intervention {
     if (this.match.pendingActionPlayerNo == this.match.activePlayerNo) {
       new InterventionBattleRoundEnd(this.match).init();
     } else {
+      this.remove();
       this.match.battle.processEndOfBattlePhase(this.match);
       this.match.battle.processBattleRound(this.match);
-      new InterventionBattleRoundStart(this.match).init();
+      // processBattleRound ends the battle (leaving Combat) once range hits 0;
+      // opening BattleRoundStart then would overwrite any turn-start intervention
+      if (this.match.turnPhase == TurnPhase.Combat) new InterventionBattleRoundStart(this.match).init();
     }
   }
 }

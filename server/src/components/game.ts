@@ -1,9 +1,8 @@
 import Match from './game_state/match';
-import toClientState from './converters/client_state_converter';
 import { rules } from '../shared/config/rules';
 import { constants } from '../shared/config/constants';
 import { MsgTypeInbound, MsgTypeOutbound, TurnPhase } from '../shared/config/enums';
-import { getCardStackByUUID, opponentPlayerNo } from './utils/helpers';
+import { getCardStackByUUID } from './utils/helpers';
 import { logger } from './utils/logger';
 import { Server, Socket } from 'socket.io';
 import ClientPlannedBattle from '../shared/interfaces/client_planned_battle';
@@ -52,13 +51,12 @@ export function gameSocketListeners(io: Server, socket: Socket) {
  * @param turnPhase turn phase the player readied for
  * @param data phase-specific payload: planned battle (Build, active player) or intercepting ship ids
  */
-function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: unknown) {
+export function onReady(io: Server, match: Match, player: Player, turnPhase: string, data?: unknown) {
   // A finished match no longer processes ready events; the initial ready
   // of a rejoin only fetches the current (final) match state
   if (turnPhase == match.turnPhase && !match.gameResult.gameOver) {
     if (turnPhase == TurnPhase.Init) {
-      match.players[player.no].ready = true;
-      if (match.players[opponentPlayerNo(player.no)].ready) initMatch(io, match);
+      if (match.setReadyAndCheck(player.no)) match.startMatch();
     } else if (player.no == match.pendingActionPlayerNo) {
       if (verifyReadyConditions(player, turnPhase)) {
         if (match.intervention) {
@@ -116,7 +114,7 @@ function onDisconnect(io: Server, socket: Socket, match: Match, player: Player) 
  * @param targetUUID uuid of the target card stack
  * @param optionalParameters optional card parameters (e.g. picked card options)
  */
-function onHandCard(
+export function onHandCard(
   io: Server,
   match: Match,
   player: Player,
@@ -153,7 +151,7 @@ function onHandCard(
  * @param rootCardStackUUID uuid of the card stack to retract from
  * @param subCardStackUUID uuid of the card stack to retract
  */
-function onRetract(
+export function onRetract(
   io: Server,
   match: Match,
   player: Player,
@@ -184,7 +182,7 @@ function onRetract(
  * @param player acting player
  * @param handCardUUID uuid of the hand card to discard
  */
-function onDiscard(io: Server, match: Match, player: Player, handCardUUID: string) {
+export function onDiscard(io: Server, match: Match, player: Player, handCardUUID: string) {
   if (match.gameResult.gameOver) return;
   const handCard = getCardStackByUUID(player.hand, handCardUUID);
   if (!handCard) {
@@ -208,7 +206,7 @@ function onDiscard(io: Server, match: Match, player: Player, handCardUUID: strin
  * @param weaponUUID uuid of the attacking weapon, or the attack-all placeholder
  * @param targetId uuid of the attacked card stack
  */
-function onAttack(
+export function onAttack(
   io: Server,
   match: Match,
   player: Player,
@@ -288,6 +286,8 @@ export function gameCron(io: Server) {
         emitState(io, match);
       }
       match.forAllPlayers((playerNo: number) => {
+        const player = match.players[playerNo];
+        if (player.isBot) return; // Bot players have no socket to emit to
         const socket = getSocket(io, match, playerNo);
         if (socket)
           socket.emit(MsgTypeOutbound.Countdown, match.countdown, match.pendingActionPlayerNo == playerNo);
@@ -316,7 +316,8 @@ function getSocketData(socket: Socket): SocketData {
 }
 
 function getSocket(io: Server, match: Match, playerNo: number): Socket | undefined {
-  return io.sockets.sockets.get(match.players[playerNo].socketId);
+  const socketId = match.players[playerNo].socketId;
+  return socketId ? io.sockets.sockets.get(socketId) : undefined;
 }
 
 function getPlayer(socket: Socket): Player | undefined {
@@ -325,56 +326,29 @@ function getPlayer(socket: Socket): Player | undefined {
 }
 
 /**
- * Emits the current match state, projected per player, to both players and resets the match's
- * temporary states afterwards.
+ * Emits the current match state, projected per player, to connected players and resets the
+ * match's temporary states afterwards.
  * @param io server instance used to look up the players' sockets
  * @param match match whose state is emitted
  */
 function emitState(io: Server, match: Match) {
-  match.forAllPlayers((playerNo: number) => {
-    const socket = getSocket(io, match, playerNo);
-    if (socket) {
-      socket.emit(MsgTypeOutbound.State, toClientState(match, playerNo));
-      // Receiving the final state of a finished match counts as the player's
-      // game result delivery (see gameCron)
-      if (match.gameResult.gameOver) match.players[playerNo].resultDelivered = true;
-    }
-    // A disconnected player's socket is expectedly absent while the grace
-    // window keeps the match alive
-    else if (match.players[playerNo].disconnectedSince == undefined)
-      logger.warn('Could not find socket to emit state');
-  });
-  match.resetTempStates();
-}
-
-/**
- * Starts a match once both players readied: nominates the second player, shuffles and draws
- * the initial hands and prepares the first start phase.
- * @param io server instance used to emit the new state to both players
- * @param match match to initialize
- */
-function initMatch(io: Server, match: Match) {
-  match.setSecondPlayer();
-  match.players.forEach(player => {
-    player.shuffleDeck();
-    player.drawCards(rules.initialCardsToDraw);
-  });
-  match.prepareStartPhase();
-  emitState(io, match);
+  match.emitState(io);
 }
 
 /**
  * Verifies that the player may ready the given turn phase: the hand card limit must be kept
- * in the End phase and no card stack may have insufficient energy.
+ * in the End phase and no card stack may have insufficient energy when leaving the active
+ * Build phase without an open intervention.
  * @param player player readying the phase
  * @param turnPhase turn phase to ready
  * @returns true if the player meets all ready conditions
  */
 export function verifyReadyConditions(player: Player, turnPhase: TurnPhase): boolean {
+  if (player.match.intervention) return true;
   if (turnPhase == TurnPhase.End && player.hand.length > player.handCardLimit) {
     return false;
   }
-  if (player.cardStacks.some(cs => cs.hasInsufficientEnergy)) {
+  if (player.hasInsufficientEnergyCard) {
     return false;
   }
   return true;

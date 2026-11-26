@@ -4,7 +4,9 @@ import { allActiveMatches, findRejoinableMatch, registerMatch, unregisterMatch }
 import { gameSocketListeners } from './game';
 import Match from './game_state/match';
 import SocketData from './game_state/socket_data';
-import DBCredentialsDAO from './persistence/db_credentials';
+import Card from './cards/card';
+import CardCollection from './cards/collection/card_collection';
+import DBCredentialsDAO, { DBCredential } from './persistence/db_credentials';
 import DBDecksDAO from './persistence/db_decks';
 import { onlineUserCount, resetOnlineUsers } from './online_users';
 import { MatchmakingStatus, MsgTypeInbound, MsgTypeOutbound } from '../shared/config/enums';
@@ -246,5 +248,117 @@ describe('Matchmaking login', () => {
 
     expect(socketMock.join).toHaveBeenCalledWith(matchmakingRoom);
     expect(findRejoinableMatch(1)).toBeUndefined();
+  });
+});
+
+describe('StartBotGame handler', () => {
+  const activeDeck = CardCollection.starterDecks[0].slice();
+
+  const createBotGameUser = (): DBCredential => ({
+    userId: 1,
+    username: 'Human',
+    email: 'human@example.com',
+    sessionToken: null
+  });
+
+  /**
+   * Mock socket whose registered message handlers can be triggered manually,
+   * like a real socket does when a client message arrives.
+   */
+  function createBotGameSocket(data?: SocketData): {
+    socket: Socket;
+    handlers: Map<string, (...args: unknown[]) => void>;
+  } {
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    const socket = {
+      id: 'socket-0',
+      data: data,
+      on: jest.fn((message: string, handler: (...args: unknown[]) => void) => handlers.set(message, handler)),
+      emit: jest.fn(),
+      join: jest.fn(),
+      leave: jest.fn()
+    } as unknown as Socket;
+    return { socket, handlers };
+  }
+
+  /** Mock io server providing the emitting and socket lookup APIs used by the handlers. */
+  function createBotGameIO(sockets: Socket[]): { io: Server; broadcast: { emit: jest.Mock } } {
+    const broadcast = { emit: jest.fn() };
+    const io = {
+      sockets: {
+        sockets: new Map(sockets.map(socket => [socket.id, socket])),
+        to: jest.fn(() => broadcast)
+      }
+    } as unknown as Server;
+    return { io, broadcast };
+  }
+
+  /** Socket data of a logged-in player, optionally with an empty active deck. */
+  function createBotGameSocketData(deck: Card[] = activeDeck): SocketData {
+    return new SocketData(createBotGameUser(), deck);
+  }
+
+  afterEach(() => {
+    allActiveMatches().forEach(unregisterMatch);
+    jest.restoreAllMocks();
+  });
+
+  function setup(data?: SocketData) {
+    const { socket, handlers } = createBotGameSocket(data);
+    const { io, broadcast } = createBotGameIO([socket]);
+    matchMakingSocketListeners(io, socket);
+    const startBotGame = () => handlers.get(MsgTypeInbound.StartBotGame)!();
+    return { socket, broadcast, startBotGame };
+  }
+
+  test('rejects the request before login and keeps the socket in the matchmaking room', () => {
+    // socket.io v4 always initializes socket.data as {} before login
+    const { socket, startBotGame } = setup({} as SocketData);
+
+    startBotGame();
+
+    expect(socket.leave).not.toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.BotRejected);
+  });
+
+  test('rejects the request without an active deck and keeps the socket in the matchmaking room', () => {
+    const { socket, startBotGame } = setup(createBotGameSocketData([]));
+
+    startBotGame();
+
+    expect(socket.leave).not.toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith(MsgTypeOutbound.Matchmaking, MatchmakingStatus.BotRejected);
+  });
+
+  test('rejects the request while already in a match', () => {
+    const socketData = createBotGameSocketData();
+    socketData.match = {} as never;
+    const { socket, broadcast, startBotGame } = setup(socketData);
+
+    startBotGame();
+
+    expect(socket.leave).not.toHaveBeenCalled();
+    expect(broadcast.emit).not.toHaveBeenCalled();
+  });
+
+  test('starts a bot game for a logged-in player with an active deck', () => {
+    const socketData = createBotGameSocketData();
+    const { socket, broadcast, startBotGame } = setup(socketData);
+
+    startBotGame();
+
+    // The player leaves the matchmaking room, so the cron can no longer pair it
+    expect(socket.leave).toHaveBeenCalledWith(matchmakingRoom);
+    expect(broadcast.emit).toHaveBeenCalledWith(
+      MsgTypeOutbound.Matchmaking,
+      MatchmakingStatus.Start,
+      expect.objectContaining({ preloadCardIds: expect.any(Array) })
+    );
+    const match = socketData.match;
+    expect(match).toBeDefined();
+    expect(match!.players[1].isBot).toBe(true);
+    expect(match!.bot).toBeDefined();
+    // The bot match is registered, so the game cron covers it like a human match
+    expect(allActiveMatches()).toContain(match);
   });
 });
