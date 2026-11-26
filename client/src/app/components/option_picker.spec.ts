@@ -1,12 +1,12 @@
-import OptionPicker from './option_picker';
-import { GameResultType, InterventionType, MsgTypeInbound, TurnPhase, Zone } from '@shared/config/enums';
-import {
-  ClientCardStack,
-  ClientHandCard,
-  ClientState,
-  emptyClientState
-} from '@shared/interfaces/client_state';
+import { EnvironmentInjector, createEnvironmentInjector } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import Phaser from 'phaser';
+import { GameInteractionService } from '../services/game_interaction_service';
+import { GameSessionService } from '../services/game_session_service';
+import { SchedulerService } from '../services/scheduler_service';
+import { SocketService } from '../socket_service';
+import { makeSocketStub } from '../testing/phaser_stubs';
+import OptionPicker from './option_picker';
 
 // The production bundle exposes Phaser as a global (see src/index.html) and CardImage
 // relies on that global, so make sure the test bundle provides it as well.
@@ -48,7 +48,22 @@ function makeScene(created: { text: any[]; keys: any[] }): any {
     list.push(stub);
     return stub;
   };
-  return {
+  const socket = makeSocketStub();
+  const scheduler: SchedulerService = {
+    schedule: () => () => {}
+  };
+  const injector = createEnvironmentInjector(
+    [
+      { provide: SocketService, useValue: socket },
+      { provide: SchedulerService, useValue: scheduler },
+      GameSessionService,
+      GameInteractionService
+    ],
+    TestBed.inject(EnvironmentInjector)
+  );
+  const session = injector.get(GameSessionService);
+  const interaction = injector.get(GameInteractionService);
+  const scene: any = {
     add: {
       rectangle: jasmine.createSpy('rectangle').and.callFake(createStub([])),
       text: jasmine.createSpy('text').and.callFake(createStub(created.text)),
@@ -61,12 +76,14 @@ function makeScene(created: { text: any[]; keys: any[] }): any {
         removeKey: jasmine.createSpy('removeKey')
       }
     },
-    socket: { emit: jasmine.createSpy('emit') },
+    socket,
+    session,
+    interaction,
     obj: {},
-    activeCards: {},
-    state: emptyClientState,
     updateView: jasmine.createSpy('updateView')
   };
+  interaction.viewChanged$.subscribe(() => scene.updateView());
+  return scene;
 }
 
 /**
@@ -83,26 +100,6 @@ function optionCardStubs(scene: any): any[] {
 describe('OptionPicker', () => {
   const handUUID = 'hand-1';
   const targetUUID = 'target-1';
-  const handCard: ClientHandCard = {
-    uuid: handUUID,
-    cardId: 101,
-    index: 0,
-    playable: true,
-    validTargets: [targetUUID],
-    ownedByPlayer: true,
-    optionsToSelect: 2
-  };
-  const targetStack: ClientCardStack = {
-    uuid: targetUUID,
-    cards: [],
-    zone: Zone.Colony,
-    index: 0,
-    zoneCardsNum: 1,
-    ownedByPlayer: false,
-    missionReady: false,
-    interceptionReady: false,
-    attributes: []
-  };
   let scene: any;
   let picker: OptionPicker;
   let overlayStub: any;
@@ -121,79 +118,91 @@ describe('OptionPicker', () => {
     it('registers itself as the pending option picker on the scene', () => {
       expect(scene.obj.optionPicker).toBe(picker);
     });
+
+    it('renders option cards once when pendingOptionPicker$ triggers sync during construction', () => {
+      picker.destroy();
+      scene.interaction.cancelOptionPicker();
+      scene.add.plane.calls.reset();
+      const syncSpy = spyOn(OptionPicker.prototype, 'sync').and.callThrough();
+
+      const sub = scene.interaction.pendingOptionPicker$.subscribe((state: unknown) => {
+        if (state) {
+          scene.obj.optionPicker?.sync();
+        }
+      });
+      picker = new OptionPicker(scene, handUUID, targetUUID, [101, 102, 103], 2);
+      sub.unsubscribe();
+
+      expect(syncSpy).toHaveBeenCalledTimes(1);
+      expect(optionCardStubs(scene).length).toBe(3);
+    });
   });
 
   describe('confirm', () => {
-    it('emits the hand card uuid captured at construction, not the current scene selection', () => {
-      scene.activeCards.hand = undefined; // e.g. cleared by an interleaved state
-      (picker as any).selectedIndexes = [0, 2];
+    it('emits the hand card uuid captured at construction, not the current selection', () => {
+      scene.interaction.activeCards.hand = undefined; // e.g. cleared by an interleaved state
+      scene.interaction.toggleOptionPickerSelection(0);
+      scene.interaction.toggleOptionPickerSelection(2);
       (picker as any).confirm();
-      expect(scene.socket.emit).toHaveBeenCalledWith(
-        MsgTypeInbound.Handcard,
-        handUUID,
-        targetUUID,
-        [101, 103]
-      );
+      expect(scene.socket.emitHandcard).toHaveBeenCalledWith(handUUID, targetUUID, [101, 103]);
     });
 
     it('emits nothing unless all options are selected', () => {
-      (picker as any).selectedIndexes = [1];
+      scene.interaction.toggleOptionPickerSelection(1);
       (picker as any).confirm();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
       expect(scene.obj.optionPicker).toBe(picker);
     });
 
     it('destroys the picker and clears the pending reference', () => {
-      (picker as any).selectedIndexes = [0, 1];
+      scene.interaction.toggleOptionPickerSelection(0);
+      scene.interaction.toggleOptionPickerSelection(1);
       (picker as any).confirm();
       expect(scene.obj.optionPicker).toBeUndefined();
     });
 
     it('is wired to the OK button', () => {
-      (picker as any).selectedIndexes = [0, 1];
+      scene.interaction.toggleOptionPickerSelection(0);
+      scene.interaction.toggleOptionPickerSelection(1);
       textStubs[2].handlers['pointerdown']({ leftButtonDown: () => true, rightButtonDown: () => false });
-      expect(scene.socket.emit).toHaveBeenCalledWith(
-        MsgTypeInbound.Handcard,
-        handUUID,
-        targetUUID,
-        [101, 102]
-      );
+      expect(scene.socket.emitHandcard).toHaveBeenCalledWith(handUUID, targetUUID, [101, 102]);
     });
 
     it('cancels on right-clicking the OK button instead of confirming', () => {
-      (picker as any).selectedIndexes = [0, 1];
+      scene.interaction.toggleOptionPickerSelection(0);
+      scene.interaction.toggleOptionPickerSelection(1);
       textStubs[2].handlers['pointerdown']({ leftButtonDown: () => false, rightButtonDown: () => true });
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
       expect(scene.obj.optionPicker).toBeUndefined();
     });
   });
 
   describe('cancel', () => {
     it('emits nothing, destroys the picker and resets the selection state', () => {
-      scene.activeCards.hand = handUUID;
+      scene.interaction.activeCards.hand = handUUID;
       picker.cancel();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
       expect(scene.obj.optionPicker).toBeUndefined();
-      expect(scene.activeCards.hand).toBeUndefined();
+      expect(scene.interaction.activeCards.hand).toBeUndefined();
       expect(scene.updateView).toHaveBeenCalled();
     });
 
     it('is triggered by left-clicking the X button', () => {
       textStubs[1].handlers['pointerdown']({ leftButtonDown: () => true, rightButtonDown: () => false });
       expect(scene.obj.optionPicker).toBeUndefined();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
     });
 
     it('is triggered by pressing Escape', () => {
       keyStubs[0].handlers['down']();
       expect(scene.obj.optionPicker).toBeUndefined();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
     });
 
     it('is triggered by right-clicking the overlay', () => {
       overlayStub.handlers['pointerdown']({ rightButtonDown: () => true });
       expect(scene.obj.optionPicker).toBeUndefined();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
     });
 
     it('is triggered by right-clicking an option card', () => {
@@ -202,7 +211,7 @@ describe('OptionPicker', () => {
         rightButtonDown: () => true
       });
       expect(scene.obj.optionPicker).toBeUndefined();
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
     });
 
     it('is not triggered by left-clicking an option card', () => {
@@ -211,7 +220,7 @@ describe('OptionPicker', () => {
         rightButtonDown: () => false
       });
       expect(scene.obj.optionPicker).toBe(picker);
-      expect(scene.socket.emit).not.toHaveBeenCalled();
+      expect(scene.socket.emitHandcard).not.toHaveBeenCalled();
     });
 
     it('is not triggered by left-clicking the overlay', () => {
@@ -224,70 +233,6 @@ describe('OptionPicker', () => {
     it('removes the Escape key binding', () => {
       picker.destroy();
       expect(scene.input.keyboard.removeKey).toHaveBeenCalledWith(keyStubs[0], true, true);
-    });
-  });
-
-  describe('isValidFor', () => {
-    function makeState(over: Partial<ClientState> = {}): ClientState {
-      return {
-        ...emptyClientState,
-        playerIsActive: true,
-        playerPendingAction: true,
-        turnPhase: TurnPhase.Build,
-        cardStacks: [targetStack],
-        player: { ...emptyClientState.player, hand: [handCard] },
-        ...over
-      };
-    }
-
-    it('accepts a state in which the pending action is still possible', () => {
-      expect(picker.isValidFor(makeState())).toBeTrue();
-    });
-
-    it('rejects a state without a pending player action', () => {
-      expect(picker.isValidFor(makeState({ playerPendingAction: false }))).toBeFalse();
-    });
-
-    it('rejects a state in which the player is no longer active', () => {
-      expect(picker.isValidFor(makeState({ playerIsActive: false }))).toBeFalse();
-    });
-
-    it('rejects a state outside the build phase', () => {
-      expect(picker.isValidFor(makeState({ turnPhase: TurnPhase.Combat }))).toBeFalse();
-    });
-
-    it('rejects a state with an intervention', () => {
-      expect(
-        picker.isValidFor(
-          makeState({
-            intervention: { type: InterventionType.TacticCard, rootType: InterventionType.TacticCard }
-          })
-        )
-      ).toBeFalse();
-    });
-
-    it('rejects a state with a game result', () => {
-      expect(
-        picker.isValidFor(makeState({ gameResult: { won: false, type: GameResultType.Surrender, sol: 0 } }))
-      ).toBeFalse();
-    });
-
-    it('rejects a state in which the hand card is no longer in hand', () => {
-      expect(picker.isValidFor(makeState({ player: { ...emptyClientState.player, hand: [] } }))).toBeFalse();
-    });
-
-    it('rejects a state in which the hand card is no longer playable', () => {
-      const hand = [{ ...handCard, playable: false }];
-      expect(picker.isValidFor(makeState({ player: { ...emptyClientState.player, hand } }))).toBeFalse();
-    });
-
-    it('rejects a state in which the target stack no longer exists', () => {
-      expect(picker.isValidFor(makeState({ cardStacks: [] }))).toBeFalse();
-    });
-
-    it('rejects a state in which the target is no longer a valid target of the hand card', () => {
-      const hand = [{ ...handCard, validTargets: ['other-target'] }];
-      expect(picker.isValidFor(makeState({ player: { ...emptyClientState.player, hand } }))).toBeFalse();
     });
   });
 });

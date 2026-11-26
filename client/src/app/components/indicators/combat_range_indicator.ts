@@ -1,7 +1,6 @@
-import { InterventionType } from '@shared/config/enums';
-import { rules } from '@shared/config/rules';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
+import { rules } from '@shared/config/rules';
 
 export default class CombatRangeIndicator {
   private scene: Game;
@@ -17,12 +16,9 @@ export default class CombatRangeIndicator {
   }
   update() {
     this.hide();
-    if (
-      // The server encodes "no battle" as rules.maxRange + 1
-      this.scene.state.battle.range < rules.maxRange + 1 &&
-      this.scene.state.intervention?.rootType != InterventionType.BattleRoundEnd
-    ) {
-      this.show(this.scene.state.battle.range);
+    const range = this.scene.interaction.getVisibleCombatRange();
+    if (range !== undefined) {
+      this.show(range);
     }
   }
   show(range: number) {

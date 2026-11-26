@@ -1,5 +1,4 @@
 import { designConfig } from 'src/app/config/design';
-import { MsgTypeInbound } from '@shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
@@ -96,7 +95,7 @@ export default class RetractCardButton {
       })
       .on('pointerdown', (p: Phaser.Input.Pointer) => {
         if (p.leftButtonDown())
-          this.scene.socket.emit(MsgTypeInbound.Retract, this.card.cardStackUUID, this.card.data.uuid);
+          this.scene.interaction.retractCard(this.card.cardStackUUID, this.card.data.uuid);
       });
   }
   // Phaser hit-testing ignores alpha, so an invisible button must not keep live handlers.

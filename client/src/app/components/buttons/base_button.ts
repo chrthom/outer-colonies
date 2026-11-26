@@ -1,6 +1,5 @@
 import { layoutConfig } from '../../config/layout';
 import { designConfig } from 'src/app/config/design';
-import { TurnPhase } from '@shared/config/enums';
 import Game from '../../scenes/game';
 import Matchmaking from '../../scenes/matchmaking';
 
@@ -74,13 +73,6 @@ export abstract class BaseButton {
   protected canShowActionButtons(): boolean {
     if (!(this.scene instanceof Game)) return false;
 
-    const gameScene = this.scene as Game;
-    return (
-      gameScene.state.playerPendingAction &&
-      gameScene.state.playerIsActive &&
-      gameScene.state.turnPhase === TurnPhase.Build &&
-      !gameScene.activeCards.hand &&
-      gameScene.cardStacks.some(stack => stack.ownedByPlayer && stack.data.missionReady)
-    );
+    return this.scene.interaction.canShowBattleActionButtons();
   }
 }

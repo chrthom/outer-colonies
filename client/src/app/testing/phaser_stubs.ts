@@ -1,7 +1,13 @@
-import Game from '../scenes/game';
+import { EnvironmentInjector, createEnvironmentInjector } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import ClientGameParams from '@shared/interfaces/client_game_params';
-import ClientPlannedBattle, { ClientPlannedBattleHelper } from '@shared/interfaces/client_planned_battle';
 import { ClientState, emptyClientState } from '@shared/interfaces/client_state';
+import { Subject } from 'rxjs';
+import Game from '../scenes/game';
+import { GameInteractionService } from '../services/game_interaction_service';
+import { GameSessionService } from '../services/game_session_service';
+import { SchedulerService } from '../services/scheduler_service';
+import { CountdownEvent, SocketService } from '../socket_service';
 
 /**
  * Shared Jasmine stubs for the Phaser scene API used by the client components.
@@ -175,17 +181,35 @@ export function makeObjStub(): ObjStub {
   };
 }
 
-/** Stub of the match socket the game scene communicates with. */
+/** Stub of the `SocketService` used by scene stubs and service-backed component specs. */
 export interface SocketStub {
-  emit: jasmine.Spy;
-  off: jasmine.Spy;
+  state$: Subject<ClientState>;
+  countdown$: Subject<CountdownEvent>;
+  disconnect$: Subject<void>;
+  disableReconnection: jasmine.Spy;
+  disconnect: jasmine.Spy;
+  emitReady: jasmine.Spy;
+  emitHandcard: jasmine.Spy;
+  emitDiscard: jasmine.Spy;
+  emitAttack: jasmine.Spy;
+  emitRetract: jasmine.Spy;
+  emitSurrender: jasmine.Spy;
 }
 
-/** Creates a stub of the scene's socket with `emit`/`off` spies. */
+/** Creates a stub of `SocketService` with typed inbound subjects and outbound spies. */
 export function makeSocketStub(): SocketStub {
   return {
-    emit: jasmine.createSpy('socket.emit'),
-    off: jasmine.createSpy('socket.off')
+    state$: new Subject<ClientState>(),
+    countdown$: new Subject<CountdownEvent>(),
+    disconnect$: new Subject<void>(),
+    disableReconnection: jasmine.createSpy('socketService.disableReconnection'),
+    disconnect: jasmine.createSpy('socketService.disconnect'),
+    emitReady: jasmine.createSpy('socketService.emitReady'),
+    emitHandcard: jasmine.createSpy('socketService.emitHandcard'),
+    emitDiscard: jasmine.createSpy('socketService.emitDiscard'),
+    emitAttack: jasmine.createSpy('socketService.emitAttack'),
+    emitRetract: jasmine.createSpy('socketService.emitRetract'),
+    emitSurrender: jasmine.createSpy('socketService.emitSurrender')
   };
 }
 
@@ -217,7 +241,6 @@ export interface SceneStub {
   add: AddStub;
   getPlayerState: jasmine.Spy;
   getPlayerUI: jasmine.Spy;
-  retractCardsExist: boolean;
   /**
    * Scene state; defaults to a deep copy of `emptyClientState` so no spec can
    * corrupt the shared constant. Pass `undefined` to mimic a scene without
@@ -226,16 +249,16 @@ export interface SceneStub {
   state?: ClientState;
   time: TimeStub;
   tweens: TweensStub;
-  /** The battle the player is planning; defaults to `ClientPlannedBattleHelper.empty` like the `Game` scene. */
-  plannedBattle?: ClientPlannedBattle;
-  /** The ships the player selected for interception; defaults to `[]` like the `Game` scene. */
-  interceptShipIds: string[];
   /** Fixed UI elements; defaults to a fresh `makeObjStub()`. */
   obj?: ObjStub;
   /** Game parameters; only set on a game scene, so their absence mimics a matchmaking scene. */
   gameParams?: ClientGameParams;
-  /** The match socket; defaults to a fresh `makeSocketStub()`. */
+  /** The `SocketService` stub backing `session` and `interaction`. */
   socket: SocketStub;
+  /** Real `GameSessionService` wired to `socket` and `time`. */
+  session: GameSessionService;
+  /** Real `GameInteractionService` wired to `session`, `socket`, and `time`. */
+  interaction: GameInteractionService;
   /** The input plugin; defaults to a stub without keyboard bindings. */
   input: InputStub;
   /** The resource loader; defaults to a fresh `makeLoadStub()`. */
@@ -243,33 +266,80 @@ export interface SceneStub {
 }
 
 /**
- * Creates a game scene stub. `getPlayerState` mirrors the real scene by
- * delegating to `state.player`/`state.opponent` and `getPlayerUI` returns an
- * empty hand; both spies can be re-stubbed per test via jasmine. The optional
- * overrides are applied to the returned stub itself, so the delegation always
- * reads the final state - also after later `scene.state = ...` assignments.
+ * Creates a game scene stub backed by `GameSessionService` and `GameInteractionService`.
+ * `getPlayerState` mirrors the real scene by delegating to `session.getPlayerState`,
+ * and `getPlayerUI` returns an empty hand; both spies can be re-stubbed per test via jasmine.
  */
 export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
+  const time = overrides.time ?? makeTimeStub();
+  const socket = overrides.socket ?? makeSocketStub();
+  const scheduler: SchedulerService = {
+    schedule: (delayMs: number, callback: () => void) => {
+      const event = time.delayedCall(delayMs, callback);
+      return () => {
+        if (event !== undefined) {
+          time.removeEvent(event);
+        }
+      };
+    }
+  };
+  const injector = createEnvironmentInjector(
+    [
+      { provide: SocketService, useValue: socket },
+      { provide: SchedulerService, useValue: scheduler },
+      GameSessionService,
+      GameInteractionService
+    ],
+    TestBed.inject(EnvironmentInjector)
+  );
+  const session = overrides.session ?? injector.get(GameSessionService);
+  const interaction = overrides.interaction ?? injector.get(GameInteractionService);
+
+  const hasExplicitUndefinedState = 'state' in overrides && overrides.state === undefined;
+  let stateUndefined = hasExplicitUndefinedState;
+  if (!hasExplicitUndefinedState) {
+    const initialState = overrides.state ?? structuredClone(emptyClientState);
+    (session as unknown as { stateSubject: { next: (s: ClientState) => void } }).stateSubject.next(
+      initialState
+    );
+  }
+
   const stub: SceneStub = {
     add: makeAddStub(),
     getPlayerState: jasmine.createSpy('getPlayerState'),
     getPlayerUI: jasmine.createSpy('getPlayerUI'),
-    retractCardsExist: false,
-    state: structuredClone(emptyClientState),
-    time: makeTimeStub(),
+    time,
     tweens: makeTweensStub(),
-    plannedBattle: ClientPlannedBattleHelper.empty,
-    interceptShipIds: [],
     obj: makeObjStub(),
-    socket: makeSocketStub(),
+    socket,
+    session,
+    interaction,
     input: makeInputStub(),
     load: makeLoadStub()
   };
-  stub.getPlayerState.and.callFake((isPlayer: boolean) =>
-    isPlayer ? stub.state?.player : stub.state?.opponent
-  );
+
+  const restOverrides = { ...overrides };
+  delete restOverrides.state;
+  Object.assign(stub, restOverrides);
+
+  Object.defineProperty(stub, 'state', {
+    configurable: true,
+    enumerable: true,
+    get: () => (stateUndefined ? undefined : session.state),
+    set: (nextState: ClientState | undefined) => {
+      if (nextState === undefined) {
+        stateUndefined = true;
+      } else {
+        stateUndefined = false;
+        (session as unknown as { stateSubject: { next: (s: ClientState) => void } }).stateSubject.next(
+          nextState
+        );
+      }
+    }
+  });
+
+  stub.getPlayerState.and.callFake((isPlayer: boolean) => session.getPlayerState(isPlayer));
   stub.getPlayerUI.and.callFake(() => ({ hand: [] }));
-  Object.assign(stub, overrides);
   return stub;
 }
 

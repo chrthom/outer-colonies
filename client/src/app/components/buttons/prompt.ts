@@ -1,8 +1,7 @@
 import { designConfig } from 'src/app/config/design';
-import { BattleType, TurnPhase } from '@shared/config/enums';
+import { animationConfig } from 'src/app/config/animation';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
-import { animationConfig } from 'src/app/config/animation';
 
 export default class Prompt {
   private scene: Game;
@@ -33,33 +32,15 @@ export default class Prompt {
     this.hide();
     // While the game-over screen is displayed, no phase prompt must be shown
     // and the exit button must stay visible.
-    if (this.scene.state.gameResult) return;
-    if (!this.scene.state.playerPendingAction) {
-      this.showWaiting();
-      this.show(true);
-    } else if (this.scene.state.intervention) {
-      this.showIntervention();
-      this.show(true);
-    } else {
-      switch (this.scene.state.turnPhase) {
-        case TurnPhase.Build:
-          if (this.scene.state.playerIsActive) this.showBuildPhase();
-          else this.showInterceptPhase();
-          break;
-        case TurnPhase.Combat:
-          this.showCombatPhase();
-          break;
-        case TurnPhase.End:
-          this.showEndPhase();
-          this.show(true);
-          break;
-        default:
-          this.setText('Lädt...');
-      }
+    const vm = this.scene.interaction.getPromptState();
+    if (vm.isGameOver) return;
+    this.setText(vm.text);
+    if (vm.visible) {
+      this.show(vm.autoHide);
     }
   }
   show(withCountdown?: boolean) {
-    if (!this.scene.state.gameResult) {
+    if (!this.scene.session.state.gameResult) {
       this.setVisible(true);
       if (withCountdown) {
         this.scene.time.delayedCall(animationConfig.duration.promptShow, () => this.hide());
@@ -75,68 +56,6 @@ export default class Prompt {
     this.text.setVisible(visible);
     this.image.setVisible(visible);
     return this;
-  }
-  private showWaiting() {
-    const waitingText = 'Warte auf Gegenspieler...';
-    // Only name the phase while the opponent is active; when the player is active and just waits for a
-    // reaction, the opponent's phase would be ambiguous.
-    const phaseText = this.scene.state.playerIsActive ? undefined : this.opponentPhaseText();
-    this.setText(phaseText ? `${waitingText}\nGegner: ${phaseText}` : waitingText);
-  }
-  private opponentPhaseText(): string | undefined {
-    switch (this.scene.state.turnPhase) {
-      case TurnPhase.Start:
-        return 'Startphase';
-      case TurnPhase.Build:
-        return 'Aufbauphase (Karten ausspielen,\nMission oder Überfall planen)';
-      case TurnPhase.Combat:
-        return 'Gefechtsphase';
-      case TurnPhase.End:
-        return 'Endphase (überzählige Handkarten ablegen)';
-      default:
-        return undefined;
-    }
-  }
-  private showBuildPhase() {
-    let text: string;
-    if (this.scene.state.player.hasToRetractCards) {
-      text = 'Einige deiner Karten haben nicht genügend\nEnergie.\nNimm sie auf die Hand zurück!';
-    } else if (this.scene.plannedBattle.type == BattleType.None) {
-      text =
-        'Spiele Karten von deiner Hand aus.\n' +
-        'Plane dann eine Mission oder Überfall.\n\n' +
-        'Klicke die gegnerische Kolonie für\n' +
-        'einen Überfall bzw. dein Deck oder\n' +
-        'Ablagestapel für eine Mission.';
-    } else {
-      text = `Wähle Schiffe für ${
-        this.scene.plannedBattle.type == BattleType.Raid ? 'den Überfall' : 'die Mission'
-      }!`;
-    }
-    this.setText(text);
-  }
-  private showInterceptPhase() {
-    const battleText =
-      this.scene.state.battle.type == BattleType.Raid
-        ? 'zur Verteidigung\ndeiner Kolonie'
-        : 'zum Abfangen der\ngegenerischen Mission';
-    this.setText(`Wähle Schiffe ${battleText}!`);
-  }
-  private showCombatPhase() {
-    this.setText(
-      `Aktuelle Reichweite des Gefechts: ${this.scene.state.battle.range}\nFühre Angriffe mit deinen\nWaffensystemen durch!`
-    );
-  }
-  private showEndPhase() {
-    const cardsToDrop = this.scene.state.player.hand.length - this.scene.state.player.handCardLimit;
-    this.setText(`Handkartenlimit um ${cardsToDrop} überschritten;\nLege überzählige Karten ab!`);
-  }
-  private showIntervention() {
-    this.setText(
-      'Unterbreche den gegnerischen Zug durch das\n' +
-        'Spielen einer Taktikkarte mit der\n' +
-        'Eigenschaft "Intervention"!'
-    );
   }
   private setText(text: string): this {
     this.text.setText(text);

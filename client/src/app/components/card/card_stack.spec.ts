@@ -1,8 +1,7 @@
 import CardStack from './card_stack';
 import Card from './card';
 import { ClientCard, ClientCardStack } from '@shared/interfaces/client_state';
-import { EventType, MsgTypeInbound, Zone } from '@shared/config/enums';
-import { constants } from '@shared/config/constants';
+import { EventType, Zone } from '@shared/config/enums';
 import { designConfig } from '../../config/design';
 import { layoutConfig } from '../../config/layout';
 import { animationConfig } from '../../config/animation';
@@ -72,9 +71,18 @@ function makeScene(): any {
     getPlayerUI: jasmine.createSpy('getPlayerUI').and.returnValue({ hand: [] }),
     getCardMovementEvent: jasmine.createSpy('getCardMovementEvent'),
     retractCardsExist: false,
-    activeCards: {},
-    isAttackAnimating: false,
-    socket: { emit: jasmine.createSpy('emit') },
+    session: {
+      markRetractCardsExist: jasmine.createSpy('session.markRetractCardsExist').and.callFake(() => {
+        scene.retractCardsExist = true;
+      })
+    },
+    interaction: {
+      retractCard: jasmine.createSpy('interaction.retractCard'),
+      clickCardStack: jasmine.createSpy('interaction.clickCardStack'),
+      isStackExpandableOnHover: jasmine
+        .createSpy('interaction.isStackExpandableOnHover')
+        .and.returnValue(true)
+    },
     time: { delayedCall: jasmine.createSpy('delayedCall') },
     add: jasmine.createSpyObj('add', ['image', 'text', 'plane']),
     tweens: jasmine.createSpyObj('tweens', ['add']),
@@ -124,41 +132,6 @@ describe('CardStack', () => {
     it('reflects the value in data', () => {
       expect(makeCardStack({ ownedByPlayer: true }).ownedByPlayer).toBeTrue();
       expect(makeCardStack({ ownedByPlayer: false }).ownedByPlayer).toBeFalse();
-    });
-  });
-
-  describe('isOpponentColony', () => {
-    const card = (id: number) => ({
-      uuid: `u-${id}`,
-      id,
-      index: 0,
-      battleReady: false,
-      retractable: false,
-      insufficientEnergy: false
-    });
-
-    it('is true only for an opponent stack whose last card is the colony card', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [card(1), card(constants.colonyID)] });
-      expect(cs.isOpponentColony).toBeTrue();
-    });
-
-    it('is false when the stack is owned by the player', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: true, cards: [card(constants.colonyID)] });
-      expect(cs.isOpponentColony).toBeFalse();
-    });
-
-    it('is false when the opponent stack ends with a non-colony card', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [card(constants.colonyID), card(42)] });
-      expect(cs.isOpponentColony).toBeFalse();
-    });
-
-    it('is false when the stack has no cards', () => {
-      const cs = makeCardStack();
-      cs.data = makeData({ ownedByPlayer: false, cards: [] });
-      expect(cs.isOpponentColony).toBeFalse();
     });
   });
 
@@ -515,7 +488,7 @@ describe('CardStack', () => {
       expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal); // visible
       expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function)); // interactive
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('binds input handlers when refresh turns a non-critical button critical', () => {
@@ -540,7 +513,7 @@ describe('CardStack', () => {
       expect(button.image.setAlpha).toHaveBeenCalledWith(designConfig.alpha.normal);
       expect(button.image.on).toHaveBeenCalledWith('pointerdown', jasmine.any(Function));
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('unbinds the input handlers when refresh turns a critical button non-critical', () => {
@@ -597,7 +570,7 @@ describe('CardStack', () => {
 
       expect(button.image.off).not.toHaveBeenCalled();
       pointerdownHandler(button.image)({ leftButtonDown: () => true });
-      expect(scene.socket.emit).toHaveBeenCalledWith(MsgTypeInbound.Retract, 'stack-uuid', 'a');
+      expect(scene.interaction.retractCard).toHaveBeenCalledWith('stack-uuid', 'a');
     });
 
     it('destroys the retract button when the card is no longer retractable', () => {

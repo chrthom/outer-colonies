@@ -2,7 +2,6 @@ import CardImage from './card_image';
 import { layoutConfig } from '../../config/layout';
 import Game from '../../scenes/game';
 import { ClientHandCard } from '@shared/interfaces/client_state';
-import { BattleType, MsgTypeInbound, TurnPhase } from '@shared/config/enums';
 import { animationConfig } from '../../config/animation';
 import { constants } from '@shared/config/constants';
 import { perspectiveConfig } from 'src/app/config/perspective';
@@ -43,14 +42,10 @@ export default class HandCard extends CardImage {
       angle: this.shortestAngle(this.targetAngle)
     });
   }
-  highlightPlayability() {
-    this.highlightReset();
-    if (this.data.playable) this.highlightSelectable();
-  }
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)
-      .setCardId(this.scene.state.highlightCardId ?? this.data.cardId)
+      .setCardId(this.scene.session.state.highlightCardId ?? this.data.cardId)
       .highlightReset();
     if (!this.data.ownedByPlayer) this.setAngle(this.angle + 180);
     this.tween({
@@ -63,7 +58,7 @@ export default class HandCard extends CardImage {
     });
   }
   private invIndex(index: number) {
-    const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
+    const handData = this.scene.getPlayerState(this.ownedByPlayer);
     return handData.hand.length - index - 1;
   }
   private targetX(index?: number): CardXPosition {
@@ -95,19 +90,8 @@ export default class HandCard extends CardImage {
   private onClickAction() {
     if (this.scene.maximizedTacticCard == this) {
       this.scene.discardMaximizedTacticCard();
-    } else if (this.ownedByPlayer && this.scene.state.playerPendingAction) {
-      if (
-        this.data.playable &&
-        (this.scene.state.turnPhase != TurnPhase.Build || this.scene.plannedBattle.type == BattleType.None)
-      ) {
-        const reset = this.scene.activeCards.hand == this.uuid;
-        this.scene.activeCards.stackUUID = undefined;
-        this.scene.activeCards.hand = undefined;
-        if (!reset) this.scene.activeCards.hand = this.uuid;
-        this.scene.updateView();
-      } else if (this.scene.state.turnPhase == TurnPhase.End) {
-        this.scene.socket.emit(MsgTypeInbound.Discard, this.uuid);
-      }
+    } else {
+      this.scene.interaction.clickHandCard(this.uuid);
     }
   }
   private enableExpandOnPointerover() {
