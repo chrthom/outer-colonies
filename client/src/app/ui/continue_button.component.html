@@ -3,7 +3,7 @@
   type="button"
   class="oc-unstyled-btn continue-button"
   [class.disabled]="!vm.enabled"
-  [disabled]="!vm.enabled"
+  [attr.aria-disabled]="!vm.enabled"
   [attr.aria-label]="vm.text || 'Warte auf Gegenspieler'"
   (click)="onClick()"
   (mouseenter)="onHover(true)"
@@ -12,5 +12,5 @@
   (blur)="onHover(false)"
 >
   <span class="label">{{ vm.text }}</span>
-  <img [src]="vm.imageUrl" alt="" />
+  <img [src]="vm.imageUrl" alt="" crossorigin="anonymous" />
 </button>

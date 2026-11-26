@@ -45,7 +45,7 @@ describe('ContinueButtonComponent', () => {
     session.stopSession();
   });
 
-  it('renders current continue label, disables while waiting, and emits Ready on click', () => {
+  it('renders current continue label, marks aria-disabled while waiting, and emits Ready only when enabled', () => {
     session.applyState({
       ...emptyClientState,
       playerPendingAction: true,
@@ -58,17 +58,66 @@ describe('ContinueButtonComponent', () => {
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
     expect(button.disabled).toBeFalse();
+    expect(button.getAttribute('aria-disabled')).toBe('false');
     expect(button.textContent?.trim()).toBe('Zug beenden');
 
     button.click();
     expect(socket.emitReady).toHaveBeenCalledWith(TurnPhase.Build, jasmine.any(Object));
 
+    socket.emitReady.calls.reset();
     session.applyState({ ...emptyClientState, playerPendingAction: false });
     fixture.detectChanges();
-    expect(button.disabled).toBeTrue();
+    expect(button.disabled).toBeFalse();
+    expect(button.getAttribute('aria-disabled')).toBe('true');
+
+    button.click();
+    expect(socket.emitReady).not.toHaveBeenCalled();
   });
 
-  it('shows hover prompt on mouseenter/mouseleave and emits returnToMatchmaking$ after game over', () => {
+  it('toggles hover prompt even when disabled (e.g. retract required) and clears hover after state disables action', () => {
+    let promptVisible = false;
+    const promptSub = interaction.promptVisible$.subscribe(v => (promptVisible = v));
+
+    session.applyState({
+      ...emptyClientState,
+      playerPendingAction: true,
+      playerIsActive: true,
+      turnPhase: TurnPhase.Build,
+      player: { ...emptyClientState.player, hasToRetractCards: true }
+    });
+    const fixture = TestBed.createComponent(ContinueButtonComponent);
+    fixture.detectChanges();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    expect(button.getAttribute('aria-disabled')).toBe('true');
+    expect(promptVisible).toBeFalse();
+
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(promptVisible).toBeTrue();
+    button.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(promptVisible).toBeFalse();
+
+    // Hover while enabled, click to submit, then move mouse away after button becomes aria-disabled
+    session.applyState({
+      ...emptyClientState,
+      playerPendingAction: true,
+      playerIsActive: true,
+      turnPhase: TurnPhase.Build
+    });
+    fixture.detectChanges();
+
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(promptVisible).toBeTrue();
+    button.click();
+    session.applyState({ ...emptyClientState, playerPendingAction: false });
+    fixture.detectChanges();
+
+    button.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(promptVisible).toBeFalse();
+    promptSub.unsubscribe();
+  });
+
+  it('emits returnToMatchmaking$ when clicked after game over', () => {
     session.applyState({
       ...emptyClientState,
       gameResult: { won: true, type: GameResultType.Domination, sol: 10 }

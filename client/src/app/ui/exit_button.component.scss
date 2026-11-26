@@ -1,8 +1,7 @@
 .exit-button-group {
   position: absolute;
   right: 3.125%;
-  top: 51.85%;
-  transform: translateY(-50%);
+  top: calc(51.85% - clamp(18px, 1.5cqh, 22px));
   display: flex;
   flex-direction: column;
   align-items: flex-end;

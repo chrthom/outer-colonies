@@ -110,56 +110,6 @@ class LayoutGameConfig {
     }
   };
   readonly ui = {
-    actionPool: {
-      player: {
-        x: 2370,
-        y: 1040,
-        yDistance: -55
-      },
-      opponent: {
-        x: 2370,
-        y: 235,
-        yDistance: 55
-      }
-    },
-    baseButtons: {
-      xTextOffset: -30,
-      yTextOffset: -4
-    },
-    combatRange: {
-      x: 1855,
-      y: 600
-    },
-    continueButton: {
-      x: 2370,
-      y: 600,
-      xTextOffset: -120
-    },
-    countdownIndicator: {
-      player: {
-        x: 2325,
-        y: 525
-      },
-      opponent: {
-        x: 2325,
-        y: 475
-      }
-    },
-    exitButton: {
-      x: 2300,
-      y: 700,
-      yConfirmOffset: 35
-    },
-    gameOver: {
-      yOffsets: {
-        title: -100,
-        subtitle: -20,
-        solGain: {
-          winner: 250,
-          loser: 200
-        }
-      }
-    },
     maxCard: {
       xOffset: 400,
       yOffset: -330
@@ -167,30 +117,6 @@ class LayoutGameConfig {
     maxedTacticCard: {
       x: new ZoomCardXPosition(1200),
       y: new ZoomCardYPosition(650)
-    },
-    missionButton: {
-      x: 2300,
-      y: 350
-    },
-    optionPicker: {
-      arrowSize: 80,
-      cardsXOffset: 750,
-      margin: {
-        x: 20,
-        y: 150
-      }
-    },
-    prompt: {
-      textOffset: {
-        x: 25,
-        y: 45
-      },
-      x: 1840,
-      y: 630
-    },
-    raidButton: {
-      x: 2300,
-      y: 400
     },
     zones: {
       height: 240,

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
 import Background from '../components/background';
 import { AssetPreloaderService } from '../services/asset_preloader_service';
 import { MatchmakingService } from '../services/matchmaking_service';
@@ -29,9 +30,6 @@ export default class Matchmaking extends Phaser.Scene {
     void this.initBackground();
   }
 
-  /**
-   * Binds scene navigation to `MatchmakingService` and cleans up on shutdown.
-   */
   private bindMatchmakingService(): void {
     this.subscriptions?.unsubscribe();
     const sub = new Subscription();
@@ -43,19 +41,28 @@ export default class Matchmaking extends Phaser.Scene {
     this.subscriptions = sub;
     this.matchmaking.start();
 
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    const teardown = () => {
+      if (this.isShutDown) return;
       this.isShutDown = true;
       this.subscriptions?.unsubscribe();
       this.subscriptions = undefined;
       this.matchmaking.stop();
-    });
+    };
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, teardown);
+    this.events.once(Phaser.Scenes.Events.DESTROY, teardown);
   }
 
   private async initBackground(): Promise<void> {
-    await this.assetPreloader.preloadRequired();
-    if (this.isShutDown) return;
-    this.assetPreloader.registerPhaserTextures(this.textures);
-    new Background(this);
-    void this.assetPreloader.preloadCommon();
+    try {
+      await this.assetPreloader.preloadRequired();
+      if (this.isShutDown || !this.textures) return;
+      this.assetPreloader.registerPhaserTextures(this.textures);
+      new Background(this);
+      await this.assetPreloader.preloadCommon();
+    } catch (err) {
+      if (environment.stage !== 'production') {
+        console.error(`Failed to initialize matchmaking background: ${err}`);
+      }
+    }
   }
 }

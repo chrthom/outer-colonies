@@ -120,4 +120,38 @@ describe('OptionPickerComponent', () => {
     expect(socket.emitHandcard).not.toHaveBeenCalled();
     expect(interaction.pendingOptionPicker).toBeUndefined();
   });
+
+  it('focuses the dialog when opened mid-game, traps Tab navigation, and preserves focus on page boundary', () => {
+    const fixture = TestBed.createComponent(OptionPickerComponent);
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).querySelector('[role="dialog"]')).toBeNull();
+
+    interaction.openOptionPicker('hand-1', 'target-1', [101, 102, 103, 104], 1);
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    const dialog = el.querySelector('[role="dialog"]') as HTMLElement;
+    const cancelBtn = el.querySelector('.cancel-btn') as HTMLButtonElement;
+    const nextBtn = el.querySelector('.page-btn.next') as HTMLButtonElement;
+    expect(document.activeElement).toBe(dialog);
+
+    // Shift+Tab from dialog container wraps to the last enabled button (nextBtn on page 1 before selection)
+    const shiftTab = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, cancelable: true });
+    dialog.dispatchEvent(shiftTab);
+    expect(shiftTab.defaultPrevented).toBeTrue();
+    expect(document.activeElement).toBe(nextBtn);
+
+    // Tab from the last enabled button wraps back to the first enabled button (cancelBtn)
+    const forwardTab = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true });
+    dialog.dispatchEvent(forwardTab);
+    expect(forwardTab.defaultPrevented).toBeTrue();
+    expect(document.activeElement).toBe(cancelBtn);
+
+    // Reaching the last page keeps focus inside the modal when nextBtn becomes disabled
+    nextBtn.focus();
+    nextBtn.click();
+    fixture.detectChanges();
+    expect(nextBtn.disabled).toBeTrue();
+    expect(document.activeElement).toBe(dialog);
+  });
 });

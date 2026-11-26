@@ -134,7 +134,7 @@ Outer Colonies is a web-based multiplayer card game consisting of four subprojec
   - `ui/`: Angular HTML/CSS components for matchmaking (`matchmaking_overlay`, `loading_status`, `online_indicator`, `version_indicator`), in-game HUD (`game_hud`, `preloader`, `action_pool`, `countdown_indicator`, `combat_range_indicator`, `battle_action_buttons`, `continue_button`, `exit_button`, `prompt`), and overlays/modals (`zoom_card`, `option_picker`, `game_over_indicator`, `connection_lost`)
   - `scenes/`: Thin Phaser board adapters (`game.ts`, `matchmaking.ts`) rendering the space background, zone markers, interactive card board, and battle FX
   - `components/`: Phaser board components (`background.ts`, `perspective.ts`, `buttons/retract_card_button.ts`, `card/`, `indicators/attack_damage_indicator.ts`, `indicators/value_indicator.ts`)
-  - `config/`: Game configuration (`animation.ts`, `background.ts`, `design.ts`, `layout_game.ts`, `layout_load.ts`, `layout.ts`, `perspective.ts`; design tokens mirrored in `styles/_design_tokens.scss`)
+  - `config/`: Game configuration (`animation.ts`, `background.ts`, `design.ts`, `layout_game.ts`, `layout.ts`, `perspective.ts`; design tokens mirrored in `styles/_design_tokens.scss`)
   - `testing/`: Shared test utilities
     - `phaser_stubs.ts`: Chainable Phaser game object, scene and system stubs for the client specs
   - `utils/`: Utility classes

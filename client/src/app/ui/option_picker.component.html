@@ -6,6 +6,7 @@
     aria-modal="true"
     aria-labelledby="option-picker-title"
     tabindex="-1"
+    (keydown)="onDialogKeydown($event)"
     (contextmenu)="$event.preventDefault(); cancel()"
   >
     <div class="option-picker-header">
@@ -42,7 +43,11 @@
             [attr.aria-label]="'Optionskarte ' + option.cardId"
             (click)="toggleSelection(option.absoluteIndex)"
           >
-            <img [src]="vm.cardUrls.get(option.cardId)" [alt]="'Karte ' + option.cardId" />
+            <img
+              [src]="vm.cardUrls.get(option.cardId)"
+              [alt]="'Karte ' + option.cardId"
+              crossorigin="anonymous"
+            />
           </button>
         }
       </div>

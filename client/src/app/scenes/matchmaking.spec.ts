@@ -21,11 +21,11 @@ describe('Matchmaking scene - service view adapter', () => {
     preloadCommon: jasmine.Spy;
     registerPhaserTextures: jasmine.Spy;
   };
-  let shutdownEvent: string;
-  let shutdownHandler: () => void;
+  let eventHandlers: Map<string, () => void>;
 
   beforeEach(() => {
     matchmakingScene = new Matchmaking();
+    eventHandlers = new Map();
     serviceStub = {
       matchStart$: new Subject<ClientGameParams>(),
       start: jasmine.createSpy('matchmaking.start'),
@@ -49,8 +49,7 @@ describe('Matchmaking scene - service view adapter', () => {
     };
     (matchmakingScene as unknown as { events: { once: jasmine.Spy } }).events = {
       once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
-        shutdownEvent = event;
-        shutdownHandler = handler;
+        eventHandlers.set(event, handler);
       })
     };
     matchmakingScene.add = makeAddStub() as unknown as Phaser.GameObjects.GameObjectFactory;
@@ -84,15 +83,33 @@ describe('Matchmaking scene - service view adapter', () => {
     ).toHaveBeenCalledWith('Game', { gameParams });
   });
 
-  it('binds cleanup to SHUTDOWN and stops subscriptions and service on shutdown', () => {
-    expect(shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+  it('binds cleanup to SHUTDOWN and DESTROY and aborts background setup if destroyed mid-preload', async () => {
+    expect(eventHandlers.has(Phaser.Scenes.Events.SHUTDOWN)).toBeTrue();
+    expect(eventHandlers.has(Phaser.Scenes.Events.DESTROY)).toBeTrue();
 
-    shutdownHandler();
+    eventHandlers.get(Phaser.Scenes.Events.SHUTDOWN)!();
+    eventHandlers.get(Phaser.Scenes.Events.DESTROY)!();
 
     expect(serviceStub.stop).toHaveBeenCalledTimes(1);
     serviceStub.matchStart$.next({ preloadCardIds: [] });
     expect(
       (matchmakingScene as unknown as { scene: { start: jasmine.Spy } }).scene.start
     ).not.toHaveBeenCalled();
+
+    let resolvePreload!: () => void;
+    assetPreloaderStub.preloadRequired.and.returnValue(
+      new Promise<void>(resolve => {
+        resolvePreload = resolve;
+      })
+    );
+    assetPreloaderStub.registerPhaserTextures.calls.reset();
+
+    matchmakingScene.create();
+    (matchmakingScene as unknown as { textures: object | null }).textures = null;
+    eventHandlers.get(Phaser.Scenes.Events.DESTROY)!();
+    resolvePreload();
+    await assetPreloaderStub.preloadRequired.calls.mostRecent().returnValue;
+
+    expect(assetPreloaderStub.registerPhaserTextures).not.toHaveBeenCalled();
   });
 });

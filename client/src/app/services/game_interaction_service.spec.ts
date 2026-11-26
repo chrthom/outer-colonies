@@ -694,6 +694,18 @@ describe('GameInteractionService', () => {
       service.toggleZoomCard(99, 60, 70);
       session.applyState(makeState());
       expect(current).toBeUndefined();
+
+      service.toggleZoomCard(55, 20, 30);
+      service.clickHandCard('missing-hand');
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(56, 20, 30);
+      service.clickCardStack('missing-stack');
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(57, 20, 30);
+      service.openOptionPicker('h1', 't1', [101], 1);
+      expect(current).toBeUndefined();
       sub.unsubscribe();
     });
 

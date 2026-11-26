@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { map, startWith } from 'rxjs';
 import { AssetPreloaderService } from '../services/asset_preloader_service';
 import { ContinueButtonViewModel, GameInteractionService } from '../services/game_interaction_service';
@@ -13,7 +13,7 @@ import { ContinueButtonViewModel, GameInteractionService } from '../services/gam
   templateUrl: './continue_button.component.html',
   styleUrl: './continue_button.component.scss'
 })
-export class ContinueButtonComponent {
+export class ContinueButtonComponent implements OnDestroy {
   private readonly interaction = inject(GameInteractionService);
   private readonly assetPreloader = inject(AssetPreloaderService);
 
@@ -31,14 +31,19 @@ export class ContinueButtonComponent {
     };
   }
 
-  /** Dispatches the primary continue or rematch action. */
+  /** Dispatches the primary continue or rematch action when enabled. */
   onClick(): void {
+    if (!this.interaction.getContinueButtonState().enabled) return;
     this.interaction.continueAction();
   }
 
   /** Shows or hides the hover prompt while the pointer/focus rests on this button. */
   onHover(hovered: boolean): void {
     this.interaction.setContinueHover(hovered);
+  }
+
+  ngOnDestroy(): void {
+    this.interaction.setContinueHover(false);
   }
 
   /** Triggers the continue action on Space when no modal or other interactive control owns focus. */

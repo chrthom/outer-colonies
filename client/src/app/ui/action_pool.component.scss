@@ -7,15 +7,13 @@
   pointer-events: none;
 
   &.player {
-    bottom: 22.96%;
+    bottom: calc(22.96% - clamp(10px, 0.9cqw, 22px));
     flex-direction: column-reverse;
-    transform: translateY(50%);
   }
 
   &.opponent {
-    top: 17.41%;
+    top: calc(17.41% - clamp(10px, 0.9cqw, 22px));
     flex-direction: column;
-    transform: translateY(-50%);
   }
 }
 

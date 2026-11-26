@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
-import { map, merge } from 'rxjs';
+import { Component, Input, OnDestroy, inject } from '@angular/core';
+import { Subscription, map, merge } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AssetPreloaderService } from '../services/asset_preloader_service';
 import { ExitButtonViewModel, GameInteractionService } from '../services/game_interaction_service';
@@ -17,7 +17,7 @@ import { NavigationService } from '../services/navigation_service';
   templateUrl: './exit_button.component.html',
   styleUrl: './exit_button.component.scss'
 })
-export class ExitButtonComponent {
+export class ExitButtonComponent implements OnDestroy {
   @Input() mode: 'matchmaking' | 'game' = 'game';
 
   private readonly matchmakingService = inject(MatchmakingService);
@@ -25,6 +25,7 @@ export class ExitButtonComponent {
   private readonly interaction = inject(GameInteractionService);
   private readonly navigation = inject(NavigationService);
   private readonly assetPreloader = inject(AssetPreloaderService);
+  private readonly subscriptions = new Subscription();
 
   confirming = false;
   readonly iconUrl = this.assetPreloader.getIconUrl('exit');
@@ -32,6 +33,21 @@ export class ExitButtonComponent {
   readonly vm$ = merge(this.interaction.hudRefresh$, this.gameSession.stateReceived$).pipe(
     map(() => this.computeViewModel())
   );
+
+  constructor() {
+    this.subscriptions.add(
+      this.interaction.promptVisible$.subscribe(visible => {
+        if (visible) {
+          this.confirming = false;
+        }
+      })
+    );
+    this.subscriptions.add(
+      merge(this.interaction.hudRefresh$, this.gameSession.stateReceived$).subscribe(() => {
+        this.confirming = false;
+      })
+    );
+  }
 
   /** Current derived exit button view-model. */
   get currentViewModel(): ExitButtonViewModel {
@@ -64,14 +80,14 @@ export class ExitButtonComponent {
     this.interaction.surrender();
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   private computeViewModel(): ExitButtonViewModel {
     if (this.mode === 'matchmaking') {
       return { label: 'Spielersuche abbrechen', canSurrender: false };
     }
-    const vm = this.interaction.getExitButtonState();
-    if (!vm.canSurrender) {
-      this.confirming = false;
-    }
-    return vm;
+    return this.interaction.getExitButtonState();
   }
 }

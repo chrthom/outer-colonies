@@ -223,6 +223,7 @@ export class GameInteractionService implements OnDestroy {
    * card or discards it during the end phase.
    */
   clickHandCard(uuid: string): void {
+    this.hideZoomCard();
     const state = this.gameSession.state;
     if (!state.playerPendingAction) return;
     const card = state.player.hand.find(h => h.uuid == uuid);
@@ -245,6 +246,7 @@ export class GameInteractionService implements OnDestroy {
    * ships, selects a weapon, or executes an attack.
    */
   clickCardStack(stackUUID: string, cardUUID?: string): void {
+    this.hideZoomCard();
     const state = this.gameSession.state;
     if (!state.playerPendingAction) return;
 
@@ -387,6 +389,7 @@ export class GameInteractionService implements OnDestroy {
     options: number[],
     optionsToSelect: number
   ): void {
+    this.hideZoomCard();
     this.pendingOptionPickerSubject.next({
       handCardUUID,
       targetUUID,

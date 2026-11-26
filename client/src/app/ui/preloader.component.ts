@@ -20,11 +20,12 @@ export class PreloaderComponent {
 
   readonly vm$ = combineLatest([
     this.gameSession.hasReceivedState$,
+    this.gameSession.connectionLost$,
     this.assetPreloader.progress$,
     this.assetPreloader.isComplete$
   ]).pipe(
-    map(([hasReceivedState, progress, isComplete]) => ({
-      visible: !hasReceivedState,
+    map(([hasReceivedState, connectionLost, progress, isComplete]) => ({
+      visible: !hasReceivedState && !connectionLost,
       progressPercent: Math.round(Math.min(1, Math.max(0, progress)) * 100),
       statusText: isComplete ? 'Warte auf Gegenspieler...' : 'Lade Spieldaten...'
     }))

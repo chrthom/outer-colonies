@@ -68,7 +68,6 @@ export class MatchmakingService implements OnDestroy {
     this.activeSubject.next(true);
     this.sessionToken = this.parseSessionToken(search);
     this.statusTextSubject.next('Verbinde mit Server...');
-    this.onlineCountSubject.next(undefined);
     this.socketService.connect();
 
     const sub = new Subscription();

@@ -10,7 +10,6 @@ class AnimationConfig {
     }
   };
   readonly duration = {
-    loaderCycle: 1000,
     attack: 1000,
     handExpand: 250,
     displayIndicator: 200,
@@ -18,12 +17,7 @@ class AnimationConfig {
     move: 550,
     showTacticCard: 600,
     min: 10,
-    promptShow: 3000,
-    zoomCard: 150
-  };
-  readonly gameOver = {
-    appear: 1500,
-    timeOffset: 800
+    promptShow: 3000
   };
 }
 

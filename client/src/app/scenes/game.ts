@@ -9,6 +9,7 @@ import {
   ClientPlayer,
   ClientState
 } from '@shared/interfaces/client_state';
+import { environment } from '../../environments/environment';
 import Background from '../components/background';
 import CardImage from '../components/card/card_image';
 import CardStack from '../components/card/card_stack';
@@ -81,13 +82,16 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    const teardown = () => {
+      if (this.isShutDown) return;
       this.isShutDown = true;
       this.subscriptions?.unsubscribe();
       this.subscriptions = undefined;
       this.session.stopSession();
       this.interaction.reset();
-    });
+    };
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, teardown);
+    this.events.once(Phaser.Scenes.Events.DESTROY, teardown);
     void this.setupBoard();
   }
 
@@ -128,24 +132,30 @@ export default class Game extends Phaser.Scene {
   }
 
   private async setupBoard(): Promise<void> {
-    await this.assetPreloader.preloadMatch(this.gameParams.preloadCardIds);
-    if (this.isShutDown) return;
-    this.assetPreloader.registerPhaserTextures(this.textures);
+    try {
+      await this.assetPreloader.preloadMatch(this.gameParams.preloadCardIds);
+      if (this.isShutDown || !this.textures) return;
+      this.assetPreloader.registerPhaserTextures(this.textures);
 
-    this.background = new Background(this);
-    this.background.initInterface();
-    this.opponent = {
-      deck: new DeckCard(this, false),
-      discardPile: new DiscardPile(this, false),
-      hand: []
-    };
-    this.player = {
-      deck: new DeckCard(this, true),
-      discardPile: new DiscardPile(this, true),
-      hand: []
-    };
-    this.bindServices();
-    this.session.startSession();
+      this.background = new Background(this);
+      this.background.initInterface();
+      this.opponent = {
+        deck: new DeckCard(this, false),
+        discardPile: new DiscardPile(this, false),
+        hand: []
+      };
+      this.player = {
+        deck: new DeckCard(this, true),
+        discardPile: new DiscardPile(this, true),
+        hand: []
+      };
+      this.bindServices();
+      this.session.startSession();
+    } catch (err) {
+      if (environment.stage !== 'production') {
+        console.error(`Failed to initialize game board: ${err}`);
+      }
+    }
   }
 
   private bindServices(): void {

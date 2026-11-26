@@ -68,4 +68,21 @@ describe('PreloaderComponent', () => {
 
     expect(el.querySelector('.preloader')).toBeNull();
   });
+
+  it('hides immediately if the socket disconnects before the first state arrives', async () => {
+    session.initMatch({ preloadCardIds: [] });
+    const fixture = TestBed.createComponent(PreloaderComponent);
+    const loadPromise = assetPreloader.preloadMatch([]);
+    resolvers.forEach(r => r());
+    await loadPromise;
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.preloader')).not.toBeNull();
+
+    session.handleDisconnect();
+    fixture.detectChanges();
+
+    expect(el.querySelector('.preloader')).toBeNull();
+  });
 });

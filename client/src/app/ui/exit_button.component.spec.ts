@@ -140,4 +140,31 @@ describe('ExitButtonComponent', () => {
     fixture.detectChanges();
     expect((fixture.nativeElement as HTMLElement).querySelector('.exit-button')).not.toBeNull();
   });
+
+  it('resets inline surrender confirmation when a prompt opens or a new state arrives', () => {
+    session.initMatch({ preloadCardIds: [] });
+    session.applyState({ ...emptyClientState, playerPendingAction: true });
+    const fixture = TestBed.createComponent(ExitButtonComponent);
+    fixture.componentInstance.mode = 'game';
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    (el.querySelector('.exit-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(el.querySelector('.confirm-button')).not.toBeNull();
+
+    interaction.setContinueHover(true);
+    fixture.detectChanges();
+    interaction.setContinueHover(false);
+    fixture.detectChanges();
+    expect(el.querySelector('.confirm-button')).toBeNull();
+
+    (el.querySelector('.exit-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(el.querySelector('.confirm-button')).not.toBeNull();
+
+    session.applyState({ ...emptyClientState, playerPendingAction: true });
+    fixture.detectChanges();
+    expect(el.querySelector('.confirm-button')).toBeNull();
+  });
 });

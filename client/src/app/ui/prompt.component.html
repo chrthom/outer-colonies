@@ -1,7 +1,7 @@
 @if (vm$ | async; as vm) {
   @if (vm.visible) {
     <div class="prompt-box" role="status" aria-live="polite">
-      <img [src]="boxUrl" alt="" />
+      <img [src]="boxUrl" alt="" crossorigin="anonymous" />
       <p class="prompt-text">{{ vm.text }}</p>
     </div>
   }

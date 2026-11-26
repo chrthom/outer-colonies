@@ -51,8 +51,7 @@ interface GameTestHandles {
     registerPhaserTextures: jasmine.Spy;
   };
   sceneManager: { start: jasmine.Spy };
-  shutdownEvent?: string;
-  shutdownHandler?: () => void;
+  eventHandlers: Map<string, () => void>;
 }
 
 function makeGameWithServices(): GameTestHandles {
@@ -102,12 +101,12 @@ function makeGameWithServices(): GameTestHandles {
     session,
     interaction,
     assetPreloader,
-    sceneManager
+    sceneManager,
+    eventHandlers: new Map()
   };
   (game as unknown as { events: { once: jasmine.Spy } }).events = {
     once: jasmine.createSpy('events.once').and.callFake((event: string, handler: () => void) => {
-      handles.shutdownEvent = event;
-      handles.shutdownHandler = handler;
+      handles.eventHandlers.set(event, handler);
     })
   };
   return handles;
@@ -193,7 +192,8 @@ describe('Game scene - board adapter & lifecycle', () => {
       .and.callFake(makeGameObjectStub);
 
     game.create();
-    expect(handles.shutdownEvent).toBe(Phaser.Scenes.Events.SHUTDOWN);
+    expect(handles.eventHandlers.has(Phaser.Scenes.Events.SHUTDOWN)).toBeTrue();
+    expect(handles.eventHandlers.has(Phaser.Scenes.Events.DESTROY)).toBeTrue();
 
     await handles.assetPreloader.preloadMatch.calls.mostRecent().returnValue;
 
@@ -202,14 +202,26 @@ describe('Game scene - board adapter & lifecycle', () => {
     expect(handles.socket.emitReady).toHaveBeenCalledWith(TurnPhase.Init);
   });
 
-  it('stops session and unsubscribes scene listeners on SHUTDOWN', () => {
+  it('stops session and aborts setup on SHUTDOWN or DESTROY', async () => {
+    let resolvePreload!: () => void;
+    handles.assetPreloader.preloadMatch.and.returnValue(
+      new Promise<void>(resolve => {
+        resolvePreload = resolve;
+      })
+    );
+    handles.assetPreloader.registerPhaserTextures.calls.reset();
+
     game.init({ gameParams: { preloadCardIds: [] } });
     game.create();
 
-    handles.shutdownHandler!();
+    (game as unknown as { textures: object | null }).textures = null;
+    handles.eventHandlers.get(Phaser.Scenes.Events.DESTROY)!();
     handles.socket.disconnect$.next();
+    resolvePreload();
+    await handles.assetPreloader.preloadMatch.calls.mostRecent().returnValue;
 
     expect(game.connectionLost).toBeFalse();
+    expect(handles.assetPreloader.registerPhaserTextures).not.toHaveBeenCalled();
   });
 });
 
