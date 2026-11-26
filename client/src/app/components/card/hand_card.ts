@@ -45,7 +45,7 @@ export default class HandCard extends CardImage {
   maximizeTacticCard() {
     this.scene.maximizedTacticCard?.destroy();
     this.scene.maximizedTacticCard = this.setDepth(layoutConfig.depth.maxedTacticCard)
-      .setCardId(this.scene.state.highlightCardId ?? this.data.cardId)
+      .setCardId(this.scene.session.state.highlightCardId ?? this.data.cardId)
       .highlightReset();
     if (!this.data.ownedByPlayer) this.setAngle(this.angle + 180);
     this.tween({
@@ -58,7 +58,7 @@ export default class HandCard extends CardImage {
     });
   }
   private invIndex(index: number) {
-    const handData = this.ownedByPlayer ? this.scene.state.player : this.scene.state.opponent;
+    const handData = this.scene.getPlayerState(this.ownedByPlayer);
     return handData.hand.length - index - 1;
   }
   private targetX(index?: number): CardXPosition {

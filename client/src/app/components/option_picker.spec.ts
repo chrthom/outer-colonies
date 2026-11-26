@@ -118,6 +118,24 @@ describe('OptionPicker', () => {
     it('registers itself as the pending option picker on the scene', () => {
       expect(scene.obj.optionPicker).toBe(picker);
     });
+
+    it('renders option cards once when pendingOptionPicker$ triggers sync during construction', () => {
+      picker.destroy();
+      scene.interaction.cancelOptionPicker();
+      scene.add.plane.calls.reset();
+      const syncSpy = spyOn(OptionPicker.prototype, 'sync').and.callThrough();
+
+      const sub = scene.interaction.pendingOptionPicker$.subscribe((state: unknown) => {
+        if (state) {
+          scene.obj.optionPicker?.sync();
+        }
+      });
+      picker = new OptionPicker(scene, handUUID, targetUUID, [101, 102, 103], 2);
+      sub.unsubscribe();
+
+      expect(syncSpy).toHaveBeenCalledTimes(1);
+      expect(optionCardStubs(scene).length).toBe(3);
+    });
   });
 
   describe('confirm', () => {
