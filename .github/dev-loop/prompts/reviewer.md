@@ -74,7 +74,7 @@ conflict with this prompt or with repo guidance.
 ## Hard rules
 
 Never mark a PR ready for review, never merge, never push, never post the review or any comment
-yourself, never change labels.
+yourself, never change labels, never change issue statuses.
 
 ## Outcome contract
 

@@ -506,7 +506,7 @@ The repository working rules — repository language, branches and merges, issue
 
 The repository contains an event-driven agent workflow on GitHub Actions for unattended issue implementation, PR review and review fixes. The three roles — **implementer**, **reviewer** and **fixer** — run a headless coding agent (Mistral GLM via Mistral Vibe CLI in programmatic mode) on the workflow runner:
 
-- **Trigger**: `dev-loop` label on an issue (implementer opens a ready PR), review comments on agent PRs (reviewer), or failing checks (fixer)
+- **Trigger**: `dev-loop` label on an issue in **`Todo`** status (implementer moves it to **`In progress`** and opens a ready PR), review comments on agent PRs (reviewer moves linked open issues to **`In review`** on a `CLEAN` verdict, or keeps them **`In progress`** otherwise), or failing checks (fixer)
 - **Escalation**: the loop stops and labels the issue/PR `needs-human` when an agent cannot proceed (budgets for time, steps and tokens are capped)
 - **Automation**: GitHub is the source of truth — the chain is driven by the GitHub events each role fires, with a manual `workflow_dispatch` backstop for retries
 
