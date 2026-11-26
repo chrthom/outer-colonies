@@ -3,12 +3,13 @@ import ClientGameParams from '@shared/interfaces/client_game_params';
 import {
   ClientAttack,
   ClientEvent,
+  ClientGameResult,
   ClientPlayer,
   ClientState,
   emptyClientState
 } from '@shared/interfaces/client_state';
 import { TurnPhase } from '@shared/config/enums';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, distinctUntilChanged } from 'rxjs';
 import { animationConfig } from '../config/animation';
 import { SocketService } from '../socket_service';
 import StateUpdateSequencer from '../utils/state_update_sequencer';
@@ -33,6 +34,9 @@ export interface DiscardPilesUpdate {
  */
 @Injectable({ providedIn: 'root' })
 export class GameSessionService implements OnDestroy {
+  private readonly activeSubject = new BehaviorSubject<boolean>(false);
+  private readonly hasReceivedStateSubject = new BehaviorSubject<boolean>(false);
+  private readonly gameOverResultSubject = new BehaviorSubject<ClientGameResult | undefined>(undefined);
   private readonly stateSubject = new BehaviorSubject<ClientState>(emptyClientState);
   private readonly countdownSubject = new BehaviorSubject<CountdownState>({});
   private readonly connectionLostSubject = new BehaviorSubject<boolean>(false);
@@ -46,6 +50,16 @@ export class GameSessionService implements OnDestroy {
   private readonly syncViewStepSubject = new Subject<ClientState>();
   private readonly syncDiscardPilesStepSubject = new Subject<DiscardPilesUpdate>();
 
+  /** Whether a match session view is currently active. */
+  readonly active$: Observable<boolean> = this.activeSubject.asObservable().pipe(distinctUntilChanged());
+  /** Whether at least one server state has been received for the current match. */
+  readonly hasReceivedState$: Observable<boolean> = this.hasReceivedStateSubject
+    .asObservable()
+    .pipe(distinctUntilChanged());
+  /** Final match result once post-attack animations settle, emitted at most once per match. */
+  readonly gameOverResult$: Observable<ClientGameResult | undefined> = this.gameOverResultSubject
+    .asObservable()
+    .pipe(distinctUntilChanged());
   /** Authoritative client game state (updated immediately upon arrival). */
   readonly state$: Observable<ClientState> = this.stateSubject.asObservable();
   /** Turn countdown values for player and opponent. */
@@ -117,15 +131,18 @@ export class GameSessionService implements OnDestroy {
    * @param gameParams Startup parameters received from matchmaking.
    */
   initMatch(gameParams: ClientGameParams): void {
-    this.stopSession();
+    this.clearRuntime();
     this.gameParams = gameParams;
     this.socketService.disableReconnection();
     this.stateSubject.next(emptyClientState);
     this.connectionLostSubject.next(false);
     this.countdownSubject.next({});
     this.isAttackAnimatingSubject.next(false);
+    this.hasReceivedStateSubject.next(false);
+    this.gameOverResultSubject.next(undefined);
     this.retractCardsExist = false;
     this.pendingCardMovementEvents.clear();
+    this.activeSubject.next(true);
   }
 
   /**
@@ -154,13 +171,20 @@ export class GameSessionService implements OnDestroy {
    * Unsubscribes match socket listeners and cancels any pending sequencer or attack timers.
    */
   stopSession(): void {
+    this.activeSubject.next(false);
+    this.hasReceivedStateSubject.next(false);
+    this.gameOverResultSubject.next(undefined);
+    this.clearRuntime();
+    this.sessionStoppedSubject.next();
+  }
+
+  private clearRuntime(): void {
     this.subscriptions?.unsubscribe();
     this.subscriptions = undefined;
     this.stateUpdateSequencer.cancel();
     this.cancelAttackTimer?.();
     this.cancelAttackTimer = undefined;
     this.isAttackAnimatingSubject.next(false);
-    this.sessionStoppedSubject.next();
   }
 
   /**
@@ -185,6 +209,7 @@ export class GameSessionService implements OnDestroy {
       }
     }
     this.stateSubject.next(state);
+    this.hasReceivedStateSubject.next(true);
     this.stateReceivedSubject.next(state);
 
     const attack = state.battle.recentAttack;
@@ -213,6 +238,9 @@ export class GameSessionService implements OnDestroy {
           this.syncHandStepSubject.next(state);
           this.pendingCardMovementEvents.clear();
           this.syncViewStepSubject.next(state);
+          if (state.gameResult && !this.gameOverResultSubject.value) {
+            this.gameOverResultSubject.next(state.gameResult);
+          }
         }
       },
       {

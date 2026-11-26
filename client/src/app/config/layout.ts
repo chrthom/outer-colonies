@@ -1,5 +1,4 @@
 import { layoutGameConfig } from './layout_game';
-import { layoutLoadConfig } from './layout_load';
 
 export interface Coordinates {
   x: number;
@@ -14,7 +13,6 @@ export class FontSizeConfig {
 }
 
 class LayoutConfig {
-  readonly load = layoutLoadConfig;
   readonly game = layoutGameConfig;
   readonly depth = {
     background: -1000,
@@ -23,12 +21,8 @@ class LayoutConfig {
     indicator: 30,
     discardCard: 40,
     handCard: 50,
-    prompt: 60,
     battleEffect: 70,
-    maxedTacticCard: 80,
-    zoomCard: 85,
-    optionsPicker: 90,
-    gameOver: 100
+    maxedTacticCard: 80
   };
   readonly fontSize = new FontSizeConfig();
   readonly scene = {

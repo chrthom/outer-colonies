@@ -164,6 +164,38 @@ describe('CardImage', () => {
     });
   });
 
+  describe('enableMaximizeOnRightclick', () => {
+    it('bridges right-click, pointermove, and pointerout to GameInteractionService', () => {
+      const { card, scene } = makeCardImage();
+      spyOn(scene.interaction, 'toggleZoomCard');
+      spyOn(scene.interaction, 'updateZoomCardPosition');
+      spyOn(scene.interaction, 'hideZoomCard');
+
+      card.enableMaximizeOnRightclick();
+
+      const handlers = new Map<string, (pointer: unknown) => void>();
+      (card.image.on as unknown as jasmine.Spy).calls.allArgs().forEach(([event, handler]) => {
+        handlers.set(event as string, handler as (pointer: unknown) => void);
+      });
+
+      handlers.get('pointerdown')!({
+        rightButtonDown: () => true,
+        x: layoutConfig.scene.width / 2,
+        y: layoutConfig.scene.height / 4
+      });
+      expect(scene.interaction.toggleZoomCard).toHaveBeenCalledWith(1, 50, 25);
+
+      handlers.get('pointermove')!({
+        x: (layoutConfig.scene.width * 3) / 4,
+        y: layoutConfig.scene.height / 2
+      });
+      expect(scene.interaction.updateZoomCardPosition).toHaveBeenCalledWith(75, 50);
+
+      handlers.get('pointerout')!(undefined);
+      expect(scene.interaction.hideZoomCard).toHaveBeenCalled();
+    });
+  });
+
   describe('destroy', () => {
     it('stops active position and rotation tweens before destroying planes', () => {
       const { card, tweens } = makeCardImage();

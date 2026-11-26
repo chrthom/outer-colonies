@@ -1,0 +1,34 @@
+.preloader {
+  position: absolute;
+  left: 50%;
+  top: 51.85%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2cqw;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.status-text {
+  margin: 0;
+  font-family: var(--oc-font-text);
+  font-size: var(--oc-font-size-normal);
+  color: var(--oc-color-neutral);
+  text-align: center;
+}
+
+.progress-track {
+  width: clamp(220px, 20.83cqw, 500px);
+  height: clamp(18px, 3.7cqh, 50px);
+  padding: clamp(3px, 0.42cqw, 10px);
+  background-color: color-mix(in srgb, var(--oc-color-player) 30%, transparent);
+  box-sizing: content-box;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: color-mix(in srgb, var(--oc-color-player) 80%, transparent);
+  transition: width 80ms linear;
+}

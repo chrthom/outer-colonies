@@ -1,0 +1,10 @@
+.online-indicator {
+  position: absolute;
+  right: 1.67%;
+  bottom: 6.67%;
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-normal);
+  color: var(--oc-color-neutral);
+  text-align: right;
+  pointer-events: none;
+}

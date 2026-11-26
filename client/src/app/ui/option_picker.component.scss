@@ -1,0 +1,125 @@
+.option-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: auto;
+  background-color: color-mix(in srgb, var(--oc-color-dark) 80%, transparent);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  padding: 4vh 2vw;
+  outline: none;
+}
+
+.option-picker-header,
+.option-picker-body {
+  display: grid;
+  align-items: center;
+}
+
+.option-picker-header {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.option-picker-body {
+  grid-template-columns: auto 1fr auto;
+  gap: clamp(12px, 2vw, 32px);
+  width: min(100%, 1800px);
+  margin: 0 auto;
+}
+
+.selection-status {
+  grid-column: 2;
+  margin: 0;
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-large);
+  text-align: center;
+}
+
+.cancel-btn,
+.confirm-btn {
+  min-height: 48px;
+  font-family: var(--oc-font-caption);
+  line-height: 1;
+}
+
+.cancel-btn {
+  grid-column: 3;
+  justify-self: end;
+  min-width: 48px;
+  font-size: clamp(28px, 4vw, 72px);
+  color: var(--oc-color-opponent);
+}
+
+.cancel-btn:hover,
+.cancel-btn:focus-visible {
+  color: var(--oc-color-hover);
+}
+
+.page-btn {
+  min-width: 56px;
+  min-height: 56px;
+  font-size: clamp(28px, 3vw, 56px);
+  color: var(--oc-color-player);
+  opacity: var(--oc-alpha-normal);
+}
+
+.page-btn:hover:not(:disabled),
+.page-btn:focus-visible:not(:disabled) {
+  color: var(--oc-color-opponent);
+}
+
+.options-grid,
+.option-picker-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.options-grid {
+  flex-wrap: wrap;
+  gap: clamp(16px, 3vw, 64px);
+}
+
+.option-card {
+  width: clamp(140px, 20vw, 380px);
+  padding: 6px;
+  border-radius: 12px;
+  border: 3px solid transparent;
+  transition: transform 120ms ease;
+}
+
+.option-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.option-card.selected {
+  border-color: var(--oc-color-opponent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--oc-color-opponent) 80%, transparent);
+}
+
+.option-card:hover,
+.option-card:focus-visible {
+  transform: translateY(-4px);
+}
+
+.option-picker-footer {
+  min-height: clamp(48px, 8vh, 96px);
+}
+
+.confirm-btn {
+  min-width: 120px;
+  font-size: clamp(32px, 4.5vw, 84px);
+  color: var(--oc-color-player);
+}
+
+.confirm-btn.hidden {
+  visibility: hidden;
+}
+
+.confirm-btn:hover:not(:disabled),
+.confirm-btn:focus-visible:not(:disabled) {
+  color: var(--oc-color-warn);
+}

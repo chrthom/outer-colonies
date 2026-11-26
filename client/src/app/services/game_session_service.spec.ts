@@ -329,4 +329,39 @@ describe('GameSessionService', () => {
       expect(service.getPlayerState(false).name).toBe('Zeus');
     });
   });
+
+  describe('UI bridge observables', () => {
+    it('tracks active$ and hasReceivedState$ across match lifecycle', () => {
+      const activeStates: boolean[] = [];
+      const receivedStates: boolean[] = [];
+      const sub = service.active$.subscribe(v => activeStates.push(v));
+      sub.add(service.hasReceivedState$.subscribe(v => receivedStates.push(v)));
+
+      service.initMatch({ preloadCardIds: [] });
+      service.applyState(makeState({ turnPhase: TurnPhase.Build }));
+      service.stopSession();
+
+      expect(activeStates).toEqual([false, true, false]);
+      expect(receivedStates).toEqual([false, true, false]);
+      sub.unsubscribe();
+    });
+
+    it('emits gameOverResult$ once per match after syncViewStep$ and resets on initMatch()', () => {
+      const results: Array<unknown> = [];
+      const sub = service.gameOverResult$.subscribe(r => results.push(r));
+
+      service.initMatch({ preloadCardIds: [] });
+      const firstResult = { won: true, type: GameResultType.Domination, sol: 42 };
+      service.applyState(makeState({ gameResult: firstResult }));
+      scheduler.fireAll();
+      service.applyState(makeState({ gameResult: { won: true, type: GameResultType.Domination, sol: 0 } }));
+      scheduler.fireAll();
+
+      expect(results).toEqual([undefined, firstResult]);
+
+      service.initMatch({ preloadCardIds: [] });
+      expect(results).toEqual([undefined, firstResult, undefined]);
+      sub.unsubscribe();
+    });
+  });
 });

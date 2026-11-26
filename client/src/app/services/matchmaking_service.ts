@@ -10,10 +10,13 @@ import { SocketService } from '../socket_service';
  */
 @Injectable({ providedIn: 'root' })
 export class MatchmakingService implements OnDestroy {
+  private readonly activeSubject = new BehaviorSubject<boolean>(false);
   private readonly statusTextSubject = new BehaviorSubject<string>('Verbinde mit Server...');
   private readonly onlineCountSubject = new BehaviorSubject<number | undefined>(undefined);
   private readonly matchStartSubject = new Subject<ClientGameParams>();
 
+  /** Whether the matchmaking view is currently active. */
+  readonly active$: Observable<boolean> = this.activeSubject.asObservable();
   /** Localized status message for the matchmaking loading display. */
   readonly statusText$: Observable<string> = this.statusTextSubject.asObservable();
   /** Current number of unique online players, or `undefined` before the first update. */
@@ -60,10 +63,11 @@ export class MatchmakingService implements OnDestroy {
    * @param search Optional query string override for token extraction.
    */
   start(search?: string): void {
-    this.stop();
+    this.clearSubscriptions();
+    this.onlineCountSubject.next(undefined);
+    this.activeSubject.next(true);
     this.sessionToken = this.parseSessionToken(search);
     this.statusTextSubject.next('Verbinde mit Server...');
-    this.onlineCountSubject.next(undefined);
     this.socketService.connect();
 
     const sub = new Subscription();
@@ -113,9 +117,14 @@ export class MatchmakingService implements OnDestroy {
    * game session can take over the connection when a match starts.
    */
   stop(): void {
+    this.activeSubject.next(false);
+    this.clearSubscriptions();
+    this.onlineCountSubject.next(undefined);
+  }
+
+  private clearSubscriptions(): void {
     this.subscriptions?.unsubscribe();
     this.subscriptions = undefined;
-    this.onlineCountSubject.next(undefined);
   }
 
   /**

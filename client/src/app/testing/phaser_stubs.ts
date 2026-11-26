@@ -165,22 +165,6 @@ export function makeTimeStub(): TimeStub {
   };
 }
 
-/** Stub of the scene's fixed UI elements (`scene.obj`). */
-export interface ObjStub {
-  exitButton: { show: jasmine.Spy; hide: jasmine.Spy; update: jasmine.Spy };
-}
-
-/** Creates a stub of the fixed UI elements with a spied exit button. */
-export function makeObjStub(): ObjStub {
-  return {
-    exitButton: {
-      show: jasmine.createSpy('exitButton.show'),
-      hide: jasmine.createSpy('exitButton.hide'),
-      update: jasmine.createSpy('exitButton.update')
-    }
-  };
-}
-
 /** Stub of the `SocketService` used by scene stubs and service-backed component specs. */
 export interface SocketStub {
   state$: Subject<ClientState>;
@@ -224,18 +208,6 @@ export function makeInputStub(): InputStub {
   return { keyboard: undefined };
 }
 
-/** Stub of the `scene.load` loader. */
-export interface LoadStub {
-  on: jasmine.Spy;
-}
-
-/** Creates a stub of the `scene.load` loader whose `on` spy returns the stub itself. */
-export function makeLoadStub(): LoadStub {
-  const stub: LoadStub = { on: jasmine.createSpy('load.on') };
-  stub.on.and.returnValue(stub);
-  return stub;
-}
-
 /** Typed stub of the game scene the client components render on. */
 export interface SceneStub {
   add: AddStub;
@@ -249,8 +221,6 @@ export interface SceneStub {
   state?: ClientState;
   time: TimeStub;
   tweens: TweensStub;
-  /** Fixed UI elements; defaults to a fresh `makeObjStub()`. */
-  obj?: ObjStub;
   /** Game parameters; only set on a game scene, so their absence mimics a matchmaking scene. */
   gameParams?: ClientGameParams;
   /** The `SocketService` stub backing `session` and `interaction`. */
@@ -261,8 +231,6 @@ export interface SceneStub {
   interaction: GameInteractionService;
   /** The input plugin; defaults to a stub without keyboard bindings. */
   input: InputStub;
-  /** The resource loader; defaults to a fresh `makeLoadStub()`. */
-  load: LoadStub;
 }
 
 /**
@@ -310,12 +278,10 @@ export function makeSceneStub(overrides: Partial<SceneStub> = {}): SceneStub {
     getPlayerUI: jasmine.createSpy('getPlayerUI'),
     time,
     tweens: makeTweensStub(),
-    obj: makeObjStub(),
     socket,
     session,
     interaction,
-    input: makeInputStub(),
-    load: makeLoadStub()
+    input: makeInputStub()
   };
 
   const restOverrides = { ...overrides };

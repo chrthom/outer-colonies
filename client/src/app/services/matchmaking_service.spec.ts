@@ -122,6 +122,19 @@ describe('MatchmakingService', () => {
       sub.unsubscribe();
     });
 
+    it('tracks active$ state across start(), stop(), and cancel()', () => {
+      const states: boolean[] = [];
+      const sub = service.active$.subscribe(active => states.push(active));
+
+      service.start('?token=tok-1');
+      service.stop();
+      service.start('?token=tok-2');
+      service.cancel();
+
+      expect(states).toEqual([false, true, false, true, false]);
+      sub.unsubscribe();
+    });
+
     it('unsubscribes from socket streams on stop() without disconnecting the socket', () => {
       const received: ClientGameParams[] = [];
       const sub = service.matchStart$.subscribe(params => received.push(params));

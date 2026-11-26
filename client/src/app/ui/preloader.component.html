@@ -1,0 +1,16 @@
+@if (vm$ | async; as vm) {
+  @if (vm.visible) {
+    <div class="preloader" role="status" aria-live="polite">
+      <p class="status-text">{{ vm.statusText }}</p>
+      <div
+        class="progress-track"
+        role="progressbar"
+        [attr.aria-valuenow]="vm.progressPercent"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div class="progress-fill" [style.width.%]="vm.progressPercent"></div>
+      </div>
+    </div>
+  }
+}

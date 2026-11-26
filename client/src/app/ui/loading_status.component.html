@@ -1,0 +1,8 @@
+<div class="loading-status" role="status" aria-live="polite">
+  <p class="status-text">{{ statusText$ | async }}</p>
+  <div class="spinner" aria-hidden="true">
+    @for (index of bars; track index) {
+      <span class="bar" [style.--bar-index]="index"></span>
+    }
+  </div>
+</div>

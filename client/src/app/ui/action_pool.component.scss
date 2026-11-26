@@ -1,0 +1,36 @@
+.action-pool {
+  position: absolute;
+  right: 1.25%;
+  display: flex;
+  align-items: center;
+  gap: 0.45cqh;
+  pointer-events: none;
+
+  &.player {
+    bottom: calc(22.96% - clamp(10px, 0.9cqw, 22px));
+    flex-direction: column-reverse;
+  }
+
+  &.opponent {
+    top: calc(17.41% - clamp(10px, 0.9cqw, 22px));
+    flex-direction: column;
+  }
+}
+
+.action-icon {
+  width: clamp(20px, 1.8cqw, 44px);
+  height: clamp(20px, 1.8cqw, 44px);
+  opacity: var(--oc-alpha-normal);
+  mask-image: var(--oc-icon-url);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.player .action-icon {
+  background-color: var(--oc-color-player);
+}
+
+.opponent .action-icon {
+  background-color: var(--oc-color-opponent);
+}

@@ -1,0 +1,26 @@
+@if (vm$ | async; as vm) {
+  @if (vm.visible) {
+    <div class="battle-action-buttons">
+      <button
+        type="button"
+        class="oc-unstyled-btn battle-button mission"
+        [class.active]="vm.plannedType === BattleType.Mission"
+        [attr.aria-pressed]="vm.plannedType === BattleType.Mission"
+        (click)="toggle(BattleType.Mission)"
+      >
+        <span class="label">Mission</span>
+        <span class="icon" [style.--oc-icon-url]="'url(' + missionIconUrl + ')'" aria-hidden="true"></span>
+      </button>
+      <button
+        type="button"
+        class="oc-unstyled-btn battle-button raid"
+        [class.active]="vm.plannedType === BattleType.Raid"
+        [attr.aria-pressed]="vm.plannedType === BattleType.Raid"
+        (click)="toggle(BattleType.Raid)"
+      >
+        <span class="label">Überfall</span>
+        <span class="icon" [style.--oc-icon-url]="'url(' + raidIconUrl + ')'" aria-hidden="true"></span>
+      </button>
+    </div>
+  }
+}

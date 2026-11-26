@@ -1,0 +1,38 @@
+.continue-button {
+  position: absolute;
+  right: 1.25%;
+  top: 44.44%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: auto;
+  z-index: 30;
+  color: var(--oc-color-neutral);
+  font-family: var(--oc-font-caption);
+  font-size: var(--oc-font-size-large);
+
+  img {
+    display: block;
+    width: clamp(220px, 22cqw, 528px);
+    height: auto;
+  }
+
+  .label {
+    position: absolute;
+    right: 26%;
+    text-align: right;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: color 120ms ease;
+  }
+
+  &:not(.disabled):hover .label,
+  &:not(.disabled):focus-visible .label {
+    color: var(--oc-color-hover);
+  }
+
+  &.disabled {
+    cursor: default;
+  }
+}

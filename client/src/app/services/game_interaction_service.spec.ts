@@ -667,5 +667,72 @@ describe('GameInteractionService', () => {
       expect(service.continueAction()).toBe('matchmaking');
       expect(service.getExitButtonState()).toEqual({ label: 'Spiel beenden', canSurrender: false });
     });
+
+    it('emits returnToMatchmaking$ when continueAction() is called after game over', () => {
+      let emitted = 0;
+      const sub = service.returnToMatchmaking$.subscribe(() => emitted++);
+      session.applyState(makeState({ gameResult: { won: false, type: GameResultType.Surrender, sol: 0 } }));
+
+      expect(service.continueAction()).toBe('matchmaking');
+      expect(emitted).toBe(1);
+      sub.unsubscribe();
+    });
+
+    it('manages zoom card preview state and clears it on state updates', () => {
+      let current: unknown;
+      const sub = service.zoomCard$.subscribe(z => (current = z));
+
+      service.toggleZoomCard(42, 30, 40);
+      expect(current).toEqual({ cardId: 42, xPercent: 30, yPercent: 40 });
+
+      service.updateZoomCardPosition(35, 45);
+      expect(current).toEqual({ cardId: 42, xPercent: 35, yPercent: 45 });
+
+      service.toggleZoomCard(42, 35, 45);
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(99, 60, 70);
+      session.applyState(makeState());
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(55, 20, 30);
+      service.clickHandCard('missing-hand');
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(56, 20, 30);
+      service.clickCardStack('missing-stack');
+      expect(current).toBeUndefined();
+
+      service.toggleZoomCard(57, 20, 30);
+      service.openOptionPicker('h1', 't1', [101], 1);
+      expect(current).toBeUndefined();
+      sub.unsubscribe();
+    });
+
+    it('manages prompt visibility with auto-hide and continue button hover while staying hidden on game over', () => {
+      let visible = false;
+      const sub = service.promptVisible$.subscribe(v => (visible = v));
+
+      session.applyState(makeState({ playerPendingAction: false }));
+      scheduler.fireNext(); // board step
+      scheduler.fireNext(); // hand + view step -> prompt auto-shows
+      expect(visible).toBeTrue();
+      expect(scheduler.activeDelays()).toContain(animationConfig.duration.promptShow);
+
+      scheduler.fireAll();
+      expect(visible).toBeFalse();
+
+      service.setContinueHover(true);
+      expect(visible).toBeTrue();
+      service.setContinueHover(false);
+      expect(visible).toBeFalse();
+
+      session.applyState(makeState({ gameResult: { won: true, type: GameResultType.Domination, sol: 10 } }));
+      scheduler.fireAll();
+      expect(visible).toBeFalse();
+      service.setContinueHover(true);
+      expect(visible).toBeFalse();
+      sub.unsubscribe();
+    });
   });
 });
